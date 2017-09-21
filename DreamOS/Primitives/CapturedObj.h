@@ -17,7 +17,7 @@ public:
 	plane GetPlaneContext();
 	point GetOffset();
 	point GetOrigin();
-	vector GetSurface();
+	vector GetRelativeSurfaceNormal();
 
 private:
 	VirtualObj *m_pObj;
@@ -25,7 +25,7 @@ private:
 	plane m_planeContext;
 	point m_ptOffset;
 	point m_ptOrigin;
-	vector m_vSurface;
+	vector m_vRelativeSurfaceNormal;
 };
 	
 

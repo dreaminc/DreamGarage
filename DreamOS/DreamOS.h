@@ -176,13 +176,6 @@ public:
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold);
-	RESULT ResetObjects(VirtualObj *pInteractionObject);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
-	bool HasCapturedObjects(VirtualObj *pInteractionObject);
-	bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj);
-	std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject);
-
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 

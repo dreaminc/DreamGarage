@@ -124,11 +124,12 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	DreamOS *pDreamOS = GetDOS();
-	pDreamOS->ResetObjects(pSelected->GetInteractionObject());
-	pDreamOS->ReleaseObjects(pSelected->GetInteractionObject());
+	//DreamOS *pDreamOS = GetDOS();
+	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
+	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
+	pInteractionProxy->ReleaseObjects(pSelected->GetInteractionObject());
 
-	pDreamOS->CaptureObject(
+	pInteractionProxy->CaptureObject(
 		pSelected,
 		pSelected->GetInteractionObject(), 
 		pSelected->GetContactPoint(), 
@@ -222,8 +223,8 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 
-	GetDOS()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");

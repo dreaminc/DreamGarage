@@ -335,10 +335,25 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 		point(pInteractionObject->GetPosition(true) - pObject->GetPosition(true)),
 		pObject->GetPosition(), 
 		vSurface);
+	CN(cObj);
 
 	m_capturedObjects[pInteractionObject].emplace_back(cObj);
 
-//Error:
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::ResetObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) {
+	RESULT r = R_PASS;
+
+	CBR(HasCapturedObjects(pInteractionObject), R_OBJECT_NOT_FOUND);
+	for (auto& cObj : m_capturedObjects[pInteractionObject]) {
+		if (cObj->GetObject() == pCapturedObj) {
+			cObj->GetObject()->SetPosition(cObj->GetOrigin());
+		}
+	}
+
+Error:
 	return r;
 }
 
@@ -348,6 +363,22 @@ RESULT InteractionEngine::ResetObjects(VirtualObj *pInteractionObject) {
 	CBR(HasCapturedObjects(pInteractionObject), R_OBJECT_NOT_FOUND);
 	for (auto& cObj : m_capturedObjects[pInteractionObject]) {
 		cObj->GetObject()->SetPosition(cObj->GetOrigin());
+	}
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) {
+	RESULT r = R_PASS;
+
+	CBR(HasCapturedObjects(pInteractionObject), R_OBJECT_NOT_FOUND);
+	for (auto& cObj : m_capturedObjects[pInteractionObject]) {
+		if (cObj->GetObject() == pCapturedObj) {
+			std::swap(cObj, m_capturedObjects[pInteractionObject].back());
+			m_capturedObjects[pInteractionObject].pop_back();
+			break;
+		}
 	}
 
 Error:
@@ -661,7 +692,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 					}
 					else {
 						// move captured object along the local surface vector
-						vector vProj = pCaptureObj->GetSurface() * (vDot);
+						vector vProj = pCaptureObj->GetRelativeSurfaceNormal() * (vDot);
 						//vector vProj = vDirection * (vDot);
 
 						pCaptureObj->GetObject()->SetPosition(pCaptureObj->GetObject()->GetPosition() + vProj);
@@ -671,7 +702,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 						if (vDistance.magnitude() > (pCaptureObj->GetThreshold())) {
 							// clamp to maximum position
-							pCaptureObj->GetObject()->SetPosition(pCaptureObj->GetOrigin() + (pCaptureObj->GetSurface() * pCaptureObj->GetThreshold()));
+							pCaptureObj->GetObject()->SetPosition(pCaptureObj->GetOrigin() + (pCaptureObj->GetRelativeSurfaceNormal() * pCaptureObj->GetThreshold()));
 
 							InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->GetObject(), pInteractionObject);
 							CR(NotifySubscribers(pCaptureObj->GetObject(), ELEMENT_COLLIDE_TRIGGER, &interactionEvent));

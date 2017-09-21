@@ -7,7 +7,7 @@ CapturedObj::CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, 
 	m_planeContext(planeContext),
 	m_ptOffset(ptOffset),
 	m_ptOrigin(ptOrigin),
-	m_vSurface(vSurface) {
+	m_vRelativeSurfaceNormal(vSurface) {
 
 }
 
@@ -36,6 +36,6 @@ point CapturedObj::GetOrigin() {
 	return m_ptOrigin;
 }
 
-vector CapturedObj::GetSurface() {
-	return m_vSurface;
+vector CapturedObj::GetRelativeSurfaceNormal() {
+	return m_vRelativeSurfaceNormal;
 }

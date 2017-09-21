@@ -91,6 +91,14 @@ public:
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
+	virtual RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) = 0;
+	virtual RESULT ResetObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual RESULT ResetObjects(VirtualObj *pInteractionObject) = 0;
+	virtual RESULT ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual RESULT ReleaseObjects(VirtualObj *pInteractionObject) = 0;
+	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) = 0;
+	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) = 0;
 	//virtual point GetInteractionRayOrigin() = 0;
 };
 
@@ -134,12 +142,14 @@ public:
 	RESULT UpdateInteractionRay();
 	*/
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold);
-	RESULT ResetObjects(VirtualObj *pInteractionObject);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
-	bool HasCapturedObjects(VirtualObj *pInteractionObject);
-	bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj);
-	std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject);
+	virtual RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) override;
+	virtual RESULT ResetObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual RESULT ResetObjects(VirtualObj *pInteractionObject) override;
+	virtual RESULT ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual RESULT ReleaseObjects(VirtualObj *pInteractionObject) override;
+	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) override;
+	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) override;
 
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
 	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);

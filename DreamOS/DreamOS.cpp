@@ -528,30 +528,6 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
-RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) {
-	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, vSurface, threshold);
-}
-
-RESULT DreamOS::ResetObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->ResetObjects(pInteractionObject);
-}
-
-RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->ReleaseObjects(pInteractionObject);
-}
-
-bool DreamOS::HasCapturedObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->HasCapturedObjects(pInteractionObject);
-}
-
-bool DreamOS::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObject) {
-	return m_pSandbox->IsObjectCaptured(pInteractionObject, pCapturedObject);
-}
-
-std::vector<CapturedObj*> DreamOS::GetCapturedObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->GetCapturedObjects(pInteractionObject);
-}
-
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);

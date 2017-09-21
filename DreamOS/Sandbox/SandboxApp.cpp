@@ -823,45 +823,6 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, vSurface, threshold));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::ResetObjects(VirtualObj *pInteractionObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->ResetObjects(pInteractionObject));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::ReleaseObjects(VirtualObj *pInteractionObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->ReleaseObjects(pInteractionObject));
-
-Error:
-	return r;
-}
-
-bool SandboxApp::HasCapturedObjects(VirtualObj *pInteractionObject) {
-	return m_pInteractionEngine->HasCapturedObjects(pInteractionObject);
-}
-
-bool SandboxApp::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) {
-	return m_pInteractionEngine->IsObjectCaptured(pInteractionObject, pCapturedObj);
-}
-
-std::vector<CapturedObj*> SandboxApp::GetCapturedObjects(VirtualObj *pInteractionObject) {
-	return m_pInteractionEngine->GetCapturedObjects(pInteractionObject);
-}
-
 RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
