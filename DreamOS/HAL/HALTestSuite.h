@@ -36,6 +36,7 @@ public:
 	RESULT AddTestText();
 	RESULT AddTestModel();
 	RESULT AddTestQuadObject();
+	RESULT AddTestUIShaderStage();
 
 	RESULT TestNestedOBB();
 

@@ -173,10 +173,9 @@ public:
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
@@ -198,6 +197,7 @@ public:
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
+	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
 	template<typename objType, typename... Targs>
 	objType *TAddObject(Targs... Fargs) {
@@ -356,6 +356,7 @@ public:
 	CameraNode* GetCameraNode() { return m_pCamera; }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
+	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
 
 	hand *GetHand(hand::HAND_TYPE handType);
 
@@ -381,6 +382,7 @@ protected:
 	//ObjectStore *m_pSceneGraph;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
+	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;

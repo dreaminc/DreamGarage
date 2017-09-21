@@ -35,6 +35,9 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
+//	m_pDreamOS->AddObjectToUIGraph(this);
+//	m_pDreamOS->AddObjectToUIClippingGraph(this);
+
 	m_pTitleView = AddUIView();
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
 
@@ -46,6 +49,8 @@ RESULT UIScrollView::Initialize() {
 	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
+	m_pTitleQuad->SetVisible(false);
+
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	pFont->SetLineHeight(0.055f);
 	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
@@ -57,16 +62,19 @@ RESULT UIScrollView::Initialize() {
 
 	m_pTitleText->RotateXByDeg(90.0f);
 	m_pTitleText->SetPosition(point(0.6f, m_titleHeight - 0.005f, 0.0f));
+	m_pTitleText->SetVisible(false);
 
 	m_pTitleView->AddObject(m_pTitleText);
+	m_pDreamOS->AddObjectToUIGraph(m_pTitleView.get());
 
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
+	m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
 	//m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, 0.3f);
 
 	m_pLeftScrollButton = AddUIButton();
+	m_pDreamOS->AddObjectToUIGraph(m_pLeftScrollButton.get());
 	m_pLeftScrollButton->SetVisible(false);
-
 	//TODO: may be worth adding a constructor that exposes surface width / height
 	//point ptRightScrollButtonOffset = point(0.0f, -0.05f * cos(m_itemAngleX), 0.05f * sin(m_itemAngleX));
 	point ptScrollButtonOffset = point(0.0f, 0.0f, 0.05f * sin(m_itemAngleX));
@@ -76,6 +84,7 @@ RESULT UIScrollView::Initialize() {
 	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition() + ptScrollButtonOffset);
 
 	m_pRightScrollButton = AddUIButton();
+	m_pDreamOS->AddObjectToUIGraph(m_pRightScrollButton.get());
 	m_pRightScrollButton->SetVisible(false);
 	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
 	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
@@ -120,7 +129,10 @@ RESULT UIScrollView::Update() {
 	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
-		m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)) , maxRotation));
+		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
+			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)) , maxRotation));
+			m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
+		}
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pLeftScrollButton.get())) {
 			color leftColor = m_pLeftScrollButton->GetMaterial()->GetDiffuseColor();
@@ -149,12 +161,15 @@ RESULT UIScrollView::Update() {
 			}
 		}
 
-		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 		//m_pMenuButtonsContainer->SetPosition(point(0.0f, 0.0f, 0.3f));
 
 		//TODO: approach will need a less naive implementation if animations are used
-		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
-		int lowIndex = std::ceil(m_yRotation / yRotationPerElement);
+/*
+		bool inc = m_velocity != 0.0f || !m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get());
+		int hack = inc ? 1 : 0;
+
+		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements + hack;
+		int lowIndex = std::ceil(m_yRotation / yRotationPerElement) - hack;
 
 		for (int i = 0; i < pChildren.size(); i++) {
 			auto pButton = dynamic_cast<UIButton*>(pChildren[i].get());
@@ -162,9 +177,10 @@ RESULT UIScrollView::Update() {
 				pButton->SetVisible(true);
 			}
 			else {
-				pButton->SetVisible(false);
+				//pButton->SetVisible(false);
 			}
 		}
+		//*/
 	}
 	m_frameMs = msNow;
 
@@ -229,9 +245,9 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
 
-		if (i > m_maxElements-1) {
-			pButton->SetVisible(false);
-		}
+		//if (i > m_maxElements-1) {
+		//	pButton->SetVisible(false);
+		//}
 
 		i++;
 	}
@@ -271,6 +287,76 @@ RESULT UIScrollView::ShowTitle() {
 	m_pTitleQuad->SetMaterialColors(m_visibleColor, true);
 	m_pTitleText->SetVisible(true);
 	m_pTitleText->SetMaterialColors(m_visibleColor, true);
+
+	return r;
+}
+
+RESULT UIScrollView::Snap() {
+	RESULT r = R_PASS;
+	
+	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
+	float rawIndex = m_yRotation / yRotationPerElement;
+	float endYRotation = (float)(std::round(rawIndex)) * yRotationPerElement;
+	float distance = std::abs(std::round(rawIndex) - rawIndex);
+	//m_yRotation = endYRotation;
+	
+	auto fnStartCallback = [&](void *pContext) {
+	//	m_pMenuButtonsContainer->SetVisible(true, true);
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
+		int startIndex = std::round(m_yRotation / yRotationPerElement);
+		float endYRotation = (float)(startIndex) * yRotationPerElement;
+		m_yRotation = endYRotation;
+	
+		int index = 0;
+		for (auto& pChild : m_pMenuButtonsContainer->GetChildren()) {
+			if (index < startIndex || index >= startIndex + m_maxElements) {
+				auto pButton = dynamic_cast<UIButton*>(pChild.get());
+				pButton->SetVisible(false);
+			}
+			index++;
+		}
+		
+		return R_PASS;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pMenuButtonsContainer.get(),
+		m_pMenuButtonsContainer->GetPosition(),
+		quaternion::MakeQuaternionWithEuler(0.0f, endYRotation, 0.0f),
+		m_pMenuButtonsContainer->GetScale(),
+		distance * 0.25f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
+RESULT UIScrollView::Show() {
+	RESULT r = R_PASS;
+
+	m_pTitleView->SetVisible(true, false);
+	m_pMenuButtonsContainer->SetVisible(true, false);
+
+	return r;
+}
+
+//needed because these objects may be in different scene graphs
+RESULT UIScrollView::Hide() {
+	RESULT r = R_PASS;
+
+	m_pTitleView->SetVisible(false, false);
+	m_pLeftScrollButton->SetVisible(false);
+	m_pRightScrollButton->SetVisible(false);
+	m_pMenuButtonsContainer->SetVisible(false, false);
 
 	return r;
 }
@@ -377,12 +463,33 @@ std::shared_ptr<UIView> UIScrollView::GetMenuItemsView() {
 }
 
 RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
+	RESULT r = R_PASS;
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 		m_velocity = pEvent->state.ptTouchpad.x() * PAD_MOVE_CONSTANT;
-		OVERLAY_DEBUG_SET("velocity", m_velocity);
+
+		float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
+		if (m_velocity == 0.0f &&
+			!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
+
+			float endYRotation = (float)(std::round(m_yRotation / yRotationPerElement)) * yRotationPerElement;
+			if (m_yRotation != endYRotation)
+				CR(Snap());
+		}
+		else if (m_velocity != 0.0f &&
+			m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get()))
+		{
+			CR(m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pMenuButtonsContainer.get()));
+		}
+		if (m_velocity != 0.0f) {
+			float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
+			if (m_yRotation > 0.0f && m_yRotation < maxRotation)
+				m_pMenuButtonsContainer->SetVisible(true, true);
+		}
 	} break;
 
 	}
-	return R_PASS;
+
+Error:
+	return r;
 }

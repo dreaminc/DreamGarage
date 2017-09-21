@@ -176,10 +176,8 @@ public:
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
-
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
@@ -191,6 +189,7 @@ public:
 	RESULT RenderToTexture(FlatContext* pContext);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
 	template<typename objType, typename... Targs>
 	objType *Add(Targs... Fargs) {
@@ -267,6 +266,7 @@ public:
 	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pSandbox->GetUISceneGraphNode(); }
+	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(hand::HAND_TYPE handType);

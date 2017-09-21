@@ -1,16 +1,18 @@
-#include "OGLProgramMinimalTexture.h"
+#include "OGLProgramUIStage.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramMinimalTexture::OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglminimaltexture")
+#include "Primitives/matrix/ProjectionMatrix.h"
+
+OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "ogluistage")
 {
 	// empty
 }
 
-RESULT OGLProgramMinimalTexture::OGLInitialize() {
+RESULT OGLProgramUIStage::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -24,14 +26,19 @@ RESULT OGLProgramMinimalTexture::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
+	// Textures
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 
+	// Clipping
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingProjection), std::string("u_mat4ClippingProjection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
+
+	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
-
-	///*
+	/*
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -55,24 +62,28 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetupConnections() {
+RESULT OGLProgramUIStage::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("clippingscenegraph", &m_pClippingSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+
+	//TODO: MatrixNode(?)
+	//CR(MakeInput<ViewMatrix>("clipping_matrix", &m_clippingView, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
+RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -81,13 +92,14 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+
 
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		m_pOGLFramebuffer->Bind();
-	//	BindToFramebuffer(m_pOGLFramebuffer);
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();	
 	}
 
 	glEnable(GL_BLEND);
@@ -95,9 +107,17 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+//*
+//	m_clippingView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
+//*/
+	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
 
-	// 3D Object / skybox
+
+	m_pUniformClippingEnabled->SetUniform(false);
 	RenderObjectStore(m_pSceneGraph);
+
+	m_pUniformClippingEnabled->SetUniform(true);
+	RenderObjectStore(m_pClippingSceneGraph);
 
 	UnbindFramebuffer();
 
@@ -105,18 +125,16 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
-		//pTexture->OGLActivateTexture(0);
-		//m_pUniformTextureColor->SetUniform(pTexture);
-
+	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
+
 		m_pUniformHasTextureColor->SetUniform(true);
 	}
 	else {
@@ -127,14 +145,33 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
+	m_clippingView = matView;
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
+	m_clippingProjection = ProjectionMatrix(left, right, top, bottom, nearPlane, farPlane);
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) {
+	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 10.0f);
+	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 5.0f, 15.0f);
+	//m_clippingProjection = ProjectionMatrix(0.09f, 0.25f, 0.0f, 5.0f, 120.0f);
+	//m_clippingProjection = ProjectionMatrix(1.2f, 0.25f, 0.0f, 5.0f, 15.0f);
+	m_clippingProjection = ProjectionMatrix(width, height, nearPlane, farPlane, angle);
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramMinimalTexture::SetMaterial(material *pMaterial) {
+RESULT OGLProgramUIStage::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -146,14 +183,14 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramUIStage::SetCameraUniforms(camera *pCamera) {
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramMinimalTexture::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramUIStage::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 

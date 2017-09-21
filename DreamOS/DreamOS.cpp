@@ -528,14 +528,6 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
-RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
-	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold);
-}
-
-RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->ReleaseObjects(pInteractionObject);
-}
-
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);
@@ -608,6 +600,10 @@ volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
 
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
 RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
@@ -817,6 +813,10 @@ Error:
 
 RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIGraph(pObject);
+}
+
+RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
 }
 
 // Cloud Controller

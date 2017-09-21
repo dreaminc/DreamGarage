@@ -23,6 +23,7 @@ SandboxApp::SandboxApp() :
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
 	m_pUISceneGraph(nullptr),
+	m_pUIClippingSceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -528,9 +529,14 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
 	
+	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
+
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());
+	CB(m_pUISceneGraph->incRefCount());
+	CB(m_pUIClippingSceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -818,28 +824,19 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::ReleaseObjects(VirtualObj *pInteractionObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->ReleaseObjects(pInteractionObject));
-
-Error:
-	return r;
-}
-
 RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pUISceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pUIClippingSceneGraph->PushObject(pObject));
 
 Error:
 	return r;
@@ -957,7 +954,11 @@ Error:
 	}
 	return nullptr;
 }
-	
+
+quad* SandboxApp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	return m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
 quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) {
 	RESULT r = R_PASS;
 

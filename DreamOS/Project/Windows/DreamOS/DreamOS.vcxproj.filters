@@ -842,6 +842,12 @@
     <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp">
       <Filter>Primitives\image</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1886,6 +1892,15 @@
     <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h">
       <Filter>Primitives\image</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\UIStageProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2062,6 +2077,12 @@
     </None>
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl">
       <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
