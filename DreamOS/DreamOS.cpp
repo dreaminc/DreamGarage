@@ -649,7 +649,7 @@ std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDis
 			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 
-			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR))));
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE))));
 		}
 
 		// Push font into store
@@ -722,6 +722,7 @@ skybox *DreamOS::MakeSkybox() {
 	return m_pSandbox->MakeSkybox();
 }
 
+/*
 model *DreamOS::AddModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
@@ -729,9 +730,14 @@ model *DreamOS::AddModel(wchar_t *pszModelName) {
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
-	
-composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
+*/
+
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->MakeModel(wstrModelFilename, pTexture);
+}
+
+model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->AddModel(wstrModelFilename, pTexture);
 }
 
 composite *DreamOS::AddComposite() {

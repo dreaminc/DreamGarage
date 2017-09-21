@@ -53,10 +53,10 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
-	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
@@ -165,7 +165,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
 		m_pUIStageProgram->SetClippingFrustrum(
@@ -193,7 +193,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			if (pNode->GetTitle() == "Share") {
-				m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 			}
 			else {
 				auto strURI = pNode->GetThumbnailURL();
@@ -384,18 +384,18 @@ RESULT DreamUIBar::Update(void *pContext) {
 		uint8_t* pBuffer = &(pBufferVector->operator[](0));
 		size_t pBuffer_n = pBufferVector->size();
 
-		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pTexture);
 
 		for (auto& pChild : pChildren) {
 			auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
 			if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
-				pObj->GetSurface()->UpdateColorTexture(pTexture);
+				pObj->GetSurface()->SetDiffuseTexture(pTexture);
 			}
 		}
 
 		if (pMenuNodeTitle == "root_menu_title") {
-			m_pScrollView->GetTitleQuad()->UpdateColorTexture(pTexture);
+			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 			//TODO: temporary, should be revisited during menu cleanup
 			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
 		}

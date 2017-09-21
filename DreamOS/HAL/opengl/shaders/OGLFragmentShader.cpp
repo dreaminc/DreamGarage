@@ -84,7 +84,7 @@ RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 	RESULT r = R_PASS;
 
 	switch (pTexture->GetTextureType()) {
-		case texture::TEXTURE_TYPE::TEXTURE_COLOR: {
+		case texture::TEXTURE_TYPE::TEXTURE_DIFFUSE: {
 			//CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
 			CR(SetColorTextureUniform(pTexture->GetOGLTextureIndex()));
 		} break;
@@ -121,11 +121,11 @@ RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {
 
 	texture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
 		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
 	}
 
-	if ((pTexture = pOGLObj->GetBumpTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureBump()) != nullptr) {
 		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
 	}
 

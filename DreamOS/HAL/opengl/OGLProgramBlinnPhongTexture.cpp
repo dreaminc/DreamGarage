@@ -59,7 +59,7 @@ RESULT OGLProgramBlinnPhongTexture::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 	*/
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	///*
@@ -122,7 +122,8 @@ RESULT OGLProgramBlinnPhongTexture::SetObjectTextures(OGLObj *pOGLObj) {
 
 	OGLTexture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
+	//if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
 		//pTexture->OGLActivateTexture(0);
 		//m_pUniformTextureColor->SetUniform(pTexture);
 		//m_pUniformUseColorTexture->SetUniform(true);

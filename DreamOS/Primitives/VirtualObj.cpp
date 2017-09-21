@@ -380,12 +380,49 @@ VirtualObj* VirtualObj::SetRotateZDeg(quaternion_precision deg) {
 }
 //*/
 
+VirtualObj* VirtualObj::ResetOrientationOffset() {
+	m_objectState.m_qOrientationOffset = quaternion();
+	OnManipulation();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetOrientationOffset(quaternion q) {
+	m_objectState.m_qOrientationOffset = q;
+	OnManipulation();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetOrientationOffset(vector vEulerRotationVector) {
+	m_objectState.m_qOrientationOffset = quaternion::MakeQuaternionWithEuler(vEulerRotationVector);
+	OnManipulation();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetOrientationOffset(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ) {
+	m_objectState.m_qOrientationOffset = quaternion::MakeQuaternionWithEuler(thetaX, thetaY, thetaZ);
+	OnManipulation();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetOrientationOffsetDeg(quaternion_precision thetaXdeg, quaternion_precision thetaYdeg, quaternion_precision thetaZdeg) {
+	quaternion_precision thetaX = thetaXdeg * ( M_PI / 180.0f);
+	quaternion_precision thetaY = thetaYdeg * ( M_PI / 180.0f);
+	quaternion_precision thetaZ = thetaZdeg * ( M_PI / 180.0f);
+
+	m_objectState.m_qOrientationOffset = quaternion::MakeQuaternionWithEuler(thetaX, thetaY, thetaZ);
+	OnManipulation();
+	return this;
+}
+
 quaternion VirtualObj::GetOrientation(bool fAbsolute) {
-	return m_objectState.m_qRotation;
+	//return m_objectState.m_qRotation;
+	//return m_objectState.m_qOrientationOffset * m_objectState.m_qRotation;
+	return m_objectState.m_qRotation * m_objectState.m_qOrientationOffset;
 }
 
 matrix<virtual_precision, 4, 4> VirtualObj::GetOrientationMatrix() {
-	matrix<virtual_precision, 4, 4> retMatrix = RotationMatrix(m_objectState.m_qRotation);
+	//matrix<virtual_precision, 4, 4> retMatrix = RotationMatrix(m_objectState.m_qRotation);
+	matrix<virtual_precision, 4, 4> retMatrix = RotationMatrix(GetOrientation());
 	return retMatrix;
 }
 
@@ -494,15 +531,18 @@ RESULT VirtualObj::OnManipulation() {
 // Matrix Functions
 matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
 	if (m_ptPivot.IsZero()) {
-		return (TranslationMatrix(m_objectState.m_ptOrigin) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
+		//return (TranslationMatrix(m_objectState.m_ptOrigin) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
+		return (TranslationMatrix(m_objectState.m_ptOrigin) * RotationMatrix(GetOrientation()) * ScalingMatrix(m_vScale) * childMat);
 	}
 	else {
-		return (TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
+		//return (TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
+		return (TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot) * RotationMatrix(GetOrientation()) * ScalingMatrix(m_vScale) * childMat);
 	}
 }
 
 matrix<virtual_precision, 4, 4> VirtualObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
-	return RotationMatrix(m_objectState.m_qRotation);
+	//return RotationMatrix(m_objectState.m_qRotation);
+	return RotationMatrix(GetOrientation());
 }
 
 matrix<virtual_precision, 4, 4> VirtualObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {

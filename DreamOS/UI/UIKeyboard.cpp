@@ -53,17 +53,17 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pFont->SetLineHeight(m_lineHeight);
 
 	// textures for keycaps and objects
-	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pNumbersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-123-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pReturnTexture = GetComposite()->MakeTexture(L"Keycaps\\key-return-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pShiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-shift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pNumbersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-123-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pReturnTexture = GetComposite()->MakeTexture(L"Keycaps\\key-return-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pShiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-shift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	{
 		//Setup textbox
@@ -73,7 +73,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
-		m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 
 		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
@@ -201,7 +201,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
 
-			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
+			pQuad->SetDiffuseTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
 			// Set up key quad positioning
 			pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
@@ -548,7 +548,7 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 
 	for (auto layoutRow : m_pLayout->GetKeys()) {
 		for (auto& pKey : layoutRow) {
-			CR(pKey->m_pQuad->UpdateColorTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
+			CR(pKey->m_pQuad->SetDiffuseTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
 		}
 	}
 
@@ -626,7 +626,7 @@ RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	if (pIconTexture != nullptr) {
-		CR(m_pTitleIcon->UpdateColorTexture(pIconTexture));
+		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}
 	m_pTitleText->SetText(strTitle);
 

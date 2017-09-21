@@ -62,10 +62,10 @@ RESULT DreamGarage::ConfigureSandbox() {
 	SandboxApp::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fMouseLook = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fMouseLook = true;
 #endif
 
@@ -213,9 +213,9 @@ RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
-	point sceneOffset = point(90, -5, -25);
+	point ptSceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
@@ -228,9 +228,6 @@ RESULT DreamGarage::LoadScene() {
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
 	//*/
-
-	// Console
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
 	CR(SetupUserModelPool());
 	
@@ -247,21 +244,23 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 #ifndef _DEBUG
-	AddModel(L"\\Models\\FloatingIsland\\env.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-	composite* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-	composite* pClouds = AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
+	model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
+	pModel->SetPosition(ptSceneOffset);
+	pModel->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
+	//pModel->SetVisible(false);
+		
+	model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
+	pRiver->SetPosition(ptSceneOffset);
+	pRiver->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
+	//pRiver->SetVisible(false);
+
+	model* pClouds = AddModel(L"\\FloatingIsland\\clouds.obj");
+	pClouds->SetPosition(ptSceneOffset);
+	pClouds->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
+	//pClouds->SetVisible(false);
 
 	pClouds->SetMaterialAmbient(0.8f);
 
@@ -490,11 +489,16 @@ RESULT DreamGarage::Update(void) {
 	/*
 	// For testing
 	if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - g_lastDebugUpdate).count() > 10) {
-		static int index = 0;
-		//SetRoundtablePosition(index++);
-		
-		auto pSphere = AddSphere(0.25f, 10, 10);
-		pSphere->SetPosition(GetRoundtablePosition(index++));
+		static int index = 1;
+
+		point ptSeatPosition;
+		float angleRotation;
+
+		GetRoundtablePosition(index++, ptSeatPosition, angleRotation);
+
+		m_usersModelPool[index].second->GetHead()->RotateYByDeg(angleRotation);
+		m_usersModelPool[index].second->SetPosition(ptSeatPosition);
+		m_usersModelPool[index].second->SetVisible(true);
 
 		g_lastDebugUpdate = timeNow;
 	}
@@ -524,6 +528,9 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 	float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
 
 	ptPosition = point(ptX, 0.0f, ptZ) + ptSeatingCenter;
+
+	// TODO: Remove this (this is a double reverse)
+	//rotationAngle *= -1.0f;
 
 Error:
 	return r;
@@ -845,55 +852,6 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	CR(r);
 
 Error:
-	return r;
-}
-
-RESULT DreamGarage::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("<blank>");
-	}
-
-	/*
-	if (event->GetArg(1).compare("cef") == 0) {
-		if (event->GetArg(2).compare("new") == 0) {
-			// defaults
-			std::string url{ "www.dreamos.com" };
-			unsigned int width = 800;
-			unsigned int height = 600;
-
-			if (event->GetArg(3) != "")
-				url = event->GetArg(3);
-			if (event->GetArg(4) != "")
-				width = std::stoi(event->GetArg(4));
-			if (event->GetArg(5) != "")
-				height = std::stoi(event->GetArg(5));
-
-			m_browsers.CreateNewBrowser(width, height, url);
-		}
-		else {
-			auto browser = m_browsers.GetBrowser(event->GetArg(2));
-
-			if (!browser) {
-				HUD_OUT("browser id does not exist");
-			}
-			else {
-				if (event->GetArg(3).compare("type") == 0) {
-					browser->SendKeySequence(event->GetArg(4));
-				}
-				else if (event->GetArg(3).compare("control") == 0) {
-					m_browsers.SetKeyFocus(event->GetArg(2));
-					HUD_OUT(("controlling browser " + event->GetArg(2) + " (hit 'esc' to release control)").c_str());
-				}
-				else {
-					browser->LoadURL(event->GetArg(3));
-				}
-			}
-		}
-	}
-	//*/
-
 	return r;
 }
 

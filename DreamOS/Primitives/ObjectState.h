@@ -134,6 +134,7 @@ protected:
 	quaternion m_qSpin;										// Spin Quantity
 
 	quaternion m_qRotation;									// Rotation
+	quaternion m_qOrientationOffset;						// A base rotation applied as an offset
 
 private:
 	VirtualObj *m_pParentObj = nullptr;						// This as a reference to parent

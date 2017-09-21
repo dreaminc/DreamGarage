@@ -191,7 +191,8 @@ public:
 	cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
-	model *MakeModel(wchar_t *pszModelName);
+
+	
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
@@ -309,11 +310,16 @@ public:
 	texture* MakeTexture(const texture &srcTexture);
 
 	skybox *AddSkybox();
-	model *AddModel(wchar_t *pszModelName);
-	model *AddModel(const std::vector<vertex>& vertices);
-	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
-	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	//model *AddModel(wchar_t *pszModelName);
+	//model *MakeModel(wchar_t *pszModelName);
+
+	mesh *AddMesh(const std::vector<vertex>& vertices);
+	mesh *AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+
+	//composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	model* MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	model* AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 
 	composite* AddComposite();
 	composite* MakeComposite();

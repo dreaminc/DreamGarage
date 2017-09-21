@@ -13,6 +13,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 #include <HMD/HMDFactory.h>
 
 SandboxApp::SandboxApp() :
@@ -456,13 +458,12 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 		//m_pOpenGLImp->Render(m_pSceneGraph);
-
 		m_pHALImp->Render();
 
 		// Swap buffers
 		SwapDisplayBuffers();
 
-		DreamConsole::GetConsole()->OnFrameRendered();
+		//DreamConsole::GetConsole()->OnFrameRendered();
 
 		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
 			Shutdown();
@@ -1307,7 +1308,7 @@ texture* SandboxApp::MakeTexture(const texture &srcTexture) {
 }
 
 texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, format, channels, pBuffer, pBuffer_n);
+	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, format, channels, pBuffer, pBuffer_n);
 }
 
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -1341,6 +1342,7 @@ Error:
 	return nullptr;
 }
 
+/*
 model* SandboxApp::MakeModel(wchar_t *pszModelName) {
 	return m_pHALImp->MakeModel(pszModelName);
 }
@@ -1363,41 +1365,42 @@ Error:
 	}
 	return nullptr;
 }
+*/
 
-model *SandboxApp::AddModel(const std::vector<vertex>& vertices) {
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(vertices);
-	CN(pModel);
+	mesh* pMesh = m_pHALImp->MakeMesh(vertices);
+	CN(pMesh);
 
-	CR(AddObject(pModel));
+	CR(AddObject(pMesh));
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
 
-model *SandboxApp::AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(vertices, indices);
-	CN(pModel);
+	mesh* pMesh = m_pHALImp->MakeMesh(vertices, indices);
+	CN(pMesh);
 
-	CR(AddObject(pModel));
+	CR(AddObject(pMesh));
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -1421,8 +1424,44 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
+model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename);
+	CN(pModel);
+
+// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	model *pModel = MakeModel(wstrModelFilename, pTexture);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
 }
 
 composite* SandboxApp::MakeComposite() {
@@ -1431,6 +1470,7 @@ composite* SandboxApp::MakeComposite() {
 
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
+
 	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));

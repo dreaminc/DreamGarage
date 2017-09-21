@@ -35,7 +35,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pF
 	// TODO: Implement valid and CV EHM
 	RESULT r = OGLInitialize();
 
-	SetColorTexture(pFontTexture);
+	SetDiffuseTexture(pFontTexture);
 }
 
 OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) :

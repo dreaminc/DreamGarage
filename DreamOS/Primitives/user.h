@@ -37,7 +37,7 @@ public:
 private:
 	// Storage of models and textures for head
 	std::vector<std::shared_ptr<composite>> m_pHeads;
-	std::shared_ptr<composite> m_pHead;
+	std::shared_ptr<model> m_pHead;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
 
 	std::shared_ptr<hand> m_pLeapLeftHand;

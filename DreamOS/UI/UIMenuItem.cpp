@@ -74,7 +74,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	pBgQuad->RotateXByDeg(90.0f);
 
 	if (labelFormat.pBgTexture != nullptr) {
-		pBgQuad->UpdateColorTexture(labelFormat.pBgTexture);
+		pBgQuad->SetDiffuseTexture(labelFormat.pBgTexture);
 	}
 	else {
 		pBgQuad->SetColor(labelFormat.bgColor);
@@ -85,7 +85,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	m_strName = labelFormat.strLabel;
 
 	if (iconFormat.pTexture != nullptr)
-		m_pSurface->SetColorTexture(iconFormat.pTexture);
+		m_pSurface->SetDiffuseTexture(iconFormat.pTexture);
 	else
 		m_pSurface->SetVisible(false);
 

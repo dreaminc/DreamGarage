@@ -15,7 +15,7 @@
 
 #include "OGLVolume.h"
 
-#include "OGLModel.h"
+#include "OGLMesh.h"
 #include "OGLText.h"
 #include "Primitives/font.h"
 #include "OGLTriangle.h"
@@ -24,6 +24,7 @@
 #include "OGLSphere.h"
 #include "OGLCylinder.h"
 #include "OGLComposite.h"
+#include "OGLModel.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
@@ -298,143 +299,46 @@ Error:
 }
 */
 
-//composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 
-// TODO: Fix this
-composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	RESULT r = R_PASS;
-	
-	LOG(INFO) << "Loading model " << wstrOBJFilename << " pos:" << LOG_xyz(ptPosition) << " scale:" << scale << " rotation:" << LOG_xyz(vEulerRotation) << " ...";
-
-	composite* pComposite = new composite(this);
-
-	// Texture caching
-	std::map<std::wstring, texture*> textureMap;
-
-	// Root folder
-	PathManager* pPathManager = PathManager::instance();
-	wchar_t* pszPath;
-	pPathManager->GetCurrentPath((wchar_t*&)pszPath);
-	std::wstring strRootFolder(pszPath);
-
-	FileLoaderHelper::multi_mesh_indices_t v;
-	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
-
-	DEBUG_LINEOUT("Loading %S verts and indices", wstrOBJFilename.c_str());
-
-	for (auto& m : v) {
-		if (m.second.indices.size() == 0) {
-			continue;
-		}
-
-		// Rotating here is a bit faster (vs below and update the buffer)
-		RotationMatrix rotMat(vEulerRotation);
-		for (auto &vert: m.second.vertices) {
-			vert.m_point = rotMat * vert.m_point;
-			vert.m_normal = rotMat * vert.m_normal;
-		}
-
-		std::shared_ptr<model> pModel(MakeModel(std::move(m.second.vertices), std::move(m.second.indices)));
-		OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pModel.get());
-		CN(pModel);
-		CN(pOGLObj);
-
-		pComposite->AddChild(pModel);
-
-		// TODO: WTF IS THIS LAMBDA FOR!!!!!
-		auto GetTexture = [&](const std::string& file) -> texture* {
-			std::wstring wstrFilename(file.begin(), file.end());
-			wstrFilename = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstrFilename;
-
-			if (textureMap.find(wstrFilename) == textureMap.end()) {
-				//texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
-				texture *pTempTexture = OGLTexture::MakeTextureFromPath(this, texture::TEXTURE_TYPE::TEXTURE_COLOR, wstrFilename);
-
-				if (!pTempTexture) {
-					LOG(ERROR) << "Failed to load model texture : " << wstrFilename;
-					return nullptr;
-				}
-
-				textureMap[wstrFilename] = pTempTexture;
-
-				if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
-					return pTempTexture;
-				}
-			}
-			else {
-				return textureMap[wstrFilename];
-			}
-
-			return nullptr;
-		};
-
-		if (m.first.map_Ka.compare("") != 0)
-			pModel->SetMaterialTexture(DimObj::MaterialTexture::Ambient, GetTexture(m.first.map_Ka));
-
-		if (m.first.map_Kd.compare("") != 0)
-			pModel->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, GetTexture(m.first.map_Kd));
-
-		if (m.first.map_Ks.compare("") != 0)
-			pModel->SetMaterialTexture(DimObj::MaterialTexture::Specular, GetTexture(m.first.map_Ks));
-
-		pModel->GetMaterial()->SetColors(m.first.Ka, m.first.Kd, m.first.Ks);
-
-		pModel->Scale(scale);
-		pModel->MoveTo(ptPosition);
-
-		LOG(INFO) << "Loaded sub-model:" << m.first.name << " vertices:" << pModel->VertexDataSize() << " indices:" << pModel->IndexDataSize();
-
-		if (pSceneGraph != nullptr) {
-			pSceneGraph->PushObject(pModel.get());
-		}
-	}
-
-	LOG(INFO) << "Loading model " << wstrOBJFilename << " - OK";
-
-Error:
-	return pComposite;
-}
-
-model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
+mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	model *pModel = new OGLModel(this, pszModelName);
-	CN(pModel);
-
-//Success:
-	return pModel;
-
-Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
-	}
-	return nullptr;
-}
-
-
-model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices) {
-	RESULT r = R_PASS;
-
-	model *pModel = new OGLModel(this, vertices);
-	CN(pModel);
+	mesh *pMesh = new OGLMesh(this, vertices);
+	CN(pMesh);
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
 
-model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
-	model *pModel = new OGLModel(this, vertices, indices);
+	mesh *pMesh = new OGLMesh(this, vertices, indices);
+	CN(pMesh);
+
+	//Success:
+	return pMesh;
+
+Error:
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+model* OpenGLImp::MakeModel() {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this);
 	CN(pModel);
 
 	//Success:
@@ -477,7 +381,7 @@ FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbCha
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
@@ -659,6 +563,7 @@ Error:
 	return nullptr;
 }
 
+/*
 composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
@@ -675,6 +580,7 @@ Error:
 	}
 	return nullptr;
 }
+*/
 
 hand* OpenGLImp::MakeHand() {
 	RESULT r = R_PASS;
@@ -743,12 +649,12 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -788,12 +694,12 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -833,7 +739,7 @@ text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -878,12 +784,12 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
@@ -924,12 +830,12 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
@@ -970,12 +876,12 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 	
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;

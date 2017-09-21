@@ -47,7 +47,7 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	// Color attachment
 	CR(m_pOGLFramebufferOutputA->MakeColorAttachment());
-	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
@@ -67,7 +67,7 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	// Color attachment
 	CR(m_pOGLFramebufferOutputB->MakeColorAttachment());
-	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 

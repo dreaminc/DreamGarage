@@ -11,8 +11,6 @@ DimObj::DimObj() :
 	m_pVertices(nullptr),
 	m_pIndices(nullptr),
 	m_material(),
-	m_pColorTexture(nullptr),
-	m_pBumpTexture(nullptr),
 	m_pObjects(nullptr),
 	m_pParent(nullptr),
 	m_fVisible(true),
@@ -180,6 +178,91 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialDiffuseColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetDiffuseColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialDiffuseColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialSpecularColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetSpecularColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialSpecularColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialAmbientColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetAmbientColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialAmbientColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialShininess(float shine, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetShininess(shine);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialShininess(shine, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialBumpiness(float bumpiness, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetBumpiness(bumpiness);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialBumpiness(bumpiness, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
 	RESULT r = R_PASS;
 
@@ -216,7 +299,7 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 
 	}
 
-	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 //Error:
 	return r;
@@ -227,60 +310,49 @@ RESULT DimObj::SetMaterialAmbient(float ambient) {
 	return R_PASS;
 }
 
-RESULT DimObj::SetColorTexture(texture *pTexture) {
+RESULT DimObj::SetDiffuseTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
-	// TODO: Currently, this will destroy the texture that is currently used
-	// A different path will be needed to re-use textures
-	CR(ClearColorTexture());
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	CN(pTexture);
+
+	m_pTextureDiffuse = pTexture;
+	m_pTextureDiffuse->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 Error:
-	return r;
+	return R_PASS;
 }
 
-RESULT DimObj::UpdateColorTexture(texture *pTexture) {
-
-	RESULT r = R_PASS;
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-//Error:
-	return r;
-}
-
-RESULT DimObj::ClearColorTexture() {
+RESULT DimObj::SetSpecularTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
-	if (m_pColorTexture != nullptr) {
-		delete m_pColorTexture;
-		m_pColorTexture = nullptr;
-	}
-//Error:
-	return r;
+	CN(pTexture);
+
+	m_pTextureSpecular = pTexture;
+	m_pTextureSpecular->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_SPECULAR);
+
+Error:
+	return R_PASS;
 }
 
-texture* DimObj::GetColorTexture() {
-	return m_pColorTexture;
-}
-
-RESULT DimObj::SetBumpTexture(texture *pBumpTexture) {
+RESULT DimObj::SetAmbientTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
-	CBM((m_pBumpTexture == nullptr), "Cannot overwrite bump texture");
-	m_pBumpTexture = pBumpTexture;
+	CN(pTexture);
+
+	m_pTextureAmbient = pTexture;
+	m_pTextureAmbient->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_AMBIENT);
+
+Error:
+	return R_PASS;
+}
+
+RESULT DimObj::SetBumpTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CN(pTexture);
+
+	m_pBumpTexture = pTexture;
 	m_pBumpTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_BUMP);
-
-Error:
-	return r;
-}
-
-RESULT DimObj::ClearBumpTexture() {
-	RESULT r = R_PASS;
-
-	CB((m_pBumpTexture != nullptr));
-	m_pBumpTexture = nullptr;
 
 Error:
 	return r;
@@ -541,7 +613,9 @@ point DimObj::GetPosition(bool fAbsolute) {
 }
 
 quaternion DimObj::GetOrientation(bool fAbsolute) {
-	quaternion qOrientation = m_objectState.m_qRotation;
+	//quaternion qOrientation = m_objectState.m_qRotation;
+	//quaternion qOrientation = m_objectState.m_qOrientationOffset * m_objectState.m_qRotation;
+	quaternion qOrientation = VirtualObj::GetOrientation(fAbsolute);
 
 	if (fAbsolute && m_pParent != nullptr) {
 		//qOrientation *= m_pParent->GetOrientation(fAbsolute);

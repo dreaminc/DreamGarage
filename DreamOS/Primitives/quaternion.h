@@ -82,6 +82,7 @@ public:
 	RESULT GetEulerAnglesDeg(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
 
 	static quaternion MakeQuaternionWithEuler(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+	static quaternion MakeQuaternionWithEuler(vector vEuler);
 
 	RESULT Reverse();
 	quaternion GetReverse();

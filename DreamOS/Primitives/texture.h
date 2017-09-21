@@ -13,6 +13,8 @@
 
 #define NUM_CUBE_MAP_TEXTURES 6
 
+class image;
+
 class texture : public valid {
 public:
 	enum class flags : uint16_t {
@@ -23,12 +25,14 @@ public:
 
 	// The texture type and channel
 	enum class TEXTURE_TYPE {
-		TEXTURE_COLOR = 0,
-		TEXTURE_BUMP = 1,
-		TEXTURE_CUBE = 2,
-		TEXTURE_HEIGHT = 3,
-		TEXTURE_DEPTH = 4,
-		TEXTURE_RECTANGLE = 5,
+		TEXTURE_DIFFUSE,
+		TEXTURE_BUMP,
+		TEXTURE_SPECULAR,
+		TEXTURE_AMBIENT,
+		TEXTURE_CUBE,
+		TEXTURE_HEIGHT,
+		TEXTURE_DEPTH,
+		TEXTURE_RECTANGLE,
 		TEXTURE_INVALID = 32
 	};
 
@@ -79,7 +83,6 @@ public:
 	//RESULT GetCubeMapFilePath(const wchar_t *pszName, wchar_t * &n_pszFilePath);
 	RESULT GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring> &vstrFiles);
 
-	RESULT FlipTextureVertical();
 	RESULT ReleaseTextureData();
 
 	RESULT LoadTextureFromPath(const wchar_t *pszFilepath);
@@ -88,13 +91,13 @@ public:
 	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
 	RESULT LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
 	RESULT LoadCubeMapByName(const wchar_t * pszName);
-	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
+	RESULT CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 
-	double GetValueAtUV(double uValue, double vValue);
+	double GetAverageValueAtUV(double uValue, double vValue);
 
 	int GetWidth() { return m_width; }
 	int GetHeight() { return m_height; }
@@ -178,7 +181,8 @@ protected:
 
 	flags m_flags = texture::flags::NONE;
 
-	unsigned char *m_pImageBuffer = nullptr;
+	//unsigned char *m_pImageBuffer = nullptr;
+	image *m_pImage = nullptr;
 
 private:
 	UID m_uid;

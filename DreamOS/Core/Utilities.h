@@ -16,8 +16,12 @@
 namespace util {
 	std::vector<std::string> TokenizeString(std::string str, char cDelim);
 	void tolowerstring(std::string& str);
+
 	std::string WideStringToString(const std::wstring& wstrStr);
 	std::wstring StringToWideString(const std::string& strStr);
+
+	char* WideCStringToCString(const wchar_t *pwszStr);
+	wchar_t* CStringToWideCString(const char *pszStr);
 
 	template <class T>
 	RESULT Clamp(T &val, const T& low, const T& high) {

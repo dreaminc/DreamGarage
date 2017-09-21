@@ -139,10 +139,12 @@ RESULT DreamControlView::SetSharedViewContext(std::shared_ptr<DreamBrowser> pCon
 
 	m_pSharedViewContext = pContext;
 	CNR(pContext, R_OBJECT_NOT_FOUND);
-	CR(m_pViewQuad->UpdateColorTexture(m_pSharedViewContext->GetScreenTexture().get()));
+	CR(m_pViewQuad->SetDiffuseTexture(m_pSharedViewContext->GetScreenTexture().get()));
+
 	float width = m_pSharedViewContext->GetWidth();
 	float height = m_pSharedViewContext->GetHeight();
 	float scale = 1.0f / 6.0f;
+
 	CR(m_pViewQuad->UpdateParams(width * scale, height * scale, m_vNormal));
 	
 	m_pViewQuad->FlipUVVertical();

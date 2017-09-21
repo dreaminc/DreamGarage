@@ -38,6 +38,8 @@ public:
 	RESULT AddTestQuadObject();
 	RESULT AddTestUIShaderStage();
 
+	RESULT TestNestedOBB();
+
 	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShader();

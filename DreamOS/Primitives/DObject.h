@@ -11,7 +11,7 @@
 #include "Primitives/valid.h"
 #include "Primitives/Types/UID.h"
 
-class DObject : valid {
+class DObject : public valid {
 public:
 	DObject() {
 		// empty

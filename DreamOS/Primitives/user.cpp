@@ -1,5 +1,6 @@
 #include "user.h"
 #include "Primitives/quad.h"
+#include "Primitives/model/model.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
@@ -14,14 +15,19 @@ RESULT user::Initialize() {
 	RESULT r = R_PASS;
 
 #ifndef _DEBUG
-	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj",
-					   nullptr,
-					   point(0.0f, 0.0f - 0.35f, HEAD_POS),
-					   0.018f,
-					   vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead = AddModel(L"\\face4\\untitled.obj");
+	m_pHead->SetPosition(point(0.0f, 0.0f - 0.35f, HEAD_POS));
+	m_pHead->SetScale(0.018f);
+	m_pHead->SetOrientationOffset(0.0f, (float)M_PI, 0.0f);
+
 #else
-	m_pHead = AddComposite();
-	m_pHead->AddVolume(0.2f);
+	//m_pHead = AddComposite();
+	//m_pHead->AddVolume(0.2f);
+
+	m_pHead = AddModel(L"\\face4\\untitled.obj");
+	m_pHead->SetPosition(point(0.0f, 0.0f - 0.35f, HEAD_POS));
+	m_pHead->SetScale(0.018f);
+	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
 #endif
 
 	m_pHeads.push_back(m_pHead);
@@ -47,7 +53,7 @@ RESULT user::Initialize() {
 	m_pMouth->RotateXByDeg(270);
 	m_pMouth->RotateZByDeg(90);
 
-	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	
 	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
@@ -58,7 +64,7 @@ RESULT user::Initialize() {
 	// Hands
 	m_pLeapLeftHand = AddHand();
 	m_pLeapLeftHand->OnLostTrack();
-
+	
 	m_pLeapRightHand = AddHand();
 	m_pLeapRightHand->OnLostTrack();
 

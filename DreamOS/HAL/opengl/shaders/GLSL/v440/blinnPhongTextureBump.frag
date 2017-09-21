@@ -117,7 +117,9 @@ void main(void) {
 	
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord);
 	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
-	//textureColor = vec4(1.0f);
+
+	// DEBUG:
+	//textureColor = vec4(1.0f) + textureColor * 0.001f;
 
 	if(u_fUseColorTexture == true) {
 		vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
@@ -130,12 +132,14 @@ void main(void) {
 
 	// Fakes blending by moving clear fragments behind the skybox
 	// Remove once blending is fully supported
+	/*
 	if (out_vec4Color.a == 0.0f) {
 		gl_FragDepth = 1.0f;
 	} 
 	else {
 		gl_FragDepth = gl_FragCoord.z;
 	}
+	*/
 	
 	/*
 	vec3 directionEye = DataIn.TangentBitangentNormalMatrix * (-normalize(DataIn.vertViewSpace.xyz));

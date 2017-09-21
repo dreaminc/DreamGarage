@@ -55,7 +55,7 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 
 		//OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, m_channels);
 		OGLTexture *pOGLTexture = OGLTexture::MakeTextureFromAllocatedTexture(m_pParentImp, 
-																			  texture::TEXTURE_TYPE::TEXTURE_COLOR, 
+																			  texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
 																			  GL_TEXTURE_2D, 
 																			  chainTextureIndex, 
 																			  m_width, 

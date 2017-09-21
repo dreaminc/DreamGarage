@@ -54,8 +54,8 @@ protected:
 	
 	// TODO: textures need to go into material once we figure out how we put a sampler2D into a uniform block
 	// TODO: Multiple textures (one for now)
-	texture *m_pColorTexture;
-	texture *m_pBumpTexture;
+	// TODO: This should go into material 
+	texture *m_pBumpTexture = nullptr;
 	texture *m_pTextureAmbient = nullptr;
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
@@ -107,23 +107,30 @@ public:
 	RESULT SetColor(color c);
 	RESULT SetAlpha(color_precision a);
 
-	RESULT SetColorTexture(texture *pTexture);
-	RESULT UpdateColorTexture(texture *pTexture);
-	RESULT ClearColorTexture();
-	texture *GetColorTexture();
+	// TODO: Move this into material 
+	RESULT SetDiffuseTexture(texture *pTexture);
+	texture* GetTextureDiffuse();
+
+	RESULT SetSpecularTexture(texture *pTexture);
+	texture* GetTextureSpecular();
+
+	RESULT SetAmbientTexture(texture *pTexture);
+	texture* GetTextureAmbient();
 
 	RESULT SetBumpTexture(texture *pBumpTexture);
-	RESULT ClearBumpTexture();
 	texture *GetBumpTexture();
 	
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialColors(color c, bool fSetChildren = false);
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
 	RESULT SetMaterialAmbient(float ambient);
+
+	RESULT SetMaterialDiffuseColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialSpecularColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
+	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
 	
-	texture* GetTextureAmbient();
-	texture* GetTextureDiffuse();
-	texture* GetTextureSpecular();
 
 	RESULT SetRandomColor();
 	

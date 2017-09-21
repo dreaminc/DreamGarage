@@ -57,7 +57,7 @@ RESULT DreamContentView::Update(void *pContext) {
 		uint8_t* pBuffer = &(m_pPendingBufferVector->operator[](0));
 		size_t pBuffer_n = m_pPendingBufferVector->size();
 
-		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pTexture);
 		CV(pTexture);
 
@@ -98,7 +98,7 @@ RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 		SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
 	}
 
-	return m_pScreenQuad->SetColorTexture(pTexture);
+	return m_pScreenQuad->SetDiffuseTexture(pTexture);
 }
 
 RESULT DreamContentView::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector) {
@@ -143,17 +143,17 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
 	CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
-	UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	CNM(pUserControllerProxy, "Failed to get user controller proxy");
+	//UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	//CNM(pUserControllerProxy, "Failed to get user controller proxy");
 
 	// Set up file request
 	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
 	{
-		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
 		//auto strHeaders = HTTPController::ContentAcceptJson();
-
 		auto strHeaders = HTTPController::ContentHttp();
-		strHeaders.push_back(strAuthorizationToken);
+		
+		//std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+		//strHeaders.push_back(strAuthorizationToken);
 
 		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
 	}
@@ -165,7 +165,7 @@ Error:
 RESULT DreamContentView::SetScreenTexture(const std::wstring &wstrTextureFilename) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = GetDOS()->MakeTexture(const_cast<wchar_t*>(wstrTextureFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pTexture = GetDOS()->MakeTexture(const_cast<wchar_t*>(wstrTextureFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(pTexture);
 
 	CR(SetScreenTexture(pTexture));

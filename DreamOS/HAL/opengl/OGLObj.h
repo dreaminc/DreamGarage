@@ -41,8 +41,7 @@ public:
 	virtual RESULT RenderBoundingVolume();
 	virtual RESULT UpdateBoundingVolume();
 
-	OGLTexture *GetColorTexture();
-	OGLTexture *GetBumpTexture();
+	OGLTexture *GetTextureBump();
 	OGLTexture *GetTextureAmbient();
 	OGLTexture *GetTextureDiffuse();
 	OGLTexture *GetTextureSpecular();
