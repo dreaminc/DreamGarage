@@ -93,8 +93,6 @@ public:
 	RESULT SetHeight(float height);
 	float GetAngle();
 	RESULT SetAngle(float angle);
-	quaternion GetOrientation();
-	RESULT SetOrientation(quaternion qOrientation);
 	UIMallet* GetRightMallet();
 	UIMallet* GetLeftMallet();
 
