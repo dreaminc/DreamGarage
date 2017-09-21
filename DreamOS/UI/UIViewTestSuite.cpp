@@ -727,7 +727,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		UIMallet *pKLeftMallet = nullptr;
 		UIMallet *pKRightMallet = nullptr;
 	};
-	TestContext *pTestContext = new TestContext();
+	TestContext *pTestContext = new TestContext;
 
 	double sTestTime = 10000.0;
 	float lineHeight = TEXTBOX_LINE_HEIGHT;
@@ -756,6 +756,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+		TestContext *pTestContext = static_cast<TestContext*>(pContext);
 		auto& pChildComposite = pTestContext->pChildComposite;
 		auto& pFont = pTestContext->pFont;
 		auto& pTextBoxText = pTestContext->pTextBoxText;
@@ -860,7 +861,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	};
 
 	auto fnUpdate = [&](void *pContext) {
-		
+		TestContext *pTestContext = static_cast<TestContext*>(pContext);
 		if (m_pDreamOS->GetKeyboard()->GetLeftMallet()->CheckAndCleanDirty()) {
 			pTestContext->malletAngle--;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
@@ -886,7 +887,18 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		return r;
 	};
 
-//Error:
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, m_pDreamOS);
+	CN(pUIViewTest);
+
+	pUIViewTest->SetTestName("Local UIView Test");
+	pUIViewTest->SetTestDescription("Basic test of UIView working locally");
+	pUIViewTest->SetTestDuration(sTestTime);
+	pUIViewTest->SetTestRepeats(1);
+Error:
 	return r;
 }
 
