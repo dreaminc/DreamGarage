@@ -173,8 +173,6 @@ public:
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);

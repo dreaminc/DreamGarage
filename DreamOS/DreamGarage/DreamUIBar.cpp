@@ -111,18 +111,29 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 	auto pSurface = pSelected->GetSurface();
+
+	//vector for captured object movement
 	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
+	//vector for captured object collisions
+	quaternion qRotation = pSurface->GetOrientation(true);
+	qRotation.Reverse();
+	vector vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
+	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	GetDOS()->CaptureObject(
-	//	pSelected->GetSurface().get(), 
+	//DreamOS *pDreamOS = GetDOS();
+	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
+	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
+	pInteractionProxy->ReleaseObjects(pSelected->GetInteractionObject());
+
+	pInteractionProxy->CaptureObject(
 		pSelected,
 		pSelected->GetInteractionObject(), 
 		pSelected->GetContactPoint(), 
-		//vector(0.0f, 0.0f, -1.0f), 
+		vRotation,
 		vSurface,
 		m_actuationDepth);
 
@@ -212,8 +223,8 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 
-	GetDOS()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");

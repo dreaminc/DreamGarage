@@ -750,6 +750,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
     <ClCompile Include="..\..\..\Primitives\camera.cpp" />
+    <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
     <ClCompile Include="..\..\..\Primitives\cylinder.cpp" />
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
@@ -1025,6 +1026,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Logger\Logger.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
+    <ClInclude Include="..\..\..\Primitives\CapturedObj.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
     <ClInclude Include="..\..\..\Primitives\cylinder.h" />

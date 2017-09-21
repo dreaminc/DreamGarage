@@ -818,6 +818,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1729,6 +1732,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\UIStageProgram.h">
       <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -823,24 +823,6 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold));
-
-Error:
-	return r;
-}
-
-RESULT SandboxApp::ReleaseObjects(VirtualObj *pInteractionObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pInteractionEngine->ReleaseObjects(pInteractionObject));
-
-Error:
-	return r;
-}
-
 RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
