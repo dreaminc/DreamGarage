@@ -130,13 +130,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		auto pMesh = m_pLeftControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(-0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
-		m_pLeftControllerModel->AddSphere(0.01f, 10, 10)->SetPosition(point(0.0f, 0.05715f, -0.04826f) + ptTest);
 
 		m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
 		pMesh = m_pRightControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
-		m_pRightControllerModel->AddSphere(0.01f, 10, 10)->SetPosition(point(0.0f, 0.05715f, -0.04826f) + ptTest);
 	}
 
 #endif
