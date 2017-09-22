@@ -54,8 +54,10 @@ RESULT ObjectStore::PushObject(VirtualObj *pObject, bool fForce) {
 
 	// Push otherwise
 	CR(m_pSceneGraphStore->PushObject(pObject));
+	
+	CR(UpdateMinMax());
 
-	Error:
+Error:
 	return r;
 }
 
@@ -81,6 +83,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT ObjectStore::PushObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
@@ -91,6 +94,7 @@ RESULT ObjectStore::PushObject(VirtualObj *pObject) {
 Error:
 	return r;
 }
+*/
 
 RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_NOT_IMPLEMENTED;

@@ -92,6 +92,8 @@ Error:
 	return r;
 }
 
+light *g_pLightTest = nullptr;
+
 RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 	RESULT r = R_PASS;
 
@@ -106,8 +108,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 	float adjs = 1.0f;
 	float sceneScale = 0.1f / adjs;
-	point sceneOffset = point(90.0f / adjs, -5.0f / adjs, -25.0f / adjs);
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+	point ptSceneOffset = point(90.0f / adjs, -5.0f / adjs, -25.0f / adjs);
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -175,11 +176,12 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 		//*/
 
 		///*
-		m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
-			nullptr,
-			sceneOffset,
-			sceneScale,
-			sceneDirection);
+		auto pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
+		CN(pModel);
+
+		pModel->SetPosition(ptSceneOffset);
+		pModel->SetScale(sceneScale);
+
 		//*/
 
 		/*
