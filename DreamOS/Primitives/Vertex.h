@@ -42,7 +42,7 @@ public:
 public:
 	vertex() {
 		m_point.clear();
-		m_color.clear();
+		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		m_normal.clear();
 		m_uvcoord.clear();
 		m_tangent.clear();

@@ -166,32 +166,40 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		vert.SetColor(color(COLOR_WHITE));
 
 		// Point
-		point ptVert; 
-		ptVert.x() = pAIMesh->mVertices[i].x;
-		ptVert.y() = pAIMesh->mVertices[i].y;
-		ptVert.z() = pAIMesh->mVertices[i].z;
-		vert.SetPoint(ptVert);
+		if (pAIMesh->mVertices != nullptr) {
+			point ptVert;
+			ptVert.x() = pAIMesh->mVertices[i].x;
+			ptVert.y() = pAIMesh->mVertices[i].y;
+			ptVert.z() = pAIMesh->mVertices[i].z;
+			vert.SetPoint(ptVert);
+		}
 
 		// Normal
-		vector vNormal;
-		vNormal.x() = pAIMesh->mNormals[i].x;
-		vNormal.y() = pAIMesh->mNormals[i].y;
-		vNormal.z() = pAIMesh->mNormals[i].z;
-		vert.SetNormal(vNormal);
+		if (pAIMesh->mNormals != nullptr) {
+			vector vNormal;
+			vNormal.x() = pAIMesh->mNormals[i].x;
+			vNormal.y() = pAIMesh->mNormals[i].y;
+			vNormal.z() = pAIMesh->mNormals[i].z;
+			vert.SetNormal(vNormal);
+		}
 
 		// Tangents
-		//vector vTangent;
-		//vTangent.x() = pAIMesh->mTangents[i].x;
-		//vTangent.y() = pAIMesh->mTangents[i].y;
-		//vTangent.z() = pAIMesh->mTangents[i].z;
-		//vert.SetTangent(vTangent);
-		//
-		//// Bitangents
-		//vector vBitangent;
-		//vBitangent.x() = pAIMesh->mBitangents[i].x;
-		//vBitangent.y() = pAIMesh->mBitangents[i].y;
-		//vBitangent.z() = pAIMesh->mBitangents[i].z;
-		//vert.SetBitangent(vBitangent);
+		if (pAIMesh->mTangents != nullptr) {
+			vector vTangent;
+			vTangent.x() = pAIMesh->mTangents[i].x;
+			vTangent.y() = pAIMesh->mTangents[i].y;
+			vTangent.z() = pAIMesh->mTangents[i].z;
+			vert.SetTangent(vTangent);
+		}
+
+		// Bitangents
+		if (pAIMesh->mBitangents != nullptr) {
+			vector vBitangent;
+			vBitangent.x() = pAIMesh->mBitangents[i].x;
+			vBitangent.y() = pAIMesh->mBitangents[i].y;
+			vBitangent.z() = pAIMesh->mBitangents[i].z;
+			vert.SetBitangent(vBitangent);
+		}
 
 		// UV 
 		// TODO: Support multi-textures (assimp supports up to 8 textures)

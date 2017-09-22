@@ -964,6 +964,8 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1013,9 +1015,10 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 4.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
+			/*
 			pTestContext->pModelLeft = m_pDreamOS->AddModel(L"\\face4\\LeftHand.obj");
 			pTestContext->pModelLeft->SetPosition(point(0.0f, -5.0f, -8.0f));
 			pTestContext->pModelLeft->SetScale(0.25f);
@@ -1025,6 +1028,24 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 			pTestContext->pModelRight->SetPosition(point(0.0f, -5.0f, -8.0f));
 			pTestContext->pModelRight->SetScale(0.25f);
 			pTestContext->pModelRight->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+			*/
+
+			//texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+			pTestContext->pModelLeft = m_pDreamOS->AddModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
+			CN(pTestContext->pModelLeft);
+
+			pTestContext->pModelLeft->SetScale(30.0f);
+			
+			//pTestContext->pModelLeft->GetFirstChild<mesh>()->SetMaterialDiffuseColor(color(COLOR_WHITE));
+
+			/*
+			pTestContext->pModelRight = m_pDreamOS->AddModel(L"\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj");
+			CN(pTestContext->pModelRight);
+
+			//pTestContext->pModelRight->SetPosition(point(0.0f, -5.0f, -8.0f));
+			pTestContext->pModelRight->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+			*/
 		}
 
 	Error:
@@ -1045,6 +1066,9 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 
 		CN(m_pDreamOS);
 
+		pTestContext->pModelLeft->RotateYByDeg(0.035f);
+
+		/*
 		hand *pLeftHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
 		hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
 
@@ -1063,6 +1087,7 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 
 			pTestContext->pModelRight->SetOrientation(qHand);
 		}
+		*/
 
 	Error:
 		return r;

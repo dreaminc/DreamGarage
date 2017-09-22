@@ -105,7 +105,7 @@ void main(void) {
 	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
 
 	if(u_fUseColorTexture == true) {
-		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
+		out_vec4Color = max((vec4LightValue * (DataIn.color + textureColor)), ambientColor);
 	}
 	else {
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
