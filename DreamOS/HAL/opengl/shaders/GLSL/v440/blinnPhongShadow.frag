@@ -8,7 +8,7 @@
 
 #define MAX_TOTAL_LIGHTS 10
 #define SHADOW_PCF_OFFSET 10.0f
-#define _USE_PCF
+//#define _USE_PCF
 
 in vec3 inF_vec3Color;
 
