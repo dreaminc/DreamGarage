@@ -482,9 +482,11 @@ RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
 			CR(m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pMenuButtonsContainer.get()));
 		}
 		if (m_velocity != 0.0f) {
-			float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
-			if (m_yRotation > 0.0f && m_yRotation < maxRotation)
-				m_pMenuButtonsContainer->SetVisible(true, true);
+			if (m_pMenuButtonsContainer->HasChildren()) {
+				float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
+				if (m_yRotation > 0.0f && m_yRotation < maxRotation)
+					m_pMenuButtonsContainer->SetVisible(true, true);
+			}
 		}
 	} break;
 
