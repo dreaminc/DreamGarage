@@ -232,12 +232,12 @@ RESULT hand::Initialize() {
 	m_pLeftModel = AddModel(L"\\face4\\LeftHand.obj");
 	m_pLeftModel->SetPosition(ptModel);
 	m_pLeftModel->SetScale(scaleModel);
-	m_pLeftModel->SetOrientationOffset((float)(M_PI_2), (float)(-M_PI_2), 0.0f);
+	m_pLeftModel->SetOrientationOffset((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
 						
 	m_pRightModel = AddModel(L"\\face4\\RightHand.obj");
 	m_pRightModel->SetPosition(ptModel);
 	m_pRightModel->SetScale(scaleModel);
-	m_pRightModel->SetOrientationOffset((float)(M_PI_2), (float)(-M_PI_2), 0.0f);
+	m_pRightModel->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
 						
 #else
 	m_pLeftModel = AddComposite();
@@ -246,9 +246,6 @@ RESULT hand::Initialize() {
 	m_pRightModel = AddComposite();
 	m_pRightModel->AddVolume(0.02f);
 #endif
-
-	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI);
-	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI);
 	
 	m_fOriented = false;
 	m_fSkeleton = false;
@@ -382,8 +379,9 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	// update model
 	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
-	m_pLeftModel->SetOrientation(m_qRotation * m_qLeftModel);
-	m_pRightModel->SetOrientation(m_qRotation * m_qRightModel);
+
+	m_pLeftModel->SetOrientation(m_qRotation);
+	m_pRightModel->SetOrientation(m_qRotation);
 	
 //Error:
 	return r;
@@ -405,12 +403,12 @@ RESULT hand::SetHandModel(hand::HAND_TYPE type) {
 	return R_PASS;
 }
 
-RESULT hand::SetHandModelOrientation(quaternion q) {
+RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
 	if (m_handType == HAND_LEFT) {
-		m_pLeftModel->SetOrientation(q * m_qLeftModel);
+		m_pLeftModel->SetOrientation(qOrientation);
 	}
 	if (m_handType == HAND_RIGHT) {
-		m_pRightModel->SetOrientation(q * m_qRightModel);
+		m_pRightModel->SetOrientation(qOrientation);
 	}
 	return R_PASS;
 }
@@ -445,8 +443,8 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	m_pThumb->SetThumbState(pHandState.thumb);
 	
 	if (pHandState.fOriented) {
-		m_pLeftModel->SetOrientation(pHandState.qOrientation * m_qLeftModel);
-		m_pRightModel->SetOrientation(pHandState.qOrientation * m_qRightModel);
+		m_pLeftModel->SetOrientation(pHandState.qOrientation);
+		m_pRightModel->SetOrientation(pHandState.qOrientation);
 	}
 	else {
 		m_pLeftModel->SetOrientation(pHandState.qOrientation);
