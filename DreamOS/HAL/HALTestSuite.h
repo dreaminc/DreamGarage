@@ -75,8 +75,6 @@ private:
 private:
 	DreamOS *m_pDreamOS;
 	HALImp *m_pHALImp = nullptr;
-
-	composite *m_pModel = nullptr;
 };
 
 #endif // ! HAL_TEST_SUITE_H_

@@ -7,8 +7,6 @@
 #version 440 core
 
 #define MAX_TOTAL_LIGHTS 10
-#define SHADOW_PCF_OFFSET 10.0f
-//#define _USE_PCF
 
 in vec3 inF_vec3Color;
 
@@ -27,6 +25,7 @@ in Data {
 
 uniform sampler2DShadow u_textureDepth;
 //uniform sampler2D u_textureDepth;
+//uniform sampler2DRectShadow u_textureDepth;
 
 // Light Structure
 struct Light {
@@ -104,39 +103,25 @@ void main(void) {
 	float lightVisibility = 1.0f;
 	float cosTheta = dot(normal, normalize(DataIn.shadowEmitterDirection.xyz));
 	
-	float bias = 0.005f * tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
-	bias = clamp(bias, 0.0f, 0.01f);
+	float offset = 0.005f + clamp(tan(acos(cosTheta)), 0.0f, 0.01f); // cosTheta is dot( n,l ), clamped between 0 and 1
 
-	if(cosTheta > bias) {
-	#ifdef 	_USE_PCF
-		float shadowAccumulator = 0.0f;
+	//float shadowVal = textureProj(u_textureDepth, vec4(DataIn.vertShadowCoordinate.xy, DataIn.vertShadowCoordinate.w, 1.0f), 0.0);
+	//float shadowVal = textureProj(u_textureDepth, DataIn.vertShadowCoordinate);
+	//float shadowVal = textureProj(u_textureDepth, vec4(DataIn.vertShadowCoordinate.xy,DataIn.vertShadowCoordinate.z, DataIn.vertShadowCoordinate.w + 0.005f));
 
-		// weight center more
-		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, 0));
+	vec3 ProjCoords = DataIn.vertShadowCoordinate.xyz / DataIn.vertShadowCoordinate.w;
+	float depth = texture(u_textureDepth, vec3(ProjCoords.xy, 0.0f));
 
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, 0));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
-
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, SHADOW_PCF_OFFSET));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, -SHADOW_PCF_OFFSET));
-
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, 0));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
-
-		
-	
-		lightVisibility *= (shadowAccumulator * (1.0f/10.0f));
-		lightVisibility = clamp(lightVisibility, 0.25f, 1.0f);
-	#else
-		float shadowVal = textureProj(u_textureDepth, DataIn.vertShadowCoordinate);
-		lightVisibility *= shadowVal;
-	#endif
+	if (depth < (DataIn.vertShadowCoordinate.z + 0.005)) {
+		lightVisibility = 0.25;
 	}
-	else {
-		lightVisibility = 0.0f;
+
+	/*
+	//if(shadowVal == 0.0f || (cosTheta < 0.0)) {
+	if(cosTheta < 0.005 || shadowVal < 1.0f) {
+		lightVisibility = 0.25;
 	}
+	*/
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
@@ -153,4 +138,5 @@ void main(void) {
 	vec4 ambientColor = g_vec4AmbientLightLevel;
 	// TODO: This is only good for one light
 	out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
+	out_vec4Color = out_vec4Color * 0.000001 + vec4(vec3(lightVisibility), 1.0f);
 }

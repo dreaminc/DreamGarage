@@ -215,15 +215,19 @@ RESULT OGLProgramBlinnPhongShadow::SetCameraUniforms(stereocamera* pStereoCamera
 		DNode *pProgramNode = pInputDConnection->GetParentNode();
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(pProgramNode);
 		if (pOGLProgramShadowDepth != nullptr) {
-			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
-			m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
+			if(m_pUniformDepthViewProjectionMatrix != nullptr)
+				m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+			
+			if(m_pUniformShadowEmitterDirection != nullptr)
+				m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
 		}
 
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureTarget(),
 			m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureIndex());
 
-		m_pUniformTextureDepth->SetUniform(0);
+		if(m_pUniformTextureDepth != nullptr)
+			m_pUniformTextureDepth->SetUniform(0);
 	}
 
 	point origin = pStereoCamera->GetOrigin();

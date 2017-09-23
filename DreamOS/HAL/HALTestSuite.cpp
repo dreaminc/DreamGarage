@@ -97,6 +97,11 @@ light *g_pLightTest = nullptr;
 RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 	RESULT r = R_PASS;
 
+	struct TestContext {
+		model *pModelClouds = nullptr;
+		model *pModelEnvironment = nullptr;
+	} *pTestContext = new TestContext();
+
 	double sTestTime = 180.0f;
 	int nRepeats = 1;
 
@@ -136,9 +141,26 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 		CR(pRenderProgramNode->ConnectToInput("input_shadowdepth_framebuffer", pShadowDepthProgramNode->Output("output_framebuffer")));
 
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -153,7 +175,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 		g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f).Normal());
 		g_pLightTest->EnableShadows();
 
-		///*
+		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		//pVolume->SetPosition(point(-width, -height/2.0f - 0.1f, (length + padding) * 0.0f));
@@ -168,28 +190,33 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 		pSphere->SetPosition(point(1.0f, 1.0f, 0.0f));
 		//*/
 
-		/*
+		///*
 		auto pQuad = m_pDreamOS->AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
 		CN(pQuad)
-		pQuad->SetPosition(point(0.0f, -1.5f, 0.0f));
+		pQuad->SetPosition(point(0.0f, -2.5f, 0.0f));
 		m_pDreamOS->GetSceneGraphNode()->UpdateMinMax();
 		//*/
 
+		/*
+		model* pSceneModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
+		CN(pSceneModel);
+		pSceneModel->SetPosition(ptSceneOffset);
+		pSceneModel->SetScale(sceneScale);
+		//*/
+
 		///*
-		auto pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
+		model* pCloudsModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
+		CN(pCloudsModel);
+		pCloudsModel->SetPosition(ptSceneOffset + point(0.0f, -17.0f, 1.0f));
+		pCloudsModel->SetScale(sceneScale);
+		//*/
+
+		/*
+		auto pModel = m_pDreamOS->AddModel(L"\\ForestIsland\\ForestIsland.obj");
 		CN(pModel);
 
 		pModel->SetPosition(ptSceneOffset);
 		pModel->SetScale(sceneScale);
-
-		//*/
-
-		/*
-		m_pDreamOS->AddModel(L"\\Models\\ForestIsland\\ForestIsland.obj",
-			nullptr,
-			sceneOffset,
-			sceneScale,
-			sceneDirection);
 		//*/
 
 		/*
@@ -201,12 +228,11 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 		//*/
 
 		/*
-		m_pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds_1.obj",
-			nullptr,
-			point(0.0f, 0.0f, 0.0f),
-			0.2f,
-			vector(0.0f, 0.0f, 0.0f));
-		m_pModel->SetPosition(point(0.0f, 0.0f, -5.0f));
+		auto pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds_1.obj");
+		CN(pModel);
+
+		pModel->SetPosition(point(0.0f, 0.0f, -50.0f));
+		pModel->SetScale(0.5f);
 		//*/
 
 		/*
@@ -232,10 +258,6 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 		if(g_pLightTest != nullptr) {
 			//g_pLightTest->RotateLightDirection(0.001f, 0.0f, 0.0f);
-		}
-		
-		if (m_pModel != nullptr) {
-			m_pModel->RotateYByDeg(0.1f);
 		}
 
 		return R_PASS;

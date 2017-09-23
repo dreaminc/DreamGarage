@@ -11,8 +11,8 @@
 #include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/matrix/ViewMatrix.h"
 
-#define SHADOW_MAP_WIDTH 1024 * 8
-#define SHADOW_MAP_HEIGHT 1024 * 8
+#define SHADOW_MAP_WIDTH 1024 * 4
+#define SHADOW_MAP_HEIGHT 1024 * 4
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:

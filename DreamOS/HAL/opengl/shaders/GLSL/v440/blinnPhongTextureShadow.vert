@@ -67,7 +67,7 @@ layout(std140) uniform ub_Lights {
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 
-mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
+mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.4,
 					0.0, 0.5, 0.0, 0.0,
 					0.0, 0.0, 0.5, 0.0,
 					0.5, 0.5, 0.5, 1.0);
