@@ -6,9 +6,9 @@
 
 #version 440 core
 
-layout (location = 0) out float out_fragmentDepth;
+//layout (location = 0) out float out_fragmentDepth;
 
 void main(void) {  
 	// Not really needed, OpenGL does it anyway
-    out_fragmentDepth = gl_FragCoord.z;
+    //out_fragmentDepth = gl_FragCoord.z;
 }

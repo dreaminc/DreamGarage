@@ -121,7 +121,7 @@ void main(void) {
 		}
 	}
 
-	DataOut.shadowEmitterDirection = normalize(vec3(mat3(u_mat4View) * (-u_vec4ShadowEmitterDirection.xyz)));
+	DataOut.shadowEmitterDirection = normalize(vec3(mat3(transpose(inverse(u_mat4View))) * (-u_vec4ShadowEmitterDirection.xyz)));
 	DataOut.vertShadowCoordinate = vertDepthSpace;
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
 	DataOut.vertWorldSpace = vertWorldSpace;

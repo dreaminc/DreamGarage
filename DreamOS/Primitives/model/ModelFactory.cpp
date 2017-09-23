@@ -321,6 +321,7 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	// Set the path (used in texture loading)
 	CR(pModel->SetModelFilePath(wstrModelFilePath));
 
+<<<<<<< HEAD
 	unsigned int assimpFlags = //aiProcess_FlipUVs |
 								aiProcess_CalcTangentSpace |
 								aiProcess_GenNormals |
@@ -334,8 +335,22 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 		assimpFlags |= aiProcess_FlipWindingOrder;
 	}
 
+	///// Load model from disk
+	///const aiScene *pAIScene =
+	///	assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath),
+	///		//aiProcess_FlipUVs |
+	///		//aiProcess_CalcTangentSpace |
+	///		aiProcess_GenNormals | 
+	///		aiProcess_PreTransformVertices |
+	///		aiProcess_JoinIdenticalVertices |
+	///		aiProcess_FixInfacingNormals |
+	///		aiProcess_FindDegenerates |
+	///		aiProcess_FindInvalidData |
+	///		aiProcess_OptimizeMeshes | //aiProcess_OptimizeGraph |
+	///		aiProcess_Triangulate);
+
 	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), assimpFlags);
+	//const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), assimpFlags);
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());

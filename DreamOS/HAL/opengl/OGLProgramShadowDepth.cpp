@@ -36,16 +36,13 @@ RESULT OGLProgramShadowDepth::OGLInitialize() {
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32, GL_FLOAT));
-	//CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT24, GL_FLOAT));
-	//CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
 	
-	// Use linear filtering
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 
 	// Reference Compare
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_FUNC, GL_LESS));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL));
 
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
@@ -110,9 +107,9 @@ RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 	
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	//glDisable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 
 	glPolygonOffset(1.0f, 1.0f);
 	glEnable(GL_POLYGON_OFFSET_FILL);
@@ -120,8 +117,8 @@ RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -172,9 +169,9 @@ matrix<virtual_precision, 4, 4> OGLProgramShadowDepth::GetViewProjectionMatrix()
 	matVP.identity();
 
 	if (m_pShadowEmitter != nullptr) {
-		//matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
+		matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
 		//matVP = m_pShadowEmitter->GetViewProjectionMatrix(10.0f, 10.0f, 0.1f, 1000.0f);
-		matVP = m_pShadowEmitter->GetViewProjectionMatrix(m_pSceneGraph->GetMaximumPoint(), m_pSceneGraph->GetMinimimPoint(), 0.1f, 1000.0f);
+		//matVP = m_pShadowEmitter->GetViewProjectionMatrix(m_pSceneGraph->GetMaximumPoint(), m_pSceneGraph->GetMinimimPoint(), 0.1f, 1000.0f);
 	}
 
 	return matVP;
