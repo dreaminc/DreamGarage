@@ -848,6 +848,9 @@
     <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamOSTestSuite.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1900,6 +1903,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSTestSuite.h">
+      <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

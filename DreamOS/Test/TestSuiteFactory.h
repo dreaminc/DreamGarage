@@ -18,6 +18,7 @@ public:
 		HAL,
 		MATH,
 		ANIMATION,
+		OS,
 		INVALID
 	} ;
 

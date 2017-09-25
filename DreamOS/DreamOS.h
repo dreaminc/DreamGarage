@@ -65,6 +65,7 @@ class DreamOS :
 	friend class InteractionEngineTestSuite;
 	friend class UIViewTestSuite;
 	friend class AnimationTestSuite;
+	friend class DreamOSTestSuite;
 
 public:
 	DreamOS();
