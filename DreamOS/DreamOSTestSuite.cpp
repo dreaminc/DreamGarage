@@ -6,6 +6,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "DreamTestingApp.h"
+
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -77,7 +79,7 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamTestApp> pDreamTestApp = nullptr;
+		std::shared_ptr<DreamTestingApp> pDreamTestApp = nullptr;
 
 		CN(m_pDreamOS);
 
@@ -86,7 +88,7 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
-		pDreamTestApp = m_pDreamOS->LaunchDreamApp<DreamTestApp>(this);
+		pDreamTestApp = m_pDreamOS->LaunchDreamApp<DreamTestingApp>(this);
 		CNM(pDreamTestApp, "Failed to create dream test app");
 
 		// Set up the view
@@ -145,6 +147,9 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		/*
+		// TODO:
 		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
 
 		CN(m_pDreamOS);
@@ -165,7 +170,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		//pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
 
 	Error:
-		return R_PASS;
+		*/
+		return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)

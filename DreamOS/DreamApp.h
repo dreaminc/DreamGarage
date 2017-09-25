@@ -183,6 +183,10 @@ protected:
 		return m_pDreamOS;
 	}
 
+	UINT64 GetUIDValue() {
+		return m_uid.GetID();
+	}
+
 	virtual RESULT Print() override {
 		DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
 		return R_PASS;
