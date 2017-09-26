@@ -35,8 +35,8 @@ protected:
 	int GetPriority();
 	RESULT ResetTimeRun();
 	RESULT IncrementTimeRun(double usTimeDelta);
-	float GetTimeRun();
-	float GetEffectivePriorityValue() const;
+	double GetTimeRun();
+	double GetEffectivePriorityValue() const;
 
 private:
 	double m_usTimeRun = 0.0;
@@ -47,9 +47,8 @@ private:
 // Using Fixed-priority preemptive scheduling: https://en.wikipedia.org/wiki/Fixed-priority_pre-emptive_scheduling
 struct DreamAppBaseCompare {
 	bool operator()(const std::shared_ptr<DreamAppBase> &lhsApp , const std::shared_ptr<DreamAppBase> &rhsApp) const {
-		// Note: This is actually returning the lowest value (not highest)
-		// Since priority is inverted
-		return lhsApp->GetEffectivePriorityValue() < rhsApp->GetEffectivePriorityValue();
+		// Note: This is actually returning the lowest value (not highest) since priority is inverted
+		return lhsApp->GetEffectivePriorityValue() > rhsApp->GetEffectivePriorityValue();
 	}
 };
 
@@ -188,7 +187,7 @@ protected:
 	}
 
 	virtual RESULT Print() override {
-		DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
+		//DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
 		return R_PASS;
 	}
 

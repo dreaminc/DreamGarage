@@ -27,12 +27,16 @@ public:
 
 	//RESULT SetVisible(bool fVisible);
 
+	RESULT SetTestingValue(int val);
+	int GetTestingValue();
+
 protected:
 	static DreamTestingApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	// Member vars go here
 	int m_counter = 0;
+	int m_testingValue = 0;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

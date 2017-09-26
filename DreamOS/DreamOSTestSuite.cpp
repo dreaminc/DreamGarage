@@ -75,11 +75,12 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 
 	double sTestTime = 3000.0f;
 	int nRepeats = 1;
+	//const int numTests = 5;
 
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamTestingApp> pDreamTestApp = nullptr;
+		std::shared_ptr<DreamTestingApp> pDreamTestApps[5];// = { nullptr };
 
 		CN(m_pDreamOS);
 
@@ -87,9 +88,12 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		// Create the Shared View App
-		pDreamTestApp = m_pDreamOS->LaunchDreamApp<DreamTestingApp>(this);
-		CNM(pDreamTestApp, "Failed to create dream test app");
+		// Create the testing apps
+		for (int i = 0; i < 5; i++) {
+			pDreamTestApps[i] = m_pDreamOS->LaunchDreamApp<DreamTestingApp>(this);
+			CNM(pDreamTestApps[i], "Failed to create dream test app");
+			pDreamTestApps[i]->SetTestingValue(i);
+		}
 
 		// Set up the view
 		//pDreamTestApp->SetParams(point(0.0f), 5.0f, DreamTestApp::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));

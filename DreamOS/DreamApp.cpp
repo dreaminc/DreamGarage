@@ -21,12 +21,12 @@ RESULT DreamAppBase::IncrementTimeRun(double usTimeDelta) {
 	return R_PASS;
 }
 
-float DreamAppBase::GetTimeRun() {
+double DreamAppBase::GetTimeRun() {
 	return m_usTimeRun;
 }
 
 // In short, this will return 
-float DreamAppBase::GetEffectivePriorityValue() const {
+double DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
 }
 

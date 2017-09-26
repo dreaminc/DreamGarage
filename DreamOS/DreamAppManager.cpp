@@ -1,5 +1,4 @@
 #include "DreamAppManager.h"
-#include <chrono>
 
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -42,6 +41,11 @@ Error:
 	return r;
 }
 
+RESULT DreamAppManager::SetMinFrameRate(double minFrameRate) {
+	m_minFrameRate = minFrameRate;
+	return R_PASS;
+}
+
 RESULT DreamAppManager::Update() {
 	RESULT r = R_PASS;
 
@@ -49,29 +53,61 @@ RESULT DreamAppManager::Update() {
 
 	CBR((!m_appPriorityQueue.empty()), R_QUEUE_EMPTY);
 
-	for (auto &pDreamApp : m_appPriorityQueue) {
-		CR(pDreamApp->Update(pDreamApp->GetAppContext()));
-	}
-/*
-	pDreamApp = m_appPriorityQueue.top();
-	CN(pDreamApp);
-
-	//CR(pDreamApp->Print());
 	{
-		auto tBefore = std::chrono::high_resolution_clock::now();
+		// TODO: A lot of this can be alleviated with multi-threading 
+		// and the update for an app is stuff that needs to be inside of the render thread
+		auto tAfterLoop = std::chrono::high_resolution_clock::now();
+		auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
+		double usAppTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
 
-		CR(pDreamApp->Update(pDreamApp->GetAppContext()));
-		auto tAfter = std::chrono::high_resolution_clock::now();
-		auto usDiff = std::chrono::duration_cast<std::chrono::microseconds>(tAfter - tBefore).count();
-		pDreamApp->IncrementTimeRun(usDiff);
+		CBRM((usAppTimeAvailable > 0.0f), R_SKIPPED ,"Sandbox took longer than min frame rate time available %f", (double)(usAppTimeAvailable));
+
+		double usTimeLeft = 0.0f;
+		auto tAppUpdatesStart = std::chrono::high_resolution_clock::now();
+		while (m_appPriorityQueue.size() > 0 && 
+			(usTimeLeft = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tAppUpdatesStart).count()) < usAppTimeAvailable) 
+		{
+			pDreamApp = m_appPriorityQueue.top();
+			CN(pDreamApp);
+
+			{
+				// Remove the top item
+				m_appPriorityQueue.pop();
+
+				// Capture time stamp
+				auto tBeforeApp = std::chrono::high_resolution_clock::now();
+
+				CR(pDreamApp->Update(pDreamApp->GetAppContext()));
+
+				// Calculate time stamp and update (will affect priority
+				auto tAfterApp = std::chrono::high_resolution_clock::now();
+				auto usDiffApp = std::chrono::duration_cast<std::chrono::microseconds>(tAfterApp - tBeforeApp).count();
+				pDreamApp->IncrementTimeRun(usDiffApp);
+
+				m_appQueueAlreadyRun.push_front(pDreamApp);
+			}
+		}
+
+		// Push all run apps back into pri-queue
+		while (m_appQueueAlreadyRun.size() > 0) {
+			pDreamApp = m_appQueueAlreadyRun.front();
+			m_appQueueAlreadyRun.pop_front();
+
+			m_appPriorityQueue.push(pDreamApp);
+		}
+
+		CBRM((usTimeLeft > 0.0f), R_SKIPPED, "App Manager ran out of time");
+
+		//*/
+
+		// TODO: Update the time run
+		// TODO: Create a time slice mechanism
+		// TODO: Threads?
 	}
-	//*/
-
-	// TODO: Update the time run
-	// TODO: Create a time slice mechanism
-	// TODO: Threads?
 
 Error:
+	m_tBeforeLoop = std::chrono::high_resolution_clock::now();
+
 	return r;
 }
 
@@ -80,10 +116,11 @@ RESULT DreamAppManager::ClearPriorityQueue() {
 
 	while (!m_appPriorityQueue.empty()) {
 		//std::shared_ptr<DreamAppBase> pDreamApp = m_appPriorityQueue.top();
-		m_appPriorityQueue.pop_front();
+		//m_appPriorityQueue.pop_front();
 
-		/*
+		///*
 		std::shared_ptr<DreamAppBase> pDreamApp = m_appPriorityQueue.top();
+
 		if (pDreamApp != nullptr) {
 			CR(pDreamApp->Shutdown());
 		}
@@ -92,6 +129,6 @@ RESULT DreamAppManager::ClearPriorityQueue() {
 		//*/
 	}
 
-//Error:
+Error:
 	return r;
 }

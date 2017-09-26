@@ -60,10 +60,19 @@ RESULT DreamTestingApp::Update(void *pContext) {
 
 	CR(r);
 
-	DEBUG_LINEOUT("Dream Test App Update ID:%ju cnt:%d", GetUIDValue(), m_counter++);
+	//DEBUG_LINEOUT("Dream Test App Update ID:%ju cnt:%d timerun: %f us value: %d", GetUIDValue(), m_counter++, GetTimeRun(), GetTestingValue());
 
 	// TODO: Better management stuff here
 
 Error:
 	return r;
+}
+
+RESULT DreamTestingApp::SetTestingValue(int val) {
+	m_testingValue = val;
+	return R_PASS;
+}
+
+int DreamTestingApp::GetTestingValue() {
+	return m_testingValue;
 }
