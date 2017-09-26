@@ -7,6 +7,91 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+struct TestContext : public Subscriber<InteractionObjectEvent> {
+	DreamOS *m_pDreamOS = nullptr;
+
+	quad *pQuad[4] = { nullptr, nullptr, nullptr, nullptr };
+	sphere *pSphere = nullptr;
+	DimRay *pRay[2] = { nullptr, nullptr };
+	DimRay *pMouseRay = nullptr;
+	sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	composite *pComposite = nullptr;
+
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
+		RESULT r = R_PASS;
+
+		// handle event
+		switch (mEvent->m_eventType) {
+		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
+			DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateYByDeg(15.0f);
+			}
+
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
+			DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
+			DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
+
+			// NOTE: This is not compatible with the composite vs non-composite tests
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+			DimObj *pDimEventObj = dynamic_cast<DimObj*>(mEvent->m_pEventObject);
+			composite *pComposite = dynamic_cast<composite*>(mEvent->m_pEventObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateYByDeg(-15.0f);
+			}
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
+			DEBUG_LINEOUT("collide began state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_BLUE);
+			}
+
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_GREEN);
+			}
+		}
+
+		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
+			DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
+			DEBUG_LINEOUT("collide ended state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(-15.0f);
+			}
+		} break;
+		}
+
+		//Error:
+		return r;
+	}
+};
+
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -72,122 +157,126 @@ Error:
 	return r;
 }
 
-RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
-	RESULT r = R_PASS;
-
-	// handle event
-	switch (mEvent->m_eventType) {
-		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-			
-			if (pDimObj != nullptr) {
-				//pDimObj->RotateYByDeg(15.0f);
-				m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.5f);
-			}
-
-		} break;
-
-		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
-		} break;
-
-		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
-
-			// NOTE: This is not compatible with the composite vs non-composite tests
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-			DimObj *pDimEventObj = dynamic_cast<DimObj*>(mEvent->m_pEventObject);
-			composite *pComposite = dynamic_cast<composite*>(mEvent->m_pEventObject);
-
-			if (pDimObj != nullptr) {
-				//pDimObj->ResetRotation();
-				//pDimObj->RotateYByDeg(-15.0f); 
-				//point ptPosition = pDimEventObj->GetPosition();
-				point ptPosition = pDimObj->GetPosition();
-				
-				// Remove object 
-				m_pDreamOS->RemoveObject(pDimEventObj);
-				m_pDreamOS->UnregisterInteractionObject(pDimEventObj);
-
-				//pDimEventObj->RemoveChild(pDimObj);
-				//m_pDreamOS->UnregisterInteractionObject(pDimObj);
-
-				/*
-				// Create new one
-				//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-				auto pQuad = pComposite->AddQuad(1.0f, 1.0f);
-				pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
-				pQuad->SetColor(COLOR_RED);
-				pQuad->SetPosition(ptPosition);
-
-				// Add to interaction engine
-				/*
-				CRM(m_pDreamOS->AddObjectToInteractionGraph(pQuad), "Failed to add quad");
-
-				// TODO: Simplify (combine with above)
-				for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-					CR(m_pDreamOS->RegisterEventSubscriber(pQuad, (InteractionEventType)(i), this));
-				}
-				*/
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
-			DEBUG_LINEOUT("collide began state: 0x%x", mEvent->m_activeState);
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-
-			if (pDimObj != nullptr) {
-				//pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_BLUE);
-				m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
-			}
-
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-
-			if (pDimObj != nullptr) {
-				//pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_GREEN);
-			}
-			m_pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(mEvent->m_pInteractionObject);
-		}
-
-		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
-			DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
-			DEBUG_LINEOUT("collide ended state: 0x%x", mEvent->m_activeState);
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-
-			if (pDimObj != nullptr) {
-				//pDimObj->ResetRotation();
-				//pDimObj->RotateZByDeg(-15.0f);
-			}
-		} break;
-	}
-
-//Error:
-	return r;
-}
-
 RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	struct CaptureContext {
+	struct CaptureContext : public Subscriber<InteractionObjectEvent> {
 		UIMallet *pLeftMallet = nullptr;
 		UIMallet *pRightMallet = nullptr;
+		DreamOS *m_pDreamOS = nullptr;
+
+		RESULT Notify(InteractionObjectEvent *mEvent) {
+			RESULT r = R_PASS;
+
+			// handle event
+			switch (mEvent->m_eventType) {
+			case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
+				DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.5f);
+				}
+
+			} break;
+
+			case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
+				DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
+			} break;
+
+			case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
+				DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
+
+				// NOTE: This is not compatible with the composite vs non-composite tests
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+				DimObj *pDimEventObj = dynamic_cast<DimObj*>(mEvent->m_pEventObject);
+				composite *pComposite = dynamic_cast<composite*>(mEvent->m_pEventObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->ResetRotation();
+					//pDimObj->RotateYByDeg(-15.0f);
+					//point ptPosition = pDimEventObj->GetPosition();
+					point ptPosition = pDimObj->GetPosition();
+
+					// Remove object 
+
+					//m_pDreamOS->RemoveObject(pDimEventObj);
+					//m_pDreamOS->UnregisterInteractionObject(pDimEventObj);
+
+					pDimEventObj->RemoveChild(pDimObj);
+					m_pDreamOS->UnregisterInteractionObject(pDimObj);
+
+					/*
+					// Create new one
+					//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+					auto pQuad = pComposite->AddQuad(1.0f, 1.0f);
+					pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
+					pQuad->SetColor(COLOR_RED);
+					pQuad->SetPosition(ptPosition);
+
+					// Add to interaction engine
+					/*
+					CRM(m_pDreamOS->AddObjectToInteractionGraph(pQuad), "Failed to add quad");
+
+					// TODO: Simplify (combine with above)
+					for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+					CR(m_pDreamOS->RegisterEventSubscriber(pQuad, (InteractionEventType)(i), this));
+					}
+					*/
+				}
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
+				DEBUG_LINEOUT("collide began state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					pDimObj->RotateZByDeg(15.0f);
+					pDimObj->SetColor(COLOR_BLUE);
+					m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
+				}
+
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->RotateZByDeg(15.0f);
+					pDimObj->SetColor(COLOR_GREEN);
+				}
+				m_pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(mEvent->m_pInteractionObject);
+			}
+
+			case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
+				DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
+			} break;
+
+			case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
+				DEBUG_LINEOUT("collide ended state: 0x%x", mEvent->m_activeState);
+
+				DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+				if (pDimObj != nullptr) {
+					//pDimObj->ResetRotation();
+					//pDimObj->RotateZByDeg(-15.0f);
+				}
+			} break;
+			}
+
+			//Error:
+			return r;
+		}
 	};
+
+	CaptureContext *pCaptureContext = new CaptureContext();
+	pCaptureContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -218,7 +307,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 			pQuad->SetColor(COLOR_BLUE);
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), this));
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), pCaptureContext));
 				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
 			}
 
@@ -231,7 +320,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			//pQuad->InitializeOBB();
 			//m_pDreamOS->AddInteractionObject(pQuad);
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), this));
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), pCaptureContext));
 				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
 			}
 
@@ -287,7 +376,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, new CaptureContext());
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pCaptureContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Capture Test");
@@ -307,6 +396,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	int nRepeats = 1;
 
 	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -386,7 +476,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
-				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), pTestContext));
 			}
 
 			// Collide point spheres
@@ -455,13 +545,8 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
-		composite *pComposite = nullptr;
-		sphere *pSphere = nullptr;
-		DimRay *pRay[2] = { nullptr, nullptr };
-		DimRay *pMouseRay = nullptr;
-		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
-	} *pTestContext = new TestContext();
+	TestContext *pTestContext = new TestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -523,7 +608,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pSphere));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, (InteractionEventType)(i), this));
+				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, (InteractionEventType)(i), pTestContext));
 			}
 
 			// Collide point spheres
@@ -604,11 +689,8 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
-		composite *pComposite = nullptr;
-		DimRay *pMouseRay = nullptr;
-		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
-	} *pTestContext = new TestContext();
+	TestContext *pTestContext = new TestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -650,7 +732,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, (InteractionEventType)(i), this));
+				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, (InteractionEventType)(i), pTestContext));
 			}
 
 			// Collide point spheres
@@ -727,11 +809,14 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
-		quad *pQuad[4] = { nullptr, nullptr, nullptr, nullptr };
-		DimRay *pMouseRay = nullptr;
-		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
-	} *pTestContext = new TestContext();
+	//struct TestContext {
+	//	quad *pQuad[4] = { nullptr, nullptr, nullptr, nullptr };
+	//	DimRay *pMouseRay = nullptr;
+	//	sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	//} *pTestContext = new TestContext();
+
+	TestContext *pTestContext = new TestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -781,7 +866,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				for (int j = 0; j < 3; j++) {
-					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), this));
+					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), pTestContext));
 				}
 			}
 
@@ -853,19 +938,88 @@ Error:
 	return r;
 }
 
+RESULT RayCompositeTestContext::Notify(InteractionObjectEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	// handle event
+	switch (mEvent->m_eventType) {
+		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
+			DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateYByDeg(15.0f);
+			}
+
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
+			DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
+			DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
+
+			// NOTE: This is not compatible with the composite vs non-composite tests
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+			DimObj *pDimEventObj = dynamic_cast<DimObj*>(mEvent->m_pEventObject);
+			composite *pComposite = dynamic_cast<composite*>(mEvent->m_pEventObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateYByDeg(-15.0f);
+			}
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
+			DEBUG_LINEOUT("collide began state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_BLUE);
+			}
+
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_GREEN);
+			}
+		}
+
+		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
+			DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
+		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
+			DEBUG_LINEOUT("collide ended state: 0x%x", mEvent->m_activeState);
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->RotateZByDeg(-15.0f);
+			}
+		} break;
+	}
+
+	//Error:
+	return r;
+}
+
 RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
-		quad *pQuad[4] = { nullptr, nullptr, nullptr, nullptr };
-		sphere *pSphere = nullptr;
-		DimRay *pRay[2] = { nullptr, nullptr };
-		DimRay *pMouseRay = nullptr;
-		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
-	} *pTestContext = new TestContext();
+	TestContext *pTestContext = new TestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -932,7 +1086,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				for (int j = 0; j < 3; j++) {
-					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), this));
+					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), pTestContext));
 				}
 			}
 
@@ -967,9 +1121,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 			pTestContext->pMouseRay->UpdateFromRay(rCast);
 			
-			pTestContext->pRay[0]->translateX(0.00052f);
-			pTestContext->pRay[1]->translateX(0.00051f);
-			pTestContext->pSphere->translateX(0.00075f);
+			//pTestContext->pRay[0]->translateX(0.00052f);
+			//pTestContext->pRay[1]->translateX(0.00051f);
+			//pTestContext->pSphere->translateX(0.00075f);
 		}
 
 		CR(r);
@@ -1015,6 +1169,7 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 	int nRepeats = 1;
 
 	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
+	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -1091,7 +1246,7 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
-				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), pTestContext));
 				//CR(m_pDreamOS->RegisterEventSubscriber(pComposite, (InteractionEventType)(i), this));
 			}
 
