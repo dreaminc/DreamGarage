@@ -690,6 +690,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeer.cpp" />
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
+    <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
@@ -933,6 +934,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
     <ClInclude Include="..\..\..\DreamPeer.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
+    <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\camera.h" />

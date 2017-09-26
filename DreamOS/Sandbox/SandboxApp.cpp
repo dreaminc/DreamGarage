@@ -755,6 +755,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	//r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
+	CR(r);
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 

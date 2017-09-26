@@ -37,6 +37,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMultiPrimitive());
+
 	CR(AddTestNestedCompositeOBB());
 
 	CR(AddTestCaptureObject());
@@ -46,8 +48,6 @@ RESULT InteractionEngineTestSuite::AddTests() {
 	CR(AddTestMultiPrimitiveRemove());
 
 	CR(AddTestMultiPrimitiveComposite());
-
-	CR(AddTestMultiPrimitive());
 
 	CR(AddTestObjectBasedEvents());
 

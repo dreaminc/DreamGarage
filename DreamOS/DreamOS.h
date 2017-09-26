@@ -282,6 +282,7 @@ protected:
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 	
 public:
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject);

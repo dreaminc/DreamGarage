@@ -68,6 +68,7 @@ public:
 
 public:
 	// This requires the event to be registered 
+	// This is an event subscription against a particular object
 	RESULT RegisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = nullptr;

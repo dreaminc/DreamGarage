@@ -7,6 +7,7 @@
 #include "HAL/Pipeline/SourceNode.h"
 
 #include "DreamTestingApp.h"
+#include "DreamUserApp.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -21,9 +22,10 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUserApp());	
+
 	CR(AddTestDreamApps());
 
-	CR(AddTestUserApp());	
 
 Error:
 	return r;
@@ -55,12 +57,18 @@ RESULT DreamOSTestSuite::SetupPipeline() {
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -148,11 +156,15 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		DimRay *pMouseRay = nullptr;
+	} *pTestContext = new TestContext();
+
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		/*
 		// TODO:
 		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
 
@@ -160,21 +172,26 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 
 		CR(SetupPipeline());
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
 		pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CNM(pDreamUserApp, "Failed to create dream user app");
 
-		// Set up the view
-		//pDreamTestApp->SetParams(point(0.0f), 5.0f, DreamTestApp::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+		// Add some objects 
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pTestContext->pSphere);
+		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pSphere);
 
-		//pDreamContentView->SetScreenTexture(L"crate_color.png");
-		//pDreamTestApp->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
-		//pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
+		// Mouse Ray
+		pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
+		CN(pTestContext->pMouseRay);
+		m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay);
 
 	Error:
-		*/
 		return r;
 	};
 
@@ -185,24 +202,42 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		ray rCast;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+		pTestContext->pMouseRay->UpdateFromRay(rCast);
+
+	Error:
+		return r;
 	};
 
 	// Reset Code
 	auto fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
 		// Will reset the sandbox as needed between tests
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
 
-		// TODO: Kill apps
+		// TODO: Kill apps as needed 
 
 	Error:
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");

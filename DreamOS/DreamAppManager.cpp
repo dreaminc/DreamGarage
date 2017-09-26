@@ -96,7 +96,7 @@ RESULT DreamAppManager::Update() {
 			m_appPriorityQueue.push(pDreamApp);
 		}
 
-		CBRM((usTimeLeft > 0.0f), R_SKIPPED, "App Manager ran out of time");
+		CBRM((usTimeLeft >= 0.0f), R_SKIPPED, "App Manager ran out of time %f", usTimeLeft);
 
 		//*/
 
