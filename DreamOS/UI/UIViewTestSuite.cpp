@@ -719,53 +719,52 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		std::shared_ptr<text> pTextBoxText;
 		std::shared_ptr<composite> pChildComposite;
 		std::shared_ptr<font> pFont;
-		std::shared_ptr<texture> pTextBoxTexture;
-		std::shared_ptr<DreamUIBar> pDreamUIBar;
+		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
 		float malletAngle = 180.0f;
 		UIMallet *pBLeftMallet = nullptr;
 		UIMallet *pBRightMallet = nullptr;
 		UIMallet *pKLeftMallet = nullptr;
 		UIMallet *pKRightMallet = nullptr;
 	};
-	TestContext *pTestContext = new TestContext;
+	TestContext *pTestContext = new TestContext();
 
 	double sTestTime = 10000.0;
-	float lineHeight = TEXTBOX_LINE_HEIGHT;
-	float numLines = TEXTBOX_NUM_LINES;
-	float lineWidth = TEXTBOX_WIDTH;
+	float lineHeight = .027f;
+	float numLines = 1.0f;
+	float lineWidth = 0.5f;
 	float currentMalletAngle = 0.0f;
-
-	auto fnAddKeyboardAngle = [&](float addAngle) {
+	float incrementAngle = 1.0f;
+	
+	auto fnAddKeyboardAngle = [&](void *pContext) {
 		RESULT r = R_PASS;
-		auto pKeyboard = m_pDreamOS->GetKeyboard();
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		//auto& pKeyboard = m_pDreamOS->GetKeyboard();
+		
+		auto& pKeyboard = pTestContext->pKeyboard;
 		float current = pKeyboard->GetAngle();
 		if (current > 90.0f) {
 			current = 15.0f;
 		}
 		else
-			current += addAngle;
-		pKeyboard->SetAngle(current);
-		pKeyboard->UpdateOrientation();
+			current += 1.0f;
+		pKeyboard->SetSurfaceAngle(current);
 		std::string strCurrentAngle = std::to_string(current);
-		pTestContext->pTextBoxText->SetText(strCurrentAngle);
 		CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		return r;
 	Error:
 		return r;
 	};
-
+	
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		TestContext *pTestContext = static_cast<TestContext*>(pContext);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
 		auto& pChildComposite = pTestContext->pChildComposite;
 		auto& pFont = pTestContext->pFont;
 		auto& pTextBoxText = pTestContext->pTextBoxText;
-		auto& pDreamUIBar = pTestContext->pDreamUIBar;
+	
 		auto& pMalletAngle = pTestContext->malletAngle;
-		pTestContext->pBLeftMallet = pDreamUIBar->GetLeftMallet();
-		pTestContext->pBRightMallet = pDreamUIBar->GetRightMallet();
-		pTestContext->pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
-		pTestContext->pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
+		
 		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
@@ -783,13 +782,17 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 			}
 
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			auto& pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
 			CN(pDreamUIBar);
 			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
 
 			CR(m_pDreamOS->InitializeKeyboard());
-
+			pTestContext->pKeyboard = m_pDreamOS->GetKeyboard();
+			pTestContext->pBLeftMallet = pDreamUIBar->GetLeftMallet();
+			pTestContext->pBRightMallet = pDreamUIBar->GetRightMallet();
+			pTestContext->pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
+			pTestContext->pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
 			//*
 			float menuHeight = pDreamUIBar->GetMenuHeight();
 			float menuDepth = pDreamUIBar->GetMenuDepth();
@@ -800,7 +803,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			//CR(pComposite->InitializeOBB());
 			//CR(tComposite->InitializeOBB());
 			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
-			pChildComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 5.1f));	//with hmd
+			pChildComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 2.1f));	//with hmd
 			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.6f));
 			//tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 4.6f));	
 			
@@ -818,14 +821,14 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			CN(pFont);
 			pFont->SetLineHeight(lineHeight);
 			{
-				float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;;
 				pChildComposite->RotateXByDeg(90.0f);
 
 				pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 					pFont,
 					"hi",
 					lineWidth - 0.02f,
-					lineHeight * numLines,
+					//lineHeight * numLines,
+					10.0f,
 					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 				CN(pTextBoxText);
 				pChildComposite->AddObject(pTextBoxText);
@@ -834,12 +837,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			//interaction
 			CR(pUIButtonAngleIncrease->RegisterToInteractionEngine(m_pDreamOS));
 			CR(pUIButtonAngleDecrease->RegisterToInteractionEngine(m_pDreamOS));
-			pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) {
-				return fnAddKeyboardAngle(-1.0f);
-			});
-			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) {
-				return fnAddKeyboardAngle(1.0f);
-			});
+			pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) { return fnAddKeyboardAngle(pTestContext); });
+			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) { return fnAddKeyboardAngle(pTestContext); });
 			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, this));
 			//*/
 
@@ -853,7 +852,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pSphere->SetPosition(ptCamera + point(0.5f, 1.0f, 0.0f));
 			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
 			pSphere->SetPosition(ptCamera + point(-0.5f, 1.0f, 0.0f));
-
+			/*m_pDreamOS->GetKeyboard()->ShowKeyboard();
+			m_pDreamOS->GetKeyboard()->UpdateComposite(ptCamera.y()+ 2.0f, ptCamera.z()-0.4f);*/
 		}
 
 	Error:
@@ -861,7 +861,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	};
 
 	auto fnUpdate = [&](void *pContext) {
-		TestContext *pTestContext = static_cast<TestContext*>(pContext);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(m_pDreamOS);
 		if (m_pDreamOS->GetKeyboard()->GetLeftMallet()->CheckAndCleanDirty()) {
 			pTestContext->malletAngle--;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
@@ -870,6 +871,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->malletAngle++;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
+		//*/
+		//*
 		if(currentMalletAngle != pTestContext->malletAngle) {
 			currentMalletAngle = pTestContext->malletAngle;
 			std::string strCurrentAngle = std::to_string(currentMalletAngle);
@@ -881,17 +884,14 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pBLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pBRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-		}
+		}//*/
 
 	Error:
-		return r;
-	};
-
-	auto fnTest = [&](void *pContext) {
 		return R_PASS;
 	};
 
-	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, m_pDreamOS);
+	auto fnTest = [&](void *pContext) {return R_PASS; };
+	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUIViewTest);
 
 	pUIViewTest->SetTestName("Local UIView Test");

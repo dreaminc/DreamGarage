@@ -16,9 +16,9 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
-	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fMouseLook = false;
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:
@@ -36,7 +36,7 @@ RESULT DreamTestApp::LoadScene() {
 	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -45,13 +45,13 @@ RESULT DreamTestApp::LoadScene() {
 	// Push to a test suite factory in testing
 
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
 
 	CN(m_pTestSuite);
 

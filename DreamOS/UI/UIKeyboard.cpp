@@ -660,12 +660,6 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateOrientation() {
-	RESULT r = R_PASS;
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
-	return r;
-}
-
 RESULT UIKeyboard::ClearActiveKeys() {
 	m_activeKeys.clear();
 	return R_PASS;
@@ -752,9 +746,10 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::SetAngle(float angle) {
+RESULT UIKeyboard::SetSurfaceAngle(float angle) {
 	RESULT r = R_PASS;
 	m_surfaceAngle = angle;
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 	CR(UpdateViewQuad());
 Error:
 	return r;

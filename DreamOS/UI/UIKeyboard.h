@@ -92,7 +92,7 @@ public:
 	float GetHeight();
 	RESULT SetHeight(float height);
 	float GetAngle();
-	RESULT SetAngle(float angle);
+	RESULT SetSurfaceAngle(float angle);
 	UIMallet* GetRightMallet();
 	UIMallet* GetLeftMallet();
 
@@ -108,7 +108,6 @@ public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
 	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
-	RESULT UpdateOrientation();
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);

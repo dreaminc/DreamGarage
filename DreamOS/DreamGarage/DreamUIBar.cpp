@@ -224,8 +224,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	//GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	//GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
