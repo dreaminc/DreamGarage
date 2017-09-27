@@ -27,7 +27,7 @@ public:
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
-	RESULT SetupSkyboxPipeline();
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "environment");
 
 	RESULT AddTestSkybox();
 
@@ -35,6 +35,7 @@ public:
 
 	RESULT AddTestText();
 	RESULT AddTestModel();
+	RESULT AddTestUserModel();
 	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
 	RESULT AddTestUIShaderStage();
