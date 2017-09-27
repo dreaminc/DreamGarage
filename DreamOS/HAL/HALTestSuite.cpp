@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUserModel());
+
 	CR(AddTestModelOrientation());
 
 	CR(AddTestBlinnPhongShaderTexture());
@@ -90,7 +92,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::SetupSkyboxPipeline() {
+RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -102,8 +104,7 @@ RESULT HALTestSuite::SetupSkyboxPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -743,6 +744,88 @@ RESULT HALTestSuite::TestNestedOBB() {
 
 		pTestContext->pComposite->RotateYByDeg(0.035f);
 		pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestUserModel() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		user *pUser = nullptr;
+	} *pTestContext = new TestContext();
+
+	float width = 5.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("environment"));
+
+		// Objects 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		volume *pVolume = nullptr;
+		sphere *pSphere = nullptr;
+
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		{
+			pTestContext->pUser = m_pDreamOS->AddUser();
+			CN(pTestContext->pUser);
+
+			pTestContext->pUser->SetPosition(0.0f, 0.0f, 1.0f);
+
+			pTestContext->pUser->UpdateMouth(1.0f);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pUser->RotateYByDeg(0.035f);
 
 	Error:
 		return r;

@@ -45,9 +45,9 @@ RESULT user::Initialize() {
 	m_pHeads.push_back(pHead);
 	//*/
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
-	m_pMouth = m_pHead->AddQuad(0.3, 1.0);
+	m_pMouth = AddQuad(0.3, 1.0);
 	m_pMouth->MoveTo(0.0f, -0.135f, 0.1f);
 
 	m_pMouth->RotateXByDeg(270);
@@ -59,7 +59,7 @@ RESULT user::Initialize() {
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 
 	m_pMouth->Scale(0.1f);
-#endif
+//#endif
 
 	// Hands
 	m_pLeapLeftHand = AddHand();
@@ -134,9 +134,10 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 RESULT user::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 	
-	if(m_pMouth)
-		m_pMouth->Scale(0.01f + 0.1f * mouthScale);
+	CN(m_pMouth);
 
-//Error:
+	m_pMouth->Scale(0.01f + 0.1f * mouthScale);
+
+Error:
 	return r;
 }
