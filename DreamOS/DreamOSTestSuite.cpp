@@ -156,9 +156,21 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
+	struct TestContext : public Subscriber<InteractionObjectEvent> {
 		sphere *pSphere = nullptr;
 		DimRay *pMouseRay = nullptr;
+
+		virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
+			RESULT r = R_PASS;
+
+			CR(r);
+
+			DEBUG_LINEOUT("stuff");
+
+		Error:
+			return r;
+		}
+
 	} *pTestContext = new TestContext();
 
 	// Initialize Code
@@ -186,10 +198,14 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		CN(pTestContext->pSphere);
 		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pSphere);
 
-		// Mouse Ray
-		pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
-		CN(pTestContext->pMouseRay);
-		m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay);
+		//// Mouse Ray
+		//pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
+		//CN(pTestContext->pMouseRay);
+		//m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay);
+
+		for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+			CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pSphere, (InteractionEventType)(i), pTestContext));
+		}
 
 	Error:
 		return r;
@@ -209,8 +225,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-		pTestContext->pMouseRay->UpdateFromRay(rCast);
+		//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+		//pTestContext->pMouseRay->UpdateFromRay(rCast);
 
 	Error:
 		return r;

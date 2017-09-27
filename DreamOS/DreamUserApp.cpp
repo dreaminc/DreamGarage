@@ -20,14 +20,6 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
 	//}
 
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		for (int j = 0; j < 3; j++) {
-			CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-		}
-	}
-
-	CR(r);
-
 	SetAppName("DreamUserApp");
 	SetAppDescription("A Dream User App");
 
@@ -37,6 +29,23 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pScreenQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	m_pScreenQuad->SetMaterialAmbient(0.8f);
 	*/
+
+	GetComposite()->InitializeOBB();
+
+	m_pVolume = GetComposite()->AddVolume(1.0f);
+	CN(m_pVolume);
+
+	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
+	CN(m_pOrientationRay);
+	m_pOrientationRay->SetVisible(false);
+
+	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+
+	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
+
+	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
+	//}
 
 Error:
 	return r;
@@ -63,7 +72,15 @@ Error:
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	//CR(r);
+	auto pCameraNode = GetDOS()->GetCameraNode();
+	CN(pCameraNode);
+
+	GetComposite()->SetPosition(pCameraNode->GetPosition());
+
+	quaternion qOrientation = (pCameraNode->GetOrientation());
+	qOrientation.Reverse();
+	GetComposite()->SetOrientation(qOrientation);
 
 Error:
 	return r;

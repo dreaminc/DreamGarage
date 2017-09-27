@@ -16,6 +16,9 @@
 
 struct InteractionObjectEvent;
 
+class volume;
+class DimRay;
+
 class DreamUserApp : public DreamApp<DreamUserApp>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
@@ -38,6 +41,9 @@ protected:
 
 private:
 	// Member vars go here
+	//user *m_pUserModel = nullptr;
+	std::shared_ptr<volume> m_pVolume = nullptr;
+	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 };
 
 #endif // ! DREAM_USER_APP_H_
