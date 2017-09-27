@@ -183,6 +183,15 @@
     <Filter Include="HAL\Pipeline">
       <UniqueIdentifier>{61e0e0cc-0539-461d-b419-c995721545e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\model">
+      <UniqueIdentifier>{2c7c6ba9-bc7c-444f-8790-4a63b1945e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\assimp">
+      <UniqueIdentifier>{3a40f6d4-8224-4a7e-bc0d-fb9c9d399cb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives\image">
+      <UniqueIdentifier>{598b61e9-4fb8-41df-97ab-dd5da1438cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -232,9 +241,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
-      <Filter>Sandbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
@@ -815,6 +821,33 @@
     <ClCompile Include="..\..\..\DreamPeer.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\model.cpp">
+      <Filter>Primitives\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\mesh.cpp">
+      <Filter>Primitives\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp">
+      <Filter>Primitives\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\image.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -985,9 +1018,6 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
       <Filter>HAL\opengl\GL</Filter>
     </ClInclude>
@@ -1047,12 +1077,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
       <Filter>TimeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\model.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\skybox.h">
       <Filter>Primitives</Filter>
@@ -1721,6 +1745,162 @@
     <ClInclude Include="..\..\..\Primitives\Proxy.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\model.h">
+      <Filter>Primitives\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\mesh.h">
+      <Filter>Primitives\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\ModelFactory.h">
+      <Filter>Primitives\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\poppack1.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pstdint.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pushpack1.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\camera.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cexport.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cfileio.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cimport.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\config.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOStream.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOSystem.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultLogger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Defines.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\defs.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Exporter.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Importer.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\importerdesc.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOStream.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOSystem.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\light.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Logger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\LogStream.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\material.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\mesh.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\metadata.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\NullLogger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\postprocess.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ProgressHandler.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\scene.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\SceneCombiner.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\texture.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\types.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\image.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\UIStageProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -1875,6 +2055,33 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\material.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

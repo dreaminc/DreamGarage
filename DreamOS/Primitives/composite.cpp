@@ -13,6 +13,8 @@
 #include "Primitives/DimRay.h"
 #include "quad.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 #include "UI/UIView.h"
 
 #include "DreamOS.h"
@@ -168,6 +170,19 @@ std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int 
 	return pTexture;
 }
 
+texture* composite::MakeTextureRaw(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+	RESULT r = R_PASS;
+
+	texture* pTexture = m_pHALImp->MakeTexture(pszFilename, type);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<hand> composite::MakeHand() {
 	RESULT r = R_PASS;
 
@@ -193,6 +208,7 @@ Error:
 	return nullptr;
 }
 
+/*
 std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
@@ -217,6 +233,7 @@ std::shared_ptr<composite> composite::AddModel(const std::wstring& wstrOBJFilena
 Error:
 	return nullptr;
 }
+*/
 
 std::shared_ptr<composite> composite::MakeComposite() {
 	RESULT r = R_PASS;
@@ -240,6 +257,45 @@ std::shared_ptr<composite> composite::AddComposite() {
 	return pComposite;
 
 Error:
+	pComposite = nullptr;
+	return nullptr;
+}
+
+std::shared_ptr<model> composite::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	std::shared_ptr<model> pModel(ModelFactory::MakeModel(m_pHALImp, wstrModelFilename));
+	CN(pModel);
+
+	// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<model> composite::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<model> pModel = MakeModel(wstrModelFilename, pTexture);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		pModel = nullptr;
+	}
+
 	return nullptr;
 }
 

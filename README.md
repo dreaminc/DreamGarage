@@ -10,7 +10,7 @@ Currently the DreamOS engine is built through the use of the VS2015 project whic
 
 **DREAMOSPATH**
 
-This is the path of the DreamOS folder in the DreamGarage repo. Since there may be multiple project / build systems in the future depending on the platform, this environment variable allows the engine to understand where any of it's given assets are located based on the dreampaths.txt which should be located at teh root DreamOS folder. 
+This is the path of the DreamOS folder in the DreamGarage repo. Since there may be multiple project / build systems in the future depending on the platform, this environment variable allows the engine to understand where any of it's given assets are located based on the dreampaths.txt which should be located at the root DreamOS folder. 
 
 **CEFPATH**
 
@@ -69,7 +69,7 @@ skybox *AddSkybox();
 model *AddModel(wchar_t *pszModelName);
 ```
 
-Currently no notifications / events are set up but this will be added to help notify the applicatio of things like keyboard entry, mouse movement or other pertinent application layer events.
+Currently no notifications / events are set up but this will be added to help notify the application of things like keyboard entry, mouse movement or other pertinent application layer events.
 
 # Headsets 
 

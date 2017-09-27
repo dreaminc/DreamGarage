@@ -337,7 +337,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
 
 			if (m_pTextureHeight != nullptr) {
-				yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
+				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, vValue);
 				yValue *= m_heightMapScale;
 			}
 

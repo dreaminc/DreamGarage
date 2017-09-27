@@ -28,6 +28,8 @@ class font;
 class texture;
 class UIButton;
 
+class UIStageProgram;
+
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 #define KEYBOARD_OFFSET -0.07f
@@ -37,6 +39,15 @@ class UIButton;
 #define MENU_ANIMATION_DURATION 0.1f;
 
 #define ACTUATION_DEPTH 0.055f;
+
+//Projection clipping values
+//TODO: optimize these values to reduce error,
+// once scrolling snap animation is determined
+#define PROJECTION_WIDTH 0.575f
+#define PROJECTION_HEIGHT 0.25f
+#define PROJECTION_NEAR 0.0f
+#define PROJECTION_FAR 5.0f
+#define PROJECTION_ANGLE 30.0f
 
 enum class MenuState {
 	NONE,
@@ -94,6 +105,8 @@ public:
 // UIEvent
 	RESULT Notify(UIEvent *pEvent);
 
+	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
+
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -133,7 +146,15 @@ private:
 	float m_animationDuration = MENU_ANIMATION_DURATION;
 	float m_actuationDepth = ACTUATION_DEPTH;
 
+	float m_projectionWidth = PROJECTION_WIDTH;
+	float m_projectionHeight = PROJECTION_HEIGHT;
+	float m_projectionNearPlane = PROJECTION_NEAR;
+	float m_projectionFarPlane = PROJECTION_FAR;
+	float m_projectionAngle = PROJECTION_ANGLE;
+
 	MenuState m_menuState = MenuState::NONE;
+
+	UIStageProgram *m_pUIStageProgram = nullptr;
 };
 
 

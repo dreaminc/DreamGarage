@@ -80,6 +80,19 @@ Error:
 	return r;
 }
 
+RESULT Win64PathManager::GetDreamPath(std::wstring &r_wstrDreamPath) {
+	RESULT r = R_PASS;
+
+	r_wstrDreamPath.clear();
+
+	CNM(m_pszDreamRootPath, "DreamRootPath NULL");
+
+	r_wstrDreamPath += m_pszDreamRootPath;
+
+Error:
+	return r;
+}
+
 RESULT Win64PathManager::GetDreamPath(char* &n_pszDreamPath) {
 	RESULT r = R_PASS;
 

@@ -29,8 +29,8 @@ public:
 	RESULT AttachRenderBufferToFramebuffer(GLenum target = GL_FRAMEBUFFER, GLenum attachment = GL_DEPTH_ATTACHMENT, GLenum renderbuffertarget = GL_RENDERBUFFER);
 
 	RESULT MakeOGLTextureMultisample();
-	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	RESULT MakeOGLTexture(texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	RESULT MakeOGLTexture(texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	GLuint GetOGLRenderbufferIndex();
 	GLuint GetOGLTextureIndex();

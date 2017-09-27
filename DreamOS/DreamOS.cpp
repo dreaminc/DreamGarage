@@ -528,14 +528,6 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
-RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
-	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold);
-}
-
-RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
-	return m_pSandbox->ReleaseObjects(pInteractionObject);
-}
-
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);
@@ -610,6 +602,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
+quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
 RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
 	RESULT r = R_PASS;
 
@@ -653,7 +649,7 @@ std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDis
 			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 
-			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR))));
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE))));
 		}
 
 		// Push font into store
@@ -726,6 +722,7 @@ skybox *DreamOS::MakeSkybox() {
 	return m_pSandbox->MakeSkybox();
 }
 
+/*
 model *DreamOS::AddModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
@@ -733,9 +730,14 @@ model *DreamOS::AddModel(wchar_t *pszModelName) {
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
-	
-composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
+*/
+
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->MakeModel(wstrModelFilename, pTexture);
+}
+
+model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->AddModel(wstrModelFilename, pTexture);
 }
 
 composite *DreamOS::AddComposite() {
@@ -811,6 +813,10 @@ Error:
 
 RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIGraph(pObject);
+}
+
+RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
 }
 
 // Cloud Controller

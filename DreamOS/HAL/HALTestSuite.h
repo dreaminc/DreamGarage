@@ -27,13 +27,23 @@ public:
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "environment");
+
+	RESULT AddTestSkybox();
+
 	RESULT AddTestEnvironmentShader();
 
 	RESULT AddTestText();
 	RESULT AddTestModel();
+	RESULT AddTestUserModel();
+	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
+	RESULT AddTestUIShaderStage();
+
+	RESULT TestNestedOBB();
 
 	// TODO: Consolidate the HMD tests 
+	// TODO: This should be easy as this is now supported by pipeline
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShader();
 	RESULT AddTestBlinnPhongShaderBlurHMD();

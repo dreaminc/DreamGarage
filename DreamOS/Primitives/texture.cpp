@@ -1,5 +1,4 @@
 #include "texture.h"
-#include "External/SOIL/SOIL.h"
 
 #include "Sandbox/PathManager.h"
 
@@ -9,15 +8,15 @@
 #include <utility>
 #include <regex>
 
+#include "Primitives/image/ImageFactory.h"
+
 texture::texture() :
-	m_pImageBuffer(nullptr),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_INVALID)
 {
 	Validate();
 }
 
 texture::texture(const texture& tex) :
-	m_pImageBuffer(nullptr),
 	m_width(tex.m_width),
 	m_height(tex.m_height),
 	m_channels(tex.m_channels),
@@ -30,14 +29,12 @@ texture::texture(const texture& tex) :
 }
 
 texture::texture(texture::TEXTURE_TYPE type) :
-	m_pImageBuffer(nullptr),
 	m_type(type)
 {
 	Validate();
 }
 
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples) :
-	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
@@ -48,7 +45,6 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels
 }
 
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples) :
-	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
@@ -57,7 +53,7 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels
 {
 	RESULT r = R_PASS;
 
-	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+	CR(CopyTextureImageBuffer(width, height, channels, pBuffer, pBuffer_n))
 	
 	Validate();
 	return;
@@ -69,7 +65,6 @@ Error:
 
 // Loads from a file buffer (file loaded into buffer)
 texture::texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
-	m_pImageBuffer(nullptr),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -84,7 +79,6 @@ Error:
 }
 
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples) :
-	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
@@ -94,7 +88,7 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::Pix
 {
 	RESULT r = R_PASS;
 
-	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n));
+	CR(CopyTextureImageBuffer(width, height, channels, pBuffer, pBuffer_n));
 
 	Validate();
 	return;
@@ -104,7 +98,6 @@ Error:
 }
 
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
-	m_pImageBuffer(nullptr),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -125,7 +118,6 @@ Error:
 }
 
 texture::texture(wchar_t *pszName, std::vector<std::wstring> cubeMapFiles) :
-	m_pImageBuffer(nullptr),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_CUBE)
 {
 	RESULT r = R_PASS;
@@ -140,15 +132,15 @@ Error:
 }
 
 texture::~texture() {
-	if (m_pImageBuffer != nullptr) {
-		delete[] m_pImageBuffer;
-		m_pImageBuffer = nullptr;
+	if (m_pImage != nullptr) {
+		delete m_pImage;
+		m_pImage = nullptr;
 	}
 }
 
 // The texture type and channel
 enum class TEXTURE_TYPE {
-	TEXTURE_COLOR = 0,
+	TEXTURE_DIFFUSE = 0,
 	TEXTURE_BUMP = 1,
 	TEXTURE_INVALID = 32
 };
@@ -221,49 +213,25 @@ Error:
 	return r;
 }
 
-RESULT texture::FlipTextureVertical() {
-	RESULT r = R_PASS;
-
-	CN(m_pImageBuffer);
-
-	for (int i = 0; i * 2 < m_height; i++) {
-		int index1 = i * m_width * m_channels;
-		int index2 = (m_height - 1 - i) * m_width * m_channels;
-
-		for (int j = m_width * m_channels; j > 0; j--) {
-			std::swap(m_pImageBuffer[index1++], m_pImageBuffer[index2++]);
-		}
-	}
-
-Error:
-	return r;
-}
-
 RESULT texture::ReleaseTextureData() {
 	RESULT r = R_PASS;
 
-	SOIL_free_image_data(m_pImageBuffer);
-	CB((m_pImageBuffer == nullptr));
+	if (m_pImage != nullptr) {
+		delete m_pImage;
+		m_pImage = nullptr;
+	}
 
-Error:
+//Error:
 	return r;
 }
 
-double texture::GetValueAtUV(double uValue, double vValue) {
-	int pxValueX = static_cast<int>(uValue * m_width);
-	int pxValueY = static_cast<int>(vValue * m_height);
-
-	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
-	
-	int accum = 0;
-	for (int i = 0; i < m_channels; i++) {
-		accum += m_pImageBuffer[lookUp + i];
+double texture::GetAverageValueAtUV(double uValue, double vValue) {
+	if (m_pImage != nullptr) {
+		return m_pImage->GetAverageValueAtUV(uValue, vValue);
 	}
-
-	double retVal = (double)((double)accum / (double)m_channels);
-	retVal /= 255.0f;
-
-	return retVal;
+	else {
+		return 0.0f;
+	}
 }
 
 RESULT texture::SetParams(int pxWidth, int pxHeight, int channels, int samples, int levels) {
@@ -281,28 +249,24 @@ Error:
 RESULT texture::LoadTextureFromPath(const wchar_t *pszFilepath) {
 	RESULT r = R_PASS;
 
-	std::wstring wstrFilepath(pszFilepath);
-	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wstrConverter;
-	std::string strFilepath = wstrConverter.to_bytes(wstrFilepath);
+	if (m_pImage != nullptr) {
+		delete m_pImage;
+		m_pImage = nullptr;
+	}
 
-	m_pImageBuffer = SOIL_load_image(strFilepath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-	CN(m_pImageBuffer);
+	m_pImage = ImageFactory::MakeImageFromPath(IMAGE_FREEIMAGE, std::wstring(pszFilepath));
+	CN(m_pImage);
 
 Error:
 	return r;
 }
 
-RESULT texture::CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+RESULT texture::CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
-	// TODO: May need to add size of stuff
+	//CN(m_pImage);
 
-	// TODO: Move to member?
-	long pImageBuffer_n = sizeof(unsigned char) * pBuffer_n;
-	m_pImageBuffer = (unsigned char*)malloc(pImageBuffer_n);
-	CN(m_pImageBuffer);
-
-	memcpy(m_pImageBuffer, pBuffer, pImageBuffer_n);
+	CR(m_pImage->CopyBuffer(width, height, channels, pBuffer, pBuffer_n));
 
 Error:
 	return r;
@@ -312,13 +276,40 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 	wchar_t *pszFilePath = nullptr;
 
-	CR(GetTextureFilePath(pszFilename, pszFilePath));
-	CN(pszFilePath);
+	// Check if this is an absolute path
+	PathManager *pPathManager = PathManager::instance();
 
-	CR(LoadTextureFromPath(pszFilePath));
+	if (pPathManager->IsDreamPath(const_cast<wchar_t*>(pszFilename))) {
+		// TODO: set to dream path
+		CN(m_pImage);
+	}
+	else if (pPathManager->IsAbsolutePath(const_cast<wchar_t*>(pszFilename))) {
+		CR(LoadTextureFromPath(const_cast<wchar_t*>(pszFilename)));
+		CN(m_pImage);
+
+		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
+		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
+		m_format = PixelFormat::BGRA;	// TODO: move this into image
+	}
+	else {
+		CR(GetTextureFilePath(pszFilename, pszFilePath));
+		CN(pszFilePath);
+
+		CR(LoadTextureFromPath(pszFilePath));
+		CN(m_pImage);
+
+		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
+		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
+		m_format = PixelFormat::BGRA;	// TODO: move this into image
+	}
+
+	// Update sizing
+	m_width = m_pImage->GetWidth();
+	m_height = m_pImage->GetHeight();
+	m_channels = m_pImage->GetChannels();
 
 	// Flip image
-	CR(FlipTextureVertical());
+	//CR(m_pImage->FlipVertical());
 
 Error:
 	if (pszFilePath != nullptr) {
@@ -334,11 +325,19 @@ RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	
 	//m_channels = 3;
 	//m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, NULL, SOIL_LOAD_RGB);
-	m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
-	CN(m_pImageBuffer);
+	//m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+	m_pImage = ImageFactory::MakeImageFromMemory(IMAGE_FREEIMAGE, (unsigned char*)(pBuffer), pBuffer_n);
+	CN(m_pImage);
+
+	// Update sizing
+	m_width = m_pImage->GetWidth();
+	m_height = m_pImage->GetHeight();
+	m_channels = m_pImage->GetChannels();
+
+	m_format = PixelFormat::BGRA;	// TODO: move this into image
 
 	// Flip image
-	CR(FlipTextureVertical());
+	//CR(m_pImage->FlipVertical());
 
 Error:
 	return r;
@@ -353,7 +352,8 @@ RESULT texture::LoadCubeMapByName(const wchar_t * pszName) {
 	CR(GetCubeMapFiles(pszName, vstrCubeMapFiles));
 
 	CR(LoadCubeMapFromFiles(pszName, vstrCubeMapFiles));
-	CN(m_pImageBuffer);
+
+	CN(m_pImage);
 
 Error:
 	return r;
@@ -407,6 +407,11 @@ size_t texture::GetCubeMapSize() {
 RESULT texture::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
 	RESULT r = R_PASS;
 	
+	return R_FAIL;
+
+	// TODO: Fix cube maps
+
+	/*
 	PathManager *pPathManager = PathManager::instance();
 	uint8_t *pBuffers[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
@@ -460,6 +465,7 @@ Error:
 	}
 
 	return r;
+	*/
 }
 
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {

@@ -19,6 +19,8 @@
 
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "HAL/UIStageProgram.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
@@ -47,15 +49,14 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 
 	m_pFont = pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pDreamOS->AddObjectToUIGraph(GetComposite());
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
-	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
@@ -110,18 +111,29 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 	auto pSurface = pSelected->GetSurface();
+
+	//vector for captured object movement
 	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
+	//vector for captured object collisions
+	quaternion qRotation = pSurface->GetOrientation(true);
+	qRotation.Reverse();
+	vector vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
+	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	GetDOS()->CaptureObject(
-	//	pSelected->GetSurface().get(), 
+	//DreamOS *pDreamOS = GetDOS();
+	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
+	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
+	pInteractionProxy->ReleaseObjects(pSelected->GetInteractionObject());
+
+	pInteractionProxy->CaptureObject(
 		pSelected,
 		pSelected->GetInteractionObject(), 
 		pSelected->GetContactPoint(), 
-		//vector(0.0f, 0.0f, -1.0f), 
+		vRotation,
 		vSurface,
 		m_actuationDepth);
 
@@ -153,8 +165,25 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
+		
+		m_pUIStageProgram->SetClippingFrustrum(
+			m_projectionWidth,
+			m_projectionHeight,
+			m_projectionNearPlane,
+			m_projectionFarPlane,
+			m_projectionAngle);
+
+		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
+		point ptOrigin = GetComposite()->GetPosition(true);
+		ptOrigin.Reverse();
+		quaternion qRotation = GetComposite()->GetOrientation(true);
+		qRotation.Reverse();
+
+		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
+		m_pUIStageProgram->SetClippingViewMatrix(matView);
+
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
 	else {
@@ -164,7 +193,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			if (pNode->GetTitle() == "Share") {
-				m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 			}
 			else {
 				auto strURI = pNode->GetThumbnailURL();
@@ -194,8 +223,8 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 
-	GetDOS()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -304,6 +333,7 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
+	m_pScrollView->Show();
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
@@ -354,18 +384,18 @@ RESULT DreamUIBar::Update(void *pContext) {
 		uint8_t* pBuffer = &(pBufferVector->operator[](0));
 		size_t pBuffer_n = pBufferVector->size();
 
-		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pTexture);
 
 		for (auto& pChild : pChildren) {
 			auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
 			if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
-				pObj->GetSurface()->UpdateColorTexture(pTexture);
+				pObj->GetSurface()->SetDiffuseTexture(pTexture);
 			}
 		}
 
 		if (pMenuNodeTitle == "root_menu_title") {
-			m_pScrollView->GetTitleQuad()->UpdateColorTexture(pTexture);
+			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 			//TODO: temporary, should be revisited during menu cleanup
 			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
 		}
@@ -459,6 +489,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 		CN(pDreamUIBar);
 
 		GetComposite()->SetVisible(false, false);
+		m_pScrollView->Hide();
 		m_menuState = MenuState::NONE;
 	Error:
 		return r;
@@ -570,4 +601,9 @@ Error:
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
+	m_pUIStageProgram = pUIStageProgram;
+	return R_PASS;
 }

@@ -37,6 +37,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestNestedCompositeOBB());
+
 	CR(AddTestCaptureObject());
 
 	CR(AddTestMultiPrimitiveCompositeRemove());
@@ -48,8 +50,6 @@ RESULT InteractionEngineTestSuite::AddTests() {
 	CR(AddTestMultiPrimitive());
 
 	CR(AddTestObjectBasedEvents());
-
-	CR(AddTestNestedCompositeOBB());
 
 	CR(AddTestCompositeRayNested());
 
@@ -84,7 +84,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			
 			if (pDimObj != nullptr) {
 				//pDimObj->RotateYByDeg(15.0f);
-				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.5f);
+				m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.5f);
 			}
 
 		} break;
@@ -143,7 +143,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			if (pDimObj != nullptr) {
 				//pDimObj->RotateZByDeg(15.0f);
 				pDimObj->SetColor(COLOR_BLUE);
-				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.1f);
+				m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
 			}
 
 		} break;
@@ -155,7 +155,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 				//pDimObj->RotateZByDeg(15.0f);
 				pDimObj->SetColor(COLOR_GREEN);
 			}
-			m_pDreamOS->ReleaseObjects(mEvent->m_pInteractionObject);
+			m_pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(mEvent->m_pInteractionObject);
 		}
 
 		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
@@ -1256,7 +1256,6 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -1279,6 +1278,16 @@ RESULT InteractionEngineTestSuite::Initialize() {
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	point ptSceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	//vector evSceneRotation = vector(0.0f, 0.0f, 0.0f);
+	
+	//*
+	auto pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
+	pModel->SetPosition(ptSceneOffset),
+	pModel->SetScale(sceneScale); 		
+	//*/
 
 	return R_PASS;
 }

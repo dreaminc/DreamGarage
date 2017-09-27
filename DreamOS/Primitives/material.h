@@ -24,6 +24,9 @@ public:
 	RESULT SetAmbientIntensity(float ambient);
 	color GetDiffuseColor();
 
+	RESULT SetShininess(float shine);
+	RESULT SetBumpiness(float bumpiness);
+
 private:
 	float m_shine;				// specular
 	float m_bump;				// bumpiness 

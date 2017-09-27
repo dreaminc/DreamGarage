@@ -48,7 +48,7 @@ RESULT OVRMirrorTexture::OVRInitialize() {
 
 	// This will create a new OGLTexture object, but will use the already allocated texture from OVR
 	m_pOGLTexture = OGLTexture::MakeTextureFromAllocatedTexture(m_pParentImp, 
-																texture::TEXTURE_TYPE::TEXTURE_COLOR, 
+																texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
 																GL_TEXTURE_2D,
 																textureIndex,
 																m_width,

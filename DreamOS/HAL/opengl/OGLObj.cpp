@@ -303,13 +303,7 @@ Error:
 	return r;
 }
 
-OGLTexture* OGLObj::GetColorTexture() {
-	DimObj *pDimObj = GetDimObj();
-	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetColorTexture());
-	return pTexture;
-}
-
-OGLTexture* OGLObj::GetBumpTexture() {
+OGLTexture* OGLObj::GetTextureBump() {
 	DimObj *pDimObj = GetDimObj();
 	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetBumpTexture());
 	return pTexture;

@@ -21,6 +21,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
+	RESULT SetupUIStagePipeline();
 
 // Tests
 public:

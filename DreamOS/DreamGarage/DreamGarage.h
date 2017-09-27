@@ -17,13 +17,13 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class UIStageProgram;
 
 #define MAX_PEERS 8
 
 class DreamGarage : public DreamOS, 
 				    public Subscriber<SenseKeyboardEvent>, 
-					public Subscriber<SenseTypingEvent>, 
-					public Subscriber<CmdPromptEvent>	// TODO: Remove this
+					public Subscriber<SenseTypingEvent>
 {
 public:
 
@@ -87,9 +87,6 @@ public:
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
 
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
-
 private:
 	//std::map<long, user*> m_peerUsers;
 	// User Pool
@@ -109,8 +106,11 @@ private:
 	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
-	
+
 	// UI
+	//ViewMatrix *m_pClippingView;
+	UIStageProgram *m_pUIProgramNode;
+	
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser;

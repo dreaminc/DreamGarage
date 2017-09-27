@@ -120,6 +120,12 @@ public:
 	VirtualObj* SetRotateDeg(quaternion_precision degX, quaternion_precision degY, quaternion_precision degZ);
 	VirtualObj* ResetRotation();
 
+	VirtualObj* ResetOrientationOffset();
+	VirtualObj* SetOrientationOffset(quaternion q);
+	VirtualObj* SetOrientationOffset(vector vEulerRotationVector);
+	VirtualObj* SetOrientationOffset(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ);
+	VirtualObj* SetOrientationOffsetDeg(quaternion_precision thetaXdeg, quaternion_precision thetaYdeg, quaternion_precision thetaZdeg);
+
 	/*
 	VirtualObj* SetRotateX(quaternion_precision theta);
 	VirtualObj* SetRotateY(quaternion_precision theta);

@@ -310,6 +310,10 @@ RESULT quaternion::GetEulerAnglesDeg(quaternion_precision *x, quaternion_precisi
 	return R_PASS;
 }
 
+quaternion quaternion::MakeQuaternionWithEuler(vector vEuler) {
+	return MakeQuaternionWithEuler(vEuler.x(), vEuler.y(), vEuler.z());
+}
+
 //quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision psi, quaternion_precision theta) {
 quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi) {
 

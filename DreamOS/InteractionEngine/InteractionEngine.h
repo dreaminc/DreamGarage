@@ -27,7 +27,7 @@
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
-#include "Primitives/plane.h"
+#include "Primitives/CapturedObj.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
@@ -91,6 +91,14 @@ public:
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
+	virtual RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) = 0;
+	virtual RESULT ResetObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual RESULT ResetObjects(VirtualObj *pInteractionObject) = 0;
+	virtual RESULT ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual RESULT ReleaseObjects(VirtualObj *pInteractionObject) = 0;
+	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) = 0;
+	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
+	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) = 0;
 	//virtual point GetInteractionRayOrigin() = 0;
 };
 
@@ -121,13 +129,6 @@ private:
 	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
-	struct CapturedObj {
-		VirtualObj *m_pObj;
-		float m_threshold;
-		plane m_planeContext;
-		point m_ptOffset;
-		point m_ptOrigin;
-	};
 
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
@@ -141,8 +142,14 @@ public:
 	RESULT UpdateInteractionRay();
 	*/
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
-	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
+	virtual RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) override;
+	virtual RESULT ResetObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual RESULT ResetObjects(VirtualObj *pInteractionObject) override;
+	virtual RESULT ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual RESULT ReleaseObjects(VirtualObj *pInteractionObject) override;
+	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) override;
+	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
+	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) override;
 
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
 	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);
@@ -210,7 +217,7 @@ private:
 	std::vector<VirtualObj*> m_interactionObjects;
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
-	std::map<VirtualObj*, CapturedObj*> m_capturedObjects;
+	std::map<VirtualObj*, std::vector<CapturedObj*>> m_capturedObjects;
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
 	AnimationQueue* m_pObjectQueue = nullptr;

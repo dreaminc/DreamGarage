@@ -356,11 +356,11 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	// Create a transparent background quad to ensure sizing 
 	point ptGlyphBg = point(glyphQuadXPosition, 0.0f, glyphBgQuadYPosition);
 	std::shared_ptr<quad> pQuadBg = AddQuad(glyphWidth, glyphBgHeight, ptGlyphBg, uvcoord(0.0f, 0.0f), uvcoord(0.0f, 0.0f));
-	pQuadBg->SetColorTexture(m_pFont->GetTexture().get());
+	pQuadBg->SetDiffuseTexture(m_pFont->GetTexture().get());
 
 	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
-	pQuad->SetColorTexture(m_pFont->GetTexture().get());
+	pQuad->SetDiffuseTexture(m_pFont->GetTexture().get());
 
 	return pQuad;
 
@@ -415,11 +415,11 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 			texture *pLayoutBGTexture = nullptr;
 			if ((pLayoutBGTexture = pLayout->GetSpecialTexture(pUIKey->m_letter)) != nullptr) {
 				std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
-				pBgQuad->SetColorTexture(pLayoutBGTexture);
+				pBgQuad->SetDiffuseTexture(pLayoutBGTexture);
 			}
 			else if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
 				std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
-				pBgQuad->SetColorTexture(pLayoutBGTexture);
+				pBgQuad->SetDiffuseTexture(pLayoutBGTexture);
 			}
 			//*/
 
@@ -449,7 +449,7 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 				//TODO: account for bearingY like AddGlyphQuad
 				// may be possible to use AddGlyphQuad
 				std::shared_ptr<quad> pGlyphQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
-				pGlyphQuad->SetColorTexture(m_pFont->GetTexture().get());
+				pGlyphQuad->SetDiffuseTexture(m_pFont->GetTexture().get());
 
 				//posX += (float)(glyph.advance);
 			}
@@ -703,7 +703,7 @@ RESULT text::SetBackgroundColorTexture(texture *pColorTexture) {
 	CR(SetBackgroundQuad());
 	CN(m_pBackgroundQuad);
 
-	CR(m_pBackgroundQuad->SetColorTexture(m_pBackgroundColorTexture));
+	CR(m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundColorTexture));
 
 Error:
 	return r;
