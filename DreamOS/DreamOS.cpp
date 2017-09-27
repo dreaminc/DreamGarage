@@ -805,6 +805,10 @@ RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject, InteractionEven
 	return m_pSandbox->UnregisterInteractionObject(pObject, eventType, pInteractionSubscriber);
 }
 
+RESULT DreamOS::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pSandbox->UnregisterInteractionSubscriber(pInteractionSubscriber);
+}
+
 RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->UnregisterInteractionObject(pObject);
 }

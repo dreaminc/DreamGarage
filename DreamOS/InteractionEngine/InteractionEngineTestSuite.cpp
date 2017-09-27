@@ -16,6 +16,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 	DimRay *pMouseRay = nullptr;
 	sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
 	composite *pComposite = nullptr;
+	int m_value = 0;
 
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
 		RESULT r = R_PASS;
@@ -23,7 +24,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 		// handle event
 		switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			DEBUG_LINEOUT("intersect began state: 0x%x", mEvent->m_activeState);
+			DEBUG_LINEOUT("intersect began state: 0x%x %d", mEvent->m_activeState, m_value);
 
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
@@ -34,11 +35,11 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
+			DEBUG_LINEOUT("intersect moved state: 0x%x %d", mEvent->m_activeState, m_value);
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			DEBUG_LINEOUT("intersect ended state: 0x%x", mEvent->m_activeState);
+			DEBUG_LINEOUT("intersect ended state: 0x%x %d", mEvent->m_activeState, m_value);
 
 			// NOTE: This is not compatible with the composite vs non-composite tests
 
@@ -48,6 +49,14 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 
 			if (pDimObj != nullptr) {
 				pDimObj->RotateYByDeg(-15.0f);
+
+				/*
+				if(m_value == 1)
+					m_pDreamOS->UnregisterInteractionObject(pDimObj);
+				
+				if(m_value == 2)
+					m_pDreamOS->UnregisterInteractionSubscriber(this);
+				*/
 			}
 		} break;
 
@@ -1020,9 +1029,14 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 	TestContext *pTestContext = new TestContext();
 	pTestContext->m_pDreamOS = m_pDreamOS;
+	pTestContext->m_value = 1;
+
+	TestContext *g_pTestContext2 = new TestContext();
+	g_pTestContext2->m_pDreamOS = m_pDreamOS;
+	g_pTestContext2->m_value = 2;
 
 	// Initialize Code 
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		CN(m_pDreamOS);
@@ -1033,6 +1047,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 		{
 			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+			TestContext *pTestContext2 = reinterpret_cast<TestContext*>(g_pTestContext2);
 
 			pTestContext->pQuad[0] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[0]->SetPosition(point(0.0f, -2.0f, 0.0f));
@@ -1087,6 +1102,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				for (int j = 0; j < 3; j++) {
 					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), pTestContext));
+					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), pTestContext2));
 				}
 			}
 

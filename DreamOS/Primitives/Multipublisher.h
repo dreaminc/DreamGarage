@@ -87,13 +87,22 @@ public:
 		pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
 		indexedIt = pSubscriberMap->find(indexEvent);
 
-		CBM((indexedIt == pSubscriberMap->end()), "Object already subscribed to event %s", GetEventKeyString(keyEvent));
+		// Look for the item's subscriber vector, if it doesn't exist add it
+		if (indexedIt == pSubscriberMap->end()) {
+			(*pSubscriberMap)[indexEvent] = T_SubscriberVector();
+			T_SubscriberVector *pSubscriberVector = &((*pSubscriberMap)[indexEvent]);
+			pSubscriberVector->push_back(pSubscriber);
+		}
+		else {
+			// Vector already exists, check to see if the subscriber is already in the item's subscriber vector
+			T_SubscriberVector *pSubscriberVector = &((*pSubscriberMap)[indexEvent]);
+			auto subscriberVectorIt = find(pSubscriberVector->begin(), pSubscriberVector->end(), pSubscriber);
 
-		// If not found - add it here
-		(*pSubscriberMap)[indexEvent] = pSubscriber;
-
-		// TODO: Don't currently support multiple subscribers to the same object 
-		// If we want this - there needs to be a list of subscribers 
+			CBM((subscriberVectorIt == pSubscriberVector->end()), "Object already subscribed to event %s", GetEventKeyString(keyEvent));
+			pSubscriberVector->push_back(pSubscriber);
+		}
+		
+		//(*pSubscriberMap)[indexEvent] = pSubscriber;
 
 	Error:
 		return r;
@@ -107,34 +116,37 @@ public:
 
 		auto it = m_indexedEvents.find(keyClass);
 
-		typename T_SubscriberMap* pSubscriberMap = nullptr;
-
 		CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyClass));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyClass));
 
-		pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
+		{
+			typename T_SubscriberMap* pSubscriberMap = nullptr;
 
-		if (pSubscriberMap != nullptr) {
+			pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
+			CNM(pSubscriberMap, "Subscriber map not set for index");
+
 			auto indexedIt = pSubscriberMap->find(indexClass);
+			CBM((indexedIt != pSubscriberMap->end()), "Object not subscribed to event");
 
-			if (indexedIt != pSubscriberMap->end()) {
+			T_SubscriberVector *pSubscriberVector = &((*pSubscriberMap)[indexClass]);
+			auto subscriberVectorIt = find(pSubscriberVector->begin(), pSubscriberVector->end(), pSubscriber);
+			CBM((subscriberVectorIt != pSubscriberVector->end()), "Subscriber not subscribed to event %s", GetEventKeyString(keyClass));
+
+			pSubscriberVector->erase(subscriberVectorIt);
+
+			// Check to see if vector is empty so we can remove it
+			if (pSubscriberVector->size() == 0) {
 				pSubscriberMap->erase(indexedIt);
+				
+				SetDirty();
+				
 				return r;
 			}
-
-			// TODO: Don't currently support multiple subscribers to the same object 
-			// If we want this - there needs to be a list of subscribers 
-
-			CBM((0), "Index not found for event %s", GetEventKeyString(keyClass));
 		}
-
-		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyClass));
 
 	Error:
 		return r;
 	}
-
-	
 
 	// This will unsubscribe a subscriber from all events
 	// Error handling warranted by the fact that something is really wrong if
@@ -146,17 +158,28 @@ public:
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 
 		while (it != m_indexedEvents.end()) {
-			T_SubscriberMap *pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
-			auto indexIt = pSubscriberMap->begin();
-
 			PKeyClass keyEvent = reinterpret_cast<PKeyClass>(it->first);
+			T_SubscriberMap *pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
 
-			while (indexIt != pSubscriberMap->end()) {
-				PIndexClass indexEvent = reinterpret_cast<PKeyClass>(indexIt->first);
+			if (pSubscriberMap != nullptr) {
 
-				CRM(UnregisterSubscriber(indexEvent, keyEvent, pSubscriber), "Failed to unsubscribe for event %s", GetEventKeyString(keyEvent));
+				auto subscriberMapIt = pSubscriberMap->begin();
 
-				indexIt++;
+				while (subscriberMapIt != pSubscriberMap->end()) {
+
+					T_SubscriberVector *pSubscriberVector = &(subscriberMapIt->second);
+					auto subscriberVectorIt = find(pSubscriberVector->begin(), pSubscriberVector->end(), pSubscriber);
+
+					// Above code should ensure that there is only one unique 
+					// subscriber in each item vector
+					if (subscriberVectorIt != pSubscriberVector->end()) {
+						pSubscriberVector->erase(subscriberVectorIt);
+						SetDirty();
+					}
+
+					subscriberMapIt++;
+
+				}
 			}
 
 			it++;
@@ -228,7 +251,10 @@ public:
 
 		if (pSubscriberMap->size() > 0) {
 			for (auto &indexSubItem : *pSubscriberMap) {
-				WCR(indexSubItem.second->Notify(pEvent));
+				for (auto &pSubscriber : indexSubItem.second) {
+					//WCR(indexSubItem.second->Notify(pEvent));
+					WCR(pSubscriber->Notify(pEvent));
+				}
 			}
 		}
 
@@ -252,13 +278,34 @@ public:
 			for (auto &indexSubItem : *pSubscriberMap) {
 				
 				if (indexSubItem.first == index) {
-					WCR(indexSubItem.second->Notify(pEvent));
-				}
 
-				// If dirty set ensure index still exists
-				if (CheckAndCleanDirty() && FindIndexClass(index) == false) {
-					break;
-				}
+					// Make a copy so that we don't block other subscribers
+					// if one is removed (we are guaranteed only one unique so this will not result in duplicates)
+					auto tempSubscriberVector = indexSubItem.second;
+
+					for (auto &pSubscriber : tempSubscriberVector) {
+						//WCR(indexSubItem.second->Notify(pEvent));
+
+						// TODO: This doesn't handle the removal of the subscriber in the vector
+						WCR(pSubscriber->Notify(pEvent));
+
+						// If dirty set ensure index still exists
+						if (CheckAndCleanDirty()) {
+							if (FindIndexClass(index) == false) {
+								// TODO: Not sure if we want to exit the function here 
+								// but this does the job
+								return r;
+							}/*
+							else {
+								// TODO: While not eloquent, this will ensure we don't continue to
+								// iterate a vector where the subscriber has been removed - there's only going to be 
+								// one unique, but this way we don't prevent block subscribers on other indexes 
+								break;
+							}
+							*/
+						}
+					}
+				}				
 			}
 		}
 
@@ -290,8 +337,8 @@ public:
 	typedef std::vector<T_EventSubscriber*> T_SubscriberVector;
 	//typedef std::map<PIndexClass, T_EventSubscriber*> T_KeyMap;
 
-	//typedef std::map<PIndexClass, T_SubscriberVector> T_SubscriberMap;
-	typedef std::map<PIndexClass, T_EventSubscriber*> T_SubscriberMap;
+	typedef std::map<PIndexClass, T_SubscriberVector> T_SubscriberMap;
+	//typedef std::map<PIndexClass, T_EventSubscriber*> T_SubscriberMap;
 
 	typedef std::map<PKeyClass, T_SubscriberMap*, MAP_COMPARE_FUNCTION_STRUCT> T_KeyMap;
 

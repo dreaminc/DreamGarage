@@ -779,6 +779,10 @@ RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject, InteractionE
 	return m_pInteractionEngine->UnregisterSubscriber(pObject, eventType, pInteractionSubscriber);
 }
 
+RESULT SandboxApp::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pInteractionEngine->UnregisterSubscriber(pInteractionSubscriber);
+}
+
 RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject) {
 	return m_pInteractionEngine->UnregisterSubscriber(pObject);
 }
