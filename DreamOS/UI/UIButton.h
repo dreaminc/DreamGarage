@@ -15,7 +15,7 @@ public:
 
 public:
 	RESULT RegisterToInteractionEngine(DreamOS *pDreamOS);
-	RESULT RegisterEvent(UIEventType type, std::function<RESULT(void*)> fnCallback);
+	RESULT RegisterEvent(UIEventType type, std::function<RESULT(UIButton*,void*)> fnCallback, void *pContext = nullptr);
 	RESULT Notify(UIEvent *pEvent);
 
 	std::shared_ptr<composite> GetContextComposite();
@@ -36,7 +36,7 @@ protected:
 	// context for positioning button
 	std::shared_ptr<composite> m_pContextComposite = nullptr;
 
-	std::map<UIEventType, std::function<RESULT(void*)>> m_callbacks;
+	std::map<UIEventType, std::pair<std::function<RESULT(UIButton*,void*)>,void*>> m_callbacks;
 
 	VirtualObj *m_pInteractionObject = nullptr; // set on UIEvents since the button is the context for the callbacks
 	point m_ptContact;
