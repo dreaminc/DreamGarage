@@ -47,10 +47,11 @@ RESULT user::Initialize() {
 
 //#ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
-	m_pMouth = AddQuad(0.3, 1.0);
-	m_pMouth->MoveTo(0.0f, -0.135f, 0.1f);
+	m_pMouth = m_pHead->AddQuad(0.3, 1.0);
+	//m_pMouth->MoveTo(0.0f, -0.135f, -0.1f);
+	m_pMouth->MoveTo(0.0f, 12.0f, 8.35f);
 
-	m_pMouth->RotateXByDeg(270);
+	m_pMouth->RotateXByDeg(90);
 	m_pMouth->RotateZByDeg(90);
 
 	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -136,7 +137,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	
 	CN(m_pMouth);
 
-	m_pMouth->Scale(0.01f + 0.1f * mouthScale);
+	m_pMouth->Scale(0.01f + 10.0f * mouthScale);
 
 Error:
 	return r;
