@@ -41,11 +41,11 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 
-	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	//}
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
+	}
 
 Error:
 	return r;
@@ -90,6 +90,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
 	CR(r);
+
+	if (mEvent->m_pInteractionObject != m_pOrientationRay.get()) {
+		int a = 5;
+	}
 
 Error:
 	return r;
