@@ -82,12 +82,12 @@ public:
 	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
-	RESULT HandleTouchStart(void* pContext);
+	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
 	RESULT HandleMenuUp(void* pContext);
-	RESULT HandleSelect(void* pContext);
+	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
 

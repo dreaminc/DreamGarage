@@ -261,29 +261,25 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::Rotate45(void *pContext) {
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	button->GetSurface()->RotateZByDeg(45.0f);
+RESULT UIViewTestSuite::Rotate45(UIButton *pButtonContext, void *pContext) {
+	pButtonContext->GetSurface()->RotateZByDeg(45.0f);
 	return R_PASS;
 };
 
-RESULT UIViewTestSuite::Rotate15(void *pContext) {
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	button->GetSurface()->RotateZByDeg(15.0f);
+RESULT UIViewTestSuite::Rotate15(UIButton *pButtonContext, void *pContext) {
+	pButtonContext->GetSurface()->RotateZByDeg(15.0f);
 	return R_PASS;
 };
 
-RESULT UIViewTestSuite::ResetRotation(void *pContext) {
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	button->GetSurface()->ResetRotation();
+RESULT UIViewTestSuite::ResetRotation(UIButton *pButtonContext, void *pContext) {
+	pButtonContext->GetSurface()->ResetRotation();
 	return R_PASS;
 };
 
-RESULT UIViewTestSuite::AnimateScaleUp(void *pContext) {
+RESULT UIViewTestSuite::AnimateScaleUp(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	DimObj *pObj = button->GetSurface().get();
+	DimObj *pObj = pButtonContext->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
@@ -299,11 +295,10 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AnimateScaleReset(void *pContext) {
+RESULT UIViewTestSuite::AnimateScaleReset(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	DimObj *pObj = button->GetSurface().get();
+	DimObj *pObj = pButtonContext->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
@@ -319,11 +314,10 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AnimateMoveUpAndBack(void *pContext) {
+RESULT UIViewTestSuite::AnimateMoveUpAndBack(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	DimObj *pObj = button->GetSurface().get();
+	DimObj *pObj = pButtonContext->GetSurface().get();
 
 	point ptOrigin = pObj->GetPosition();
 
@@ -428,18 +422,18 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 			pButton->RegisterToInteractionEngine(m_pDreamOS);
 
 			pButton->RegisterEvent(UIEventType::UI_HOVER_BEGIN, 
-				std::bind(&UIViewTestSuite::Rotate45, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::Rotate45, this, std::placeholders::_1, std::placeholders::_2));
 			pButton->RegisterEvent(UIEventType::UI_HOVER_ENDED,
-				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1, std::placeholders::_2));
 		
 			auto p2 = pView->AddUIButton();
 			p2->SetPosition(point(2.0f, 0.0f, 0.0f));
 			p2->RegisterToInteractionEngine(m_pDreamOS);
 
 			p2->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
-				std::bind(&UIViewTestSuite::Rotate15, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::Rotate15, this, std::placeholders::_1, std::placeholders::_2));
 			p2->RegisterEvent(UIEventType::UI_HOVER_ENDED,
-				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1, std::placeholders::_2));
 
 			m_pDreamOS->AddInteractionObject(pComposite);
 
@@ -448,9 +442,9 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 			p3->RegisterToInteractionEngine(m_pDreamOS);
 
 			p3->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
-				std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1, std::placeholders::_2));
 			p3->RegisterEvent(UIEventType::UI_HOVER_ENDED,
-				std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1));
+				std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1, std::placeholders::_2));
 		}
 	Error:
 		return r;
@@ -497,9 +491,9 @@ RESULT UIViewTestSuite::AddTestUIButtons() {
 				pButton->SetPosition(point(i * 1.5f - 2.25f, 0.0f, 0.0f));
 
 				pButton->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
-					std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1));
+					std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1, std::placeholders::_2));
 				pButton->RegisterEvent(UIEventType::UI_HOVER_ENDED,
-					std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1));
+					std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1, std::placeholders::_2));
 				//pButton->RegisterEvent(UI_SELECT_ENDED,
 				//	std::bind(&UIViewTestSuite::AnimateMoveUpAndBack, this, std::placeholders::_1));
 			}

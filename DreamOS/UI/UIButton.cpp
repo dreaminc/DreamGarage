@@ -47,8 +47,8 @@ Error:
 	return r;
 }
 
-RESULT UIButton::RegisterEvent(UIEventType type, std::function<RESULT(void*)> fnCallback) {
-	m_callbacks[type] = fnCallback;
+RESULT UIButton::RegisterEvent(UIEventType type, std::function<RESULT(UIButton*,void*)> fnCallback, void *pContext) {
+	m_callbacks[type] = std::make_pair(fnCallback,pContext);
 	return R_PASS;
 }
 
@@ -58,14 +58,16 @@ RESULT UIButton::Notify(UIEvent *pEvent) {
 	m_pInteractionObject = pEvent->m_pInteractionObject;
 	m_ptContact = pEvent->m_ptContact;
 
-	std::function<RESULT(void*)> fnCallback;
+	std::function<RESULT(UIButton*,void*)> fnCallback;
 
 	CBR(m_callbacks.count(pEvent->m_eventType) > 0, R_OBJECT_NOT_FOUND);
 
-	fnCallback = m_callbacks[pEvent->m_eventType];
+	fnCallback = m_callbacks[pEvent->m_eventType].first;
+	void *pContext = m_callbacks[pEvent->m_eventType].second;
+
 	CN(fnCallback);
 
-	CR(fnCallback(this));
+	CR(fnCallback(this,pContext));
 
 Error:
 	return r;

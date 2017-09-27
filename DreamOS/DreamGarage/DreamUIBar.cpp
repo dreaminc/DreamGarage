@@ -106,10 +106,10 @@ RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUIBar::HandleTouchStart(void* pContext) {
+RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	auto pSurface = pSelected->GetSurface();
 
 	//vector for captured object movement
@@ -215,13 +215,13 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleSelect(void* pContext) {
+RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
@@ -429,9 +429,9 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//*
 			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
+				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
+				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));
 				//*/
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
