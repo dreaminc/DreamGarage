@@ -371,6 +371,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 			RemoveActiveKey(key);
 			key->m_state = KeyState::KEY_UP;
 		}
+		//break;	//used for testing
 	}
 
 Error:
