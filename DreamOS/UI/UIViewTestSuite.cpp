@@ -7,6 +7,7 @@
 #include "UIView.h"
 #include "UIButton.h"
 #include "UIScrollView.h"
+#include "UIMallet.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -715,51 +716,44 @@ Error:
 
 RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	RESULT r = R_PASS;
-	struct TestContext {
+	struct TestContext : public Subscriber<SenseControllerEvent> {
 		std::shared_ptr<text> pTextBoxText;
 		std::shared_ptr<composite> pChildComposite;
 		std::shared_ptr<font> pFont;
 		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
-		DreamOS *pDreamOS;	//lost in button function otherwise
-		
+		bool fMalletIncreaseAngle = false;
+		bool fMalletDecreaseAngle = false;		
+		DreamOS *pDreamOS;	
 		float malletAngle = 180.0f;
 		UIMallet *pBLeftMallet = nullptr;
 		UIMallet *pBRightMallet = nullptr;
 		UIMallet *pKLeftMallet = nullptr;
 		UIMallet *pKRightMallet = nullptr;
-		RESULT addKeyboardAngle(void *pContext) {
+		virtual RESULT Notify(SenseControllerEvent *event) override {
 			RESULT r = R_PASS;
-			float current = pDreamOS->GetKeyboard()->GetAngle();
-			if (current > 90.0f) {
-				current = 15.0f;
+			SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+
+			if (event->state.type == CONTROLLER_RIGHT) {
+				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+					fMalletDecreaseAngle = true;
+				}
 			}
-			else
-				current += 1.0f;
-			pKeyboard->SetSurfaceAngle(current);
-			CR(pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			return r;
-		Error:
+			else if (event->state.type == CONTROLLER_LEFT) {
+				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+					fMalletIncreaseAngle = true;
+				}
+			}
 			return r;
 		}
 	};
-	//static TestContext *pTestContext = new TestContext();
 	TestContext *pTestContext = new TestContext();
 
 	double sTestTime = 10000.0;
-	float lineHeight = .027f;
-	float numLines = 1.0f;
-	float lineWidth = 0.5f;
-	float currentMalletAngle = 0.0f;
-	
-	auto fnGetTestContext = [&]() {
-		return pTestContext;
-	};
 
-	auto fnAddKeyboardAngle = [=](void *pContext) {
+	auto fnAddKeyboardAngle = [=](UIButton *pButton, void *pContext) {
 		RESULT r = R_PASS;
-		//auto pTContext = reinterpret_cast<TestContext*>(pTestContext);
-		//auto& pKeyboard = m_pDreamOS->GetKeyboard();
-		TestContext	*pTestContext = fnGetTestContext();
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
 		auto& pKeyboard = pTestContext->pKeyboard;
 		float current = pKeyboard->GetAngle();
 		if (current > 90.0f) {
@@ -769,24 +763,16 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			current += 1.0f;
 		pKeyboard->SetSurfaceAngle(current);
 		std::string strCurrentAngle = std::to_string(current);
+		pTestContext->pTextBoxText->SetText(strCurrentAngle);
 		CR(pTestContext->pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		return r;
 	Error:
 		return r;
 	};
-	
-	auto fnDoNothing = [&](void *pContext) {
-		
-		return R_PASS;
-	};
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-
-		auto& pChildComposite = pTestContext->pChildComposite;
-		auto& pFont = pTestContext->pFont;
-		auto& pTextBoxText = pTestContext->pTextBoxText;
 		pTestContext->pDreamOS = m_pDreamOS;
 		auto& pMalletAngle = pTestContext->malletAngle;
 		
@@ -823,14 +809,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			float menuDepth = pDreamUIBar->GetMenuDepth();
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
-			pChildComposite = pComposite->AddComposite();
-			CN(pChildComposite);
-			//CR(pComposite->InitializeOBB());
-			//CR(tComposite->InitializeOBB());
 			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
-			pChildComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 2.1f));	//with hmd
-			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.6f));
-			//tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 4.6f));	
 			
 			auto pView = pComposite->AddUIView(m_pDreamOS);
 			CN(pView);
@@ -842,32 +821,29 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pUIButtonAngleDecrease->SetPosition(point(-0.5f, 0.0f, -0.1f));
 
 			//Setup textbox
-			pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-			CN(pFont);
-			pFont->SetLineHeight(lineHeight);
+			pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			CN(pTestContext->pFont);
+			pTestContext->pFont->SetLineHeight(0.050f);
 			{
-				pChildComposite->RotateXByDeg(90.0f);
-
-				pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
-					pFont,
-					"hi",
-					lineWidth - 0.02f,
-					//lineHeight * numLines,
-					10.0f,
+				pTestContext->pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+					pTestContext->pFont,
+					"hihihihihihi",
+					0.5f - 0.02f,
+					.050,
 					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
-				CN(pTextBoxText);
-				pComposite->AddObject(pTextBoxText);
+				CN(pTestContext->pTextBoxText);
+				pView->AddObject(pTestContext->pTextBoxText);
+				pTestContext->pTextBoxText->SetPosition(point(0.0f, 0.0f, -.1f));
+				pTestContext->pTextBoxText->RotateXByDeg(90.0f);
 			}
 
 			//interaction
 			CR(pUIButtonAngleIncrease->RegisterToInteractionEngine(m_pDreamOS));
 			CR(pUIButtonAngleDecrease->RegisterToInteractionEngine(m_pDreamOS));
-			//pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) {return pTestContext->addKeyboardAngle(pContext); });
-			//pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, [&](void *pContext) { return fnAddKeyboardAngle(pTestContext); });
-			pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnDoNothing);
-			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnDoNothing);
+			pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnAddKeyboardAngle, pTestContext);
+			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnAddKeyboardAngle, pTestContext);
 
-			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, this));
+			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext));
 			//*/
 
 			float radiusOfReferenceSpheres = 0.015f;
@@ -880,8 +856,10 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pSphere->SetPosition(ptCamera + point(0.5f, 1.0f, 0.0f));
 			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
 			pSphere->SetPosition(ptCamera + point(-0.5f, 1.0f, 0.0f));
-			/*m_pDreamOS->GetKeyboard()->ShowKeyboard();
-			m_pDreamOS->GetKeyboard()->UpdateComposite(ptCamera.y()+ 2.0f, ptCamera.z()-0.4f);*/
+			
+			//m_pDreamOS->GetKeyboard()->ShowKeyboard();
+			//m_pDreamOS->GetKeyboard()->UpdateComposite(ptCamera.y(), ptCamera.z()-.3f);
+			
 		}
 
 	Error:
@@ -891,28 +869,26 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	auto fnUpdate = [&](void *pContext) {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(m_pDreamOS);
-		if (m_pDreamOS->GetKeyboard()->GetLeftMallet()->CheckAndCleanDirty()) {
+		if (pTestContext->fMalletDecreaseAngle) {
 			pTestContext->malletAngle--;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
-		else if (m_pDreamOS->GetKeyboard()->GetRightMallet()->CheckAndCleanDirty()) {
+		else if (pTestContext->fMalletIncreaseAngle) {
 			pTestContext->malletAngle++;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
-		//*/
-		//*
-		if(currentMalletAngle != pTestContext->malletAngle) {
-			currentMalletAngle = pTestContext->malletAngle;
-			std::string strCurrentAngle = std::to_string(currentMalletAngle);
+		if(pTestContext->fMalletDecreaseAngle || pTestContext->fMalletIncreaseAngle) {
+			pTestContext->fMalletIncreaseAngle = false;
+			pTestContext->fMalletDecreaseAngle = false;
+			std::string strCurrentAngle = std::to_string(pTestContext->malletAngle);
 			pTestContext->pTextBoxText->SetText(strCurrentAngle);
-
 			float rotationAngle = (pTestContext->malletAngle * (float)(M_PI) / 180.0f);
 
 			pTestContext->pKLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pBLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pBRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-		}//*/
+		}
 
 	Error:
 		return R_PASS;
@@ -955,36 +931,8 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
-	case (UIEventType::UI_SELECT_BEGIN): {
-		float current = m_pDreamOS->GetKeyboard()->GetAngle();
-		if (current > 90.0f) {
-			current = 15.0f;
-		}
-		else
-			current += 1.0f;
-		m_pDreamOS->GetKeyboard()->SetSurfaceAngle(current);
-		m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1);
-	} break;
 	}
 
-//Error:
-	return r;
-}
-
-RESULT UIViewTestSuite::Notify(SenseControllerEvent *event) {
-	RESULT r = R_PASS;
-	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	
-	if (event->state.type == CONTROLLER_RIGHT) {
-		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			m_pDreamOS->GetKeyboard()->GetRightMallet()->SetDirty();
-		}
-	}
-	else if (event->state.type == CONTROLLER_LEFT) {
-		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			m_pDreamOS->GetKeyboard()->GetLeftMallet()->SetDirty();
-		}
-	}
 //Error:
 	return r;
 }

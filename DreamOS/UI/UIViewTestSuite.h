@@ -5,22 +5,17 @@
 #include "RESULT/EHM.h"
 
 #include "Primitives/valid.h"
-#include "Primitives/TextEntryString.h"
 #include "Primitives/Subscriber.h"
-#include "Primitives/dirty.h"
 #include "Test/TestSuite.h"
 
-#define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
-#define TEXTBOX_NUM_LINES 1.0f
-#define TEXTBOX_WIDTH 0.2f
 
 class DreamOS;
 class UIView;
 class UIButton;
+class UIStageProgram;
 struct UIEvent;
-struct SenseControllerEvent;
 
-class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
+class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
 {
 public:
 	UIViewTestSuite(DreamOS *pDreamOS);
@@ -63,7 +58,6 @@ public:
 
 public:
 	virtual RESULT Notify(UIEvent *pEvent) override;
-	virtual RESULT Notify(SenseControllerEvent *event) override;
 
 private:
 	DreamOS *m_pDreamOS;
