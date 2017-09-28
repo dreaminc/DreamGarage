@@ -158,7 +158,7 @@ RESULT DreamGarage::SetupUserModelPool() {
 
 	// Set up user pool
 	for (int i = 0; i < MAX_PEERS; i++) {
-		m_usersModelPool[i] = std::make_pair<DreamPeer*, user*>(nullptr, AddUser());
+		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, user*>(nullptr, AddUser());
 		m_usersModelPool[i].second->SetVisible(false);
 	}
 
@@ -166,13 +166,14 @@ RESULT DreamGarage::SetupUserModelPool() {
 	return r;
 }
 
-RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer) {
+RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == nullptr) {
 			userModelPair.second->SetVisible(0.0f);
-			CR(pDreamPeer->AssignUserModel(userModelPair.second));
+			
+			//CR(pDreamPeer->AssignUserModel(userModelPair.second));
 
 			userModelPair.first = pDreamPeer;
 
@@ -182,11 +183,11 @@ RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer) {
 
 	return R_POOL_FULL;
 
-Error:
+//Error:
 	return r;
 }
 
-RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
@@ -199,7 +200,7 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDrea
 	return R_NOT_FOUND;
 }
 
-user* DreamGarage::FindUserModelInPool(DreamPeer *pDreamPeer) {
+user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
 			return userModelPair.second;
@@ -561,7 +562,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition) {
+RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition) {
 	RESULT r = R_PASS;
 
 	point ptSeatPosition;
@@ -578,7 +579,7 @@ Error:
 
 // Cloud Controller
 
-RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	RESULT r = R_PASS;
 
 	CR(UnallocateUserModelFromPool(pDreamPeer));
@@ -587,7 +588,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
+RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	///*

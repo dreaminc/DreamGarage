@@ -32,20 +32,19 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	GetComposite()->InitializeOBB();
 
-	m_pVolume = GetComposite()->AddVolume(1.0f);
-	CN(m_pVolume);
+	//m_pVolume = GetComposite()->AddVolume(1.0f);
+	//CN(m_pVolume);
 
 	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
 	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(false);
+	m_pOrientationRay->SetVisible(true);
 
 	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	}
+	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
+	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
+	//}
 
 Error:
 	return r;

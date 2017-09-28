@@ -26,6 +26,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestUserModel());
 
+	CR(AddTestModel());
+
 	CR(AddTestModelOrientation());
 
 	CR(AddTestBlinnPhongShaderTexture());
@@ -33,8 +35,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestUIShaderStage());
 
 	CR(AddTestEnvironmentShader());
-
-	CR(AddTestModel());
 
 	CR(AddTestSkybox());
 
@@ -775,6 +775,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 	struct TestContext {
 		user *pUser = nullptr;
+		composite *pComposite = nullptr;
 	} *pTestContext = new TestContext();
 
 	float width = 5.5f;
@@ -801,11 +802,20 @@ RESULT HALTestSuite::AddTestUserModel() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
+
+			//pTestContext->pComposite = m_pDreamOS->AddComposite();
+			//CN(pTestContext->pComposite);
+			//pTestContext->pComposite->InitializeOBB();
+			//
+			//auto pModel = pTestContext->pComposite->AddModel(L"\\face4\\untitled.obj");
+			//pTestContext->pComposite->SetPosition(point(0.0f, -1.0f, -5.0f));
+			//pTestContext->pComposite->SetScale(0.1f);
+
 			pTestContext->pUser = m_pDreamOS->AddUser();
 			CN(pTestContext->pUser);
-
-			pTestContext->pUser->SetPosition(0.0f, 0.0f, 1.0f);
-
+			
+			pTestContext->pUser->SetPosition(0.0f, 0.0f, 0.0f);
+			
 			pTestContext->pUser->UpdateMouth(1.0f);
 		}
 
@@ -825,7 +835,8 @@ RESULT HALTestSuite::AddTestUserModel() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->pUser->RotateYByDeg(0.035f);
+		if(pTestContext->pUser != nullptr)
+			pTestContext->pUser->RotateYByDeg(0.035f);
 
 	Error:
 		return r;
@@ -960,7 +971,11 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 
-			///*
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pTestContext->pModel->SetScale(0.1f);
+
+			/*
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj");
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -8.0f));
 			pTestContext->pModel->SetScale(0.5f);

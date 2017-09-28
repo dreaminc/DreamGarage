@@ -157,7 +157,10 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	int nRepeats = 1;
 
 	struct TestContext : public Subscriber<InteractionObjectEvent> {
+		user *pUser = nullptr;
 		sphere *pSphere = nullptr;
+		std::shared_ptr<DreamPeerApp> m_pPeers[4] = { nullptr };
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
 		DimRay *pMouseRay = nullptr;
 
 		virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
@@ -166,6 +169,9 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 			CR(r);
 
 			DEBUG_LINEOUT("stuff");
+
+			if(mEvent->m_numContacts > 0)
+				pSphere->SetPosition(mEvent->m_ptContact[0]);
 
 		Error:
 			return r;
@@ -190,22 +196,35 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
-		pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
-		CNM(pDreamUserApp, "Failed to create dream user app");
+		pTestContext->pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
-		// Add some objects 
-		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		// Add some users
+		//for (int i = 0; i < 4; i++) {
+		//	pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
+		//	CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
+		//
+		//	pTestContext->m_pPeers[i]->SetPosition(point(-2.0f + i * 1.0f, 0.0f, 0.0f));
+		//}
+
+
+		// Sphere test
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.025f, 10, 10);
 		CN(pTestContext->pSphere);
-		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pSphere);
+		//m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pSphere);
+
+		// User test
+		pTestContext->pUser = m_pDreamOS->AddUser();
+		CN(pTestContext->pUser);
+		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pUser);
 
 		//// Mouse Ray
 		//pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
 		//CN(pTestContext->pMouseRay);
 		//m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay);
 
-		for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-			CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pSphere, (InteractionEventType)(i), pTestContext));
-		}
+		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_BEGAN, pTestContext));
+		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_ENDED, pTestContext));
 
 	Error:
 		return r;

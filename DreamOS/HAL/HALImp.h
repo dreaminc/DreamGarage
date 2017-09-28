@@ -152,6 +152,15 @@ public:
 		return pObj;
 	}
 
+	template<typename objType>
+	objType* TMakeObject() {
+		HelperFactory<objType> helperFactory(this);
+
+		objType *pObj = helperFactory.TMakeObject();
+
+		return pObj;
+	}
+
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 
@@ -247,6 +256,7 @@ template<typename... Targs>
 texture* HALImp::HelperFactory<texture>::TMakeObject(Targs... Fargs) {
 	return m_pImp->MakeTexture(Fargs...);
 }
+
 
 // TODO: a lot of this logic should go into the implementation maybe?
 template<>

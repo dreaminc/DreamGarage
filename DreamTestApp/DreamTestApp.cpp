@@ -99,11 +99,11 @@ RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessag
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnNewDreamPeer(DreamPeer *pDreamPeer) {
+RESULT DreamTestApp::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 

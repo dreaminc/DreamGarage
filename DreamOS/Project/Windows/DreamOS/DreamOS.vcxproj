@@ -688,7 +688,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSTestSuite.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
-    <ClCompile Include="..\..\..\DreamPeer.cpp" />
+    <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
@@ -932,7 +932,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSTestSuite.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
-    <ClInclude Include="..\..\..\DreamPeer.h" />
+    <ClInclude Include="..\..\..\DreamPeerApp.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />

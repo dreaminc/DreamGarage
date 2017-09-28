@@ -3,6 +3,7 @@
 #include "HAL/HALImp.h"
 
 #include "Primitives/hand.h"
+#include "Primitives/user.h"
 
 #include "Primitives/FlatContext.h"
 #include "Primitives/camera.h"
@@ -203,6 +204,31 @@ std::shared_ptr<hand> composite::AddHand() {
 
 	//Success:
 	return pHand;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<user> composite::MakeUser() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<user> pUser(m_pHALImp->MakeUser());
+
+	//Success:
+	return pUser;
+
+//Error:
+	return nullptr;
+}
+
+std::shared_ptr<user> composite::AddUser() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<user> pUser = MakeUser();
+	CR(AddObject(pUser));
+
+	//Success:
+	return pUser;
 
 Error:
 	return nullptr;

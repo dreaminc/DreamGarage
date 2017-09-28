@@ -210,11 +210,11 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
+RESULT DreamOS::OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) {
 	RESULT r = R_PASS;
 
 	switch (pDreamPeer->GetState()) {
-		case DreamPeer::state::ESTABLISHED: {
+		case DreamPeerApp::state::ESTABLISHED: {
 			CR(OnNewDreamPeer(pDreamPeer));
 		} break;
 	}
@@ -355,39 +355,39 @@ Error:
 	return r;
 }
 
-std::shared_ptr<DreamPeer> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
+std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
-	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+	std::shared_ptr<DreamPeerApp> pDreamPeerApp = nullptr;
 
 	long peerUserID = pPeerConnection->GetPeerUserID();
-	CBM((m_dreamPeers.find(peerUserID) == m_dreamPeers.end()), "Error: Peer user ID %d already exists", peerUserID);
+	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
-	pDreamPeer = std::make_shared<DreamPeer>(this, pPeerConnection);
-	CN(pDreamPeer);
+	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, nullptr);
+	CNM(pDreamPeerApp, "Failed to create dream peer app");
 
-	CR(pDreamPeer->Initialize());
+	pDreamPeerApp->SetPeerConnection(pPeerConnection);
 
 	// Set map
-	m_dreamPeers[peerUserID] = pDreamPeer;
+	m_dreamPeerApps[peerUserID] = pDreamPeerApp;
 
-	return pDreamPeer;
+	return pDreamPeerApp;
 
 Error:
-	if (pDreamPeer != nullptr) {
-		pDreamPeer = nullptr;
+	if (pDreamPeerApp != nullptr) {
+		pDreamPeerApp = nullptr;
 	}
 
 	return nullptr;
 }
 
-std::shared_ptr<DreamPeer> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
+std::shared_ptr<DreamPeerApp> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
 	return FindPeer(pPeerConnection->GetPeerUserID());
 }
 
-std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+std::shared_ptr<DreamPeerApp> DreamOS::FindPeer(long peerUserID) {
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
-	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
+	if ((it = m_dreamPeerApps.find(peerUserID)) != m_dreamPeerApps.end()) {
 		return (*it).second;
 	}
 
@@ -395,23 +395,23 @@ std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
 }
 
 RESULT DreamOS::RemovePeer(long peerUserID) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
-	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
-		m_dreamPeers.erase(it);
+	if ((it = m_dreamPeerApps.find(peerUserID)) != m_dreamPeerApps.end()) {
+		m_dreamPeerApps.erase(it);
 		return R_PASS;
 	}
 
 	return R_NOT_FOUND;
 }
 
-RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
-	for (auto &pairDreamPeer : m_dreamPeers) {
+	for (auto &pairDreamPeer : m_dreamPeerApps) {
 		if (pairDreamPeer.second == pDreamPeer) {
-			it = m_dreamPeers.find(pairDreamPeer.first);
-			m_dreamPeers.erase(it);
+			it = m_dreamPeerApps.find(pairDreamPeer.first);
+			m_dreamPeerApps.erase(it);
 			return R_PASS;
 		}
 	}
@@ -419,14 +419,14 @@ RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer) {
 	return R_NOT_FOUND;
 }
 
-DreamPeer::state DreamOS::GetPeerState(long peerUserID) {
-	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {
+	std::shared_ptr<DreamPeerApp> pDreamPeer = nullptr;
 
 	if ((pDreamPeer = FindPeer(peerUserID)) != nullptr) {
 		return pDreamPeer->GetState();
 	}
 
-	return DreamPeer::state::INVALID;
+	return DreamPeerApp::state::INVALID;
 }
 
 
