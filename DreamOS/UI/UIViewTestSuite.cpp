@@ -769,7 +769,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		std::string strCurrentAngle = std::to_string(current);
 		pTestContext->pTextBoxText->SetText(strCurrentAngle);
 		CR(pTestContext->pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-		return r;
+		
 	Error:
 		return r;
 	};
