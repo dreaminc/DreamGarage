@@ -748,9 +748,8 @@ Error:
 RESULT UIKeyboard::SetSurfaceAngle(float angle) {
 	RESULT r = R_PASS;
 	m_surfaceAngle = angle;
-	std::string strcurrentAngle = std::to_string(angle);
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(angle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
-	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+	quaternion qOrientation = quaternion::MakeQuaternionWithEuler(angle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	m_pSurfaceContainer->SetOrientation(qOrientation);
 	return r;
 }
 
