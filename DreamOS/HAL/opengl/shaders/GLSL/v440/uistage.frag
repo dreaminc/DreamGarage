@@ -10,7 +10,8 @@ in Data {
 	vec4 color;
 	vec2 uvCoord;
 	//vec4 vertClipSpace;
-	float angle;
+	//float angle;
+	vec4 ptMid;
 } DataIn;
 
 uniform bool u_hasTextureColor;
@@ -18,6 +19,8 @@ uniform sampler2D u_textureColor;
 
 //uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
+uniform vec4 u_ptOrigin;
+uniform vec4 u_vOrigin;
 
 struct Material {
 	float m_shine;
@@ -49,8 +52,14 @@ void main(void) {
 	}
 
 	if(u_clippingEnabled == true) {
+	
+		vec3 dotOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
+		vec3 dotDir = normalize(vec3(DataIn.ptMid.x - u_ptOrigin.x, 0.0f, DataIn.ptMid.z - u_ptOrigin.z));
+		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
+		float angle = dot(dotOrigin, dotDir);
+
 		float knee = 0.05f;
-		float minDistance = DataIn.angle - 0.3f;
+		float minDistance = angle - 0.7f;
 		if (minDistance < 0.0f) {
 			discard;
 		}

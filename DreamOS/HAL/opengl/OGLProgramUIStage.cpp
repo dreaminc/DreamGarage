@@ -204,10 +204,12 @@ RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	//TODO: shader likely breaks when pDimObj is not a quad
 	auto pQuad = dynamic_cast<quad*>(pDimObj);
 	if (pQuad != nullptr) {
-		point ptTest = pQuad->GetOrigin();
-		point ptTest2 = pQuad->GetOrigin(true);
-		m_pUniformQuadCenter->SetUniform(pQuad->GetOrigin(true));
+		DimObj* pParent = pQuad->GetParent();
+		if (pParent != nullptr) {
+			m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true));
+		}
 	}
+
 
 //Error:
 	return r;

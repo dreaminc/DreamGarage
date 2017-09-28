@@ -180,8 +180,6 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		point ptOrigin = GetComposite()->GetPosition();
 		//point ptOrigin = m_pView->GetPosition(true);
 		//point ptOrigin = m_pScrollView->GetPosition(true);
-		m_pUIStageProgram->SetOriginPoint(ptOrigin);
-		ptOrigin.Reverse();
 
 		quaternion qRotation = GetComposite()->GetOrientation(true);// *quaternion::MakeQuaternionWithEuler(-(float)(M_PI) / 2.0f, 0.0f, 0.0f);
 		//quaternion qRotation = m_pScrollView->GetOrientation(true);
@@ -193,6 +191,11 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
 		m_pUIStageProgram->SetClippingViewMatrix(matView);
+
+		ptOrigin += vLookXZ * (m_menuDepth);
+		
+		m_pUIStageProgram->SetOriginPoint(ptOrigin);
+		ptOrigin.Reverse();
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
