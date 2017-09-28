@@ -29,7 +29,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
 	//TODO this may become deprecated
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(SURFACE_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 
 	m_pSurfaceContainer = GetComposite()->AddComposite();
 	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
@@ -68,7 +68,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	{
 		//Setup textbox
 		float offset = m_surfaceHeight / 2.0f;
-		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+		float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
 
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
@@ -365,12 +365,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	}
 
-	for (auto key : m_activeKeys) {
+	for (auto key : m_activeKeys) {	
 		if (key->m_state == KeyState::KEY_NOT_INTERSECTED) {
 			ReleaseKey(key);
 			RemoveActiveKey(key);
 			key->m_state = KeyState::KEY_UP;
 		}
+		//break;	//used for testing
 	}
 
 Error:
@@ -571,6 +572,14 @@ Error:
 	return R_PASS;
 }
 
+UIMallet* UIKeyboard::GetRightMallet() {
+	return m_pRightMallet;
+}
+
+UIMallet* UIKeyboard::GetLeftMallet() {
+	return m_pLeftMallet;
+}
+
 RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	RESULT r = R_PASS;
 
@@ -640,7 +649,8 @@ RESULT UIKeyboard::UpdateComposite(float height, float depth) {
 	point ptHeader = m_pHeaderContainer->GetPosition();
 	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
 	float offset = m_surfaceHeight / 2.0f;
-	float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
+	//float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
 	CR(UpdateCompositeWithHands(height));
@@ -716,6 +726,10 @@ float UIKeyboard::GetHeight() {
 	return m_surfaceHeight;
 }
 
+float UIKeyboard::GetAngle() {
+	return m_surfaceAngle;
+}
+
 RESULT UIKeyboard::SetWidth(float width) {
 	RESULT r = R_PASS;
 	m_surfaceWidth = width;
@@ -729,6 +743,14 @@ RESULT UIKeyboard::SetHeight(float height) {
 	m_surfaceHeight = height;
 	CR(UpdateViewQuad());
 Error:
+	return r;
+}
+
+RESULT UIKeyboard::SetSurfaceAngle(float angle) {
+	RESULT r = R_PASS;
+	m_surfaceAngle = angle;
+	quaternion qOrientation = quaternion::MakeQuaternionWithEuler(angle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	m_pSurfaceContainer->SetOrientation(qOrientation);
 	return r;
 }
 

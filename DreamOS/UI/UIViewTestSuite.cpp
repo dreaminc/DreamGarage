@@ -19,6 +19,11 @@
 
 #include "Primitives/hand.h"
 
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+#include <string>
+#include "Sense/SenseController.h"
+
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -80,7 +85,7 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::SetupUIStagePipeline() {
+RESULT UIViewTestSuite::SetupUIStagePipeline(UIStageProgram* &pUIStageProgram) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -131,6 +136,7 @@ RESULT UIViewTestSuite::SetupUIStagePipeline() {
 	// Connect output as pass-thru to internal blend program
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	//*/
+	pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -207,11 +213,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	//CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
+	CR(AddTestKeyboardAngle());
 
 Error:
 	return r;
@@ -642,67 +649,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		
 		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
-		//CR(SetupUIStagePipeline());
-		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		//CR(pHAL->MakeCurrentContext());
-
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	/*
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		//*/
-
-	//*
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-		//*/
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-
-		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-		//CR(SetupUINodePipeline());
+		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
@@ -717,7 +664,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 			}
-//*
+			//*
 			for (int i = -4; i < 5; i++) {
 				pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
 				CN(pQuad);
@@ -733,7 +680,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
 
 			CR(m_pDreamOS->InitializeKeyboard());
-
+			
 			float radius = 0.015f;
 			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
 			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
@@ -744,7 +691,6 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pSphere->SetPosition(ptcam + point(0.5f, 1.0f, 0.0f));
 			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
 			pSphere->SetPosition(ptcam + point(-0.5f, 1.0f, 0.0f));
-
 		}
 
 	Error:
@@ -767,12 +713,207 @@ Error:
 	return r;
 }
 
+
+RESULT UIViewTestSuite::AddTestKeyboardAngle() {
+	RESULT r = R_PASS;
+	struct TestContext : public Subscriber<SenseControllerEvent> {
+		std::shared_ptr<text> pTextBoxText;
+		std::shared_ptr<composite> pChildComposite;
+		std::shared_ptr<font> pFont;
+		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
+		bool fIncreaseMalletAngle = false;
+		bool fDecreaseMalletAngle = false;
+		DreamOS *pDreamOS;	
+		float malletAngle = 180.0f;
+		UIMallet *pBLeftMallet = nullptr;
+		UIMallet *pBRightMallet = nullptr;
+		UIMallet *pKLeftMallet = nullptr;
+		UIMallet *pKRightMallet = nullptr;
+		virtual RESULT Notify(SenseControllerEvent *event) override {
+			RESULT r = R_PASS;
+			SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+
+			if (event->state.type == CONTROLLER_RIGHT) {
+				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+					fIncreaseMalletAngle = true;
+				}
+			}
+			else if (event->state.type == CONTROLLER_LEFT) {
+				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+					fDecreaseMalletAngle = true;
+				}
+			}
+			return r;
+		}
+	};
+	TestContext *pTestContext = new TestContext();
+
+	double sTestTime = 10000.0;
+
+	auto fnAddKeyboardAngle = [=](UIButton *pButton, void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		auto& pKeyboard = pTestContext->pKeyboard;
+		float current = pKeyboard->GetAngle();
+		if (current > 70.0f) {
+			current = 25.0f;
+		}
+		else {
+			if (pButton->GetContactPoint().x() > 0)
+				current += 1.0f;
+			else if (pButton->GetContactPoint().x() < 0)
+				current -= 1.0f;
+		}
+		pKeyboard->SetSurfaceAngle(current);
+		std::string strCurrentAngle = std::to_string(current);
+		pTestContext->pTextBoxText->SetText(strCurrentAngle);
+		CR(pTestContext->pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		
+	Error:
+		return r;
+	};
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		pTestContext->pDreamOS = m_pDreamOS;
+		auto& pMalletAngle = pTestContext->malletAngle;
+		
+		CN(m_pDreamOS);
+		UIStageProgram *pUIStageProgram = nullptr;
+		CR(SetupUIStagePipeline(pUIStageProgram));
+
+		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+
+			auto& pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			CN(pDreamUIBar);
+			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
+
+			CR(m_pDreamOS->InitializeKeyboard());
+			pTestContext->pKeyboard = m_pDreamOS->GetKeyboard();
+			pTestContext->pBLeftMallet = pDreamUIBar->GetLeftMallet();
+			pTestContext->pBRightMallet = pDreamUIBar->GetRightMallet();
+			pTestContext->pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
+			pTestContext->pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
+			//*
+			composite *pComposite = m_pDreamOS->AddComposite();
+			CN(pComposite);
+			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
+			
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			CN(pView);
+			auto& pUIButtonAngleIncrease = pView->AddUIButton();
+			auto& pUIButtonAngleDecrease = pView->AddUIButton();
+			CN(pUIButtonAngleIncrease);
+			CN(pUIButtonAngleDecrease);
+			pUIButtonAngleIncrease->SetPosition(point(0.5f, 0.0f, -0.1f));
+			pUIButtonAngleDecrease->SetPosition(point(-0.5f, 0.0f, -0.1f));
+
+			//Setup textbox
+			pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			CN(pTestContext->pFont);
+			pTestContext->pFont->SetLineHeight(0.050f);
+			{
+				pTestContext->pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+					pTestContext->pFont,
+					"hihihihihihi",
+					0.5f - 0.02f,
+					.050,
+					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+				CN(pTestContext->pTextBoxText);
+				pView->AddObject(pTestContext->pTextBoxText);
+				pTestContext->pTextBoxText->SetPosition(point(0.0f, 0.0f, -.1f));
+				pTestContext->pTextBoxText->RotateXByDeg(90.0f);
+			}
+
+			//interaction
+			CR(pUIButtonAngleIncrease->RegisterToInteractionEngine(m_pDreamOS));
+			CR(pUIButtonAngleDecrease->RegisterToInteractionEngine(m_pDreamOS));
+			pUIButtonAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnAddKeyboardAngle, pTestContext);
+			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnAddKeyboardAngle, pTestContext);
+
+			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext));
+			//*/
+
+			float radiusOfReferenceSpheres = 0.015f;
+			point ptCamera = m_pDreamOS->GetCamera()->GetPosition();
+			auto pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
+			pSphere->SetPosition(ptCamera + point(0.0f, 1.0f, -0.5f));
+			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
+			pSphere->SetPosition(ptCamera + point(0.0f, 1.0f, 0.5f));
+			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
+			pSphere->SetPosition(ptCamera + point(0.5f, 1.0f, 0.0f));
+			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
+			pSphere->SetPosition(ptCamera + point(-0.5f, 1.0f, 0.0f));
+			
+			//m_pDreamOS->GetKeyboard()->ShowKeyboard();
+			//m_pDreamOS->GetKeyboard()->UpdateComposite(ptCamera.y(), ptCamera.z()-.3f);
+			
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(m_pDreamOS);
+		if (pTestContext->fDecreaseMalletAngle) {
+			pTestContext->malletAngle--;
+			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		}
+		else if (pTestContext->fIncreaseMalletAngle) {
+			pTestContext->malletAngle++;
+			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		}
+		if(pTestContext->fDecreaseMalletAngle || pTestContext->fIncreaseMalletAngle) {
+			pTestContext->fIncreaseMalletAngle = false;
+			pTestContext->fDecreaseMalletAngle = false;
+			std::string strCurrentAngle = std::to_string(pTestContext->malletAngle);
+			pTestContext->pTextBoxText->SetText(strCurrentAngle);
+			float rotationAngle = (pTestContext->malletAngle * (float)(M_PI) / 180.0f);
+
+			pTestContext->pKLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
+			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
+			pTestContext->pBLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
+			pTestContext->pBRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	auto fnTest = [&](void *pContext) {return R_PASS; };
+	auto pUIViewTest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	CN(pUIViewTest);
+
+	pUIViewTest->SetTestName("Local UIView Test");
+	pUIViewTest->SetTestDescription("Basic test of UIView working locally");
+	pUIViewTest->SetTestDuration(sTestTime);
+	pUIViewTest->SetTestRepeats(1);
+Error:
+	return r;
+}
+
 RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 	RESULT r = R_PASS;
 	switch (pEvent->m_eventType) {
 	case (UIEventType::UI_SELECT_ENDED): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->RotateYByDeg(45.0f);
 		}
@@ -780,7 +921,7 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 	//*
 	case (UIEventType::UI_HOVER_BEGIN): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->RotateZByDeg(45.0f);
 		}
@@ -792,7 +933,6 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
-	//*/
 	}
 
 //Error:

@@ -91,6 +91,10 @@ public:
 	RESULT SetWidth(float width);
 	float GetHeight();
 	RESULT SetHeight(float height);
+	float GetAngle();
+	RESULT SetSurfaceAngle(float angle);
+	UIMallet* GetRightMallet();
+	UIMallet* GetLeftMallet();
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
@@ -122,6 +126,7 @@ private:
 	// layout variables
 	float m_surfaceWidth = SURFACE_WIDTH;
 	float m_surfaceHeight = SURFACE_HEIGHT;
+	float m_surfaceAngle = SURFACE_ANGLE;
 
 	float m_lineHeight = TEXTBOX_LINE_HEIGHT;
 	float m_numLines = TEXTBOX_NUM_LINES;

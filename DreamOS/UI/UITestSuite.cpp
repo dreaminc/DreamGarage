@@ -132,7 +132,7 @@ RESULT UITestSuite::Initialize() {
 	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
 		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
 	}
-	*/
+	//*/
 
 //Error:
 	return r;

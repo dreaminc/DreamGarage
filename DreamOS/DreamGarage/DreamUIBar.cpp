@@ -160,7 +160,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	CN(pKeyboard);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
 
 	if (m_pathStack.empty()) {
@@ -168,6 +168,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
+		CN(m_pUIStageProgram);
 		m_pUIStageProgram->SetClippingFrustrum(
 			m_projectionWidth,
 			m_projectionHeight,
@@ -222,9 +223,12 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
-
+	
+	// For testing these need to be removed 
+	///*
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	//*/
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -607,3 +611,12 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
 }
+
+UIMallet* DreamUIBar::GetRightMallet() {
+	return m_pRightMallet;
+}
+
+UIMallet* DreamUIBar::GetLeftMallet() {
+	return m_pLeftMallet;
+}
+
