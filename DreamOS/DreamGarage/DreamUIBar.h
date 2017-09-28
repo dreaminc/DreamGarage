@@ -77,9 +77,6 @@ public:
 	UIMallet* GetRightMallet();
 	UIMallet* GetLeftMallet();
 
-	float GetMenuHeight();
-	float GetMenuDepth();
-
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 

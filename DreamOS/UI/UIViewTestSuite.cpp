@@ -721,8 +721,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		std::shared_ptr<composite> pChildComposite;
 		std::shared_ptr<font> pFont;
 		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
-		bool fMalletIncreaseAngle = false;
-		bool fMalletDecreaseAngle = false;		
+		bool fIncreaseMalletAngle = false;
+		bool fDecreaseMalletAngle = false;
 		DreamOS *pDreamOS;	
 		float malletAngle = 180.0f;
 		UIMallet *pBLeftMallet = nullptr;
@@ -735,12 +735,12 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 			if (event->state.type == CONTROLLER_RIGHT) {
 				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-					fMalletDecreaseAngle = true;
+					fIncreaseMalletAngle = true;
 				}
 			}
 			else if (event->state.type == CONTROLLER_LEFT) {
 				if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-					fMalletIncreaseAngle = true;
+					fDecreaseMalletAngle = true;
 				}
 			}
 			return r;
@@ -756,11 +756,15 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 		auto& pKeyboard = pTestContext->pKeyboard;
 		float current = pKeyboard->GetAngle();
-		if (current > 90.0f) {
-			current = 15.0f;
+		if (current > 70.0f) {
+			current = 25.0f;
 		}
-		else
-			current += 1.0f;
+		else {
+			if (pButton->GetContactPoint().x() > 0)
+				current += 1.0f;
+			else if (pButton->GetContactPoint().x() < 0)
+				current -= 1.0f;
+		}
 		pKeyboard->SetSurfaceAngle(current);
 		std::string strCurrentAngle = std::to_string(current);
 		pTestContext->pTextBoxText->SetText(strCurrentAngle);
@@ -805,8 +809,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
 			pTestContext->pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
 			//*
-			float menuHeight = pDreamUIBar->GetMenuHeight();
-			float menuDepth = pDreamUIBar->GetMenuDepth();
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
 			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
@@ -869,17 +871,17 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	auto fnUpdate = [&](void *pContext) {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(m_pDreamOS);
-		if (pTestContext->fMalletDecreaseAngle) {
+		if (pTestContext->fDecreaseMalletAngle) {
 			pTestContext->malletAngle--;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
-		else if (pTestContext->fMalletIncreaseAngle) {
+		else if (pTestContext->fIncreaseMalletAngle) {
 			pTestContext->malletAngle++;
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
-		if(pTestContext->fMalletDecreaseAngle || pTestContext->fMalletIncreaseAngle) {
-			pTestContext->fMalletIncreaseAngle = false;
-			pTestContext->fMalletDecreaseAngle = false;
+		if(pTestContext->fDecreaseMalletAngle || pTestContext->fIncreaseMalletAngle) {
+			pTestContext->fIncreaseMalletAngle = false;
+			pTestContext->fDecreaseMalletAngle = false;
 			std::string strCurrentAngle = std::to_string(pTestContext->malletAngle);
 			pTestContext->pTextBoxText->SetText(strCurrentAngle);
 			float rotationAngle = (pTestContext->malletAngle * (float)(M_PI) / 180.0f);

@@ -224,8 +224,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 
-	//GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	//GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -607,14 +607,6 @@ DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
-}
-
-float DreamUIBar::GetMenuDepth() {
-	return m_menuDepth;
-}
-
-float DreamUIBar::GetMenuHeight() {
-	return m_menuHeight;
 }
 
 UIMallet* DreamUIBar::GetRightMallet() {
