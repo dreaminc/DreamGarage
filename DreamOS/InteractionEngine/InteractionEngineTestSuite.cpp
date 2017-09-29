@@ -131,9 +131,9 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestMultiPrimitive());
-
 	CR(AddTestNestedCompositeOBB());
+
+	CR(AddTestMultiPrimitive());
 
 	CR(AddTestCaptureObject());
 

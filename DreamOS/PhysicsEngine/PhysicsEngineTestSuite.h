@@ -20,6 +20,7 @@ public:
 
 	virtual RESULT AddTests() override;
 
+	RESULT AddTestRayModel();
 	RESULT AddTestCompositeRay();
 	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
@@ -49,6 +50,9 @@ public:
 	RESULT AddTestRayScaledQuads();
 	RESULT AddTestMultiCompositeRayScaledQuad();
 
+
+private:
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 	RESULT ResetTest(void *pContext);
 
 private:
