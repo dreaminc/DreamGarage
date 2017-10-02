@@ -14,25 +14,18 @@ layout (location = 3) in vec2 inV_vec2UVCoord;
 out Data {
 	vec4 color;
 	vec2 uvCoord;
-	//vec4 vertClipSpace;
 	vec4 ptMid;
-	//float angle;
 } DataOut;
 
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4ViewProjection;
 
-//uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
 
 uniform vec4 u_ptQuadCenter;
 uniform mat4 u_mat4ParentModel;
-//uniform vec4 u_vQuadNormal;
-//uniform float u_quadWidth;
 
 uniform vec4 u_ptOrigin;
-//uniform vec4 u_vOrigin;
-//uniform float u_dot;
 
 void main(void) {	
 	// UV Coordinate
@@ -42,28 +35,16 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	if(u_clippingEnabled == true) {
-		//vec3 dotOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
 		vec3 dotDir = u_ptOrigin.xyz - u_ptQuadCenter.xyz;
 		dotDir = normalize(dotDir);
-		float centerLength = length(vec3(u_ptOrigin.x - u_ptQuadCenter.x, 0.0f, u_ptOrigin.z - u_ptQuadCenter.z));
+
 		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
-		//right = 0.017f * right;
 
 		vec4 invModel = u_mat4ParentModel * vec4(inV_vec4Position.xyz, 1.0f);
-		//vec4 invModel = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
-		float invLength = length(vec3(u_ptOrigin.x - invModel.x, 0.0f, u_ptOrigin.z - invModel.z));
 		vec3 ptVec = invModel.xyz - u_ptQuadCenter.xyz;
 
-		//vec3 ptVec = inV_vec4Position.xyz - u_ptQuadCenter.xyz;
-		//ptVec = vec3(ptVec.x, 0.0f, ptVec.z);
-
 		vec3 ptMid = (right * (dot(ptVec,right)));
-		float ratio = 1.0f - (invModel.y - u_ptQuadCenter.y);
-		//vec4 ptTest = u_mat4Model * vec4(invModel.x, 0.0f, 0.0f, 1.0f);
-		//DataOut.ptMid = u_ptQuadCenter - ptTest;
 		DataOut.ptMid = u_ptQuadCenter + (vec4(ptMid.xyz, 0.0f));// + (vec4(right, 0.0f) * ratio);
-		//DataOut.ptMid = u_ptQuadCenter + ( 2 * (invLength / centerLength) * vec4(ptMid.xyz, 0.0f));// + (vec4(right, 0.0f) * ratio);
-		//DataOut.ptMid = u_ptQuadCenter;	
 	}
 	else {
 		DataOut.ptMid = vec4(0.0f);

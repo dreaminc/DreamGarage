@@ -124,6 +124,9 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
+	//don't capture buttons that are out of view
+	CBR(m_pScrollView->IsCapturable(pButtonContext), R_OBJECT_NOT_FOUND);
+
 	//DreamOS *pDreamOS = GetDOS();
 	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
 	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
@@ -168,36 +171,19 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
-		CN(m_pUIStageProgram);
-		m_pUIStageProgram->SetClippingFrustrum(
-			m_projectionWidth,
-			m_projectionHeight,
-			m_projectionNearPlane,
-			m_projectionFarPlane,
-			m_projectionAngle);
-
-		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
 		point ptOrigin = GetComposite()->GetPosition();
-		//point ptOrigin = m_pView->GetPosition(true);
-		//point ptOrigin = m_pScrollView->GetPosition(true);
 
-		quaternion qRotation = GetComposite()->GetOrientation(true);// *quaternion::MakeQuaternionWithEuler(-(float)(M_PI) / 2.0f, 0.0f, 0.0f);
-		//quaternion qRotation = m_pScrollView->GetOrientation(true);
 		vector vLook = GetDOS()->GetCamera()->GetLookVector();
 		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		
 		m_pUIStageProgram->SetOriginDirection(vLookXZ);
-		//m_pUIStageProgram->SetOriginDirection(qRotation.RotateVector(vector(0.0f, 0.0f, -1.0f)));
-		qRotation.Reverse();
-
-		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
-		m_pUIStageProgram->SetClippingViewMatrix(matView);
 
 		ptOrigin += vLookXZ * (m_menuDepth);
 		
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
-		ptOrigin.Reverse();
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+
 	}
 	else {
 		m_pathStack.pop();

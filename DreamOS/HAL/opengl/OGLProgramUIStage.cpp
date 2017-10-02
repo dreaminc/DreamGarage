@@ -32,17 +32,13 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 
 	// Clipping
-//	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingProjection), std::string("u_mat4ClippingProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadCenter), std::string("u_ptQuadCenter")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformParentModelMatrix), std::string("u_mat4ParentModel")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadNormal), std::string("u_vQuadNormal")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadWidth), std::string("u_quadWidth")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformptOrigin), std::string("u_ptOrigin")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformvOrigin), std::string("u_vOrigin")));
-//	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDot), std::string("u_dot")));
 
 	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -117,21 +113,17 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-//*
-//	m_clippingView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
-//*/
-//	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
 
 	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
 	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
-	m_fClippingEnabled = false;
-	m_pUniformClippingEnabled->SetUniform(false);
-	RenderObjectStore(m_pSceneGraph);
-
 	m_fClippingEnabled = true;
 	m_pUniformClippingEnabled->SetUniform(true);
 	RenderObjectStore(m_pClippingSceneGraph);
+
+	m_fClippingEnabled = false;
+	m_pUniformClippingEnabled->SetUniform(false);
+	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();
 
@@ -180,19 +172,17 @@ RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float n
 
 RESULT OGLProgramUIStage::SetOriginPoint(point ptOrigin) {
 	RESULT r = R_PASS;
+
 	m_ptOrigin = ptOrigin;
-	//CR(m_pUniformptOrigin->SetUniform(ptOrigin));
-//Error:
+
 	return r;
 }
 
 RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
 	RESULT r = R_PASS;
-	//CR(vOrigin.Normalize());
+
 	m_vOrigin = vOrigin;
-	//m_vOrigin = -1.0f * vOrigin;
-	//CR(m_pUniformvOrigin->SetUniform(vOrigin));
-//Error:
+
 	return r;
 }
 
@@ -239,9 +229,6 @@ RESULT OGLProgramUIStage::SetCameraUniforms(camera *pCamera) {
 RESULT OGLProgramUIStage::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-	//m_pUniformptOrigin->SetUniform(pStereoCamera->GetOrigin(true));
-	//m_pUniformvOrigin->SetUniform(pStereoCamera->GetLookVector());
 
 	return R_PASS;
 }

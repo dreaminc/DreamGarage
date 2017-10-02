@@ -67,12 +67,8 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	m_pLabel->SetPosition(labelFormat.ptPosition);
 
-	//auto pBgQuad = AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f);
 	vector bgNormal = vector(0.0f, sin(-M_PI / 6.0), cos(-M_PI / 6.0));
 	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f, 1, 1, nullptr, bgNormal);
-	//m_pDreamOS->AddObjectToUIClippingGraph(pBgQuad.get());
-	//m_pDreamOS->AddObjectToUIClippingGraph(m_pLabel.get());
-	//m_pDreamOS->AddObjectToUIClippingGraph(m_pSurfaceComposite.get());
 
 	point ptDiff = point(0.0f, (GetSurface()->GetHeight() + pBgQuad->GetHeight()) / 2.0f, 0.0001f);
 	pBgQuad->SetPosition(GetSurface()->GetPosition() - ptDiff);

@@ -51,17 +51,13 @@ private:
 	OGLUniformBool *m_pUniformHasTextureColor;
 
 	OGLUniformBool *m_pUniformClippingEnabled;
-	OGLUniformMatrix4 *m_pUniformClippingProjection;
 
 	// quad uniforms for clip
 	OGLUniformPoint *m_pUniformQuadCenter;
-	OGLUniformVector *m_pUniformQuadNormal;
-	OGLUniformFloat *m_pUniformQuadWidth;
 	OGLUniformMatrix4 *m_pUniformParentModelMatrix;
 
 	OGLUniformPoint *m_pUniformptOrigin;
 	OGLUniformVector *m_pUniformvOrigin;
-	OGLUniformFloat *m_pUniformDot;
 
 	OGLMaterialBlock *m_pMaterialsBlock;
 };

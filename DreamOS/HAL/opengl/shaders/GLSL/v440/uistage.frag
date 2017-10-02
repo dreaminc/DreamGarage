@@ -9,15 +9,12 @@
 in Data {
 	vec4 color;
 	vec2 uvCoord;
-	//vec4 vertClipSpace;
-	//float angle;
 	vec4 ptMid;
 } DataIn;
 
 uniform bool u_hasTextureColor;
 uniform sampler2D u_textureColor;
 
-//uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
 uniform vec4 u_ptOrigin;
 uniform vec4 u_vOrigin;
@@ -58,17 +55,30 @@ void main(void) {
 		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
 		float angle = dot(dotOrigin, dotDir);
 
-		//float knee = 0.005f;
-		float knee = 0.096f;
-		float minDistance = angle - 0.54f;
+		float knee = 0.1f;
+		//float knee = 0.096f;
+		float minDistance = angle - 0.56f;
+		//float minDistance = angle - 0.58f;
 		if (minDistance < 0.0f) {
 			discard;
 		}
 
-		//float ratio = (minDistance - knee) / knee;
 		float ratio = (knee - minDistance) / knee;
 		if (ratio > 0.0f) {
-			color.a = color.a * pow(1.0f - ratio, 1.25f);
+		//	color.a = color.a * pow(1.0f - ratio, 1.25f);
+
+			//input for blending function
+			//float x = (1.0f - (pow(ratio-0.5f,0.25f)));
+			float x = ratio-0.5f;
+			//x = pow(x-0.5f,0.25f);
+			//y=x/sqrt(1+x^2)
+			//float y = x / (pow(1 + (x*x), 0.5f));
+			float y = (tanh(6*x)+1.0f)/2.0f;
+			//scale y to range of [0,1]
+
+			color.a = color.a * (1.0 - y);
+			//vec3 white = vec3(1.0f, 1.0f, 1.0f);
+			//color.rgb = color.rgb + (white - (white * (1.0 - y)));
 		}
 	}
 
