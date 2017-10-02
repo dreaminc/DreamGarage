@@ -453,6 +453,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
 			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 			pButtons.emplace_back(pButton);
 		}
 

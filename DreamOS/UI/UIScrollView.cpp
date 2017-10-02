@@ -1,5 +1,6 @@
 #include "UIScrollView.h"
 #include "UIButton.h"
+#include "UIMenuItem.h"
 
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
@@ -233,6 +234,11 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 			CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
 			CR(m_pDreamOS->RemoveObject(pButton));
 			CR(m_pDreamOS->UnregisterInteractionObject(pButton));
+
+			UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
+			if (pMenuItem) {
+				CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurfaceComposite().get()));
+			}
 		}
 	}
 	CR(m_pMenuButtonsContainer->ClearChildren());

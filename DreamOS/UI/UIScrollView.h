@@ -23,7 +23,7 @@ class text;
 #define PAD_MOVE_CONSTANT 0.015f
 
 #define SCROLL_SCALE 0.2f 
-#define SCROLL_ARROW_BIAS 0.4f // Pulls scroll chevrons in towards the menu items
+#define SCROLL_ARROW_BIAS 0.25f // Pulls scroll chevrons in towards the menu items
 #define SCROLL_ASPECT_RATIO 138.0f / 200.0f
 
 #define FADE_DURATION 0.1f

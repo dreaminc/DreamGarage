@@ -57,6 +57,7 @@ private:
 	OGLUniformPoint *m_pUniformQuadCenter;
 	OGLUniformVector *m_pUniformQuadNormal;
 	OGLUniformFloat *m_pUniformQuadWidth;
+	OGLUniformMatrix4 *m_pUniformParentModelMatrix;
 
 	OGLUniformPoint *m_pUniformptOrigin;
 	OGLUniformVector *m_pUniformvOrigin;

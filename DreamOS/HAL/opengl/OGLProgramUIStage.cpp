@@ -36,6 +36,7 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadCenter), std::string("u_ptQuadCenter")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformParentModelMatrix), std::string("u_mat4ParentModel")));
 	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadNormal), std::string("u_vQuadNormal")));
 	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadWidth), std::string("u_quadWidth")));
 
@@ -206,12 +207,13 @@ RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	if (pQuad != nullptr) {
 		DimObj* pParent = pQuad->GetParent();
 		if (pParent != nullptr) {
-			m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true));
+			CR(m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true)));
+			CR(m_pUniformParentModelMatrix->SetUniform(pParent->GetModelMatrix()));
 		}
 	}
 
 
-//Error:
+Error:
 	return r;
 }
 

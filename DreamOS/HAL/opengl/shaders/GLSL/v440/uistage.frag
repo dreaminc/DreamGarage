@@ -58,15 +58,17 @@ void main(void) {
 		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
 		float angle = dot(dotOrigin, dotDir);
 
-		float knee = 0.05f;
-		float minDistance = angle - 0.7f;
+		//float knee = 0.005f;
+		float knee = 0.096f;
+		float minDistance = angle - 0.54f;
 		if (minDistance < 0.0f) {
 			discard;
 		}
 
+		//float ratio = (minDistance - knee) / knee;
 		float ratio = (knee - minDistance) / knee;
 		if (ratio > 0.0f) {
-			color.a = color.a * (1.0f - ratio);
+			color.a = color.a * pow(1.0f - ratio, 1.25f);
 		}
 	}
 
