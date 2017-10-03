@@ -60,8 +60,8 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());
 }
 
-vector BoundingVolume::GetScale() const {
-	return m_pParent->GetScale();
+vector BoundingVolume::GetScale(bool fAbsolute) const {
+	return m_pParent->GetScale(fAbsolute);
 }
 
 quaternion BoundingVolume::GetOrientation() { 
@@ -91,7 +91,7 @@ quaternion BoundingVolume::GetAbsoluteOrientation() {
 
 point BoundingVolume::GetAbsoluteOrigin() {
 	if (!m_ptCenter.IsZero()) {
-		point ptRotated = RotationMatrix(GetAbsoluteOrientation()) * vector(m_ptCenter);
+		point ptRotated = RotationMatrix(GetAbsoluteOrientation()) * ScalingMatrix(GetScale(true)) * vector(m_ptCenter);
 		return (m_pParent->GetOrigin(true) + ptRotated);
 	}
 	else {
@@ -101,7 +101,7 @@ point BoundingVolume::GetAbsoluteOrigin() {
 
 point BoundingVolume::GetOrigin() {
 	if (!m_ptCenter.IsZero()) {
-		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptCenter);
+		point ptRotated = RotationMatrix(GetAbsoluteOrientation()) * ScalingMatrix(GetScale(false)) * vector(m_ptCenter);
 		return (m_pParent->GetOrigin() + ptRotated);
 	}
 	else {

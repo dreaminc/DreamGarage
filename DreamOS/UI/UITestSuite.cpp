@@ -244,19 +244,19 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 
 			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, -1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_GREEN);
+			pQuad->SetVertexColor(COLOR_GREEN);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, 1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_RED);
+			pQuad->SetVertexColor(COLOR_RED);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, -1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_YELLOW);
+			pQuad->SetVertexColor(COLOR_YELLOW);
 
 			pFlatContext->RotateXByDeg(90.0f);
 			//*/

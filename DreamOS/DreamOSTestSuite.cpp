@@ -200,31 +200,31 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Add some users
-		//for (int i = 0; i < 4; i++) {
-		//	pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
-		//	CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
-		//
-		//	pTestContext->m_pPeers[i]->SetPosition(point(-2.0f + i * 1.0f, 0.0f, 0.0f));
-		//}
+		for (int i = 0; i < 4; i++) {
+			pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
+			CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
+		
+			pTestContext->m_pPeers[i]->SetPosition(point(-2.0f + (i * 1.0f), 0.0f, -3.0f));
+		}
 
 
 		// Sphere test
-		pTestContext->pSphere = m_pDreamOS->AddSphere(0.025f, 10, 10);
-		CN(pTestContext->pSphere);
+		//pTestContext->pSphere = m_pDreamOS->AddSphere(0.025f, 10, 10);
+		//CN(pTestContext->pSphere);
 		//m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pSphere);
 
 		// User test
-		pTestContext->pUser = m_pDreamOS->AddUser();
-		CN(pTestContext->pUser);
-		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pUser);
+		//pTestContext->pUser = m_pDreamOS->AddUser();
+		//CN(pTestContext->pUser);
+		//m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pUser);
 
 		//// Mouse Ray
 		//pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
 		//CN(pTestContext->pMouseRay);
 		//m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay);
 
-		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_BEGAN, pTestContext));
-		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_ENDED, pTestContext));
+		//CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_BEGAN, pTestContext));
+		//CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pUser, ELEMENT_INTERSECT_ENDED, pTestContext));
 
 	Error:
 		return r;

@@ -60,12 +60,14 @@ RESULT DreamAppManager::Update() {
 		auto usLastLoopTime = std::chrono::duration_cast<std::chrono::microseconds>(tAfterLoop - m_tBeforeLoop).count();
 		double usAppTimeAvailable = (1.0e6 / m_minFrameRate) - (double)(usLastLoopTime);
 
-		CBRM((usAppTimeAvailable > 0.0f), R_SKIPPED ,"Sandbox took longer than min frame rate time available %f", (double)(usAppTimeAvailable));
+		//CBRM((usAppTimeAvailable > 0.0f), R_SKIPPED ,"Sandbox took longer than min frame rate time available %f", (double)(usAppTimeAvailable));
 
 		double usTimeLeft = 0.0f;
 		auto tAppUpdatesStart = std::chrono::high_resolution_clock::now();
-		while (m_appPriorityQueue.size() > 0 && 
-			(usTimeLeft = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tAppUpdatesStart).count()) < usAppTimeAvailable) 
+
+		//while (m_appPriorityQueue.size() > 0 && 
+		//	(usTimeLeft = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - tAppUpdatesStart).count()) < usAppTimeAvailable) 
+		while (m_appPriorityQueue.size() > 0)
 		{
 			pDreamApp = m_appPriorityQueue.top();
 			CN(pDreamApp);
@@ -96,7 +98,7 @@ RESULT DreamAppManager::Update() {
 			m_appPriorityQueue.push(pDreamApp);
 		}
 
-		CBRM((usTimeLeft >= 0.0f), R_SKIPPED, "App Manager ran out of time %f", usTimeLeft);
+		//CBRM((usTimeLeft >= 0.0f), R_SKIPPED, "App Manager ran out of time %f", usTimeLeft);
 
 		//*/
 

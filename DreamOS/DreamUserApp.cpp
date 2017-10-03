@@ -15,36 +15,29 @@ DreamUserApp* DreamUserApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamUserApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	// Subscribers (children)
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	//}
-
 	SetAppName("DreamUserApp");
 	SetAppDescription("A Dream User App");
 
-	// Set up the user asset
-	/*
-	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-	m_pScreenQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	m_pScreenQuad->SetMaterialAmbient(0.8f);
-	*/
-
 	GetComposite()->InitializeOBB();
 
-	//m_pVolume = GetComposite()->AddVolume(1.0f);
-	//CN(m_pVolume);
+	m_pVolume = GetComposite()->AddVolume(1.0f);
+	CN(m_pVolume);
+	//m_pVolume->SetVisible(false);
 
-	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
+	m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -2.0f), vector::kVector(-1.0f), 1.0f);
 	CN(m_pOrientationRay);
 	m_pOrientationRay->SetVisible(true);
 
 	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
-	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
 	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
 	//}
+
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
 
 Error:
 	return r;
@@ -88,11 +81,9 @@ Error:
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
 
-	if (mEvent->m_pInteractionObject != m_pOrientationRay.get()) {
-		int a = 5;
-	}
+	int a = 5;
 
 Error:
 	return r;

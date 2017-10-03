@@ -128,7 +128,9 @@ private:
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
 	//user *m_pUserModel = nullptr;
+	sphere *m_pSphere = nullptr;
 	std::shared_ptr<user> m_pUserModel = nullptr;
+	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};

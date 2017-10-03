@@ -53,12 +53,17 @@ public:
 
 	virtual CollisionManifold Collide(const ray &rCast) = 0;
 
-	virtual point GetMinPoint() = 0;
-	virtual point GetMaxPoint() = 0;
+	virtual point GetMinPoint(bool fAbsolute = false) = 0;
+	virtual point GetMaxPoint(bool fAbsolute = false) = 0;
 
 	// This will only apply to certain bounding volumes - otherwise use the above methods 
-	virtual point GetMinPointOriented() { return GetMinPoint(); };
-	virtual point GetMaxPointOriented() { return GetMaxPoint(); };
+	virtual point GetMinPointOriented(bool fAbsolute = false) {
+		return GetMinPoint(fAbsolute); 
+	};
+
+	virtual point GetMaxPointOriented(bool fAbsolute = false) {
+		return GetMaxPoint(fAbsolute); 
+	};
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 	virtual RESULT SetHalfVector(vector vHalfVector) = 0;
@@ -75,7 +80,7 @@ public:
 	VirtualObj *GetParentObject() const;
 	point GetOrigin();
 	quaternion GetOrientation();
-	vector GetScale() const;
+	vector GetScale(bool fAbsolute = false) const;
 
 	// These provide the absolute orientation/origin of the object
 	point GetAbsoluteOrigin();

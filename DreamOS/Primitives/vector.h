@@ -65,6 +65,8 @@ public:
 
 	// Utility
 public:
+	static vector ComponentMultiply(vector &lhs, vector &rhs);
+
 	static vector XUnitVector() { return vector(1.0f, 0.0f, 0.0f); }
 	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
 	static vector ZUnitVector() { return vector(0.0f, 0.0f, 1.0f); }

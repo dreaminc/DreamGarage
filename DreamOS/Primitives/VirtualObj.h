@@ -91,7 +91,7 @@ public:
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
 	VirtualObj* SetScale(vector vScale);
-	vector GetScale();
+	virtual vector GetScale(bool fAbsolute = false);
 	VirtualObj* Scale(point_precision scale);
 	VirtualObj* ScaleX(point_precision scale);
 	VirtualObj* ScaleY(point_precision scale);

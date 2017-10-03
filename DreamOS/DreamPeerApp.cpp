@@ -37,35 +37,28 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
 
-	// Set up the user asset
-	/*
-	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-	m_pScreenQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	m_pScreenQuad->SetMaterialAmbient(0.8f);
-	*/
-
 	GetComposite()->InitializeOBB();
 
 	m_pUserModel = GetComposite()->AddUser();
 	CN(m_pUserModel);
 
-	/*
-	m_pVolume = GetComposite()->AddVolume(1.0f);
-	CN(m_pVolume);
-
 	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
 	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(false);
-
+	m_pOrientationRay->SetVisible(true);
 	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-
-	*/
 
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	}
+	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
+	CN(m_pSphere);
+
+	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
+	//}
+
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
 
 Error:
 	return r;
@@ -101,10 +94,14 @@ Error:
 RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
+	CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
+
+	m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			m_pUserModel->RotateYByDeg(180.0f);
+			GetComposite()->SetRotateDeg(0.0f, 180.0f, 0.0f);
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
@@ -112,7 +109,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_pUserModel->RotateYByDeg(180.0f);
+			GetComposite()->ResetRotation();
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -132,7 +129,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 	}
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -226,7 +223,8 @@ RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->GetHead()->SetPosition(ptPosition);
+	//m_pUserModel->GetHead()->SetPosition(ptPosition);
+	GetComposite()->SetPosition(ptPosition);
 
 Error:
 	return r;

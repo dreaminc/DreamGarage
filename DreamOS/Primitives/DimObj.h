@@ -104,7 +104,7 @@ public:
 	RESULT SetWireframe(bool fWireframe = true);
 
 	color GetColor();
-	RESULT SetColor(color c);
+	RESULT SetVertexColor(color c, bool fSetChildren = false);
 	RESULT SetAlpha(color_precision a);
 
 	// TODO: Move this into material 
@@ -175,6 +175,7 @@ public:
 	virtual point GetOrigin(bool fAbsolute = false) override;
 	virtual point GetPosition(bool fAbsolute = false) override;
 	virtual quaternion GetOrientation(bool fAbsolute = false) override;
+	virtual vector GetScale(bool fAbsolute = false) override;
 
 	// Composites will accumulate mass
 	virtual double GetMass() override;

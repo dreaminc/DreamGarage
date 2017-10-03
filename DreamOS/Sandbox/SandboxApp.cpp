@@ -150,13 +150,13 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 					if (pDimObj != nullptr) {
-						pDimObj->SetColor(color(COLOR_WHITE));
+						pDimObj->SetVertexColor(color(COLOR_WHITE));
 					}
 				}
 
 				for (auto &pObject : intersectedObjects) {
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-					pDimObj->SetColor(color(COLOR_RED));
+					pDimObj->SetVertexColor(color(COLOR_RED));
 				}
 			}
 		} break;
@@ -220,7 +220,7 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 
 		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_WHITE));
+			pDimObj->SetVertexColor(color(COLOR_WHITE));
 		}
 	}
 
@@ -228,7 +228,7 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 		
 		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_RED));
+			pDimObj->SetVertexColor(color(COLOR_RED));
 		}
 	}
 	

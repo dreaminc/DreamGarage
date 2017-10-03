@@ -67,7 +67,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 
 			if (pDimObj != nullptr) {
 				pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_BLUE);
+				pDimObj->SetVertexColor(COLOR_BLUE);
 			}
 
 		} break;
@@ -77,7 +77,7 @@ struct TestContext : public Subscriber<InteractionObjectEvent> {
 
 			if (pDimObj != nullptr) {
 				pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_GREEN);
+				pDimObj->SetVertexColor(COLOR_GREEN);
 			}
 		}
 
@@ -247,7 +247,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 
 				if (pDimObj != nullptr) {
 					pDimObj->RotateZByDeg(15.0f);
-					pDimObj->SetColor(COLOR_BLUE);
+					pDimObj->SetVertexColor(COLOR_BLUE);
 					m_pDreamOS->GetInteractionEngineProxy()->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
 				}
 
@@ -258,7 +258,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 
 				if (pDimObj != nullptr) {
 					//pDimObj->RotateZByDeg(15.0f);
-					pDimObj->SetColor(COLOR_GREEN);
+					pDimObj->SetVertexColor(COLOR_GREEN);
 				}
 				m_pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(mEvent->m_pInteractionObject);
 			}
@@ -314,7 +314,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			pQuad->RotateXByDeg(90.0f);
 			pQuad->RotateYByDeg(0.0f);
 			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), pCaptureContext));
 				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
@@ -325,7 +325,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			pQuad->RotateXByDeg(90.0f);
 			pQuad->RotateYByDeg(-30.0f);
 			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			//pQuad->InitializeOBB();
 			//m_pDreamOS->AddInteractionObject(pQuad);
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
@@ -445,7 +445,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 
 			auto pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			//pQuad->RotateXByDeg(90.0f);
 
 			/*
@@ -580,17 +580,17 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
 			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 
 			auto pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			//pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
 			//pQuad->RotateXByDeg(90.0f);
 			//pQuad->RotateYByDeg(45.0f);
 
 			pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			pQuad->SetPosition(point(2.0f, 0.0f, 0.0f));
 
 			pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			pQuad->SetPosition(point(4.0f, 0.0f, 0.0f));
 
 			// The Ray
@@ -724,14 +724,14 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveCompositeRemove() {
 			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 
 			auto pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			pQuad->SetPosition(point(2.0f, 0.0f, 0.0f));
 
 			pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 			pQuad->SetPosition(point(4.0f, 0.0f, 0.0f));
 
 			pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
@@ -842,7 +842,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 
 			pTestContext->pQuad[0] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[0]->SetPosition(point(0.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[0]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[0]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -851,7 +851,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 
 			pTestContext->pQuad[1] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[1]->SetPosition(point(2.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[1]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[1]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -860,7 +860,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveRemove() {
 
 			pTestContext->pQuad[2] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[2]->SetPosition(point(4.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[2]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[2]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -988,7 +988,7 @@ RESULT RayCompositeTestContext::Notify(InteractionObjectEvent *mEvent) {
 
 			if (pDimObj != nullptr) {
 				pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_BLUE);
+				pDimObj->SetVertexColor(COLOR_BLUE);
 			}
 
 		} break;
@@ -998,7 +998,7 @@ RESULT RayCompositeTestContext::Notify(InteractionObjectEvent *mEvent) {
 
 			if (pDimObj != nullptr) {
 				pDimObj->RotateZByDeg(15.0f);
-				pDimObj->SetColor(COLOR_GREEN);
+				pDimObj->SetVertexColor(COLOR_GREEN);
 			}
 		}
 
@@ -1051,7 +1051,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 			pTestContext->pQuad[0] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[0]->SetPosition(point(0.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[0]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[0]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -1060,7 +1060,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 			pTestContext->pQuad[1] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[1]->SetPosition(point(2.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[1]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[1]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -1069,7 +1069,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 			pTestContext->pQuad[2] = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			pTestContext->pQuad[2]->SetPosition(point(4.0f, -2.0f, 0.0f));
-			pTestContext->pQuad[2]->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[2]->SetVertexColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
@@ -1225,23 +1225,23 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 
 			auto pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(-1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, 1.5f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, -1.5f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pChildComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
 			pChildComposite->RotateYByDeg(45.0f);
@@ -1514,7 +1514,7 @@ RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 		pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
 		CN(pTestContext->pCollidePoint[i]);
 		pTestContext->pCollidePoint[i]->SetVisible(false);
-		pTestContext->pCollidePoint[i]->SetColor(COLOR_RED);
+		pTestContext->pCollidePoint[i]->SetVertexColor(COLOR_RED);
 	}
 
 	// Add Ray to interaction
@@ -1753,23 +1753,23 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayNested() {
 
 			auto pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(-1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, 1.5f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
 			pQuad->SetPosition(point(0.0f, 0.0f, -1.5f));
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pChildComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
 			pChildComposite->RotateYByDeg(45.0f);

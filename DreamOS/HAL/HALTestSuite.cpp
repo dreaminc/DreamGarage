@@ -206,7 +206,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
 		CN(pSphere);
 		pSphere->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetVertexColor(COLOR_WHITE));
 		CR(pSphere->SetAlpha(alpha));
 		//*/
 
@@ -214,7 +214,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pVolume = pTestContext->pVolume1;
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(1.0f));
 
 		// Opposite ordering 
@@ -222,7 +222,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pVolume = pTestContext->pVolume2;
 		CN(pVolume);
 		pVolume->SetPosition(point(width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(1.0f));
 
 		/*
@@ -237,7 +237,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
 		CN(pSphere);
 		pSphere->SetPosition(point(width, 0.0f, (length + padding) * 0.0f));
-		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetVertexColor(COLOR_WHITE));
 		CR(pSphere->SetAlpha(alpha));
 		//*/
 
@@ -355,17 +355,17 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -552,17 +552,17 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -1774,12 +1774,12 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureCopy() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -1866,7 +1866,7 @@ RESULT HALTestSuite::AddTestSenseHaptics() {
 		pTestContext->pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetPosition(point(0.0f, 1.0f, 4.0f));
-		pTestContext->pVolume->SetColor(COLOR_BLUE);
+		pTestContext->pVolume->SetVertexColor(COLOR_BLUE);
 
 	Error:
 		return r;
@@ -1999,12 +1999,12 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -2092,22 +2092,22 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlur() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2195,22 +2195,22 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlurHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2291,27 +2291,27 @@ RESULT HALTestSuite::AddTestBlinnPhongShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 		CN(pSphere);
 		pSphere->SetPosition(point(width, 0.0f, 0.0f));
-		CR(pSphere->SetColor(COLOR_YELLOW));
+		CR(pSphere->SetVertexColor(COLOR_YELLOW));
 
 	Error:
 		return r;
@@ -2396,22 +2396,22 @@ RESULT HALTestSuite::AddTestMinimalShaderHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2495,22 +2495,22 @@ RESULT HALTestSuite::AddTestMouseDrag() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2594,22 +2594,22 @@ RESULT HALTestSuite::AddTestMinimalShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2801,7 +2801,7 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			quad *pQuad = m_pDreamOS->AddQuad(width, height);
 			CN(pQuad);
 			CN(pQuad->SetPosition(point(0.0f, -2.0f, 0.0f)));
-			pQuad->SetColor(COLOR_GREEN);
+			pQuad->SetVertexColor(COLOR_GREEN);
 
 			// TODO: this is no longer supported:
 			CR(pQuad->SetDiffuseTexture(pFlatContext->GetFramebuffer()->GetColorTexture()));
@@ -2863,26 +2863,26 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 		CR(pVolume->SetAlpha(alpha));
 
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 		CR(pVolume->SetAlpha(alpha));
 		
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 		CR(pVolume->SetAlpha(alpha));
 		
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(alpha));
 	
 

@@ -20,7 +20,6 @@ public:
 
 	virtual RESULT AddTests() override;
 
-	RESULT AddTestRayModel();
 	RESULT AddTestCompositeRay();
 	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
