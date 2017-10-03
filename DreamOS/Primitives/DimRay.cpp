@@ -131,8 +131,9 @@ CollisionManifold DimRay::Collide(VirtualObj* pObj) {
 // since this is not a general solution
 
 ray DimRay::GetRay(bool fAbsolute) {
-	//point ptOrigin = m_ptOrigin + DimObj::GetOrigin(fAbsolute);
-	point ptOrigin = DimObj::GetOrigin(fAbsolute);
+	point ptOrigin = (RotationMatrix(GetOrientation(fAbsolute)) * m_ptOrigin) + DimObj::GetOrigin(fAbsolute);
+	//point ptOrigin = DimObj::GetOrigin(fAbsolute);
+	
 	vector vDirection = RotationMatrix(GetOrientation(fAbsolute)) * m_vDirection;
 
 	return ray(ptOrigin, vDirection);

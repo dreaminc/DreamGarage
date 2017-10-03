@@ -404,7 +404,31 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	double sTestTime = 100.0f;
 	int nRepeats = 1;
 
-	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
+	struct TestContext : public Subscriber<InteractionObjectEvent> {
+		composite *pComposite = nullptr;
+		DimRay *pRay = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DreamOS* m_pDreamOS = nullptr;
+
+		virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
+			RESULT r = R_PASS;
+
+			CR(r);
+
+			for (int i = 0; i < 4; i++) 
+				pCollidePoint[i]->SetVisible(false);
+
+
+			for (int i = 0; i < mEvent->m_numContacts; i++) {
+				pCollidePoint[i]->SetPosition(mEvent->m_ptContact[i]);
+				pCollidePoint[i]->SetVisible(true);
+			}
+
+		Error:
+			return r;
+		}
+	} *pTestContext = new TestContext();
+
 	pTestContext->m_pDreamOS = m_pDreamOS;
 
 	// Initialize Code 
@@ -415,85 +439,51 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupPipeline());
+		CR(SetupPipeline("minimal"));
 
 		{
-			RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
 			std::shared_ptr<composite> pChildComposite = nullptr;
-			composite *pComposite = nullptr;
-			std::shared_ptr<sphere> pSphere = nullptr;
-
+			
 			// Create a complex composite
-			pComposite = m_pDreamOS->AddComposite();
-			CN(pComposite);
-
-			pTestContext->pComposite = pComposite;
-
-			pComposite->InitializeOBB();
-
-			///*
-			pChildComposite = pComposite->AddComposite();
-			CN(pChildComposite);
-			CR(pChildComposite->InitializeOBB());
-
-			auto pChildChildComposite = pChildComposite->AddComposite();
-			CN(pChildChildComposite);
-			CR(pChildChildComposite->InitializeOBB());
-			//*/
-
-			auto pActiveComposite = pChildChildComposite;
-
-			auto pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pQuad->SetVertexColor(COLOR_BLUE);
-			//pQuad->RotateXByDeg(90.0f);
-
-			/*
-			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(point(1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
-
-			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(point(-1.5f, 0.0f, 0.0f));
-			pQuad->SetColor(COLOR_BLUE);
-
-			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(point(0.0f, 0.0f, 1.5f));
-			pQuad->SetColor(COLOR_BLUE);
-
-			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(point(0.0f, 0.0f, -1.5f));
-			pQuad->SetColor(COLOR_BLUE);
-
-			pChildComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
-
-			pChildChildComposite->SetPosition(point(0.0f, 1.0f, 0.0f));
-			*/
-			pChildComposite->RotateYByDeg(45.0f);
-			pChildChildComposite->RotateYByDeg(45.0f);
-
-			pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pComposite->RotateXByDeg(90.0f);
-			//pComposite->RotateZByDeg(45.0f);
-
-			// The Ray
-			//pTestContext->pRay = m_pDreamOS->AddRay(point(-size / 2, size / 2, 2.0f), vector(0.0f, 0.0f, -1.0f).Normal());
-			//CN(pTestContext->pRay);
-
-			// Add composite to interaction
-			CR(m_pDreamOS->AddObjectToInteractionGraph(pComposite));
-
-			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
-				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), pTestContext));
-			}
-
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+			
 			// Collide point spheres
 			for (int i = 0; i < 4; i++) {
 				pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
 				CN(pTestContext->pCollidePoint[i]);
 				pTestContext->pCollidePoint[i]->SetVisible(false);
 			}
+			
+			auto pObject = pTestContext->pComposite->AddVolume(0.5f, 0.5f, 1.0f);
+			CN(pObject);
+			pObject->SetVertexColor(COLOR_BLUE);
+			
+			pObject = pTestContext->pComposite->AddVolume(0.5f, 1.0f, 0.5f);
+			CN(pObject);
+			pObject->SetVertexColor(COLOR_GREEN);
+
+			pTestContext->pComposite->SetPosition(point(0.75f, -1.5f, 0.0f));
+			//pComposite->RotateXByDeg(90.0f);
+			//pComposite->RotateZByDeg(45.0f);
+
+			// The Ray
+			pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 1.0f, 0.0f), vector(1.0f, -1.5f, 0.0f).Normal());
+			CN(pTestContext->pRay);
+
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay));
+
+			// Add composite to interaction
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
+
+			CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_BEGAN, pTestContext));
+			CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_MOVED, pTestContext));
+			CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_ENDED, pTestContext));
+			
 		}
 
 	Error:
@@ -508,11 +498,15 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	// Update Code 
 	auto fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
-		ray rCast;
+		
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 
 		// Get ray from mouse
-		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+		//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+		pTestContext->pRay->translateX(0.0005f);
 
 	Error:
 		return r;
@@ -522,7 +516,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 	auto fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		if (pTestContext != nullptr) {
 			delete pTestContext;
@@ -1401,7 +1395,7 @@ Error:
 	return r;
 }
 
-RESULT InteractionEngineTestSuite::SetupPipeline() {
+RESULT InteractionEngineTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -1413,11 +1407,7 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1429,9 +1419,16 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 

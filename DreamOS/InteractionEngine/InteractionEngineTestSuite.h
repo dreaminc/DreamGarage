@@ -36,7 +36,7 @@ public:
 
 	virtual RESULT AddTests() override;
 
-	RESULT SetupPipeline();
+	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT Initialize();
 
 	RESULT AddTestCaptureObject();

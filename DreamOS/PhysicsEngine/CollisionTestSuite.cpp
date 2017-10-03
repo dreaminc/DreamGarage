@@ -23,9 +23,9 @@ RESULT CollisionTestSuite::AddTests() {
 
 	CR(AddTestRayInComposite());
 
-	CR(AddTestRayModel());
-
 	CR(AddTestScaledCompositeRay());
+
+	CR(AddTestRayModel());
 
 Error:
 	return r;
@@ -188,11 +188,11 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 		pTestContext->pComposite->SetPosition(point(0.0f, -1.0f, 0.0f));
 		pTestContext->pComposite->SetScale(0.5f);
 
-		m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite);
-
-		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_BEGAN, pTestContext));
-		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_MOVED, pTestContext));
-		CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_ENDED, pTestContext));
+		//m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite);
+		//
+		//CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_BEGAN, pTestContext));
+		//CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_MOVED, pTestContext));
+		//CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, ELEMENT_INTERSECT_ENDED, pTestContext));
 
 		// The Ray
 		///*
@@ -204,7 +204,7 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 		CN(pTestContext->pRay);
 		pTestContext->pRay->SetPosition(point(-1.0f, 1.0f, 0.0f));
 
-		CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay.get()));
+		//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay.get()));
 
 		pTestContext->pRayComposite->SetPosition(-3.0f, 1.0f, 0.0f);
 		pTestContext->pRayComposite->RotateZByDeg(45.0f);
@@ -232,7 +232,7 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 		CN(pTestContext->pSphere);
 		CN(pTestContext->pQuad);
 
-		/*
+		///*
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 
@@ -248,7 +248,7 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 				}
 			}
 		}
-		*/
+		//*/
 
 		pTestContext->pRayComposite->translateX(0.001f);
 

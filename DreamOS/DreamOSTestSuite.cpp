@@ -200,7 +200,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Add some users
-		for (int i = 0; i < 4; i++) {
+		//for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 1; i++) {
 			pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
 			CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
 		
