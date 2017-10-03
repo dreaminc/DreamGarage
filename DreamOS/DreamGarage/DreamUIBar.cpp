@@ -173,8 +173,11 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		
 		point ptOrigin = GetComposite()->GetPosition();
 
-		vector vLook = GetDOS()->GetCamera()->GetLookVector();
-		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		//vector vLook = GetDOS()->GetCamera()->GetLookVector();
+		//vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		vector vLookXZ = GetCameraLookXZ();
+		//vector vLookXZ = GetComposite()->GetOrientation().RotateVector(vector(0.0f, 0.0f, -1.0f));
+		//vector vLookXZ = GetComposite()->GetOrientation().GetVector();
 		
 		m_pUIStageProgram->SetOriginDirection(vLookXZ);
 

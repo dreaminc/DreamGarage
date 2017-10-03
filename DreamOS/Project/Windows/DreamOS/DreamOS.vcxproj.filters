@@ -2084,6 +2084,9 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\DreamApp.tpp">
+      <Filter>DreamOS</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

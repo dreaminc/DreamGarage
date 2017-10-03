@@ -1,59 +1,5 @@
-#include "DreamApp.h"
-#include "DreamOS.h"
-#include "Primitives/composite.h"
-#include "Primitives/vector.h"
 
-// DreamAppBase
-RESULT DreamAppBase::SetPriority(int priority) {
-	m_priority = priority;
-	return R_PASS;
-}
-
-int DreamAppBase::GetPriority() {
-	return m_priority;
-}
-
-RESULT DreamAppBase::ResetTimeRun() {
-	m_usTimeRun = 0.0;
-	return R_PASS;
-}
-
-RESULT DreamAppBase::IncrementTimeRun(double usTimeDelta) {
-	m_usTimeRun += usTimeDelta;
-	return R_PASS;
-}
-
-float DreamAppBase::GetTimeRun() {
-	return m_usTimeRun;
-}
-
-// In short, this will return 
-float DreamAppBase::GetEffectivePriorityValue() const {
-	return (m_usTimeRun * m_priority);
-}
-
-// DreamApp<derived>
-
-template<class derivedAppType>
-RESULT DreamApp<derivedAppType>::Initialize() {
-	RESULT r = R_PASS;
-
-	// Grab the context composite from DreamOS
-	CN(m_pDreamOS);
-	m_pCompositeContext = m_pDreamOS->AddComposite();
-	CN(m_pCompositeContext);
-
-	// Initialize the OBB (collisions)
-	CR(m_pCompositeContext->InitializeOBB());
-	CR(m_pDreamOS->AddObjectToInteractionGraph(m_pCompositeContext));
-
-	// Initialize the App
-	CR(InitializeApp(m_pContext));
-
-Error:
-	return r;
-}
-/*
+//*
 template<class derivedAppType>
 vector DreamApp<derivedAppType>::GetCameraLookXZ() {
 	vector vLook = GetComposite()->GetCamera()->GetLookVector();
@@ -75,14 +21,11 @@ RESULT DreamApp<derivedAppType>::UpdateCompositeWithCameraLook(float depth, floa
 }
 
 template<class derivedAppType>
-RESULT DreamApp<derivedAppType>::UpdateCompositeWithHands(float yPos) {//, DreamApp<derivedAppType>::Axes handAxes = DreamApp<derivedAppType>::Axes::ALL) {
+RESULT DreamApp<derivedAppType>::UpdateCompositeWithHands(float yPos, Axes handAxes) {
 	RESULT r = R_PASS;
 
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
-//		vector vLook = pCamera->GetLookVector();
-
-//		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
 	vector vLookXZ = GetCameraLookXZ();
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 

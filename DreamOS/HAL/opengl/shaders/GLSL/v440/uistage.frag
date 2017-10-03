@@ -38,6 +38,10 @@ layout (location = 0) out vec4 out_vec4Color;
 //vec4 g_ambient = vec4(0.05f);
 vec4 g_ambient = vec4(0.0f);
 
+float g_knee = 0.1f;
+float g_cosThreshold = 0.56f;
+float g_fadeRate = 6.0f;
+
 void main(void) {  
 	vec4 color = DataIn.color;
 
@@ -50,26 +54,23 @@ void main(void) {
 
 	if(u_clippingEnabled == true) {
 	
-		vec3 dotOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
-		vec3 dotDir = normalize(vec3(DataIn.ptMid.x - u_ptOrigin.x, 0.0f, DataIn.ptMid.z - u_ptOrigin.z));
-		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
-		float angle = dot(dotOrigin, dotDir);
+		vec3 vOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
+		vec3 vOrigintoQuadVertex = normalize(vec3(DataIn.ptMid.x - u_ptOrigin.x, 0.0f, DataIn.ptMid.z - u_ptOrigin.z));
+		float angle = dot(vOrigin, vOrigintoQuadVertex);
 
-		float knee = 0.1f;
-		//float knee = 0.096f;
-		float minDistance = angle - 0.56f;
-		//float minDistance = angle - 0.58f;
+		float minDistance = angle - g_cosThreshold;
+
 		if (minDistance < 0.0f) {
 			discard;
 		}
 
-		float ratio = (knee - minDistance) / knee;
+		float ratio = (g_knee - minDistance) / g_knee;
 		if (ratio > 0.0f) {
 			//scale function to fit domain of [0,1]
 			float x = ratio-0.5f;
 
 			//scale y to range of [0,1]
-			float y = (tanh(6*x)+1.0f)/2.0f;
+			float y = (tanh(g_fadeRate*x)+1.0f)/2.0f;
 
 			color.a = color.a * (1.0 - y);
 

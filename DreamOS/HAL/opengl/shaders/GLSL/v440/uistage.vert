@@ -35,15 +35,14 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	if(u_clippingEnabled == true) {
-		vec3 dotDir = u_ptOrigin.xyz - u_ptQuadCenter.xyz;
-		dotDir = normalize(dotDir);
+		vec3 vOrigintoQuadCenter = normalize(u_ptOrigin.xyz - u_ptQuadCenter.xyz);
 
-		vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f),dotDir));
+		vec3 vBitangent = normalize(cross(vec3(0.0f, 1.0f, 0.0f),vOrigintoQuadCenter));
 
 		vec4 invModel = u_mat4ParentModel * vec4(inV_vec4Position.xyz, 1.0f);
-		vec3 ptVec = invModel.xyz - u_ptQuadCenter.xyz;
+		vec3 vVertextoCenter = invModel.xyz - u_ptQuadCenter.xyz;
 
-		vec3 ptMid = (right * (dot(ptVec,right)));
+		vec3 ptMid = (vBitangent * (dot(vVertextoCenter, vBitangent)));
 		DataOut.ptMid = u_ptQuadCenter + (vec4(ptMid.xyz, 0.0f));// + (vec4(right, 0.0f) * ratio);
 	}
 	else {
