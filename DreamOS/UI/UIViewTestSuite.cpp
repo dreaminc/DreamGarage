@@ -909,7 +909,7 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AddTestCurvedTitle() {
+RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth with index triggers
 	RESULT r = R_PASS;
 	struct TestContext : public Subscriber<SenseControllerEvent> {
 		bool fRight = false;
@@ -937,27 +937,12 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
-			DEBUG_LINEOUT("Initializing Cloud Controller");
-			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-			{
-				std::string strUsername = pCommandLineManager->GetParameterValue("username");
-				std::string strPassword = pCommandLineManager->GetParameterValue("password");
-				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-
-				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-			}
-			auto& pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-			CN(pDreamUIBar);
-			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
-			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
-
 			composite *pComposite = m_pDreamOS->AddComposite();
 			pTestContext->pComposite = pComposite;
 			pComposite->InitializeOBB();
@@ -969,21 +954,19 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {
 				pButtons.emplace_back(pView->MakeUIButton());
 			}
 			
-			texture *pTexture3 = m_pDreamOS->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTexture2 = m_pDreamOS->MakeTexture(L"dropbox.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTexture1 = m_pDreamOS->MakeTexture(L"google-drive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTexture = m_pDreamOS->MakeTexture(L"cloud-storage.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTexturePlaceholder = m_pDreamOS->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTextureDropbox = m_pDreamOS->MakeTexture(L"dropbox.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTextureDrive = m_pDreamOS->MakeTexture(L"google-drive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTextureCloud = m_pDreamOS->MakeTexture(L"cloud-storage.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 			pScrollView->UpdateMenuButtons(pButtons);
+			
+			pButtons[0]->GetSurface()->SetDiffuseTexture(pTextureCloud);
+			pButtons[1]->GetSurface()->SetDiffuseTexture(pTextureDrive);
+			pButtons[2]->GetSurface()->SetDiffuseTexture(pTextureDropbox);
+			pButtons[3]->GetSurface()->SetDiffuseTexture(pTexturePlaceholder);
 
-			pButtons[0]->GetSurface()->SetDiffuseTexture(pTexture);
-			pButtons[1]->GetSurface()->SetDiffuseTexture(pTexture1);
-			pButtons[2]->GetSurface()->SetDiffuseTexture(pTexture2);
-			pButtons[3]->GetSurface()->SetDiffuseTexture(pTexture3);
-
-			//pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
 			pScrollView->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.15f, -5.27f));
-			//pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler(1.0f, -(float)(M_PI_2), 1.0f));
 
 			auto pFlatContext = m_pDreamOS->Add<FlatContext>(1024, 1024, 2);
 			CN(pFlatContext);
@@ -993,7 +976,7 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {
 			pFont->SetLineHeight(0.055f);
 			auto pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 				pFont,
-				"share",
+				"Share",
 				//"This one is even longer to check out them curves",
 				1.25,
 				0.055,
@@ -1001,19 +984,11 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {
 
 			pFlatContext->AddObject(pTitleText);
 			pFlatContext->RotateXByDeg(90.0f);
-
-			/*	this doesn't work lol
-			color visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
-			pFlatContext->SetMaterialColors(visibleColor, true);
-			pTitleText->SetColor(visibleColor);
-			pTitleText->SetMaterialColors(visibleColor, true);
-			*/
-			
 			pFlatContext->RenderToQuad(quad::CurveType::CIRCLE);
 
 			m_pDreamOS->GetCamera()->SetPosition(point(0.0f, -1.5f, 0.50f));
 			pFlatContext->SetPosition(m_pDreamOS->GetCamera()->GetPosition() - point(0.0f, -1.46f, .80f)); //with HMD
-			//pFlatContext->SetPosition(m_pDreamOS->GetCamera()->GetPosition() - point(0.05f, 0.0f, .85f));
+			//pFlatContext->SetPosition(m_pDreamOS->GetCamera()->GetPosition() - point(0.0f, 0.0f, .80f));
 			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext));
 		}
 
@@ -1024,12 +999,14 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		point ptCurrent = pTestContext->pComposite->GetPosition(false);
+		CN(pTestContext);
 		if (pTestContext->fLeft) {
+			point ptCurrent = pTestContext->pComposite->GetPosition(false);
 			pTestContext->pComposite->SetPosition(ptCurrent - point(0.0f, 0.0f, 0.01f));
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
 		else if (pTestContext->fRight) {
+			point ptCurrent = pTestContext->pComposite->GetPosition(false);
 			pTestContext->pComposite->SetPosition(ptCurrent + point(0.0f, 0.0f, 0.01f));
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
