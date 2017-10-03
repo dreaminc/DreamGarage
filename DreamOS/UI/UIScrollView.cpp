@@ -162,27 +162,6 @@ RESULT UIScrollView::Update() {
 				HideObject(m_pRightScrollButton.get());
 			}
 		}
-
-		//m_pMenuButtonsContainer->SetPosition(point(0.0f, 0.0f, 0.3f));
-
-		//TODO: approach will need a less naive implementation if animations are used
-/*
-		bool inc = m_velocity != 0.0f || !m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get());
-		int hack = inc ? 1 : 0;
-
-		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements + hack;
-		int lowIndex = std::ceil(m_yRotation / yRotationPerElement) - hack;
-
-		for (int i = 0; i < pChildren.size(); i++) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[i].get());
-			if (i >= lowIndex && i < highIndex) {
-				pButton->SetVisible(true);
-			}
-			else {
-				//pButton->SetVisible(false);
-			}
-		}
-		//*/
 	}
 	m_frameMs = msNow;
 

@@ -117,11 +117,9 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
 	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
-	m_fClippingEnabled = true;
 	m_pUniformClippingEnabled->SetUniform(true);
 	RenderObjectStore(m_pClippingSceneGraph);
 
-	m_fClippingEnabled = false;
 	m_pUniformClippingEnabled->SetUniform(false);
 	RenderObjectStore(m_pSceneGraph);
 

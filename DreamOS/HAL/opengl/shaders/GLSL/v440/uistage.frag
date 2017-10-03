@@ -65,18 +65,15 @@ void main(void) {
 
 		float ratio = (knee - minDistance) / knee;
 		if (ratio > 0.0f) {
-		//	color.a = color.a * pow(1.0f - ratio, 1.25f);
-
-			//input for blending function
-			//float x = (1.0f - (pow(ratio-0.5f,0.25f)));
+			//scale function to fit domain of [0,1]
 			float x = ratio-0.5f;
-			//x = pow(x-0.5f,0.25f);
-			//y=x/sqrt(1+x^2)
-			//float y = x / (pow(1 + (x*x), 0.5f));
-			float y = (tanh(6*x)+1.0f)/2.0f;
+
 			//scale y to range of [0,1]
+			float y = (tanh(6*x)+1.0f)/2.0f;
 
 			color.a = color.a * (1.0 - y);
+
+			//potentially normalize color
 			//vec3 white = vec3(1.0f, 1.0f, 1.0f);
 			//color.rgb = color.rgb + (white - (white * (1.0 - y)));
 		}
