@@ -213,13 +213,13 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
+	CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
 	//CR(AddTestKeyboardAngle());
-	CR(AddTestCurvedTitle());
+	//CR(AddTestCurvedTitle());
 
 Error:
 	return r;
