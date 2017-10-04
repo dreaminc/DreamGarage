@@ -9,12 +9,14 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/Types/UID.h"
+#include "Primitives/vector.h"
 
 #include <string>
 #include <memory>
 
 class DreamOS;
 class composite;
+//class vector;
 
 class DreamAppBase {
 	friend class DreamAppManager;
@@ -91,67 +93,11 @@ public:
 
 protected:
 
-	//template<class derivedAppType>
-	//TODO: move to the source file
-	RESULT UpdateCompositeWithCameraLook(float depth, float yPos) {
+	vector GetCameraLookXZ();
+	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
+	RESULT UpdateCompositeWithHands(float yPos, Axes handAxes = Axes::ALL);
 
-		composite *pComposite = GetComposite();
-		auto pCamera = pComposite->GetCamera();
-		vector vLook = pCamera->GetLookVector();
-
-		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
-		point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
-
-		pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
-		pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-
-		return R_PASS;
-	}
-
-	RESULT UpdateCompositeWithHands(float yPos, Axes handAxes = Axes::ALL) {
-		RESULT r = R_PASS;
-
-		composite *pComposite = GetComposite();
-		auto pCamera = pComposite->GetCamera();
-		vector vLook = pCamera->GetLookVector();
-
-		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
-		vector vUp = vector(0.0f, 1.0f, 0.0f);
-
-		hand *pLeftHand = GetDOS()->GetHand(hand::HAND_LEFT);
-		hand *pRightHand = GetDOS()->GetHand(hand::HAND_RIGHT);
-
-		//TODO: use axes enum to define plane, cylinder, or sphere surface
-		uint16_t axes = static_cast<uint16_t>(handAxes);
-
-		CN(pCamera);
-		CN(pLeftHand);
-		CN(pRightHand);
-		{
-			float dist = 0.0f;
-
-			point ptCamera = pCamera->GetPosition();
-			vector vPos;
-			for (auto& hand : { pLeftHand, pRightHand }) {
-				float handDist = 0.0f;
-				point ptHand = hand->GetPosition(true);
-				vector vHand = ptHand - pCamera->GetOrigin(true);
-				vector vTempPos = vLookXZ * (vHand.dot(vLookXZ));
-				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
-					vPos = vTempPos;
-			}
-
-			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
-
-			pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
-			pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-		}
-
-	Error:
-		return r;
-
-	}
-
+	//TODO: these can be moved into DreamApp.tpp
 	void *GetAppContext() {
 		return m_pContext;
 	}
@@ -199,5 +145,6 @@ private:
 	UID m_uid;
 };
 
+#include "DreamApp.tpp"
 
 #endif // ! DREAM_APP_H_

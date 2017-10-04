@@ -124,6 +124,9 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
+	//don't capture buttons that are out of view
+	CBR(m_pScrollView->IsCapturable(pButtonContext), R_OBJECT_NOT_FOUND);
+
 	//DreamOS *pDreamOS = GetDOS();
 	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
 	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
@@ -168,24 +171,22 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
-		CN(m_pUIStageProgram);
-		m_pUIStageProgram->SetClippingFrustrum(
-			m_projectionWidth,
-			m_projectionHeight,
-			m_projectionNearPlane,
-			m_projectionFarPlane,
-			m_projectionAngle);
+		point ptOrigin = GetComposite()->GetPosition();
 
-		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
-		point ptOrigin = GetComposite()->GetPosition(true);
-		ptOrigin.Reverse();
-		quaternion qRotation = GetComposite()->GetOrientation(true);
-		qRotation.Reverse();
+		//vector vLook = GetDOS()->GetCamera()->GetLookVector();
+		//vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		vector vLookXZ = GetCameraLookXZ();
+		//vector vLookXZ = GetComposite()->GetOrientation().RotateVector(vector(0.0f, 0.0f, -1.0f));
+		//vector vLookXZ = GetComposite()->GetOrientation().GetVector();
+		
+		m_pUIStageProgram->SetOriginDirection(vLookXZ);
 
-		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
-		m_pUIStageProgram->SetClippingViewMatrix(matView);
+		ptOrigin += vLookXZ * (m_menuDepth);
+		
+		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+
 	}
 	else {
 		m_pathStack.pop();
@@ -440,6 +441,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 			pButtons.emplace_back(pButton);
 		}
 

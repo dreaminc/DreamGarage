@@ -13,7 +13,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
-    <LocalDebuggerCommandArguments>-u jason_test1@dreamos.com -p nightmare</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-u defaulttestuser@dreamos.com -p Nightmare479!</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">

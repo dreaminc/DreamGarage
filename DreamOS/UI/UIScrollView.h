@@ -48,6 +48,8 @@ public:
 	RESULT PositionMenuButton(float index, std::shared_ptr<UIButton> pButton);
 
 	RESULT SetScrollVisible(bool fVisible);
+	bool IsCapturable(UIButton* pButton);
+
 // default behaviors
 public:
 	RESULT HideObject(DimObj* pObject);

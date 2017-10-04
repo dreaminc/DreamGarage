@@ -1,5 +1,7 @@
 #include "DreamApp.h"
 #include "DreamOS.h"
+#include "Primitives/composite.h"
+#include "Primitives/vector.h"
 
 // DreamAppBase
 RESULT DreamAppBase::SetPriority(int priority) {
@@ -28,27 +30,5 @@ float DreamAppBase::GetTimeRun() {
 // In short, this will return 
 float DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
-}
-
-// DreamApp<derived>
-
-template<class derivedAppType>
-RESULT DreamApp<derivedAppType>::Initialize() {
-	RESULT r = R_PASS;
-
-	// Grab the context composite from DreamOS
-	CN(m_pDreamOS);
-	m_pCompositeContext = m_pDreamOS->AddComposite();
-	CN(m_pCompositeContext);
-
-	// Initialize the OBB (collisions)
-	CR(m_pCompositeContext->InitializeOBB());
-	CR(m_pDreamOS->AddObjectToInteractionGraph(m_pCompositeContext));
-
-	// Initialize the App
-	CR(InitializeApp(m_pContext));
-
-Error:
-	return r;
 }
 
