@@ -221,8 +221,10 @@ private:
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
 	std::map<VirtualObj*, std::vector<CapturedObj*>> m_capturedObjects;
-	std::vector<std::pair<VirtualObj*, CapturedObj*>> m_capturedObjectsToRelease;
-	std::vector<std::pair<VirtualObj*, CapturedObj*>> m_objectsToCapture;
+
+	typedef std::pair<VirtualObj*, CapturedObj*> T_PendingCapturedObj;
+	std::vector<T_PendingCapturedObj> m_capturedObjectsToRelease;
+	std::vector<T_PendingCapturedObj> m_objectsToCapture;
 
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
