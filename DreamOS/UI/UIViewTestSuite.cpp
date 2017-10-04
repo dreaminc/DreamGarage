@@ -934,6 +934,7 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 	};
 	TestContext *pTestContext = new TestContext();
 	double sTestTime = 10000.0;
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1024,6 +1025,7 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUITest);
+	CN(pTestContext);
 
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
