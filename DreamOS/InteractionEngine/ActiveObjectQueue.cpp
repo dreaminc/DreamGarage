@@ -164,6 +164,16 @@ Error:
 	return ActiveObject::state::INVALID;
 }
 
+bool ActiveObjectQueue::HasActiveEventObject(VirtualObj *pInteractionObject, VirtualObj *pEventObject) {
+	for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+		if (pActiveObject->GetEventObject() == pEventObject) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 std::vector<std::shared_ptr<ActiveObject>> ActiveObjectQueue::FindActiveObjectsWithState(ActiveObject::state state, VirtualObj *pInteractionObject) {
 	std::vector<std::shared_ptr<ActiveObject>> retVector;
 

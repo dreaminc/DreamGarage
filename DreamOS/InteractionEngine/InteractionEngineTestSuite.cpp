@@ -424,6 +424,20 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 				pCollidePoint[i]->SetVisible(true);
 			}
 
+			switch (mEvent->m_eventType) {
+				case ELEMENT_INTERSECT_BEGAN: {
+					DEBUG_LINEOUT("begin");
+				} break;
+
+				case ELEMENT_INTERSECT_MOVED: {
+					DEBUG_LINEOUT("moved");
+				} break;
+
+				case ELEMENT_INTERSECT_ENDED: {
+					DEBUG_LINEOUT("end");
+				} break;
+			}
+
 		Error:
 			return r;
 		}
@@ -466,6 +480,10 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 			pObject = pTestContext->pComposite->AddVolume(0.5f, 1.0f, 0.5f);
 			CN(pObject);
 			pObject->SetVertexColor(COLOR_GREEN);
+
+			pObject = pTestContext->pComposite->AddVolume(0.5f, 0.65f, 0.65f);
+			CN(pObject);
+			pObject->SetVertexColor(COLOR_YELLOW);
 
 			pTestContext->pComposite->SetPosition(point(0.75f, -1.5f, 0.0f));
 			//pComposite->RotateXByDeg(90.0f);

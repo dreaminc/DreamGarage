@@ -318,18 +318,7 @@ VirtualObj* VirtualObj::SetOrientation(quaternion qOrientation) {
 }
 
 VirtualObj* VirtualObj::SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
-	//m_objectState.m_qRotation = quaternion::MakeQuaternionWithEuler(x, y, z);
-	//m_objectState.m_qRotation.Normalize();
-
-	m_objectState.m_qRotation.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
-
-	m_objectState.m_qRotation.RotateByVector(vector::iVector(), x);
-	m_objectState.m_qRotation.Normalize();
-
-	m_objectState.m_qRotation.RotateByVector(vector::jVector(), y);
-	m_objectState.m_qRotation.Normalize();
-
-	m_objectState.m_qRotation.RotateByVector(vector::kVector(), z);
+	m_objectState.m_qRotation = quaternion::MakeQuaternionWithEuler(x, y, z);
 	m_objectState.m_qRotation.Normalize();
 
 	OnManipulation();
@@ -342,7 +331,7 @@ VirtualObj* VirtualObj::SetRotateDeg(quaternion_precision degX, quaternion_preci
 	quaternion_precision thetaY = degY * (M_PI / 180.f);
 	quaternion_precision thetaZ = degZ * (M_PI / 180.f);
 
-	return SetRotate(degX, degY, degZ);
+	return SetRotate(thetaX, thetaY, thetaZ);
 }
 
 VirtualObj* VirtualObj::ResetRotation() {

@@ -506,6 +506,15 @@ InteractionEventType InteractionEngine::UpdateActiveObject(ActiveObject::type ac
 	pActiveObject = m_activeObjectQueues[activeObjectType].FindActiveObject(pObject, pInteractionObject);
 
 	if (pActiveObject == nullptr) {
+		bool fEventObjectFound = false;
+
+		// Lets cross check against duplicate event objects
+		// This will change eventState to moved vs began
+		// This will prevent sending repro start / move events
+		if (m_activeObjectQueues[activeObjectType].HasActiveEventObject(pInteractionObject, pEventObject) == true) {
+			fEventObjectFound = true;
+		}
+
 		pActiveObject = m_activeObjectQueues[activeObjectType].AddActiveObject(pObject, pInteractionObject);
 		CN(pActiveObject);
 
@@ -517,9 +526,11 @@ InteractionEventType InteractionEngine::UpdateActiveObject(ActiveObject::type ac
 
 		pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
 
-		// Notify element intersect begin 
-		//eventType = InteractionEventType::ELEMENT_INTERSECT_BEGAN;
-		eventState = EventState::BEGAN;
+		// If event object already found, then report a moved event
+		if(fEventObjectFound)
+			eventState = EventState::MOVED;
+		else
+			eventState = EventState::BEGAN;
 	}
 	else {
 		vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
@@ -532,8 +543,6 @@ InteractionEventType InteractionEngine::UpdateActiveObject(ActiveObject::type ac
 			eventState = EventState::MOVED;
 		}
 	}
-
-	
 
 	if (activeObjectType == ActiveObject::type::INTERSECT) {
 		pActiveObject->AddState(ActiveObject::state::RAY_INTERSECTED);
@@ -668,6 +677,8 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		for (auto &pInteractionObject : m_interactionObjects) {
 			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
 			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+			
+			// TODO: Move this to function
 			if (HasCapturedObjects(pInteractionObject)) {
 
 				for (auto &pCaptureObj : m_capturedObjects[pInteractionObject]) {
@@ -743,7 +754,11 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 				interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
 				interactionEvent.m_activeState = pActiveObject->GetState();
 
-				CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
+				// Lets cross check against active event objects to ensure against double releases 
+				// This will prevent the end event
+				if(activeObjectQueue.second.HasActiveEventObject(pInteractionObject, pActiveObject->GetEventObject()) == false) {
+					CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
+				}
 			}
 		}
 		for (auto& pInteractionObject : capturedObjectsToRemove) {

@@ -42,6 +42,8 @@ public:
 
 	RESULT TestNestedOBB();
 
+	RESULT AddTestRotation();
+
 	// TODO: Consolidate the HMD tests 
 	// TODO: This should be easy as this is now supported by pipeline
 	RESULT AddTestMinimalShaderHMD();
