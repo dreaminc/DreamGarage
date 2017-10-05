@@ -78,6 +78,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
+	RESULT SetupDreamAppPipeline();
 
 private:
 	DreamOS *m_pDreamOS;

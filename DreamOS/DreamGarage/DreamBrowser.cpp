@@ -382,6 +382,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 					if (pKeyboard != nullptr) {
 						//scope is from the MenuNode in DreamUIBar
+						//TODO: remove this once app attachments are implemented
 						strScope = pKeyboard->GetScope();
 						pKeyboard->HideKeyboard();
 					}
