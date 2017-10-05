@@ -219,7 +219,7 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
 	//CR(AddTestKeyboardAngle());
-	CR(AddTestCurvedTitle());
+	//CR(AddTestCurvedTitle());
 
 Error:
 	return r;

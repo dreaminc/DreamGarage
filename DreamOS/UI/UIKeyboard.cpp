@@ -368,14 +368,6 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	}
 
-
-//	for (auto key : m_activeKeys) {	
-//		if (key->m_state == KeyState::KEY_NOT_INTERSECTED) {
-//			activeKeysToRemove.emplace_back(key);
-//		}
-		//break;	//used for testing
-//	}
-
 	for (auto key : activeKeysToRemove) {
 		ReleaseKey(key);
 		RemoveActiveKey(key);
