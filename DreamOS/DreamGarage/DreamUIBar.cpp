@@ -159,8 +159,21 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	auto pItemsView = m_pScrollView->GetMenuItemsView();
 
-	auto pKeyboard = GetDOS()->GetKeyboard();
-	CN(pKeyboard);
+	//Initial keyboard separation
+	{
+		auto pKeyboard = GetDOS()->CaptureKeyboard();
+
+		if (pKeyboard != nullptr) {
+			if (m_pathStack.empty()) {
+				pKeyboard->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+			}
+			else if (pKeyboard->IsVisible()) {
+				pKeyboard->HideKeyboard();
+			}
+		}
+
+		CR(GetDOS()->ReleaseKeyboard());
+	}
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -172,25 +185,16 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		UpdateCompositeWithHands(m_menuHeight);
 		
 		point ptOrigin = GetComposite()->GetPosition();
-
-		//vector vLook = GetDOS()->GetCamera()->GetLookVector();
-		//vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
 		vector vLookXZ = GetCameraLookXZ();
-		//vector vLookXZ = GetComposite()->GetOrientation().RotateVector(vector(0.0f, 0.0f, -1.0f));
-		//vector vLookXZ = GetComposite()->GetOrientation().GetVector();
 		
 		m_pUIStageProgram->SetOriginDirection(vLookXZ);
 
 		ptOrigin += vLookXZ * (m_menuDepth);
 		
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
-
-		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
-
 	}
 	else {
 		m_pathStack.pop();
-		if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
 
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
@@ -225,11 +229,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	
-	// For testing these need to be removed 
-	///*
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
-	//*/
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -300,10 +301,16 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				m_pathStack.push(pSubMenuNode);
 
 				// TODO: This is temporary until we have better IPC
-				GetDOS()->GetKeyboard()->SetPath(strPath);
-				GetDOS()->GetKeyboard()->SetScope(strScope);
+				{
+					auto pKeyboard = GetDOS()->CaptureKeyboard();
+					if (pKeyboard != nullptr) {
+						pKeyboard->SetPath(strPath);
+						pKeyboard->SetScope(strScope);
 
-				GetDOS()->GetKeyboard()->ShowKeyboard();
+						pKeyboard->ShowKeyboard();
+					}
+					CR(GetDOS()->ReleaseKeyboard());
+				}
 			}
 		}
 	}
@@ -401,8 +408,12 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 		if (pMenuNodeTitle == "root_menu_title") {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-			//TODO: temporary, should be revisited during menu cleanup
-			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
+
+			//TODO: May want to move downloading outside of DreamUIBar
+			auto pKeyboard = GetDOS()->CaptureKeyboard();
+			if (pKeyboard != nullptr)
+				pKeyboard->UpdateTitle(pTexture, "Website");
+			CR(GetDOS()->ReleaseKeyboard());
 		}
 		
 		if (pBufferVector != nullptr) {

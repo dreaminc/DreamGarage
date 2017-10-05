@@ -376,11 +376,20 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 
-				std::string strPath = GetDOS()->GetKeyboard()->GetPath();
-				std::string strScope = GetDOS()->GetKeyboard()->GetScope();
-				std::string strTitle = "website";
+				std::string strScope = "";
+				{
+					auto pKeyboard = GetDOS()->CaptureKeyboard();
 
-				strPath = strURL;
+					if (pKeyboard != nullptr) {
+						//scope is from the MenuNode in DreamUIBar
+						strScope = pKeyboard->GetScope();
+						pKeyboard->HideKeyboard();
+					}
+					CR(GetDOS()->ReleaseKeyboard());
+				}
+
+				std::string strTitle = "website";
+				std::string strPath = strURL;
 
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
