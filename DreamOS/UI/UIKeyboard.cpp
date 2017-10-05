@@ -677,6 +677,7 @@ RESULT UIKeyboard::UpdateComposite(float height, float depth) {
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
 	CR(UpdateCompositeWithHands(height));
+	m_ptComposite = GetComposite()->GetPosition();
 
 Error:
 	return r;
