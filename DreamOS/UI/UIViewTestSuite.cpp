@@ -794,6 +794,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pKeyboard->ShowKeyboard();
 			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
 			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
+			m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
+			m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
