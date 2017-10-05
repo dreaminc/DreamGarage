@@ -105,7 +105,7 @@ private:
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
-	RESULT UpdateTextBox(int chkey, std::string strEntered);
+	RESULT UpdateTextBox(int chkey);
 	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
 

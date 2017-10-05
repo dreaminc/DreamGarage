@@ -314,9 +314,12 @@ private:
 
 // System Applications
 public:
-	std::shared_ptr<UIKeyboard> GetKeyboard();
+	std::shared_ptr<UIKeyboard> CaptureKeyboard();
+	RESULT ReleaseKeyboard();
 
 private:
+	//TODO: generalize when there are more system apps
+	bool m_fKeyboardCaptured = false;
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
 
 private:

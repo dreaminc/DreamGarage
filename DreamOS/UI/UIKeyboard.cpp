@@ -240,6 +240,8 @@ RESULT UIKeyboard::Update(void *pContext) {
 	point ptCollisions[2];
 	point ptCollision;
 
+	std::vector<UIKey*> activeKeysToRemove;
+
 	// skip keyboard interaction if not visible
 	CBR((IsVisible()), R_SKIPPED);
 
@@ -323,6 +325,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 		if (!fActive) {
 			key->m_state = KeyState::KEY_NOT_INTERSECTED;
+			activeKeysToRemove.emplace_back(key);
 			continue;
 		}
 		
@@ -365,14 +368,12 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	}
 
-	for (auto key : m_activeKeys) {	
-		if (key->m_state == KeyState::KEY_NOT_INTERSECTED) {
-			ReleaseKey(key);
-			RemoveActiveKey(key);
-			key->m_state = KeyState::KEY_UP;
-		}
-		//break;	//used for testing
+	for (auto key : activeKeysToRemove) {
+		ReleaseKey(key);
+		RemoveActiveKey(key);
+		key->m_state = KeyState::KEY_UP;
 	}
+	activeKeysToRemove.clear();
 
 Error:
 	return r;
@@ -535,6 +536,9 @@ Error:
 }
 
 RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
+	if (keyState == 1) {
+		UpdateTextBox(key);
+	}
 	return SetKeyState(key, keyState);
 }
 
@@ -580,7 +584,7 @@ UIMallet* UIKeyboard::GetLeftMallet() {
 	return m_pLeftMallet;
 }
 
-RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
+RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	RESULT r = R_PASS;
 
 	//TODO: this logic should probably be in UIKeyboardLayout
@@ -600,11 +604,19 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		//TODO: it is possible that when the menu button is pressed again, 
 		// the user is at the root menu by coincidence.  may need to notify
 		// DreamUIBar in some way in the future
-		HideKeyboard();
+
+		//HideKeyboard();
 	}
 
 	else if (chkey == 0x01) {
 		m_pTextBoxText->SetText("");
+	}
+
+	else if (chkey == SVK_BACK) {
+		auto strTextbox = m_pTextBoxText->GetText();
+		if (strTextbox.size() > 0)
+			strTextbox.pop_back();
+			m_pTextBoxText->SetText(strTextbox);
 	}
 
 	else if (chkey == SVK_CONTROL) {
@@ -620,7 +632,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	}
 
 	else {
-		m_pTextBoxText->SetText(strEntered);
+		std::string strNew = m_pTextBoxText->GetText();
+		strNew += chkey;
+		m_pTextBoxText->SetText(strNew);
+
 		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
 			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 		}
