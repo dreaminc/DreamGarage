@@ -213,12 +213,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	//CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	//CR(AddTestKeyboardAngle());
+	CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
 
 Error:
@@ -726,8 +726,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		bool fDecreaseMalletAngle = false;
 		DreamOS *pDreamOS;	
 		float malletAngle = 180.0f;
-		UIMallet *pBLeftMallet = nullptr;
-		UIMallet *pBRightMallet = nullptr;
 		UIMallet *pKLeftMallet = nullptr;
 		UIMallet *pKRightMallet = nullptr;
 		virtual RESULT Notify(SenseControllerEvent *event) override {
@@ -744,6 +742,11 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 					fDecreaseMalletAngle = true;
 				}
 			}
+			if (eventType == SENSE_CONTROLLER_MENU_UP) {
+				//hardcoded values taken from DreamUIBar
+				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
+			}
+		Error:
 			return r;
 		}
 	};
@@ -786,29 +789,11 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
-			DEBUG_LINEOUT("Initializing Cloud Controller");
-			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-			{
-				std::string strUsername = pCommandLineManager->GetParameterValue("username");
-				std::string strPassword = pCommandLineManager->GetParameterValue("password");
-				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
 
-				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-			}
-
-			auto& pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-			CN(pDreamUIBar);
-			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
-			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
-
-			CR(m_pDreamOS->InitializeKeyboard());
-			pTestContext->pKeyboard = m_pDreamOS->GetKeyboard();
-			pTestContext->pBLeftMallet = pDreamUIBar->GetLeftMallet();
-			pTestContext->pBRightMallet = pDreamUIBar->GetRightMallet();
-			pTestContext->pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
-			pTestContext->pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
+			pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+			pTestContext->pKeyboard->ShowKeyboard();
+			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
+			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
@@ -847,6 +832,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pUIButtonAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, fnAddKeyboardAngle, pTestContext);
 
 			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext));
+			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, pTestContext));
 			//*/
 
 			float radiusOfReferenceSpheres = 0.015f;
@@ -859,10 +845,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pSphere->SetPosition(ptCamera + point(0.5f, 1.0f, 0.0f));
 			pSphere = m_pDreamOS->AddSphere(radiusOfReferenceSpheres, 10, 10);
 			pSphere->SetPosition(ptCamera + point(-0.5f, 1.0f, 0.0f));
-			
-			//m_pDreamOS->GetKeyboard()->ShowKeyboard();
-			//m_pDreamOS->GetKeyboard()->UpdateComposite(ptCamera.y(), ptCamera.z()-.3f);
-			
 		}
 
 	Error:
@@ -889,8 +871,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 			pTestContext->pKLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-			pTestContext->pBLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-			pTestContext->pBRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
 		}
 
 	Error:

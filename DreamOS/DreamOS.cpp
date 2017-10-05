@@ -768,10 +768,6 @@ const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
 }
 
-std::shared_ptr<UIKeyboard> DreamOS::GetKeyboard() {
-	return m_pKeyboard;
-}
-
 std::shared_ptr<UIKeyboard> DreamOS::CaptureKeyboard() {
 	if (!m_fKeyboardCaptured) {
 		m_fKeyboardCaptured = true;

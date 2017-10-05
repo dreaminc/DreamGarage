@@ -314,9 +314,6 @@ private:
 
 // System Applications
 public:
-	//TODO: deprecate
-	std::shared_ptr<UIKeyboard> GetKeyboard();
-
 	std::shared_ptr<UIKeyboard> CaptureKeyboard();
 	RESULT ReleaseKeyboard();
 
