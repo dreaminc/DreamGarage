@@ -55,14 +55,14 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestKeyboard());
+
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestBrowserRequest());
 	CR(AddTestBrowser());
 
 	CR(AddTestFont());
-
-	CR(AddTestKeyboard());
 
 	CR(AddTestUIMenuItem());
 
@@ -73,8 +73,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestFlatContextCompositionQuads());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
-
-
 
 	//CR(AddTestBrowserRequestWithMenuAPI());
 	//CR(AddTestBrowserRequest());
@@ -960,18 +958,81 @@ RESULT UITestSuite::AddTestKeyboard() {
 
 	double sTestTime = 10000.0;
 
+	struct TestContext : public Subscriber<SenseControllerEvent> {
+		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
+
+		virtual RESULT Notify(SenseControllerEvent *event) override {
+			RESULT r = R_PASS;
+			if (event->type == SENSE_CONTROLLER_MENU_UP) {
+				//hardcoded values taken from DreamUIBar
+				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
+			}
+		Error:
+			return r;
+		}
+	};
+	TestContext *pTestContext = new TestContext();
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
 
-		//m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
-		CR(m_pDreamOS->InitializeKeyboard());
-		m_pKeyboard = m_pDreamOS->GetKeyboard();
-		m_pKeyboard->ShowKeyboard();
-		//m_pKeyboard->GetComposite()->SetPosition(point(0.0f, 1.0f, 0.0f));
+		SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		//CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+		pTestContext->pKeyboard->ShowKeyboard();
+		CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, pTestContext));
 
 		CR(Initialize());
 
@@ -980,11 +1041,7 @@ RESULT UITestSuite::AddTestKeyboard() {
 	};
 
 	auto fnUpdate = [&](void *pContext) {
-		RESULT r = R_PASS;
-		//m_pDreamOS->GetKeyboard()->GetComposite()->SetPosition(0.0f, 1.0f, 0.0f);
-		CR(r);
-	Error:
-		return r;
+		return R_PASS;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -1004,7 +1061,7 @@ RESULT UITestSuite::AddTestKeyboard() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");

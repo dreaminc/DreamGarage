@@ -372,10 +372,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
-
-			// TODO: Move this into keyboard
-			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
-
+			
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 

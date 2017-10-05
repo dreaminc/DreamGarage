@@ -92,8 +92,6 @@ private:
 
 	sphere *m_pSphere1;
 	sphere *m_pSphere2;
-
-	std::shared_ptr<UIKeyboard> m_pKeyboard;
 };
 
 
