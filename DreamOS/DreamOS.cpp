@@ -111,6 +111,20 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	//m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
 	//CN(m_pKeyboard);
 
+	// TODO: Move log in to here (avoid loading ordering issues since cloud is async and other things may
+	// be as well)
+
+	// Auto Login Handling
+	auto pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+
+	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		GetCloudController()->Start();
+	}
+
+	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
+
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -359,7 +373,12 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 	RESULT r = R_PASS;
 	std::shared_ptr<DreamPeerApp> pDreamPeerApp = nullptr;
 
-	long peerUserID = pPeerConnection->GetPeerUserID();
+	long peerUserID = 0; 
+	
+	if (pPeerConnection != nullptr) {
+		peerUserID = pPeerConnection->GetPeerUserID();
+	}
+
 	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
 	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, nullptr);
@@ -746,6 +765,10 @@ composite *DreamOS::AddComposite() {
 
 composite *DreamOS::MakeComposite() {
 	return m_pSandbox->MakeComposite();
+}
+
+user *DreamOS::MakeUser() {
+	return m_pSandbox->MakeUser();
 }
 
 user *DreamOS::AddUser() {

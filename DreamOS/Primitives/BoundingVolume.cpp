@@ -64,8 +64,8 @@ vector BoundingVolume::GetScale(bool fAbsolute) const {
 	return m_pParent->GetScale(fAbsolute);
 }
 
-quaternion BoundingVolume::GetOrientation() { 
-	return m_pParent->GetOrientation(); 
+quaternion BoundingVolume::GetOrientation(bool fAbsolute) {
+	return m_pParent->GetOrientation(fAbsolute); 
 }
 
 point BoundingVolume::GetParentOrigin() {
@@ -101,7 +101,7 @@ point BoundingVolume::GetAbsoluteOrigin() {
 
 point BoundingVolume::GetOrigin() {
 	if (!m_ptCenter.IsZero()) {
-		point ptRotated = RotationMatrix(GetAbsoluteOrientation()) * ScalingMatrix(GetScale(false)) * vector(m_ptCenter);
+		point ptRotated = RotationMatrix(GetOrientation(false)) * ScalingMatrix(GetScale(false)) * vector(m_ptCenter);
 		return (m_pParent->GetOrigin() + ptRotated);
 	}
 	else {

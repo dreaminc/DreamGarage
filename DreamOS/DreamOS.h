@@ -79,6 +79,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
+	virtual RESULT DidFinishLoading() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED; }
 	virtual RESULT Update(void) = 0;
 
@@ -259,6 +260,7 @@ public:
 	composite *MakeComposite();
 
 	user *AddUser();
+	user *MakeUser();
 
 	Pipeline *GetRenderPipeline();
 

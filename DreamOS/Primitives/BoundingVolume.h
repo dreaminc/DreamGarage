@@ -79,7 +79,7 @@ public:
 	point GetParentPivot();
 	VirtualObj *GetParentObject() const;
 	point GetOrigin();
-	quaternion GetOrientation();
+	quaternion GetOrientation(bool fAbsolute = false);
 	vector GetScale(bool fAbsolute = false) const;
 
 	// These provide the absolute orientation/origin of the object

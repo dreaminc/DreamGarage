@@ -576,10 +576,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	});
 
 	// Auto Login Handling
-	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
-		// auto login
-		m_pCloudController->Start();
-	}
+	// This is done in DreamOS now
+	//if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+	//	// auto login
+	//	m_pCloudController->Start();
+	//}
 
 	// Register with command prompt
 	// TODO: This should be changed to a command pattern
@@ -1419,10 +1420,27 @@ Error:
 	return nullptr;
 }
 
-user *SandboxApp::AddUser() {
+user *SandboxApp::MakeUser() {
 	RESULT r = R_PASS;
 
 	user* pUser = m_pHALImp->MakeUser();
+	CN(pUser);
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+user *SandboxApp::AddUser() {
+	RESULT r = R_PASS;
+
+	user* pUser = MakeUser();
 	CN(pUser);
 
 	CR(AddObject(pUser));

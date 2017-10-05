@@ -328,6 +328,7 @@ public:
 	composite* MakeComposite();
 
 	user *AddUser();
+	user *MakeUser();
 
 	// Cloud Controller 
 public:

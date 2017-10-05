@@ -37,12 +37,9 @@ class DimObj : public VirtualObj,
 	friend class OGLObj;
 
 protected:
-    //point m_ptOrigin;   // origin > now in virtual object
-    //AABV m_aabv;        // Axis Aligned Bounding Volume
+	vertex *m_pVertices = nullptr;
+	dimindex *m_pIndices = nullptr;
 
-protected:
-	vertex *m_pVertices;
-	dimindex *m_pIndices;
 	material m_material;
 
 	// Bounding Volume
@@ -190,7 +187,7 @@ public:
 	DimObj *GetParent();
 
 protected:
-	DimObj* m_pParent;
+	DimObj* m_pParent = nullptr;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
 
 	// Bounding Volume

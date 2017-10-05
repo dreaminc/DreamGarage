@@ -60,12 +60,12 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fMouseLook = true;
 #endif
 
@@ -158,8 +158,8 @@ RESULT DreamGarage::SetupUserModelPool() {
 
 	// Set up user pool
 	for (int i = 0; i < MAX_PEERS; i++) {
-		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, user*>(nullptr, AddUser());
-		m_usersModelPool[i].second->SetVisible(false);
+		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, user*>(nullptr, MakeUser());
+		//m_usersModelPool[i].second->SetVisible(false);
 	}
 
 //Error:
@@ -171,9 +171,9 @@ RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer)
 
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == nullptr) {
-			userModelPair.second->SetVisible(0.0f);
 			
-			//CR(pDreamPeer->AssignUserModel(userModelPair.second));
+			//userModelPair.second->SetVisible(false);
+			CR(pDreamPeer->AssignUserModel(userModelPair.second));
 
 			userModelPair.first = pDreamPeer;
 
@@ -183,7 +183,7 @@ RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer)
 
 	return R_POOL_FULL;
 
-//Error:
+Error:
 	return r;
 }
 
@@ -224,7 +224,7 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = false;
+	halconf.fRenderReferenceGeometry = true;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -292,9 +292,23 @@ RESULT DreamGarage::LoadScene() {
 	}
 #endif
 
+Error:
+	return r;
+}
+
+std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
+
+RESULT DreamGarage::DidFinishLoading() {
+	RESULT r = R_PASS;
+
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-	m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode);
-	CN(m_pDreamUIBar);
+
+	if (m_pDreamUIBar != nullptr) {
+		CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+	}
+	else {
+		DEBUG_LINEOUT("Warning Dream UI Bar failed to load");
+	}
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -303,7 +317,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 	m_pDreamBrowser->SetDiagonalSize(9.0f);
 	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-	
+
 	m_pDreamBrowser->SetVisible(false);
 #endif
 
@@ -316,7 +330,7 @@ RESULT DreamGarage::LoadScene() {
 	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
 	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, 0.0f));
 	//*/
-/*
+	/*
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");
 
@@ -330,6 +344,20 @@ RESULT DreamGarage::LoadScene() {
 
 	// UIKeyboard App
 	CR(InitializeKeyboard());
+
+
+	{
+		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
+
+		g_pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this);
+		AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
+		g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
+
+
+		//auto pDreamPeer = CreateNewPeer(nullptr);
+		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
+
+	}
 
 Error:
 	return r;
@@ -462,7 +490,9 @@ RESULT DreamGarage::Update(void) {
 	//m_browsers.Update();
 
 	// TODO: Move this into DreamApp arch
-	m_pDreamUIBar->Update();
+	//if (m_pDreamUIBar != nullptr) {
+	//	m_pDreamUIBar->Update();
+	//}
 
 	// TODO: Switch to message queue that runs on own thread
 	// for now just throttle it down
@@ -517,7 +547,7 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 	CB((index < m_seatLookup.size()));
 
 	float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
-	diffAngle *= -1.0f;
+	//diffAngle *= -1.0f;
 
 	rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 

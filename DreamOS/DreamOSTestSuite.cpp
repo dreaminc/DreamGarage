@@ -193,18 +193,23 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
 		pTestContext->pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Add some users
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 1; i++) {
 			pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
 			CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
+			
+			auto pUserModel = m_pDreamOS->MakeUser();
+			CN(pUserModel);
+			pTestContext->m_pPeers[i]->AssignUserModel(pUserModel);
 		
-			pTestContext->m_pPeers[i]->SetPosition(point(-2.0f + (i * 1.0f), 0.0f, -3.0f));
+			pTestContext->m_pPeers[i]->SetPosition(point(-1.0f + (i * 1.0f), 0.0f, 2.0f));
+			pTestContext->m_pPeers[i]->RotateByDeg(0.0f, 45.0f, 0.0f);
 		}
 
 
@@ -246,6 +251,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 
 		//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 		//pTestContext->pMouseRay->UpdateFromRay(rCast);
+
+		pTestContext->m_pPeers[0]->RotateByDeg(0.1f, 0.0f, 0.0f);
 
 	Error:
 		return r;

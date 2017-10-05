@@ -43,6 +43,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
+	virtual RESULT DidFinishLoading() override;
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 

@@ -33,6 +33,7 @@ public:
 
 	RESULT AddTestEnvironmentShader();
 
+	RESULT AddTestModelInstancing();
 	RESULT AddTestText();
 	RESULT AddTestModel();
 	RESULT AddTestUserModel();

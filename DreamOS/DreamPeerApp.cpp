@@ -39,8 +39,8 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	GetComposite()->InitializeOBB();
 
-	m_pUserModel = GetComposite()->AddUser();
-	CN(m_pUserModel);
+	//m_pUserModel = GetComposite()->AddUser();
+	//CN(m_pUserModel);
 
 	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
 	CN(m_pOrientationRay);
@@ -49,8 +49,12 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
-	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
-	CN(m_pSphere);
+	//m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
+	//CN(m_pSphere);
+
+	//m_pSphere = GetComposite()->AddSphere(0.025f, 10, 10);
+	//CN(m_pSphere);
+	//m_pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
@@ -78,6 +82,8 @@ RESULT DreamPeerApp::Shutdown(void *pContext) {
 
 	CR(r);
 
+	m_pUserModel = nullptr;
+
 Error:
 	return r;
 }
@@ -86,6 +92,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
+	RotateByDeg(0.0f, 0.25f, 0.0f);
 
 Error:
 	return r;
@@ -96,12 +103,12 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 
 	CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
 
-	m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+	//m_pSphere->SetPosition(mEvent->m_ptContact[0]);
 
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			GetComposite()->SetRotateDeg(0.0f, 180.0f, 0.0f);
+			//GetComposite()->SetRotateDeg(0.0f, 180.0f, 0.0f);
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
@@ -109,7 +116,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			GetComposite()->ResetRotation();
+			//GetComposite()->ResetRotation();
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -188,15 +195,18 @@ std::shared_ptr<user> DreamPeerApp::GetUserModel() {
 	return m_pUserModel;
 }
 
-//RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
-//	RESULT r = R_PASS;
-//
-//	CBN(m_pUserModel);
-//	m_pUserModel = pUserModel;
-//
+RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
+	RESULT r = R_PASS;
+
+	//CBN(m_pUserModel);
+	m_pUserModel = std::shared_ptr<user>(pUserModel);
+	GetComposite()->AddObject(m_pUserModel);
+
+	//m_pUserModel->SetVisible(true);
+
 //Error:
-//	return r;
-//}
+	return r;
+}
 
 // TODO: We should create a proper object pool design
 RESULT DreamPeerApp::ReleaseUserModel() {
@@ -235,6 +245,18 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 
 	CN(m_pUserModel);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::RotateByDeg(float degX, float degY, float degZ) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+	//m_pUserModel->RotateByDeg(degX, degY, degZ);
+	m_pUserModel->GetHead()->RotateByDeg(degX, degY, degZ);
+	//GetComposite()->RotateByDeg(degX, degY, degZ);
 
 Error:
 	return r;

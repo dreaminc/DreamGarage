@@ -15,9 +15,10 @@ RESULT user::Initialize() {
 
 	InitializeOBB();
 
-	SetScale(0.018f);
 
 #ifndef _DEBUG
+	SetScale(0.018f);
+
 	m_pHead = AddModel(L"\\face4\\untitled.obj");
 	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
 	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
@@ -26,17 +27,18 @@ RESULT user::Initialize() {
 	//m_pHead = AddComposite();
 	//m_pHead->AddVolume(0.2f);
 
-	m_pHead = AddModel(L"\\face4\\untitled.obj");
-	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
-	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead = AddModel(L"\\cube.obj");
+	m_pHead->RotateYByDeg(25.0f);
+	m_pHead->SetVertexColor(COLOR_BLUE);
+	m_pHead->SetMaterialDiffuseColor(COLOR_BLUE, true);
+
 #endif
 
 
-//#ifndef _DEBUG
+#ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
 
 	m_pMouth = m_pHead->AddQuad(0.3, 1.0);
-	//m_pMouth->MoveTo(0.0f, -0.135f, -0.1f);
 	m_pMouth->MoveTo(0.0f, 12.0f, 8.35f);
 	
 	m_pMouth->RotateXByDeg(90);
@@ -48,14 +50,13 @@ RESULT user::Initialize() {
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 	
 	m_pMouth->Scale(0.1f);
-//#endif
 
-	// Hands
 	m_pLeapLeftHand = AddHand();
 	m_pLeapLeftHand->OnLostTrack();
 	
 	m_pLeapRightHand = AddHand();
 	m_pLeapRightHand->OnLostTrack();
+#endif
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
