@@ -55,12 +55,15 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestDreamUIBar());
+
+	CR(AddTestBrowser());
+
 	CR(AddTestKeyboard());
 
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestBrowserRequest());
-	CR(AddTestBrowser());
 
 	CR(AddTestFont());
 
@@ -921,6 +924,60 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestDreamUIBar() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupDreamAppPipeline());
+		{
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
@@ -935,7 +992,7 @@ RESULT UITestSuite::AddTestBrowser() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
+		CR(SetupDreamAppPipeline());
 
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
@@ -951,19 +1008,6 @@ RESULT UITestSuite::AddTestBrowser() {
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
-
-		/*
-		{
-			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-			auto pComposite = m_pDreamOS->AddComposite();
-
-			auto pQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
-			CN(pQuad);
-			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
-			//CR(pVolume->SetColor(COLOR_GREEN));
-			pQuad->SetColorTexture(pColorTexture1);
-		}
-		*/
 
 	Error:
 		return R_PASS;

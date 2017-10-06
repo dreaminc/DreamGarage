@@ -52,6 +52,7 @@ public:
 
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
+	RESULT AddTestDreamUIBar();
 	RESULT AddTestBrowser();
 	RESULT AddTestBrowserRequest();
 	RESULT AddTestBrowserRequestWithMenuAPI();
