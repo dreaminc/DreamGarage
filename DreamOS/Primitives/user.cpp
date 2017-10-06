@@ -28,7 +28,6 @@ RESULT user::Initialize() {
 	//m_pHead->AddVolume(0.2f);
 
 	m_pHead = AddModel(L"\\cube.obj");
-	m_pHead->RotateYByDeg(25.0f);
 	m_pHead->SetVertexColor(COLOR_BLUE);
 	m_pHead->SetMaterialDiffuseColor(COLOR_BLUE, true);
 

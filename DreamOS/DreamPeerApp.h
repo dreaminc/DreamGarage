@@ -130,6 +130,7 @@ private:
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
 	std::shared_ptr<user> m_pUserModel = nullptr;
+	bool m_fPendingAssignedUserMode = false;
 
 	std::shared_ptr<sphere> m_pSphere = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;

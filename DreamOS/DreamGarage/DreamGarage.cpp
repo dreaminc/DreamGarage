@@ -60,7 +60,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 
@@ -224,7 +224,7 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -349,13 +349,15 @@ RESULT DreamGarage::DidFinishLoading() {
 	{
 		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
 
-		g_pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this);
-		AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
-		g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
+		//g_pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this);
+		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
+		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
 
 
-		//auto pDreamPeer = CreateNewPeer(nullptr);
-		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
+		//auto pDreamPeerApp = CreateNewPeer(nullptr);
+		//g_pDreamPeerApp = CreateNewPeer(nullptr);
+		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
+		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
 
 	}
 

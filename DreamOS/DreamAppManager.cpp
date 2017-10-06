@@ -1,5 +1,7 @@
 #include "DreamAppManager.h"
 
+#include "DreamOS.h"
+
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -75,6 +77,14 @@ RESULT DreamAppManager::Update() {
 			{
 				// Remove the top item
 				m_appPriorityQueue.pop();
+
+				// Check shutdown flag
+				if (pDreamApp->IsAppShuttingDown()) {
+					// On shut down, don't update or push into run queue
+					CR(pDreamApp->Shutdown(nullptr));
+					CR(m_pDreamOS->RemoveObject(pDreamApp->GetComposite()));
+					continue;
+				}
 
 				// Capture time stamp
 				auto tBeforeApp = std::chrono::high_resolution_clock::now();

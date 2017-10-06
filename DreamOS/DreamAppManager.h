@@ -77,6 +77,16 @@ public:
 		return nullptr;
 	}
 
+	template<class derivedAppType>
+	RESULT ShutdownApp(std::shared_ptr<derivedAppType> pDreamApp) {
+		RESULT r = R_PASS;
+
+		CR(pDreamApp->FlagShutdown("now"));
+
+	Error:
+		return r;
+	}
+
 	RESULT SetMinFrameRate(double minFrameRate);
 
 private:

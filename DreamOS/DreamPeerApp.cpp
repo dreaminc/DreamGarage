@@ -42,12 +42,12 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	//m_pUserModel = GetComposite()->AddUser();
 	//CN(m_pUserModel);
 
-	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
-	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(true);
-	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
+	//m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
+	//CN(m_pOrientationRay);
+	//m_pOrientationRay->SetVisible(true);
+	//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+	//
+	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	//m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
 	//CN(m_pSphere);
@@ -91,8 +91,11 @@ Error:
 RESULT DreamPeerApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
-	RotateByDeg(0.0f, 0.25f, 0.0f);
+	// If pending user mode - add to composite here
+	if (m_fPendingAssignedUserMode) {
+		CN(m_pUserModel);
+		CR(GetComposite()->AddObject(m_pUserModel));
+	}
 
 Error:
 	return r;
@@ -198,13 +201,11 @@ std::shared_ptr<user> DreamPeerApp::GetUserModel() {
 RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	RESULT r = R_PASS;
 
-	//CBN(m_pUserModel);
+	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
-	GetComposite()->AddObject(m_pUserModel);
+	m_fPendingAssignedUserMode = true;
 
-	//m_pUserModel->SetVisible(true);
-
-//Error:
+Error:
 	return r;
 }
 

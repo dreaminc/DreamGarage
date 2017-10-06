@@ -7,6 +7,26 @@ RESULT DreamAppBase::SetPriority(int priority) {
 	return R_PASS;
 }
 
+RESULT DreamAppBase::FlagShutdown(std::string strShutdownFlagSignalName) {
+	RESULT r = R_PASS;
+
+	CB((m_fShutdownFlag == false));
+
+	m_fShutdownFlag = true;
+	m_strShutdownFlagSignalName = strShutdownFlagSignalName;
+
+Error:
+	return r;
+}
+
+bool DreamAppBase::IsAppShuttingDown() {
+	return m_fShutdownFlag;
+}
+
+std::string DreamAppBase::GetShutdownFlagSignalName() {
+	return m_strShutdownFlagSignalName;
+}
+
 int DreamAppBase::GetPriority() {
 	return m_priority;
 }

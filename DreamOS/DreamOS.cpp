@@ -195,14 +195,14 @@ Error:
 RESULT DreamOS::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	auto pDreamPeer = FindPeer(pPeerConnection);
-	CN(pDreamPeer);
+	auto pDreamPeerApp = FindPeer(pPeerConnection);
+	CN(pDreamPeerApp);
 
 	// First give client layer to do something 
-	CR(OnDreamPeerConnectionClosed(pDreamPeer));
+	CR(OnDreamPeerConnectionClosed(pDreamPeerApp));
 
 	// Delete the dream peer
-	CR(RemovePeer(pDreamPeer));
+	CR(RemovePeer(pDreamPeerApp));
 
 Error:
 	return r;
@@ -375,13 +375,12 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 
 	long peerUserID = 0; 
 	
-	if (pPeerConnection != nullptr) {
-		peerUserID = pPeerConnection->GetPeerUserID();
-	}
+	CNM(pPeerConnection, "Peer Connection invalid");
+	peerUserID = pPeerConnection->GetPeerUserID();
 
 	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
-	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, nullptr);
+	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	CNM(pDreamPeerApp, "Failed to create dream peer app");
 
 	pDreamPeerApp->SetPeerConnection(pPeerConnection);
@@ -425,17 +424,27 @@ RESULT DreamOS::RemovePeer(long peerUserID) {
 }
 
 RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+	RESULT r = R_PASS;
+
 	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
 	for (auto &pairDreamPeer : m_dreamPeerApps) {
 		if (pairDreamPeer.second == pDreamPeer) {
 			it = m_dreamPeerApps.find(pairDreamPeer.first);
+			auto pDreamPeerApp = (*it).second;
+
 			m_dreamPeerApps.erase(it);
+
+			CRM(ShutdownDreamApp<DreamPeerApp>(pDreamPeerApp), "Failed to shut down dream peer app");
+
 			return R_PASS;
 		}
 	}
 
 	return R_NOT_FOUND;
+
+Error:
+	return r;
 }
 
 DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {

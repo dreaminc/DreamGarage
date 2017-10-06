@@ -25,10 +25,15 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
+	virtual composite *GetComposite() = 0;
 
 protected:
 	virtual void *GetAppContext() = 0;
 	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
+
+	RESULT FlagShutdown(std::string strShutdownFlagSignalName = "normal");
+	bool IsAppShuttingDown();
+	std::string GetShutdownFlagSignalName();
 
 protected:
 	RESULT SetPriority(int priority);
@@ -41,6 +46,9 @@ protected:
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
+
+	bool m_fShutdownFlag = false;
+	std::string m_strShutdownFlagSignalName;
 };
 
 
@@ -155,7 +163,7 @@ protected:
 		return m_pContext;
 	}
 
-	composite *GetComposite() {
+	virtual composite *GetComposite() override {
 		return m_pCompositeContext;
 	}
 

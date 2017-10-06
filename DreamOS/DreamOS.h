@@ -164,6 +164,16 @@ public:
 
 		return nullptr;
 	}
+	
+	template<class derivedAppType>
+	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp) {
+		RESULT r = R_PASS;
+
+		CR(m_pSandbox->m_pDreamAppManager->ShutdownApp<derivedAppType>(pDreamApp));
+
+	Error:
+		return r;
+	}
 
 //protected:
 public:
