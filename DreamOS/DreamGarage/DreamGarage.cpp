@@ -65,8 +65,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fMouseLook = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = false;
-	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fMouseLook = false;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -302,13 +302,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-
-	if (m_pDreamUIBar != nullptr) {
-		CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
-	}
-	else {
-		DEBUG_LINEOUT("Warning Dream UI Bar failed to load");
-	}
+	CN(m_pDreamUIBar);
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -344,7 +339,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	// UIKeyboard App
 	CR(InitializeKeyboard());
-
+	CR(InitializeDreamUser());
 
 	{
 		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());

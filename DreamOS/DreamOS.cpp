@@ -542,6 +542,16 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::InitializeDreamUser() {
+	RESULT r = R_PASS;
+
+	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
+	CN(m_pDreamUser);
+
+Error:
+	return r;
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);

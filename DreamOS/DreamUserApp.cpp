@@ -22,14 +22,12 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	m_pVolume = GetComposite()->AddVolume(1.0f);
 	CN(m_pVolume);
-	//m_pVolume->SetVisible(false);
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -2.0f), vector::kVector(-1.0f), 1.0f);
 	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(true);
-
+	m_pOrientationRay->SetVisible(false);
 	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));

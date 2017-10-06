@@ -39,26 +39,17 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	GetComposite()->InitializeOBB();
 
-	//m_pUserModel = GetComposite()->AddUser();
-	//CN(m_pUserModel);
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
-	//m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
-	//CN(m_pOrientationRay);
-	//m_pOrientationRay->SetVisible(true);
-	//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-	//
-	//GetDOS()->AddObjectToInteractionGraph(GetComposite());
+	// NOTE: User Model is assigned externally
 
-	//m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
-	//CN(m_pSphere);
+	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
+	CN(m_pOrientationRay);
+	m_pOrientationRay->SetVisible(false);
+	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 
-	//m_pSphere = GetComposite()->AddSphere(0.025f, 10, 10);
-	//CN(m_pSphere);
-	//m_pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
-
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	//}
+	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
+	CN(m_pSphere);
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
@@ -107,7 +98,9 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 
 	CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
 
-	//m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+	if (m_pSphere != nullptr) {
+		m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+	}
 
 	// handle event
 	switch (mEvent->m_eventType) {

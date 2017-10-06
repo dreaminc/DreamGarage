@@ -38,6 +38,7 @@
 
 #include "DreamAppManager.h"
 #include "DreamPeerApp.h"
+#include "DreamUserApp.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -179,6 +180,7 @@ public:
 public:
 	// Keyboard
 	RESULT InitializeKeyboard();
+	RESULT InitializeDreamUser();
 
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
@@ -330,11 +332,13 @@ private:
 	SandboxApp *m_pSandbox;
 
 // System Applications
+// Should flesh out a better arch here
 public:
 	std::shared_ptr<UIKeyboard> GetKeyboard();
 
 private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
+	std::shared_ptr<DreamUserApp> m_pDreamUser;
 
 private:
 	version m_versionDreamOS;
