@@ -95,6 +95,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	if (m_fPendingAssignedUserMode) {
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
+		m_fPendingAssignedUserMode = false;
 	}
 
 Error:
