@@ -3,6 +3,7 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -220,6 +221,7 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestUIView());
 	CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
+	CR(AddTestDreamControlView());
 
 Error:
 	return r;
@@ -1011,6 +1013,70 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::AddTestDreamControlView() {
+	RESULT r = R_PASS;
+	struct TestContext {
+		bool fRight = false;
+		bool fLeft = false;
+		composite *pComposite = nullptr;
+		std::shared_ptr<font> pFont = nullptr;
+		std::shared_ptr<text> pTextBoxText = nullptr;
+	};
+	std::shared_ptr<TestObject> pUITest = nullptr;
+	TestContext *pTestContext = new TestContext();
+	CN(pTestContext);
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(m_pDreamOS);
+		UIStageProgram *pUIStageProgram = nullptr;
+		CR(SetupUIStagePipeline(pUIStageProgram));
+
+		{
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			auto pComposite = m_pDreamOS->AddComposite();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			CR(pDreamControlView->SetSharedViewContext());
+
+			pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			CN(pTestContext->pFont);
+			pTestContext->pFont->SetLineHeight(0.050f);
+			{
+				pTestContext->pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+					pTestContext->pFont,
+					"hi",
+					0.5f - 0.02f,
+					.050,
+					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+				CN(pTestContext->pTextBoxText);
+				pView->AddObject(pTestContext->pTextBoxText);
+				pTestContext->pTextBoxText->SetPosition(point(0.0f, 0.0f, -.1f));
+				pTestContext->pTextBoxText->RotateXByDeg(90.0f);
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		return r;
+	};
+
+	pUITest = AddTest(fnInitialize, fnUpdate, pTestContext);
+	CN(pUITest);
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 

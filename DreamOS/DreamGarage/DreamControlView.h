@@ -3,10 +3,21 @@
 
 #include "RESULT/EHM.h"
 #include "DreamApp.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
-#include "DreamBrowser.h"
+#include "Primitives/Subscriber.h"
+#include <functional>
+#include <stack>
 
-class DreamControlView : public DreamApp<DreamControlView> {
+class quad; 
+class sphere;
+class UIView;
+class UIMallet;
+class UIScrollView;
+class texture;
+
+class DreamControlView : public DreamApp<DreamControlView>, 
+						 public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
 public:
@@ -27,6 +38,8 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
+
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -39,18 +52,22 @@ private:
 // View Context
 public:
 	//When update is called the screen texture is updated to the texture of this object
-	RESULT SetSharedViewContext(std::shared_ptr<DreamBrowser> pContext);
+	RESULT SetSharedViewContext();
 
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
 
 private:
-	std::shared_ptr<DreamBrowser> m_pSharedViewContext; // unclear whether this should be a DreamBrowser
 	std::shared_ptr<quad> m_pViewQuad;
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
+	std::shared_ptr<UIView> m_pView;
+	std::shared_ptr<UIScrollView> m_pScrollView;
 
 	State m_viewState;
+
+	UIMallet *m_pLeftMallet;
+	UIMallet *m_pRightMallet;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
