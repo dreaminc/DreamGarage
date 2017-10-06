@@ -85,18 +85,20 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
 
 	m_pCloudController = pDreamOS->GetCloudController();
-	CN(m_pCloudController);
+	if (m_pCloudController != nullptr) {
 
-	m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
-	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
+		m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+		//CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
+		if (m_pMenuControllerProxy != nullptr) {
+			CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+		}
 
-	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+		m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+		//CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
 
-	m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-	CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
-
-	m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
+		m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
+	}
 
 Error:
 	return r;
@@ -174,6 +176,9 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 		CR(GetDOS()->ReleaseKeyboard());
 	}
+
+	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
+	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
