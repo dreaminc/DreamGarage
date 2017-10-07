@@ -49,8 +49,8 @@ RESULT DreamApp<derivedAppType>::UpdateCompositeWithHands(float yPos, Axes handA
 	vector vLookXZ = GetCameraLookXZ();
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
-	hand *pLeftHand = GetDOS()->GetHand(hand::HAND_LEFT);
-	hand *pRightHand = GetDOS()->GetHand(hand::HAND_RIGHT);
+	hand *pLeftHand = GetDOS()->GetHand(HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT);
 
 	//TODO: use axes enum to define plane, cylinder, or sphere surface
 	//uint16_t axes = static_cast<uint16_t>(handAxes);
