@@ -33,8 +33,19 @@ public:
 
 	virtual RESULT Notify(SEventClass *pSubscriberEvent) = 0;
 
+	RESULT SetRemove() {
+		m_fRemove = true;
+	}
+
+	bool CheckAndCleanToBeRemoved() {
+		bool fRemove = m_fRemove;
+		m_fRemove = false;
+		return fRemove;
+	}
+
 private:
 	//Publisher *m_pSubject;
+	bool m_fRemove = false;
 
 };
 

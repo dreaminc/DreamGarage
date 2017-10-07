@@ -250,14 +250,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 	CN(pProxy);
 
 	// Update Mallet Positions
-	hand *pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+	hand *pHand = pDOS->GetHand(HAND_TYPE::HAND_LEFT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
-	pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+	pHand = pDOS->GetHand(HAND_TYPE::HAND_RIGHT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();

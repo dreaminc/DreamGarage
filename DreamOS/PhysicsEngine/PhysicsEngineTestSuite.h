@@ -49,6 +49,9 @@ public:
 	RESULT AddTestRayScaledQuads();
 	RESULT AddTestMultiCompositeRayScaledQuad();
 
+
+private:
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 	RESULT ResetTest(void *pContext);
 
 private:

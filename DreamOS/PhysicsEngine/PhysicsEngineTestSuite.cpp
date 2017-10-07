@@ -1,6 +1,10 @@
 #include "PhysicsEngineTestSuite.h"
 #include "DreamOS.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+
 #include "PhysicsEngine/CollisionManifold.h"
 
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
@@ -45,6 +49,52 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestSphereVsSphere());
 	CR(AddTestVolumeToPlaneVolume());
 	CR(AddTestBallVolume());
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+	light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 Error:
 	return r;
@@ -866,10 +916,12 @@ Error:
 	return r;
 }
 
+// TODO: This is really a collision test
+// Should create a collision / intersection test suite
 RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 15.0f;
+	double sTestTime = 25.0f;
 	int nRepeats = 1;
 	const int numQuads = 4;
 
@@ -886,6 +938,8 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("blinnphong"));
 
 		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
 
@@ -904,13 +958,16 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 		pTestContext->pQuad[quadCount] = pTestContext->pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad[quadCount]);
 		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetVertexColor(color(COLOR_GREEN));
 		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
 		xPos -= 1.0f;
+		quadCount++;
 
 		// Rotated by orientation
 		pTestContext->pQuad[quadCount] = pTestContext->pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad[quadCount]);
 		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetVertexColor(color(COLOR_GREEN));
 		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
 		pTestContext->pQuad[quadCount]->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
 		xPos -= 1.0f;
@@ -920,6 +977,7 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 		pTestContext->pQuad[quadCount] = pTestContext->pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad[quadCount]);
 		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetVertexColor(color(COLOR_GREEN));
 		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
 		xPos -= 1.0f;
 
@@ -928,12 +986,15 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 		CN(pTestContext->pQuad[quadCount]);
 		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
 		pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		pTestContext->pQuad[quadCount]->SetVertexColor(color(COLOR_GREEN));
 		xPos -= 1.0f;
 		//*/
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetMaterialDiffuseColor(color(COLOR_BLUE));
+			pTestContext->pCollidePoint[i]->SetVertexColor(color(COLOR_BLUE));
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 

@@ -19,20 +19,24 @@ struct InteractionObjectEvent;
 class DimRay;
 class sphere;
 
-struct RayCompositeTestContext {
+struct RayCompositeTestContext : public Subscriber<InteractionObjectEvent> {
 	composite *pComposite = nullptr;
 	DimRay *pRay = nullptr;
 	sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	DreamOS* m_pDreamOS = nullptr;
+
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
 };
+
 // TODO: Consider moving valid up to TestSuite
-class InteractionEngineTestSuite : public valid, public TestSuite, public Subscriber<InteractionObjectEvent> {
+class InteractionEngineTestSuite : public valid, public TestSuite  {
 public:
 	InteractionEngineTestSuite(DreamOS *pDreamOS);
 	~InteractionEngineTestSuite();
 
 	virtual RESULT AddTests() override;
 
-	RESULT SetupPipeline();
+	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT Initialize();
 
 	RESULT AddTestCaptureObject();
@@ -54,9 +58,7 @@ public:
 	RESULT InitializeRayCompositeTest(void *pContext);
 	RESULT ResetTest(void *pContext);
 	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
-
-public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	
 
 private:
 	DreamOS *m_pDreamOS;

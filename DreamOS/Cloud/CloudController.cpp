@@ -49,15 +49,10 @@ CloudController::~CloudController() {
 RESULT CloudController::ProcessingThread() {
 	RESULT r = R_PASS;
 
-	LOG(INFO) << "ProcessingThread start";
-
-	m_fRunning = true;
-
-	CR(Initialize());
-
-	//std::this_thread::sleep_for(std::chrono::seconds(3));
+	DEBUG_LINEOUT("ProcessingThread start");
 
 	CR(Login());
+	m_fRunning = true;
 
 	// Message pump goes here
 #if (defined(_WIN32) || defined(_WIN64))
@@ -69,7 +64,7 @@ RESULT CloudController::ProcessingThread() {
 	}
 #endif
 
-	LOG(INFO) << "ProcessingThread end";
+	DEBUG_LINEOUT("ProcessingThread end");
 
 Error:
 	return r;

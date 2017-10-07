@@ -21,6 +21,7 @@
 #include "Primitives/point.h"
 #include "Primitives/composite.h"
 #include "Primitives/hand.h"
+#include "Primitives/HandType.h"
 
 #include "Sense/SenseController.h"
 
@@ -125,8 +126,8 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
 
-	RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
-	hand* GetHand(hand::HAND_TYPE type);
+	RESULT AttachHand(hand *pHand, HAND_TYPE type);
+	hand* GetHand(HAND_TYPE type);
 
 	SenseController* GetSenseController();
 	virtual VirtualObj *GetSenseControllerObject(ControllerType controllerType) = 0;

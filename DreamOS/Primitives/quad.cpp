@@ -227,7 +227,7 @@ Error:
 RESULT quad::UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	if (pBoundingQuad->GetWidth() != m_width || pBoundingQuad->GetHeight() != m_height || pBoundingQuad->GetNormal() != m_vNormal) {
+	if (pBoundingQuad->GetWidth(false) != m_width || pBoundingQuad->GetHeight(false) != m_height || pBoundingQuad->GetNormal() != m_vNormal) {
 		CR(SetVertices(pBoundingQuad, fTriangleBased));
 	}
 
@@ -243,8 +243,9 @@ RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 
 	SetOrigin(pBoundingQuad->GetOrigin());
 
-	m_width = pBoundingQuad->GetWidth();
-	m_height = pBoundingQuad->GetHeight();
+	m_width = pBoundingQuad->GetWidth(false);
+	m_height = pBoundingQuad->GetHeight(false);
+
 	m_vNormal = pBoundingQuad->GetNormal();
 
 	CR(SetVertices(m_width, m_height, m_vNormal));

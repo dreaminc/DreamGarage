@@ -8,7 +8,10 @@
 // Dream Peer holds context for a given dream peer
 // and keeps track of state
 
-#include "Primitives/DObject.h"
+//#include "Primitives/DObject.h"
+#include "Primitives/Subscriber.h"
+
+#include "DreamApp.h"
 
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
@@ -20,10 +23,16 @@ class PeerConnection;
 class composite;
 class DreamOS;
 class user;
+class text;
+class font;
+
+struct InteractionObjectEvent;
 
 class WebRTCPeerConnectionProxy;
 
-class DreamPeer : public DObject {
+class DreamPeerApp : public DreamApp<DreamPeerApp>, public Subscriber<InteractionObjectEvent> {
+	friend class DreamAppManager;
+
 public:
 	enum class state : uint16_t {
 		UNINITIALIZED,
@@ -51,21 +60,33 @@ public:
 	};
 
 public:
-	class DreamPeerObserver {
+	class DreamPeerAppObserver {
 	public:
-		virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) = 0;
+		virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) = 0;
 	};
 
-	RESULT RegisterDreamPeerObserver(DreamPeerObserver* pDreamPeerObserver);
+	RESULT RegisterDreamPeerObserver(DreamPeerAppObserver* pDreamPeerObserver);
 
 private:
-	DreamPeerObserver* m_pDreamPeerObserver = nullptr;
+	DreamPeerAppObserver* m_pDreamPeerObserver = nullptr;
 
 public:
-	DreamPeer::DreamPeer(DreamOS *pDOS, PeerConnection *pPeerConnection);
 
-	RESULT Initialize();
+	DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext = nullptr);
+	//DreamPeerApp::DreamPeerApp(DreamOS *pDOS, PeerConnection *pPeerConnection, void *pContext = nullptr);
 
+	virtual RESULT InitializeApp(void *pContext = nullptr) override;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+protected:
+	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
+public:
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+
+public:
 	RESULT OnDataChannel();
 	RESULT OnAudioChannel();
 
@@ -77,16 +98,18 @@ public:
 	RESULT UpdatePeerHandshakeState();
 	bool IsPeerReady();
 
-	DreamPeer::state GetState();
+	DreamPeerApp::state GetState();
 
 	long GetPeerUserID();
 
 	PeerConnection *GetPeerConnection();
+	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
 
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
-	user* GetUserModel();
+	std::shared_ptr<user> GetUserModel();
 	RESULT AssignUserModel(user* pUserModel);
+
 	RESULT ReleaseUserModel();
 
 	RESULT SetVisible(bool fVisibile = true);
@@ -94,16 +117,29 @@ public:
 	RESULT SetOrientation(const quaternion& qOrientation);
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
+	RESULT RotateByDeg(float degX, float degY, float degZ);
 
 private:
-	RESULT SetState(DreamPeer::state peerState);
+	RESULT SetState(DreamPeerApp::state peerState);
 
 private:
 	long m_peerUserID = -1;
+	
 	DreamOS *m_pDOS = nullptr;
+	
 	PeerConnection *m_pPeerConnection = nullptr;
-	DreamPeer::state m_state = DreamPeer::state::UNINITIALIZED;
-	user *m_pUserModel = nullptr;
+	
+	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
+
+	std::shared_ptr<user> m_pUserModel = nullptr;
+	bool m_fPendingAssignedUserMode = false;
+
+	sphere *m_pSphere = nullptr;
+
+	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
+	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
+	std::shared_ptr<text> m_pTextUserName = nullptr;
+	std::shared_ptr<font> m_pFont = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};
