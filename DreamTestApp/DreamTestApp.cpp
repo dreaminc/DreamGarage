@@ -19,7 +19,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
-	SetSandboxConfiguration(sandboxconfig);\
+	SetSandboxConfiguration(sandboxconfig);
 
 //Error:
 	return r;
