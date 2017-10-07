@@ -383,9 +383,9 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	cState.fMenu = ((inputState.Buttons & 1<<1) != 0) || cState.fMenu;
 
 	// TODO: should probably change this value in controllerState to 'fSelected'
-	cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;
-	//cState.triggerRange = (inputState.IndexTrigger[cState.type]);
-
+	//cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;
+	
+	
 	switch(type) {
 		case ovrControllerType::ovrControllerType_LTouch: {
 			cState.type = CONTROLLER_LEFT;
@@ -399,6 +399,8 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 			return r;
 		} break;
 	}
+
+	cState.triggerRange = inputState.IndexTrigger[cState.type];
 
 	cState.fGrip = (inputState.HandTrigger[cState.type] > 0.9f);
 

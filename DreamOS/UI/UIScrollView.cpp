@@ -1,5 +1,6 @@
 #include "UIScrollView.h"
 #include "UIButton.h"
+#include "UIMenuItem.h"
 
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
@@ -69,7 +70,7 @@ RESULT UIScrollView::Initialize() {
 
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
-	m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
+	//m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
 	//m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, 0.3f);
 
 	m_pLeftScrollButton = AddUIButton();
@@ -125,6 +126,7 @@ RESULT UIScrollView::Update() {
 
 	double tDiff = (msNow - m_frameMs) * (90.0);
 
+	//m_yRotation = m_yRotation + (m_velocity*(float)(tDiff));
 	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
@@ -160,27 +162,6 @@ RESULT UIScrollView::Update() {
 				HideObject(m_pRightScrollButton.get());
 			}
 		}
-
-		//m_pMenuButtonsContainer->SetPosition(point(0.0f, 0.0f, 0.3f));
-
-		//TODO: approach will need a less naive implementation if animations are used
-/*
-		bool inc = m_velocity != 0.0f || !m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get());
-		int hack = inc ? 1 : 0;
-
-		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements + hack;
-		int lowIndex = std::ceil(m_yRotation / yRotationPerElement) - hack;
-
-		for (int i = 0; i < pChildren.size(); i++) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[i].get());
-			if (i >= lowIndex && i < highIndex) {
-				pButton->SetVisible(true);
-			}
-			else {
-				//pButton->SetVisible(false);
-			}
-		}
-		//*/
 	}
 	m_frameMs = msNow;
 
@@ -232,6 +213,11 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 			CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
 			CR(m_pDreamOS->RemoveObject(pButton));
 			CR(m_pDreamOS->UnregisterInteractionObject(pButton));
+
+			UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
+			if (pMenuItem) {
+				CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurfaceComposite().get()));
+			}
 		}
 	}
 	CR(m_pMenuButtonsContainer->ClearChildren());
@@ -344,7 +330,7 @@ RESULT UIScrollView::Show() {
 	RESULT r = R_PASS;
 
 	m_pTitleView->SetVisible(true, false);
-	m_pMenuButtonsContainer->SetVisible(true, false);
+	m_pMenuButtonsContainer->SetVisible(true, true);
 
 	return r;
 }
@@ -356,7 +342,7 @@ RESULT UIScrollView::Hide() {
 	m_pTitleView->SetVisible(false, false);
 	m_pLeftScrollButton->SetVisible(false);
 	m_pRightScrollButton->SetVisible(false);
-	m_pMenuButtonsContainer->SetVisible(false, false);
+	m_pMenuButtonsContainer->SetVisible(false, true);
 
 	return r;
 }
@@ -448,6 +434,25 @@ ScrollState UIScrollView::GetState() {
 RESULT UIScrollView::SetScrollVisible(bool fVisible) {
 	m_fScrollButtonVisible = fVisible;
 	return R_PASS;
+}
+
+bool UIScrollView::IsCapturable(UIButton *pButton) {
+
+	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
+	int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
+	int lowIndex = std::ceil(m_yRotation / yRotationPerElement);
+
+	auto pChildren = m_pMenuButtonsContainer->GetChildren();
+	for (int i = 0; i < pChildren.size(); i++) {
+		auto pChildButton = dynamic_cast<UIButton*>(pChildren[i].get());
+		if (pChildButton == pButton) {
+			if (i >= lowIndex && i < highIndex) {
+				return true;
+			}
+			return false;
+		}
+	}
+	return true;
 }
 
 std::shared_ptr<quad> UIScrollView::GetTitleQuad() {

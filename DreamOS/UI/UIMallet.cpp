@@ -38,3 +38,8 @@ sphere *UIMallet::GetMalletHead() {
 point UIMallet::GetHeadOffset() {
 	return m_headOffset;
 }
+
+RESULT UIMallet::SetHeadOffset(point p) {
+	m_headOffset = p;
+	return R_PASS;
+}

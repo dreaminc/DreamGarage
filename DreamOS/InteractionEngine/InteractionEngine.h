@@ -151,6 +151,9 @@ public:
 	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
 	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) override;
 
+	RESULT UpdateCapturedObjectStore();
+	RESULT UpdateCapturedObjects(VirtualObj *pInteractionObject);
+
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
 	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);
 	RESULT ClearInteractionObjects();
@@ -218,6 +221,11 @@ private:
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
 	std::map<VirtualObj*, std::vector<CapturedObj*>> m_capturedObjects;
+
+	typedef std::pair<VirtualObj*, CapturedObj*> T_PendingCapturedObj;
+	std::vector<T_PendingCapturedObj> m_capturedObjectsToRelease;
+	std::vector<T_PendingCapturedObj> m_objectsToCapture;
+
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
 	AnimationQueue* m_pObjectQueue = nullptr;

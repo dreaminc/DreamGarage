@@ -1,14 +1,18 @@
 #ifndef UI_VIEW_TEST_SUITE_H_
 
+
+
 #include "RESULT/EHM.h"
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
 #include "Test/TestSuite.h"
 
+
 class DreamOS;
 class UIView;
 class UIButton;
+class UIStageProgram;
 struct UIEvent;
 
 class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
@@ -22,7 +26,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
-	RESULT SetupUIStagePipeline();
+	RESULT SetupUIStagePipeline(UIStageProgram* &pUIStageProgram);
 
 // Tests
 public:
@@ -31,6 +35,8 @@ public:
 	RESULT AddTestUIButtons();
 	RESULT AddTestUIScrollView();
 	RESULT AddTestDreamUIBar();
+	RESULT AddTestKeyboardAngle();
+	RESULT AddTestCurvedTitle();
 
 	virtual RESULT AddTests() override;
 
