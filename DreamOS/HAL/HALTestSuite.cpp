@@ -26,6 +26,12 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestUserModel());
 
+	CR(AddTestModel());
+
+	CR(AddTestModelInstancing());
+	
+	CR(AddTestRotation());
+
 	CR(AddTestModelOrientation());
 
 	CR(AddTestBlinnPhongShaderTexture());
@@ -33,8 +39,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestUIShaderStage());
 
 	CR(AddTestEnvironmentShader());
-
-	CR(AddTestModel());
 
 	CR(AddTestSkybox());
 
@@ -206,7 +210,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
 		CN(pSphere);
 		pSphere->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetVertexColor(COLOR_WHITE));
 		CR(pSphere->SetAlpha(alpha));
 		//*/
 
@@ -214,7 +218,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pVolume = pTestContext->pVolume1;
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(1.0f));
 
 		// Opposite ordering 
@@ -222,7 +226,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pVolume = pTestContext->pVolume2;
 		CN(pVolume);
 		pVolume->SetPosition(point(width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(1.0f));
 
 		/*
@@ -237,7 +241,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
 		CN(pSphere);
 		pSphere->SetPosition(point(width, 0.0f, (length + padding) * 0.0f));
-		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetVertexColor(COLOR_WHITE));
 		CR(pSphere->SetAlpha(alpha));
 		//*/
 
@@ -355,17 +359,17 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -552,17 +556,17 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -767,6 +771,97 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::AddTestRotation() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Objects 
+
+		DimRay *pRay = nullptr;
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(-1.0f);
+
+			pRay->RotateZByDeg(45.0f * i);
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(0.0f);
+
+			pRay->RotateZBy(M_PI_4 * i);
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(1.0f);
+
+			pRay->SetRotate(0.0f, 0.0f, (M_PI_4 * i));
+		}
+
+		for (int i = 0; i < 9; i++) {
+			pRay = m_pDreamOS->AddRay(point(0.0f), vector::iVector(1.0f), 0.5f);
+			CN(pRay);
+			pRay->translateX(-4.5f + (i * 1.0f));
+			pRay->translateY(2.0f);
+
+			pRay->SetRotateDeg(0.0f, 0.0f, (45.0f * i));
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Render To Texture");
+	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT HALTestSuite::AddTestUserModel() {
 	RESULT r = R_PASS;
 
@@ -775,6 +870,8 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 	struct TestContext {
 		user *pUser = nullptr;
+		composite *pComposite = nullptr;
+		std::shared_ptr<model> pModel = nullptr;
 	} *pTestContext = new TestContext();
 
 	float width = 5.5f;
@@ -801,12 +898,25 @@ RESULT HALTestSuite::AddTestUserModel() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
+
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+			pTestContext->pComposite->SetPosition(0.0f, -2.0f, 0.0f);
+			
+			//auto pModel = pTestContext->pComposite->AddModel(L"\\face4\\untitled.obj");
+			//pTestContext->pComposite->SetPosition(point(0.0f, -1.0f, -5.0f));
+			//pTestContext->pComposite->SetScale(0.1f);
+
+			//pTestContext->pModel = pTestContext->pComposite->AddModel(L"cube.obj");
+			//CN(pTestContext->pModel);
+
 			pTestContext->pUser = m_pDreamOS->AddUser();
 			CN(pTestContext->pUser);
-
-			pTestContext->pUser->SetPosition(0.0f, 0.0f, 1.0f);
-
+			pTestContext->pUser->SetPosition(0.0f, -2.0f, 0.0f);
 			pTestContext->pUser->UpdateMouth(1.0f);
+
+			pTestContext->pUser->GetHead()->RotateYByDeg(0.035f);
 		}
 
 	Error:
@@ -825,7 +935,114 @@ RESULT HALTestSuite::AddTestUserModel() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->pUser->RotateYByDeg(0.035f);
+		if (pTestContext->pUser != nullptr) {
+			pTestContext->pUser->RotateYByDeg(0.035f);
+			//pTestContext->pUser->GetHead()->RotateYByDeg(0.035f);
+		}
+		else if (pTestContext->pComposite != nullptr) {
+			pTestContext->pComposite->RotateYByDeg(0.035f);
+		}
+		else if (pTestContext->pModel != nullptr) {
+			pTestContext->pModel->RotateYByDeg(0.035f);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+// TODO: This is a deeper project
+RESULT HALTestSuite::AddTestModelInstancing() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		model *pModel = nullptr;
+	} *pTestContext = new TestContext();
+
+	float width = 5.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("environment"));
+
+		// Objects 
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		{
+			pTestContext->pModel = m_pDreamOS->MakeModel(L"\\face4\\untitled.obj");
+			//pTestContext->pModel->SetPosition(point(-7.0f + i * 1.5f, 0.0f, -5.0f));
+			//pTestContext->pModel->SetScale(0.03f);
+
+			for (int i = 0; i < 10; i++) {
+
+				auto pComposite = m_pDreamOS->AddComposite();
+
+				pComposite->AddObject(std::shared_ptr<model>(pTestContext->pModel));
+				CN(pComposite);
+
+				pComposite->SetPosition(point(-7.0f + i * 1.5f, 0.0f, -5.0f));
+				pComposite->SetScale(0.03f);
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->pModel->RotateYByDeg(0.035f);
+
+		//ObjectStoreImp *pObjectStoreImp = m_pDreamOS->GetUISceneGraphNode()->GetSceneGraphStore();
+		//VirtualObj *pVirtualObj = nullptr;
+		//
+		//CN(pObjectStoreImp);
+		//
+		//m_pDreamOS->GetUISceneGraphNode()->Reset();
+		//while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+		//	pVirtualObj->translateX(0.001f);
+		//}
 
 	Error:
 		return r;
@@ -871,64 +1088,7 @@ RESULT HALTestSuite::AddTestModel() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		CR(pHAL->MakeCurrentContext());
-
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		///*
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		//*/
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Connect Program to Display
-
-		// Connected in parallel (order matters)
-		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-
-		CR(pHAL->ReleaseCurrentContext());
+		CR(SetupSkyboxPipeline("environment"));
 
 		// Objects 
 
@@ -960,7 +1120,11 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 
-			///*
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pTestContext->pModel->SetScale(0.1f);
+
+			/*
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj");
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -8.0f));
 			pTestContext->pModel->SetScale(0.5f);
@@ -987,7 +1151,7 @@ RESULT HALTestSuite::AddTestModel() {
     TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		//pTestContext->pModel->RotateYByDeg(0.035f);
+		pTestContext->pModel->RotateYByDeg(0.035f);
   
 		ObjectStoreImp *pObjectStoreImp = m_pDreamOS->GetUISceneGraphNode()->GetSceneGraphStore();
 		VirtualObj *pVirtualObj = nullptr;
@@ -1759,12 +1923,12 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureCopy() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -1851,7 +2015,7 @@ RESULT HALTestSuite::AddTestSenseHaptics() {
 		pTestContext->pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetPosition(point(0.0f, 1.0f, 4.0f));
-		pTestContext->pVolume->SetColor(COLOR_BLUE);
+		pTestContext->pVolume->SetVertexColor(COLOR_BLUE);
 
 	Error:
 		return r;
@@ -1984,12 +2148,12 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		//*/
 
 	Error:
@@ -2077,22 +2241,22 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlur() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2180,22 +2344,22 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlurHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2276,27 +2440,27 @@ RESULT HALTestSuite::AddTestBlinnPhongShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 		CN(pSphere);
 		pSphere->SetPosition(point(width, 0.0f, 0.0f));
-		CR(pSphere->SetColor(COLOR_YELLOW));
+		CR(pSphere->SetVertexColor(COLOR_YELLOW));
 
 	Error:
 		return r;
@@ -2381,22 +2545,22 @@ RESULT HALTestSuite::AddTestMinimalShaderHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2480,22 +2644,22 @@ RESULT HALTestSuite::AddTestMouseDrag() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2579,22 +2743,22 @@ RESULT HALTestSuite::AddTestMinimalShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 
 	Error:
 		return r;
@@ -2786,7 +2950,7 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			quad *pQuad = m_pDreamOS->AddQuad(width, height);
 			CN(pQuad);
 			CN(pQuad->SetPosition(point(0.0f, -2.0f, 0.0f)));
-			pQuad->SetColor(COLOR_GREEN);
+			pQuad->SetVertexColor(COLOR_GREEN);
 
 			// TODO: this is no longer supported:
 			CR(pQuad->SetDiffuseTexture(pFlatContext->GetFramebuffer()->GetColorTexture()));
@@ -2848,26 +3012,26 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
 		CR(pVolume->SetAlpha(alpha));
 
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 		CR(pVolume->SetAlpha(alpha));
 		
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetVertexColor(COLOR_RED));
 		CR(pVolume->SetAlpha(alpha));
 		
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(alpha));
 	
 

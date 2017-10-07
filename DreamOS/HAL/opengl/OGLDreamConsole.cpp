@@ -25,7 +25,7 @@ void OGLRenderContext::Initialize()
 	m_fontSize = 4.0f;
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.2f));
+	m_Background->SetVertexColor(color(0.0f, 0.0f, 0.0f, 0.2f));
 }
 
 void OGLRenderContext::Render(point& topLeft, point& bottomRight) {
@@ -209,7 +209,7 @@ void OGLProfilerGraph::Initialize()
 	OGLRenderContext::Initialize();
 
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_OGLTriangle->SetColor(color(0.8f, 0.0f, 0.0f, 1));
+	m_OGLTriangle->SetVertexColor(color(0.8f, 0.0f, 0.0f, 1));
 
 	m_pOGLFont = std::make_shared<font>(L"Arial.fnt", false);
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_pOGLFont);
@@ -456,7 +456,7 @@ void OGLDebugConsole::Initialize() {
 	m_OGLTextBackground = std::make_unique<OGLQuad>(m_OGLImp, 1, 1);
 
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.3f));
+	m_OGLTriangle->SetVertexColor(color(0.0f, 0.0f, 0.0f, 0.3f));
 
 }
 
@@ -464,7 +464,7 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 {
 	float consoleHeight = 0;
 
-	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.3f));
+	m_OGLTriangle->SetVertexColor(color(0.0f, 0.0f, 0.0f, 0.3f));
 
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData()) {
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
@@ -482,7 +482,7 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 	auto currentCmdText = DreamConsole::GetConsole()->GetCmdText();
 	
 	if (currentCmdText.length() > 0) {
-		m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.8f));
+		m_OGLTriangle->SetVertexColor(color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
 

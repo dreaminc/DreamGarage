@@ -101,14 +101,20 @@ Error:
 RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	double length = pBoundingBox->GetWidth();
-	double height = pBoundingBox->GetHeight();
-	double width = pBoundingBox->GetLength();
+	//double length = pBoundingBox->GetWidth();
+	//double height = pBoundingBox->GetHeight();
+	//double width = pBoundingBox->GetLength();
+
+	double length = pBoundingBox->GetHalfVectorWidth(false) * 2.0f;
+	double height = pBoundingBox->GetHalfVectorHeight(false) * 2.0f;
+	double width = pBoundingBox->GetHalfVectorLength(false) * 2.0f;
 
 	if (width == length &&
 		width == height &&
-		length == height)
+		length == height) 
+	{
 		m_volumeType = CUBE;
+	}
 
 	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetCenter()));
 

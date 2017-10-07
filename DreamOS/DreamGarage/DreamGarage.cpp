@@ -66,7 +66,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
-	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fMouseLook = false;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -158,20 +158,21 @@ RESULT DreamGarage::SetupUserModelPool() {
 
 	// Set up user pool
 	for (int i = 0; i < MAX_PEERS; i++) {
-		m_usersModelPool[i] = std::make_pair<DreamPeer*, user*>(nullptr, AddUser());
-		m_usersModelPool[i].second->SetVisible(false);
+		m_usersModelPool[i] = std::make_pair<DreamPeerApp*, user*>(nullptr, MakeUser());
+		//m_usersModelPool[i].second->SetVisible(false);
 	}
 
 //Error:
 	return r;
 }
 
-RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer) {
+RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == nullptr) {
-			userModelPair.second->SetVisible(0.0f);
+			
+			//userModelPair.second->SetVisible(false);
 			CR(pDreamPeer->AssignUserModel(userModelPair.second));
 
 			userModelPair.first = pDreamPeer;
@@ -186,7 +187,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
@@ -199,7 +200,7 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDrea
 	return R_NOT_FOUND;
 }
 
-user* DreamGarage::FindUserModelInPool(DreamPeer *pDreamPeer) {
+user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
 			return userModelPair.second;
@@ -291,9 +292,18 @@ RESULT DreamGarage::LoadScene() {
 	}
 #endif
 
+Error:
+	return r;
+}
+
+std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
+
+RESULT DreamGarage::DidFinishLoading() {
+	RESULT r = R_PASS;
+
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-	m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode);
 	CN(m_pDreamUIBar);
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -302,7 +312,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 	m_pDreamBrowser->SetDiagonalSize(9.0f);
 	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-	
+
 	m_pDreamBrowser->SetVisible(false);
 #endif
 
@@ -315,7 +325,7 @@ RESULT DreamGarage::LoadScene() {
 	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
 	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, 0.0f));
 	//*/
-/*
+	/*
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");
 
@@ -329,6 +339,22 @@ RESULT DreamGarage::LoadScene() {
 
 	// UIKeyboard App
 	CR(InitializeKeyboard());
+	CR(InitializeDreamUser());
+
+	{
+		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
+
+		//g_pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this);
+		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
+		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
+
+
+		//auto pDreamPeerApp = CreateNewPeer(nullptr);
+		//g_pDreamPeerApp = CreateNewPeer(nullptr);
+		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
+		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
+
+	}
 
 Error:
 	return r;
@@ -402,8 +428,8 @@ Error:
 RESULT DreamGarage::SendHandPosition() {
 	RESULT r = R_PASS;
 
-	hand *pLeftHand = GetHand(hand::HAND_LEFT);
-	hand *pRightHand = GetHand(hand::HAND_RIGHT);
+	hand *pLeftHand = GetHand(HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = GetHand(HAND_TYPE::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
@@ -461,7 +487,9 @@ RESULT DreamGarage::Update(void) {
 	//m_browsers.Update();
 
 	// TODO: Move this into DreamApp arch
-	m_pDreamUIBar->Update();
+	//if (m_pDreamUIBar != nullptr) {
+	//	m_pDreamUIBar->Update();
+	//}
 
 	// TODO: Switch to message queue that runs on own thread
 	// for now just throttle it down
@@ -561,7 +589,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition) {
+RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition) {
 	RESULT r = R_PASS;
 
 	point ptSeatPosition;
@@ -578,7 +606,7 @@ Error:
 
 // Cloud Controller
 
-RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	RESULT r = R_PASS;
 
 	CR(UnallocateUserModelFromPool(pDreamPeer));
@@ -587,7 +615,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
+RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	///*

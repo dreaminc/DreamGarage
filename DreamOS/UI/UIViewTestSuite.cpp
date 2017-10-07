@@ -245,7 +245,7 @@ RESULT UIViewTestSuite::UpdateHandRay(void *pContext) {
 
 	ray rCast;
 	CN(m_pDreamOS);
-	hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+	hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 	if (pHand != nullptr) {
 		point ptHand = pHand->GetPosition();
@@ -602,14 +602,14 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 			auto& pLeftMallet = pTestContext->pLeftMallet;
 			auto& pRightMallet = pTestContext->pRightMallet;
 
-			hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 			CN(pHand);
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 			if (pLeftMallet)
 				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
 
-			pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
 
 			qOffset = RotationMatrix();

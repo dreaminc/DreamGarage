@@ -78,7 +78,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		pBgQuad->SetDiffuseTexture(labelFormat.pBgTexture);
 	}
 	else {
-		pBgQuad->SetColor(labelFormat.bgColor);
+		pBgQuad->SetVertexColor(labelFormat.bgColor);
 	}
 
 	//AddObject(m_pLabel);

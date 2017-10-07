@@ -111,13 +111,17 @@ public:
 	double GetHeight();
 	double GetLength();
 
-	vector GetHalfVector();
+	double GetHalfVectorWidth(bool fAbsolute = false);
+	double GetHalfVectorHeight(bool fAbsolute = false);
+	double GetHalfVectorLength(bool fAbsolute = false);
+
+	vector GetHalfVector(bool fAbsolute = true);
 	virtual RESULT SetHalfVector(vector vHalfVector) override;
 
-	virtual point GetMinPoint() override;
-	virtual point GetMaxPoint() override;
-	virtual point GetMinPointOriented() override;
-	virtual point GetMaxPointOriented() override;
+	virtual point GetMinPoint(bool fAbsolute = false) override;
+	virtual point GetMaxPoint(bool fAbsolute = false) override;
+	virtual point GetMinPointOriented(bool fAbsolute = false) override;
+	virtual point GetMaxPointOriented(bool fAbsolute = false) override;
 
 	BoundingBox GetBoundingAABB();
 

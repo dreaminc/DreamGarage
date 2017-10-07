@@ -662,8 +662,8 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 }
 
 // http://www.willperone.net/Code/coderr.php
-vector BoundingBox::GetHalfVector() {
-	vector vScale = GetScale();
+vector BoundingBox::GetHalfVector(bool fAbsolute) {
+	vector vScale = GetScale(fAbsolute);
 
 	if (m_type == Type::AABB) {
 		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
@@ -766,6 +766,36 @@ double BoundingBox::GetWidth() {
 	return static_cast<double>(m_vHalfSize.x() * 2.0f);
 }
 
+double BoundingBox::GetHalfVectorWidth(bool fAbsolute) {
+	double retVal = m_vHalfSize.x();
+
+	if (fAbsolute) {
+		retVal *= GetScale().x();
+	}
+	
+	return retVal;
+}
+
+double BoundingBox::GetHalfVectorHeight(bool fAbsolute) {
+	double retVal = m_vHalfSize.y();
+
+	if (fAbsolute) {
+		retVal *= GetScale().y();
+	}
+
+	return retVal;
+}
+
+double BoundingBox::GetHalfVectorLength(bool fAbsolute) {
+	double retVal = m_vHalfSize.z();
+
+	if (fAbsolute) {
+		retVal *= GetScale().z();
+	}
+
+	return retVal;
+}
+
 double BoundingBox::GetHeight() {
 	if (m_type == Type::AABB && m_pParent != nullptr) {
 		//RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
@@ -817,15 +847,15 @@ double BoundingBox::GetLength() {
 }
 
 // TODO: Why do we need to invert the point?
-point BoundingBox::GetMinPoint() {
-	return (GetOrigin() - GetHalfVector());
+point BoundingBox::GetMinPoint(bool fAbsolute) {
+	return (GetOrigin() - GetHalfVector(fAbsolute));
 }
 
-point BoundingBox::GetMaxPoint() {
-	return (GetOrigin() + GetHalfVector());
+point BoundingBox::GetMaxPoint(bool fAbsolute) {
+	return (GetOrigin() + GetHalfVector(fAbsolute));
 }
 
-point BoundingBox::GetMinPointOriented() {
+point BoundingBox::GetMinPointOriented(bool fAbsolute) {
 	if (m_type == Type::AABB) {
 		return GetMinPoint();
 	}
@@ -835,7 +865,7 @@ point BoundingBox::GetMinPointOriented() {
 	}
 }
 
-point BoundingBox::GetMaxPointOriented() {
+point BoundingBox::GetMaxPointOriented(bool fAbsolute) {
 	if (m_type == Type::AABB) {
 		return GetMaxPoint();
 	}

@@ -10,6 +10,11 @@ DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
 	// Empty - initialization by factory
 }
 
+DreamContentView* DreamContentView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamContentView *pDreamApp = new DreamContentView(pDreamOS, pContext);
+	return pDreamApp;
+}
+
 RESULT DreamContentView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -194,11 +199,6 @@ RESULT DreamContentView::Notify(InteractionObjectEvent *event) {
 
 Error:
 	return r;
-}
-
-DreamContentView* DreamContentView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamContentView *pDreamApp = new DreamContentView(pDreamOS, pContext);
-	return pDreamApp;
 }
 
 RESULT DreamContentView::SetAspectRatio(float aspectRatio) {

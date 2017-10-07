@@ -11,8 +11,10 @@
 
 #include "composite.h"
 #include "Leap.h"
+#include "HandType.h"
 
 class SenseLeapMotionHand;
+class model;
 
 class finger : public composite {
 public:
@@ -90,17 +92,10 @@ public:
 };
 
 class hand : public composite {
-public:
-	typedef enum HandType {
-		HAND_LEFT,
-		HAND_RIGHT,
-		HAND_SKELETON,
-		HAND_INVALID
-	} HAND_TYPE;
 
 public:
 	struct HandState {
-		hand::HAND_TYPE handType;
+		HAND_TYPE handType;
 		point ptPalm;
 		quaternion qOrientation;
 
@@ -127,9 +122,9 @@ public:
 	};
 
 public:
-	hand(HALImp* pHALImp);
+	hand(HALImp* pHALImp, HAND_TYPE type);
 
-	RESULT Initialize();
+	RESULT Initialize(HAND_TYPE type);
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
@@ -145,21 +140,19 @@ public:
 	RESULT SetLocalOrientation(quaternion qRotation);
 
 	hand::HandState GetHandState();
-	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
+	static hand::HandState GetDebugHandState(HAND_TYPE handType);
 	RESULT ToggleRenderType();
 	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
-	RESULT SetHandModel(hand::HAND_TYPE type);
+	RESULT SetHandModel(HAND_TYPE type);
 	RESULT SetHandModelOrientation(quaternion qOrientation);
 
-	std::shared_ptr<composite> GetModel(hand::HAND_TYPE handType);
+	std::shared_ptr<model> GetModel(HAND_TYPE handType);
 
 private:
 
 	HAND_TYPE m_handType;
 
-	std::shared_ptr<composite> m_pLeftModel;
-	std::shared_ptr<composite> m_pRightModel;
-
+	std::shared_ptr<model> m_pModel;
 	std::shared_ptr<sphere> m_pPalm;
 
 	std::shared_ptr<finger> m_pIndexFinger;

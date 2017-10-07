@@ -104,9 +104,12 @@ private:
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
 	
+	// Interaction Engine
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject);
+	RESULT UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -325,6 +328,7 @@ public:
 	composite* MakeComposite();
 
 	user *AddUser();
+	user *MakeUser();
 
 	// Cloud Controller 
 public:
@@ -358,7 +362,7 @@ public:
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
 
-	hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(HAND_TYPE handType);
 
 public:
 	bool IsSandboxRunning();

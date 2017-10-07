@@ -43,6 +43,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
+	virtual RESULT DidFinishLoading() override;
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
@@ -51,7 +52,7 @@ public:
 
 	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
 	RESULT SetRoundtablePosition(int index);
-	RESULT SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition);
+	RESULT SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingPosition);
 
 	// PeerConnectionObserver
 	//virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
@@ -62,8 +63,8 @@ public:
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
-	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) override;
-	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) override;
+	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) override;
+	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// Environment
@@ -92,11 +93,11 @@ private:
 	// User Pool
 
 	RESULT SetupUserModelPool();
-	RESULT AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer);
-	user* FindUserModelInPool(DreamPeer *pDreamPeer);
-	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer);
+	RESULT AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer);
+	user* FindUserModelInPool(DreamPeerApp *pDreamPeer);
+	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer);
 
-	std::array<std::pair<DreamPeer*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeer*, user*>(nullptr, nullptr) };
+	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
 
 private:

@@ -348,8 +348,7 @@ RESULT OVRHMD::UpdateHMD() {
 			hand->SetLocalOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
 			
-			hand::HAND_TYPE hType = i == 0 ? hand::HAND_TYPE::HAND_LEFT : hand::HAND_TYPE::HAND_RIGHT;
-//			hand->SetHandModel(hType);
+			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
 			pModel->SetVisible(true);
 

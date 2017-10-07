@@ -686,8 +686,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\DreamOSTestSuite.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
-    <ClCompile Include="..\..\..\DreamPeer.cpp" />
+    <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
+    <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
+    <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
@@ -767,6 +770,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
@@ -927,8 +931,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\DreamOSTestSuite.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
-    <ClInclude Include="..\..\..\DreamPeer.h" />
+    <ClInclude Include="..\..\..\DreamPeerApp.h" />
+    <ClInclude Include="..\..\..\DreamTestingApp.h" />
+    <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\camera.h" />
@@ -1084,6 +1091,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
@@ -1110,6 +1118,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
+    <ClInclude Include="..\..\..\Primitives\HandType.h" />
     <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\image\image.h" />
     <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h" />

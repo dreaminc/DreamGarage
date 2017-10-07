@@ -100,7 +100,7 @@ bool BoundingSphere::Intersect(const ray &r) {
 CollisionManifold BoundingSphere::Collide(const ray &rCast) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
 	vector vRayCircle = rCast.GetOrigin() - GetAbsoluteOrigin();
-	float radius = GetRadius();
+	float radius = GetRadius(true);
 
 	double bValue = rCast.GetVector().dot(vector(vRayCircle));
 	double cValue = vRayCircle.dot(vRayCircle) - (radius * radius);
@@ -158,17 +158,17 @@ RESULT BoundingSphere::SetHalfVector(vector vHalfVector) {
 	return R_PASS;
 }
 
-vector BoundingSphere::GetHalfVector() {
+vector BoundingSphere::GetHalfVector(bool fAbsolute) {
 	//point_precision vecRadiusValue = m_radius / std::sqrt(3);
 	return vector(m_radius);
 }
 
-point BoundingSphere::GetMinPoint() {
-	return (GetOrigin() - GetHalfVector());
+point BoundingSphere::GetMinPoint(bool fAbsolute) {
+	return (GetOrigin() - GetHalfVector(fAbsolute));
 }
 
-point BoundingSphere::GetMaxPoint() {
-	return (GetOrigin() + GetHalfVector());
+point BoundingSphere::GetMaxPoint(bool fAbsolute) {
+	return (GetOrigin() + GetHalfVector(fAbsolute));
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

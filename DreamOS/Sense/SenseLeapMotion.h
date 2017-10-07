@@ -78,10 +78,10 @@ public:
 	}
 	*/
 
-	RESULT AttachHand(hand *pHand, hand::HAND_TYPE handType) {
-		if(handType == hand::HAND_TYPE::HAND_LEFT)
+	RESULT AttachHand(hand *pHand, HAND_TYPE handType) {
+		if(handType == HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
-		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+		else if (handType == HAND_TYPE::HAND_RIGHT)
 			m_pRightHand = pHand;
 		else
 			return R_FAIL;
@@ -89,10 +89,10 @@ public:
 		return R_PASS;
 	}
 
-	RESULT AttachModel(composite *pModel, hand::HAND_TYPE handType) {
-		if(handType == hand::HAND_TYPE::HAND_LEFT)
+	RESULT AttachModel(composite *pModel, HAND_TYPE handType) {
+		if(handType == HAND_TYPE::HAND_LEFT)
 			m_pLeftModel = pModel;
-		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+		else if (handType == HAND_TYPE::HAND_RIGHT)
 			m_pRightModel = pModel;
 		else
 			return R_FAIL;
@@ -100,10 +100,10 @@ public:
 		return R_PASS;
 	}
 
-	hand *GetHand(hand::HAND_TYPE handType) {
-		if (handType == hand::HAND_TYPE::HAND_LEFT)
+	hand *GetHand(HAND_TYPE handType) {
+		if (handType == HAND_TYPE::HAND_LEFT)
 			return m_pLeftHand;
-		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+		else if (handType == HAND_TYPE::HAND_RIGHT)
 			return m_pRightHand;
 
 		return nullptr;

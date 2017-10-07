@@ -18,10 +18,13 @@ class HALImp;
 class sphere;
 class volume;
 class DimRay;
+class user;
 class quad;
 class model;
 
 class hand;
+#include "HandType.h"
+
 class camera;
 class FlatContext;
 class UIView;
@@ -86,7 +89,7 @@ public:
 	std::shared_ptr<objType> Add() {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>());
 		CN(pObj);
 
 		CR(AddObject(pObj));
@@ -106,7 +109,7 @@ public:
 	std::shared_ptr<objType> Make() {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>());
 		CN(pObj);
 
 		//Success:
@@ -138,8 +141,11 @@ public:
 	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 
-	std::shared_ptr<hand> MakeHand();
-	std::shared_ptr<hand> AddHand();
+	std::shared_ptr<hand> MakeHand(HAND_TYPE type);
+	std::shared_ptr<hand> AddHand(HAND_TYPE type);
+
+	std::shared_ptr<user> MakeUser();
+	std::shared_ptr<user> AddUser();
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
