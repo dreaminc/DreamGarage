@@ -1060,7 +1060,7 @@ RESULT UITestSuite::AddTestUIView() {
 
 		ray rCast;
 		CN(m_pDreamOS);
-		hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 		if (pHand != nullptr) {
 			point ptHand = pHand->GetPosition();
@@ -1270,7 +1270,7 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		hand* pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		hand* pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 		if (pRightHand != nullptr && pTestContext->pRay != nullptr) {
 			pTestContext->pRay->SetPosition(pRightHand->GetPosition());

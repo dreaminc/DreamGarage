@@ -20,18 +20,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	GetComposite()->InitializeOBB();
 
-	m_pVolume = GetComposite()->AddVolume(1.0f);
-	CN(m_pVolume);
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -2.0f), vector::kVector(-1.0f), 1.0f);
-	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(false);
-	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	//}
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
@@ -71,6 +60,19 @@ RESULT DreamUserApp::Update(void *pContext) {
 	quaternion qOrientation = (pCameraNode->GetOrientation());
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
+
+	if (m_pVolume == nullptr) {
+		m_pVolume = GetComposite()->AddVolume(1.0f);
+		CN(m_pVolume);
+		m_pVolume->SetVisible(false);
+	}
+	
+	if (m_pOrientationRay == nullptr) {
+		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
+		CN(m_pOrientationRay);
+		m_pOrientationRay->SetVisible(false);
+		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+	}
 
 Error:
 	return r;

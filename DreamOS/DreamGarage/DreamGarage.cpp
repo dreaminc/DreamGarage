@@ -428,8 +428,8 @@ Error:
 RESULT DreamGarage::SendHandPosition() {
 	RESULT r = R_PASS;
 
-	hand *pLeftHand = GetHand(hand::HAND_LEFT);
-	hand *pRightHand = GetHand(hand::HAND_RIGHT);
+	hand *pLeftHand = GetHand(HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = GetHand(HAND_TYPE::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
@@ -544,7 +544,7 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 	CB((index < m_seatLookup.size()));
 
 	float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
-	//diffAngle *= -1.0f;
+	diffAngle *= -1.0f;
 
 	rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 

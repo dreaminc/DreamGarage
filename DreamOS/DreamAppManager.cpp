@@ -86,6 +86,12 @@ RESULT DreamAppManager::Update() {
 					continue;
 				}
 
+				// Check Add to Scene Flag
+				// TODO: This is really unspecific and will likely get torn up
+				if (pDreamApp->CheckAndCleanAddToSceneFlag()) {
+					m_pDreamOS->AddObject(pDreamApp->GetComposite());
+				}
+
 				// Capture time stamp
 				auto tBeforeApp = std::chrono::high_resolution_clock::now();
 

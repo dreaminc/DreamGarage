@@ -301,8 +301,8 @@ Error:
 RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
-	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
@@ -313,8 +313,8 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
@@ -324,14 +324,14 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
 	if (m_pHMD != nullptr) {
-		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 		pLeftHand->SetOriented(false);
 		pRightHand->SetOriented(false);
 
-		CR(m_pHMD->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
-		CR(m_pHMD->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
+		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
 /*
 		if (dynamic_cast<OVRHMD*>(m_pHMD) != nullptr) {
@@ -346,7 +346,7 @@ Error:
 
 //hand *Windows64App::AttachHand
 
-hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
+hand *SandboxApp::GetHand(HAND_TYPE handType) {
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
 	}

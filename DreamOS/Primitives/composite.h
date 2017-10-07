@@ -23,6 +23,8 @@ class quad;
 class model;
 
 class hand;
+#include "HandType.h"
+
 class camera;
 class FlatContext;
 class UIView;
@@ -139,8 +141,8 @@ public:
 	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 
-	std::shared_ptr<hand> MakeHand();
-	std::shared_ptr<hand> AddHand();
+	std::shared_ptr<hand> MakeHand(HAND_TYPE type);
+	std::shared_ptr<hand> AddHand(HAND_TYPE type);
 
 	std::shared_ptr<user> MakeUser();
 	std::shared_ptr<user> AddUser();

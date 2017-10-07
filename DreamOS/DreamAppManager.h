@@ -50,12 +50,16 @@ public:
 		CN(pDreamApp);
 
 		// Assign the app a composite
-		if (fAddToScene) {
-			CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
-		}
-		else {
-			CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
-		}
+		//if (fAddToScene) {
+		//	CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
+		//}
+		//else {
+		//	CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+		//}
+		CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+
+		if (fAddToScene)
+			pDreamApp->SetAddToSceneFlag();
 
 		// Initialize the app
 		CR(pDreamApp->InitializeApp(pDreamApp->GetAppContext()));

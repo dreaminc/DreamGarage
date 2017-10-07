@@ -184,10 +184,10 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<hand> composite::MakeHand() {
+std::shared_ptr<hand> composite::MakeHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand());
+	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand(type));
 
 	//Success:
 	return pHand;
@@ -196,10 +196,10 @@ std::shared_ptr<hand> composite::MakeHand() {
 	return nullptr;
 }
 
-std::shared_ptr<hand> composite::AddHand() {
+std::shared_ptr<hand> composite::AddHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<hand> pHand = MakeHand();
+	std::shared_ptr<hand> pHand = MakeHand(type);
 	CR(AddObject(pHand));
 
 	//Success:

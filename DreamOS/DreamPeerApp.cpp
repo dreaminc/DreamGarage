@@ -37,19 +37,9 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
 
-	GetComposite()->InitializeOBB();
-
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
 	// NOTE: User Model is assigned externally
-
-	m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
-	CN(m_pOrientationRay);
-	m_pOrientationRay->SetVisible(false);
-	CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-
-	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
-	CN(m_pSphere);
+	GetComposite()->InitializeOBB();
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
@@ -89,6 +79,50 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_fPendingAssignedUserMode = false;
 	}
 
+	//if (m_pSphere == nullptr) {
+	//	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
+	//	CN(m_pSphere);
+	//}
+
+	if (m_pOrientationRay == nullptr) {
+		m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
+		CN(m_pOrientationRay);
+		m_pOrientationRay->SetVisible(false);
+
+		// Adding the line below will register the peer look ray and will trigger an 
+		// event when the peer is looking at something that consumes these events
+		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+	}
+
+	if (m_pPhantomVolume == nullptr) {
+		m_pPhantomVolume = GetComposite()->AddVolume(2.0f);
+		CN(m_pPhantomVolume);
+		m_pPhantomVolume->SetVisible(false);
+	}
+
+	///*
+	if (m_pFont == nullptr) {
+		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+		CN(m_pFont);
+	}
+
+	if (m_pTextUserName == nullptr) {
+		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"u mad bro",
+			1.0,
+			0.25,
+			text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD));
+		CN(m_pTextUserName);
+
+		CR(GetComposite()->AddObject(m_pTextUserName));
+
+		m_pTextUserName->SetPosition(point(0.0f, 1.0f, 0.0f));
+		m_pTextUserName->SetOrientationOffsetDeg(90.0f, 180.0f, 0.0f);
+		m_pTextUserName->SetVisible(false);
+	}
+	//*/
+
 Error:
 	return r;
 }
@@ -96,16 +130,18 @@ Error:
 RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
-
-	if (m_pSphere != nullptr) {
-		m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+	if (mEvent->m_pInteractionObject != nullptr) {
+		CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
 	}
+
+	//if (m_pSphere != nullptr) {
+	//	m_pSphere->SetPosition(mEvent->m_ptContact[0]);
+	//}
 
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			//GetComposite()->SetRotateDeg(0.0f, 180.0f, 0.0f);
+			m_pTextUserName->SetVisible(true);
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
@@ -113,7 +149,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			//GetComposite()->ResetRotation();
+			m_pTextUserName->SetVisible(false);
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -240,6 +276,7 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 
 	CN(m_pUserModel);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+	m_pTextUserName->SetOrientation(qOrientation);
 
 Error:
 	return r;

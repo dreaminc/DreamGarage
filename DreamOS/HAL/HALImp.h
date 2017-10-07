@@ -215,7 +215,7 @@ public:
 
 	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
 
-	virtual hand* MakeHand() = 0;
+	virtual hand* MakeHand(HAND_TYPE type) = 0;
 
 	/*
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;

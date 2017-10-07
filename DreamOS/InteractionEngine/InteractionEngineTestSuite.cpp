@@ -352,7 +352,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
 
 		RotationMatrix qOffset = RotationMatrix();
-		hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 		CN(pHand);
 		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 		auto& pLeftMallet = pCaptureContext->pLeftMallet;
@@ -361,7 +361,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 		if (pLeftMallet)
 			pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
 
-		pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 		CN(pHand);
 
 		qOffset = RotationMatrix();
@@ -1565,7 +1565,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 
 		// Get Ray from controller
 
-		hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		hand *pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 		if (pRightHand != nullptr) {
 			point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);

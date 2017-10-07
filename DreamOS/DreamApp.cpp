@@ -27,6 +27,17 @@ std::string DreamAppBase::GetShutdownFlagSignalName() {
 	return m_strShutdownFlagSignalName;
 }
 
+RESULT DreamAppBase::SetAddToSceneFlag() {
+	m_fAddToSceneFlag = true;
+	return R_PASS;
+}
+
+bool DreamAppBase::CheckAndCleanAddToSceneFlag() {
+	bool fRetVal = m_fAddToSceneFlag;
+	m_fAddToSceneFlag = false;
+	return fRetVal;
+}
+
 int DreamAppBase::GetPriority() {
 	return m_priority;
 }

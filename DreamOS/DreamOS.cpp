@@ -470,7 +470,7 @@ point DreamOS::GetCameraPosition() {
 	return m_pSandbox->GetCameraPosition();
 }
 
-hand *DreamOS::GetHand(hand::HAND_TYPE handType) {
+hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
@@ -555,6 +555,10 @@ Error:
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
+}
+
+RESULT DreamOS::AddObject(VirtualObj *pObject) {
+	return m_pSandbox->AddObject(pObject);
 }
 
 // This is a pass-thru at the moment

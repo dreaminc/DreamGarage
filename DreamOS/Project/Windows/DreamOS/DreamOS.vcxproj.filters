@@ -1925,6 +1925,9 @@
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\HandType.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

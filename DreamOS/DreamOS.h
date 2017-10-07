@@ -187,6 +187,7 @@ public:
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
+	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -286,7 +287,7 @@ public:
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
 
 	// Hands
-	hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(HAND_TYPE handType);
 
 protected:
 	long GetTickCount();

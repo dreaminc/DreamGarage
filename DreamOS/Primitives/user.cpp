@@ -15,13 +15,13 @@ RESULT user::Initialize() {
 
 	InitializeOBB();
 
-
 #ifndef _DEBUG
-	SetScale(0.018f);
+	//SetScale(0.018f);
 
 	m_pHead = AddModel(L"\\face4\\untitled.obj");
 	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
 	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead->SetScale(0.018f);
 
 #else
 	//m_pHead = AddComposite();
@@ -50,11 +50,11 @@ RESULT user::Initialize() {
 	
 	m_pMouth->Scale(0.1f);
 
-	m_pLeapLeftHand = AddHand();
-	m_pLeapLeftHand->OnLostTrack();
+	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT);
+	m_pLeftHand->OnLostTrack();
 	
-	m_pLeapRightHand = AddHand();
-	m_pLeapRightHand->OnLostTrack();
+	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT);
+	m_pRightHand->OnLostTrack();
 #endif
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
@@ -70,8 +70,8 @@ std::shared_ptr<composite> user::GetHead() {
 RESULT user::Activate(user::CONTROLLER_TYPE type) {
 
 	SetVisible(true);
-	m_pLeapLeftHand->SetVisible(false);
-	m_pLeapRightHand->SetVisible(false);
+	m_pLeftHand->SetVisible(false);
+	m_pRightHand->SetVisible(false);
 
 	return R_PASS;
 }
@@ -79,16 +79,29 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	if (pHandState.handType == hand::HAND_LEFT) {
-		m_pLeapLeftHand->SetHandState(pHandState);
-		m_pLeapLeftHand->SetFrameOfReferenceObject(m_pHead, pHandState);
-	}
-	else if (pHandState.handType == hand::HAND_RIGHT) {
-		m_pLeapRightHand->SetHandState(pHandState);
-		m_pLeapRightHand->SetFrameOfReferenceObject(m_pHead, pHandState);
+	point ptHand = pHandState.ptPalm;
+	ptHand = ptHand - GetPosition(true) + point(0.0f, -0.35f, HEAD_POS);
+
+	quaternion qHandOrientation = pHandState.qOrientation;
+
+	std::shared_ptr<hand> pHand = nullptr;
+
+	switch (pHandState.handType) {
+		case HAND_TYPE::HAND_LEFT: {
+			pHand = m_pLeftHand;
+		} break;
+
+		case HAND_TYPE::HAND_RIGHT: {
+			pHand = m_pRightHand;
+		} break;
 	}
 
-//Error:
+	CN(pHand);
+
+	pHand->SetPosition(ptHand);
+	pHand->SetOrientation(qHandOrientation);
+
+Error:
 	return r;
 }
 
@@ -97,7 +110,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	
 	CN(m_pMouth);
 
-	m_pMouth->Scale(0.01f + 10.0f * mouthScale);
+	m_pMouth->Scale(0.01f + 8.0f * mouthScale);
 
 Error:
 	return r;

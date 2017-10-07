@@ -362,7 +362,7 @@ public:
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pUIClippingSceneGraph; }
 
-	hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(HAND_TYPE handType);
 
 public:
 	bool IsSandboxRunning();

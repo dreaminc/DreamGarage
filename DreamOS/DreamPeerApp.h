@@ -23,6 +23,8 @@ class PeerConnection;
 class composite;
 class DreamOS;
 class user;
+class text;
+class font;
 
 struct InteractionObjectEvent;
 
@@ -133,7 +135,11 @@ private:
 	bool m_fPendingAssignedUserMode = false;
 
 	sphere *m_pSphere = nullptr;
+
+	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
+	std::shared_ptr<text> m_pTextUserName = nullptr;
+	std::shared_ptr<font> m_pFont = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};
