@@ -52,6 +52,7 @@ public:
 
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
+	RESULT AddTestDreamUIBar();
 	RESULT AddTestBrowser();
 	RESULT AddTestBrowserRequest();
 	RESULT AddTestBrowserRequestWithMenuAPI();
@@ -78,6 +79,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
+	RESULT SetupDreamAppPipeline();
 
 private:
 	DreamOS *m_pDreamOS;
@@ -92,8 +94,6 @@ private:
 
 	sphere *m_pSphere1;
 	sphere *m_pSphere2;
-
-	std::shared_ptr<UIKeyboard> m_pKeyboard;
 };
 
 

@@ -9,14 +9,15 @@
 in Data {
 	vec4 color;
 	vec2 uvCoord;
-	vec4 vertClipSpace;
+	vec4 ptMid;
 } DataIn;
 
 uniform bool u_hasTextureColor;
 uniform sampler2D u_textureColor;
 
-uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
+uniform vec4 u_ptOrigin;
+uniform vec4 u_vOrigin;
 
 struct Material {
 	float m_shine;
@@ -37,6 +38,10 @@ layout (location = 0) out vec4 out_vec4Color;
 //vec4 g_ambient = vec4(0.05f);
 vec4 g_ambient = vec4(0.0f);
 
+float g_knee = 0.1f;
+float g_cosThreshold = 0.56f;
+float g_fadeRate = 6.0f;
+
 void main(void) {  
 	vec4 color = DataIn.color;
 
@@ -48,21 +53,30 @@ void main(void) {
 	}
 
 	if(u_clippingEnabled == true) {
-		float xDiff = 1.0f - abs(DataIn.vertClipSpace.x);
-		float yDiff = 1.0f - abs(DataIn.vertClipSpace.y);
-		float zDiff = 1.0f - abs(DataIn.vertClipSpace.z);
+	
+		vec3 vOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
+		vec3 vOrigintoQuadVertex = normalize(vec3(DataIn.ptMid.x - u_ptOrigin.x, 0.0f, DataIn.ptMid.z - u_ptOrigin.z));
+		float angle = dot(vOrigin, vOrigintoQuadVertex);
 
-		if(xDiff < 0.0f || yDiff < 0.0f || zDiff < 0.0f) {
+		float minDistance = angle - g_cosThreshold;
+
+		if (minDistance < 0.0f) {
 			discard;
 		}
-		else {
-			float knee = 0.01f;
-			float minDistance = min(min(xDiff, yDiff), zDiff);
-			float ratio = (knee - minDistance) / knee;
 
-			if(ratio > 0.0f) {
-				color.a = color.a * (1.0f - ratio);
-			}
+		float ratio = (g_knee - minDistance) / g_knee;
+		if (ratio > 0.0f) {
+			//scale function to fit domain of [0,1]
+			float x = ratio-0.5f;
+
+			//scale y to range of [0,1]
+			float y = (tanh(g_fadeRate*x)+1.0f)/2.0f;
+
+			color.a = color.a * (1.0 - y);
+
+			//potentially normalize color
+			//vec3 white = vec3(1.0f, 1.0f, 1.0f);
+			//color.rgb = color.rgb + (white - (white * (1.0 - y)));
 		}
 	}
 

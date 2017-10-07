@@ -74,6 +74,9 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	UIMallet* GetRightMallet();
+	UIMallet* GetLeftMallet();
+
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 

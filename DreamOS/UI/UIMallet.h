@@ -16,6 +16,7 @@ public:
 public:
 	RESULT Show();
 	RESULT Hide();
+	RESULT SetHeadOffset(point p);
 	sphere* GetMalletHead();
 	float GetRadius();
 	point GetHeadOffset();

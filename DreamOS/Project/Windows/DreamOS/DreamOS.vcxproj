@@ -1226,6 +1226,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\DreamApp.tpp" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\material.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.inl" />

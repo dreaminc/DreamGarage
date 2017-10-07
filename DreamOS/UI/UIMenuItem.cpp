@@ -67,11 +67,12 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	m_pLabel->SetPosition(labelFormat.ptPosition);
 
-	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f);
+	vector bgNormal = vector(0.0f, sin(-M_PI / 6.0), cos(-M_PI / 6.0));
+	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f, 1, 1, nullptr, bgNormal);
 
 	point ptDiff = point(0.0f, (GetSurface()->GetHeight() + pBgQuad->GetHeight()) / 2.0f, 0.0001f);
 	pBgQuad->SetPosition(GetSurface()->GetPosition() - ptDiff);
-	pBgQuad->RotateXByDeg(90.0f);
+	pBgQuad->RotateXByDeg(-30.0f);
 
 	if (labelFormat.pBgTexture != nullptr) {
 		pBgQuad->SetDiffuseTexture(labelFormat.pBgTexture);
@@ -80,6 +81,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		pBgQuad->SetVertexColor(labelFormat.bgColor);
 	}
 
+	//AddObject(m_pLabel);
 	m_pSurfaceComposite->AddObject(m_pLabel);
 
 	m_strName = labelFormat.strLabel;

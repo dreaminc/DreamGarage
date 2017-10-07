@@ -5,6 +5,7 @@
 #include "OGLAttachment.h"
 
 #include "Primitives/matrix/ProjectionMatrix.h"
+#include "Primitives/quad.h"
 
 OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "ogluistage")
@@ -31,8 +32,13 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 
 	// Clipping
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingProjection), std::string("u_mat4ClippingProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadCenter), std::string("u_ptQuadCenter")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformParentModelMatrix), std::string("u_mat4ParentModel")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformptOrigin), std::string("u_ptOrigin")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformvOrigin), std::string("u_vOrigin")));
 
 	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -107,17 +113,15 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-//*
-//	m_clippingView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
-//*/
-	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
 
-
-	m_pUniformClippingEnabled->SetUniform(false);
-	RenderObjectStore(m_pSceneGraph);
+	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
+	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
 	m_pUniformClippingEnabled->SetUniform(true);
 	RenderObjectStore(m_pClippingSceneGraph);
+
+	m_pUniformClippingEnabled->SetUniform(false);
+	RenderObjectStore(m_pSceneGraph);
 
 	UnbindFramebuffer();
 
@@ -164,11 +168,41 @@ RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float n
 	return R_PASS;
 }
 
+RESULT OGLProgramUIStage::SetOriginPoint(point ptOrigin) {
+	RESULT r = R_PASS;
+
+	m_ptOrigin = ptOrigin;
+
+	return r;
+}
+
+RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
+	RESULT r = R_PASS;
+
+	m_vOrigin = vOrigin;
+
+	return r;
+}
+
 RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
-	return R_PASS;
+	//TODO: shader likely breaks when pDimObj is not a quad
+	auto pQuad = dynamic_cast<quad*>(pDimObj);
+	if (pQuad != nullptr) {
+		DimObj* pParent = pQuad->GetParent();
+		if (pParent != nullptr) {
+			CR(m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true)));
+			CR(m_pUniformParentModelMatrix->SetUniform(pParent->GetModelMatrix()));
+		}
+	}
+
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramUIStage::SetMaterial(material *pMaterial) {

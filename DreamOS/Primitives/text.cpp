@@ -103,7 +103,7 @@ RESULT text::RenderToQuad() {
 		curveType = quad::CurveType::PARABOLIC;
 	}
 	else if (((m_flags & text::flags::CURVE_QUAD_CIRCLE) != text::flags::NONE)) {
-		curveType = quad::CurveType::PARABOLIC;
+		curveType = quad::CurveType::CIRCLE;
 	}
 
 	// Render with the appropriate curve

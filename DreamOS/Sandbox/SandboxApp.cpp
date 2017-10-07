@@ -878,6 +878,7 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
+	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
@@ -894,6 +895,7 @@ RESULT SandboxApp::RemoveAllObjects() {
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
 	CR(m_pUISceneGraph->RemoveAllObjects());
+	CR(m_pUIClippingSceneGraph->RemoveAllObjects());
 	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
