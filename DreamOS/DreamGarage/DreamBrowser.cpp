@@ -167,6 +167,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
+	
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
