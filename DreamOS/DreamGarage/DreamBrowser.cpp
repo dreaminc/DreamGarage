@@ -40,6 +40,10 @@ Error:
 	return r;
 }
 
+std::shared_ptr<DreamAppHandle> DreamBrowser::GetAppHandle() {
+	return nullptr;
+}
+
 // TODO: Only update the rect
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;

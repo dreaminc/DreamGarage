@@ -150,3 +150,48 @@ RESULT DreamAppManager::ClearPriorityQueue() {
 Error:
 	return r;
 }
+
+std::vector<UID> DreamAppManager::GetAppUID(std::string strName) {
+	std::vector<UID> appUIDs;
+	for (auto pApp : m_apps) {
+		if (pApp->GetAppName() == strName) {
+			appUIDs.emplace_back(pApp->GetAppUID());
+		}
+	}
+	return appUIDs;
+}
+
+std::shared_ptr<DreamAppHandle> DreamAppManager::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
+	for (auto pApp : m_apps) {
+		if (pApp->GetAppUID() == uid) {
+			auto pAppHandle = pApp->GetAppHandle();
+			if (m_capturedApps.count(uid) == 0) {
+				//TODO: semaphor pattern for real use of app state
+				//
+				pAppHandle->SetAppState(true);
+				if (pAppHandle->GetAppState()) {
+					m_capturedApps[uid] = std::pair<std::shared_ptr<DreamAppBase>, std::shared_ptr<DreamAppBase>>(pApp, pHoldingApp);
+					return pAppHandle;
+				}
+			}
+			else {
+				return nullptr;
+			}
+		}
+	}
+	return nullptr;
+}
+
+RESULT DreamAppManager::ReleaseApp(std::shared_ptr<DreamAppHandle> pHandle, UID uid, DreamAppBase* pHoldingApp) {
+	RESULT r = R_PASS;
+
+	//TODO: does it make more sense to have DreamAppHandle as the key to the map?
+	if (m_capturedApps.count(uid) > 0) {
+		//currently only allowing one captured app
+		pHandle->SetAppState(false);
+		m_capturedApps.erase(uid);
+	}
+
+Error:
+	return r;
+}

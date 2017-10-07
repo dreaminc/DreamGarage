@@ -383,6 +383,10 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
+std::shared_ptr<DreamAppHandle> UIKeyboard::GetAppHandle() {
+	return nullptr;
+}
+
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	UIKeyboard *pUIKeyboard = new UIKeyboard(pDreamOS, pContext);
 	return pUIKeyboard;

@@ -2,6 +2,7 @@
 #define DREAM_UI_BAR_H_
 
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
 
 #include "UI/UIEvent.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
@@ -54,7 +55,14 @@ enum class MenuState {
 	ANIMATING
 };
 
+class DreamUIBarHandle : public DreamAppHandle {
+public:
+	virtual RESULT ShowApp() = 0;
+	virtual RESULT HideApp() = 0;
+};
+
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
+					public DreamUIBarHandle,
 					public MenuController::observer, 
 					public Subscriber<UIEvent>
 {
@@ -74,6 +82,8 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	virtual std::shared_ptr<DreamAppHandle> GetAppHandle() override;
+
 	UIMallet* GetRightMallet();
 	UIMallet* GetLeftMallet();
 
@@ -81,8 +91,9 @@ public:
 	RESULT UpdateMenu(void *pContext);
 
 	// Animations
-	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr);
-	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	virtual RESULT HideApp() override;
+	virtual RESULT ShowApp() override;
+
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);

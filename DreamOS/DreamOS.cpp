@@ -528,6 +528,10 @@ ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controll
 	return GetCloudController()->GetControllerProxy(controllerType);
 }
 
+std::shared_ptr<DreamAppHandle> DreamOS::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
+	return m_pSandbox->m_pDreamAppManager->CaptureApp(uid, pHoldingApp);
+}
+
 HALImp* DreamOS::GetHALImp() {
 	return m_pSandbox->m_pHALImp;
 }

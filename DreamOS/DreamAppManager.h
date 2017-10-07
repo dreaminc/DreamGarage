@@ -10,6 +10,7 @@
 #include "Primitives/Types/UID.h"
 
 #include <queue>
+#include <map>
 #include <vector>
 #include <memory>
 #include <chrono>
@@ -22,6 +23,7 @@
 
 #include "DreamApp.h"
 #include "Primitives/Manager.h"
+#include "DreamAppHandle.h"
 
 class DreamOS;
 
@@ -37,7 +39,7 @@ public:
 	// TODO: This is here because of template silliness - but should be 
 	// put into a .tpp file with an #include of said tpp file at the end
 	// of the header
-	template<class derivedAppType> 
+	template<class derivedAppType>
 	std::shared_ptr<derivedAppType> CreateRegisterAndStartApp(void *pContext = nullptr, bool fAddToScene = true) {
 		RESULT r = R_PASS;
 
@@ -69,8 +71,8 @@ public:
 		// Push to priority queue
 		//m_appPriorityQueue.push_front(pDreamApp);
 		m_appPriorityQueue.push(pDreamApp);
-
-	// Success::
+		m_apps.emplace_back(pDreamApp);
+		// Success::
 		return pDreamApp;
 
 	Error:
@@ -91,6 +93,11 @@ public:
 		return r;
 	}
 
+	std::vector<UID> GetAppUID(std::string strName);
+
+	std::shared_ptr<DreamAppHandle> CaptureApp(UID uid, DreamAppBase* pHoldingApp);
+	RESULT ReleaseApp(std::shared_ptr<DreamAppHandle> pHandle, UID uid, DreamAppBase* pHoldingApp);
+
 	RESULT SetMinFrameRate(double minFrameRate);
 
 private:
@@ -99,10 +106,13 @@ private:
 private:
 	std::deque<std::shared_ptr<DreamAppBase>> m_appQueueAlreadyRun;
 	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
+	std::map<UID, std::pair<std::shared_ptr<DreamAppBase>, std::shared_ptr<DreamAppBase>>> m_capturedApps;
+	std::vector<std::shared_ptr<DreamAppBase>> m_apps;
 	DreamOS *m_pDreamOS;
 
 	double m_minFrameRate = 90.0f;
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_tBeforeLoop;
+
 };
 
 
