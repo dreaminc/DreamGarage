@@ -9,6 +9,37 @@ RESULT DreamAppBase::SetPriority(int priority) {
 	return R_PASS;
 }
 
+RESULT DreamAppBase::FlagShutdown(std::string strShutdownFlagSignalName) {
+	RESULT r = R_PASS;
+
+	CB((m_fShutdownFlag == false));
+
+	m_fShutdownFlag = true;
+	m_strShutdownFlagSignalName = strShutdownFlagSignalName;
+
+Error:
+	return r;
+}
+
+bool DreamAppBase::IsAppShuttingDown() {
+	return m_fShutdownFlag;
+}
+
+std::string DreamAppBase::GetShutdownFlagSignalName() {
+	return m_strShutdownFlagSignalName;
+}
+
+RESULT DreamAppBase::SetAddToSceneFlag() {
+	m_fAddToSceneFlag = true;
+	return R_PASS;
+}
+
+bool DreamAppBase::CheckAndCleanAddToSceneFlag() {
+	bool fRetVal = m_fAddToSceneFlag;
+	m_fAddToSceneFlag = false;
+	return fRetVal;
+}
+
 int DreamAppBase::GetPriority() {
 	return m_priority;
 }
@@ -23,12 +54,12 @@ RESULT DreamAppBase::IncrementTimeRun(double usTimeDelta) {
 	return R_PASS;
 }
 
-float DreamAppBase::GetTimeRun() {
+double DreamAppBase::GetTimeRun() {
 	return m_usTimeRun;
 }
 
 // In short, this will return 
-float DreamAppBase::GetEffectivePriorityValue() const {
+double DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
 }
 

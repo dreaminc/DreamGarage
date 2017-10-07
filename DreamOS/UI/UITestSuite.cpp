@@ -245,19 +245,19 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 
 			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_BLUE);
+			pQuad->SetVertexColor(COLOR_BLUE);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, -1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_GREEN);
+			pQuad->SetVertexColor(COLOR_GREEN);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, 1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_RED);
+			pQuad->SetVertexColor(COLOR_RED);
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, -1.0f));
 			CN(pQuad);
-			pQuad->SetColor(COLOR_YELLOW);
+			pQuad->SetVertexColor(COLOR_YELLOW);
 
 			pFlatContext->RotateXByDeg(90.0f);
 			//*/
@@ -1168,7 +1168,7 @@ RESULT UITestSuite::AddTestUIView() {
 
 		ray rCast;
 		CN(m_pDreamOS);
-		hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 		if (pHand != nullptr) {
 			point ptHand = pHand->GetPosition();
@@ -1378,7 +1378,7 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		hand* pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		hand* pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 
 		if (pRightHand != nullptr && pTestContext->pRay != nullptr) {
 			pTestContext->pRay->SetPosition(pRightHand->GetPosition());

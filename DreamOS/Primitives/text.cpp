@@ -689,7 +689,7 @@ RESULT text::SetBackgroundColor(color backgroundColor) {
 	CR(SetBackgroundQuad());
 	CN(m_pBackgroundQuad);
 
-	CR(m_pBackgroundQuad->SetColor(m_backgroundColor));
+	CR(m_pBackgroundQuad->SetVertexColor(m_backgroundColor));
 
 Error:
 	return r;

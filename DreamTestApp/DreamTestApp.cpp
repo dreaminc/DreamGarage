@@ -44,8 +44,10 @@ RESULT DreamTestApp::LoadScene() {
 
 	// Push to a test suite factory in testing
 
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
 	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
@@ -98,11 +100,11 @@ RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessag
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnNewDreamPeer(DreamPeer *pDreamPeer) {
+RESULT DreamTestApp::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	return R_NOT_IMPLEMENTED;
 }
 
@@ -130,11 +132,11 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
 	RESULT r = R_PASS;
 
-	dynamic_cast<DimObj*>(oEvent->m_pCollisionObject)->SetColor(color(COLOR_RED));
+	dynamic_cast<DimObj*>(oEvent->m_pCollisionObject)->SetVertexColor(color(COLOR_RED));
 
 	for (auto &pObj : oEvent->m_collisionGroup) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
-		pDimObj->SetColor(color(COLOR_PINK));
+		pDimObj->SetVertexColor(color(COLOR_PINK));
 	}
 
 //Error:

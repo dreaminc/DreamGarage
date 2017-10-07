@@ -27,31 +27,43 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
+	virtual composite *GetComposite() = 0;
 
 protected:
 	virtual void *GetAppContext() = 0;
 	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
+
+	RESULT FlagShutdown(std::string strShutdownFlagSignalName = "normal");
+	bool IsAppShuttingDown();
+	std::string GetShutdownFlagSignalName();
+
+	RESULT SetAddToSceneFlag();
+	bool CheckAndCleanAddToSceneFlag();
 
 protected:
 	RESULT SetPriority(int priority);
 	int GetPriority();
 	RESULT ResetTimeRun();
 	RESULT IncrementTimeRun(double usTimeDelta);
-	float GetTimeRun();
-	float GetEffectivePriorityValue() const;
+	double GetTimeRun();
+	double GetEffectivePriorityValue() const;
 
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
+
+	bool m_fShutdownFlag = false;
+	std::string m_strShutdownFlagSignalName;
+
+	bool m_fAddToSceneFlag = false;
 };
 
 
 // Using Fixed-priority preemptive scheduling: https://en.wikipedia.org/wiki/Fixed-priority_pre-emptive_scheduling
 struct DreamAppBaseCompare {
 	bool operator()(const std::shared_ptr<DreamAppBase> &lhsApp , const std::shared_ptr<DreamAppBase> &rhsApp) const {
-		// Note: This is actually returning the lowest value (not highest)
-		// Since priority is inverted
-		return lhsApp->GetEffectivePriorityValue() < rhsApp->GetEffectivePriorityValue();
+		// Note: This is actually returning the lowest value (not highest) since priority is inverted
+		return lhsApp->GetEffectivePriorityValue() > rhsApp->GetEffectivePriorityValue();
 	}
 };
 
@@ -92,7 +104,6 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 
 protected:
-
 	vector GetCameraLookXZ();
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos, Axes handAxes = Axes::ALL);
@@ -102,7 +113,7 @@ protected:
 		return m_pContext;
 	}
 
-	composite *GetComposite() {
+	virtual composite *GetComposite() override {
 		return m_pCompositeContext;
 	}
 
@@ -129,8 +140,12 @@ protected:
 		return m_pDreamOS;
 	}
 
+	UINT64 GetUIDValue() {
+		return m_uid.GetID();
+	}
+
 	virtual RESULT Print() override {
-		DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
+		//DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
 		return R_PASS;
 	}
 

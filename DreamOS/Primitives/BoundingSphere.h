@@ -36,15 +36,15 @@ public:
 	virtual CollisionManifold Collide(const ray &rCast) override;
 
 	// TODO: Bounding sphere does not work with scale where not all equal
-	float GetRadius() const {
-		return m_radius * GetScale().x();
+	float GetRadius(bool fAbsolute = true) const {
+		return m_radius * GetScale(fAbsolute).x();
 	}
 
-	vector GetHalfVector();
+	vector GetHalfVector(bool fAbsolute = false);
 	virtual RESULT SetHalfVector(vector vHalfVector) override;
 
-	virtual point GetMinPoint() override;
-	virtual point GetMaxPoint() override;
+	virtual point GetMinPoint(bool fAbsolute = false) override;
+	virtual point GetMaxPoint(bool fAbsolute = false) override;
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {

@@ -12,6 +12,7 @@
 #include <queue>
 #include <vector>
 #include <memory>
+#include <chrono>
 
 // Some priority settings
 #define SYSTEM_APP_PRIORITY 0
@@ -49,12 +50,16 @@ public:
 		CN(pDreamApp);
 
 		// Assign the app a composite
-		if (fAddToScene) {
-			CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
-		}
-		else {
-			CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
-		}
+		//if (fAddToScene) {
+		//	CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
+		//}
+		//else {
+		//	CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+		//}
+		CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+
+		if (fAddToScene)
+			pDreamApp->SetAddToSceneFlag();
 
 		// Initialize the app
 		CR(pDreamApp->InitializeApp(pDreamApp->GetAppContext()));
@@ -62,8 +67,8 @@ public:
 		CR(pDreamApp->ResetTimeRun());
 
 		// Push to priority queue
-		m_appPriorityQueue.push_front(pDreamApp);
-		//m_appPriorityQueue.push(pDreamApp);
+		//m_appPriorityQueue.push_front(pDreamApp);
+		m_appPriorityQueue.push(pDreamApp);
 
 	// Success::
 		return pDreamApp;
@@ -76,13 +81,28 @@ public:
 		return nullptr;
 	}
 
+	template<class derivedAppType>
+	RESULT ShutdownApp(std::shared_ptr<derivedAppType> pDreamApp) {
+		RESULT r = R_PASS;
+
+		CR(pDreamApp->FlagShutdown("now"));
+
+	Error:
+		return r;
+	}
+
+	RESULT SetMinFrameRate(double minFrameRate);
+
 private:
 	RESULT ClearPriorityQueue();
 
 private:
-	std::deque<std::shared_ptr<DreamAppBase>> m_appPriorityQueue;
-	//std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
+	std::deque<std::shared_ptr<DreamAppBase>> m_appQueueAlreadyRun;
+	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
 	DreamOS *m_pDreamOS;
+
+	double m_minFrameRate = 90.0f;
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_tBeforeLoop;
 };
 
 

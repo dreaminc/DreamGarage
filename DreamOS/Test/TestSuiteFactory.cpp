@@ -1,12 +1,14 @@
 #include "TestSuiteFactory.h"
 
 #include "PhysicsEngine/PhysicsEngineTestSuite.h"
+#include "PhysicsEngine/CollisionTestSuite.h"
 #include "InteractionEngine/InteractionEngineTestSuite.h"
 #include "InteractionEngine/AnimationTestSuite.h"
 #include "UI/UITestSuite.h"
 #include "UI/UIViewTestSuite.h"
 #include "Cloud/CloudTestSuite.h"
 #include "HAL/HALTestSuite.h"
+#include "DreamOSTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
@@ -14,37 +16,47 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 
 	switch (type) {
 		case TEST_SUITE_TYPE::PHYSICS: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<PhysicsEngineTestSuite>((DreamOS*)pContext);
+		} break;
+
+		case TEST_SUITE_TYPE::COLLISION: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<CollisionTestSuite>((DreamOS*)pContext);
 		} break;
 		
 		case TEST_SUITE_TYPE::INTERACTION: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<InteractionEngineTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::ANIMATION: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<AnimationTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::CLOUD: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<CloudTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::UI: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<UITestSuite>((DreamOS*)pContext);			
 		} break;
 
+		case TEST_SUITE_TYPE::OS: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<DreamOSTestSuite>((DreamOS*)pContext);
+		} break;
+
 		case TEST_SUITE_TYPE::UIVIEW: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<UIViewTestSuite>((DreamOS*)pContext);			
 		} break;
 
 		case TEST_SUITE_TYPE::HAL: {
-			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<HALTestSuite>((DreamOS*)pContext);
 		} break;
 

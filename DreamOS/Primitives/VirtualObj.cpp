@@ -131,7 +131,7 @@ VirtualObj* VirtualObj::SetScale(vector vScale) {
 	return this;
 }
 
-vector VirtualObj::GetScale() {
+vector VirtualObj::GetScale(bool fAbsolute) {
 	return m_vScale;
 }
 
@@ -256,6 +256,7 @@ VirtualObj* VirtualObj::RotateBy(quaternion_precision thetaX, quaternion_precisi
 	RotateXBy(thetaX);
 	RotateYBy(thetaY);
 	RotateZBy(thetaZ);
+
 	OnManipulation();
 
 	return this;
@@ -318,7 +319,10 @@ VirtualObj* VirtualObj::SetOrientation(quaternion qOrientation) {
 
 VirtualObj* VirtualObj::SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 	m_objectState.m_qRotation = quaternion::MakeQuaternionWithEuler(x, y, z);
+	m_objectState.m_qRotation.Normalize();
+
 	OnManipulation();
+
 	return this;
 }
 
@@ -326,8 +330,8 @@ VirtualObj* VirtualObj::SetRotateDeg(quaternion_precision degX, quaternion_preci
 	quaternion_precision thetaX = degX * (M_PI / 180.f);
 	quaternion_precision thetaY = degY * (M_PI / 180.f);
 	quaternion_precision thetaZ = degZ * (M_PI / 180.f);
-	OnManipulation();
-	return SetRotate(degX, degY, degZ);
+
+	return SetRotate(thetaX, thetaY, thetaZ);
 }
 
 VirtualObj* VirtualObj::ResetRotation() {

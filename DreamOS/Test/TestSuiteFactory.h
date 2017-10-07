@@ -11,6 +11,7 @@ class TestSuiteFactory {
 public:
 	enum class TEST_SUITE_TYPE : std::uint32_t {
 		PHYSICS,
+		COLLISION,
 		INTERACTION,
 		UI,
 		UIVIEW,
@@ -18,6 +19,7 @@ public:
 		HAL,
 		MATH,
 		ANIMATION,
+		OS,
 		INVALID
 	} ;
 

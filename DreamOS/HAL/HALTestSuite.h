@@ -33,6 +33,7 @@ public:
 
 	RESULT AddTestEnvironmentShader();
 
+	RESULT AddTestModelInstancing();
 	RESULT AddTestText();
 	RESULT AddTestModel();
 	RESULT AddTestUserModel();
@@ -41,6 +42,8 @@ public:
 	RESULT AddTestUIShaderStage();
 
 	RESULT TestNestedOBB();
+
+	RESULT AddTestRotation();
 
 	// TODO: Consolidate the HMD tests 
 	// TODO: This should be easy as this is now supported by pipeline

@@ -25,6 +25,8 @@ public:
 	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr);
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
 	std::vector<std::shared_ptr<ActiveObject>> FindActiveObjectsWithState(ActiveObject::state state, VirtualObj *pInteractionObject = nullptr);
+	
+	bool HasActiveEventObject(VirtualObj *pInteractionObject, VirtualObj *pEventObject);
 
 	RESULT RemoveActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr);
 	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
