@@ -219,7 +219,7 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	CR(AddTestKeyboardAngle());
+	//CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
 	CR(AddTestDreamControlView());
 

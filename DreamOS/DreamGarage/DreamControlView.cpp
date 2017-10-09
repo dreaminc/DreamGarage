@@ -196,7 +196,7 @@ Error:
 RESULT DreamControlView::SetSharedViewContext() {
 	RESULT r = R_PASS;
 
-	texture *tempTexture = GetDOS()->MakeTexture(L"1920x1080.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	texture *tempTexture = GetDOS()->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CR(m_pViewQuad->SetDiffuseTexture(tempTexture));
 
 	float width = 1920.0f;
