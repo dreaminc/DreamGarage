@@ -195,6 +195,8 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	float palmRadius = 0.01f;
+	point ptModel = point(0.0f, 0.0f, 0.0f);
+	float scaleModel = 0.015f;
 
 	m_pPalm = AddSphere(palmRadius, 10, 10);
 

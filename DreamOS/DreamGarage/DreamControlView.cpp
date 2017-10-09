@@ -72,14 +72,14 @@ RESULT DreamControlView::Update(void *pContext) {
 	vector vLook = GetDOS()->GetCamera()->GetLookVector();
 
 	RotationMatrix qOffset = RotationMatrix();
-	hand *pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
-	pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();
@@ -101,7 +101,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	} break;
 	
 	}
-	
+
 Error:
 	return r;
 }
@@ -196,7 +196,7 @@ Error:
 RESULT DreamControlView::SetSharedViewContext() {
 	RESULT r = R_PASS;
 
-	texture *tempTexture = GetDOS()->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	texture *tempTexture = GetDOS()->MakeTexture(L"larger-texture.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CR(m_pViewQuad->SetDiffuseTexture(tempTexture));
 
 	float width = 1920.0f;
@@ -204,8 +204,6 @@ RESULT DreamControlView::SetSharedViewContext() {
 	float scale = 1.0f / 10000.0f;
 
 	CR(m_pViewQuad->UpdateParams(width * scale, height * scale, m_vNormal));
-
-	//m_pViewQuad->FlipUVVertical();
 
 Error:
 	return r;
