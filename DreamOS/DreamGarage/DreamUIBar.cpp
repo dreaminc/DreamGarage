@@ -85,18 +85,20 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
 
 	m_pCloudController = pDreamOS->GetCloudController();
-	CN(m_pCloudController);
+	if (m_pCloudController != nullptr) {
 
-	m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
-	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
+		m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+		//CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
+		if (m_pMenuControllerProxy != nullptr) {
+			CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+		}
 
-	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+		m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+		//CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
 
-	m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-	CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
-
-	m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
+		m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
+	}
 
 Error:
 	return r;
@@ -106,10 +108,10 @@ RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUIBar::HandleTouchStart(void* pContext) {
+RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	auto pSurface = pSelected->GetSurface();
 
 	//vector for captured object movement
@@ -123,6 +125,9 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	vector vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 	
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
+
+	//don't capture buttons that are out of view
+	CBR(m_pScrollView->IsCapturable(pButtonContext), R_OBJECT_NOT_FOUND);
 
 	//DreamOS *pDreamOS = GetDOS();
 	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
@@ -156,11 +161,27 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	auto pItemsView = m_pScrollView->GetMenuItemsView();
 
-	auto pKeyboard = GetDOS()->GetKeyboard();
-	CN(pKeyboard);
+	//Initial keyboard separation
+	{
+		auto pKeyboard = GetDOS()->CaptureKeyboard();
+
+		if (pKeyboard != nullptr) {
+			if (m_pathStack.empty()) {
+				pKeyboard->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+			}
+			else if (pKeyboard->IsVisible()) {
+				pKeyboard->HideKeyboard();
+			}
+		}
+
+		CR(GetDOS()->ReleaseKeyboard());
+	}
+
+	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
+	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
 
 	if (m_pathStack.empty()) {
@@ -168,27 +189,17 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
-		m_pUIStageProgram->SetClippingFrustrum(
-			m_projectionWidth,
-			m_projectionHeight,
-			m_projectionNearPlane,
-			m_projectionFarPlane,
-			m_projectionAngle);
+		point ptOrigin = GetComposite()->GetPosition();
+		vector vLookXZ = GetCameraLookXZ();
+		
+		m_pUIStageProgram->SetOriginDirection(vLookXZ);
 
-		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
-		point ptOrigin = GetComposite()->GetPosition(true);
-		ptOrigin.Reverse();
-		quaternion qRotation = GetComposite()->GetOrientation(true);
-		qRotation.Reverse();
-
-		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
-		m_pUIStageProgram->SetClippingViewMatrix(matView);
-
-		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+		ptOrigin += vLookXZ * (m_menuDepth);
+		
+		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}
 	else {
 		m_pathStack.pop();
-		if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
 
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
@@ -215,14 +226,14 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleSelect(void* pContext) {
+RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
-
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
+	
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
@@ -295,10 +306,16 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				m_pathStack.push(pSubMenuNode);
 
 				// TODO: This is temporary until we have better IPC
-				GetDOS()->GetKeyboard()->SetPath(strPath);
-				GetDOS()->GetKeyboard()->SetScope(strScope);
+				{
+					auto pKeyboard = GetDOS()->CaptureKeyboard();
+					if (pKeyboard != nullptr) {
+						pKeyboard->SetPath(strPath);
+						pKeyboard->SetScope(strScope);
 
-				GetDOS()->GetKeyboard()->ShowKeyboard();
+						pKeyboard->ShowKeyboard();
+					}
+					CR(GetDOS()->ReleaseKeyboard());
+				}
 			}
 		}
 	}
@@ -354,14 +371,14 @@ RESULT DreamUIBar::Update(void *pContext) {
 	m_downloadQueue.clear();
 
 	RotationMatrix qOffset = RotationMatrix();
-	hand *pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
-	pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();
@@ -396,8 +413,12 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 		if (pMenuNodeTitle == "root_menu_title") {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-			//TODO: temporary, should be revisited during menu cleanup
-			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
+
+			//TODO: May want to move downloading outside of DreamUIBar
+			auto pKeyboard = GetDOS()->CaptureKeyboard();
+			if (pKeyboard != nullptr)
+				pKeyboard->UpdateTitle(pTexture, "Website");
+			CR(GetDOS()->ReleaseKeyboard());
 		}
 		
 		if (pBufferVector != nullptr) {
@@ -429,13 +450,15 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//*
 			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
+				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
+				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));
 				//*/
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 			pButtons.emplace_back(pButton);
 		}
 
@@ -607,3 +630,12 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
 }
+
+UIMallet* DreamUIBar::GetRightMallet() {
+	return m_pRightMallet;
+}
+
+UIMallet* DreamUIBar::GetLeftMallet() {
+	return m_pLeftMallet;
+}
+

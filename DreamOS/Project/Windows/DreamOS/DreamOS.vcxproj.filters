@@ -818,9 +818,6 @@
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp">
       <Filter>HMD\OpenVR</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamPeer.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\model\model.cpp">
       <Filter>Primitives\model</Filter>
     </ClCompile>
@@ -847,6 +844,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamOSTestSuite.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamTestingApp.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamUserApp.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamPeerApp.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp">
+      <Filter>PhysicsEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1727,9 +1739,6 @@
     <ClInclude Include="..\..\..\DreamMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamPeer.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\PeerAckMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
@@ -1899,6 +1908,24 @@
       <Filter>HAL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSTestSuite.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamTestingApp.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamUserApp.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamPeerApp.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\HandType.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2083,6 +2110,9 @@
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\DreamApp.tpp">
+      <Filter>DreamOS</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

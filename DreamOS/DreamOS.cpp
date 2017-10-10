@@ -111,6 +111,20 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	//m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
 	//CN(m_pKeyboard);
 
+	// TODO: Move log in to here (avoid loading ordering issues since cloud is async and other things may
+	// be as well)
+
+	// Auto Login Handling
+	auto pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+
+	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		GetCloudController()->Start();
+	}
+
+	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
+
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -181,14 +195,14 @@ Error:
 RESULT DreamOS::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	auto pDreamPeer = FindPeer(pPeerConnection);
-	CN(pDreamPeer);
+	auto pDreamPeerApp = FindPeer(pPeerConnection);
+	CN(pDreamPeerApp);
 
 	// First give client layer to do something 
-	CR(OnDreamPeerConnectionClosed(pDreamPeer));
+	CR(OnDreamPeerConnectionClosed(pDreamPeerApp));
 
 	// Delete the dream peer
-	CR(RemovePeer(pDreamPeer));
+	CR(RemovePeer(pDreamPeerApp));
 
 Error:
 	return r;
@@ -210,11 +224,11 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
+RESULT DreamOS::OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) {
 	RESULT r = R_PASS;
 
 	switch (pDreamPeer->GetState()) {
-		case DreamPeer::state::ESTABLISHED: {
+		case DreamPeerApp::state::ESTABLISHED: {
 			CR(OnNewDreamPeer(pDreamPeer));
 		} break;
 	}
@@ -355,39 +369,43 @@ Error:
 	return r;
 }
 
-std::shared_ptr<DreamPeer> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
+std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
-	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+	std::shared_ptr<DreamPeerApp> pDreamPeerApp = nullptr;
 
-	long peerUserID = pPeerConnection->GetPeerUserID();
-	CBM((m_dreamPeers.find(peerUserID) == m_dreamPeers.end()), "Error: Peer user ID %d already exists", peerUserID);
+	long peerUserID = 0; 
+	
+	CNM(pPeerConnection, "Peer Connection invalid");
+	peerUserID = pPeerConnection->GetPeerUserID();
 
-	pDreamPeer = std::make_shared<DreamPeer>(this, pPeerConnection);
-	CN(pDreamPeer);
+	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
-	CR(pDreamPeer->Initialize());
+	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
+	CNM(pDreamPeerApp, "Failed to create dream peer app");
+
+	pDreamPeerApp->SetPeerConnection(pPeerConnection);
 
 	// Set map
-	m_dreamPeers[peerUserID] = pDreamPeer;
+	m_dreamPeerApps[peerUserID] = pDreamPeerApp;
 
-	return pDreamPeer;
+	return pDreamPeerApp;
 
 Error:
-	if (pDreamPeer != nullptr) {
-		pDreamPeer = nullptr;
+	if (pDreamPeerApp != nullptr) {
+		pDreamPeerApp = nullptr;
 	}
 
 	return nullptr;
 }
 
-std::shared_ptr<DreamPeer> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
+std::shared_ptr<DreamPeerApp> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
 	return FindPeer(pPeerConnection->GetPeerUserID());
 }
 
-std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+std::shared_ptr<DreamPeerApp> DreamOS::FindPeer(long peerUserID) {
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
-	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
+	if ((it = m_dreamPeerApps.find(peerUserID)) != m_dreamPeerApps.end()) {
 		return (*it).second;
 	}
 
@@ -395,38 +413,48 @@ std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
 }
 
 RESULT DreamOS::RemovePeer(long peerUserID) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
 
-	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
-		m_dreamPeers.erase(it);
+	if ((it = m_dreamPeerApps.find(peerUserID)) != m_dreamPeerApps.end()) {
+		m_dreamPeerApps.erase(it);
 		return R_PASS;
 	}
 
 	return R_NOT_FOUND;
 }
 
-RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer) {
-	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer) {
+	RESULT r = R_PASS;
 
-	for (auto &pairDreamPeer : m_dreamPeers) {
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
+
+	for (auto &pairDreamPeer : m_dreamPeerApps) {
 		if (pairDreamPeer.second == pDreamPeer) {
-			it = m_dreamPeers.find(pairDreamPeer.first);
-			m_dreamPeers.erase(it);
+			it = m_dreamPeerApps.find(pairDreamPeer.first);
+			auto pDreamPeerApp = (*it).second;
+
+			m_dreamPeerApps.erase(it);
+
+			CRM(ShutdownDreamApp<DreamPeerApp>(pDreamPeerApp), "Failed to shut down dream peer app");
+
 			return R_PASS;
 		}
 	}
 
 	return R_NOT_FOUND;
+
+Error:
+	return r;
 }
 
-DreamPeer::state DreamOS::GetPeerState(long peerUserID) {
-	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {
+	std::shared_ptr<DreamPeerApp> pDreamPeer = nullptr;
 
 	if ((pDreamPeer = FindPeer(peerUserID)) != nullptr) {
 		return pDreamPeer->GetState();
 	}
 
-	return DreamPeer::state::INVALID;
+	return DreamPeerApp::state::INVALID;
 }
 
 
@@ -442,7 +470,7 @@ point DreamOS::GetCameraPosition() {
 	return m_pSandbox->GetCameraPosition();
 }
 
-hand *DreamOS::GetHand(hand::HAND_TYPE handType) {
+hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
 }
 
@@ -514,9 +542,23 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::InitializeDreamUser() {
+	RESULT r = R_PASS;
+
+	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
+	CN(m_pDreamUser);
+
+Error:
+	return r;
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
+}
+
+RESULT DreamOS::AddObject(VirtualObj *pObject) {
+	return m_pSandbox->AddObject(pObject);
 }
 
 // This is a pass-thru at the moment
@@ -748,6 +790,10 @@ composite *DreamOS::MakeComposite() {
 	return m_pSandbox->MakeComposite();
 }
 
+user *DreamOS::MakeUser() {
+	return m_pSandbox->MakeUser();
+}
+
 user *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }
@@ -768,8 +814,17 @@ const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
 }
 
-std::shared_ptr<UIKeyboard> DreamOS::GetKeyboard() {
-	return m_pKeyboard;
+std::shared_ptr<UIKeyboard> DreamOS::CaptureKeyboard() {
+	if (!m_fKeyboardCaptured) {
+		m_fKeyboardCaptured = true;
+		return m_pKeyboard;
+	}
+	return nullptr;
+}
+
+RESULT DreamOS::ReleaseKeyboard() {
+	m_fKeyboardCaptured = false;
+	return R_PASS;
 }
 
 // Physics Engine
@@ -778,6 +833,15 @@ RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
 
 	r = m_pSandbox->RegisterObjectAndSubscriber(pVirtualObject, this);
 	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pSandbox->RegisterEventSubscriber(eventType, pInteractionSubscriber));
 
 Error:
 	return r;
@@ -794,6 +858,10 @@ Error:
 
 RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	return m_pSandbox->UnregisterInteractionObject(pObject, eventType, pInteractionSubscriber);
+}
+
+RESULT DreamOS::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pSandbox->UnregisterInteractionSubscriber(pInteractionSubscriber);
 }
 
 RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject) {

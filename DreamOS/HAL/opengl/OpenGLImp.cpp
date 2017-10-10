@@ -582,10 +582,10 @@ Error:
 }
 */
 
-hand* OpenGLImp::MakeHand() {
+hand* OpenGLImp::MakeHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
-	hand *pHand = new OGLHand(this);
+	hand *pHand = new OGLHand(this, type);
 	CN(pHand);
 
 	//Success:

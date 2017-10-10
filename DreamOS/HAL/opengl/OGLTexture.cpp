@@ -434,6 +434,10 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 		CR(pTexture->SetDefaultTextureParams());
 	}
 
+	// TODO: Temp
+	CRM(pTexture->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+	CRM(pTexture->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+
 Error:
 	return pTexture;
 }

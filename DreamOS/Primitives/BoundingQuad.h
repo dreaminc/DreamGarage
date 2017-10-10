@@ -50,8 +50,9 @@ public:
 	// Quad specific 
 	RESULT SetBounds(float width, float height);
 
-	double GetWidth();
-	double GetHeight();
+	double GetWidth(bool fAbsolute = false);
+	double GetHeight(bool fAbsolute = false);
+
 	double GetLeft(bool fAbsolute = true);
 	double GetRight(bool fAbsolute = true);
 	double GetTop(bool fAbsolute = true);
@@ -59,11 +60,11 @@ public:
 
 	vector GetNormal();
 
-	vector GetHalfVector();
+	vector GetHalfVector(bool fAbsolute = false);
 	virtual RESULT SetHalfVector(vector vHalfVector) override;
 
-	virtual point GetMinPoint() override;
-	virtual point GetMaxPoint() override;
+	virtual point GetMinPoint(bool fAbsolute = false) override;
+	virtual point GetMaxPoint(bool fAbsolute = false) override;
 	
 	point GetQuadPoint(QuadPoint ptType);
 

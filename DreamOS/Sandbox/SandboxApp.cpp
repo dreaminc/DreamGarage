@@ -150,13 +150,13 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 					if (pDimObj != nullptr) {
-						pDimObj->SetColor(color(COLOR_WHITE));
+						pDimObj->SetVertexColor(color(COLOR_WHITE));
 					}
 				}
 
 				for (auto &pObject : intersectedObjects) {
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-					pDimObj->SetColor(color(COLOR_RED));
+					pDimObj->SetVertexColor(color(COLOR_RED));
 				}
 			}
 		} break;
@@ -220,7 +220,7 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 
 		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_WHITE));
+			pDimObj->SetVertexColor(color(COLOR_WHITE));
 		}
 	}
 
@@ -228,7 +228,7 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 		
 		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_RED));
+			pDimObj->SetVertexColor(color(COLOR_RED));
 		}
 	}
 	
@@ -301,8 +301,8 @@ Error:
 RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
-	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
@@ -313,8 +313,8 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
@@ -324,14 +324,14 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
 	if (m_pHMD != nullptr) {
-		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
+		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
 
 		pLeftHand->SetOriented(false);
 		pRightHand->SetOriented(false);
 
-		CR(m_pHMD->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
-		CR(m_pHMD->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
+		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
 /*
 		if (dynamic_cast<OVRHMD*>(m_pHMD) != nullptr) {
@@ -346,7 +346,7 @@ Error:
 
 //hand *Windows64App::AttachHand
 
-hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
+hand *SandboxApp::GetHand(HAND_TYPE handType) {
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
 	}
@@ -576,10 +576,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	});
 
 	// Auto Login Handling
-	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
-		// auto login
-		m_pCloudController->Start();
-	}
+	// This is done in DreamOS now
+	//if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+	//	// auto login
+	//	m_pCloudController->Start();
+	//}
 
 	// Register with command prompt
 	// TODO: This should be changed to a command pattern
@@ -755,6 +756,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	//r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
+	CR(r);
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
@@ -767,6 +778,10 @@ Error:
 
 RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	return m_pInteractionEngine->UnregisterSubscriber(pObject, eventType, pInteractionSubscriber);
+}
+
+RESULT SandboxApp::UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pInteractionEngine->UnregisterSubscriber(pInteractionSubscriber);
 }
 
 RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject) {
@@ -863,6 +878,7 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
+	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
@@ -879,6 +895,7 @@ RESULT SandboxApp::RemoveAllObjects() {
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
 	CR(m_pUISceneGraph->RemoveAllObjects());
+	CR(m_pUIClippingSceneGraph->RemoveAllObjects());
 	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
@@ -1405,10 +1422,27 @@ Error:
 	return nullptr;
 }
 
-user *SandboxApp::AddUser() {
+user *SandboxApp::MakeUser() {
 	RESULT r = R_PASS;
 
 	user* pUser = m_pHALImp->MakeUser();
+	CN(pUser);
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+user *SandboxApp::AddUser() {
+	RESULT r = R_PASS;
+
+	user* pUser = MakeUser();
 	CN(pUser);
 
 	CR(AddObject(pUser));

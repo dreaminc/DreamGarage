@@ -139,16 +139,26 @@ color DimObj::GetColor() {
 	return GetMaterial()->GetDiffuseColor();
 }
 
-RESULT DimObj::SetColor(color c) {
+RESULT DimObj::SetVertexColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
 	for (unsigned int i = 0; i < NumberVertices(); i++) {
 		m_pVertices[i].SetColor(c);
 	}
 
 	SetDirty();
-
 	GetMaterial()->SetColors(c, c, c);
 
-	return R_PASS;
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetVertexColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT DimObj::SetAlpha(color_precision a) {
@@ -610,6 +620,16 @@ point DimObj::GetOrigin(bool fAbsolute) {
 
 point DimObj::GetPosition(bool fAbsolute) {
 	return GetOrigin(fAbsolute);
+}
+
+vector DimObj::GetScale(bool fAbsolute) {
+	vector vScale = VirtualObj::GetScale();
+
+	if (fAbsolute && m_pParent != nullptr) {
+		vScale = vector::ComponentMultiply(vScale, m_pParent->GetScale(fAbsolute));
+	}
+
+	return vScale;
 }
 
 quaternion DimObj::GetOrientation(bool fAbsolute) {

@@ -167,6 +167,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
+	
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
@@ -372,18 +373,25 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
-
-			// TODO: Move this into keyboard
-			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
-
+			
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 
-				std::string strPath = GetDOS()->GetKeyboard()->GetPath();
-				std::string strScope = GetDOS()->GetKeyboard()->GetScope();
-				std::string strTitle = "website";
+				std::string strScope = "";
+				{
+					auto pKeyboard = GetDOS()->CaptureKeyboard();
 
-				strPath = strURL;
+					if (pKeyboard != nullptr) {
+						//scope is from the MenuNode in DreamUIBar
+						//TODO: remove this once app attachments are implemented
+						strScope = pKeyboard->GetScope();
+						pKeyboard->HideKeyboard();
+					}
+					CR(GetDOS()->ReleaseKeyboard());
+				}
+
+				std::string strTitle = "website";
+				std::string strPath = strURL;
 
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");

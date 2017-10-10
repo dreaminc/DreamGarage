@@ -37,7 +37,8 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
-#include "DreamPeer.h"
+#include "DreamPeerApp.h"
+#include "DreamUserApp.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -54,7 +55,7 @@ class DreamOS :
 	public valid,
 	public CloudController::PeerConnectionObserver,
 	public CloudController::EnvironmentObserver,
-	public DreamPeer::DreamPeerObserver
+	public DreamPeerApp::DreamPeerAppObserver
 {
 	friend class CloudTestSuite;
 
@@ -63,8 +64,11 @@ class DreamOS :
 	friend class HALTestSuite;
 	friend class UITestSuite;
 	friend class InteractionEngineTestSuite;
+	friend class PhysicsEngineTestSuite;
 	friend class UIViewTestSuite;
 	friend class AnimationTestSuite;
+	friend class DreamOSTestSuite;
+	friend class CollisionTestSuite;
 
 public:
 	DreamOS();
@@ -76,6 +80,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
+	virtual RESULT DidFinishLoading() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED; }
 	virtual RESULT Update(void) = 0;
 
@@ -98,11 +103,11 @@ public:
 	}
 
 	// DreamPeer Observer
-	virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) override;
+	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 
 	// Cloud Controller Hooks
-	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) = 0;
-	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) = 0;
+	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) = 0;
+	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
 
 	// Peers
@@ -113,15 +118,15 @@ public:
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection);
 
 protected:
-	std::shared_ptr<DreamPeer> CreateNewPeer(PeerConnection *pPeerConnection);
-	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);
-	std::shared_ptr<DreamPeer> FindPeer(PeerConnection *pPeerConnection);
+	std::shared_ptr<DreamPeerApp> CreateNewPeer(PeerConnection *pPeerConnection);
+	std::shared_ptr<DreamPeerApp> FindPeer(long peerUserID);
+	std::shared_ptr<DreamPeerApp> FindPeer(PeerConnection *pPeerConnection);
 	RESULT RemovePeer(long peerUserID);
-	RESULT RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer);
-	DreamPeer::state GetPeerState(long peerUserID);
+	RESULT RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer);
+	DreamPeerApp::state GetPeerState(long peerUserID);
 
 private:
-	std::map<long, std::shared_ptr<DreamPeer>> m_dreamPeers;
+	std::map<long, std::shared_ptr<DreamPeerApp>> m_dreamPeerApps;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();
@@ -160,17 +165,29 @@ public:
 
 		return nullptr;
 	}
+	
+	template<class derivedAppType>
+	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp) {
+		RESULT r = R_PASS;
+
+		CR(m_pSandbox->m_pDreamAppManager->ShutdownApp<derivedAppType>(pDreamApp));
+
+	Error:
+		return r;
+	}
 
 //protected:
 public:
 	// Keyboard
 	RESULT InitializeKeyboard();
+	RESULT InitializeDreamUser();
 
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
+	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -256,6 +273,7 @@ public:
 	composite *MakeComposite();
 
 	user *AddUser();
+	user *MakeUser();
 
 	Pipeline *GetRenderPipeline();
 
@@ -269,7 +287,7 @@ public:
 	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
 
 	// Hands
-	hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(HAND_TYPE handType);
 
 protected:
 	long GetTickCount();
@@ -281,9 +299,11 @@ protected:
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 	
 public:
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UnregisterInteractionObject(VirtualObj *pObject);
+	RESULT UnregisterInteractionSubscriber(Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 
 	// Cloud Controller
 protected:
@@ -313,11 +333,16 @@ private:
 	SandboxApp *m_pSandbox;
 
 // System Applications
+// Should flesh out a better arch here
 public:
-	std::shared_ptr<UIKeyboard> GetKeyboard();
+	std::shared_ptr<UIKeyboard> CaptureKeyboard();
+	RESULT ReleaseKeyboard();
 
 private:
+	//TODO: generalize when there are more system apps
+	bool m_fKeyboardCaptured = false;
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
+	std::shared_ptr<DreamUserApp> m_pDreamUser;
 
 private:
 	version m_versionDreamOS;

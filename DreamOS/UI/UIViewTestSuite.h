@@ -1,13 +1,18 @@
 #ifndef UI_VIEW_TEST_SUITE_H_
 
+
+
 #include "RESULT/EHM.h"
 
 #include "Primitives/valid.h"
 #include "Primitives/Subscriber.h"
 #include "Test/TestSuite.h"
 
+
 class DreamOS;
 class UIView;
+class UIButton;
+class UIStageProgram;
 struct UIEvent;
 
 class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
@@ -21,7 +26,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
-	RESULT SetupUIStagePipeline();
+	RESULT SetupUIStagePipeline(UIStageProgram* &pUIStageProgram);
 
 // Tests
 public:
@@ -30,6 +35,8 @@ public:
 	RESULT AddTestUIButtons();
 	RESULT AddTestUIScrollView();
 	RESULT AddTestDreamUIBar();
+	RESULT AddTestKeyboardAngle();
+	RESULT AddTestCurvedTitle();
 
 	virtual RESULT AddTests() override;
 
@@ -41,14 +48,14 @@ public:
 
 // behaviors
 public:
-	RESULT Rotate45(void *pContext);
-	RESULT Rotate15(void *pContext);
-	RESULT ResetRotation(void *pContext);
+	RESULT Rotate45(UIButton *pButtonContext, void *pContext);
+	RESULT Rotate15(UIButton *pButtonContext, void *pContext);
+	RESULT ResetRotation(UIButton *pButtonContext, void *pContext);
 
-	RESULT AnimateScaleUp(void *pContext);
-	RESULT AnimateScaleReset(void *pContext);
+	RESULT AnimateScaleUp(UIButton *pButtonContext, void *pContext);
+	RESULT AnimateScaleReset(UIButton *pButtonContext, void *pContext);
 
-	RESULT AnimateMoveUpAndBack(void *pContext);
+	RESULT AnimateMoveUpAndBack(UIButton *pButtonContext, void *pContext);
 
 public:
 	virtual RESULT Notify(UIEvent *pEvent) override;

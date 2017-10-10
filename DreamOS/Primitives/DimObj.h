@@ -37,12 +37,9 @@ class DimObj : public VirtualObj,
 	friend class OGLObj;
 
 protected:
-    //point m_ptOrigin;   // origin > now in virtual object
-    //AABV m_aabv;        // Axis Aligned Bounding Volume
+	vertex *m_pVertices = nullptr;
+	dimindex *m_pIndices = nullptr;
 
-protected:
-	vertex *m_pVertices;
-	dimindex *m_pIndices;
 	material m_material;
 
 	// Bounding Volume
@@ -104,7 +101,7 @@ public:
 	RESULT SetWireframe(bool fWireframe = true);
 
 	color GetColor();
-	RESULT SetColor(color c);
+	RESULT SetVertexColor(color c, bool fSetChildren = false);
 	RESULT SetAlpha(color_precision a);
 
 	// TODO: Move this into material 
@@ -175,6 +172,7 @@ public:
 	virtual point GetOrigin(bool fAbsolute = false) override;
 	virtual point GetPosition(bool fAbsolute = false) override;
 	virtual quaternion GetOrientation(bool fAbsolute = false) override;
+	virtual vector GetScale(bool fAbsolute = false) override;
 
 	// Composites will accumulate mass
 	virtual double GetMass() override;
@@ -189,7 +187,7 @@ public:
 	DimObj *GetParent();
 
 protected:
-	DimObj* m_pParent;
+	DimObj* m_pParent = nullptr;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
 
 	// Bounding Volume

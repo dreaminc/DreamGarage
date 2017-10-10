@@ -173,30 +173,25 @@ RESULT finger::SetJointPosition(point ptJoint, JOINT_TYPE jointType) {
 }
 
 
-hand::hand(HALImp* pHALImp) :
+hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {
-	Initialize();
+	Initialize(type);
 }
 
 RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
 
 	if (!CompareParent(pParent.get()) && pHandState.fOriented)
 		pParent->AddChild(std::shared_ptr<DimObj>(this));
+
 	return R_PASS;
 }
 
-std::shared_ptr<composite> hand::GetModel(hand::HAND_TYPE handType) {
-	if (handType == hand::HAND_TYPE::HAND_LEFT) {
-		return m_pLeftModel;
-	}
-	else if (handType == hand::HAND_TYPE::HAND_RIGHT) {
-		return m_pRightModel;
-	}
-	return nullptr;
+std::shared_ptr<model> hand::GetModel(HAND_TYPE handType) {
+	return m_pModel;
 }
 
-RESULT hand::Initialize() {
+RESULT hand::Initialize(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	float palmRadius = 0.01f;
@@ -229,22 +224,24 @@ RESULT hand::Initialize() {
 	float scaleModel = 0.015f;
 
 #ifndef _DEBUG
-	m_pLeftModel = AddModel(L"\\face4\\LeftHand.obj");
-	m_pLeftModel->SetPosition(ptModel);
-	m_pLeftModel->SetScale(scaleModel);
-	m_pLeftModel->SetOrientationOffset((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
-						
-	m_pRightModel = AddModel(L"\\face4\\RightHand.obj");
-	m_pRightModel->SetPosition(ptModel);
-	m_pRightModel->SetScale(scaleModel);
-	m_pRightModel->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+	if (type == HAND_TYPE::HAND_LEFT) {
+		m_pModel = AddModel(L"\\face4\\LeftHand.obj");
+		m_pModel->SetOrientationOffset((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
+	}
+	
+	if (type == HAND_TYPE::HAND_RIGHT) {
+		m_pModel = AddModel(L"\\face4\\RightHand.obj");
+		m_pModel->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+	}
+
+	CN(m_pModel);
+
+	m_pModel->SetPosition(ptModel);
+	m_pModel->SetScale(scaleModel);
 						
 #else
-	m_pLeftModel = AddComposite();
-	m_pLeftModel->AddVolume(0.02f);
-
-	m_pRightModel = AddComposite();
-	m_pRightModel->AddVolume(0.02f);
+	m_pModel = AddComposite();
+	m_pModel->AddVolume(0.02f);
 #endif
 	
 	m_fOriented = false;
@@ -256,7 +253,7 @@ RESULT hand::Initialize() {
 	//Start all visibility at false
 	OnLostTrack();
 
-//Error:
+Error:
 	return r;
 }
 
@@ -290,11 +287,7 @@ bool hand::IsTracked() {
 RESULT hand::OnLostTrack() {
 	m_fTracked = false;
 	
-	if(m_pLeftModel)
-		m_pLeftModel->SetVisible(m_fTracked);
-
-	if(m_pRightModel)
-		m_pRightModel->SetVisible(m_fTracked);
+	m_pModel->SetVisible(m_fTracked);
 	
 	m_pPalm->SetVisible(m_fTracked);
 	m_pIndexFinger->SetVisible(m_fTracked);
@@ -316,7 +309,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 	m_fTracked = true;
 
-	m_handType = (hand.isLeft()) ? HAND_LEFT : HAND_RIGHT;
+	m_handType = (hand.isLeft()) ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 	//m_leapHandID = hand.id();
 
 	// update skeleton
@@ -377,45 +370,41 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	}
 
 	// update model
-	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
+	HAND_TYPE modelType = (m_fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
-	m_pLeftModel->SetOrientation(m_qRotation);
-	m_pRightModel->SetOrientation(m_qRotation);
+	m_pModel->SetOrientation(m_qRotation);
 	
 //Error:
 	return r;
 }
 
-RESULT hand::SetHandModel(hand::HAND_TYPE type) {
+RESULT hand::SetHandModel(HAND_TYPE type) {
 	SetVisible();
-	m_pLeftModel->SetVisible(type == hand::HAND_TYPE::HAND_LEFT);
-	m_pRightModel->SetVisible(type == hand::HAND_TYPE::HAND_RIGHT);
 	
-	bool showSkeleton = type == hand::HAND_TYPE::HAND_SKELETON;
-	m_pPalm->SetVisible(showSkeleton);
-	m_pIndexFinger->SetVisible(showSkeleton);
-	m_pMiddleFinger->SetVisible(showSkeleton);
-	m_pRingFinger->SetVisible(showSkeleton);
-	m_pPinkyFinger->SetVisible(showSkeleton);
-	m_pThumb->SetVisible(showSkeleton);
+	if (type == HAND_TYPE::HAND_SKELETON) {
+		m_pPalm->SetVisible(true);
+		m_pIndexFinger->SetVisible(true);
+		m_pMiddleFinger->SetVisible(true);
+		m_pRingFinger->SetVisible(true);
+		m_pPinkyFinger->SetVisible(true);
+		m_pThumb->SetVisible(true);
+	}
+	else {
+		m_pModel->SetVisible(true);
+	}
 
 	return R_PASS;
 }
 
 RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
-	if (m_handType == HAND_LEFT) {
-		m_pLeftModel->SetOrientation(qOrientation);
-	}
-	if (m_handType == HAND_RIGHT) {
-		m_pRightModel->SetOrientation(qOrientation);
-	}
+	m_pModel->SetOrientation(qOrientation);
 	return R_PASS;
 }
 
 RESULT hand::ToggleRenderType() {
 	m_fSkeleton = !m_fSkeleton;
-	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
+	HAND_TYPE modelType = (m_fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
 	return R_PASS;
@@ -426,10 +415,9 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 
 	point pt = pHandState.ptPalm;
 	SetPosition(pt);
-	//SetOrientation(pHandState.qOrientation);
 
 	m_handType = pHandState.handType;
-	hand::HandType modelType = (pHandState.fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
+	HAND_TYPE modelType = (pHandState.fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
 	m_fTracked = pHandState.fTracked;
@@ -442,14 +430,7 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
 	m_pThumb->SetThumbState(pHandState.thumb);
 	
-	if (pHandState.fOriented) {
-		m_pLeftModel->SetOrientation(pHandState.qOrientation);
-		m_pRightModel->SetOrientation(pHandState.qOrientation);
-	}
-	else {
-		m_pLeftModel->SetOrientation(pHandState.qOrientation);
-		m_pRightModel->SetOrientation(pHandState.qOrientation);
-	}
+	m_pModel->SetOrientation(pHandState.qOrientation);
 
 //Error:
 	return r;
@@ -458,7 +439,7 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
-		GetPosition(),
+		GetPosition(true),
 		m_qRotation,
 		m_fOriented,
 		m_fSkeleton,
@@ -473,7 +454,7 @@ hand::HandState hand::GetHandState() {
 	return handState;
 }
 
-hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
+hand::HandState hand::GetDebugHandState(HAND_TYPE handType) {
 	hand::HandState handState = {
 		handType,
 		point(1,2,3),

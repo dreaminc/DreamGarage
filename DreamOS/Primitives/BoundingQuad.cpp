@@ -178,8 +178,8 @@ bool BoundingQuad::Intersect(const ray& r) {
 
 			point ptPlane = inverse(rotMat) * ((r.GetOrigin() + r.GetVector() * t) - GetAbsoluteOrigin());
 
-			if (ptPlane.x() < GetWidth() / 2.0f && ptPlane.x() > -GetWidth() / 2.0f &&
-				ptPlane.z() < GetHeight() / 2.0f && ptPlane.z() > -GetHeight() / 2.0f)
+			if (ptPlane.x() < GetWidth(true) / 2.0f && ptPlane.x() > -GetWidth(true) / 2.0f &&
+				ptPlane.z() < GetHeight(true) / 2.0f && ptPlane.z() > -GetHeight(true) / 2.0f)
 			{
 				return true;
 			}
@@ -244,12 +244,12 @@ RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
 	return r;
 }
 
-double BoundingQuad::GetWidth() {
-	return m_width * GetScale().x();
+double BoundingQuad::GetWidth(bool fAbsolute) {
+	return m_width * GetScale(fAbsolute).x();
 }
 
-double BoundingQuad::GetHeight() {
-	return m_height* GetScale().y();
+double BoundingQuad::GetHeight(bool fAbsolute) {
+	return m_height * GetScale(fAbsolute).y();
 }
 
 vector BoundingQuad::GetNormal() {
@@ -303,8 +303,8 @@ double BoundingQuad::GetBottom(bool fAbsolute) {
 }
 
 // This is busted
-vector BoundingQuad::GetHalfVector() {
-	vector vScale = GetScale();
+vector BoundingQuad::GetHalfVector(bool fAbsolute) {
+	vector vScale = GetScale(fAbsolute);
 	//RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 	RotationMatrix matRotation = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
@@ -329,12 +329,12 @@ vector BoundingQuad::GetHalfVector() {
 	return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
 }
 
-point BoundingQuad::GetMinPoint() {
-	return (GetHalfVector() * -1.0f) + GetOrigin();
+point BoundingQuad::GetMinPoint(bool fAbsolute) {
+	return (GetHalfVector(fAbsolute) * -1.0f) + GetOrigin();
 }
 
-point BoundingQuad::GetMaxPoint() {
-	return GetHalfVector() + GetOrigin();
+point BoundingQuad::GetMaxPoint(bool fAbsolute) {
+	return GetHalfVector(fAbsolute) + GetOrigin();
 }
 
 point BoundingQuad::GetQuadPoint(QuadPoint ptType) {

@@ -1,14 +1,14 @@
 #include "HMD.h"
 
-RESULT HMD::AttachHand(hand *pHand, hand::HAND_TYPE type) {
+RESULT HMD::AttachHand(hand *pHand, HAND_TYPE type) {
 	hand::HandState state;
 	state.handType = type;
 	state.ptPalm = point(0.0f, 0.0f, 0.0f);
-	if (type == hand::HAND_TYPE::HAND_LEFT) {
+	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
 		m_pLeftHand->SetHandState(state);
 	}
-	else if (type == hand::HAND_TYPE::HAND_RIGHT) {
+	else if (type == HAND_TYPE::HAND_RIGHT) {
 		m_pRightHand = pHand;
 		m_pRightHand->SetHandState(state);
 	}
@@ -18,11 +18,11 @@ RESULT HMD::AttachHand(hand *pHand, hand::HAND_TYPE type) {
 	return R_PASS;
 }
 
-hand *HMD::GetHand(hand::HAND_TYPE type) {
-	if (type == hand::HAND_TYPE::HAND_LEFT) {
+hand *HMD::GetHand(HAND_TYPE type) {
+	if (type == HAND_TYPE::HAND_LEFT) {
 		return m_pLeftHand;
 	}
-	else if (type == hand::HAND_TYPE::HAND_RIGHT) {
+	else if (type == HAND_TYPE::HAND_RIGHT) {
 		return m_pRightHand;
 	}
 	else {
