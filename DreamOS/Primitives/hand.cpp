@@ -255,7 +255,7 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	m_fTracked = false;
 	//Start all visibility at false
-	OnLostTrack();
+	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
 
 	CR(r);
 
