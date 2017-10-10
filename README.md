@@ -2,6 +2,8 @@
 
 This is the DreamOS Engine Git repo. 
 
+## Version 0.2.6
+
 ## Setting Up Your Environemnt 
 
 Currently the DreamOS engine is built through the use of the VS2015 project which can be found in `DreamOS\Project\Windows\DreamOS`
