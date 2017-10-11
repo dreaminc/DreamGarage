@@ -70,6 +70,7 @@ class DreamOS :
 	friend class AnimationTestSuite;
 	friend class DreamOSTestSuite;
 	friend class CollisionTestSuite;
+	friend class WebRTCTestSuite;
 
 public:
 	DreamOS();

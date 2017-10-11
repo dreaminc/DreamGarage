@@ -240,8 +240,10 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	m_pModel->SetScale(scaleModel);
 						
 #else
-	m_pModel = AddComposite();
-	m_pModel->AddVolume(0.02f);
+	//m_pModel = AddComposite();
+	//m_pModel->AddVolume(0.02f);
+	m_pModel = AddModel(L"cube.obj");
+	m_pModel->SetScale(0.02f);
 #endif
 	
 	m_fOriented = false;
@@ -252,6 +254,8 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	m_fTracked = false;
 	//Start all visibility at false
 	OnLostTrack();
+
+	CR(r);
 
 Error:
 	return r;
