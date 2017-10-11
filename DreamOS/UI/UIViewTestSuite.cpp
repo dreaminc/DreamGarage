@@ -1028,6 +1028,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		composite *pComposite = nullptr;
 		std::shared_ptr<font> pFont = nullptr;
 		std::shared_ptr<text> pTextBoxText = nullptr;
+		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
 	};
 	std::shared_ptr<TestObject> pUITest = nullptr;
 	TestContext *pTestContext = new TestContext();
@@ -1046,6 +1047,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 			auto pComposite = m_pDreamOS->AddComposite();
 			auto pView = pComposite->AddUIView(m_pDreamOS);
 			CR(pDreamControlView->SetSharedViewContext());
+			pTestContext->pDreamControlView = pDreamControlView;
 
 			pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 			CN(pTestContext->pFont);
@@ -1054,12 +1056,12 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 				pTestContext->pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 					pTestContext->pFont,
 					"hi",
-					0.5f - 0.02f,
+					.8f,
 					.050,
 					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 				CN(pTestContext->pTextBoxText);
 				pView->AddObject(pTestContext->pTextBoxText);
-				pTestContext->pTextBoxText->SetPosition(point(0.0f, 0.0f, -.1f));
+				pTestContext->pTextBoxText->SetPosition(point(0.0f, 2.0f, 3.0f));
 				pTestContext->pTextBoxText->RotateXByDeg(90.0f);
 			}
 		}
@@ -1070,10 +1072,22 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		if (pTestContext->pDreamControlView->m_flag) {
+			std::string strContactX = std::to_string(pTestContext->pDreamControlView->GetRelativePointofContact().x);
+			std::string strContactY = std::to_string(pTestContext->pDreamControlView->GetRelativePointofContact().y);
+
+			pTestContext->pTextBoxText->SetText(strContactX + ", " + strContactY);
+			pTestContext->pDreamControlView->m_flag = false;
+		}
 		return r;
 	};
 
-	pUITest = AddTest(fnInitialize, fnUpdate, pTestContext);
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	pUITest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
 	CN(pUITest);
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test of DreamControlView");

@@ -3,7 +3,9 @@
 
 #include "RESULT/EHM.h"
 #include "DreamApp.h"
+#include "Sense/SenseController.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
+#include "WebBrowser/WebBrowserController.h"
 
 #include "Primitives/Subscriber.h"
 #include <functional>
@@ -17,7 +19,8 @@ class UIScrollView;
 class texture;
 
 class DreamControlView : public DreamApp<DreamControlView>, 
-						 public Subscriber<InteractionObjectEvent> {
+						 public Subscriber<InteractionObjectEvent>,
+						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
 
 public:
@@ -39,6 +42,7 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -53,9 +57,10 @@ private:
 public:
 	//When update is called the screen texture is updated to the texture of this object
 	RESULT SetSharedViewContext();
-
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
+	WebBrowserPoint GetRelativePointofContact();
+	bool m_flag;
 
 private:
 	std::shared_ptr<quad> m_pViewQuad;
@@ -71,7 +76,9 @@ private:
 
 	float m_hiddenScale; 
 	float m_visibleScale;
+	float m_velocity;
 
+	point m_ptContact;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
 

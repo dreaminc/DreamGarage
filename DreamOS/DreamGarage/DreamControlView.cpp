@@ -7,9 +7,6 @@
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
 
-#include <functional>
-#include <stack>
-
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
 {
@@ -19,14 +16,11 @@ DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 RESULT DreamControlView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
-
-	m_vNormal = vector::jVector().RotateByQuaternion(quaternion::MakeQuaternionWithEuler(-(float)M_PI / 3.0f, 0.0f, 0.0f));
 	
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
-	m_pScrollView = m_pView->AddUIScrollView();
-	CN(m_pScrollView);
-	m_pViewQuad = m_pView->AddQuad(.48f, .27f, 1, 1, nullptr, m_vNormal);
+	m_pViewQuad = m_pView->AddQuad(.96f, .54f, 1, 1, nullptr);
+	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)M_PI / 3.0f, 0.0f, 0.0f));
 	CN(m_pViewQuad);
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	CR(m_pViewQuad->SetVisible(false));
@@ -37,7 +31,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_ptVisiblePosition = point(0.0f, -0.25f, 4.0f);
 
 	m_hiddenScale = 0.2f;
-	m_visibleScale = 2.0f;
+	m_visibleScale = 1.0f;
 
 	m_hideThreshold = 0.20f;
 	m_showThreshold = -0.35f;
@@ -52,12 +46,12 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
 	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
-	//pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), INTERACTION_EVENT_SELECT, this);
+	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), (InteractionEventType)(i), this));
-	}
-
+	texture *tempTexture = GetDOS()->MakeTexture(L"larger-texture.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CR(m_pViewQuad->SetDiffuseTexture(tempTexture));
+	
 Error:
 	return r;
 }
@@ -108,10 +102,33 @@ Error:
 
 RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
-	m_pViewQuad->FlipUVVertical();
-	switch (pInteractionEvent->m_eventType) {
-	case (InteractionEventType::INTERACTION_EVENT_SELECT_DOWN): {
-		m_pViewQuad->FlipUVVertical();
+	if (pInteractionEvent->m_pObject == m_pViewQuad.get() &&
+		(pInteractionEvent->m_pInteractionObject == m_pLeftMallet->GetMalletHead() || pInteractionEvent->m_pInteractionObject == m_pRightMallet->GetMalletHead())) {
+		switch (pInteractionEvent->m_eventType) {
+		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
+			m_pViewQuad->FlipUVVertical();
+			m_ptContact = pInteractionEvent->m_ptContact[0];
+			//std::string strContact = m_ptContact.toString();
+			m_flag = true;
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		} break;
+			/*case (InteractionEventType::INTERACTION_EVENT_WHEEL): {
+				m_velocity = pInteractionEvent->state.ptTouchpad.x() * .015f;	// PAD_MOVE_CONSTANT
+				if (m_velocity == 0.0f) {
+					//do some momentum stuffs?
+				}
+			} break; */
+		}
+	}
+Error:
+	return r;
+}
+
+RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
+	RESULT r = R_PASS;
+	switch (pEvent->type) {
+	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
+		m_velocity = pEvent->state.ptTouchpad.x() * 0.015f;	// PAD_MOVE_CONSTANT
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 	} break;
 	}
@@ -196,16 +213,6 @@ Error:
 RESULT DreamControlView::SetSharedViewContext() {
 	RESULT r = R_PASS;
 
-	texture *tempTexture = GetDOS()->MakeTexture(L"larger-texture.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	CR(m_pViewQuad->SetDiffuseTexture(tempTexture));
-
-	float width = 1920.0f;
-	float height = 1080.0f;
-	float scale = 1.0f / 10000.0f;
-
-	CR(m_pViewQuad->UpdateParams(width * scale, height * scale, m_vNormal));
-
-Error:
 	return r;
 }
 
@@ -229,6 +236,32 @@ Error:
 	return r;
 }
 */
+WebBrowserPoint DreamControlView::GetRelativePointofContact() {
+	point ptIntersectionContact = m_ptContact;
+	ptIntersectionContact.w() = 1.0f;
+	WebBrowserPoint ptRelative;
+	// First apply transforms to the ptIntersectionContact 
+	point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
+	
+
+	float width = m_pViewQuad->GetWidth();
+	float height = m_pViewQuad->GetHeight();
+
+	float posX = ptAdjustedContact.x();
+	float posY = ptAdjustedContact.z();
+	float posZ = ptAdjustedContact.z();
+
+	posX /= width / 2.0f;
+	posY /= height / 2.0f;
+
+	posX = (posX + 1.0f) / 2.0f;
+	posY = (posY + 1.0f) / 2.0f;  // flip it
+	
+	ptRelative.x = posX * 1920;
+	ptRelative.y = posY * 1080;
+
+	return ptRelative;
+}
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
