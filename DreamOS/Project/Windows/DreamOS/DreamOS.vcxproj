@@ -672,6 +672,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\Core\Utilities.cpp" />
     <ClCompile Include="..\..\..\DreamApp.cpp" />
@@ -907,6 +908,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />

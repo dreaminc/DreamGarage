@@ -897,8 +897,8 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
+		///*
 		{
-
 			pTestContext->pComposite = m_pDreamOS->AddComposite();
 			CN(pTestContext->pComposite);
 			pTestContext->pComposite->InitializeOBB();
@@ -918,6 +918,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 			pTestContext->pUser->GetHead()->RotateYByDeg(0.035f);
 		}
+		//*/
 
 	Error:
 		return r;

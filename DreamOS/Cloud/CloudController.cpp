@@ -73,17 +73,13 @@ Error:
 RESULT CloudController::Start() {
 	RESULT r = R_PASS;
 
-	if (m_fRunning) {
-		// cloud already running
-		HUD_OUT("cloud trying to start but already running");
-		return R_FAIL;
-	}
+	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
 
 	DEBUG_LINEOUT("CloudController::Start");
 
 	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
 
-//Error:
+Error:
 	return r;
 }
 
