@@ -555,7 +555,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
 
 	// Generalize this module pattern
-	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+	if (m_SandboxConfiguration.fInitCloud) {
+		CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+	}
+
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 

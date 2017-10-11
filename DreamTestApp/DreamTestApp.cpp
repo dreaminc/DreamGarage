@@ -19,6 +19,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fInitCloud = false;
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:

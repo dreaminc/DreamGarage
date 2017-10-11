@@ -69,6 +69,7 @@ public:
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
 		unsigned fMouseLook : 1;
+		unsigned fInitCloud : 1;
 	};
 
 private:
