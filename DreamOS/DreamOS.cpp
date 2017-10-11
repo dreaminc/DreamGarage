@@ -99,8 +99,12 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	}
 
 	// Cloud Controller
-	CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
-	CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+	// TODO: This code is getting way too specialized 
+	// TODO: need that module pattern
+	if (GetSandboxConfiguration().fInitCloud) {
+		CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
+		CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+	}
 
 	// Give the Client a chance to set up the pipeline
 	CRM(SetupPipeline(GetRenderPipeline()), "Failed to set up pipeline");

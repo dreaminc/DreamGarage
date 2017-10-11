@@ -8,6 +8,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "Cloud/CloudControllerFactory.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -101,17 +103,16 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		CN(pTestContext->pQuad);
 		pTestContext->pQuad->RotateXByDeg(45.0f);
 
-		// Cloud Controller
-		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-		CN(pCloudController);
 		CN(pCommandLineManager);
 
-		// For later
-		m_pCloudController = pCloudController;
+		// Cloud Controller
+		m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+		CNM(m_pCloudController, "Cloud Controller failed to initialize");
 
-		//DEBUG_LINEOUT("Initializing Cloud Controller");
-		//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(m_pCloudController->Initialize(), "Failed to initialize cloud controller");
 
 		// Log in 
 		{
@@ -123,7 +124,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			CR(pCommandLineManager->SetParameterValue("username", strUsername));
 			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
 
-			CRM(pCloudController->Start(), "Failed to start cloud controller");
+			CRM(m_pCloudController->Start(), "Failed to start cloud controller");
 		}
 
 	Error:
