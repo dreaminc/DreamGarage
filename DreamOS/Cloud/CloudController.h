@@ -106,7 +106,7 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-	RESULT Start();
+	RESULT Start(bool fLogin = true);
 	RESULT Stop();
 
 	RESULT Initialize();
@@ -114,7 +114,7 @@ public:
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	//RESULT LoginUser();
-	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK = "INVALIDONETIMEKEY");
 	RESULT Update();
 	RESULT Login();
 
@@ -186,6 +186,8 @@ private:
 
 	std::thread	m_cloudThread;
 	bool m_fRunning;
+	bool m_fLoginOnStart = true;
+
 	RESULT ProcessingThread();
 };
 

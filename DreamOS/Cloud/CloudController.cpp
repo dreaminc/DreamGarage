@@ -51,7 +51,11 @@ RESULT CloudController::ProcessingThread() {
 
 	DEBUG_LINEOUT("ProcessingThread start");
 
-	CR(Login());
+	// TODO: This should be removed
+	if (m_fLoginOnStart) {
+		CR(Login());
+	}
+
 	m_fRunning = true;
 
 	// Message pump goes here
@@ -70,13 +74,14 @@ Error:
 	return r;
 }
 
-RESULT CloudController::Start() {
+RESULT CloudController::Start(bool fLoginOnStart) {
 	RESULT r = R_PASS;
 
 	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fLoginOnStart = fLoginOnStart;
 	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
 
 Error:

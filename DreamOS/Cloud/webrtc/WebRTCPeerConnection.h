@@ -32,6 +32,7 @@ class WebRTCPeerConnection :
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
 	public webrtc::AudioTrackSinkInterface,
+	public rtc::VideoSinkInterface<cricket::VideoFrame>,
 	public WebRTCPeerConnectionProxy
 {
 public:
@@ -113,6 +114,9 @@ protected:
 
 	// webrtc::AudioTrackSinkInterface
 	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+
+	// rtc::VideoSinkInterface<cricket::VideoFrame>
+	virtual void OnFrame(const cricket::VideoFrame& frame) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);

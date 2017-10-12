@@ -36,7 +36,7 @@ private:
 
 private:
 	DreamOS *m_pDreamOS;
-	CloudController *m_pCloudController = nullptr;
+	//CloudController *m_pCloudController = nullptr;
 };
 
 #endif // ! WEBRTC_TEST_SUITE_H_

@@ -85,6 +85,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 	struct TestContext {
 		quad *pQuad = nullptr;
+		CloudController *pCloudController = nullptr;
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -108,11 +109,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		CN(pCommandLineManager);
 
 		// Cloud Controller
-		m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
-		CNM(m_pCloudController, "Cloud Controller failed to initialize");
+		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(m_pCloudController->Initialize(), "Failed to initialize cloud controller");
+		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
 
 		// Log in 
 		{
@@ -121,10 +122,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
 
-			CR(pCommandLineManager->SetParameterValue("username", strUsername));
-			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
+			std::string strPassword = "nightmare";
 
-			CRM(m_pCloudController->Start(), "Failed to start cloud controller");
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", strPassword));
+			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(15)));
+
+			CRM(pTestContext->pCloudController->Start(true), "Failed to start cloud controller");
 		}
 
 	Error:
