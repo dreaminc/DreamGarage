@@ -106,18 +106,10 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		(pInteractionEvent->m_pInteractionObject == m_pLeftMallet->GetMalletHead() || pInteractionEvent->m_pInteractionObject == m_pRightMallet->GetMalletHead())) {
 		switch (pInteractionEvent->m_eventType) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
-			m_pViewQuad->FlipUVVertical();
 			m_ptContact = pInteractionEvent->m_ptContact[0];
-			//std::string strContact = m_ptContact.toString();
-			m_flag = true;
+			m_flag = true;	// just for testing?
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		} break;
-			/*case (InteractionEventType::INTERACTION_EVENT_WHEEL): {
-				m_velocity = pInteractionEvent->state.ptTouchpad.x() * .015f;	// PAD_MOVE_CONSTANT
-				if (m_velocity == 0.0f) {
-					//do some momentum stuffs?
-				}
-			} break; */
 		}
 	}
 Error:
@@ -129,7 +121,7 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 		m_velocity = pEvent->state.ptTouchpad.x() * 0.015f;	// PAD_MOVE_CONSTANT
-		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
 	} break;
 	}
 Error:
@@ -216,26 +208,6 @@ RESULT DreamControlView::SetSharedViewContext() {
 	return r;
 }
 
-/* old stuffs
-RESULT DreamControlView::SetSharedViewContext(std::shared_ptr<DreamBrowser> pContext) {
-	RESULT r = R_PASS;
-
-	m_pSharedViewContext = pContext;
-	CNR(pContext, R_OBJECT_NOT_FOUND);
-	CR(m_pViewQuad->SetDiffuseTexture(m_pSharedViewContext->GetScreenTexture().get()));
-
-	float width = m_pSharedViewContext->GetWidth();
-	float height = m_pSharedViewContext->GetHeight();
-	float scale = 1.0f / 6.0f;
-
-	CR(m_pViewQuad->UpdateParams(width * scale, height * scale, m_vNormal));
-	
-	m_pViewQuad->FlipUVVertical();
-
-Error:
-	return r;
-}
-*/
 WebBrowserPoint DreamControlView::GetRelativePointofContact() {
 	point ptIntersectionContact = m_ptContact;
 	ptIntersectionContact.w() = 1.0f;
