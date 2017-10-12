@@ -473,11 +473,15 @@ void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame)
 		m_pParentObserver->OnVideoFrame(m_peerConnectionID, pVideoFrameDataBuffer, videoFrameWidth, videoFrameHeight);
 	}
 
+	return;
+
 Error:
+	// In a non-error state, this is left to the app to do
 	if (pVideoFrameDataBuffer != nullptr) {
 		delete[] pVideoFrameDataBuffer;
 		pVideoFrameDataBuffer = nullptr;
 	}
+
 	return;
 }
 
