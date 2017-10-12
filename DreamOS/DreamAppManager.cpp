@@ -83,6 +83,12 @@ RESULT DreamAppManager::Update() {
 					// On shut down, don't update or push into run queue
 					CR(pDreamApp->Shutdown(nullptr));
 					CR(m_pDreamOS->RemoveObject(pDreamApp->GetComposite()));
+
+					UID pDreamAppUID = pDreamApp->GetAppUID();
+					if (m_appRegistry.count(pDreamAppUID) > 0) {
+						m_appRegistry.erase(pDreamAppUID);
+					}
+
 					continue;
 				}
 
@@ -153,7 +159,7 @@ Error:
 
 std::vector<UID> DreamAppManager::GetAppUID(std::string strName) {
 	std::vector<UID> appUIDs;
-	for (auto pApp : m_apps) {
+	for (auto pApp : m_appRegistry) {
 		if (pApp.second->GetAppName() == strName) {
 			appUIDs.emplace_back(pApp.first);
 		}
@@ -161,39 +167,42 @@ std::vector<UID> DreamAppManager::GetAppUID(std::string strName) {
 	return appUIDs;
 }
 
-DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
+DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingApp) {
 	DreamAppHandle* pAppHandle = nullptr;
-	if (m_apps.count(uid) > 0) {
-		auto pApp = m_apps[uid];
-		if (pApp->GetAppUID() == uid) {
-			//TODO: the real thing limiting getting a handle is whether there
-			//stored in the map, not whether the 'AppState' is true or not
-			if (m_capturedApps.count(uid) == 0) {
-				pAppHandle = pApp->GetAppHandle();
-				pAppHandle->SetAppState(true);
-				if (pAppHandle->GetAppState()) {
-					m_capturedApps[uid] = std::pair<DreamAppBase*, DreamAppBase*>(pApp, pHoldingApp);
-					return pAppHandle;
-				}
-			}
-			else {
-				return pAppHandle;
-			}
-		}
-	}
-	return pAppHandle;
-}
-
-RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp) {
 	RESULT r = R_PASS;
 
-	//TODO: does it make more sense to have DreamAppHandle as the key to the map?
-	if (pHandle != nullptr && m_capturedApps.count(uid) > 0) {
-		//currently only allowing one captured app
-		pHandle->SetAppState(false);
-		m_capturedApps.erase(uid);
-	}
+	CN(pRequestingApp);
+	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
+	CB(m_appRegistry.count(uid) > 0);
+	auto pApp = m_appRegistry[uid];
+	CN(pApp);
+	CB(pApp->GetAppUID() == uid);
 
-//Error:
+	//TODO: the real thing limiting getting a handle is whether there
+	//stored in the map, not whether the 'AppState' is true or not
+	CB(m_capturedApps.count(uid) == 0);
+	pAppHandle = pApp->GetAppHandle();
+	pAppHandle->SetAppState(true);
+
+	CB(pAppHandle->GetAppState());
+	m_capturedApps[uid] = std::pair<DreamAppHandle*, DreamAppBase*>(pAppHandle, pRequestingApp);
+
+	return pAppHandle;
+Error:
+	return nullptr;
+}
+
+//TODO: ReleaseApp could function with only the uid argument
+RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pRequestingApp) {
+	RESULT r = R_PASS;
+
+	//currently only allowing one captured app
+	CN(pHandle);
+	pHandle->SetAppState(false);
+
+	CB(m_capturedApps.count(uid) > 0);
+	m_capturedApps.erase(uid);
+
+Error:
 	return r;
 }

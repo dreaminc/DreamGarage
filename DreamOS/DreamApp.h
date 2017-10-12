@@ -150,7 +150,7 @@ protected:
 
 	RESULT SetComposite(composite *pComposite) {
 		RESULT r = R_PASS;
-		CB(m_pCompositeContext == nullptr);
+		CBM(m_pCompositeContext == nullptr, "composite is already set");
 
 		m_pCompositeContext = pComposite;
 

@@ -73,7 +73,7 @@ public:
 		m_appPriorityQueue.push(pDreamApp);
 
 		//TODO: may want to use get() at a different level, keeping the map with shared_ptrs
-		m_apps[pDreamApp->GetAppUID()] = pDreamApp.get();
+		m_appRegistry[pDreamApp->GetAppUID()] = pDreamApp.get();
 
 		// Success::
 		return pDreamApp;
@@ -98,8 +98,8 @@ public:
 
 	std::vector<UID> GetAppUID(std::string strName);
 
-	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
-	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp);
+	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pRequestingApp);
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pRequestingApp);
 
 	RESULT SetMinFrameRate(double minFrameRate);
 
@@ -110,8 +110,8 @@ private:
 	std::deque<std::shared_ptr<DreamAppBase>> m_appQueueAlreadyRun;
 	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
 
-	std::map<UID, std::pair<DreamAppBase*, DreamAppBase*>> m_capturedApps;
-	std::map<UID, DreamAppBase*> m_apps;
+	std::map<UID, std::pair<DreamAppHandle*, DreamAppBase*>> m_capturedApps;
+	std::map<UID, DreamAppBase*> m_appRegistry;
 	DreamOS *m_pDreamOS;
 
 	double m_minFrameRate = 90.0f;
