@@ -114,6 +114,9 @@ RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pA
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamTestApp::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	return R_NOT_IMPLEMENTED;
+}
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;

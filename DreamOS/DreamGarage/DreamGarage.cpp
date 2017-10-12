@@ -750,6 +750,11 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	// TODO: Implement this?
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 

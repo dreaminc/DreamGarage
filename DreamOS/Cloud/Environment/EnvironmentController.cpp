@@ -906,6 +906,17 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::OnDataChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
