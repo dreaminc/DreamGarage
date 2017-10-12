@@ -123,40 +123,71 @@ Error:
 
 // Video
 cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
-	std::vector<std::string> device_names;
+	std::vector<std::string> deviceNames;
 
 	{
-		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
-		if (!info) {
+		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> videoCaptureModuleDeviceInfo(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
+		if (!videoCaptureModuleDeviceInfo) {
 			return nullptr;
 		}
 
-		int num_devices = info->NumberOfDevices();
+		int numCaptureDevices = videoCaptureModuleDeviceInfo->NumberOfDevices();
 
-		for (int i = 0; i < num_devices; ++i) {
+		for (int i = 0; i < numCaptureDevices; ++i) {
 			const uint32_t kSize = 256;
-			char name[kSize] = { 0 };
+			char szCaptureDeviceName[kSize] = { 0 };
 			char id[kSize] = { 0 };
 
-			if (info->GetDeviceName(i, name, kSize, id, kSize) != -1) {
-				device_names.push_back(name);
+			if (videoCaptureModuleDeviceInfo->GetDeviceName(i, szCaptureDeviceName, kSize, id, kSize) != -1) {
+				deviceNames.push_back(szCaptureDeviceName);
 			}
 		}
 	}
 
 	cricket::WebRtcVideoDeviceCapturerFactory webRTCVideoDeviceCapturerFactory;
 
-	cricket::VideoCapturer* capturer = nullptr;
+	cricket::VideoCapturer* pCricketVideoCapturer = nullptr;
 
-	for (const auto& name : device_names) {
-		capturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(name, 0));
+	for (const auto& strDeviceName : deviceNames) {
+		pCricketVideoCapturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(strDeviceName, 0));
 
-		if (capturer) {
+		if (pCricketVideoCapturer) {
 			break;
 		}
 	}
 
-	return capturer;
+	return pCricketVideoCapturer;
+}
+
+
+
+RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
+	RESULT r = R_PASS;
+
+	//m_cricketVideoCapturer
+
+	cricket::WebRtcVideoDeviceCapturerFactory webRTCVideoDeviceCapturerFactory;
+
+	m_pCricketVideoCapturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(strDeviceName, 0));
+	CN(m_pCricketVideoCapturer);
+
+	/*
+	rtc::WindowId wid(hW);
+	cricket::ScreencastId sid(wid);
+
+	m_pCricketVideoCapturer = m_screenCaptureFactory.Create(sid);
+
+	//	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+	//		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
+	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+	
+	cricket::CaptureState state = m_screenCaptureFactory.capture_state();
+	*/
+	
+	
+
+Error:
+	return r;
 }
 
 RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
@@ -170,7 +201,11 @@ RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStre
 	webrtc::FakeConstraints videoSourceConstraints;
 
 	// TODO: Add video constraints if needed
-	pVideoCapturer = OpenVideoCaptureDevice();
+	//pVideoCapturer = OpenVideoCaptureDevice();
+	//CN(pVideoCapturer);
+
+	CR(InitializeVideoCaptureDevice("default_capture"));
+	pVideoCapturer = m_pCricketVideoCapturer;
 	CN(pVideoCapturer);
 
 	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
