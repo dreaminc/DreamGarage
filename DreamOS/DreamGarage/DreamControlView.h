@@ -11,6 +11,8 @@
 #include <functional>
 #include <stack>
 
+#define PAD_MOVE_CONSTANT 0.015f
+
 class quad; 
 class sphere;
 class UIView;
@@ -76,7 +78,7 @@ private:
 
 	float m_hiddenScale; 
 	float m_visibleScale;
-	float m_velocity;
+	WebBrowserPoint m_velocity;
 
 	point m_ptContact;
 	point m_ptHiddenPosition;

@@ -21,12 +21,36 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SetScrollingParams(WebBrowserPoint ptDiff) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ScrollBrowser(ptDiff));
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetBrowserPath(strPath));
 Error:
 	return r;
+}
+
+RESULT DreamBrowserHandle::SetClickParams(WebBrowserPoint ptContact) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ClickBrowser(ptContact));
+Error:
+	return r;
+}
+
+std::shared_ptr<texture> DreamBrowserHandle::GetBrowserTexture() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return BrowserTexture();
+Error:
+	return nullptr;
 }
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
@@ -58,6 +82,18 @@ Error:
 
 DreamAppHandle* DreamBrowser::GetAppHandle() {
 	return (DreamBrowserHandle*)(this);
+}
+
+RESULT DreamBrowser::ScrollBrowser(WebBrowserPoint ptDiff) {
+	return R_PASS;
+}
+
+RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
+	return R_PASS;
+}
+
+std::shared_ptr<texture> DreamBrowser::BrowserTexture() {
+	return m_pBrowserTexture;
 }
 
 // TODO: Only update the rect

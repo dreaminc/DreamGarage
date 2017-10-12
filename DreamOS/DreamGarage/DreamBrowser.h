@@ -37,9 +37,20 @@ class DreamBrowserHandle : public DreamAppHandle {
 public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
+	
+	RESULT SetScrollingParams(WebBrowserPoint ptDiff);
+	RESULT SetClickParams(WebBrowserPoint ptContact);
+	
+	std::shared_ptr<texture> GetBrowserTexture();
+
 private:
 	virtual RESULT SetBrowserScope(std::string strScope) = 0;
 	virtual RESULT SetBrowserPath(std::string strPath) = 0;
+	
+	virtual RESULT ScrollBrowser(WebBrowserPoint ptDiff) = 0;
+	virtual RESULT ClickBrowser(WebBrowserPoint ptContact) = 0;
+
+	virtual std::shared_ptr<texture> BrowserTexture() = 0;
 };
 
 class DreamBrowser : 
@@ -61,6 +72,11 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	virtual DreamAppHandle* GetAppHandle() override;
+
+	// DreamBrowserHandle
+	virtual RESULT ScrollBrowser(WebBrowserPoint ptDiff) override;
+	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
+	virtual std::shared_ptr<texture> BrowserTexture() override;
 
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

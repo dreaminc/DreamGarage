@@ -1,4 +1,5 @@
 #include "DreamControlView.h"
+#include "DreamBrowser.h"
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
@@ -109,6 +110,17 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			m_ptContact = pInteractionEvent->m_ptContact[0];
 			m_flag = true;	// just for testing?
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+
+			std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");
+			CB(uids.size() == 1);
+			UID browserUID = uids[0];
+
+			auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
+			CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+			pBrowserHandle->SetClickParams(GetRelativePointofContact());
+
+			CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
 		} break;
 		}
 	}
@@ -120,8 +132,21 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-		m_velocity = pEvent->state.ptTouchpad.x() * 0.015f;	// PAD_MOVE_CONSTANT
+		m_velocity.x = pEvent->state.ptTouchpad.x() * PAD_MOVE_CONSTANT;
+		m_velocity.y = pEvent->state.ptTouchpad.y() * PAD_MOVE_CONSTANT;
+
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
+
+		std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");
+		CB(uids.size() == 1);
+		UID browserUID = uids[0];
+
+		auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
+		CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+		pBrowserHandle->SetScrollingParams(m_velocity);
+
+		CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
 	} break;
 	}
 Error:

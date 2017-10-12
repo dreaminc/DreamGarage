@@ -200,9 +200,6 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	m_pPalm = AddSphere(palmRadius, 10, 10);
 
-	point ptModel = point(0.0f, 0.0f, 0.0f);
-	float scaleModel = 0.015f;
-
 	m_pIndexFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pIndexFinger->Initialize();
 	CR(AddObject(m_pIndexFinger));
