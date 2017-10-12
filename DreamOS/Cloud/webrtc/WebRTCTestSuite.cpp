@@ -88,6 +88,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		texture *pQuadTexture = nullptr;
 		CloudController *pCloudController = nullptr;
 
+		struct PendingVideoBuffer {
+			uint8_t *pPendingBuffer = nullptr;
+			int pxWidth = 0;
+			int pxHeight = 0;
+			bool fPendingBufferReady = false;
+		} m_pendingVideoBuffer;
+
 		// PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 			return R_NOT_HANDLED;
@@ -120,9 +127,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
 			RESULT r = R_PASS;
 
-			CR(r);
+			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
 
-			int a = 5;
+			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+			m_pendingVideoBuffer.pxWidth = pxWidth;
+			m_pendingVideoBuffer.pxHeight = pxHeight;
+			m_pendingVideoBuffer.fPendingBufferReady = true;
 
 		Error:
 			return r;
@@ -201,7 +211,17 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
+		if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady) {
+			// Update the video buffer to texture
+
+			pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+		}
+
 	Error:
+		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+			delete [] pTestContext->m_pendingVideoBuffer.pPendingBuffer;
+			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
+		}
 		return r;
 	};
 
