@@ -142,6 +142,9 @@ public:
 	// Video (TODO eventually)
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
 
+	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
+	cricket::VideoCapturer* m_pCricketVideoCapturer = nullptr;
+
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }
 	int GetPeerUserID() { return m_WebRTCPeerID; }
