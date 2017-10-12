@@ -219,7 +219,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 		}
 		else {
-			CR(HideMenu());
+			CR(HideApp());
 		}
 	}
 Error:
@@ -466,10 +466,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		
 		CR(m_pScrollView->UpdateMenuButtons(pButtons));
 
-
-
-		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), 
-					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+		CR(ShowApp());
 	}
 
 Error:
@@ -497,13 +494,18 @@ RESULT DreamUIBar::ClearMenuState(void* pContext) {
 	return r;
 }
 
-RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
+RESULT DreamUIBar::HideApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
 	m_menuState = MenuState::ANIMATING;
 	m_pLeftMallet->Hide();
 	m_pRightMallet->Hide();
+
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		return r;
+	};
 
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -535,12 +537,34 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
+RESULT DreamUIBar::ShowApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
 	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
 //*
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		CN(pDreamUIBar);
+
+		CR(pDreamUIBar->UpdateMenu(pContext));
+	Error:
+		return r;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		CN(pDreamUIBar);
+
+		CR(pDreamUIBar->ClearMenuState(pContext));
+	Error:
+		return r;
+	};
+
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
@@ -629,6 +653,10 @@ DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
+}
+
+DreamAppHandle* DreamUIBar::GetAppHandle() {
+	return (DreamAppHandle*)(this);
 }
 
 UIMallet* DreamUIBar::GetRightMallet() {

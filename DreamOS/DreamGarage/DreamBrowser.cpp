@@ -40,6 +40,10 @@ Error:
 	return r;
 }
 
+DreamAppHandle* DreamBrowser::GetAppHandle() {
+	return nullptr;
+}
+
 // TODO: Only update the rect
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
@@ -133,7 +137,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
 	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
 
-	SetAppName("DreamContentView");
+	SetAppName("DreamBrowser");
 	SetAppDescription("A Shared Content View");
 
 	// Set up browser manager

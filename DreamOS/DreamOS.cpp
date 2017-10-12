@@ -528,6 +528,18 @@ ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controll
 	return GetCloudController()->GetControllerProxy(controllerType);
 }
 
+DreamAppHandle* DreamOS::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
+	return m_pSandbox->m_pDreamAppManager->CaptureApp(uid, pHoldingApp);
+}
+
+RESULT DreamOS::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp) {
+	return m_pSandbox->m_pDreamAppManager->ReleaseApp(pHandle, uid, pHoldingApp);
+}
+
+std::vector<UID> DreamOS::GetAppUID(std::string strAppName) {
+	return m_pSandbox->m_pDreamAppManager->GetAppUID(strAppName);
+}
+
 HALImp* DreamOS::GetHALImp() {
 	return m_pSandbox->m_pHALImp;
 }

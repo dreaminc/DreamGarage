@@ -63,3 +63,7 @@ double DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
 }
 
+DreamAppHandle* DreamAppBase::GetAppHandle() {
+	return nullptr;
+}
+

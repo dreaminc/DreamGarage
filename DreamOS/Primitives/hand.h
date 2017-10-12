@@ -146,13 +146,13 @@ public:
 	RESULT SetHandModel(HAND_TYPE type);
 	RESULT SetHandModelOrientation(quaternion qOrientation);
 
-	std::shared_ptr<model> GetModel(HAND_TYPE handType);
+	std::shared_ptr<composite> GetModel(HAND_TYPE handType);
 
 private:
 
 	HAND_TYPE m_handType;
 
-	std::shared_ptr<model> m_pModel;
+	std::shared_ptr<composite> m_pModel;
 	std::shared_ptr<sphere> m_pPalm;
 
 	std::shared_ptr<finger> m_pIndexFinger;

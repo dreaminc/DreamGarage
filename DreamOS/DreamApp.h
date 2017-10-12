@@ -16,6 +16,7 @@
 
 class DreamOS;
 class composite;
+class DreamAppHandle;
 //class vector;
 
 class DreamAppBase {
@@ -28,6 +29,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
 	virtual composite *GetComposite() = 0;
+	virtual DreamAppHandle* GetAppHandle();
 
 protected:
 	virtual void *GetAppContext() = 0;
@@ -48,6 +50,30 @@ protected:
 	double GetTimeRun();
 	double GetEffectivePriorityValue() const;
 
+protected:
+
+	std::string GetAppName() {
+		return m_strAppName;
+	}
+
+	RESULT SetAppName(std::string strAppName) {
+		m_strAppName = strAppName;
+		return R_PASS;
+	}
+
+	RESULT SetAppDescription(std::string strAppDescription) {
+		m_strAppDescription = strAppDescription;
+		return R_PASS;
+	}
+
+	UINT64 GetUIDValue() {
+		return m_uid.GetID();
+	}
+
+	UID GetAppUID() {
+		return m_uid;
+	}
+
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
@@ -56,6 +82,11 @@ private:
 	std::string m_strShutdownFlagSignalName;
 
 	bool m_fAddToSceneFlag = false;
+
+private:
+	std::string m_strAppName;
+	std::string m_strAppDescription;
+	UID m_uid;
 };
 
 
@@ -118,30 +149,21 @@ protected:
 	}
 
 	RESULT SetComposite(composite *pComposite) {
+		RESULT r = R_PASS;
+		CBM(m_pCompositeContext == nullptr, "composite is already set");
+
 		m_pCompositeContext = pComposite;
-		return R_PASS;
+
+	Error:
+		return r;
 	}
 
 	static derivedAppType* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};
 
-	RESULT SetAppName(std::string strAppName) {
-		m_strAppName = strAppName;
-		return R_PASS;
-	}
-
-	RESULT SetAppDescription(std::string strAppDescription) {
-		m_strAppDescription = strAppDescription;
-		return R_PASS;
-	}
-
 	DreamOS *GetDOS() {
 		return m_pDreamOS;
-	}
-
-	UINT64 GetUIDValue() {
-		return m_uid.GetID();
 	}
 
 	virtual RESULT Print() override {
@@ -153,11 +175,6 @@ private:
 	composite *m_pCompositeContext;
 	DreamOS *m_pDreamOS;
 	void *m_pContext = nullptr;
-
-private:
-	std::string m_strAppName;
-	std::string m_strAppDescription;
-	UID m_uid;
 };
 
 #include "DreamApp.tpp"

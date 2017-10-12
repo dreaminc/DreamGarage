@@ -39,6 +39,7 @@
 #include "DreamAppManager.h"
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
+#include "DreamAppHandle.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -146,35 +147,21 @@ protected:
 public:
 	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
 
-	// TODO: This is here because of template sillyness - but should be 
-	// put into a .tpp file with an #include of said tpp file at the end
-	// of the header
 	template<class derivedAppType>
-	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext, bool fAddToScene = true) {
-		RESULT r = R_PASS;
-		
-		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext, fAddToScene);
-		CNM(pDreamApp, "Failed to create app");
+	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext, bool fAddToScene = true);
 
-		return pDreamApp;
-
-	Error:
-		if (pDreamApp != nullptr) {
-			pDreamApp = nullptr;
-		}
-
-		return nullptr;
-	}
-	
 	template<class derivedAppType>
-	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp) {
-		RESULT r = R_PASS;
+	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp);
 
-		CR(m_pSandbox->m_pDreamAppManager->ShutdownApp<derivedAppType>(pDreamApp));
+	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp);
 
-	Error:
-		return r;
-	}
+	std::vector<UID> GetAppUID(std::string strAppName);
+
+	//template<class derivedAppType>
+	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
+
+	//std::map<DreamAppHandleBase*, std::vector<DreamAppBase*>> m_capturedApps;
 
 //protected:
 public:
@@ -355,5 +342,7 @@ private:
 
 	std::map<std::wstring, std::shared_ptr<font>> m_fonts;
 };
+
+#include "DreamOS.tpp"
 
 #endif	// ! DREAM_OS_H_

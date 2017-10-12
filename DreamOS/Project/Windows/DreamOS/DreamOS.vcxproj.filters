@@ -860,6 +860,9 @@
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppHandle.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1928,6 +1931,9 @@
     <ClInclude Include="..\..\..\Primitives\HandType.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppHandle.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2112,6 +2118,9 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\DreamApp.tpp">
+      <Filter>DreamOS</Filter>
+    </None>
+    <None Include="..\..\..\DreamOS.tpp">
       <Filter>DreamOS</Filter>
     </None>
   </ItemGroup>

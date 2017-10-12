@@ -27,8 +27,17 @@ public:
 	RESULT AddTestDreamApps();
 	RESULT AddTestUserApp();
 
+	//Isolated Apps
+	RESULT AddTestUIKeyboard();
+	RESULT AddTestDreamUIBar();
+	RESULT AddTestDreamBrowser();
+
+	// Capturing Apps
+	RESULT AddTestCaptureApp();
+
 private:
 	RESULT SetupPipeline();
+	RESULT SetupDreamAppPipeline();
 
 private:
 	DreamOS *m_pDreamOS = nullptr;

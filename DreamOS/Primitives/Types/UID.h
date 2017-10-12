@@ -15,8 +15,16 @@ public:
 		return(m_uiID == rhs.m_uiID);
 	}
 
+	bool operator<(const UID& rhs) {
+		return(m_uiID < rhs.m_uiID);
+	}
+
 	friend inline bool operator==(const UID& lhs, const UID& rhs) {
 		return(lhs.m_uiID == rhs.m_uiID);
+	}
+
+	friend inline bool operator<(const UID& lhs, const UID& rhs) {
+		return(lhs.m_uiID < rhs.m_uiID);
 	}
 
 private:

@@ -2,6 +2,7 @@
 #define UI_KEYBOARD_H_
 
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
 #include "Primitives/TextEntryString.h"
 #include "Primitives/Publisher.h"
 #include "Sense/SenseKeyboard.h"
@@ -39,7 +40,18 @@ class texture;
 class CollisionManifold;
 class FlatContext;
 
-class UIKeyboard : public DreamApp<UIKeyboard>, public SenseKeyboard {
+class UIKeyboardHandle : public DreamAppHandle {
+public:
+	RESULT Show();
+	RESULT Hide();
+private:
+	virtual RESULT ShowKeyboard() = 0;
+	virtual RESULT HideKeyboard() = 0;
+};
+
+class UIKeyboard :	public DreamApp<UIKeyboard>, 
+					public UIKeyboardHandle, 
+					public SenseKeyboard {
 	friend class DreamAppManager;
 
 public:
@@ -57,13 +69,16 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	virtual DreamAppHandle* GetAppHandle() override;
+
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 //Animation
 public:
-	RESULT ShowKeyboard();
-	RESULT HideKeyboard();
+	virtual RESULT ShowKeyboard() override;
+	virtual RESULT HideKeyboard() override;
+
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
