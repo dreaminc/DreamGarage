@@ -431,12 +431,54 @@ void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, i
 	}
 }
 
-void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& frame) {
-	int b = 5;
-	if (m_pParentObserver != nullptr) {
-		// TODO: Pass it up the chain
-		int a = 5;
+#include "webrtc/common_video/libyuv/include/webrtc_libyuv.h"
+
+// TODO: Update WebRTC version and move to webrtc::video_frame since 
+// I'm not sure what the hell cricket is all about
+
+// TODO: Need to be wary of memory stuff
+// Might want to give observer the handle for the memory and 
+// they will deallocate it
+void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame) {
+	RESULT r = R_PASS;
+
+	int videoFrameWidth = cricketVideoFrame.width();
+	int videoFrameHeight = cricketVideoFrame.height();
+
+	uint8_t *pVideoFrameDataBuffer = new uint8_t[videoFrameWidth * videoFrameHeight * 4];
+	//size_t res = frame.ConvertToRgbBuffer(webrtc::VideoType::kARGB, dst_frame, frame.height()*frame.width() * 4, frame.width() * 4);
+	
+	const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& webRTCVideoFrameBuffer = cricketVideoFrame.video_frame_buffer();
+	webrtc::VideoFrame webRTCVideoFrame(webRTCVideoFrameBuffer, 0, 0, webrtc::VideoRotation::kVideoRotation_0);
+	
+	/*
+	VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
+	uint32_t timestamp,
+	int64_t render_time_ms,
+	VideoRotation rotation);
+	*/
+
+	int convertFromI420Result = webrtc::ConvertFromI420(webRTCVideoFrame, webrtc::VideoType::kARGB, 0, pVideoFrameDataBuffer);
+	CBM((convertFromI420Result == 0), "YUV I420 conversion failed");
+	
+	/*
+	{
+		std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
+		memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
+		g_updateTexture = true;
 	}
+	*/
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnVideoFrame(m_peerConnectionID, pVideoFrameDataBuffer, videoFrameWidth, videoFrameHeight);
+	}
+
+Error:
+	if (pVideoFrameDataBuffer != nullptr) {
+		delete[] pVideoFrameDataBuffer;
+		pVideoFrameDataBuffer = nullptr;
+	}
+	return;
 }
 
 // TODO: Add callbacks

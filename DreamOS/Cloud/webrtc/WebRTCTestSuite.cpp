@@ -83,9 +83,50 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
+	struct TestContext : public CloudController::PeerConnectionObserver {
 		quad *pQuad = nullptr;
 		CloudController *pCloudController = nullptr;
+
+		// PeerConnectionObserver
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			RESULT r = R_PASS;
+
+			CR(r);
+
+			int a = 5;
+
+		Error:
+			return r;
+		}
+
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -114,6 +155,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
 
 		// Log in 
 		{
