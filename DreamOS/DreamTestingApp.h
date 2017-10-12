@@ -10,11 +10,17 @@
 // system level apps and priority levels 
 
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
 
 #include <map>
 #include <vector>
 
-class DreamTestingApp : public DreamApp<DreamTestingApp>{
+class DreamTestingAppHandle : public DreamAppHandle {
+public:
+//	virtual RESULT;
+};
+
+class DreamTestingApp : public DreamApp<DreamTestingApp>, public DreamTestingAppHandle {
 	friend class DreamAppManager;
 
 public:

@@ -29,7 +29,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
 	virtual composite *GetComposite() = 0;
-	virtual std::shared_ptr<DreamAppHandle> GetAppHandle();
+	virtual DreamAppHandle* GetAppHandle();
 
 protected:
 	virtual void *GetAppContext() = 0;

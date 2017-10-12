@@ -187,7 +187,7 @@ RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const ha
 	return R_PASS;
 }
 
-std::shared_ptr<model> hand::GetModel(HAND_TYPE handType) {
+std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
 	return m_pModel;
 }
 
@@ -198,30 +198,30 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	m_pPalm = AddSphere(palmRadius, 10, 10);
 
+	point ptModel = point(0.0f, 0.0f, 0.0f);
+	float scaleModel = 0.015f;
+
 	m_pIndexFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pIndexFinger->Initialize();
-	AddObject(m_pIndexFinger);
+	CR(AddObject(m_pIndexFinger));
 
 	m_pMiddleFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pMiddleFinger->Initialize();
-	AddObject(m_pMiddleFinger);
+	CR(AddObject(m_pMiddleFinger));
 
 	m_pRingFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pRingFinger->Initialize();
-	AddObject(m_pRingFinger);
+	CR(AddObject(m_pRingFinger));
 
 	m_pPinkyFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pPinkyFinger->Initialize();
-	AddObject(m_pPinkyFinger);
+	CR(AddObject(m_pPinkyFinger));
 
 	m_pThumb = std::shared_ptr<thumb>(new thumb(m_pHALImp));
 	m_pThumb->Initialize();
-	AddObject(m_pThumb);
+	CR(AddObject(m_pThumb));
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
-
-	point ptModel = point(0.0f, 0.0f, 0.0f);
-	float scaleModel = 0.015f;
 
 #ifndef _DEBUG
 	if (type == HAND_TYPE::HAND_LEFT) {

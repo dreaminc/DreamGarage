@@ -11,6 +11,22 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+RESULT UIKeyboardHandle::Show() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ShowKeyboard());
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::Hide() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(HideKeyboard());
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -22,6 +38,9 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	std::shared_ptr<font> pFont;
 	std::wstring wstrFont;
+
+	SetAppName("UIKeyboard");
+	SetAppDescription("Virtual text entry");
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
@@ -383,8 +402,8 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
-std::shared_ptr<DreamAppHandle> UIKeyboard::GetAppHandle() {
-	return nullptr;
+DreamAppHandle* UIKeyboard::GetAppHandle() {
+	return (UIKeyboardHandle*)(this);
 }
 
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {

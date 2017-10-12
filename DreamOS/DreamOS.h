@@ -153,7 +153,10 @@ public:
 	template<class derivedAppType>
 	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp);
 
-	std::shared_ptr<DreamAppHandle> CaptureApp(UID uid, DreamAppBase* pHoldingApp);
+	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp);
+
+	std::vector<UID> GetAppUID(std::string strAppName);
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);

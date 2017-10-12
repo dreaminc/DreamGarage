@@ -52,11 +52,8 @@ public:
 
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
-	RESULT AddTestDreamUIBar();
-	RESULT AddTestBrowser();
 	RESULT AddTestBrowserRequest();
 	RESULT AddTestBrowserRequestWithMenuAPI();
-	RESULT AddTestKeyboard();
 	RESULT AddTestUIView();
 	RESULT AddTestUIMenuItem();
 	RESULT AddTestFont();
@@ -79,7 +76,6 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
-	RESULT SetupDreamAppPipeline();
 
 private:
 	DreamOS *m_pDreamOS;

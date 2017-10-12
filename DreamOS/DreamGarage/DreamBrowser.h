@@ -48,7 +48,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual std::shared_ptr<DreamAppHandle> GetAppHandle() override;
+	virtual DreamAppHandle* GetAppHandle() override;
 
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

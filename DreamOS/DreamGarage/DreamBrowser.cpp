@@ -40,7 +40,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<DreamAppHandle> DreamBrowser::GetAppHandle() {
+DreamAppHandle* DreamBrowser::GetAppHandle() {
 	return nullptr;
 }
 
@@ -137,7 +137,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
 	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
 
-	SetAppName("DreamContentView");
+	SetAppName("DreamBrowser");
 	SetAppDescription("A Shared Content View");
 
 	// Set up browser manager

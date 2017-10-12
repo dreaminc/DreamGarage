@@ -154,44 +154,46 @@ Error:
 std::vector<UID> DreamAppManager::GetAppUID(std::string strName) {
 	std::vector<UID> appUIDs;
 	for (auto pApp : m_apps) {
-		if (pApp->GetAppName() == strName) {
-			appUIDs.emplace_back(pApp->GetAppUID());
+		if (pApp.second->GetAppName() == strName) {
+			appUIDs.emplace_back(pApp.first);
 		}
 	}
 	return appUIDs;
 }
 
-std::shared_ptr<DreamAppHandle> DreamAppManager::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
-	for (auto pApp : m_apps) {
+DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
+	DreamAppHandle* pAppHandle = nullptr;
+	if (m_apps.count(uid) > 0) {
+		auto pApp = m_apps[uid];
 		if (pApp->GetAppUID() == uid) {
-			auto pAppHandle = pApp->GetAppHandle();
+			//TODO: the real thing limiting getting a handle is whether there
+			//stored in the map, not whether the 'AppState' is true or not
 			if (m_capturedApps.count(uid) == 0) {
-				//TODO: semaphor pattern for real use of app state
-				//
+				pAppHandle = pApp->GetAppHandle();
 				pAppHandle->SetAppState(true);
 				if (pAppHandle->GetAppState()) {
-					m_capturedApps[uid] = std::pair<std::shared_ptr<DreamAppBase>, std::shared_ptr<DreamAppBase>>(pApp, pHoldingApp);
+					m_capturedApps[uid] = std::pair<DreamAppBase*, DreamAppBase*>(pApp, pHoldingApp);
 					return pAppHandle;
 				}
 			}
 			else {
-				return nullptr;
+				return pAppHandle;
 			}
 		}
 	}
-	return nullptr;
+	return pAppHandle;
 }
 
-RESULT DreamAppManager::ReleaseApp(std::shared_ptr<DreamAppHandle> pHandle, UID uid, DreamAppBase* pHoldingApp) {
+RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp) {
 	RESULT r = R_PASS;
 
 	//TODO: does it make more sense to have DreamAppHandle as the key to the map?
-	if (m_capturedApps.count(uid) > 0) {
+	if (pHandle != nullptr && m_capturedApps.count(uid) > 0) {
 		//currently only allowing one captured app
 		pHandle->SetAppState(false);
 		m_capturedApps.erase(uid);
 	}
 
-Error:
+//Error:
 	return r;
 }

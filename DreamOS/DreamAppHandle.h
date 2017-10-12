@@ -13,8 +13,11 @@ public:
 	~DreamAppHandle() {};
 
 protected:
-	bool GetAppState() { return m_fAppState; };
-	RESULT SetAppState(bool fAppState) { m_fAppState = fAppState; }
+	virtual bool GetAppState() { return m_fAppState; };
+	RESULT SetAppState(bool fAppState) { 
+		m_fAppState = fAppState; 
+		return R_PASS;
+	}
 
 private:
 	bool m_fAppState;

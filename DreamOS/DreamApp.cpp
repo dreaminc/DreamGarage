@@ -63,7 +63,7 @@ double DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
 }
 
-std::shared_ptr<DreamAppHandle> DreamAppBase::GetAppHandle() {
+DreamAppHandle* DreamAppBase::GetAppHandle() {
 	return nullptr;
 }
 

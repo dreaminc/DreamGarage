@@ -655,8 +655,8 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	return R_PASS;
 }
 
-std::shared_ptr<DreamAppHandle> DreamUIBar::GetAppHandle() {
-	return std::shared_ptr<DreamAppHandle>(this);
+DreamAppHandle* DreamUIBar::GetAppHandle() {
+	return (DreamAppHandle*)(this);
 }
 
 UIMallet* DreamUIBar::GetRightMallet() {
