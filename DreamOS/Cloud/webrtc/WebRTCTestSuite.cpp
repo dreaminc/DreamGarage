@@ -144,6 +144,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		// temp
+		int pxWidth = 640;
+		int pxHeight = 480;
+
+		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+
 		CR(SetupSkyboxPipeline("environment"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -155,6 +161,23 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		pTestContext->pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
 		CN(pTestContext->pQuad);
 		pTestContext->pQuad->RotateXByDeg(45.0f);
+
+		// Temporary
+		///*
+
+		pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
+			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
+			pxWidth, 
+			pxHeight, 
+			texture::PixelFormat::RGBA, 
+			4, 
+			&vectorByteBuffer[0], 
+			pxWidth * pxHeight * 4
+		);
+
+		CN(pTestContext->pQuadTexture);
+		pTestContext->pQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
+		//*/
 
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
@@ -211,17 +234,24 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady) {
+		if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
 			// Update the video buffer to texture
-
-			pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+			CR(pTestContext->pQuadTexture->Update(
+				(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
+				pTestContext->m_pendingVideoBuffer.pxWidth,
+				pTestContext->m_pendingVideoBuffer.pxHeight,
+				texture::PixelFormat::BGRA)
+			);
 		}
 
 	Error:
+		pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+
 		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
-			delete [] pTestContext->m_pendingVideoBuffer.pPendingBuffer;
+			delete pTestContext->m_pendingVideoBuffer.pPendingBuffer;
 			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
 		}
+
 		return r;
 	};
 

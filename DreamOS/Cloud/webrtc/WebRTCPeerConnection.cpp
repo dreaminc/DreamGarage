@@ -445,7 +445,7 @@ void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame)
 	int videoFrameWidth = cricketVideoFrame.width();
 	int videoFrameHeight = cricketVideoFrame.height();
 
-	uint8_t *pVideoFrameDataBuffer = new uint8_t[videoFrameWidth * videoFrameHeight * 4];
+	uint8_t *pVideoFrameDataBuffer = (uint8_t*)malloc(sizeof(uint8_t) * videoFrameWidth * videoFrameHeight * 4);
 	//size_t res = frame.ConvertToRgbBuffer(webrtc::VideoType::kARGB, dst_frame, frame.height()*frame.width() * 4, frame.width() * 4);
 	
 	const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& webRTCVideoFrameBuffer = cricketVideoFrame.video_frame_buffer();
@@ -478,7 +478,7 @@ void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame)
 Error:
 	// In a non-error state, this is left to the app to do
 	if (pVideoFrameDataBuffer != nullptr) {
-		delete[] pVideoFrameDataBuffer;
+		delete pVideoFrameDataBuffer;
 		pVideoFrameDataBuffer = nullptr;
 	}
 
