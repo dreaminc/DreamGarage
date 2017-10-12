@@ -85,6 +85,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 	struct TestContext : public CloudController::PeerConnectionObserver {
 		quad *pQuad = nullptr;
+		texture *pQuadTexture = nullptr;
 		CloudController *pCloudController = nullptr;
 
 		// PeerConnectionObserver
