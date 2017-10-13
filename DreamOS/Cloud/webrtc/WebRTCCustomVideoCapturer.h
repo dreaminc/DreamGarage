@@ -26,11 +26,9 @@ public:
 	virtual bool GetBestCaptureFormat(const cricket::VideoFormat& desiredVideoFormat, cricket::VideoFormat* pBestVideoFormat) override;
 	virtual bool IsScreencast() const override;
 
+	RESULT SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels = 4);
+
 private:
-	//DISALLOW_COPY_AND_ASSIGN(CustomVideoCapturer);
-
-	static void* grabCapture(void* pContext);
-
 	// To call the SignalFrameCaptured call on the main thread
 	void SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame);
 
@@ -39,14 +37,12 @@ private:
 };
 
 
-class VideoCapturerFactoryCustom : public cricket::VideoDeviceCapturerFactory
-{
+class WebRTCCustomVideoCapturerFactory : public cricket::VideoDeviceCapturerFactory {
 public:
-	VideoCapturerFactoryCustom() {}
-	virtual ~VideoCapturerFactoryCustom() {}
+	WebRTCCustomVideoCapturerFactory() {}
+	virtual ~WebRTCCustomVideoCapturerFactory() {}
 
 	virtual cricket::VideoCapturer* Create(const cricket::Device& device) {
-
 		// XXX: WebRTC uses device name to instantiate the capture, which is always 0.
 		return new WebRTCCustomVideoCapturer(atoi(device.id.c_str()));
 	}

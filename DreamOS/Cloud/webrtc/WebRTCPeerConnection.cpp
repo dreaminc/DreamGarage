@@ -27,6 +27,8 @@
 
 #include "Core/Utilities.h"
 
+#include "WebRTCCustomVideoCapturer.h"
+
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
@@ -164,27 +166,10 @@ cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
 RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
 	RESULT r = R_PASS;
 
-	//m_cricketVideoCapturer
-
-	cricket::WebRtcVideoDeviceCapturerFactory webRTCVideoDeviceCapturerFactory;
-
-	m_pCricketVideoCapturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(strDeviceName, 0));
-	CN(m_pCricketVideoCapturer);
-
-	/*
-	rtc::WindowId wid(hW);
-	cricket::ScreencastId sid(wid);
-
-	m_pCricketVideoCapturer = m_screenCaptureFactory.Create(sid);
-
-	//	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-	//		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
-	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturer;
 	
-	cricket::CaptureState state = m_screenCaptureFactory.capture_state();
-	*/
-	
-	
+	m_pCricketVideoCapturer = webrtcCustomVideoCapturer.Create(cricket::Device(strDeviceName, 0));
+	CNM(m_pCricketVideoCapturer, "Failed to create video capturer");
 
 Error:
 	return r;
@@ -405,6 +390,12 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 			//g_capturer->Start(format);
 			
 			//track->GetSource()->Restart();
+
+			// Kick off our stream (testing)
+			if (m_pCricketVideoCapturer != nullptr) {
+				cricket::VideoFormat videoCaptureFormat(640, 480, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_RGBA);
+				m_pCricketVideoCapturer->Start(videoCaptureFormat);
+			}
 		}
 		else {
 			DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
@@ -1058,6 +1049,19 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 
 	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
 	
+Error:
+	return r;
+}
+
+RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pCricketVideoCapturer);
+
+	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer);
+
+	CR(pWebRTCCustomVideoCapturer->SubmitNewFrameBuffer(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
 Error:
 	return r;
 }

@@ -185,6 +185,19 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	CR(m_pWebRTCConductor->SendVideoFrame(peerConnectionID, pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage) {
 	RESULT r = R_PASS;
 

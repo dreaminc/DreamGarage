@@ -821,6 +821,16 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::SetUser(User currentUser) {
 	return m_pPeerConnectionController->SetUser(currentUser);
 }

@@ -552,7 +552,6 @@ void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
 	return fnUIThreadCallback(msgID, data);
 }
 
-
 // Send some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
@@ -605,7 +604,18 @@ Error:
 	return r;
 }
 
+// Submit Video Frame
+RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
 
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
 
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
