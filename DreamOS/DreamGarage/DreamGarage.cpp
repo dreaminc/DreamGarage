@@ -301,9 +301,9 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
-	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+	// UIKeyboard App
+	CR(InitializeKeyboard());
+	CR(InitializeDreamUser());
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -315,6 +315,10 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamBrowser->SetVisible(false);
 #endif
+
+	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
+	CN(m_pDreamUIBar);
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
 	//m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
 	//CN(m_pDreamControlView);
@@ -337,9 +341,6 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	//CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 
-	// UIKeyboard App
-	CR(InitializeKeyboard());
-	CR(InitializeDreamUser());
 
 	{
 		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());

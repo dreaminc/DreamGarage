@@ -27,6 +27,31 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardHandle::UpdateComposite(float height, float depth) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateKeyboardComposite(height, depth));
+Error:
+	return r;
+}
+
+bool UIKeyboardHandle::IsVisible() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return IsKeyboardVisible();
+Error:
+	//TODO: could be a problem because nullptr is equal to false
+	return nullptr;
+}
+
+RESULT UIKeyboardHandle::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateKeyboardTitleView(pIconTexture,strTitle));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -496,6 +521,14 @@ bool UIKeyboard::IsVisible() {
 	return GetComposite()->IsVisible();
 }
 
+bool UIKeyboard::IsKeyboardVisible() {
+	return IsVisible();
+}
+
+RESULT UIKeyboard::UpdateKeyboardComposite(float height, float depth) {
+	return UpdateComposite(height, depth);
+}
+
 RESULT UIKeyboard::SetVisible(bool fVisible) {
 	return GetComposite()->SetVisible(fVisible);
 }
@@ -669,7 +702,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
+RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	if (pIconTexture != nullptr) {
@@ -800,22 +833,4 @@ RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
 RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	m_keyReleaseThreshold = threshold;
 	return R_PASS;
-}
-
-RESULT UIKeyboard::SetPath(std::string strPath) {
-	m_strPath = strPath;
-	return R_PASS;
-}
-
-RESULT UIKeyboard::SetScope(std::string strScope) {
-	m_strScope = strScope;
-	return R_PASS;
-}
-
-std::string UIKeyboard::GetPath() {
-	return m_strPath;
-}
-
-std::string UIKeyboard::GetScope() {
-	return m_strScope;
 }

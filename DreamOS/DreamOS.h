@@ -320,14 +320,7 @@ private:
 	SandboxApp *m_pSandbox;
 
 // System Applications
-// Should flesh out a better arch here
-public:
-	std::shared_ptr<UIKeyboard> CaptureKeyboard();
-	RESULT ReleaseKeyboard();
-
 private:
-	//TODO: generalize when there are more system apps
-	bool m_fKeyboardCaptured = false;
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 

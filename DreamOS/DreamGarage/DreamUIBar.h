@@ -169,6 +169,9 @@ private:
 	MenuState m_menuState = MenuState::NONE;
 
 	UIStageProgram *m_pUIStageProgram = nullptr;
+
+	UID m_keyboardUID;
+	UID m_browserUID;
 };
 
 

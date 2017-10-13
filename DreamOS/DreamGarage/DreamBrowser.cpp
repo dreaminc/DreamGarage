@@ -13,6 +13,22 @@
 
 #include "Cloud/WebRequest.h"
 
+RESULT DreamBrowserHandle::SetScope(std::string strScope) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetBrowserScope(strScope));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SetPath(std::string strPath) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetBrowserPath(strPath));
+Error:
+	return r;
+}
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -41,7 +57,7 @@ Error:
 }
 
 DreamAppHandle* DreamBrowser::GetAppHandle() {
-	return nullptr;
+	return (DreamBrowserHandle*)(this);
 }
 
 // TODO: Only update the rect
@@ -381,26 +397,27 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 
-				std::string strScope = "";
+				std::string strScope = m_strScope;
+				auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
+				
+				CN(keyUIDs.size() == 1);
 				{
-					auto pKeyboard = GetDOS()->CaptureKeyboard();
+					UID keyUID = keyUIDs[0];
+					auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUID, this));
+					CN(pKeyboardHandle);
 
-					if (pKeyboard != nullptr) {
-						//scope is from the MenuNode in DreamUIBar
-						//TODO: remove this once app attachments are implemented
-						strScope = pKeyboard->GetScope();
-						pKeyboard->HideKeyboard();
-					}
-					CR(GetDOS()->ReleaseKeyboard());
+					pKeyboardHandle->Hide();
+					CR(GetDOS()->ReleaseApp(pKeyboardHandle, keyUID, this));
+
 				}
 
 				std::string strTitle = "website";
 				std::string strPath = strURL;
-
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+
 			}
 
 			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
@@ -521,6 +538,16 @@ RESULT DreamBrowser::SetVisible(bool fVisible) {
 	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
 	return r;
+}
+
+RESULT DreamBrowser::SetBrowserScope(std::string strScope) {
+	m_strScope = strScope;
+	return R_PASS;
+}
+
+RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
+	m_strPath = strPath;
+	return R_PASS;
 }
 
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
