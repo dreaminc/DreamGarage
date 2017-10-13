@@ -118,6 +118,8 @@ public:
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+
 	long GetUserID();
 
 	RESULT SetUser(User currentUser);

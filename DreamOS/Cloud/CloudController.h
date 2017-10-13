@@ -96,6 +96,7 @@ private:
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
 public:
 	CloudController();

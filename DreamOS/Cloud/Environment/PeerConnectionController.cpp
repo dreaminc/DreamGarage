@@ -772,6 +772,24 @@ Error:
 	return r;
 }
 
+RESULT PeerConnectionController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendVideoFrame(pPeerConnection->GetPeerConnectionID(), pVideoFrameBuffer, pxWidth, pxHeight, channels));
+		}
+	}
+
+Error:
+	return r;
+}
+
 long PeerConnectionController::GetUserID() {
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		return m_pPeerConnectionControllerObserver->GetUserID();

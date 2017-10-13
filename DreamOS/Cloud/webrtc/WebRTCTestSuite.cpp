@@ -95,6 +95,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			bool fPendingBufferReady = false;
 		} m_pendingVideoBuffer;
 
+		uint8_t *pTestVideoFrameBuffer = nullptr;
+
 		// PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 			return R_NOT_HANDLED;
@@ -147,6 +149,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// temp
 		int pxWidth = 640;
 		int pxHeight = 480;
+		int channels = 4;
 
 		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
@@ -177,6 +180,34 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		CN(pTestContext->pQuadTexture);
 		pTestContext->pQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
+
+		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+
+		pTestContext->pTestVideoFrameBuffer = (uint8_t*)malloc(bufSize);
+		CN(pTestContext->pTestVideoFrameBuffer);
+		int styleCounter = 0;
+
+		for (int i = 0; i < pxHeight; i++) {
+			for (int j = 0; j < pxWidth; j++) {
+				uint8_t cPixel[4] = { 0x00, 0x00, 0x00, 0x00 };
+				cPixel[styleCounter] = 0xFF;
+
+				size_t offset = (i * ((pxWidth - 1)) + (j));
+				offset *= 4;
+
+				CB((offset < bufSize));
+
+				uint8_t *pPixelMemLocation = pTestContext->pTestVideoFrameBuffer + offset;
+
+				memcpy(pPixelMemLocation, cPixel, sizeof(cPixel));
+			}
+
+			if (i % 50 == 0) {
+				if (++styleCounter > 3) {
+					styleCounter = 0;
+				}
+			}
+		}
 		//*/
 
 		// Command Line Manager
@@ -242,6 +273,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 				pTestContext->m_pendingVideoBuffer.pxHeight,
 				texture::PixelFormat::BGRA)
 			);
+		}
+
+		if (pTestContext->pCloudController != nullptr) {
+			pTestContext->pCloudController->BroadcastVideoFrame(pTestContext->pTestVideoFrameBuffer, 640, 480, 4);
 		}
 
 	Error:

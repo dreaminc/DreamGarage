@@ -542,3 +542,15 @@ RESULT WebRTCConductor::SendDataChannelMessage(long peerConnectionID, uint8_t *p
 Error:
 	return r;
 }
+
+RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->SendVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}

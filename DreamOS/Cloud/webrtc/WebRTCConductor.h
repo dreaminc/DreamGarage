@@ -126,6 +126,8 @@ public:
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
+	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
 	WebRTCConductorObserver *m_pParentObserver;

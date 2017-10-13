@@ -900,6 +900,10 @@ RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver
 	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
+RESULT DreamOS::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pSandbox->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+}
+
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pSandbox->SendDataMessage(userID, pDataMessage);
 }

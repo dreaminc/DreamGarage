@@ -56,55 +56,63 @@ Error:
 	return;
 }
 
-void* WebRTCCustomVideoCapturer::grabCapture(void* pContext) {
+RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
+	size_t frameSize = sizeof(uint8_t) * pxHeight * pxWidth * channels;
+	cricket::CapturedFrame capturedVideoframe;
 
-	WebRTCCustomVideoCapturer *pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)pContext;
-	CN(pWebRTCCustomVideoCapturer);
+	CB(IsRunning());
 
+	capturedVideoframe.width = pxWidth;
+	capturedVideoframe.height = pxHeight;
+	capturedVideoframe.fourcc = cricket::FOURCC_RGBA;
+	capturedVideoframe.data_size = (uint32_t)frameSize;
+	capturedVideoframe.time_stamp = rtc::TimeNanos();
 
+	// Set the buffer
+	// Not clear who deletes the buffer
+	capturedVideoframe.data = pVideoBufferFrame;
 
-	while (pWebRTCCustomVideoCapturer->IsRunning()) {
-		
-		// Create and populate a frame
+	// Signal the frame
+	SignalFrameCaptured(this, &capturedVideoframe);
 
-		webrtc::VideoFrame webRTCVideoFrame;
-
-		if (0 != webRTCVideoFrame.CreateEmptyFrame(bgra.cols, bgra.rows, bgra.cols, (bgra.cols + 1) / 2, (bgra.cols + 1) / 2)) {
-			std::cout << "Failed to create empty frame" << std::endl;
-		}
-
-		//convert the frame to I420, which is the supported format for webrtc transport
-		if (0 != webrtc::ConvertToI420(webrtc::kBGRA, bgra.ptr(), 0, 0, bgra.cols, bgra.rows, 0, webrtc::kVideoRotation_0, &webRTCVideoFrame)) {
-			std::cout << "Failed to convert frame to i420" << std::endl;
-		}
-
-		std::vector<uint8_t> captureBufferVector;
-		size_t length = webrtc::CalcBufferSize(webrtc::kI420, webRTCVideoFrame.width(), webRTCVideoFrame.height());
-		captureBufferVector.resize(length);
-		webrtc::ExtractBuffer(webRTCVideoFrame, length, &captureBufferVector[0]);
-		
-		std::shared_ptr<cricket::CapturedFrame> capturedVideoFrame(new cricket::CapturedFrame(webRTCVideoFrame, &captureBufferVector[0], length));
-
-		// forward the frame to the video capture start thread
-		if (pWebRTCCustomVideoCapturer->m_startThread->IsCurrent()) {
-			pWebRTCCustomVideoCapturer->SignalFrameCaptured(pWebRTCCustomVideoCapturer, capturedVideoFrame.get());
-		}
-		else {
-			pWebRTCCustomVideoCapturer->m_startThread->Invoke<void>(
-				rtc::Bind(&WebRTCCustomVideoCapturer::SignalFrameCapturedOnStartThread, 
-						  pWebRTCCustomVideoCapturer, 
-						  capturedVideoFrame.get()
-				)
-			);
-		}
+	// forward the frame to the video capture start thread
+	if (m_startThread->IsCurrent()) {
+		SignalFrameCaptured(this, &capturedVideoframe);
 	}
 
-	return nullptr;
+	//else {
+	//	m_startThread->Invoke<void>(
+	//		rtc::Bind(&WebRTCCustomVideoCapturer::SignalFrameCapturedOnStartThread, this, &capturedVideoFrame)
+	//		);
+	//}
+
+	/*
+	webrtc::VideoFrame webRTCVideoFrame;
+
+	if (0 != webRTCVideoFrame.CreateEmptyFrame(bgra.cols, bgra.rows, bgra.cols, (bgra.cols + 1) / 2, (bgra.cols + 1) / 2)) {
+		std::cout << "Failed to create empty frame" << std::endl;
+	}
+
+	//convert the frame to I420, which is the supported format for webrtc transport
+	if (0 != webrtc::ConvertToI420(webrtc::kBGRA, bgra.ptr(), 0, 0, bgra.cols, bgra.rows, 0, webrtc::kVideoRotation_0, &webRTCVideoFrame)) {
+		std::cout << "Failed to convert frame to i420" << std::endl;
+	}
+
+	std::vector<uint8_t> captureBufferVector;
+	size_t length = webrtc::CalcBufferSize(webrtc::kI420, webRTCVideoFrame.width(), webRTCVideoFrame.height());
+	captureBufferVector.resize(length);
+	webrtc::ExtractBuffer(webRTCVideoFrame, length, &captureBufferVector[0]);
+		
+	std::shared_ptr<cricket::CapturedFrame> capturedVideoFrame(new cricket::CapturedFrame(webRTCVideoFrame, &captureBufferVector[0], length));
+
+	
+	*/
+
 
 Error:
-	return nullptr;
+	return r;
 }
 
 void WebRTCCustomVideoCapturer::SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame) {
