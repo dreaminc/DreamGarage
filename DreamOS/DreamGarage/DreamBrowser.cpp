@@ -85,11 +85,30 @@ DreamAppHandle* DreamBrowser::GetAppHandle() {
 }
 
 RESULT DreamBrowser::ScrollBrowser(WebBrowserPoint ptDiff) {
-	return R_PASS;
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	mouseEvent.pt = m_lastWebBrowserPoint;	//maybe we don't need this, that'd be nice
+
+	int deltaX = 0;	//ptDiff.x
+	int deltaY = ptDiff.y;
+
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, deltaX, deltaY));
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
-	return R_PASS;
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	mouseEvent.pt = ptContact;
+
+	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));	// mouse down
+	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, true, 1));		// mouse up
+Error:
+	return r;
 }
 
 std::shared_ptr<texture> DreamBrowser::BrowserTexture() {

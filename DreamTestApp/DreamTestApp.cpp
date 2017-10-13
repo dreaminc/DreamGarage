@@ -37,7 +37,7 @@ RESULT DreamTestApp::LoadScene() {
 	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);

@@ -11,7 +11,7 @@
 #include <functional>
 #include <stack>
 
-#define PAD_MOVE_CONSTANT 0.015f
+#define BROWSER_SCROLL_CONSTANT 10.0f
 
 class quad; 
 class sphere;
@@ -63,6 +63,7 @@ public:
 	RESULT SetViewState(State state);
 	WebBrowserPoint GetRelativePointofContact();
 	bool m_flag;
+	WebBrowserPoint GetScrollVelocity();
 
 private:
 	std::shared_ptr<quad> m_pViewQuad;

@@ -1038,11 +1038,22 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(m_pDreamOS);
+		
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::string strURL = "http://www.youtube.com";
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
+		CN(m_pDreamOS);
 
 		{
+			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			
+
+			// Set up the view
+			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetDiagonalSize(10.0f);
+			pDreamBrowser->SetURI(strURL);
 			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
 			auto pComposite = m_pDreamOS->AddComposite();
 			auto pView = pComposite->AddUIView(m_pDreamOS);
@@ -1074,8 +1085,8 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		RESULT r = R_PASS;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		if (pTestContext->pDreamControlView->m_flag) {
-			std::string strContactX = std::to_string(pTestContext->pDreamControlView->GetRelativePointofContact().x);
-			std::string strContactY = std::to_string(pTestContext->pDreamControlView->GetRelativePointofContact().y);
+			std::string strContactX = std::to_string(pTestContext->pDreamControlView->GetScrollVelocity().x);
+			std::string strContactY = std::to_string(pTestContext->pDreamControlView->GetScrollVelocity().y);
 
 			pTestContext->pTextBoxText->SetText(strContactX + ", " + strContactY);
 			pTestContext->pDreamControlView->m_flag = false;
