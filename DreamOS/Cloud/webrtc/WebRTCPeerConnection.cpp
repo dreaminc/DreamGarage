@@ -393,7 +393,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 			// Kick off our stream (testing)
 			if (m_pCricketVideoCapturer != nullptr) {
-				cricket::VideoFormat videoCaptureFormat(640, 480, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_RGBA);
+				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(5), cricket::FOURCC_RGBA);
 				m_pCricketVideoCapturer->Start(videoCaptureFormat);
 			}
 		}

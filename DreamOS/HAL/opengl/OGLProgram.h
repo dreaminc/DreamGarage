@@ -135,6 +135,7 @@ public:
 
 public:
 	OGLFramebuffer *GetOGLFramebuffer();
+	texture *GetOGLFramebufferColorTexture();
 	RESULT SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 protected:

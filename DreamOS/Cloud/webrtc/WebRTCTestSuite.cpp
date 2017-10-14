@@ -10,6 +10,8 @@
 
 #include "Cloud/CloudControllerFactory.h"
 
+#include "HAL/opengl/OGLProgram.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -32,6 +34,8 @@ Error:
 CloudController *WebRTCTestSuite::GetCloudController() {
 	return m_pDreamOS->GetCloudController();
 }
+
+OGLProgram *g_pRenderProg = nullptr;
 
 RESULT WebRTCTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	RESULT r = R_PASS;
@@ -73,9 +77,15 @@ RESULT WebRTCTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 
 	CR(pHAL->ReleaseCurrentContext());
 
+	g_pRenderProg = (OGLProgram*)(pRenderScreenQuad);
+
 Error:
 	return r;
 }
+
+#define UPDATE_SCREENCAST_COUNT 5	
+#define UPDATE_SCREENCAST_MS ((1000.0f) / UPDATE_SCREENCAST_COUNT)
+std::chrono::system_clock::time_point g_lastTestUpdate = std::chrono::system_clock::now();
 
 RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	RESULT r = R_PASS;
@@ -151,8 +161,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		RESULT r = R_PASS;
 
 		// temp
-		int pxWidth = 640;
-		int pxHeight = 480;
+		int pxWidth = 500;
+		int pxHeight = 500;
 		int channels = 4;
 
 		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
@@ -235,7 +245,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			(unsigned char*)(pTestContext->pTestVideoFrameBuffer),
 			pxWidth,
 			pxHeight,
-			texture::PixelFormat::BGRA)
+			texture::PixelFormat::RGBA)
 		);
 
 		//CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, texture::PixelFormat::BGRA));
@@ -303,13 +313,28 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 				(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
 				pTestContext->m_pendingVideoBuffer.pxWidth,
 				pTestContext->m_pendingVideoBuffer.pxHeight,
-				texture::PixelFormat::BGRA)
+				texture::PixelFormat::RGBA)
 			);
 		}
 
 		// Replace with BroadcastTexture
-		if (pTestContext->pCloudController != nullptr) {
-			pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::BGRA);
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - g_lastTestUpdate).count() > UPDATE_SCREENCAST_MS) {
+			if (pTestContext->pCloudController != nullptr) {
+				//pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::RGBA);
+
+				HALImp *pHAL = m_pDreamOS->GetHALImp();
+				Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+				if (g_pRenderProg != nullptr) {
+					auto pScreenQuadTexture = g_pRenderProg->GetOGLFramebufferColorTexture();
+
+					if (pScreenQuadTexture != nullptr) {
+						pTestContext->pCloudController->BroadcastTextureFrame(pScreenQuadTexture, 0, texture::PixelFormat::RGBA);
+					}
+				}
+			}
+	
+			g_lastTestUpdate = std::chrono::system_clock::now();
 		}
 
 	Error:

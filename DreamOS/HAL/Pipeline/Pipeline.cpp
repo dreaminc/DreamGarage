@@ -11,6 +11,7 @@ Pipeline::~Pipeline() {
 	// empty
 }
 
+// TODO: This doesn't do shit
 std::shared_ptr<DNode> Pipeline::FindNode(std::string strName) {
 	for (auto &pNode : m_nodes) {
 		if (pNode->GetName() == strName) {
