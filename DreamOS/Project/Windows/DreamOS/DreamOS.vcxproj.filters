@@ -866,6 +866,9 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1939,6 +1942,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.h">
       <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h">
+      <Filter>Primitives\image</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

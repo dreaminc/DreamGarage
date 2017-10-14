@@ -1801,6 +1801,36 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels) {
+	RESULT r = R_PASS;
+
+	glGetTexImage(target, level, format, type, pixels);
+	CRM(CheckGLError(), "glGetTexImage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetTextureImage(texture, level, format, type, bufSize, pixels);
+	CRM(CheckGLError(), "glGetTexImage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetnTexImage(target, level, format, type, bufSize, pixels);
+	CRM(CheckGLError(), "glGetTexImage failed");
+
+Error:
+	return r;
+}
+
 // Queries
 RESULT OpenGLImp::glGenQueries(GLsizei n, GLuint *ids) {
 	RESULT r = R_PASS;

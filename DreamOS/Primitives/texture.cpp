@@ -272,6 +272,10 @@ Error:
 	return r;
 }
 
+RESULT texture::LoadImageFromTexture(int level, texture::PixelFormat pixelFormat) {
+	return R_NOT_HANDLED;
+}
+
 RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 	wchar_t *pszFilePath = nullptr;
@@ -479,4 +483,11 @@ bool texture::IsDistanceMapped() {
 RESULT texture::SetDistanceMapped() {
 	m_flags = m_flags | texture::flags::DISTANCE_MAP;
 	return R_PASS;
+}
+
+uint8_t *texture::GetImageBuffer() {
+	if (m_pImage != nullptr)
+		return m_pImage->GetImageBuffer();
+	else
+		return nullptr;
 }

@@ -1,6 +1,7 @@
 #include "OGLTexture.h"
 
 #include "Primitives/image/image.h"
+#include "Primitives/image/ImageFactory.h"
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget) :
 	texture(type),
@@ -609,6 +610,28 @@ GLenum OGLTexture::GetGLTextureNumberDefine(int value) {
 
 GLuint OGLTexture::GetOGLTextureIndex() {
 	return m_textureIndex;
+}
+
+RESULT OGLTexture::LoadImageFromTexture(int level, texture::PixelFormat pixelFormat) {
+	RESULT r = R_PASS;
+
+	// Create the buffer in memory
+	if (m_pImage == nullptr) {
+		m_pImage = ImageFactory::MakeMemoryImage(IMAGE_TYPE::IMAGE_MEMORY, m_width, m_height, m_channels);
+		CN(m_pImage);
+	}
+
+	uint8_t *pBuffer = m_pImage->GetImageBuffer();
+	size_t pBuffer_n = m_pImage->GetImageBufferSize();
+
+	m_pParentImp->GetTextureImage(m_textureIndex, 0, GetOGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer));
+
+	CN(pBuffer);
+
+	// TODO: Update the texture image here (call super?)
+
+Error:
+	return r;
 }
 
 RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {

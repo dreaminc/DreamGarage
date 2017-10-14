@@ -797,6 +797,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\image.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp" />
+    <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
@@ -1126,6 +1127,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\image\image.h" />
     <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h" />
+    <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\Manager.h" />
