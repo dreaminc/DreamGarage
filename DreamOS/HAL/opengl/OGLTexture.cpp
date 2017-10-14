@@ -639,7 +639,18 @@ RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture
 
 	CR(Bind());
 
-	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
+	// Protect against copying larger than texture
+	int pxWidth = width;
+	int pxHeight = height;
+
+	// TODO: Flag an issue
+	if (pxWidth > m_width)
+		pxWidth = m_width;
+
+	if (pxHeight > m_height)
+		pxHeight = m_height;
+
+	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pxWidth, pxHeight, GetOGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
 
 Error:
 	return r;

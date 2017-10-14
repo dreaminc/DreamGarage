@@ -1078,6 +1078,13 @@ OGLFramebuffer *OGLProgram::GetOGLFramebuffer() {
 	return m_pOGLFramebuffer;
 }
 
+texture *OGLProgram::GetOGLFramebufferColorTexture() {
+	if (m_pOGLFramebuffer != nullptr)
+		return m_pOGLFramebuffer->GetColorTexture();
+	else
+		return nullptr;
+}
+
 // Set Matrix Functions
 /*
 RESULT OGLProgram::SetEyePosition(point ptEye) {
