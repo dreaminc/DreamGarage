@@ -129,8 +129,8 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-		m_velocity.x = pEvent->state.ptTouchpad.x() * SCROLL_MOVE_CONSTANT;
-		m_velocity.y = pEvent->state.ptTouchpad.y() * SCROLL_MOVE_CONSTANT;
+		m_velocity.x = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
+		m_velocity.y = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
 		m_flag = true;
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
 
