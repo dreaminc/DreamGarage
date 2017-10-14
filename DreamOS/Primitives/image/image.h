@@ -17,6 +17,10 @@ public:
 	image(std::wstring wstrFilename);
 	image(uint8_t *pBuffer, size_t pBuffer_n);
 
+protected:
+	image(int width, int height, int channels);
+
+public:
 	~image();
 
 	virtual RESULT LoadFromPath() = 0;
@@ -30,6 +34,7 @@ public:
 	RESULT CopyBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
 
 	unsigned char *GetImageBuffer();
+	size_t GetImageBufferSize();
 
 	int GetWidth();
 	int GetHeight();
@@ -48,6 +53,7 @@ protected:
 	int m_channels = 0;
 
 	unsigned char *m_pImageBuffer = nullptr;
+	size_t m_pImageBuffer_n = 0;
 };
 
 #endif // !IMAGE_H_

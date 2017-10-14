@@ -13,6 +13,14 @@ image::image(uint8_t *pBuffer, size_t pBuffer_n) :
 	// empty
 }
 
+image::image(int width, int height, int channels) :
+	m_width(width),
+	m_height(height),
+	m_channels(channels)
+{
+	// empty
+}
+
 image::~image() {
 	// Release the image / texture
 	Release();
@@ -71,6 +79,10 @@ Error:
 
 unsigned char *image::GetImageBuffer() {
 	return m_pImageBuffer;
+}
+
+size_t image::GetImageBufferSize() {
+	return m_pImageBuffer_n;
 }
 
 int image::GetWidth() {

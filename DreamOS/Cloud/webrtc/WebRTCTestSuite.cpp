@@ -86,6 +86,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 	struct TestContext : public CloudController::PeerConnectionObserver {
 		quad *pQuad = nullptr;
 		texture *pQuadTexture = nullptr;
+
+		quad *pSourceQuad = nullptr;
+		texture *pSourceTexture = nullptr;
+
 		CloudController *pCloudController = nullptr;
 
 		struct PendingVideoBuffer {
@@ -164,10 +168,15 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		pTestContext->pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
 		CN(pTestContext->pQuad);
 		pTestContext->pQuad->RotateXByDeg(45.0f);
+		pTestContext->pQuad->translateX(-1.0f);
+
+		pTestContext->pSourceQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
+		CN(pTestContext->pSourceQuad);
+		pTestContext->pSourceQuad->RotateXByDeg(45.0f);
+		pTestContext->pSourceQuad->translateX(1.0f);
 
 		// Temporary
 		///*
-
 		pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
 			pxWidth, 
@@ -181,6 +190,19 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		CN(pTestContext->pQuadTexture);
 		pTestContext->pQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
 
+		pTestContext->pSourceTexture = m_pDreamOS->MakeTexture(
+			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+			pxWidth,
+			pxHeight,
+			texture::PixelFormat::RGBA,
+			4,
+			&vectorByteBuffer[0],
+			pxWidth * pxHeight * 4
+		);
+
+		CN(pTestContext->pSourceTexture);
+		pTestContext->pSourceQuad->SetDiffuseTexture(pTestContext->pSourceTexture);
+
 		size_t bufSize = sizeof(uint8_t) * pxWidth * pxHeight * channels;
 
 		pTestContext->pTestVideoFrameBuffer = (uint8_t*)malloc(bufSize);
@@ -189,7 +211,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		for (int i = 0; i < pxHeight; i++) {
 			for (int j = 0; j < pxWidth; j++) {
-				uint8_t cPixel[4] = { 0x00, 0x00, 0x00, 0x00 };
+				uint8_t cPixel[4] = { 0x00, 0x00, 0x00, 0xFF };
 				cPixel[styleCounter] = 0xFF;
 
 				size_t offset = (i * ((pxWidth - 1)) + (j));
@@ -208,6 +230,16 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 				}
 			}
 		}
+
+		CR(pTestContext->pSourceTexture->Update(
+			(unsigned char*)(pTestContext->pTestVideoFrameBuffer),
+			pxWidth,
+			pxHeight,
+			texture::PixelFormat::BGRA)
+		);
+
+		//CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, texture::PixelFormat::BGRA));
+
 		//*/
 
 		// Command Line Manager
@@ -226,7 +258,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// Log in 
 		{
 			// TODO: This way to start the cloud controller thread is not great
-			std::string strUsername = "jason_test";
+			std::string strUsername = "test";
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
 
@@ -234,7 +266,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 			CR(pCommandLineManager->SetParameterValue("username", strUsername));
 			CR(pCommandLineManager->SetParameterValue("password", strPassword));
-			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(15)));
+			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
 
 			CRM(pTestContext->pCloudController->Start(true), "Failed to start cloud controller");
 		}
@@ -275,8 +307,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			);
 		}
 
+		// Replace with BroadcastTexture
 		if (pTestContext->pCloudController != nullptr) {
-			pTestContext->pCloudController->BroadcastVideoFrame(pTestContext->pTestVideoFrameBuffer, 640, 480, 4);
+			pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::BGRA);
 		}
 
 	Error:

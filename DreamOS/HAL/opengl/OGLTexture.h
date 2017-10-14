@@ -79,6 +79,9 @@ public:
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
 
+public:
+	virtual RESULT LoadImageFromTexture(int level, texture::PixelFormat pixelFormat) override;
+
 private:
 	GLenum GetOGLPixelFormat();
 	RESULT CopyTextureBufferFromTexture(OGLTexture *pTexture);

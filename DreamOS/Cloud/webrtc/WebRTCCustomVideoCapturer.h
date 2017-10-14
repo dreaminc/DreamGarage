@@ -32,7 +32,7 @@ private:
 	// To call the SignalFrameCaptured call on the main thread
 	void SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame);
 
-	// video capture thread
+	// RTC Video capture thread
 	rtc::Thread* m_startThread; 
 };
 
@@ -42,8 +42,8 @@ public:
 	WebRTCCustomVideoCapturerFactory() {}
 	virtual ~WebRTCCustomVideoCapturerFactory() {}
 
+	// WebRTC uses device name to instantiate the capture, which is always 0.
 	virtual cricket::VideoCapturer* Create(const cricket::Device& device) {
-		// XXX: WebRTC uses device name to instantiate the capture, which is always 0.
 		return new WebRTCCustomVideoCapturer(atoi(device.id.c_str()));
 	}
 };

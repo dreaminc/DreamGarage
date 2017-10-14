@@ -617,6 +617,25 @@ Error:
 	return r;
 }
 
+RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CN(pTexture);
+
+	CR(pTexture->LoadImageFromTexture(0, pixelFormat));
+
+	// Broadcast the data
+	CR(m_pEnvironmentController->BroadcastVideoFrame(
+		pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
+	));
+
+Error:
+	return r;
+}
+
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 

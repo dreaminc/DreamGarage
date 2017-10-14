@@ -259,6 +259,14 @@ public:
 	}
 	*/
 
+	inline void glGetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
+		return m_glGetnTexImage(target, level, format, type, bufSize, pixels);
+	}
+
+	inline void glGetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
+		return m_glGetTextureImage(texture, level, format, type, bufSize, pixels);
+	}
+
 	inline void glGenerateMipmap(GLenum target) {
 		return m_glGenerateMipmap(target);
 	}
@@ -465,6 +473,8 @@ private:
 	//PFNGLCOPYTEXIMAGE2DPROC m_glCopyTexImage2D;	// part of core
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
 	PFNGLGENERATEMIPMAPPROC m_glGenerateMipmap;
+	PFNGLGETTEXTUREIMAGEPROC m_glGetTextureImage;
+	PFNGLGETNTEXIMAGEPROC m_glGetnTexImage;
 
 
 	// FBO

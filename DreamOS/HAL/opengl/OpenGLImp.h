@@ -233,6 +233,9 @@ public:
 	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 	RESULT glGenerateMipmap(GLenum target);
+	RESULT GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
+	RESULT GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels);
+	RESULT GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels);
 
 	// Queries
 	RESULT glGenQueries(GLsizei n, GLuint *ids);
