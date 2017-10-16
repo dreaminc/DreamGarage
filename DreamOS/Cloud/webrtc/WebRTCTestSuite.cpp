@@ -248,7 +248,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			texture::PixelFormat::RGBA)
 		);
 
-		//CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, texture::PixelFormat::BGRA));
+		CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, texture::PixelFormat::BGRA));
 
 		//*/
 
@@ -320,8 +320,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// Replace with BroadcastTexture
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - g_lastTestUpdate).count() > UPDATE_SCREENCAST_MS) {
 			if (pTestContext->pCloudController != nullptr) {
-				//pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::RGBA);
+				pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::RGBA);
 
+				/*
 				HALImp *pHAL = m_pDreamOS->GetHALImp();
 				Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 
@@ -332,6 +333,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 						pTestContext->pCloudController->BroadcastTextureFrame(pScreenQuadTexture, 0, texture::PixelFormat::RGBA);
 					}
 				}
+				*/
 			}
 	
 			g_lastTestUpdate = std::chrono::system_clock::now();
