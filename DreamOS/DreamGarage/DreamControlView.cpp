@@ -8,6 +8,14 @@
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
 
+RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> browserTexture) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return ControlViewTexture(browserTexture);
+Error:
+	return r;
+}
+
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
 {
@@ -115,7 +123,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
 			CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-			pBrowserHandle->SetClickParams(GetRelativePointofContact());
+			pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact());
 
 			CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
 		} break;
@@ -151,6 +159,15 @@ Error:
 }
 
 RESULT DreamControlView::Shutdown(void *pContext) {
+	return R_PASS;
+}
+
+DreamAppHandle* DreamControlView::GetAppHandle() {
+	return (DreamControlViewHandle*)(this);
+}
+
+RESULT DreamControlView::ControlViewTexture(std::shared_ptr<texture> browserTexture) {
+	m_pViewQuad->SetDiffuseTexture(browserTexture.get());	//Control view texture to be set by Browser
 	return R_PASS;
 }
 

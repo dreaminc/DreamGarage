@@ -39,8 +39,19 @@ public:
 	RESULT SetPath(std::string strPath);
 	
 	RESULT SetScrollingParams(WebBrowserPoint ptDiff);
-	RESULT SetClickParams(WebBrowserPoint ptContact);
+	RESULT SetScroll(int pxXScroll, int pxYScroll);		// Absolute
+	RESULT SetScrollX(int pxXScroll);
+	RESULT Scroll(int pxXDiff, int pxYDiff);			// Relative
+	RESULT ScrollX(int pxXDiff);
+	RESULT ScrollY(int pxYDiff);
+
+	RESULT SendClickToBrowserAtPoint(WebBrowserPoint ptContact);
 	
+	int GetScrollX();
+	int GetScrollY();
+	int GetPageHeight();
+	int GetPageWidth();
+	// GetFrameFocused();		//textbox detection
 	std::shared_ptr<texture> GetBrowserTexture();
 
 private:

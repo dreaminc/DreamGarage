@@ -37,7 +37,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowserHandle::SetClickParams(WebBrowserPoint ptContact) {
+RESULT DreamBrowserHandle::SendClickToBrowserAtPoint(WebBrowserPoint ptContact) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(ClickBrowser(ptContact));
@@ -89,7 +89,7 @@ RESULT DreamBrowser::ScrollBrowser(WebBrowserPoint ptDiff) {
 	WebBrowserMouseEvent mouseEvent;
 
 	mouseEvent.pt = m_lastWebBrowserPoint;	//maybe we don't need this, that'd be nice
-
+											//may need to track previous deltas for momentum scroll
 	int deltaX = 0;	//ptDiff.x
 	int deltaY = ptDiff.y;
 
@@ -105,7 +105,7 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	mouseEvent.pt = ptContact;
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));	// mouse down
+	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));		// mouse down
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, true, 1));		// mouse up
 Error:
 	return r;

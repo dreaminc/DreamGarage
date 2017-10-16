@@ -3,6 +3,8 @@
 
 #include "RESULT/EHM.h"
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
+
 #include "Sense/SenseController.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -20,7 +22,16 @@ class UIMallet;
 class UIScrollView;
 class texture;
 
+class DreamControlViewHandle : public DreamAppHandle {
+public:
+	RESULT SetControlViewTexture(std::shared_ptr<texture> browserTexture);
+
+private:
+	virtual RESULT ControlViewTexture(std::shared_ptr<texture> browserTexture) = 0;
+};
+
 class DreamControlView : public DreamApp<DreamControlView>, 
+						 public DreamControlViewHandle,
 						 public Subscriber<InteractionObjectEvent>,
 						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
@@ -42,6 +53,9 @@ public:
 
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	virtual RESULT ControlViewTexture(std::shared_ptr<texture> browserTexture) override;
+	virtual DreamAppHandle* GetAppHandle() override;
 
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
