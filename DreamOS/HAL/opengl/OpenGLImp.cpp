@@ -1815,7 +1815,7 @@ RESULT OpenGLImp::GetTextureImage(GLuint texture, GLint level, GLenum format, GL
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetTextureImage(texture, level, format, type, bufSize, pixels);
-	CRM(CheckGLError(), "glGetTexImage failed");
+	CRM(CheckGLError(), "glGetTextureImage failed");
 
 Error:
 	return r;
@@ -1825,7 +1825,7 @@ RESULT OpenGLImp::GetnTexImage(GLenum target, GLint level, GLenum format, GLenum
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glGetnTexImage(target, level, format, type, bufSize, pixels);
-	CRM(CheckGLError(), "glGetTexImage failed");
+	CRM(CheckGLError(), "glGetnTexImage failed");
 
 Error:
 	return r;
