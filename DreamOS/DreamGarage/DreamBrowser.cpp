@@ -400,7 +400,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				std::string strScope = m_strScope;
 				auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
 				
-				CN(keyUIDs.size() == 1);
+				CB(keyUIDs.size() == 1);
 				{
 					UID keyUID = keyUIDs[0];
 					auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUID, this));

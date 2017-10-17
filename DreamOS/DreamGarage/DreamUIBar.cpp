@@ -59,14 +59,10 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
 
 	CB(keyUIDs.size() == 1);
-	{
-		m_keyboardUID = keyUIDs[0];
-	}
+	m_keyboardUID = keyUIDs[0];
 
 	CB(browserUIDs.size() == 1);
-	{
-		m_browserUID = browserUIDs[0];
-	}
+	m_browserUID = browserUIDs[0];
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
