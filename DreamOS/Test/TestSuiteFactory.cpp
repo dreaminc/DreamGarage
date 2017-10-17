@@ -7,6 +7,7 @@
 #include "UI/UITestSuite.h"
 #include "UI/UIViewTestSuite.h"
 #include "Cloud/CloudTestSuite.h"
+#include "Cloud/webrtc/WebRTCTestSuite.h"
 #include "HAL/HALTestSuite.h"
 #include "DreamOSTestSuite.h"
 
@@ -38,6 +39,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 		case TEST_SUITE_TYPE::CLOUD: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<CloudTestSuite>((DreamOS*)pContext);
+		} break;
+
+		case TEST_SUITE_TYPE::WEBRTC: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<WebRTCTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::UI: {

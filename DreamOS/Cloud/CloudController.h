@@ -76,6 +76,7 @@ public:
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 	};
@@ -95,6 +96,8 @@ private:
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat);
 
 public:
 	CloudController();
@@ -106,7 +109,7 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-	RESULT Start();
+	RESULT Start(bool fLogin = true);
 	RESULT Stop();
 
 	RESULT Initialize();
@@ -114,7 +117,7 @@ public:
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	//RESULT LoginUser();
-	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK = "INVALIDONETIMEKEY");
 	RESULT Update();
 	RESULT Login();
 
@@ -147,6 +150,8 @@ public:
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
@@ -186,6 +191,8 @@ private:
 
 	std::thread	m_cloudThread;
 	bool m_fRunning;
+	bool m_fLoginOnStart = true;
+
 	RESULT ProcessingThread();
 };
 

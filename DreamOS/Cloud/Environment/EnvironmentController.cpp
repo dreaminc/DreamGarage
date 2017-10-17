@@ -821,6 +821,16 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::SetUser(User currentUser) {
 	return m_pPeerConnectionController->SetUser(currentUser);
 }
@@ -900,6 +910,17 @@ RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

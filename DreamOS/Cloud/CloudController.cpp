@@ -51,7 +51,11 @@ RESULT CloudController::ProcessingThread() {
 
 	DEBUG_LINEOUT("ProcessingThread start");
 
-	CR(Login());
+	// TODO: This should be removed
+	if (m_fLoginOnStart) {
+		CR(Login());
+	}
+
 	m_fRunning = true;
 
 	// Message pump goes here
@@ -70,20 +74,17 @@ Error:
 	return r;
 }
 
-RESULT CloudController::Start() {
+RESULT CloudController::Start(bool fLoginOnStart) {
 	RESULT r = R_PASS;
 
-	if (m_fRunning) {
-		// cloud already running
-		HUD_OUT("cloud trying to start but already running");
-		return R_FAIL;
-	}
+	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fLoginOnStart = fLoginOnStart;
 	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
 
-//Error:
+Error:
 	return r;
 }
 
@@ -314,6 +315,20 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	long senderUserID = pPeerConnection->GetPeerUserID();
+	long recieverUserID = pPeerConnection->GetUserID();
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
 	RESULT r = R_PASS;
 
@@ -537,7 +552,6 @@ void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
 	return fnUIThreadCallback(msgID, data);
 }
 
-
 // Send some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
@@ -590,7 +604,37 @@ Error:
 	return r;
 }
 
+// Submit Video Frame
+RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
 
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CN(pTexture);
+
+	CR(pTexture->LoadImageFromTexture(0, pixelFormat));
+
+	// Broadcast the data
+	CR(m_pEnvironmentController->BroadcastVideoFrame(
+		pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
+	));
+
+Error:
+	return r;
+}
 
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;

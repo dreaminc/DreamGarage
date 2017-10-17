@@ -473,16 +473,20 @@ User WebRTCConductor::GetUser() {
 TwilioNTSInformation WebRTCConductor::GetTwilioNTSInformation() {
 	return m_pParentObserver->GetTwilioNTSInformation();
 }
-	
-RESULT WebRTCConductor::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) {
+
+RESULT WebRTCConductor::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 		
 	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnAudioData(peerConnectionID, audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames);
+		return m_pParentObserver->OnAudioData(peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
 
 	return R_NOT_HANDLED;
@@ -534,6 +538,18 @@ RESULT WebRTCConductor::SendDataChannelMessage(long peerConnectionID, uint8_t *p
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
 	CR(pWebRTCPeerConnection->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->SendVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
 Error:
 	return r;

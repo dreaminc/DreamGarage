@@ -16,6 +16,7 @@ public:
 		UI,
 		UIVIEW,
 		CLOUD,
+		WEBRTC,
 		HAL,
 		MATH,
 		ANIMATION,

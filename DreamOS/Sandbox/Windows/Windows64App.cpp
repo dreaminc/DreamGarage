@@ -236,7 +236,6 @@ RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
-
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
 	// TODO: Remove this code

@@ -63,6 +63,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fInitCloud = true;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
@@ -747,6 +748,11 @@ RESULT DreamGarage::OnAudioData(PeerConnection* pPeerConnection, const void* pAu
 
 Error:
 	return r;
+}
+
+RESULT DreamGarage::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	// TODO: Implement this?
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {

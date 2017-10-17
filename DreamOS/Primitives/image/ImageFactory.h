@@ -14,6 +14,7 @@
 
 typedef enum {
 	IMAGE_FREEIMAGE,
+	IMAGE_MEMORY,
 	IMAGE_INVALID
 } IMAGE_TYPE;
 
@@ -21,6 +22,7 @@ class ImageFactory {
 public:
 	static image* MakeImageFromPath(IMAGE_TYPE type, std::wstring wstrImageFilepath);
 	static image* MakeImageFromMemory(IMAGE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
+	static image* MakeMemoryImage(IMAGE_TYPE type, int width, int height, int channels);
 };
 
 #endif // !IMAGE_FACTORY_H_

@@ -48,12 +48,8 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 		
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCImp;
@@ -90,12 +86,8 @@ public:
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
-	virtual RESULT OnAudioData(long peerConnectionID,
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 private:
 	RESULT ClearPeerConnections();
@@ -133,6 +125,8 @@ public:
 
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface

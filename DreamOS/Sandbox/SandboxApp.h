@@ -69,6 +69,7 @@ public:
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
 		unsigned fMouseLook : 1;
+		unsigned fInitCloud : 1;
 	};
 
 private:
@@ -335,6 +336,7 @@ public:
 	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
 	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
 
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 

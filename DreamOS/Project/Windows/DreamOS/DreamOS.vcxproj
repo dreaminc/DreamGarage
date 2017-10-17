@@ -666,12 +666,14 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\Core\Utilities.cpp" />
     <ClCompile Include="..\..\..\DreamApp.cpp" />
@@ -796,6 +798,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\image.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp" />
+    <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
@@ -895,6 +898,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
@@ -908,6 +912,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
@@ -1124,6 +1129,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\image\image.h" />
     <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h" />
+    <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\Manager.h" />

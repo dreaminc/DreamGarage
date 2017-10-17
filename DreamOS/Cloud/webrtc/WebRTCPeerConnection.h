@@ -13,6 +13,9 @@
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
 
+#include "webrtc/media/base/videocommon.h"
+#include "webrtc/media/base/videoframe.h"
+
 #include "WebRTCICECandidate.h"
 #include "WebRTCIceConnection.h"
 
@@ -32,6 +35,7 @@ class WebRTCPeerConnection :
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
 	public webrtc::AudioTrackSinkInterface,
+	public rtc::VideoSinkInterface<cricket::VideoFrame>,
 	public WebRTCPeerConnectionProxy
 {
 public:
@@ -61,6 +65,7 @@ public:
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
 		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -114,6 +119,9 @@ protected:
 	// webrtc::AudioTrackSinkInterface
 	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
+	// rtc::VideoSinkInterface<cricket::VideoFrame>
+	virtual void OnFrame(const cricket::VideoFrame& cricketVideoFrame) override;
+
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
 	RESULT CreatePeerConnection(bool dtls);
@@ -124,6 +132,7 @@ public:
 
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+	RESULT SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
 protected:
 	// TODO: Move to peer Connection
@@ -133,6 +142,9 @@ protected:
 public:
 	// Video (TODO eventually)
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
+
+	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
+	cricket::VideoCapturer* m_pCricketVideoCapturer = nullptr;
 
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }

@@ -27,6 +27,8 @@
 
 #include "Core/Utilities.h"
 
+#include "WebRTCCustomVideoCapturer.h"
+
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
@@ -94,7 +96,8 @@ RESULT WebRTCPeerConnection::AddStreams() {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
-	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
+	//rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
 
 	CB((m_WebRTCLocalActiveStreams.find(kStreamLabel) == m_WebRTCLocalActiveStreams.end()));
 
@@ -106,10 +109,10 @@ RESULT WebRTCPeerConnection::AddStreams() {
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 
 	CR(AddAudioStream(pMediaStreamInterface));
+	CR(AddVideoStream(pMediaStreamInterface));
 
 	// Add streams
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
-		LOG(ERROR) << "Adding stream to PeerConnection failed";
 		DEBUG_LINEOUT("Adding stream to PeerConnection failed");
 	}
 
@@ -120,17 +123,88 @@ Error:
 	return r;
 }
 
+// Video
+cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
+	std::vector<std::string> deviceNames;
+
+	{
+		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> videoCaptureModuleDeviceInfo(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
+		if (!videoCaptureModuleDeviceInfo) {
+			return nullptr;
+		}
+
+		int numCaptureDevices = videoCaptureModuleDeviceInfo->NumberOfDevices();
+
+		for (int i = 0; i < numCaptureDevices; ++i) {
+			const uint32_t kSize = 256;
+			char szCaptureDeviceName[kSize] = { 0 };
+			char id[kSize] = { 0 };
+
+			if (videoCaptureModuleDeviceInfo->GetDeviceName(i, szCaptureDeviceName, kSize, id, kSize) != -1) {
+				deviceNames.push_back(szCaptureDeviceName);
+			}
+		}
+	}
+
+	cricket::WebRtcVideoDeviceCapturerFactory webRTCVideoDeviceCapturerFactory;
+
+	cricket::VideoCapturer* pCricketVideoCapturer = nullptr;
+
+	for (const auto& strDeviceName : deviceNames) {
+		pCricketVideoCapturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(strDeviceName, 0));
+
+		if (pCricketVideoCapturer) {
+			break;
+		}
+	}
+
+	return pCricketVideoCapturer;
+}
+
+
+
+RESULT WebRTCPeerConnection::InitializeVideoCaptureDevice(std::string strDeviceName) {
+	RESULT r = R_PASS;
+
+	WebRTCCustomVideoCapturerFactory webrtcCustomVideoCapturer;
+	
+	m_pCricketVideoCapturer = webrtcCustomVideoCapturer.Create(cricket::Device(strDeviceName, 0));
+	CNM(m_pCricketVideoCapturer, "Failed to create video capturer");
+
+Error:
+	return r;
+}
+
 RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
+	rtc::scoped_refptr<webrtc::VideoTrackSourceInterface> pVideoTrackSource = nullptr;
+	cricket::VideoCapturer* pVideoCapturer = nullptr;
+
+	// Set up constraints
+	webrtc::FakeConstraints videoSourceConstraints;
+
+	// TODO: Add video constraints if needed
+	//pVideoCapturer = OpenVideoCaptureDevice();
+	//CN(pVideoCapturer);
+
+	CR(InitializeVideoCaptureDevice("default_capture"));
+	pVideoCapturer = m_pCricketVideoCapturer;
+	CN(pVideoCapturer);
+
+	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
+	CN(pVideoTrackSource);
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, pVideoTrackSource)
+	);
+	//CN(pVideoTrack);
 
+	pVideoTrack->AddRef();
 	pMediaStreamInterface->AddTrack(pVideoTrack);
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -253,12 +327,14 @@ WebRTCPeerConnectionProxy* WebRTCPeerConnection::GetProxy() {
 }
 
 // PeerConnectionObserver Interface
+
+// TODO: Add multiple streams (video vector, audio vector etc)
+// This is important if we want to multiple video streams as we will need to do soon (this is per peer connection)
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	
 	// TODO: do we add to a map like out going? Or check existing ?
 
 	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
-	LOG(INFO) << "Added " << pMediaStreamInterface->label() << " me=" << m_peerConnectionID;
 
 	// Add to remote streams
 	if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->label()) == m_WebRTCRemoteActiveStreams.end()) {
@@ -267,30 +343,65 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	}
 
 	if (!pMediaStreamInterface) {
-		LOG(ERROR) << "Cannot add stream";
 		DEBUG_LINEOUT("Cannot add stream");
 		return;
 	}
 
-	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)) {
-		LOG(ERROR) << "Cannot FindAudioTrack";
-		DEBUG_LINEOUT("Cannot FindAudioTrack");
-		return;
+	// Audio track
+	auto pAudioTrack = pMediaStreamInterface->FindAudioTrack(kAudioLabel);
+	if (pAudioTrack != nullptr) {
+		auto pAudioTrackSource = pAudioTrack->GetSource();
+
+		if (pAudioTrackSource != nullptr) {
+			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
+
+			pAudioTrackSource->AddSink(this);
+
+			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
+			SetAudioVolume(0.0f);
+
+			DEBUG_LINEOUT("Added audio Sink");
+		}
+		else {
+			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+		}
 	}
 
-	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()) {
-		LOG(ERROR) << "Cannot GetSource";
-		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
-		return;
-	}
+	// Video track
+	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kVideoLabel);
+	if (pVideoTrack != nullptr) {
+		DEBUG_LINEOUT("Found VideoTrackSourceInterface");
 
-	pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
+		auto pVideoTrackSource = pVideoTrack->GetSource();
 
-	//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
-	SetAudioVolume(0.0f);
+		if (pVideoTrackSource != nullptr) {
+			// Get some information
+			webrtc::VideoTrackSourceInterface::Stats stats;
+			pVideoTrackSource->GetStats(&stats);
 
-	LOG(INFO) << "Added audio sink";
-	DEBUG_LINEOUT("Added audio Sink");
+			// This object informs the source of the format requirements of the sink
+			rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
+
+			pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
+			//bool res = track->GetSource()->is_screencast();
+			
+			//const int64_t interval = 1000000000;//33333333
+			//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
+			//g_capturer->Start(format);
+			
+			//track->GetSource()->Restart();
+
+			// Kick off our stream (testing)
+			if (m_pCricketVideoCapturer != nullptr) {
+				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(5), cricket::FOURCC_RGBA);
+				m_pCricketVideoCapturer->Start(videoCaptureFormat);
+			}
+		}
+		else {
+			DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
+		}
+
+	}	
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
@@ -299,7 +410,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	DEBUG_LINEOUT("OnRemoveStream: %s", pMediaStreamInterface->label().c_str());
-	LOG(INFO) << "OnRemoveStream: " << pMediaStreamInterface->label();
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnRemoveStream(m_peerConnectionID, pMediaStreamInterface);
@@ -308,7 +418,6 @@ void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStream
 
 void WebRTCPeerConnection::OnRenegotiationNeeded() {
 	DEBUG_LINEOUT("OnRenegotiationNeeded");
-	LOG(INFO) << "OnRenegotiationNeeded";
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnRenegotiationNeeded(m_peerConnectionID);
@@ -346,6 +455,60 @@ void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, i
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAudioData(m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
+}
+
+#include "webrtc/common_video/libyuv/include/webrtc_libyuv.h"
+
+// TODO: Update WebRTC version and move to webrtc::video_frame since 
+// I'm not sure what the hell cricket is all about
+
+// TODO: Need to be wary of memory stuff
+// Might want to give observer the handle for the memory and 
+// they will deallocate it
+void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame) {
+	RESULT r = R_PASS;
+
+	int videoFrameWidth = cricketVideoFrame.width();
+	int videoFrameHeight = cricketVideoFrame.height();
+
+	uint8_t *pVideoFrameDataBuffer = (uint8_t*)malloc(sizeof(uint8_t) * videoFrameWidth * videoFrameHeight * 4);
+	//size_t res = frame.ConvertToRgbBuffer(webrtc::VideoType::kARGB, dst_frame, frame.height()*frame.width() * 4, frame.width() * 4);
+	
+	const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& webRTCVideoFrameBuffer = cricketVideoFrame.video_frame_buffer();
+	webrtc::VideoFrame webRTCVideoFrame(webRTCVideoFrameBuffer, 0, 0, webrtc::VideoRotation::kVideoRotation_0);
+	
+	/*
+	VideoFrame(const rtc::scoped_refptr<webrtc::VideoFrameBuffer>& buffer,
+	uint32_t timestamp,
+	int64_t render_time_ms,
+	VideoRotation rotation);
+	*/
+
+	int convertFromI420Result = webrtc::ConvertFromI420(webRTCVideoFrame, webrtc::VideoType::kARGB, 0, pVideoFrameDataBuffer);
+	CBM((convertFromI420Result == 0), "YUV I420 conversion failed");
+	
+	/*
+	{
+		std::lock_guard<std::mutex> lock(g_UpdateTextureMutex);
+		memcpy_s(m_pRecieveBuffer, m_ScreenWidth * m_ScreenHeight * 4, dst_frame, frame.height()*frame.width() * 4);
+		g_updateTexture = true;
+	}
+	*/
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnVideoFrame(m_peerConnectionID, pVideoFrameDataBuffer, videoFrameWidth, videoFrameHeight);
+	}
+
+	return;
+
+Error:
+	// In a non-error state, this is left to the app to do
+	if (pVideoFrameDataBuffer != nullptr) {
+		delete pVideoFrameDataBuffer;
+		pVideoFrameDataBuffer = nullptr;
+	}
+
+	return;
 }
 
 // TODO: Add callbacks
@@ -681,7 +844,6 @@ Error:
 	return;
 }
 
-// TODO: Support many peer connections
 // TODO: Remove arbitrary data channels etc
 RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
@@ -696,6 +858,7 @@ RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 #ifndef WEBRTC_NO_CANDIDATES
 	CR(AddStreams());
 
+	// TODO: Do this moar bettar
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
@@ -890,47 +1053,25 @@ Error:
 	return r;
 }
 
+RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pCricketVideoCapturer);
+
+	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer);
+
+	CR(pWebRTCCustomVideoCapturer->SubmitNewFrameBuffer(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
 // TODO: This is not ideal, should be replaced with more robust flag
 bool WebRTCPeerConnection::IsPeerConnectionInitialized() {
 	if (m_pWebRTCPeerConnectionInterface.get() == nullptr)
 		return false;
 	else
 		return true;
-}
-
-// Video
-cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
-	std::vector<std::string> device_names;
-
-	{
-		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
-		if (!info) {
-			return nullptr;
-		}
-
-		int num_devices = info->NumberOfDevices();
-		for (int i = 0; i < num_devices; ++i) {
-			const uint32_t kSize = 256;
-			char name[kSize] = { 0 };
-			char id[kSize] = { 0 };
-			if (info->GetDeviceName(i, name, kSize, id, kSize) != -1) {
-				device_names.push_back(name);
-			}
-		}
-	}
-
-	cricket::WebRtcVideoDeviceCapturerFactory factory;
-	cricket::VideoCapturer* capturer = nullptr;
-
-	for (const auto& name : device_names) {
-		capturer = factory.Create(cricket::Device(name, 0));
-
-		if (capturer) {
-			break;
-		}
-	}
-
-	return capturer;
 }
 
 std::string WebRTCPeerConnection::GetPeerConnectionString() {

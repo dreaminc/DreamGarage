@@ -93,6 +93,8 @@ public:
 	RESULT LoadCubeMapByName(const wchar_t * pszName);
 	RESULT CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
 
+	virtual RESULT LoadImageFromTexture(int level, texture::PixelFormat pixelFormat);
+
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
@@ -168,6 +170,8 @@ public:
 
 	bool IsDistanceMapped();
 	RESULT SetDistanceMapped();
+
+	uint8_t *GetImageBuffer();
 
 protected:
 	PixelFormat	m_format = PixelFormat::Unspecified;
