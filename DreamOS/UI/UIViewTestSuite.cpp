@@ -1022,59 +1022,27 @@ Error:
 
 RESULT UIViewTestSuite::AddTestDreamControlView() {
 	RESULT r = R_PASS;
-	struct TestContext {
-		bool fRight = false;
-		bool fLeft = false;
-		composite *pComposite = nullptr;
-		std::shared_ptr<font> pFont = nullptr;
-		std::shared_ptr<text> pTextBoxText = nullptr;
-		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
-	};
-	std::shared_ptr<TestObject> pUITest = nullptr;
-	TestContext *pTestContext = new TestContext();
-	CN(pTestContext);
+	
 	double sTestTime = 10000.0;
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::string strURL = "http://www.youtube.com";
+
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
 		CN(m_pDreamOS);
 
 		{
-			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-			
-
-			// Set up the view
-			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);	// setup browser
 			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 			pDreamBrowser->SetDiagonalSize(10.0f);
 			pDreamBrowser->SetURI(strURL);
-			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
-			auto pComposite = m_pDreamOS->AddComposite();
-			auto pView = pComposite->AddUIView(m_pDreamOS);
-			CR(pDreamControlView->SetSharedViewContext());
-			pTestContext->pDreamControlView = pDreamControlView;
 
-			pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-			CN(pTestContext->pFont);
-			pTestContext->pFont->SetLineHeight(0.050f);
-			{
-				pTestContext->pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
-					pTestContext->pFont,
-					"hi",
-					.8f,
-					.050,
-					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
-				CN(pTestContext->pTextBoxText);
-				pView->AddObject(pTestContext->pTextBoxText);
-				pTestContext->pTextBoxText->SetPosition(point(0.0f, 2.0f, 3.0f));
-				pTestContext->pTextBoxText->RotateXByDeg(90.0f);
-			}
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+
 		}
 
 	Error:
@@ -1083,14 +1051,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		if (pTestContext->pDreamControlView->m_flag) {
-			std::string strContactX = std::to_string(pTestContext->pDreamControlView->GetScrollVelocity().x);
-			std::string strContactY = std::to_string(pTestContext->pDreamControlView->GetScrollVelocity().y);
 
-			pTestContext->pTextBoxText->SetText(strContactX + ", " + strContactY);
-			pTestContext->pDreamControlView->m_flag = false;
-		}
 		return r;
 	};
 
@@ -1098,7 +1059,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		return R_PASS;
 	};
 
-	pUITest = AddTest(fnInitialize, fnUpdate, fnTest, pTestContext);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
 	CN(pUITest);
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test of DreamControlView");

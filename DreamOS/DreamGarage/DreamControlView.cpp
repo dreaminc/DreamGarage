@@ -8,10 +8,11 @@
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
 
-RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> browserTexture) {
+RESULT DreamControlViewHandle::SendTextureToControlView(std::shared_ptr<texture> pBrowserTexture) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	return ControlViewTexture(browserTexture);
+
+	return SetControlViewTexture(pBrowserTexture);
 Error:
 	return r;
 }
@@ -28,35 +29,36 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
-	m_pViewQuad = m_pView->AddQuad(.96f, .54f, 1, 1, nullptr);
-	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)M_PI / 3.0f, 0.0f, 0.0f));
+
+	m_pViewQuad = m_pView->AddQuad(CONTROL_VIEWQUAD_WIDTH, CONTROL_VIEWQUAD_HEIGHT, 1, 1, nullptr);
+	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
 	CN(m_pViewQuad);
+
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
 
 	m_viewState = State::HIDDEN;
 
-	m_ptHiddenPosition = point(0.0f, -0.25f, 5.0f);
-	m_ptVisiblePosition = point(0.0f, -0.25f, 4.0f);
-
 	m_hiddenScale = 0.2f;
-	m_visibleScale = 1.0f;
+	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
 
 	m_hideThreshold = 0.20f;
 	m_showThreshold = -0.35f;
 
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
+	m_pLeftMallet->Show();
 
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
 	m_pRightMallet->Show();
-	m_pLeftMallet->Show();
 
 	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
 	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
+
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 Error:
 	return r;
@@ -69,6 +71,7 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
+
 	vector vLook = GetDOS()->GetCamera()->GetLookVector();
 
 	RotationMatrix qOffset = RotationMatrix();
@@ -112,20 +115,14 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		(pInteractionEvent->m_pInteractionObject == m_pLeftMallet->GetMalletHead() || pInteractionEvent->m_pInteractionObject == m_pRightMallet->GetMalletHead())) {
 		switch (pInteractionEvent->m_eventType) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
-			m_ptContact = pInteractionEvent->m_ptContact[0];
-			m_flag = true;	// just for testing?
+			point ptContact = pInteractionEvent->m_ptContact[0];
+
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 
-			std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");
-			CB(uids.size() == 1);
-			UID browserUID = uids[0];
+			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-			auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
-			CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
+			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
 
-			pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact());
-
-			CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
 		} break;
 		}
 	}
@@ -135,24 +132,20 @@ Error:
 
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
-	switch (pEvent->type) {
-	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-		m_velocity.x = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
-		m_velocity.y = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
-		m_flag = true;
-		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
+	if (m_viewState == State::VISIBLE) {
+		switch (pEvent->type) {
+		case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
+			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
+			int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
 
-		std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");
-		CB(uids.size() == 1);
-		UID browserUID = uids[0];
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
 
-		auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
-		CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
+			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-		pBrowserHandle->SetScrollingParams(m_velocity);
+			m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff);
 
-		CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
-	} break;
+		} break;
+		}
 	}
 Error:
 	return r;
@@ -166,8 +159,8 @@ DreamAppHandle* DreamControlView::GetAppHandle() {
 	return (DreamControlViewHandle*)(this);
 }
 
-RESULT DreamControlView::ControlViewTexture(std::shared_ptr<texture> browserTexture) {
-	m_pViewQuad->SetDiffuseTexture(browserTexture.get());	//Control view texture to be set by Browser
+RESULT DreamControlView::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
+	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
 	return R_PASS;
 }
 
@@ -178,8 +171,16 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
+
+	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
+	CB(uids.size() == 1);
+	m_browserUID = uids[0];
+
+	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+
 	SetSharedViewContext();
-	UpdateCompositeWithCameraLook(0.6f, -0.20f);	//depth, height
+	UpdateCompositeWithCameraLook(CONTROL_VIEW_DEPTH, CONTROL_VIEW_HEIGHT);	//depth, height
+
 	m_ptVisiblePosition = GetComposite()->GetPosition();
 	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
 
@@ -206,7 +207,6 @@ RESULT DreamControlView::Show() {
 		fnEndCallback,
 		this
 	));
-
 
 Error:
 	return r;
@@ -239,28 +239,26 @@ RESULT DreamControlView::Hide() {
 		this
 	));
 
+	CR(GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this)); // release browser
 Error:
 	return r;
 }
 
+///*
 RESULT DreamControlView::SetSharedViewContext() {
 	RESULT r = R_PASS;
-	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");
-	UID browserUID;
-	CB(uids.size() == 1);
-	browserUID = uids[0];
-	
-	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(browserUID, this));
-	CNR(pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-	CR(m_pViewQuad->SetDiffuseTexture(pBrowserHandle->GetBrowserTexture().get()));
-	CR(GetDOS()->ReleaseApp(pBrowserHandle, browserUID, this));
+	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+	CR(m_pViewQuad->SetDiffuseTexture(m_pBrowserHandle->GetBrowserTexture().get()));
+	
 Error:
 	return r;
 }
+//*/
 
-WebBrowserPoint DreamControlView::GetRelativePointofContact() {
-	point ptIntersectionContact = m_ptContact;
+WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
+	point ptIntersectionContact = ptContact;
 	ptIntersectionContact.w() = 1.0f;
 	WebBrowserPoint ptRelative;
 	// First apply transforms to the ptIntersectionContact 
@@ -270,18 +268,15 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact() {
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
 
-	float posX = ptAdjustedContact.x();
-	float posY = ptAdjustedContact.z();
-	float posZ = ptAdjustedContact.z();
-
-	posX /= width / 2.0f;
-	posY /= height / 2.0f;
+	float posX = ptAdjustedContact.x() / (width / 2.0f);	// flip it
+	float posY = ptAdjustedContact.z() / (height / 2.0f);
+	//float posZ = ptAdjustedContact.z();	// 3D browser when
 
 	posX = (posX + 1.0f) / 2.0f;
-	posY = (posY + 1.0f) / 2.0f;  // flip it
+	posY = (posY + 1.0f) / 2.0f;  
 	
-	ptRelative.x = posX * 1366;	//probably add these fields to the handle, or we need a way to convert to match browser pixel density
-	ptRelative.y = posY * 768;
+	ptRelative.x = posX * m_pBrowserHandle->GetWidthOfBrowser();
+	ptRelative.y = posY * m_pBrowserHandle->GetHeightOfBrowser();
 
 	return ptRelative;
 }
@@ -293,8 +288,4 @@ std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 RESULT DreamControlView::SetViewState(State state) {
 	m_viewState = state;
 	return R_PASS;
-}
-
-WebBrowserPoint DreamControlView::GetScrollVelocity() {
-	return m_velocity;
 }

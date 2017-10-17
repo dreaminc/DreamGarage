@@ -21,10 +21,44 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowserHandle::SetScrollingParams(WebBrowserPoint ptDiff) {
+RESULT DreamBrowserHandle::ScrollToPoint(int pxXScroll, int pxYScroll) {
 	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ScrollBrowser(ptDiff));
+	CR(ScrollBrowserToPoint(pxXScroll, pxYScroll));
+Error: 
+	return r;
+}
+
+RESULT DreamBrowserHandle::ScrollToX(int pxXScroll) {
+	RESULT r = R_PASS;
+	CR(ScrollBrowserToX(pxXScroll));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::ScrollToY(int pyYScroll) {
+	RESULT r = R_PASS;
+	CR(ScrollBrowserToY(pyYScroll));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::ScrollByDiff(int pxXDiff, int pxYDiff) {
+	RESULT r = R_PASS;
+	CR(ScrollBrowserByDiff(pxXDiff, pxYDiff));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::ScrollXByDiff(int pxXDiff) {
+	RESULT r = R_PASS;
+	CR(ScrollBrowserXByDiff(pxXDiff));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::ScrollYByDiff(int pxYDiff) {
+	RESULT r = R_PASS;
+	CR(ScrollBrowserYByDiff(pxYDiff));
 Error:
 	return r;
 }
@@ -43,6 +77,34 @@ RESULT DreamBrowserHandle::SendClickToBrowserAtPoint(WebBrowserPoint ptContact) 
 	CR(ClickBrowser(ptContact));
 Error:
 	return r;
+}
+
+int DreamBrowserHandle::GetScrollPixelsX() {
+	return GetScrollX();
+}
+
+int DreamBrowserHandle::GetScrollPixelsY() {
+	return GetScrollY();	// what to do here
+}
+
+int DreamBrowserHandle::GetPageHeightFromBrowser() {
+	return GetPageHeight();
+}
+
+int DreamBrowserHandle::GetPageWidthFromBrowser() {
+	return GetPageWidth();
+}
+
+int DreamBrowserHandle::GetWidthOfBrowser() {
+	return GetBrowserWidth();
+}
+
+int DreamBrowserHandle::GetHeightOfBrowser() {
+	return GetBrowserHeight();
+}
+
+float DreamBrowserHandle::GetAspectRatioFromBrowser() {
+	return GetAspectRatio();
 }
 
 std::shared_ptr<texture> DreamBrowserHandle::GetBrowserTexture() {
@@ -84,18 +146,120 @@ DreamAppHandle* DreamBrowser::GetAppHandle() {
 	return (DreamBrowserHandle*)(this);
 }
 
-RESULT DreamBrowser::ScrollBrowser(WebBrowserPoint ptDiff) {
+RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 	RESULT r = R_PASS;
 	WebBrowserMouseEvent mouseEvent;
 
-	mouseEvent.pt = m_lastWebBrowserPoint;	//maybe we don't need this, that'd be nice
-											//may need to track previous deltas for momentum scroll
-	int deltaX = 0;	//ptDiff.x
-	int deltaY = ptDiff.y;
+	int pxXDiff, pxYDiff;
 
-	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, deltaX, deltaY));
+	if (pxXScroll > m_pxXPosition)
+		pxXDiff = pxXScroll - m_pxXPosition;
+	else pxXDiff = m_pxXPosition - pxXScroll;
+	if (pxYScroll > m_pxYPosition)
+		pxYDiff = pxYScroll - m_pxYPosition;
+	else pxYDiff = m_pxYPosition - pxYScroll;
+
+	m_pxXPosition = pxXScroll;
+	m_pxYPosition = pxYScroll;
+
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
+
 Error:
 	return r;
+}
+
+RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	int pxXDiff;
+
+	if (pxXScroll > m_pxXPosition)
+		pxXDiff = pxXScroll - m_pxXPosition;
+	else pxXDiff = m_pxXPosition - pxXScroll;
+
+	m_pxXPosition = pxXScroll;
+
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, 0));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	int pxYDiff;
+
+	if (pxYScroll > m_pxYPosition)
+		pxYDiff = pxYScroll - m_pxYPosition;
+	else pxYDiff = m_pxYPosition - pxYScroll;
+
+	m_pxYPosition = pxYScroll;
+	
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, 0, pxYDiff));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff) {
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	m_pxXPosition += pxXDiff;
+	m_pxYPosition += pxYDiff;
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::ScrollBrowserXByDiff(int pxXDiff) {
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	m_pxXPosition += pxXDiff;
+
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, 0));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::ScrollBrowserYByDiff(int pxYDiff) {
+	RESULT r = R_PASS;
+	WebBrowserMouseEvent mouseEvent;
+
+	m_pxYPosition += pxYDiff;
+
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, 0, pxYDiff));
+Error:
+	return r;
+}
+
+int DreamBrowser::GetPageHeight() {	// This is incomplete, should be entire page- from CEF
+	return 1;
+}
+
+int DreamBrowser::GetPageWidth() {
+	return 1;
+}
+
+int DreamBrowser::GetScrollX() {
+	return m_pxXPosition;
+}
+
+int DreamBrowser::GetScrollY() {
+	return m_pxYPosition;
+}
+
+int DreamBrowser::GetBrowserHeight() {
+	return m_BrowserHeight;
+}
+
+int DreamBrowser::GetBrowserWidth() {
+	return m_BrowserWidth;
 }
 
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
@@ -193,8 +357,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	std::string strURL = "http://www.google.com";
 
-	int pxWidth = 1366;
-	int pxHeight = 768;
+	int pxWidth = m_BrowserWidth;
+	int pxHeight = m_BrowserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 

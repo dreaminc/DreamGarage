@@ -38,19 +38,26 @@ public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
 	
-	RESULT SetScrollingParams(WebBrowserPoint ptDiff);
-	RESULT SetScroll(int pxXScroll, int pxYScroll);		// Absolute
-	RESULT SetScrollX(int pxXScroll);
-	RESULT Scroll(int pxXDiff, int pxYDiff);			// Relative
-	RESULT ScrollX(int pxXDiff);
-	RESULT ScrollY(int pxYDiff);
+	RESULT ScrollToPoint(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
+	RESULT ScrollToX(int pxXScroll);
+	RESULT ScrollToY(int pyYScroll);
+	
+	RESULT ScrollByDiff(int pxXDiff, int pxYDiff);			// Relative- scroll this far
+	RESULT ScrollXByDiff(int pxXDiff);
+	RESULT ScrollYByDiff(int pxYDiff);
 
 	RESULT SendClickToBrowserAtPoint(WebBrowserPoint ptContact);
 	
-	int GetScrollX();
-	int GetScrollY();
-	int GetPageHeight();
-	int GetPageWidth();
+	int GetScrollPixelsX();
+	int GetScrollPixelsY();
+
+	int GetPageHeightFromBrowser();
+	int GetPageWidthFromBrowser();
+
+	int GetHeightOfBrowser();
+	int GetWidthOfBrowser();
+	float GetAspectRatioFromBrowser();
+
 	// GetFrameFocused();		//textbox detection
 	std::shared_ptr<texture> GetBrowserTexture();
 
@@ -58,8 +65,25 @@ private:
 	virtual RESULT SetBrowserScope(std::string strScope) = 0;
 	virtual RESULT SetBrowserPath(std::string strPath) = 0;
 	
-	virtual RESULT ScrollBrowser(WebBrowserPoint ptDiff) = 0;
+	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) = 0;		// Absolute- scroll to this point
+	virtual RESULT ScrollBrowserToX(int pxXScroll) = 0;
+	virtual RESULT ScrollBrowserToY(int pyYScroll) = 0;
+	
+	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff) = 0;			// Relative- scroll this far
+	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) = 0;
+	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) = 0;
+	
 	virtual RESULT ClickBrowser(WebBrowserPoint ptContact) = 0;
+
+	virtual int GetScrollX() = 0;
+	virtual int GetScrollY() = 0;
+	
+	virtual int GetPageHeight() = 0;
+	virtual int GetPageWidth() = 0;
+
+	virtual int GetBrowserHeight() = 0;
+	virtual int GetBrowserWidth() = 0;
+	virtual float GetAspectRatio() = 0;
 
 	virtual std::shared_ptr<texture> BrowserTexture() = 0;
 };
@@ -85,7 +109,23 @@ public:
 	virtual DreamAppHandle* GetAppHandle() override;
 
 	// DreamBrowserHandle
-	virtual RESULT ScrollBrowser(WebBrowserPoint ptDiff) override;
+	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) override;		// Absolute- scroll to this point
+	virtual RESULT ScrollBrowserToX(int pxXScroll) override;
+	virtual RESULT ScrollBrowserToY(int pyYScroll) override;
+
+	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff) override;			// Relative- scroll this far
+	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) override;
+	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) override;
+
+	virtual int GetScrollX() override;		// use to get position scrolled to
+	virtual int GetScrollY() override;
+
+	virtual int GetBrowserHeight() override;
+	virtual int GetBrowserWidth() override;
+
+	virtual int GetPageHeight() override;	// get page context
+	virtual int GetPageWidth() override;
+
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
 
@@ -112,7 +152,7 @@ public:
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
-	float GetAspectRatio();
+	virtual float GetAspectRatio() override;
 
 	RESULT UpdateViewQuad();
 
@@ -147,12 +187,17 @@ private:
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 
-	WebBrowserPoint m_lastWebBrowserPoint;
+	//WebBrowserPoint m_lastWebBrowserPoint;
 	bool m_fBrowserActive = false;
 
+	int m_BrowserWidth = 1366;
+	int m_BrowserHeight = 768;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
+
+	int m_pxXPosition = 0;
+	int m_pxYPosition = 0;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 

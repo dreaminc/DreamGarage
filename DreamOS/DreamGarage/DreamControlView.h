@@ -15,19 +15,26 @@
 
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
+#define CONTROL_VIEWQUAD_WIDTH 0.96f // This is 1080p scaled down - may want to use browser aspect ration soon
+#define CONTROL_VIEWQUAD_HEIGHT 0.54f
+#define CONTROL_VIEWQUAD_ANGLE (M_PI / 3.0f)
+#define CONTROL_VIEW_DEPTH 0.6f
+#define CONTROL_VIEW_HEIGHT -0.20f
+
 class quad; 
 class sphere;
 class UIView;
 class UIMallet;
 class UIScrollView;
 class texture;
+class DreamBrowserHandle;
 
 class DreamControlViewHandle : public DreamAppHandle {
 public:
-	RESULT SetControlViewTexture(std::shared_ptr<texture> browserTexture);
+	RESULT SendTextureToControlView(std::shared_ptr<texture> pBrowserTexture);
 
 private:
-	virtual RESULT ControlViewTexture(std::shared_ptr<texture> browserTexture) = 0;
+	virtual RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
 };
 
 class DreamControlView : public DreamApp<DreamControlView>, 
@@ -54,7 +61,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual RESULT ControlViewTexture(std::shared_ptr<texture> browserTexture) override;
+	virtual RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) override;
 	virtual DreamAppHandle* GetAppHandle() override;
 
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
@@ -75,9 +82,8 @@ public:
 	RESULT SetSharedViewContext();
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
-	WebBrowserPoint GetRelativePointofContact();
-	bool m_flag;
-	WebBrowserPoint GetScrollVelocity();
+
+	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 private:
 	std::shared_ptr<quad> m_pViewQuad;
@@ -86,6 +92,9 @@ private:
 	std::shared_ptr<UIView> m_pView;
 	std::shared_ptr<UIScrollView> m_pScrollView;
 
+	DreamBrowserHandle* m_pBrowserHandle;
+	UID m_browserUID;
+
 	State m_viewState;
 
 	UIMallet *m_pLeftMallet;
@@ -93,9 +102,7 @@ private:
 
 	float m_hiddenScale; 
 	float m_visibleScale;
-	WebBrowserPoint m_velocity;
 
-	point m_ptContact;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
 
