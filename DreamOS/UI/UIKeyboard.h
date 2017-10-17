@@ -44,9 +44,16 @@ class UIKeyboardHandle : public DreamAppHandle {
 public:
 	RESULT Show();
 	RESULT Hide();
+	RESULT UpdateComposite(float height, float depth);
+	bool IsVisible();
+	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
+
 private:
 	virtual RESULT ShowKeyboard() = 0;
 	virtual RESULT HideKeyboard() = 0;
+	virtual RESULT UpdateKeyboardComposite(float height, float depth) = 0;
+	virtual bool IsKeyboardVisible() = 0;
+	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
 };
 
 class UIKeyboard :	public DreamApp<UIKeyboard>, 
@@ -78,6 +85,9 @@ protected:
 public:
 	virtual RESULT ShowKeyboard() override;
 	virtual RESULT HideKeyboard() override;
+
+	virtual RESULT UpdateKeyboardComposite(float height, float depth) override;
+	virtual bool IsKeyboardVisible() override;
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
@@ -121,21 +131,11 @@ private:
 
 public:
 	RESULT UpdateTextBox(int chkey);
-	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
+	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
-
-	// TODO: Temo until better IPC
-public:
-	RESULT SetPath(std::string strPath);
-	RESULT SetScope(std::string strScope);
-	std::string GetPath();
-	std::string GetScope();
-
-	std::string m_strPath;
-	std::string m_strScope;
 
 private:
 	// layout variables

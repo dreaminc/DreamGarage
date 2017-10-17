@@ -13,6 +13,8 @@
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
 
+#include "DreamBrowser.h"
+
 #include "Primitives/font.h"
 
 #include <vector>
@@ -52,6 +54,15 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
+
+	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
+
+	CB(keyUIDs.size() == 1);
+	m_keyboardUID = keyUIDs[0];
+
+	CB(browserUIDs.size() == 1);
+	m_browserUID = browserUIDs[0];
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
@@ -163,18 +174,16 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	//Initial keyboard separation
 	{
-		auto pKeyboard = GetDOS()->CaptureKeyboard();
-
-		if (pKeyboard != nullptr) {
-			if (m_pathStack.empty()) {
-				pKeyboard->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
-			}
-			else if (pKeyboard->IsVisible()) {
-				pKeyboard->HideKeyboard();
-			}
+		auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+		CN(pKeyboardHandle);
+		if (m_pathStack.empty()) {
+			pKeyboardHandle->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
+		}
+		else if (pKeyboardHandle->IsVisible()) {
+			pKeyboardHandle->Hide();
 		}
 
-		CR(GetDOS()->ReleaseKeyboard());
+		CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
 	}
 
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
@@ -305,16 +314,19 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
 
-				// TODO: This is temporary until we have better IPC
 				{
-					auto pKeyboard = GetDOS()->CaptureKeyboard();
-					if (pKeyboard != nullptr) {
-						pKeyboard->SetPath(strPath);
-						pKeyboard->SetScope(strScope);
+					auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+					CN(pKeyboardHandle);
+					pKeyboardHandle->Show();
+					CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+				}
 
-						pKeyboard->ShowKeyboard();
-					}
-					CR(GetDOS()->ReleaseKeyboard());
+				{
+					auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+					CN(pBrowserHandle);
+					pBrowserHandle->SetScope(strScope);
+					pBrowserHandle->SetPath(strPath);
+					CR(GetDOS()->ReleaseApp(pBrowserHandle, m_browserUID, this));
 				}
 			}
 		}
@@ -415,10 +427,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 
 			//TODO: May want to move downloading outside of DreamUIBar
-			auto pKeyboard = GetDOS()->CaptureKeyboard();
-			if (pKeyboard != nullptr)
-				pKeyboard->UpdateTitle(pTexture, "Website");
-			CR(GetDOS()->ReleaseKeyboard());
+			auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+			CN(pKeyboardHandle);
+			pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+			CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
 		}
 		
 		if (pBufferVector != nullptr) {

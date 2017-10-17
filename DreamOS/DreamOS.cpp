@@ -826,19 +826,6 @@ const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
 }
 
-std::shared_ptr<UIKeyboard> DreamOS::CaptureKeyboard() {
-	if (!m_fKeyboardCaptured) {
-		m_fKeyboardCaptured = true;
-		return m_pKeyboard;
-	}
-	return nullptr;
-}
-
-RESULT DreamOS::ReleaseKeyboard() {
-	m_fKeyboardCaptured = false;
-	return R_PASS;
-}
-
 // Physics Engine
 RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;

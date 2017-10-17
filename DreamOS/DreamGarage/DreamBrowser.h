@@ -10,6 +10,8 @@
 // content of various formats 
 
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
+
 #include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
@@ -31,8 +33,18 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 
+class DreamBrowserHandle : public DreamAppHandle {
+public:
+	RESULT SetScope(std::string strScope);
+	RESULT SetPath(std::string strPath);
+private:
+	virtual RESULT SetBrowserScope(std::string strScope) = 0;
+	virtual RESULT SetBrowserPath(std::string strPath) = 0;
+};
+
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
+	public DreamBrowserHandle,
 	public Subscriber<InteractionObjectEvent>, 
 	public WebBrowserController::observer
 {
@@ -80,6 +92,9 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
+	virtual RESULT SetBrowserScope(std::string strScope) override;
+	virtual RESULT SetBrowserPath(std::string strPath) override;
+
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetURI(std::string strURI);
 	RESULT LoadRequest(const WebRequest &webRequest);
@@ -115,6 +130,9 @@ private:
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	TextEntryString m_strEntered;
+
+	std::string m_strScope;
+	std::string m_strPath;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
