@@ -108,7 +108,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 
-	//CR(AddAudioStream(pMediaStreamInterface));
+	CR(AddAudioStream(pMediaStreamInterface));
 	CR(AddVideoStream(pMediaStreamInterface));
 
 	// Add streams
@@ -859,9 +859,9 @@ RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	CR(AddStreams());
 
 	// TODO: Do this moar bettar
-	//if (fAddDataChannel) {
-	//	CR(AddDataChannel());
-	//}
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 #endif
 
 Error:
