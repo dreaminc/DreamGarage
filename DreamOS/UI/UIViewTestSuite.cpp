@@ -3,6 +3,7 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -218,8 +219,9 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	CR(AddTestKeyboardAngle());
+	//CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
+	CR(AddTestDreamControlView());
 
 Error:
 	return r;
@@ -1011,6 +1013,55 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::AddTestDreamControlView() {	
+	RESULT r = R_PASS;
+	
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::string strURL = "http://www.youtube.com";
+
+		UIStageProgram *pUIStageProgram = nullptr;
+		CR(SetupUIStagePipeline(pUIStageProgram));
+		CN(m_pDreamOS);
+
+		{
+			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);	// setup browser
+			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetDiagonalSize(10.0f);
+			pDreamBrowser->SetURI(strURL);
+
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
+	CN(pUITest);
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 

@@ -195,11 +195,10 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	float palmRadius = 0.01f;
-
-	m_pPalm = AddSphere(palmRadius, 10, 10);
-
 	point ptModel = point(0.0f, 0.0f, 0.0f);
 	float scaleModel = 0.015f;
+
+	m_pPalm = AddSphere(palmRadius, 10, 10);
 
 	m_pIndexFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
 	m_pIndexFinger->Initialize();
@@ -253,7 +252,7 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	m_fTracked = false;
 	//Start all visibility at false
-	OnLostTrack();
+	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
 
 	CR(r);
 
