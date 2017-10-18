@@ -261,9 +261,9 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	point ptIntersectionContact = ptContact;
 	ptIntersectionContact.w() = 1.0f;
 	WebBrowserPoint ptRelative;
+
 	// First apply transforms to the ptIntersectionContact 
 	point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
-	
 
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
