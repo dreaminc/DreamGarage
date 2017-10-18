@@ -1020,7 +1020,7 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AddTestDreamControlView() {
+RESULT UIViewTestSuite::AddTestDreamControlView() {	
 	RESULT r = R_PASS;
 	
 	double sTestTime = 10000.0;
@@ -1051,7 +1051,6 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-
 		return r;
 	};
 

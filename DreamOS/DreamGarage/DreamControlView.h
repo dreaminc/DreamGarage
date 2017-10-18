@@ -15,7 +15,7 @@
 
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
-#define CONTROL_VIEWQUAD_WIDTH 0.96f // This is 1080p scaled down - may want to use browser aspect ration soon
+#define CONTROL_VIEWQUAD_WIDTH 0.96f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define CONTROL_VIEWQUAD_HEIGHT 0.54f
 #define CONTROL_VIEWQUAD_ANGLE (M_PI / 3.0f)
 #define CONTROL_VIEW_DEPTH 0.6f

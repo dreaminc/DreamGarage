@@ -84,10 +84,10 @@ int DreamBrowserHandle::GetScrollPixelsX() {
 }
 
 int DreamBrowserHandle::GetScrollPixelsY() {
-	return GetScrollY();	// what to do here
+	return GetScrollY();
 }
 
-int DreamBrowserHandle::GetPageHeightFromBrowser() {
+int DreamBrowserHandle::GetPageHeightFromBrowser() {	//TODO bring through CEF
 	return GetPageHeight();
 }
 
@@ -148,7 +148,9 @@ DreamAppHandle* DreamBrowser::GetAppHandle() {
 
 RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 	RESULT r = R_PASS;
+	
 	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt = m_lastWebBrowserPoint;
 
 	int pxXDiff, pxYDiff;
 
@@ -170,8 +172,10 @@ Error:
 
 RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
 	RESULT r = R_PASS;
+	
 	WebBrowserMouseEvent mouseEvent;
-
+	mouseEvent.pt = m_lastWebBrowserPoint;
+	
 	int pxXDiff;
 
 	if (pxXScroll > m_pxXPosition)
@@ -188,7 +192,9 @@ Error:
 
 RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
 	RESULT r = R_PASS;
+	
 	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt = m_lastWebBrowserPoint;
 
 	int pxYDiff;
 
@@ -206,7 +212,9 @@ Error:
 
 RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff) {
 	RESULT r = R_PASS;
+	
 	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt = m_lastWebBrowserPoint;
 
 	m_pxXPosition += pxXDiff;
 	m_pxYPosition += pxYDiff;
@@ -219,6 +227,7 @@ Error:
 RESULT DreamBrowser::ScrollBrowserXByDiff(int pxXDiff) {
 	RESULT r = R_PASS;
 	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt = m_lastWebBrowserPoint;
 
 	m_pxXPosition += pxXDiff;
 
@@ -229,7 +238,9 @@ Error:
 
 RESULT DreamBrowser::ScrollBrowserYByDiff(int pxYDiff) {
 	RESULT r = R_PASS;
+	
 	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt = m_lastWebBrowserPoint;
 
 	m_pxYPosition += pxYDiff;
 
@@ -267,6 +278,7 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	WebBrowserMouseEvent mouseEvent;
 
 	mouseEvent.pt = ptContact;
+	m_lastWebBrowserPoint = ptContact;
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));		// mouse down

@@ -187,7 +187,7 @@ private:
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 
-	//WebBrowserPoint m_lastWebBrowserPoint;
+	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 	bool m_fBrowserActive = false;
 
 	int m_BrowserWidth = 1366;

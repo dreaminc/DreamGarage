@@ -13,6 +13,7 @@ RESULT DreamControlViewHandle::SendTextureToControlView(std::shared_ptr<texture>
 	CB(GetAppState());
 
 	return SetControlViewTexture(pBrowserTexture);
+
 Error:
 	return r;
 }
@@ -60,6 +61,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
+
 Error:
 	return r;
 }
@@ -117,6 +119,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
+			// This GetSenseController crashes in testing if fUseHMD is false
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
@@ -240,6 +243,7 @@ RESULT DreamControlView::Hide() {
 	));
 
 	CR(GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this)); // release browser
+
 Error:
 	return r;
 }
