@@ -9,6 +9,7 @@
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
+#include "DreamUserApp.h"
 
 #include <vector>
 #include <string>
@@ -118,8 +119,6 @@ public:
 	RESULT SetHeight(float height);
 	float GetAngle();
 	RESULT SetSurfaceAngle(float angle);
-	UIMallet* GetRightMallet();
-	UIMallet* GetLeftMallet();
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
@@ -133,9 +132,6 @@ public:
 	RESULT UpdateTextBox(int chkey);
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
-
-	//temp
-	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
 
 private:
 	// layout variables
@@ -160,10 +156,6 @@ private:
 	float m_animationOffsetHeight = ANIMATION_OFFSET_HEIGHT;
 
 	float m_ambientIntensity = AMBIENT_INTENSITY;
-
-	// objects
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
 
 	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
@@ -195,6 +187,9 @@ private:
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
+
+	DreamUserHandle *m_pUserHandle = nullptr;
+	UID m_userAppUID;
 };
 
 #endif // ! UI_KEYBOARD_H_

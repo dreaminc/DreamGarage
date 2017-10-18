@@ -577,6 +577,9 @@ RESULT DreamOS::InitializeDreamUser() {
 	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
 	CN(m_pDreamUser);
 
+	CR(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)));
+	CR(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)));
+
 Error:
 	return r;
 }

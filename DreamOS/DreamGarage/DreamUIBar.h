@@ -25,6 +25,8 @@ class EnvironmentControllerProxy;
 class HTTPControllerProxy;
 class UserControllerProxy;
 
+class DreamUserHandle;
+
 class font;
 class texture;
 class UIButton;
@@ -84,9 +86,6 @@ public:
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
-	UIMallet* GetRightMallet();
-	UIMallet* GetLeftMallet();
-
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
@@ -129,10 +128,6 @@ private:
 	std::shared_ptr<UIView> m_pView; // not used for anything yet, but would be used for other UI elements
 	std::shared_ptr<UIScrollView> m_pScrollView;
 
-	//TODO: Mallets should probably become a system app, like keyboard
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
-
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
@@ -172,6 +167,9 @@ private:
 
 	UID m_keyboardUID;
 	UID m_browserUID;
+	UID m_userUID;
+
+	DreamUserHandle *m_pUserHandle = nullptr;
 };
 
 

@@ -69,6 +69,11 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
+
+	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+	CB(userUIDs.size() == 1);
+	m_userAppUID = userUIDs[0];
+
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
@@ -85,13 +90,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
 	m_pHeaderContainer = GetComposite()->AddComposite();
-
-	//TODO: should not need defaults here anymore
-	m_pLeftMallet = new UIMallet(GetDOS());
-	CN(m_pLeftMallet);
-
-	m_pRightMallet = new UIMallet(GetDOS());
-	CN(m_pRightMallet);
 
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
@@ -288,31 +286,21 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	// skip keyboard interaction if not visible
 	CBR((IsVisible()), R_SKIPPED);
+	CBR(m_pUserHandle != nullptr, R_SKIPPED);
+	//CBR(m_pUserHandle != nullptr && m_pUserHandle->GetAppState(), R_SKIPPED);
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
 	CN(pProxy);
 
-	// Update Mallet Positions
-	hand *pHand = pDOS->GetHand(HAND_TYPE::HAND_LEFT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	pHand = pDOS->GetHand(HAND_TYPE::HAND_RIGHT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
-
-	// Update Keys
+	// Update Keys if the app is active
 	int i = 0;
-	for (auto &mallet : { m_pLeftMallet, m_pRightMallet })
+	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	CNR(pLMallet, R_SKIPPED);
+	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	CNR(pRMallet, R_SKIPPED);
+
+	for (auto &mallet : { pLMallet, pRMallet })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
 		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
@@ -347,7 +335,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		auto key = keyCollisions[0];
 		point ptPosition = key->m_pQuad->GetPosition();
 		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
-		key->m_pQuad->SetPosition(point(ptPosition.x(), y - m_pLeftMallet->GetRadius(), ptPosition.z()));
+		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLMallet->GetRadius(), ptPosition.z()));
 	}
 
 
@@ -363,7 +351,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
 				controllerType = (ControllerType)(j);
-				pMallet = (j == 0) ? m_pLeftMallet : m_pRightMallet;
+				pMallet = (j == 0) ? pLMallet : pRMallet;
 			}
 		}
 
@@ -438,6 +426,9 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 
 RESULT UIKeyboard::ShowKeyboard() {
 
+	//Capture user app
+	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
@@ -454,8 +445,10 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		m_pLeftMallet->Show();
-		m_pRightMallet->Show();
+		CN(m_pUserHandle);
+//		CB(m_pUserHandle->GetAppState());
+		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
+		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
 	Error:
 		return r;
 	};
@@ -478,25 +471,32 @@ RESULT UIKeyboard::ShowKeyboard() {
 
 RESULT UIKeyboard::HideKeyboard() {
 
+	RESULT r = R_PASS;
+
 	auto fnCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
-		m_pLeftMallet->Hide();
-		m_pRightMallet->Hide();
-
 		// full press of key that clears whole string
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 0));
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 
+
 	Error:
 		return r;
 	};
 
 	DimObj *pObj = GetComposite();
+
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Hide());
+	CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Hide());
+
+	CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userAppUID, this));
+
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
@@ -510,7 +510,8 @@ RESULT UIKeyboard::HideKeyboard() {
 		this
 	);
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT UIKeyboard::HideSurface() {
@@ -617,27 +618,6 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	
 Error:
 	return r;
-}
-
-RESULT UIKeyboard::SetMallets(UIMallet *leftMallet, UIMallet *rightMallet) {
-	RESULT r = R_PASS;
-
-	CN(leftMallet);
-	m_pLeftMallet = leftMallet;
-
-	CN(rightMallet);
-	m_pRightMallet = rightMallet;
-
-Error:
-	return R_PASS;
-}
-
-UIMallet* UIKeyboard::GetRightMallet() {
-	return m_pRightMallet;
-}
-
-UIMallet* UIKeyboard::GetLeftMallet() {
-	return m_pLeftMallet;
 }
 
 RESULT UIKeyboard::UpdateTextBox(int chkey) {

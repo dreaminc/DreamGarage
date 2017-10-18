@@ -303,8 +303,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
 	// UIKeyboard App
-	CR(InitializeKeyboard());
 	CR(InitializeDreamUser());
+	CR(InitializeKeyboard());
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);

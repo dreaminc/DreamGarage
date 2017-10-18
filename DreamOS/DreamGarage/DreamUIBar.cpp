@@ -58,12 +58,16 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
+	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
 
 	CB(keyUIDs.size() == 1);
 	m_keyboardUID = keyUIDs[0];
 
 	CB(browserUIDs.size() == 1);
 	m_browserUID = browserUIDs[0];
+
+	CB(userUIDs.size() == 1);
+	m_userUID = userUIDs[0];
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
@@ -83,15 +87,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pScrollView = m_pView->AddUIScrollView();
 	//m_pScrollView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pScrollView);
-
-	m_pLeftMallet = new UIMallet(GetDOS());
-	CN(m_pLeftMallet);
-
-	m_pRightMallet = new UIMallet(GetDOS());
-	CN(m_pRightMallet);
-
-	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
@@ -181,6 +176,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			pKeyboardHandle->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 		}
 		else if (pKeyboardHandle->IsVisible()) {
+			//This also releases the keyboard's control of the User app
 			pKeyboardHandle->Hide();
 		}
 
@@ -211,6 +207,12 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 
 	if (m_pathStack.empty()) {
+
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle);
+		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
+		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
+
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
@@ -228,6 +230,12 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pathStack.pop();
 
 		if (!m_pathStack.empty()) {
+
+			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+			CN(m_pUserHandle);
+			CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
+			CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
+
 			auto pNode = m_pathStack.top();
 			if (pNode->GetTitle() == "Share") {
 				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
@@ -245,6 +253,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 		}
 		else {
+			//Hide app also releases control of the user app 
 			CR(HideApp());
 		}
 	}
@@ -260,9 +269,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
-
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 	CBR(pSelected, R_OBJECT_NOT_FOUND);
@@ -274,17 +280,27 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	CBR(m_menuState == MenuState::NONE, R_PASS);
 
+	CNR(m_pUserHandle, R_SKIPPED);
+	auto pLeftMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	auto pRightMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	CN(pLeftMallet);
+	CN(pRightMallet);
+
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
+
 	//hack - need to make sure the root node is added to the path
 	// even though it is not selected through this method
 	// ideally, some kind of path is managed in the cloud instead
 	if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 
+	//TODO: potentially move this to user app
 	auto pMalletHead = pSelected->GetInteractionObject();
 	if (pMalletHead != nullptr) {
-		if (pMalletHead == m_pLeftMallet->GetMalletHead()) {
+		if (pMalletHead == pLeftMallet->GetMalletHead()) {
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
-		else if (pMalletHead == m_pRightMallet->GetMalletHead()) {
+		else if (pMalletHead == pRightMallet->GetMalletHead()) {
 			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
 	}
@@ -319,8 +335,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
-				m_pLeftMallet->Hide();
-				m_pRightMallet->Hide();
+				pLeftMallet->Hide();
+				pRightMallet->Hide();
+				CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userUID, this));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -330,6 +347,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
+
+				CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userUID, this));
 
 				{
 					auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
@@ -384,8 +403,6 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
 
-	m_pLeftMallet->Show();
-	m_pRightMallet->Show();
 	m_menuState = MenuState::ANIMATING;
 Error:
 	return r;
@@ -398,23 +415,6 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Copy into temp vector
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
 	m_downloadQueue.clear();
-
-	RotationMatrix qOffset = RotationMatrix();
-	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
 	CR(m_pScrollView->Update());
 
@@ -528,8 +528,7 @@ RESULT DreamUIBar::HideApp() {
 
 	composite *pComposite = m_pScrollView.get();
 	m_menuState = MenuState::ANIMATING;
-	m_pLeftMallet->Hide();
-	m_pRightMallet->Hide();
+	CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userUID, this));
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -687,12 +686,3 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 DreamAppHandle* DreamUIBar::GetAppHandle() {
 	return (DreamAppHandle*)(this);
 }
-
-UIMallet* DreamUIBar::GetRightMallet() {
-	return m_pRightMallet;
-}
-
-UIMallet* DreamUIBar::GetLeftMallet() {
-	return m_pLeftMallet;
-}
-

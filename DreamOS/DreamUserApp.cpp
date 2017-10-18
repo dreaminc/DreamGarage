@@ -1,6 +1,18 @@
 #include "DreamUserApp.h"
 #include "DreamOS.h"
 
+#include "UI/UIMallet.h"
+
+UIMallet *DreamUserHandle::RequestMallet(HAND_TYPE type) {
+	RESULT r = R_PASS;
+
+	CB(GetAppState());
+
+	return GetMallet(type);
+Error:
+	return nullptr;
+}
+
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -20,11 +32,23 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	GetComposite()->InitializeOBB();
 
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
+	auto pDreamOS = GetDOS();
 
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
+	pDreamOS->AddObjectToInteractionGraph(GetComposite());
+
+	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
+	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
+
+	// Initialize mallets
+	m_pLeftMallet = new UIMallet(pDreamOS);
+	CN(m_pLeftMallet);
+
+	m_pRightMallet = new UIMallet(pDreamOS);
+	CN(m_pRightMallet);
+
+	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
+	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 Error:
 	return r;
@@ -48,8 +72,14 @@ Error:
 	return r;
 }
 
+DreamAppHandle* DreamUserApp::GetAppHandle() {
+	return (DreamUserHandle*)(this);
+}
+
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
+
+	RotationMatrix qOffset; // mallet positioning
 
 	//CR(r);
 	auto pCameraNode = GetDOS()->GetCameraNode();
@@ -74,6 +104,18 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 
+	// Update Mallet Positions
+	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
+
+	if (m_pLeftMallet)
+		m_pLeftMallet->GetMalletHead()->MoveTo(m_pLeftHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
+
+	qOffset = RotationMatrix();
+	qOffset.SetQuaternionRotationMatrix(m_pRightHand->GetOrientation());
+
+	if (m_pRightMallet)
+		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
+
 Error:
 	return r;
 }
@@ -87,4 +129,27 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 Error:
 	return r;
+}
+
+RESULT DreamUserApp::SetHand(hand *pHand) {
+	RESULT r = R_PASS;
+	if (pHand->GetHandState().handType == HAND_TYPE::HAND_LEFT) {
+		m_pLeftHand = pHand;
+	}
+	else if (pHand->GetHandState().handType == HAND_TYPE::HAND_RIGHT) {
+		m_pRightHand = pHand;
+	}
+	return R_PASS;
+}
+
+UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		return m_pLeftMallet;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		return m_pRightMallet;
+	}
+
+	return nullptr;
 }
