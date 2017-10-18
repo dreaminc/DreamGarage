@@ -31,10 +31,10 @@ class DreamBrowserHandle;
 
 class DreamControlViewHandle : public DreamAppHandle {
 public:
-	RESULT SendTextureToControlView(std::shared_ptr<texture> pBrowserTexture);
+	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
 
 private:
-	virtual RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
+	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
 };
 
 class DreamControlView : public DreamApp<DreamControlView>, 
@@ -61,7 +61,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) override;
+	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
 	virtual DreamAppHandle* GetAppHandle() override;
 
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;

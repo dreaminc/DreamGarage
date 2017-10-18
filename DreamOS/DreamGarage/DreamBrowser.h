@@ -38,7 +38,7 @@ public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
 	
-	RESULT ScrollToPoint(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
+	RESULT ScrollTo(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
 	RESULT ScrollToX(int pxXScroll);
 	RESULT ScrollToY(int pyYScroll);
 	
@@ -190,8 +190,8 @@ private:
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 	bool m_fBrowserActive = false;
 
-	int m_BrowserWidth = 1366;
-	int m_BrowserHeight = 768;
+	int m_browserWidth = 1366;
+	int m_browserHeight = 768;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;

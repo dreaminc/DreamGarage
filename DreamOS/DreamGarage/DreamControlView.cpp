@@ -8,11 +8,11 @@
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
 
-RESULT DreamControlViewHandle::SendTextureToControlView(std::shared_ptr<texture> pBrowserTexture) {
-	RESULT r = R_PASS;
+RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
+	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
 	CB(GetAppState());
 
-	return SetControlViewTexture(pBrowserTexture);
+	return SetViewQuadTexture(pBrowserTexture);
 
 Error:
 	return r;
@@ -76,22 +76,22 @@ RESULT DreamControlView::Update(void *pContext) {
 
 	vector vLook = GetDOS()->GetCamera()->GetLookVector();
 
-	RotationMatrix qOffset = RotationMatrix();
+	RotationMatrix rotmat = RotationMatrix();
 	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+	rotmat.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
+		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pLeftMallet->GetHeadOffset()));
 
 	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+	rotmat = RotationMatrix();
+	rotmat.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
+		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pRightMallet->GetHeadOffset()));
 
 	switch (m_viewState) {
 
@@ -162,7 +162,7 @@ DreamAppHandle* DreamControlView::GetAppHandle() {
 	return (DreamControlViewHandle*)(this);
 }
 
-RESULT DreamControlView::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
+RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
 	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
 	return R_PASS;
 }
@@ -182,7 +182,7 @@ RESULT DreamControlView::Show() {
 	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
 
 	SetSharedViewContext();
-	UpdateCompositeWithCameraLook(CONTROL_VIEW_DEPTH, CONTROL_VIEW_HEIGHT);	//depth, height
+	UpdateCompositeWithCameraLook(CONTROL_VIEW_DEPTH, CONTROL_VIEW_HEIGHT);	
 
 	m_ptVisiblePosition = GetComposite()->GetPosition();
 	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
@@ -272,11 +272,11 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
 
-	float posX = ptAdjustedContact.x() / (width / 2.0f);	// flip it
+	float posX = ptAdjustedContact.x() / (width / 2.0f);	
 	float posY = ptAdjustedContact.z() / (height / 2.0f);
 	//float posZ = ptAdjustedContact.z();	// 3D browser when
 
-	posX = (posX + 1.0f) / 2.0f;
+	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
 	
 	ptRelative.x = posX * m_pBrowserHandle->GetWidthOfBrowser();
