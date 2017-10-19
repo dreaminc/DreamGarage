@@ -18,6 +18,36 @@ Error:
 	return r;
 }
 
+RESULT DreamControlViewHandle::ShowApp() {
+	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
+
+	CB(GetAppState());
+	CR(Show());
+
+Error:
+	return r;
+}
+
+RESULT DreamControlViewHandle::HideApp() {
+	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
+
+	CB(GetAppState());
+	CR(Hide());
+
+Error:
+	return r;
+}
+
+bool DreamControlViewHandle::IsAppVisible() {
+	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
+
+	CB(GetAppState());
+	return IsVisible();
+
+Error:
+	return false;
+}
+
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
 {
@@ -27,6 +57,8 @@ DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 RESULT DreamControlView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
+
+	SetAppName("DreamControlView");
 	
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
@@ -46,7 +78,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_hideThreshold = 0.20f;
 	m_showThreshold = -0.35f;
-
+/*
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
 	m_pLeftMallet->Show();
@@ -54,9 +86,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
 	m_pRightMallet->Show();
+	//*/
 
-	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
+//	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
+//	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
@@ -81,6 +114,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 	rotmat.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
+/*
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pLeftMallet->GetHeadOffset()));
 
@@ -92,7 +126,7 @@ RESULT DreamControlView::Update(void *pContext) {
 
 	if (m_pRightMallet)
 		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pRightMallet->GetHeadOffset()));
-
+/*
 	switch (m_viewState) {
 
 	case State::VISIBLE: {
@@ -106,6 +140,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	} break;
 	
 	}
+//*/
 
 Error:
 	return r;
@@ -113,8 +148,7 @@ Error:
 
 RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
-	if (pInteractionEvent->m_pObject == m_pViewQuad.get() &&
-		(pInteractionEvent->m_pInteractionObject == m_pLeftMallet->GetMalletHead() || pInteractionEvent->m_pInteractionObject == m_pRightMallet->GetMalletHead())) {
+	if (pInteractionEvent->m_pObject == m_pViewQuad.get()) {
 		switch (pInteractionEvent->m_eventType) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
@@ -246,6 +280,10 @@ RESULT DreamControlView::Hide() {
 
 Error:
 	return r;
+}
+
+bool DreamControlView::IsVisible() {
+	return m_viewState == State::SHOW || m_viewState == State::VISIBLE;
 }
 
 ///*

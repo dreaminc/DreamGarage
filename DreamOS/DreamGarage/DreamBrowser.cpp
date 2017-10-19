@@ -1,4 +1,5 @@
 #include "DreamBrowser.h"
+#include "DreamControlView.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -685,6 +686,18 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 					CR(GetDOS()->ReleaseApp(pKeyboardHandle, keyUID, this));
 
 				}
+//*
+				auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
+				CB(viewUIDs.size() == 1);
+				{
+					UID viewUID = viewUIDs[0];
+					auto pControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(viewUID, this));
+					CN(pControlViewHandle);
+
+					CR(pControlViewHandle->ShowApp());
+					CR(GetDOS()->ReleaseApp(pControlViewHandle, viewUID, this));
+				}
+				//*/
 
 				std::string strTitle = "website";
 				std::string strPath = strURL;
