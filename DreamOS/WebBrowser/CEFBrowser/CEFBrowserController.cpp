@@ -1,7 +1,9 @@
 #include "CefBrowserController.h"
 //#include "easylogging++.h"
 
+#include "include/cef_base.h"
 #include "include/cef_browser.h"
+#include "include/wrapper/cef_helpers.h"
 
 #include <sstream>
 #include <string>
@@ -384,6 +386,61 @@ CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 }
 
 
-int CEFBrowserController::GetFrameCount() {
-	m_pCEFBrowser->GetFrameCount();
+size_t CEFBrowserController::GetFrameCount() {
+	return m_pCEFBrowser->GetFrameCount();
+}
+
+// TODO: Put this somewhere better
+class CEFDOMVisitor : public CefDOMVisitor {
+public:
+	CEFDOMVisitor(std::shared_ptr<CEFBrowserController> pParentController) :
+		m_pParentCEFBrowserController(pParentController)
+	{
+		// empty
+	}
+
+	virtual void Visit(CefRefPtr<CefDOMDocument> pCefDOMDocument) override {
+		RESULT r = R_PASS;
+
+		CN(pCefDOMDocument);
+		
+		{
+			auto pCefDOMNode = pCefDOMDocument->GetFocusedNode();
+			CN(pCefDOMNode);
+		}
+
+		// catch it
+
+	Error:
+		return;
+	}
+
+	IMPLEMENT_REFCOUNTING(CEFDOMVisitor);
+
+private:
+	std::shared_ptr<CEFBrowserController> m_pParentCEFBrowserController = nullptr;
+};
+
+std::shared_ptr<DOMNode> CEFBrowserController::GetFocusedNode() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<DOMNode> pDOMNode = nullptr;
+
+	CN(m_pCEFBrowser);
+
+	{
+		auto pCEFFrame = m_pCEFBrowser->GetFocusedFrame();
+		CN(pCEFFrame);
+
+		// Create a visitor
+		CefRefPtr<CEFDOMVisitor> pCEFDOMVisitor = new CEFDOMVisitor(std::shared_ptr<CEFBrowserController>(this));
+		CN(pCEFDOMVisitor);
+
+		CEF_REQUIRE_RENDERER_THREAD();
+
+		pCEFFrame->VisitDOM(pCEFDOMVisitor);
+	}
+
+Error:
+	return nullptr;
 }

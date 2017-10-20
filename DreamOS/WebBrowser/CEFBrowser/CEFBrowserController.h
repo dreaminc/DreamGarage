@@ -80,10 +80,10 @@ public:
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 
 	// Frames
-	virtual int GetFrameCount() override;
+	virtual size_t GetFrameCount() override;
 
 	// Get Focused DOM element
-
+	virtual std::shared_ptr<DOMNode> GetFocusedNode() override;
 
 private:
 	// browser logical size

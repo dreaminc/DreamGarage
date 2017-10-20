@@ -862,7 +862,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamAppHandle.cpp">
       <Filter>DreamOS</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
@@ -871,6 +871,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp">
       <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMDocument.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1942,7 +1948,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamAppHandle.h">
       <Filter>DreamOS</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
@@ -1951,6 +1957,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h">
       <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\DOMNode.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\DOMDocument.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMDocument.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

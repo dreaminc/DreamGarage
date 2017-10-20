@@ -11,6 +11,9 @@
 
 #include <vector>
 
+class DOMNode;
+class DOMDocument;
+
 struct WebBrowserPoint {
 	int x;
 	int y;
@@ -93,8 +96,10 @@ public:
 
 
 	// frames
-	virtual int GetFrameCount() = 0;
+	virtual size_t GetFrameCount() = 0;
 
+	// DOM
+	virtual std::shared_ptr<DOMNode> GetFocusedNode() = 0;
 
 	std::string GetID() {
 		return m_strID;
