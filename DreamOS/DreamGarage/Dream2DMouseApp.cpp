@@ -19,10 +19,7 @@ RESULT Dream2DMouseApp::InitializeApp(void *pContext) {
 	SetAppName("Dream2DMouseApp");
 	SetAppDescription("A Dream App for 2D use of the mouse");
 
-	// Subscribers (children)
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	//}
+	CR(r);
 
 Error:
 	return r;
@@ -55,7 +52,6 @@ RESULT Dream2DMouseApp::Update(void *pContext) {
 
 		CR(GetDOS()->AddInteractionObject(m_pMouseRay));
 	}
-
 
 	if (m_pMouseRay != nullptr) {
 		ray rMouseCast;

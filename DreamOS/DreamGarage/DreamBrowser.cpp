@@ -418,11 +418,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-	// Subscribers (children)
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	}
-
 	// Controller
 	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
 	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
@@ -486,6 +481,17 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//*/
 
 	GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
+
+	// Subscribers (children)
+
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_ENDED, this));
+
+	// Mouse related
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_UP, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_WHEEL, this));
 
 Error:
 	return r;
@@ -561,9 +567,9 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	bool fUpdateMouse = false;
 
-	//m_pTestSphereAbsolute->SetPosition(pEvent->m_ptContact[0]);
+	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
+
 	switch (pEvent->m_eventType) {
-	/*
 		case ELEMENT_INTERSECT_BEGAN: {
 			if (m_pBrowserQuad->IsVisible()) {
 				m_pPointerCursor->SetVisible(true);
@@ -646,7 +652,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
-		//*/
+
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
 		// TODO: haven't seen any issues with KEY_UP being a no-op
@@ -688,7 +694,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 		} break;
 	}
-/*
+	
 	// First point of contact
 	if (fUpdateMouse) {
 		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
@@ -700,7 +706,6 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
-	//*/
 
 Error:
 	return r;
