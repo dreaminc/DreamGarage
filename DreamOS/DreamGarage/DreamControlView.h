@@ -105,9 +105,6 @@ private:
 
 	State m_viewState;
 
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
-
 	float m_hiddenScale; 
 	float m_visibleScale;
 

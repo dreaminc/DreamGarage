@@ -78,18 +78,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_hideThreshold = 0.20f;
 	m_showThreshold = -0.35f;
-/*
-	m_pLeftMallet = new UIMallet(GetDOS());
-	CN(m_pLeftMallet);
-	m_pLeftMallet->Show();
-
-	m_pRightMallet = new UIMallet(GetDOS());
-	CN(m_pRightMallet);
-	m_pRightMallet->Show();
-	//*/
-
-//	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-//	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
@@ -105,44 +93,7 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
-	DreamOS *pDreamOS = GetDOS();
 
-	vector vLook = GetDOS()->GetCamera()->GetLookVector();
-
-	RotationMatrix rotmat = RotationMatrix();
-	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-	rotmat.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-/*
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pLeftMallet->GetHeadOffset()));
-
-	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-
-	rotmat = RotationMatrix();
-	rotmat.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(rotmat * m_pRightMallet->GetHeadOffset()));
-/*
-	switch (m_viewState) {
-
-	case State::VISIBLE: {
-		if (vLook.y() > m_hideThreshold)
-			Hide();
-	} break;
-		
-	case State::HIDDEN: {
-		if (vLook.y() < m_showThreshold)
-			Show();
-	} break;
-	
-	}
-//*/
-
-Error:
 	return r;
 }
 
