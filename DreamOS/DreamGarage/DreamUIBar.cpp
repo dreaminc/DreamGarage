@@ -12,6 +12,7 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
+#include "DreamControlView.h"
 
 #include "DreamBrowser.h"
 
@@ -184,6 +185,22 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		}
 
 		CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+	}
+
+	{
+		//*
+		auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
+		CB(viewUIDs.size() == 1);
+		{
+			UID viewUID = viewUIDs[0];
+			auto pControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(viewUID, this));
+			//CN(pControlViewHandle);
+			if (pControlViewHandle && pControlViewHandle->IsAppVisible()) {
+				CR(pControlViewHandle->HideApp());
+			}
+			CR(GetDOS()->ReleaseApp(pControlViewHandle, viewUID, this));
+		}
+		//*/
 	}
 
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);

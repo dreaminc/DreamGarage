@@ -32,9 +32,15 @@ class DreamBrowserHandle;
 class DreamControlViewHandle : public DreamAppHandle {
 public:
 	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
+	RESULT ShowApp();
+	RESULT HideApp();
+	bool IsAppVisible();
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
+	virtual RESULT Show() = 0;
+	virtual RESULT Hide() = 0;
+	virtual bool IsVisible() = 0;
 };
 
 class DreamControlView : public DreamApp<DreamControlView>, 
@@ -72,9 +78,11 @@ protected:
 
 // Animations
 private:
-	// Called based entirely on head orientation.  Show is called if the user is 'looking down'
-	RESULT Show();
-	RESULT Hide();
+
+	virtual RESULT Show() override;
+	virtual RESULT Hide() override;
+
+	virtual bool IsVisible() override;
 
 // View Context
 public:
@@ -96,9 +104,6 @@ private:
 	UID m_browserUID;
 
 	State m_viewState;
-
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
