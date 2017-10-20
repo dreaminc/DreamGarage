@@ -512,23 +512,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 		SetVisible(false);
 	}
 
-	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
-
-	if(m_fMouseEnabled) {
-		ray rMouseCast;
-		GetDOS()->GetMouseRay(rCast);
-
-		CollisionManifold manifold = m_pBrowserQuad->Collide(rCast);
-
-		if (manifold.NumContacts() > 0) {
-			m_pPointerCursor->SetVisible(true);
-			m_pPointerCursor->SetOrigin(manifold.GetContactPoint(0).GetPoint());
-		}
-		else {
-			m_pPointerCursor->SetVisible(false);
-		}
-	}
-
 Error:
 	return r;
 }
@@ -819,11 +802,6 @@ RESULT DreamBrowser::SetVisible(bool fVisible) {
 	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
 	return r;
-}
-
-RESULT DreamBrowser::SetMouseEnabled(bool fMouseEnabled) {
-	m_fMouseEnabled = fMouseEnabled;
-	return R_PASS;
 }
 
 RESULT DreamBrowser::SetBrowserScope(std::string strScope) {

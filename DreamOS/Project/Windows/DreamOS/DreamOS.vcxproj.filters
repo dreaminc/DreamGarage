@@ -878,6 +878,9 @@
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1969,6 +1972,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

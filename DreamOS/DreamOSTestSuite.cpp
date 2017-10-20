@@ -10,7 +10,9 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
+
 #include "DreamGarage\DreamBrowser.h"
+#include "DreamGarage\Dream2DMouseApp.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -212,6 +214,10 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		CR(SetupDreamAppPipeline());
 
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the 2D Mouse App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		CNM(pDreamBrowser, "Failed to create dream 2D mouse app");
 
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
