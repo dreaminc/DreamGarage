@@ -52,6 +52,8 @@ public:
 	RESULT ScrollYByDiff(int pxYDiff);
 
 	RESULT SendClickToBrowserAtPoint(WebBrowserPoint ptContact);
+
+	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	
 	int GetScrollPixelsX();
 	int GetScrollPixelsY();
@@ -78,6 +80,8 @@ private:
 	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) = 0;
 	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) = 0;
 	
+	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) = 0;
+
 	virtual RESULT ClickBrowser(WebBrowserPoint ptContact) = 0;
 
 	virtual int GetScrollX() = 0;
@@ -133,6 +137,8 @@ public:
 
 	virtual int GetPageHeight() override;	// get page context
 	virtual int GetPageWidth() override;
+
+	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown);
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;

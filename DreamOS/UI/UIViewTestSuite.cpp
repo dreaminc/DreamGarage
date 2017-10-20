@@ -1031,6 +1031,8 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::string strURL = "http://www.youtube.com";
 
+		std::shared_ptr<UIKeyboard> pUIKeyboard = nullptr;
+
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
 		CN(m_pDreamOS);
@@ -1041,8 +1043,11 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 			pDreamBrowser->SetDiagonalSize(10.0f);
 			pDreamBrowser->SetURI(strURL);
 
-			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+			pUIKeyboard->SetVisible(true);
 
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			
 		}
 
 	Error:

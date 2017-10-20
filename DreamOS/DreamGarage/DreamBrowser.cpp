@@ -76,6 +76,15 @@ RESULT DreamBrowserHandle::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetBrowserPath(strPath));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SendKeyCharacter(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SendKeyPressed(chKey, fkeyDown));
 Error:
 	return r;
 }
@@ -326,6 +335,13 @@ int DreamBrowser::GetBrowserHeight() {
 
 int DreamBrowser::GetBrowserWidth() {
 	return m_browserWidth;
+}
+
+RESULT DreamBrowser::SendKeyPressed(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
@@ -930,7 +946,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
-			std::string strURL = m_strEntered.GetString();
+			std::string strURL = "";
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
@@ -940,11 +956,11 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 				std::string strScope = m_strScope;
 				std::string strTitle = "website";
-				std::string strPath = strURL;
+				//std::string strPath = strURL;
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+				//CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
 
 			}
 

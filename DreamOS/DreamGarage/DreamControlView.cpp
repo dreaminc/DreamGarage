@@ -66,6 +66,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 	CN(m_pUserHandle);
 
+	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+	CB(keyUIDs.size() == 1);
+	m_keyboardUID = keyUIDs[0];
+
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
 
@@ -73,6 +77,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
 	CN(m_pViewQuad);
 
+	
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
@@ -86,8 +91,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_showThreshold = -0.35f;
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
+	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
 
 Error:
 	return r;
@@ -106,7 +113,7 @@ RESULT DreamControlView::Update(void *pContext) {
 RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
 	if (pInteractionEvent->m_pObject == m_pViewQuad.get()) {
-		switch (pInteractionEvent->m_eventType) {
+	switch (pInteractionEvent->m_eventType) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
@@ -114,9 +121,24 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
-
+			
+			//if (getfocusedframe == textbox)
+			if (m_viewState != State::TYPING) {
+				auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+				CN(pKeyboardHandle);
+				pKeyboardHandle->Show();
+				CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+			}
+				HandleTextBox();
+				// 
 		} break;
 		}
+	}
+	if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
+		char chKey = (char)(pInteractionEvent->m_value);
+		CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+		m_pBrowserHandle->SendKeyCharacter(chKey, true);
 	}
 Error:
 	return r;
@@ -139,6 +161,11 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 
 			m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff);
 
+		} break;
+		case SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN: {
+			m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
+			m_pViewQuad->SetPosition(0.0f, 0.0f, 0.0f);
+			m_viewState = State::SHOW;
 		} break;
 		}
 	}
@@ -190,7 +217,8 @@ RESULT DreamControlView::Show() {
 
 	m_ptVisiblePosition = GetComposite()->GetPosition();
 	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
-
+	// TODO this should be calculated based on ptContact and headset position
+	
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
 		SetViewState(State::SHOW);
@@ -254,6 +282,40 @@ Error:
 
 bool DreamControlView::IsVisible() {
 	return m_viewState == State::SHOW || m_viewState == State::VISIBLE;
+}
+
+RESULT DreamControlView::HandleTextBox() {
+	RESULT r = R_PASS;
+
+	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f));
+	m_ptTypingPosition = point(0.0f, 0.25f, -0.5f);
+
+	auto fnStartCallback = [&](void *pContext) {
+		SetViewState(State::SHOW);	// might want to just make an "ANIMATING" state
+
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		SetViewState(State::TYPING);
+		return R_PASS;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pViewQuad.get(),
+		m_ptTypingPosition,
+		m_pViewQuad->GetOrientation(),
+		vector(m_visibleScale, m_visibleScale, m_visibleScale),
+		0.1f,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
 }
 
 ///*

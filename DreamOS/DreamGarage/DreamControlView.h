@@ -21,6 +21,7 @@
 #define CONTROL_VIEWQUAD_ANGLE (M_PI / 3.0f)
 #define CONTROL_VIEW_DEPTH 0.6f
 #define CONTROL_VIEW_HEIGHT -0.20f
+#define TYPING_ROTATION (M_PI / 2.0f)
 
 class quad; 
 class sphere;
@@ -60,7 +61,8 @@ public:
 		HIDDEN,
 		HIDE,
 		VISIBLE,
-		SHOW
+		SHOW,
+		TYPING
 	};
 
 // DreamApp
@@ -97,6 +99,8 @@ public:
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
 
+	RESULT HandleTextBox();
+
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 private:
@@ -111,6 +115,7 @@ private:
 
 	UID m_browserUID;
 	UID m_userUID;
+	UID m_keyboardUID;
 
 	State m_viewState;
 
@@ -119,7 +124,7 @@ private:
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
-
+	point m_ptTypingPosition;
 	float m_showThreshold;
 	float m_hideThreshold;
 };
