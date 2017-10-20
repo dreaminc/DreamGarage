@@ -79,6 +79,12 @@ public:
 
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 
+	// Frames
+	virtual int GetFrameCount() override;
+
+	// Get Focused DOM element
+
+
 private:
 	// browser logical size
 	int m_browserWidth = 0;

@@ -159,6 +159,8 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
+	RESULT SetMouseEnabled(bool fMouseEnabled);
+
 	virtual RESULT SetBrowserScope(std::string strScope) override;
 	virtual RESULT SetBrowserPath(std::string strPath) override;
 
@@ -200,6 +202,8 @@ private:
 	int m_pxYPosition = 0;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
+
+	bool m_fMouseEnabled = false;
 
 	TextEntryString m_strEntered;
 

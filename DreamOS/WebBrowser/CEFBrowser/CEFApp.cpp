@@ -140,7 +140,7 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;
 
-	// Set up the promise (Will be set in OnBrowserCreated
+	// Set up the promise (Will be set in OnBrowserCreated)
 	
 	m_promiseCEFBrowserController = std::promise<std::shared_ptr<CEFBrowserController>>();
 	std::future<std::shared_ptr<CEFBrowserController>> futureCEFBrowserController = m_promiseCEFBrowserController.get_future();

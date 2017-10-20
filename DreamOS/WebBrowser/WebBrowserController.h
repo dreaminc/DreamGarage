@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/CEFBrowser/WebBrowserController.h
+// DreamOS/WebBrowser/WebBrowser.h
 
 #include <memory>
 #include <functional>
@@ -90,6 +90,10 @@ public:
 	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;
 
 	virtual RESULT Shutdown() = 0;
+
+
+	// frames
+	virtual int GetFrameCount() = 0;
 
 
 	std::string GetID() {

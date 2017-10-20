@@ -25,6 +25,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
 	CR(AddTestCaptureApp());
 
 	CR(AddTestUserApp());	
@@ -35,15 +37,13 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamUIBar());
 
-	CR(AddTestDreamBrowser());
-
 	CR(AddTestCaptureApp());
 
 Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::SetupPipeline() {
+RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -55,11 +55,7 @@ RESULT DreamOSTestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -225,6 +221,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetDiagonalSize(10.0f);
+		pDreamBrowser->SetMouseEnabled(true);
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");

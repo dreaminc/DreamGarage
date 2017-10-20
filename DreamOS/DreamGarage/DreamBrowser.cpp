@@ -466,12 +466,13 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
-	/*
-	m_pPointerCursor = GetComposite()->AddModel(L"\\Models\\mouse-cursor\\mouse-cursor.obj",
-												nullptr,
-												point(-0.2f, -0.43f, 0.0f),
-												0.01f,
-												vector(-(float)M_PI_2, 0.0f, 0.0f));
+	///*
+	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
+	CN(m_pPointerCursor);
+
+	m_pPointerCursor->SetPivotPoint(point(-0.2f, -0.43f, 0.0f));
+	m_pPointerCursor->SetScale(0.01f);
+	m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
 	m_pPointerCursor->SetMaterialAmbient(1.0f);
 	m_pPointerCursor->SetVisible(false);
 	//*/
@@ -513,15 +514,20 @@ RESULT DreamBrowser::Update(void *pContext) {
 
 	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
 
-	/*
-	{
+	if(m_fMouseEnabled) {
+		ray rMouseCast;
+		GetDOS()->GetMouseRay(rCast);
+
 		CollisionManifold manifold = m_pBrowserQuad->Collide(rCast);
 
 		if (manifold.NumContacts() > 0) {
+			m_pPointerCursor->SetVisible(true);
 			m_pPointerCursor->SetOrigin(manifold.GetContactPoint(0).GetPoint());
 		}
+		else {
+			m_pPointerCursor->SetVisible(false);
+		}
 	}
-	*/
 
 Error:
 	return r;
@@ -813,6 +819,11 @@ RESULT DreamBrowser::SetVisible(bool fVisible) {
 	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
 	return r;
+}
+
+RESULT DreamBrowser::SetMouseEnabled(bool fMouseEnabled) {
+	m_fMouseEnabled = fMouseEnabled;
+	return R_PASS;
 }
 
 RESULT DreamBrowser::SetBrowserScope(std::string strScope) {

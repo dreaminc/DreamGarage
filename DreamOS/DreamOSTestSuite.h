@@ -27,7 +27,7 @@ public:
 	RESULT AddTestDreamApps();
 	RESULT AddTestUserApp();
 
-	//Isolated Apps
+	// Apps
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestDreamBrowser();
@@ -36,7 +36,7 @@ public:
 	RESULT AddTestCaptureApp();
 
 private:
-	RESULT SetupPipeline();
+	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupDreamAppPipeline();
 
 private:

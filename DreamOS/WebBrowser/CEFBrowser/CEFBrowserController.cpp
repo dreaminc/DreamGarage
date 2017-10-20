@@ -382,3 +382,8 @@ Error:
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
+
+
+int CEFBrowserController::GetFrameCount() {
+	m_pCEFBrowser->GetFrameCount();
+}
