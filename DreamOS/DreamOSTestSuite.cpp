@@ -214,7 +214,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		CR(SetupDreamAppPipeline());
 
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the 2D Mouse App
 		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
@@ -229,8 +229,6 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetDiagonalSize(10.0f);
 
-		//pDreamContentView->SetScreenTexture(L"crate_color.png");
-		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
 
 	Error:

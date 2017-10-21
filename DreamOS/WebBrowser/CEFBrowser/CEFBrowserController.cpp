@@ -4,6 +4,13 @@
 #include "include/cef_base.h"
 #include "include/cef_browser.h"
 #include "include/wrapper/cef_helpers.h"
+#include "include/base/cef_bind.h"
+
+#include "include/cef_browser.h"
+#include "include/cef_app.h"
+
+#include "include/wrapper/cef_closure_task.h"
+#include "include/wrapper/cef_helpers.h"
 
 #include <sstream>
 #include <string>
@@ -421,12 +428,12 @@ private:
 	std::shared_ptr<CEFBrowserController> m_pParentCEFBrowserController = nullptr;
 };
 
-std::shared_ptr<DOMNode> CEFBrowserController::GetFocusedNode() {
+RESULT CEFBrowserController::GetFocusedNode() {
 	RESULT r = R_PASS;
 
+	/*
 	std::shared_ptr<DOMNode> pDOMNode = nullptr;
 
-	CN(m_pCEFBrowser);
 
 	{
 		auto pCEFFrame = m_pCEFBrowser->GetFocusedFrame();
@@ -436,11 +443,27 @@ std::shared_ptr<DOMNode> CEFBrowserController::GetFocusedNode() {
 		CefRefPtr<CEFDOMVisitor> pCEFDOMVisitor = new CEFDOMVisitor(std::shared_ptr<CEFBrowserController>(this));
 		CN(pCEFDOMVisitor);
 
-		CEF_REQUIRE_RENDERER_THREAD();
-
-		pCEFFrame->VisitDOM(pCEFDOMVisitor);
+		// Send task to render thread as needed by VisitDOM
+		CBM((CefPostTask(TID_RENDERER, base::Bind(&CefFrame::VisitDOM, pCEFFrame, pCEFDOMVisitor))), 
+			"Failed to post visit dom to render thread");
 	}
+	*/
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("CEFBrowserController::GetFocusedNode");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefMessageArgs = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	cefMessageArgs->SetString(0, "TestString");
+	cefMessageArgs->SetInt(0, 55);
+
+	// Send the process message to the render process.
+	// Use PID_BROWSER instead when sending a message to the browser process.
+	CN(m_pCEFBrowser);
+	CBM((m_pCEFBrowser->SendProcessMessage(PID_RENDERER, pCEFProcessMessage)), "Failed to send browser process a message");
 
 Error:
-	return nullptr;
+	return r;
 }

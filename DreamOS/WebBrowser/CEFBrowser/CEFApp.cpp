@@ -113,6 +113,18 @@ Error:
 	return;
 }
 
+// This handles IPC between render and browser processes 
+bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProcessId cefSourceProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
+	if (cefSourceProcessID == PID_BROWSER) {
+
+	}
+	else if (cefSourceProcessID == PID_RENDERER) {
+
+	}
+
+	return false;
+}
+
 RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {
 	RESULT r = R_PASS;
 

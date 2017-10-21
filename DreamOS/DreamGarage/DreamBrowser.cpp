@@ -625,6 +625,11 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+
+			// Determine focused node
+			CR(m_pWebBrowserController->GetFocusedNode());
+			
+
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {

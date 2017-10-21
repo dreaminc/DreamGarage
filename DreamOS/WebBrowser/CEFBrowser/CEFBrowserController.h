@@ -25,6 +25,7 @@
 #undef PLOG
 #endif
 
+#include "include\cef_base.h"
 #include "include/cef_render_handler.h"
 #include "include/cef_load_handler.h"
 
@@ -83,7 +84,33 @@ public:
 	virtual size_t GetFrameCount() override;
 
 	// Get Focused DOM element
-	virtual std::shared_ptr<DOMNode> GetFocusedNode() override;
+	virtual RESULT GetFocusedNode() override;
+
+	/*
+	// Reference Counting for Post Task
+	// *********************************
+public:                                           
+	void AddRef() {
+		ref_count_.AddRef();
+	}
+
+	bool Release() {
+		if (ref_count_.Release()) {
+				delete static_cast<const CEFBrowserController*>(this);
+				return true;                                
+		}                                       
+
+		return false;                                 
+	}              
+
+	bool HasOneRef() {
+		return ref_count_.HasOneRef();                
+	}                                               
+
+private:                                          
+	CefRefCount ref_count_;
+	// *********************************
+	*/
 
 private:
 	// browser logical size

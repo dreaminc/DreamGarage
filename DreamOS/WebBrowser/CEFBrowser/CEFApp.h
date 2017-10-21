@@ -30,7 +30,8 @@ class WebBrowserController;
 class CEFApp : public singleton<CEFApp>, 
 	public CEFHandler::CEFHandlerObserver,
 	public CefApp, 
-	public CefBrowserProcessHandler
+	public CefBrowserProcessHandler,
+	public CefRenderProcessHandler
 {
 public:
 	CEFApp();
@@ -58,10 +59,17 @@ public:
 		return this;
 	}
 
+	virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override {
+		return this;
+	}
+
 	// CefBrowserProcessHandler methods:
 	virtual void OnContextInitialized() override;
 
 	std::shared_ptr<WebBrowserController> CreateBrowser(int width, int height, const std::string& strURL);
+
+	// CefRenderProcessHandler
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 	// CEFAppObserver
 	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
