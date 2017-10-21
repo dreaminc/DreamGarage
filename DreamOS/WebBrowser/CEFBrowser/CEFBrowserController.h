@@ -68,6 +68,7 @@ public:
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward);
 	RESULT OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type);
 	RESULT OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode);
+	RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
 
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
@@ -84,7 +85,7 @@ public:
 	virtual size_t GetFrameCount() override;
 
 	// Get Focused DOM element
-	virtual RESULT GetFocusedNode() override;
+	//virtual RESULT GetFocusedNode() override;
 
 	/*
 	// Reference Counting for Post Task

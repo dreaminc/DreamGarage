@@ -392,11 +392,35 @@ CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
 
+RESULT CEFBrowserController::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	if (pCEFDOMNode != nullptr && pCEFDOMNode->GetType() == DOM_NODE_TYPE_ELEMENT) {
+		DEBUG_LINEOUT("Node %S gained focus tag: %S", pCEFDOMNode->GetName().c_str(), pCEFDOMNode->GetElementTagName().c_str());
+
+		if (pCEFDOMNode->IsEditable()) {
+			// report to browser text focus
+			int a = 5;
+
+			// Kill it
+			return r;
+		}
+	}
+
+	// Not text focus (or otherwise)
+	// Report not text focus change
+
+	CR(r);
+
+Error:
+	return r;
+}
 
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }
 
+/*
 // TODO: Put this somewhere better
 class CEFDOMVisitor : public CefDOMVisitor {
 public:
@@ -428,26 +452,9 @@ private:
 	std::shared_ptr<CEFBrowserController> m_pParentCEFBrowserController = nullptr;
 };
 
+// TODO: Not sure if we need this
 RESULT CEFBrowserController::GetFocusedNode() {
 	RESULT r = R_PASS;
-
-	/*
-	std::shared_ptr<DOMNode> pDOMNode = nullptr;
-
-
-	{
-		auto pCEFFrame = m_pCEFBrowser->GetFocusedFrame();
-		CN(pCEFFrame);
-
-		// Create a visitor
-		CefRefPtr<CEFDOMVisitor> pCEFDOMVisitor = new CEFDOMVisitor(std::shared_ptr<CEFBrowserController>(this));
-		CN(pCEFDOMVisitor);
-
-		// Send task to render thread as needed by VisitDOM
-		CBM((CefPostTask(TID_RENDERER, base::Bind(&CefFrame::VisitDOM, pCEFFrame, pCEFDOMVisitor))), 
-			"Failed to post visit dom to render thread");
-	}
-	*/
 
 	// Create the message object.
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("CEFBrowserController::GetFocusedNode");
@@ -467,3 +474,4 @@ RESULT CEFBrowserController::GetFocusedNode() {
 Error:
 	return r;
 }
+*/

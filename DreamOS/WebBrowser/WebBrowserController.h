@@ -99,7 +99,7 @@ public:
 	virtual size_t GetFrameCount() = 0;
 
 	// DOM
-	virtual RESULT GetFocusedNode() = 0;
+	//virtual RESULT GetFocusedNode() = 0;
 
 	std::string GetID() {
 		return m_strID;

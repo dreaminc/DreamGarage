@@ -115,14 +115,55 @@ Error:
 
 // This handles IPC between render and browser processes 
 bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProcessId cefSourceProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
-	if (cefSourceProcessID == PID_BROWSER) {
+	RESULT r = R_PASS;
 
+	if (cefSourceProcessID == PID_BROWSER) {
+		/*
+		std::shared_ptr<DOMNode> pDOMNode = nullptr;
+
+		auto pCEFFrame = m_pCEFBrowser->GetFocusedFrame();
+		CN(pCEFFrame);
+
+		// Create a visitor
+		CefRefPtr<CEFDOMVisitor> pCEFDOMVisitor = new CEFDOMVisitor(std::shared_ptr<CEFBrowserController>(this));
+		CN(pCEFDOMVisitor);
+
+		// Send task to render thread as needed by VisitDOM
+		CBM((CefPostTask(TID_RENDERER, base::Bind(&CefFrame::VisitDOM, pCEFFrame, pCEFDOMVisitor))), 
+			"Failed to post visit dom to render thread");
+			*/
 	}
 	else if (cefSourceProcessID == PID_RENDERER) {
 
 	}
 
+//Error: 
 	return false;
+}
+
+void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->OnFocusedNodeChanged(pCEFBrowser, pCEFFrame, pCEFDOMNode));
+	}
+
+Error:
+	return;
+}
+
+void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
+	CN(pCEFBrowser);
+
+	{
+		auto pCEFBrowserController = m_pCEFAppObserver->GetCEFBrowserController(pCEFBrowser);
+		CN(pCEFBrowserController);
+	}
+
+Error:
+	return;
 }
 
 RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {

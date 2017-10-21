@@ -208,7 +208,9 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
-		std::string strURL = "http://www.youtube.com";
+		//std::string strURL = "http://www.youtube.com";
+
+		std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 
 		CN(m_pDreamOS);
 

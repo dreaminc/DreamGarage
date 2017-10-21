@@ -70,6 +70,8 @@ public:
 
 	// CefRenderProcessHandler
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
+	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
+	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
 
 	// CEFAppObserver
 	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
