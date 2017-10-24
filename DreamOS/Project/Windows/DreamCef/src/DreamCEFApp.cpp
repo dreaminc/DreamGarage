@@ -35,9 +35,10 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 	cefProcessMessageArguments->SetString(1, pCEFDOMNode->GetName());
 	cefProcessMessageArguments->SetString(2, pCEFDOMNode->GetValue());
 	
-	cefProcessMessageArguments->SetInt(0, (int)(pCEFDOMNode->GetType()));
+	cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
 
-	cefProcessMessageArguments->SetBool(0, (bool)(pCEFDOMNode->IsEditable()));
+	int cefDOMNodeType = pCEFDOMNode->GetType();
+	cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
 
 	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 

@@ -409,7 +409,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnNodeFocusChanged(std::shared_ptr<DOMNode> pDOMNode) {
+RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
