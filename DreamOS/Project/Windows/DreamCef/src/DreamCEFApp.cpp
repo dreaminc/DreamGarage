@@ -31,14 +31,23 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 	//cefProcessMessageArguments->SetInt(0, cefBrowserID);
 	//cefProcessMessageArguments->SetInt(1, cefFrameID);
 
-	cefProcessMessageArguments->SetString(0, pCEFDOMNode->GetElementTagName());
-	cefProcessMessageArguments->SetString(1, pCEFDOMNode->GetName());
-	cefProcessMessageArguments->SetString(2, pCEFDOMNode->GetValue());
-	
-	cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
+	if (pCEFDOMNode != nullptr) {
+		cefProcessMessageArguments->SetString(0, pCEFDOMNode->GetElementTagName());
+		cefProcessMessageArguments->SetString(1, pCEFDOMNode->GetName());
+		cefProcessMessageArguments->SetString(2, pCEFDOMNode->GetValue());
 
-	int cefDOMNodeType = pCEFDOMNode->GetType();
-	cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
+		cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
+
+		int cefDOMNodeType = pCEFDOMNode->GetType();
+		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
+	}
+	else {
+		cefProcessMessageArguments->SetString(0, "");
+		cefProcessMessageArguments->SetString(1, "");
+		cefProcessMessageArguments->SetString(2, "");
+		cefProcessMessageArguments->SetBool(3, false);
+		cefProcessMessageArguments->SetInt(4, 0);
+	}
 
 	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 

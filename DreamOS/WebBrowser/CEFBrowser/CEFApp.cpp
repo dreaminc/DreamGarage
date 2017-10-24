@@ -122,28 +122,47 @@ bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProc
 	return false;
 }
 
+// If this takes too long debug will screw up the render process 
+// If this is an issue, we'll need to create a pending queue arch to avoid the delay
+// Meanwhile, this is a duplication of the code in DreamCEFApp in DreamCEF
+// TODO: Find a good way to merge across DreamCEF and main client app
 void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
 	RESULT r = R_PASS;
 
-	// This enters a cross-process boundary so we cannot really trust a lot of the handles provided
-	// so capture this here and pass on
-
-	CEFDOMNode *pDreamCEFDOMNode = new CEFDOMNode(pCEFDOMNode);
-	CN(pDreamCEFDOMNode);
-
 	int cefBrowserID = pCEFBrowser->GetIdentifier();
 	int cefFrameID = pCEFFrame->GetIdentifier();
-	
-	if (m_pCEFAppObserver != nullptr) {
-		CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pDreamCEFDOMNode));
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::OnFocusedNodeChanged");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	//cefProcessMessageArguments->SetInt(0, cefBrowserID);
+	//cefProcessMessageArguments->SetInt(1, cefFrameID);
+
+	if (pCEFDOMNode != nullptr) {
+		cefProcessMessageArguments->SetString(0, pCEFDOMNode->GetElementTagName());
+		cefProcessMessageArguments->SetString(1, pCEFDOMNode->GetName());
+		cefProcessMessageArguments->SetString(2, pCEFDOMNode->GetValue());
+
+		cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
+
+		int cefDOMNodeType = pCEFDOMNode->GetType();
+		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
 	}
+	else {
+		cefProcessMessageArguments->SetString(0, "");
+		cefProcessMessageArguments->SetString(1, "");
+		cefProcessMessageArguments->SetString(2, "");
+		cefProcessMessageArguments->SetBool(3, false);
+		cefProcessMessageArguments->SetInt(4, 0);
+	}
+
+	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 
 Error:
-	if (pDreamCEFDOMNode != nullptr) {
-		delete pDreamCEFDOMNode;
-		pDreamCEFDOMNode = nullptr;
-	}
-
 	return;
 }
 
