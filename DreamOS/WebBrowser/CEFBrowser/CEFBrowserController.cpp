@@ -402,7 +402,7 @@ RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrame
 
 	// Report to browser
 	if (m_pWebBrowserControllerObserver != nullptr) {
-		DOMNode *pDOMNode = reinterpret_cast<DOMNode*>(pCEFDOMNode);
+		std::shared_ptr<DOMNode> pDOMNode = std::shared_ptr<DOMNode>(pCEFDOMNode);
 		CN(pDOMNode);
 
 		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(pDOMNode));

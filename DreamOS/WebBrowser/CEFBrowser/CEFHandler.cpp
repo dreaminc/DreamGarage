@@ -89,18 +89,31 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 		if (strObjectName == "DreamCEFApp") {
 			if (strMethodName == "OnFocusedNodeChanged") {
 				
-				//CEFDOMNode cefDOMNode = CEFDOMNode(pCEFDOMNode);
-				pCEFDOMNode = (CEFDOMNode *)malloc(sizeof(CEFDOMNode));
-				CN(pCEFDOMNode);
+				auto pCEFProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+				size_t numArgs = pCEFProcessMessageArguments->GetSize();
 
-				auto pCEFDomNodeBinary = pCEFProcessMessage->GetArgumentList()->GetBinary(0);
-				pCEFDomNodeBinary->GetData(pCEFDOMNode, sizeof(CEFDOMNode), 0);
+				CB((numArgs > 0));
 
 				int cefBrowserID = pCefBrowser->GetIdentifier();
-				int cefFrameID = 5;
+
+				//CB((cefBrowserID == cefProcBrowserID));
+
+				// Strings
+				std::string strElementTagName = pCEFProcessMessageArguments->GetString(1);
+				std::string strName = pCEFProcessMessageArguments->GetString(2);
+				std::string strValue = pCEFProcessMessageArguments->GetString(3);
+
+				// Type
+				cef_dom_node_type_t cefDOMNodeType = (cef_dom_node_type_t)(pCEFProcessMessageArguments->GetInt(0));
+
+				// Editable
+				bool fEditable = pCEFProcessMessageArguments->GetBool(0);
+
+				// Create the node
+				pCEFDOMNode = new CEFDOMNode(cefDOMNodeType, strName, strElementTagName, strValue, fEditable);
 
 				if (m_pCEFHandlerObserver != nullptr) {
-					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, -1, pCEFDOMNode));
 				}
 
 				fHandled = true;
@@ -110,7 +123,7 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 
 Error:
 	if (pCEFDOMNode != nullptr) {
-		free(pCEFDOMNode);
+		delete pCEFDOMNode;
 		pCEFDOMNode = nullptr;
 	}
 

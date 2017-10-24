@@ -1,37 +1,46 @@
 #include "CEFDOMNode.h"
 
-CEFDOMNode::CEFDOMNode() {
+CEFDOMNode::CEFDOMNode() :
+	DOMNode(DOMNode::type::INVALID)
+{
 	// empty
 }
 
-CEFDOMNode::CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode) {
+CEFDOMNode::CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode) :
+	DOMNode(GetType(pCEFDOMNode->GetType()))
+{
 	if (pCEFDOMNode != nullptr) {
 		m_fEditable = pCEFDOMNode->IsEditable();
 		m_strElementTagName = pCEFDOMNode->GetElementTagName();
 		m_strName = pCEFDOMNode->GetName();
 		m_strValue = pCEFDOMNode->GetValue();
-		m_type = GetType(pCEFDOMNode->GetType());
 	}
+}
+
+CEFDOMNode::CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable) :
+	DOMNode(GetType(cefDOMNodeType)),
+	m_strName(strName),
+	m_strElementTagName(strElementTagName),
+	m_strValue(strValue),
+	m_fEditable(fEditable)
+{
+	// empty
 }
 
 CEFDOMNode::~CEFDOMNode() {
 	// empty
 }
 
-std::string CEFDOMNode::GetElementTagName() const {
+std::string CEFDOMNode::GetElementTagName() {
 	return m_strElementTagName;
 }
 
-std::string CEFDOMNode::GetName() const {
+std::string CEFDOMNode::GetName() {
 	return m_strName;
 }
 
-std::string CEFDOMNode::GetValue() const {
+std::string CEFDOMNode::GetValue() {
 	return m_strValue;
-}
-
-DOMNode::type CEFDOMNode::GetType() const {
-	return m_type;
 }
 
 DOMNode::type CEFDOMNode::GetType(cef_dom_node_type_t cefDomNodeType) {
@@ -54,6 +63,6 @@ DOMNode::type CEFDOMNode::GetType(cef_dom_node_type_t cefDomNodeType) {
 	return domNodeType;
 }
 
-bool CEFDOMNode::IsEditable() const {
+bool CEFDOMNode::IsEditable() {
 	return m_fEditable;
 }

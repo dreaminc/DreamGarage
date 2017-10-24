@@ -27,12 +27,28 @@ public:
 	};
 
 public:
-	virtual std::string GetElementTagName() const = 0;
-	virtual std::string GetName() const = 0;
-	virtual std::string GetValue() const = 0;
-	virtual bool IsEditable() const = 0;
+	DOMNode(DOMNode::type domNodeType) :
+		m_type(domNodeType)
+	{
+		// empty
+	}
 
-	virtual DOMNode::type GetType() const = 0;
+	~DOMNode() {
+		// empty
+	}
+
+public:
+	virtual std::string GetElementTagName() = 0;
+	virtual std::string GetName() = 0;
+	virtual std::string GetValue() = 0;
+	virtual bool IsEditable() = 0;
+
+	DOMNode::type GetType() {
+		return m_type;
+	}
+
+private:
+	type m_type;
 };
 
 

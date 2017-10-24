@@ -138,7 +138,7 @@ public:
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode) override;
-	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
+	virtual RESULT OnNodeFocusChanged(std::shared_ptr<DOMNode> pDOMNode) override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
