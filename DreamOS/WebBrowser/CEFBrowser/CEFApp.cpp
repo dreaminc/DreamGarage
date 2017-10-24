@@ -118,29 +118,6 @@ Error:
 bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProcessId cefSourceProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
 	RESULT r = R_PASS;
 
-	if (cefSourceProcessID == PID_BROWSER) {
-		/*
-		std::shared_ptr<DOMNode> pDOMNode = nullptr;
-
-		auto pCEFFrame = m_pCEFBrowser->GetFocusedFrame();
-		CN(pCEFFrame);
-
-		// Create a visitor
-		CefRefPtr<CEFDOMVisitor> pCEFDOMVisitor = new CEFDOMVisitor(std::shared_ptr<CEFBrowserController>(this));
-		CN(pCEFDOMVisitor);
-
-		// Send task to render thread as needed by VisitDOM
-		CBM((CefPostTask(TID_RENDERER, base::Bind(&CefFrame::VisitDOM, pCEFFrame, pCEFDOMVisitor))), 
-			"Failed to post visit dom to render thread");
-			*/
-		int a = 5;
-		printf("hi");
-	}
-	else if (cefSourceProcessID == PID_RENDERER) {
-		int a = 5;
-		printf("hi");
-	}
-
 //Error: 
 	return false;
 }
@@ -151,28 +128,35 @@ void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<C
 	// This enters a cross-process boundary so we cannot really trust a lot of the handles provided
 	// so capture this here and pass on
 
-	//CEFDOMNode cefDOMNode = CEFDOMNode(pCEFDOMNode);
-	//int cefBrowserID = pCEFBrowser->GetIdentifier();
-	//int cefFrameID = pCEFFrame->GetIdentifier();
-	//
-	//if (m_pCEFAppObserver != nullptr) {
-	//	CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, cefDOMNode));
-	//}
+	CEFDOMNode *pDreamCEFDOMNode = new CEFDOMNode(pCEFDOMNode);
+	CN(pDreamCEFDOMNode);
 
-	// Create the message object.
-	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("testing");
-
-	// Retrieve the argument list object.
-	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
-
-	// Populate the argument values.
-	cefProcessMessageArguments->SetString(0, "testing string");
-	cefProcessMessageArguments->SetInt(0, 10);
-
-	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+	int cefBrowserID = pCEFBrowser->GetIdentifier();
+	int cefFrameID = pCEFFrame->GetIdentifier();
+	
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pDreamCEFDOMNode));
+	}
 
 Error:
+	if (pDreamCEFDOMNode != nullptr) {
+		delete pDreamCEFDOMNode;
+		pDreamCEFDOMNode = nullptr;
+	}
+
 	return;
+}
+
+// This is the inter-process boundary call back (vs the one above)
+RESULT CEFApp::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+	}
+
+Error:
+	return r;
 }
 
 // This doesn't do much right now

@@ -394,17 +394,24 @@ CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
 
-RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode) {
+#pragma optimize( "", off )
+RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
 	RESULT r = R_PASS;
+
+	CN(pCEFDOMNode);
 
 	// Report to browser
 	if (m_pWebBrowserControllerObserver != nullptr) {
-		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(cefDomNode));
+		DOMNode *pDOMNode = reinterpret_cast<DOMNode*>(pCEFDOMNode);
+		CN(pDOMNode);
+
+		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(pDOMNode));
 	}
 
 Error:
 	return r;
 }
+#pragma optimize( "", on )
 
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();

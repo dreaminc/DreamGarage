@@ -409,10 +409,10 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnNodeFocusChanged(const DOMNode &domNode) {
+RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	if (domNode.GetType() == DOMNode::type::ELEMENT && domNode.IsEditable()) {
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
 		m_pPointerCursor->SetVisible(false);
 	}

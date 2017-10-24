@@ -1,5 +1,7 @@
 #include "DreamCEFApp.h"
 
+#include "WebBrowser/CEFBrowser/CEFDOMNode.h"
+
 DreamCEFApp::DreamCEFApp() {
 	// empty
 }
@@ -15,18 +17,30 @@ bool DreamCEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefPro
 	return false;
 }
 
-void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) {
+void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
 	RESULT r = R_PASS;
 
+	CEFDOMNode cefDOMNode = CEFDOMNode(pCEFDOMNode);
+	int cefBrowserID = pCEFBrowser->GetIdentifier();
+	int cefFrameID = pCEFFrame->GetIdentifier();
+
 	// Create the message object.
-	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("testing");
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::OnFocusedNodeChanged");
 
 	// Retrieve the argument list object.
 	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
 
 	// Populate the argument values.
-	cefProcessMessageArguments->SetString(0, "testing string");
-	cefProcessMessageArguments->SetInt(0, 10);
+	cefProcessMessageArguments->SetString(0, "OnFocusedNodeChanged");
+
+	cefProcessMessageArguments->SetInt(0, cefBrowserID);
+	cefProcessMessageArguments->SetInt(1, cefFrameID);
+
+	// Create the binary 
+	auto pCefBinValueDomNode = CefBinaryValue::Create(&cefDOMNode, sizeof(cefDOMNode));
+	CN(pCefBinValueDomNode);
+
+	CB(cefProcessMessageArguments->SetBinary(0, pCefBinValueDomNode));
 
 	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 
@@ -36,5 +50,4 @@ Error:
 
 void DreamCEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser) {
 	// empty
-	int a = 5;
 }

@@ -14,6 +14,7 @@
 
 class CEFDOMNode : public DOMNode {
 public:
+	CEFDOMNode();
 	CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode);
 	~CEFDOMNode();
 

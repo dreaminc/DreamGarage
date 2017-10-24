@@ -1,5 +1,9 @@
 #include "CEFDOMNode.h"
 
+CEFDOMNode::CEFDOMNode() {
+	// empty
+}
+
 CEFDOMNode::CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode) {
 	if (pCEFDOMNode != nullptr) {
 		m_fEditable = pCEFDOMNode->IsEditable();

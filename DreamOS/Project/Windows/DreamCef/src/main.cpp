@@ -24,9 +24,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	CefMainArgs cefMainArgs(hInstance);
 
 	// Optional implementation of the CefApp interface.
-	//CefRefPtr<DreamCEFApp> pDreamCEFApp(new DreamCEFApp());
-	//return CefExecuteProcess(cefMainArgs, pDreamCEFApp.get(), nullptr);
+	CefRefPtr<DreamCEFApp> pDreamCEFApp(new DreamCEFApp());
+	return CefExecuteProcess(cefMainArgs, pDreamCEFApp.get(), nullptr);
 
-
-	return CefExecuteProcess(cefMainArgs, nullptr, nullptr);
+	//return CefExecuteProcess(cefMainArgs, nullptr, nullptr);
 }

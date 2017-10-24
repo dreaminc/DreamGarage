@@ -20,6 +20,10 @@
 
 #include "CEFApp.h"
 
+#include "Core/Utilities.h"
+#include "CEFDOMNode.h"
+
+
 #pragma warning(default : 4067)
 
 // Initialize and allocate the instance
@@ -67,10 +71,50 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
 
-bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) {
-	int a = 5;
-	
-	return false;
+bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, CefProcessId sourceCEFProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
+	RESULT r = R_PASS;
+
+	const std::string& strMessageName = pCEFProcessMessage->GetName();
+	CEFDOMNode *pCEFDOMNode = nullptr;
+
+	bool fHandled = false;
+
+	auto tokens = util::TokenizeString(strMessageName, "::");
+	CB((tokens.size() == 2));
+
+	{
+		std::string strObjectName = tokens[0];
+		std::string strMethodName = tokens[1];
+
+		if (strObjectName == "DreamCEFApp") {
+			if (strMethodName == "OnFocusedNodeChanged") {
+				
+				//CEFDOMNode cefDOMNode = CEFDOMNode(pCEFDOMNode);
+				pCEFDOMNode = (CEFDOMNode *)malloc(sizeof(CEFDOMNode));
+				CN(pCEFDOMNode);
+
+				auto pCEFDomNodeBinary = pCEFProcessMessage->GetArgumentList()->GetBinary(0);
+				pCEFDomNodeBinary->GetData(pCEFDOMNode, sizeof(CEFDOMNode), 0);
+
+				int cefBrowserID = pCefBrowser->GetIdentifier();
+				int cefFrameID = 5;
+
+				if (m_pCEFHandlerObserver != nullptr) {
+					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+				}
+
+				fHandled = true;
+			}
+		}
+	}
+
+Error:
+	if (pCEFDOMNode != nullptr) {
+		free(pCEFDOMNode);
+		pCEFDOMNode = nullptr;
+	}
+
+	return fHandled;
 }
 
 /*

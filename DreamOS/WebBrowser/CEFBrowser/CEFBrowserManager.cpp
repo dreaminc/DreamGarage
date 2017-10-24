@@ -120,7 +120,7 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode) {
+RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CEFBrowserManager: OnFocusedNodeChanged");
@@ -129,7 +129,7 @@ RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID,
 	CN(pCEFBrowserController);
 
 	// TODO: add frame
-	CR(pCEFBrowserController->OnFocusedNodeChanged(cefBrowserID, cefFrameID, cefDomNode));
+	CR(pCEFBrowserController->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
 
 Error:
 	return r;
@@ -188,9 +188,9 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	cefSettings.single_process = true;
-//#endif
+#endif
 
 	cefSettings.multi_threaded_message_loop = true;
 
