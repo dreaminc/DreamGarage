@@ -1,6 +1,9 @@
 #include "DreamPeerApp.h"
 #include "DreamOS.h"
 
+#include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/Environment/PeerConnection.h"
+
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
 	m_pDOS(pDOS),
@@ -210,6 +213,52 @@ long DreamPeerApp::GetPeerUserID() {
 	return m_peerUserID;
 }
 
+RESULT DreamPeerApp::GetPeerProfile(long peerUserID) {
+	RESULT r = R_PASS;
+
+	std::cout << "load peer profile..." << std::endl;
+	{
+		HTTPResponse httpResponse;
+		User peer;
+		auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+		std::string	strURI = strAPIURL + "/user/" + std::to_string(peerUserID);
+
+		HTTPController *pHTTPController = HTTPController::instance();
+
+		auto headers = HTTPController::ContentAcceptJson();
+		headers.push_back(strAuthorizationToken);
+
+		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
+
+		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
+		peer = User(
+			jsonResponse["/data/id"_json_pointer].get<long>(),
+			jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			jsonResponse["/data/email"_json_pointer].get<std::string>(),
+			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
+			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
+			jsonResponse["/data/last_name"_json_pointer].get<std::string>(),
+			version(1.0f)	// version
+		);
+
+		DEBUG_LINEOUT("User Profile Loaded");
+
+		m_pTextUserName->SetText(peer.GetScreenName());
+	}
+
+Error:
+	return r;
+}
+
 PeerConnection* DreamPeerApp::GetPeerConnection() {
 	return m_pPeerConnection;
 }
@@ -219,6 +268,8 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 
 	CN(pPeerConnection);
 	m_pPeerConnection = pPeerConnection;
+	m_peerUserID = m_pPeerConnection->GetPeerUserID();
+	GetPeerProfile(m_peerUserID);
 
 Error:
 	return r;

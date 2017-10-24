@@ -101,6 +101,7 @@ public:
 	DreamPeerApp::state GetState();
 
 	long GetPeerUserID();
+	RESULT GetPeerProfile(long peerUserID);
 
 	PeerConnection *GetPeerConnection();
 	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
