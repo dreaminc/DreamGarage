@@ -946,6 +946,15 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 					CR(GetDOS()->ReleaseApp(pKeyboardHandle, keyUID, this));
 
 				}
+
+				auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+				CB(userUIDs.size() == 1);
+				{
+					UID userUID = userUIDs[0];
+					auto pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userUID, this));
+					pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
+					CR(GetDOS()->ReleaseApp(pUserHandle, userUID, this));
+				}
 //*
 				auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
 				CB(viewUIDs.size() == 1);

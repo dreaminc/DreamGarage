@@ -447,8 +447,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		CN(m_pUserHandle);
 //		CB(m_pUserHandle->GetAppState());
-		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
-		CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
+		//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
+		//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
 	Error:
 		return r;
 	};
@@ -491,9 +491,9 @@ RESULT UIKeyboard::HideKeyboard() {
 
 	DimObj *pObj = GetComposite();
 
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Hide());
-	CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Hide());
+	//CN(m_pUserHandle);
+	//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Hide());
+	//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Hide());
 
 	CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userAppUID, this));
 

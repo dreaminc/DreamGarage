@@ -22,6 +22,17 @@ class volume;
 class hand;
 class UIMallet;
 class DimRay;
+class VirtualObj;
+
+// determines the app that handles the controller "menu up" event
+enum class ActiveAppType {
+	MENU,		// default state
+	KB_MENU,	// kb presents when "share website" is pressed in the menu
+	CONTROL,	// control presents when "enter" is pressed on the kb (browser) 
+	KB_CONTROL,	// kb (control) presents when there is text focus
+	NONE,
+	INVALID
+};
 
 class DreamUserHandle : public DreamAppHandle {
 public:
@@ -29,8 +40,11 @@ public:
 	// potentially, this function should return a handle to a mallet
 	UIMallet *RequestMallet(HAND_TYPE type);
 
+	RESULT SendPresentApp(ActiveAppType type);
+
 private:
 	virtual UIMallet *GetMallet(HAND_TYPE type) = 0;
+	virtual RESULT PresentApp(ActiveAppType type) = 0;
 
 };
 
@@ -46,8 +60,9 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	virtual DreamAppHandle *GetAppHandle() override;
-public:
-	// Member funcs 
+
+protected:
+	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
@@ -55,9 +70,11 @@ public:
 	RESULT SetHand(hand* pHand);
 
 	virtual UIMallet *GetMallet(HAND_TYPE type) override;
+	virtual RESULT PresentApp(ActiveAppType type) override;
 
 protected:
-	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
+	RESULT UpdateCompositeWithHands(float yPos);
 
 private:
 	// Member vars go here
@@ -70,6 +87,12 @@ private:
 
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
+
+	// the user app maintains an active app state to send events to the right app 
+	ActiveAppType m_activeState = ActiveAppType::NONE; 
+
+	// apps position themselves with this when they are presented
+	VirtualObj *m_pAppBasis;
 };
 
 #endif // ! DREAM_USER_APP_H_

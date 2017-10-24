@@ -61,6 +61,20 @@ class DreamUIBarHandle : public DreamAppHandle {
 public:
 	virtual RESULT ShowApp() = 0;
 	virtual RESULT HideApp() = 0;
+
+public:
+	RESULT SendMenuUp(void *pContext);
+	RESULT RequestPathEmpty(bool &fPathEmpty);
+	RESULT SendPopPath();
+	RESULT SendShowRootMenu();
+	RESULT SendRequestMenu();
+
+private:
+	virtual RESULT HandleMenuUp(void *pContext) = 0;
+	virtual RESULT IsPathEmpty(bool &fPathEmpty) = 0;
+	virtual RESULT PopPath() = 0;
+	virtual RESULT RequestMenu() = 0;
+	virtual RESULT ShowRootMenu() = 0;
 };
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
@@ -99,7 +113,13 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
-	RESULT HandleMenuUp(void* pContext);
+	virtual RESULT HandleMenuUp(void* pContext) override;
+	virtual RESULT IsPathEmpty(bool &fPathEmpty) override;
+	virtual RESULT PopPath() override;
+	//virtual RESUL-
+	virtual RESULT RequestMenu() override;
+	virtual RESULT ShowRootMenu() override;
+
 	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
