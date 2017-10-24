@@ -219,7 +219,7 @@ RESULT DreamPeerApp::GetPeerProfile(long peerUserID) {
 	std::cout << "load peer profile..." << std::endl;
 	{
 		HTTPResponse httpResponse;
-		User peer;
+	
 		auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
 
@@ -240,19 +240,12 @@ RESULT DreamPeerApp::GetPeerProfile(long peerUserID) {
 		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
 		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
 
-		peer = User(
-			jsonResponse["/data/id"_json_pointer].get<long>(),
-			jsonResponse["/data/default_environment"_json_pointer].get<long>(),
-			jsonResponse["/data/email"_json_pointer].get<std::string>(),
-			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
-			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
-			jsonResponse["/data/last_name"_json_pointer].get<std::string>(),
-			version(1.0f)	// version
-		);
+		if (peerUserID = jsonResponse["/data/id"_json_pointer].get<long>()) {
+			m_pTextUserName->SetText(jsonResponse["/data/public_name"_json_pointer].get<std::string>());
+		}
 
 		DEBUG_LINEOUT("User Profile Loaded");
 
-		m_pTextUserName->SetText(peer.GetScreenName());
 	}
 
 Error:
