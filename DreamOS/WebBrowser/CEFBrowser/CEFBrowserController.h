@@ -45,6 +45,8 @@ class CefPostData;
 class WebRequest;
 class WebRequestPostData;
 
+class CEFDOMNode;
+
 class CEFBrowserController :  public WebBrowserController {
 
 	RESULT RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver);
@@ -68,7 +70,8 @@ public:
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward);
 	RESULT OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type);
 	RESULT OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode);
-	RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
+	//RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
+	RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode);
 
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
@@ -86,32 +89,6 @@ public:
 
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
-
-	/*
-	// Reference Counting for Post Task
-	// *********************************
-public:                                           
-	void AddRef() {
-		ref_count_.AddRef();
-	}
-
-	bool Release() {
-		if (ref_count_.Release()) {
-				delete static_cast<const CEFBrowserController*>(this);
-				return true;                                
-		}                                       
-
-		return false;                                 
-	}              
-
-	bool HasOneRef() {
-		return ref_count_.HasOneRef();                
-	}                                               
-
-private:                                          
-	CefRefCount ref_count_;
-	// *********************************
-	*/
 
 private:
 	// browser logical size

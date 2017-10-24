@@ -40,6 +40,7 @@ struct WebBrowserMouseEvent {
 };
 
 class WebRequest;
+class DOMNode;
 
 // TODO: Revisit these functions 
 class WebBrowserController {
@@ -56,6 +57,7 @@ public:
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode) = 0;
+		virtual RESULT OnNodeFocusChanged(const DOMNode &pDOMNode) = 0;	
 	};
 
 public:

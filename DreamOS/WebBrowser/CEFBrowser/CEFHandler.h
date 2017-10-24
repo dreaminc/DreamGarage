@@ -65,6 +65,7 @@ public:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
 	// CefDownloadHandler methods

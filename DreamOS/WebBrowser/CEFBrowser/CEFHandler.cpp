@@ -67,6 +67,12 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
 
+bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) {
+	int a = 5;
+	
+	return false;
+}
+
 /*
 CefRefPtr<CefDownloadHandler> CEFHandler::GetDownloadHandler() {
 	return this;
@@ -95,6 +101,8 @@ void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	
 	m_cefBrowsers.push_back(pCEFBrowser);
 	m_fBrowserRunning = true;
+
+	int browserID = pCEFBrowser->GetIdentifier();
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::make_shared<CEFBrowserController>(pCEFBrowser);
 	CN(pCEFBrowserController);

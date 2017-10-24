@@ -13,6 +13,8 @@
 
 #include "Cloud/WebRequest.h"
 
+#include "WebBrowser/DOMNode.h"
+
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -404,6 +406,22 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 	));
 
 Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnNodeFocusChanged(const DOMNode &domNode) {
+	RESULT r = R_PASS;
+
+	if (domNode.GetType() == DOMNode::type::ELEMENT && domNode.IsEditable()) {
+		DEBUG_LINEOUT("editable!");
+		m_pPointerCursor->SetVisible(false);
+	}
+	else {
+		DEBUG_LINEOUT("non editable!");
+		m_pPointerCursor->SetVisible(true);
+	}
+
+//Error:
 	return r;
 }
 

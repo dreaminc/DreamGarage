@@ -19,6 +19,8 @@
 #include "Cloud/WebRequestPostData.h"
 #include "Cloud/WebRequestPostDataElement.h"
 
+#include "CEFDOMNode.h"
+
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
 {
@@ -392,25 +394,13 @@ CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
 
-RESULT CEFBrowserController::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
+RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode) {
 	RESULT r = R_PASS;
 
-	if (pCEFDOMNode != nullptr && pCEFDOMNode->GetType() == DOM_NODE_TYPE_ELEMENT) {
-		DEBUG_LINEOUT("Node %S gained focus tag: %S", pCEFDOMNode->GetName().c_str(), pCEFDOMNode->GetElementTagName().c_str());
-
-		if (pCEFDOMNode->IsEditable()) {
-			// report to browser text focus
-			int a = 5;
-
-			// Kill it
-			return r;
-		}
+	// Report to browser
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(cefDomNode));
 	}
-
-	// Not text focus (or otherwise)
-	// Report not text focus change
-
-	CR(r);
 
 Error:
 	return r;

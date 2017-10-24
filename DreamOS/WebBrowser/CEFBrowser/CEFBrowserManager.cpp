@@ -120,29 +120,41 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserManager::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
+RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CEFBrowserManager: OnFocusedNodeChanged");
 
-	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(cefBrowserID);
 	CN(pCEFBrowserController);
 
 	// TODO: add frame
-	CR(pCEFBrowserController->OnFocusedNodeChanged(pCEFBrowser, pCEFFrame, pCEFDOMNode));
+	CR(pCEFBrowserController->OnFocusedNodeChanged(cefBrowserID, cefFrameID, cefDomNode));
 
 Error:
 	return r;
 }
 
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(int cefBrowserID) {
+	for (auto &pWebBrowserController : m_webBrowserControllers) {
+		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
+		if (pCEFBrowserController != nullptr) {
+			if (pCEFBrowserController->GetCEFBrowser()->GetIdentifier() == cefBrowserID) {
+				return pCEFBrowserController;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
 		if (pCEFBrowserController != nullptr) {
-			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser)) {
-				return pCEFBrowserController;
-			}
-			else if (pCEFBrowserController->GetCEFBrowser()->GetFocusedFrame() == pCEFBrowser->GetFocusedFrame()) {
+			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser))  {
 				return pCEFBrowserController;
 			}
 		}
@@ -176,9 +188,9 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	cefSettings.single_process = true;
-#endif
+//#endif
 
 	cefSettings.multi_threaded_message_loop = true;
 

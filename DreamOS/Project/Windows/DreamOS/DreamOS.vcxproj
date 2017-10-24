@@ -872,7 +872,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp" />
-    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserFactory.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1236,7 +1236,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\DOMDocument.h" />
     <ClInclude Include="..\..\..\WebBrowser\DOMNode.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h" />
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserFactory.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h" />
     <ClInclude Include="resource.h" />

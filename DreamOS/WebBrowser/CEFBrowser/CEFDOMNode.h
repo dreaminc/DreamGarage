@@ -3,6 +3,8 @@
 
 #include "RESULT/EHM.h"
 
+#include "include/cef_dom.h"
+
 // DREAM OS
 // DreamOS/WebBrowser/CEFBrowser/CEFDOMNode.h
 
@@ -12,18 +14,26 @@
 
 class CEFDOMNode : public DOMNode {
 public:
-	CEFDOMNode();
+	CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode);
 	~CEFDOMNode();
 
 public:
-	virtual std::string GetElementTagName() override;
-	virtual std::string GetName() override;
-	virtual std::string GetValue() override;
+	virtual std::string GetElementTagName() const override;
+	virtual std::string GetName() const override;
+	virtual std::string GetValue() const override;
 
-	virtual DOMNode::type GetType() override;
+	virtual DOMNode::type GetType() const override;
+
+	static DOMNode::type GetType(cef_dom_node_type_t cefDomNodeType);
+
+	virtual bool IsEditable() const override;
 
 private:
-
+	bool m_fEditable = false;
+	std::string m_strElementTagName = "";
+	std::string m_strName = "";
+	std::string m_strValue = "";
+	DOMNode::type m_type = DOMNode::type::INVALID;
 };
 
 

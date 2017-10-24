@@ -20,6 +20,7 @@
 #include "include/cef_load_handler.h"
 
 class CEFBrowserController;
+class CEFDOMNode;
 
 class CEFAppObserver {
 public:
@@ -28,8 +29,9 @@ public:
 	virtual RESULT OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 	virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) = 0;
 	virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) = 0;
-	virtual RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) = 0;
+	virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, const CEFDOMNode &cefDomNode) = 0;
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) = 0;
+	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(int cefBrowserID) = 0;
 };
 
 #endif	// ! CEF_APP_OBSERVER_H_

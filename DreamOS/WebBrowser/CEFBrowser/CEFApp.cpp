@@ -9,6 +9,7 @@
 #include "include/wrapper/cef_helpers.h"
 
 #include "CEFHandler.h"
+#include "CEFDOMNode.h"
 
 // Initialize and allocate the instance
 CEFApp* singleton<CEFApp>::s_pInstance = nullptr;
@@ -132,9 +133,12 @@ bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProc
 		CBM((CefPostTask(TID_RENDERER, base::Bind(&CefFrame::VisitDOM, pCEFFrame, pCEFDOMVisitor))), 
 			"Failed to post visit dom to render thread");
 			*/
+		int a = 5;
+		printf("hi");
 	}
 	else if (cefSourceProcessID == PID_RENDERER) {
-
+		int a = 5;
+		printf("hi");
 	}
 
 //Error: 
@@ -144,23 +148,48 @@ bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProc
 void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
 	RESULT r = R_PASS;
 
-	if (m_pCEFAppObserver != nullptr) {
-		CR(m_pCEFAppObserver->OnFocusedNodeChanged(pCEFBrowser, pCEFFrame, pCEFDOMNode));
-	}
+	// This enters a cross-process boundary so we cannot really trust a lot of the handles provided
+	// so capture this here and pass on
+
+	//CEFDOMNode cefDOMNode = CEFDOMNode(pCEFDOMNode);
+	//int cefBrowserID = pCEFBrowser->GetIdentifier();
+	//int cefFrameID = pCEFFrame->GetIdentifier();
+	//
+	//if (m_pCEFAppObserver != nullptr) {
+	//	CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, cefDOMNode));
+	//}
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("testing");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	cefProcessMessageArguments->SetString(0, "testing string");
+	cefProcessMessageArguments->SetInt(0, 10);
+
+	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 
 Error:
 	return;
 }
 
+// This doesn't do much right now
+// but this gives us back a different browser than the browser process (render process)
 void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	RESULT r = R_PASS;
 
 	CN(pCEFBrowser);
 
+	int browserID = pCEFBrowser->GetIdentifier();
+
+	/*
 	{
 		auto pCEFBrowserController = m_pCEFAppObserver->GetCEFBrowserController(pCEFBrowser);
 		CN(pCEFBrowserController);
 	}
+	*/
 
 Error:
 	return;

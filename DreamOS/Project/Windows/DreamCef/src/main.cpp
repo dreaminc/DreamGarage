@@ -9,7 +9,7 @@
 
 #include "RESULT/EHM.h"
 
-#include "WebBrowser/CEFBrowser/CEFApp.h"
+#include "DreamCEFApp.h"
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -24,8 +24,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	CefMainArgs cefMainArgs(hInstance);
 
 	// Optional implementation of the CefApp interface.
-	//CefRefPtr<CEFApp> pCEFApp(new CEFApp);
+	//CefRefPtr<DreamCEFApp> pDreamCEFApp(new DreamCEFApp());
+	//return CefExecuteProcess(cefMainArgs, pDreamCEFApp.get(), nullptr);
 
-	//return CefExecuteProcess(cefMainArgs, pCEFApp.get(), nullptr);
+
 	return CefExecuteProcess(cefMainArgs, nullptr, nullptr);
 }
