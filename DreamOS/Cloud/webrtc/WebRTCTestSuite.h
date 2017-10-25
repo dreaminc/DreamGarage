@@ -30,6 +30,9 @@ public:
 	// Tests
 	RESULT AddTestWebRTCVideoStream();
 
+	// Apps
+	RESULT AddTestChromeMultiBrowser();
+
 private:
 	CloudController *GetCloudController();
 	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);

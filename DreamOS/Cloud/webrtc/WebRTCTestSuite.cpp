@@ -12,6 +12,9 @@
 
 #include "HAL/opengl/OGLProgram.h"
 
+#include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/Dream2DMouseApp.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -24,6 +27,8 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestChromeMultiBrowser());
 
 	CR(AddTestWebRTCVideoStream());
 
@@ -362,6 +367,128 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		CloudController *pCloudController = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
+
+		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
+		std::string strURL = "http://urlme.me/troll/dream_test/";
+
+		CR(SetupSkyboxPipeline("environment"));
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		CN(m_pDreamOS);
+
+		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
+
+		// Objects 
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Command Line Manager
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		// Cloud Controller
+		CN(pTestContext->pCloudController);
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		// Log in 
+		{
+			std::string strUsername = "test";
+			strUsername += pCommandLineManager->GetParameterValue("testval");
+			strUsername += "@dreamos.com";
+
+			strURL += pCommandLineManager->GetParameterValue("testval") + ".jpg";
+
+			std::string strPassword = "nightmare";
+
+			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
+
+			CRM(pTestContext->pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+		}
+
+		// Create the 2D Mouse App
+		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
+
+		// Create the Shared View App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(10.0f);
+
+		pDreamBrowser->SetURI(strURL);
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

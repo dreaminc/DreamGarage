@@ -187,9 +187,13 @@ Error:
 RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
+	// temp
+	return r;
+
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
+
 	CR(pDreamPeer->RegisterDreamPeerObserver(this));
 	
 Error:
