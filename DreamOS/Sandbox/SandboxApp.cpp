@@ -1578,6 +1578,18 @@ RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
 
+RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CN(pPeerConnection);
+	CN(pDreamAppMessage);
+
+	CR(m_pDreamAppManager->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 

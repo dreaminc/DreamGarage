@@ -114,6 +114,9 @@ public:
 	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
 
+	// Handle the Dream App Messages
+	RESULT OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+
 	// Peers
 	RESULT HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage);
 	RESULT HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage);

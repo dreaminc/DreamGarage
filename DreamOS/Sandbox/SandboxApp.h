@@ -343,6 +343,8 @@ public:
 
 	RESULT BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage);
 
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+
 	// IO
 public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);

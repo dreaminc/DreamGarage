@@ -613,6 +613,17 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 	return webPt;
 }
 
+RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+	// TODO: this
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 

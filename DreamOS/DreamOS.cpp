@@ -247,6 +247,16 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	// Send the dream app message to the dream app manager
+	CR(m_pSandbox->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	
@@ -282,7 +292,7 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		CR(OnDreamMessage(pPeerConnection, (DreamMessage*)(pDataMessage)));
 	}
 	else if (dreamMsgType >= DreamMessage::type::APP) {
-		// TODO: App messages
+		CR(OnDreamAppMessage(pPeerConnection, (DreamAppMessage*)(pDataMessage)));
 	}
 	else {
 		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);

@@ -17,7 +17,8 @@
 class DreamOS;
 class composite;
 class DreamAppHandle;
-//class vector;
+class PeerConnection;
+class DreamAppMessage;
 
 class DreamAppBase {
 	friend class DreamAppManager;
@@ -28,6 +29,9 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
+
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
+
 	virtual composite *GetComposite() = 0;
 	virtual DreamAppHandle* GetAppHandle();
 

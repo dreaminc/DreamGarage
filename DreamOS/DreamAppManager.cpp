@@ -2,6 +2,9 @@
 
 #include "DreamOS.h"
 
+#include "Cloud/Environment/PeerConnection.h"
+#include "DreamAppMessage.h"
+
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -46,6 +49,35 @@ Error:
 RESULT DreamAppManager::SetMinFrameRate(double minFrameRate) {
 	m_minFrameRate = minFrameRate;
 	return R_PASS;
+}
+
+RESULT DreamAppManager::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	auto dreamApps = GetDreamApp(pDreamAppMessage->GetDreamAppName());
+	CB((dreamApps.size() > 0));
+
+	for (auto &pDreamApp : dreamApps) {
+		CR(pDreamApp->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+	}
+
+Error:
+	return r;
+}
+
+// TODO: This is not currently handling multiple apps with the same name
+std::vector<DreamAppBase*> DreamAppManager::GetDreamApp(std::string strDreamAppName) {
+	std::vector<DreamAppBase*> returnAppVector;
+
+	for (auto dreamAppEntry : m_appRegistry) {
+		auto &pDreamApp = dreamAppEntry.second;
+
+		if (pDreamApp->GetAppName() == strDreamAppName) {
+			returnAppVector.push_back(pDreamApp);
+		}
+	}
+
+	return returnAppVector;
 }
 
 bool DreamAppManager::FindDreamAppWithName(std::string strDreamAppName) {

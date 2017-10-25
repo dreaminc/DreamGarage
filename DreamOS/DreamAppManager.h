@@ -26,8 +26,12 @@
 #include "DreamAppHandle.h"
 
 class DreamOS;
+class PeerConnection;
+class DreamAppMessage;
 
 class DreamAppManager : public Manager {
+	friend class SandboxApp;
+
 public:
 	DreamAppManager(DreamOS *pDreamOS);
 	~DreamAppManager();
@@ -103,6 +107,12 @@ public:
 
 	RESULT SetMinFrameRate(double minFrameRate);
 	bool FindDreamAppWithName(std::string strDreamAppName);
+
+private:
+	std::vector<DreamAppBase*> GetDreamApp(std::string strDreamAppName);
+
+protected:
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 private:
 	RESULT ClearPriorityQueue();
