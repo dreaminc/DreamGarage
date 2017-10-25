@@ -112,7 +112,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	if (m_pTextUserName == nullptr) {
 		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
-			"u mad bro",
+			m_strScreenName,
 			1.0,
 			0.25,
 			text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD));
@@ -123,6 +123,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pTextUserName->SetPosition(point(0.0f, 1.0f, 0.0f));
 		m_pTextUserName->SetOrientationOffsetDeg(90.0f, 180.0f, 0.0f);
 		m_pTextUserName->SetVisible(false);
+	}
+
+	if (m_pTextUserName->GetText() == "") {
+		m_pTextUserName->SetText(m_strScreenName);
 	}
 	//*/
 
@@ -213,45 +217,6 @@ long DreamPeerApp::GetPeerUserID() {
 	return m_peerUserID;
 }
 
-RESULT DreamPeerApp::GetPeerProfile(long peerUserID) {
-	RESULT r = R_PASS;
-
-	std::cout << "load peer profile..." << std::endl;
-	{
-		HTTPResponse httpResponse;
-	
-		auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-		std::string	strURI = strAPIURL + "/user/" + std::to_string(peerUserID);
-
-		HTTPController *pHTTPController = HTTPController::instance();
-
-		auto headers = HTTPController::ContentAcceptJson();
-		headers.push_back(strAuthorizationToken);
-
-		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
-
-		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
-
-		std::string strHttpResponse(httpResponse.PullResponse());
-		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
-		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
-
-		if (peerUserID = jsonResponse["/data/id"_json_pointer].get<long>()) {
-			m_pTextUserName->SetText(jsonResponse["/data/public_name"_json_pointer].get<std::string>());
-		}
-
-		DEBUG_LINEOUT("User Profile Loaded");
-
-	}
-
-Error:
-	return r;
-}
-
 PeerConnection* DreamPeerApp::GetPeerConnection() {
 	return m_pPeerConnection;
 }
@@ -260,9 +225,12 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	CN(pPeerConnection);
+
 	m_pPeerConnection = pPeerConnection;
-	m_peerUserID = m_pPeerConnection->GetPeerUserID();
-	GetPeerProfile(m_peerUserID);
+	m_peerUserID = m_pPeerConnection->GetPeerUserID();	// this may not need to be member- was for testing
+	
+	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);
 
 Error:
 	return r;

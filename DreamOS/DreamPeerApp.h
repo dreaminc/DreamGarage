@@ -101,7 +101,6 @@ public:
 	DreamPeerApp::state GetState();
 
 	long GetPeerUserID();
-	RESULT GetPeerProfile(long peerUserID);
 
 	PeerConnection *GetPeerConnection();
 	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
@@ -125,7 +124,8 @@ private:
 
 private:
 	long m_peerUserID = -1;
-	
+	std::string m_strScreenName;
+
 	DreamOS *m_pDOS = nullptr;
 	
 	PeerConnection *m_pPeerConnection = nullptr;
