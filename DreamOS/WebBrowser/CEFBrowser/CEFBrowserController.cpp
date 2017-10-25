@@ -394,7 +394,6 @@ CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
 
-#pragma optimize( "", off )
 RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
 	RESULT r = R_PASS;
 
@@ -408,7 +407,6 @@ RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrame
 Error:
 	return r;
 }
-#pragma optimize( "", on )
 
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();

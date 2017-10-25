@@ -43,6 +43,8 @@ Error:
 	return r;
 }
 
+// Currently creating objects in Update to follow the pattern in DreamPeer
+// TODO: Reconsider this arch, as there should be a safe place for apps to create objects in the engine
 RESULT Dream2DMouseApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
