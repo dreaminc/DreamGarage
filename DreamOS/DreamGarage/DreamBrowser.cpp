@@ -16,6 +16,8 @@
 
 #include "WebBrowser/DOMNode.h"
 
+#include "DreamBrowserMessage.h"
+
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -447,7 +449,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-	SetAppName("DreamBrowser");
+	SetAppName(DREAM_BROWSER_APP_NAME);
 	SetAppDescription("A Shared Content View");
 
 	// Set up browser manager

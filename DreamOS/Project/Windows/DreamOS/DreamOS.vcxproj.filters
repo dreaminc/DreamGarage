@@ -884,6 +884,9 @@
     <ClCompile Include="..\..\..\DreamAppMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1980,6 +1983,9 @@
       <Filter>WebBrowser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamAppMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamBrowserMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>
