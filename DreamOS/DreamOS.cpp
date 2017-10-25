@@ -8,6 +8,8 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
+#include "DreamAppMessage.h"
+
 // Messages
 #include "PeerHandshakeMessage.h"
 #include "PeerAckMessage.h"
@@ -914,6 +916,10 @@ RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 
 RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT DreamOS::BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage) {
+	return m_pSandbox->BroadcastDreamAppMessage(strDreamAppName, pDreamAppMessage);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {

@@ -630,7 +630,7 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
-			int a = 5;
+			//SendDreamAppMessage()
 		} break;
 	}
 

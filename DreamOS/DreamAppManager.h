@@ -102,6 +102,7 @@ public:
 	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pRequestingApp);
 
 	RESULT SetMinFrameRate(double minFrameRate);
+	bool FindDreamAppWithName(std::string strDreamAppName);
 
 private:
 	RESULT ClearPriorityQueue();

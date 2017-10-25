@@ -45,6 +45,7 @@
 
 class UIKeyboardLayout;
 class DreamMessage;
+class DreamAppMessage;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -302,6 +303,9 @@ protected:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+
+	// Dream App Messaging 
+	RESULT BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage);
 
 	// IO
 //protected:

@@ -679,6 +679,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamApp.cpp" />
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
+    <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
@@ -924,6 +925,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamApp.h" />
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
+    <ClInclude Include="..\..\..\DreamAppMessage.h" />
     <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
     <ClInclude Include="..\..\..\DreamConsole\Console.h" />
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />

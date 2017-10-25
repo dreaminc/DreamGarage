@@ -48,6 +48,18 @@ RESULT DreamAppManager::SetMinFrameRate(double minFrameRate) {
 	return R_PASS;
 }
 
+bool DreamAppManager::FindDreamAppWithName(std::string strDreamAppName) {
+	for (auto dreamAppEntry : m_appRegistry) {
+		auto &pDreamApp = dreamAppEntry.second;
+
+		if (pDreamApp->GetAppName() == strDreamAppName) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 RESULT DreamAppManager::Update() {
 	RESULT r = R_PASS;
 

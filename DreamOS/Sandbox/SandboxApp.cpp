@@ -9,6 +9,7 @@
 #include <HMD/Oculus/OVR.h>
 
 #include "DreamAppManager.h"
+#include "DreamAppMessage.h"
 
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
@@ -1575,6 +1576,17 @@ RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT SandboxApp::BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CBM((m_pDreamAppManager->FindDreamAppWithName(strDreamAppName)), "Cannot find dream app name %s", strDreamAppName.c_str());
+
+	CR(BroadcastDataMessage(pDreamAppMessage));
+
+Error:
+	return r;
 }
 
 // TimeManager

@@ -48,6 +48,7 @@ class skybox;
 class model;
 class user;
 class Message;
+class DreamAppMessage;
 
 class UIKeyboardLayout;
 
@@ -339,6 +340,8 @@ public:
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+
+	RESULT BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage);
 
 	// IO
 public:
