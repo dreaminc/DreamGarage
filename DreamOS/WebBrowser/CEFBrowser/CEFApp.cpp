@@ -9,6 +9,7 @@
 #include "include/wrapper/cef_helpers.h"
 
 #include "CEFHandler.h"
+#include "CEFDOMNode.h"
 
 // Initialize and allocate the instance
 CEFApp* singleton<CEFApp>::s_pInstance = nullptr;
@@ -113,6 +114,90 @@ Error:
 	return;
 }
 
+// This handles IPC between render and browser processes 
+bool CEFApp::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCEFBrowser, CefProcessId cefSourceProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
+	RESULT r = R_PASS;
+
+//Error: 
+	return false;
+}
+
+// If this takes too long debug will screw up the render process 
+// If this is an issue, we'll need to create a pending queue arch to avoid the delay
+// Meanwhile, this is a duplication of the code in DreamCEFApp in DreamCEF
+// TODO: Find a good way to merge across DreamCEF and main client app
+void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	int cefBrowserID = pCEFBrowser->GetIdentifier();
+	int cefFrameID = pCEFFrame->GetIdentifier();
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::OnFocusedNodeChanged");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	//cefProcessMessageArguments->SetInt(0, cefBrowserID);
+	//cefProcessMessageArguments->SetInt(1, cefFrameID);
+
+	if (pCEFDOMNode != nullptr) {
+		cefProcessMessageArguments->SetString(0, pCEFDOMNode->GetElementTagName());
+		cefProcessMessageArguments->SetString(1, pCEFDOMNode->GetName());
+		cefProcessMessageArguments->SetString(2, pCEFDOMNode->GetValue());
+
+		cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
+
+		int cefDOMNodeType = pCEFDOMNode->GetType();
+		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
+	}
+	else {
+		cefProcessMessageArguments->SetString(0, "");
+		cefProcessMessageArguments->SetString(1, "");
+		cefProcessMessageArguments->SetString(2, "");
+		cefProcessMessageArguments->SetBool(3, false);
+		cefProcessMessageArguments->SetInt(4, 0);
+	}
+
+	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return;
+}
+
+// This is the inter-process boundary call back (vs the one above)
+RESULT CEFApp::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+	}
+
+Error:
+	return r;
+}
+
+// This doesn't do much right now
+// but this gives us back a different browser than the browser process (render process)
+void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
+	CN(pCEFBrowser);
+
+	int browserID = pCEFBrowser->GetIdentifier();
+
+	/*
+	{
+		auto pCEFBrowserController = m_pCEFAppObserver->GetCEFBrowserController(pCEFBrowser);
+		CN(pCEFBrowserController);
+	}
+	*/
+
+Error:
+	return;
+}
+
 RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {
 	RESULT r = R_PASS;
 
@@ -140,7 +225,7 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;
 
-	// Set up the promise (Will be set in OnBrowserCreated
+	// Set up the promise (Will be set in OnBrowserCreated)
 	
 	m_promiseCEFBrowserController = std::promise<std::shared_ptr<CEFBrowserController>>();
 	std::future<std::shared_ptr<CEFBrowserController>> futureCEFBrowserController = m_promiseCEFBrowserController.get_future();

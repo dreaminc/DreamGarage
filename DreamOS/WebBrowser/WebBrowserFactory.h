@@ -6,16 +6,19 @@
 // DREAM OS
 // DreamOS/CEFBrowser/WebBrowserControllerFactory.h
 
-enum class WEB_BROWSER_CONTROLLER_TYPE {
+enum class WEB_BROWSER_TYPE {
 	CEF,
 	INVALID
 };
 
+class DOMNode;
+class DOMDocument;
 class WebBrowserController;
 
-class WebBrowserControllerFactory {
+class WebBrowserFactory {
 public:
-	static WebBrowserController* MakeWebBrowserController(WEB_BROWSER_CONTROLLER_TYPE type);
+	static WebBrowserController* MakeWebBrowserController(WEB_BROWSER_TYPE type);
+	static DOMNode* MakeDOMNode(WEB_BROWSER_TYPE type, void *pSource = nullptr);
 };
 
 #endif // ! WEB_BROWSER_FACTORY_H_

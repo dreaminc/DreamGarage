@@ -4,12 +4,15 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/CEFBrowser/WebBrowserController.h
+// DreamOS/WebBrowser/WebBrowser.h
 
 #include <memory>
 #include <functional>
 
 #include <vector>
+
+class DOMNode;
+class DOMDocument;
 
 struct WebBrowserPoint {
 	int x;
@@ -37,6 +40,7 @@ struct WebBrowserMouseEvent {
 };
 
 class WebRequest;
+class DOMNode;
 
 // TODO: Revisit these functions 
 class WebBrowserController {
@@ -53,6 +57,7 @@ public:
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode) = 0;
+		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
 	};
 
 public:
@@ -91,6 +96,12 @@ public:
 
 	virtual RESULT Shutdown() = 0;
 
+
+	// frames
+	virtual size_t GetFrameCount() = 0;
+
+	// DOM
+	//virtual RESULT GetFocusedNode() = 0;
 
 	std::string GetID() {
 		return m_strID;

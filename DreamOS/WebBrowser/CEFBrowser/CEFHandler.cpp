@@ -20,6 +20,10 @@
 
 #include "CEFApp.h"
 
+#include "Core/Utilities.h"
+#include "CEFDOMNode.h"
+
+
 #pragma warning(default : 4067)
 
 // Initialize and allocate the instance
@@ -67,6 +71,65 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
 
+bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, CefProcessId sourceCEFProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
+	RESULT r = R_PASS;
+
+	const std::string& strMessageName = pCEFProcessMessage->GetName();
+	CEFDOMNode *pCEFDOMNode = nullptr;
+
+	bool fHandled = false;
+
+	auto tokens = util::TokenizeString(strMessageName, "::");
+	CB((tokens.size() == 2));
+
+	{
+		std::string strObjectName = tokens[0];
+		std::string strMethodName = tokens[1];
+
+		if (strObjectName == "DreamCEFApp") {
+			if (strMethodName == "OnFocusedNodeChanged") {
+				
+				auto pCEFProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+				size_t numArgs = pCEFProcessMessageArguments->GetSize();
+
+				CB((numArgs > 0));
+
+				int cefBrowserID = pCefBrowser->GetIdentifier();
+
+				//CB((cefBrowserID == cefProcBrowserID));
+
+				// Strings
+				std::string strElementTagName = pCEFProcessMessageArguments->GetString(0);
+				std::string strName = pCEFProcessMessageArguments->GetString(1);
+				std::string strValue = pCEFProcessMessageArguments->GetString(2);
+
+				// Editable
+				bool fEditable = pCEFProcessMessageArguments->GetBool(3);
+
+				// Type
+				cef_dom_node_type_t cefDOMNodeType = (cef_dom_node_type_t)(pCEFProcessMessageArguments->GetInt(4));
+
+				// Create the node
+				pCEFDOMNode = new CEFDOMNode(cefDOMNodeType, strName, strElementTagName, strValue, fEditable);
+
+				if (m_pCEFHandlerObserver != nullptr) {
+					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, -1, pCEFDOMNode));
+				}
+
+				fHandled = true;
+			}
+		}
+	}
+
+Error:
+	if (pCEFDOMNode != nullptr) {
+		delete pCEFDOMNode;
+		pCEFDOMNode = nullptr;
+	}
+
+	return fHandled;
+}
+
 /*
 CefRefPtr<CefDownloadHandler> CEFHandler::GetDownloadHandler() {
 	return this;
@@ -95,6 +158,8 @@ void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	
 	m_cefBrowsers.push_back(pCEFBrowser);
 	m_fBrowserRunning = true;
+
+	int browserID = pCEFBrowser->GetIdentifier();
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::make_shared<CEFBrowserController>(pCEFBrowser);
 	CN(pCEFBrowserController);

@@ -14,6 +14,8 @@
 
 #include "Cloud/WebRequest.h"
 
+#include "WebBrowser/DOMNode.h"
+
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -408,6 +410,22 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
+	RESULT r = R_PASS;
+
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+		DEBUG_LINEOUT("editable!");
+		m_pPointerCursor->SetVisible(false);
+	}
+	else {
+		DEBUG_LINEOUT("non editable!");
+		m_pPointerCursor->SetVisible(true);
+	}
+
+//Error:
+	return r;
+}
+
 // DreamApp Interface
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
@@ -418,11 +436,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	int pxHeight = m_browserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
-
-	// Subscribers (children)
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
-	}
 
 	// Controller
 	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
@@ -467,12 +480,13 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
-	/*
-	m_pPointerCursor = GetComposite()->AddModel(L"\\Models\\mouse-cursor\\mouse-cursor.obj",
-												nullptr,
-												point(-0.2f, -0.43f, 0.0f),
-												0.01f,
-												vector(-(float)M_PI_2, 0.0f, 0.0f));
+	///*
+	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
+	CN(m_pPointerCursor);
+
+	m_pPointerCursor->SetPivotPoint(point(-0.2f, -0.43f, 0.0f));
+	m_pPointerCursor->SetScale(0.01f);
+	m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
 	m_pPointerCursor->SetMaterialAmbient(1.0f);
 	m_pPointerCursor->SetVisible(false);
 	//*/
@@ -486,6 +500,17 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//*/
 
 	GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
+
+	// Subscribers (children)
+
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_ENDED, this));
+
+	// Mouse related
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_UP, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_WHEEL, this));
 
 Error:
 	return r;
@@ -511,18 +536,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 	else {
 		SetVisible(false);
 	}
-
-	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
-
-	/*
-	{
-		CollisionManifold manifold = m_pBrowserQuad->Collide(rCast);
-
-		if (manifold.NumContacts() > 0) {
-			m_pPointerCursor->SetOrigin(manifold.GetContactPoint(0).GetPoint());
-		}
-	}
-	*/
 
 Error:
 	return r;
@@ -573,9 +586,9 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	bool fUpdateMouse = false;
 
-	//m_pTestSphereAbsolute->SetPosition(pEvent->m_ptContact[0]);
+	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
+
 	switch (pEvent->m_eventType) {
-	/*
 		case ELEMENT_INTERSECT_BEGAN: {
 			if (m_pBrowserQuad->IsVisible()) {
 				m_pPointerCursor->SetVisible(true);
@@ -631,6 +644,10 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+
+			//// Determine focused node
+			//CR(m_pWebBrowserController->GetFocusedNode());
+
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
@@ -658,7 +675,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
-		//*/
+
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
 		// TODO: haven't seen any issues with KEY_UP being a no-op
@@ -712,7 +729,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 		} break;
 	}
-/*
+	
 	// First point of contact
 	if (fUpdateMouse) {
 		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
@@ -724,7 +741,6 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
-	//*/
 
 Error:
 	return r;

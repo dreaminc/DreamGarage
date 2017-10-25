@@ -25,6 +25,7 @@
 #undef PLOG
 #endif
 
+#include "include\cef_base.h"
 #include "include/cef_render_handler.h"
 #include "include/cef_load_handler.h"
 
@@ -43,6 +44,8 @@ class CefPostData;
 // Ours
 class WebRequest;
 class WebRequestPostData;
+
+class CEFDOMNode;
 
 class CEFBrowserController :  public WebBrowserController {
 
@@ -67,6 +70,8 @@ public:
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward);
 	RESULT OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type);
 	RESULT OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode);
+	//RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
+	RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode);
 
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
@@ -78,6 +83,12 @@ public:
 	virtual RESULT Shutdown() override; 
 
 	CefRefPtr<CefBrowser> GetCEFBrowser();
+
+	// Frames
+	virtual size_t GetFrameCount() override;
+
+	// Get Focused DOM element
+	//virtual RESULT GetFocusedNode() override;
 
 private:
 	// browser logical size

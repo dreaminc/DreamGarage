@@ -10,7 +10,9 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
+
 #include "DreamGarage\DreamBrowser.h"
+#include "DreamGarage\Dream2DMouseApp.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -25,6 +27,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
 	CR(AddTestCaptureApp());
 
 	CR(AddTestUserApp());	
@@ -35,15 +39,13 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamUIBar());
 
-	CR(AddTestDreamBrowser());
-
 	CR(AddTestCaptureApp());
 
 Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::SetupPipeline() {
+RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -55,11 +57,7 @@ RESULT DreamOSTestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -208,14 +206,21 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
-		std::string strURL = "http://www.youtube.com";
+		//std::string strURL = "http://www.youtube.com";
+
+		std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 
 		CN(m_pDreamOS);
 
 		CR(SetupDreamAppPipeline());
 
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the 2D Mouse App
+		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
 
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
@@ -226,8 +231,6 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetDiagonalSize(10.0f);
 
-		//pDreamContentView->SetScreenTexture(L"crate_color.png");
-		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
 
 	Error:

@@ -1,7 +1,16 @@
 #include "CefBrowserController.h"
 //#include "easylogging++.h"
 
+#include "include/cef_base.h"
 #include "include/cef_browser.h"
+#include "include/wrapper/cef_helpers.h"
+#include "include/base/cef_bind.h"
+
+#include "include/cef_browser.h"
+#include "include/cef_app.h"
+
+#include "include/wrapper/cef_closure_task.h"
+#include "include/wrapper/cef_helpers.h"
 
 #include <sstream>
 #include <string>
@@ -9,6 +18,8 @@
 #include "Cloud/WebRequest.h"
 #include "Cloud/WebRequestPostData.h"
 #include "Cloud/WebRequestPostDataElement.h"
+
+#include "CEFDOMNode.h"
 
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
@@ -382,3 +393,77 @@ Error:
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
+
+RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	CN(pCEFDOMNode);
+
+	// Report to browser
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(pCEFDOMNode));
+	}
+
+Error:
+	return r;
+}
+
+size_t CEFBrowserController::GetFrameCount() {
+	return m_pCEFBrowser->GetFrameCount();
+}
+
+/*
+// TODO: Put this somewhere better
+class CEFDOMVisitor : public CefDOMVisitor {
+public:
+	CEFDOMVisitor(std::shared_ptr<CEFBrowserController> pParentController) :
+		m_pParentCEFBrowserController(pParentController)
+	{
+		// empty
+	}
+
+	virtual void Visit(CefRefPtr<CefDOMDocument> pCefDOMDocument) override {
+		RESULT r = R_PASS;
+
+		CN(pCefDOMDocument);
+		
+		{
+			auto pCefDOMNode = pCefDOMDocument->GetFocusedNode();
+			CN(pCefDOMNode);
+		}
+
+		// catch it
+
+	Error:
+		return;
+	}
+
+	IMPLEMENT_REFCOUNTING(CEFDOMVisitor);
+
+private:
+	std::shared_ptr<CEFBrowserController> m_pParentCEFBrowserController = nullptr;
+};
+
+// TODO: Not sure if we need this
+RESULT CEFBrowserController::GetFocusedNode() {
+	RESULT r = R_PASS;
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("CEFBrowserController::GetFocusedNode");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefMessageArgs = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	cefMessageArgs->SetString(0, "TestString");
+	cefMessageArgs->SetInt(0, 55);
+
+	// Send the process message to the render process.
+	// Use PID_BROWSER instead when sending a message to the browser process.
+	CN(m_pCEFBrowser);
+	CBM((m_pCEFBrowser->SendProcessMessage(PID_RENDERER, pCEFProcessMessage)), "Failed to send browser process a message");
+
+Error:
+	return r;
+}
+*/

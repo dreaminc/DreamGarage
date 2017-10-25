@@ -30,7 +30,8 @@ class WebBrowserController;
 class CEFApp : public singleton<CEFApp>, 
 	public CEFHandler::CEFHandlerObserver,
 	public CefApp, 
-	public CefBrowserProcessHandler
+	public CefBrowserProcessHandler,
+	public CefRenderProcessHandler
 {
 public:
 	CEFApp();
@@ -52,9 +53,14 @@ public:
 	virtual RESULT OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
 	virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) override;
 	virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) override;
+	virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) override;
 
 	// CefApp methods:
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {
+		return this;
+	}
+
+	virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override {
 		return this;
 	}
 
@@ -62,6 +68,11 @@ public:
 	virtual void OnContextInitialized() override;
 
 	std::shared_ptr<WebBrowserController> CreateBrowser(int width, int height, const std::string& strURL);
+
+	// CefRenderProcessHandler
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
+	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
+	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
 
 	// CEFAppObserver
 	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;

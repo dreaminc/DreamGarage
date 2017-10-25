@@ -107,6 +107,7 @@ Error:
 
 RESULT CEFBrowserManager::OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
@@ -119,11 +120,41 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEFBrowserManager: OnFocusedNodeChanged");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(cefBrowserID);
+	CN(pCEFBrowserController);
+
+	// TODO: add frame
+	CR(pCEFBrowserController->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(int cefBrowserID) {
+	for (auto &pWebBrowserController : m_webBrowserControllers) {
+		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
+		if (pCEFBrowserController != nullptr) {
+			if (pCEFBrowserController->GetCEFBrowser()->GetIdentifier() == cefBrowserID) {
+				return pCEFBrowserController;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
 		if (pCEFBrowserController != nullptr) {
-			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser)) {
+			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser))  {
 				return pCEFBrowserController;
 			}
 		}

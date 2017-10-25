@@ -76,7 +76,6 @@ RESULT UITestSuite::AddTests() {
 
 	//CR(AddTestKeyboard());
 
-	//CR(AddTestBrowser());
 //	CR(AddTestInteractionFauxUI());
 
 
