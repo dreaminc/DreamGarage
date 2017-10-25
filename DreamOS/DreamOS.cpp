@@ -187,7 +187,7 @@ Error:
 RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
-	// temp
+	// TEMP: This prevents a peer connection from being created
 	return r;
 
 	// Create a new peer

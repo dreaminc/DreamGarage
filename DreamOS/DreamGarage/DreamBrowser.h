@@ -132,6 +132,8 @@ public:
 
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
+	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
+	bool m_fTestQuadActive = false;
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
@@ -178,10 +180,13 @@ protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
-	sphere *m_pTestSphereAbsolute = nullptr;
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
+
+	// Test Stuff
+	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
+	sphere *m_pTestSphereAbsolute = nullptr;
+	std::shared_ptr<quad> m_pTestQuad = nullptr;
 
 	std::shared_ptr<composite> m_pPointerCursor = nullptr;
 	std::shared_ptr<composite> m_pHandCursor = nullptr;

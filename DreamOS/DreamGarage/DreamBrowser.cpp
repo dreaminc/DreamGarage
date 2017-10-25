@@ -195,14 +195,16 @@ RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 	if (pxXScroll > m_pxXPosition) {
 		pxXDiff = pxXScroll - m_pxXPosition;
 	}
-	else
+	else {
 		pxXDiff = m_pxXPosition - pxXScroll;
+	}
 	
 	if (pxYScroll > m_pxYPosition) {
 		pxYDiff = pxYScroll - m_pxYPosition;
 	}
-	else 
+	else {
 		pxYDiff = m_pxYPosition - pxYScroll;
+	}
 
 	m_pxXPosition = pxXScroll;
 	m_pxYPosition = pxYScroll;
@@ -224,8 +226,9 @@ RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
 	if (pxXScroll > m_pxXPosition) {
 		pxXDiff = pxXScroll - m_pxXPosition;
 	}
-	else 
+	else {
 		pxXDiff = m_pxXPosition - pxXScroll;
+	}
 
 	m_pxXPosition = pxXScroll;
 
@@ -243,10 +246,12 @@ RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
 
 	int pxYDiff;
 
-	if (pxYScroll > m_pxYPosition)
+	if (pxYScroll > m_pxYPosition) {
 		pxYDiff = pxYScroll - m_pxYPosition;
-	else 
+	}
+	else {
 		pxYDiff = m_pxYPosition - pxYScroll;
+	}
 
 	m_pxYPosition = pxYScroll;
 	
@@ -264,6 +269,7 @@ RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff) {
 
 	m_pxXPosition += pxXDiff;
 	m_pxYPosition += pxYDiff;
+
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
 
 Error:
@@ -279,6 +285,7 @@ RESULT DreamBrowser::ScrollBrowserXByDiff(int pxXDiff) {
 	m_pxXPosition += pxXDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, 0));
+
 Error:
 	return r;
 }
@@ -292,6 +299,7 @@ RESULT DreamBrowser::ScrollBrowserYByDiff(int pxYDiff) {
 	m_pxYPosition += pxYDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, 0, pxYDiff));
+
 Error:
 	return r;
 }
@@ -322,14 +330,17 @@ int DreamBrowser::GetBrowserWidth() {
 
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	RESULT r = R_PASS;
+
 	WebBrowserMouseEvent mouseEvent;
 
 	mouseEvent.pt = ptContact;
 	m_lastWebBrowserPoint = ptContact;
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+	
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));		// mouse down
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, true, 1));		// mouse up
+
 Error:
 	return r;
 }
@@ -343,7 +354,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	RESULT r = R_PASS;
 
 	CN(m_pBrowserTexture);
-	//CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
+
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	
 Error:
@@ -355,7 +366,6 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 }
 
 RESULT DreamBrowser::FadeQuadToBlack() {
-
 	RESULT r = R_PASS;
 
 	//Fade to black
@@ -437,11 +447,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
-	// Controller
-	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
-	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
-	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
-
 	SetAppName("DreamBrowser");
 	SetAppDescription("A Shared Content View");
 
@@ -458,6 +463,13 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+	CN(m_pBrowserQuad);
+
+	// Test code
+	///*
+	m_pTestQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
+	CN(m_pTestQuad);
+	m_pTestQuad->translateX(GetWidth() + 0.5f + 0.1f);
 
 	/*
 	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
@@ -465,7 +477,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
 	m_pTestSphereRelative->SetColor(COLOR_RED);
-	*/
+	//*/
 	
 	// Flip UV vertically
 	///*
@@ -481,6 +493,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up mouse / hand cursor model
 	///*
+	GetComposite()->InitializeOBB();
+
 	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
 	CN(m_pPointerCursor);
 
@@ -499,10 +513,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 											 vector(0.0f, 0.0f, 0.0f));
 	//*/
 
-	GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
+	//GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
+	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	// Subscribers (children)
-
+	/*
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_MOVED, this));
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_ENDED, this));
@@ -511,6 +526,24 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_UP, this));
 	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_WHEEL, this));
+	*/
+
+	/*
+	// Test
+	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_ENDED, this));
+	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
+	*/
+
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
+
+	// Mouse related
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_DOWN, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_UP, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_WHEEL, this));
 
 Error:
 	return r;
@@ -580,6 +613,33 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 	return webPt;
 }
 
+RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	switch (pEvent->m_eventType) {
+		case ELEMENT_INTERSECT_BEGAN: {
+			m_fTestQuadActive = true;
+		} break;
+
+		case ELEMENT_INTERSECT_MOVED: {
+			// empty
+		} break;
+
+		case ELEMENT_INTERSECT_ENDED: {
+			m_fTestQuadActive = false;
+		} break;
+
+		case INTERACTION_EVENT_SELECT_DOWN: {
+			int a = 5;
+		} break;
+	}
+
+	CR(r);
+
+Error:
+	return r;
+}
+
 // InteractionObjectEvent
 RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
@@ -587,6 +647,10 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	bool fUpdateMouse = false;
 
 	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
+
+	if (pEvent->m_pObject == m_pTestQuad.get() || m_fTestQuadActive) {
+		return HandleTestQuadInteractionEvents(pEvent);
+	}
 
 	switch (pEvent->m_eventType) {
 		case ELEMENT_INTERSECT_BEGAN: {
@@ -899,45 +963,6 @@ RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
 Error:
 	return r;
 }
-
-// TODO: Remove
-/*
-RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {
-	RESULT r = R_PASS;
-
-	SENSE_CONTROLLER_EVENT_TYPE eventType = pEvent->type;
-
-	// TODO: Replace with interaction engine based events
-
-	if (pEvent->state.type == CONTROLLER_RIGHT) {
-		
-		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			// TODO: mouse down 
-			if (m_fBrowserActive) {
-				WebBrowserMouseEvent webBrowserEvent;
-
-				webBrowserEvent.pt = m_lastWebBrowserPoint;
-				webBrowserEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-				CR(m_pWebBrowserController->SendMouseClick(webBrowserEvent, true, 1));
-			}
-		}
-		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			if (m_fBrowserActive) {
-				WebBrowserMouseEvent webBrowserEvent;
-
-				webBrowserEvent.pt = m_lastWebBrowserPoint;
-				webBrowserEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-				CR(m_pWebBrowserController->SendMouseClick(webBrowserEvent, false, 1));
-			}
-		}
-	}
-
-Error:
-	return r;
-}
-*/
 
 std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
 	return m_pBrowserTexture;
