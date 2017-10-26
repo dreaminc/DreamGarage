@@ -104,13 +104,15 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
-			// This GetSenseController crashes in testing if fUseHMD is false
-			if (GetDOS()->GetHMD() != nullptr) {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			}
+			UIMallet* pLeftMallet = nullptr;
+			UIMallet* pRightMallet = nullptr;
+			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+			CB(userUIDs.size() == 1);
+			auto pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userUIDs[0], this));
+			pUserHandle->SendHapticImpulse(pInteractionEvent->m_pInteractionObject);
+			CR(GetDOS()->ReleaseApp(pUserHandle, userUIDs[0], this));
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-
 			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
 
 		} break;

@@ -288,7 +288,7 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 			RESULT r = R_PASS;
 			if (event->type == SENSE_CONTROLLER_MENU_UP) {
 				//hardcoded values taken from DreamUIBar
-				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
+				CR(pKeyboard->UpdateComposite(-0.30f));
 			}
 		Error:
 			return r;

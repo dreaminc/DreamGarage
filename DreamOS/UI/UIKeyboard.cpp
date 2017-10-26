@@ -27,10 +27,18 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboardHandle::UpdateComposite(float height, float depth) {
+RESULT UIKeyboardHandle::SendUpdateComposite(float depth) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	CR(UpdateKeyboardComposite(height, depth));
+	CR(UpdateComposite(depth));
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateComposite(depth, ptOrigin, qOrigin));
 Error:
 	return r;
 }
@@ -425,9 +433,20 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 }
 
 RESULT UIKeyboard::ShowKeyboard() {
+	RESULT r = R_PASS;
 
 	//Capture user app
+	//point ptOrigin;
+	//quaternion qOrigin;
+
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+	CN(m_pUserHandle);
+
+	//CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	//CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	
+	//GetComposite()->SetPosition(ptOrigin);
+	//GetComposite()->SetOrientation(qOrigin);
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -445,16 +464,12 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		CN(m_pUserHandle);
-//		CB(m_pUserHandle->GetAppState());
-		//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Show());
-		//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Show());
 	Error:
 		return r;
 	};
 
 	DimObj *pObj = GetComposite();
-	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
@@ -465,8 +480,9 @@ RESULT UIKeyboard::ShowKeyboard() {
 		fnStartCallback,
 		fnEndCallback,
 		this
-	);
-	return R_PASS;
+	));
+Error:
+	return r;
 }
 
 RESULT UIKeyboard::HideKeyboard() {
@@ -491,12 +507,6 @@ RESULT UIKeyboard::HideKeyboard() {
 
 	DimObj *pObj = GetComposite();
 
-	//CN(m_pUserHandle);
-	//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->Hide());
-	//CR(m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->Hide());
-
-	CR(GetDOS()->ReleaseApp(m_pUserHandle, m_userAppUID, this));
-
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
@@ -510,7 +520,6 @@ RESULT UIKeyboard::HideKeyboard() {
 		this
 	);
 
-Error:
 	return r;
 }
 
@@ -524,10 +533,6 @@ bool UIKeyboard::IsVisible() {
 
 bool UIKeyboard::IsKeyboardVisible() {
 	return IsVisible();
-}
-
-RESULT UIKeyboard::UpdateKeyboardComposite(float height, float depth) {
-	return UpdateComposite(height, depth);
 }
 
 RESULT UIKeyboard::SetVisible(bool fVisible) {
@@ -694,20 +699,53 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateComposite(float height, float depth) {
+RESULT UIKeyboard::UpdateComposite(float depth) {
 	RESULT r = R_PASS;
 
 	point ptHeader = m_pHeaderContainer->GetPosition();
 	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
+
 	float offset = m_surfaceHeight / 2.0f;
 	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
-	//float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
-	CR(UpdateCompositeWithHands(height));
+	point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+
+	point ptOrigin;
+	quaternion qOrigin;
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+
+	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
+	GetComposite()->SetOrientation(qOrigin);
+
 	m_ptComposite = GetComposite()->GetPosition();
 
 Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
+	RESULT r = R_PASS;
+
+	point ptHeader = m_pHeaderContainer->GetPosition();
+	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
+
+	float offset = m_surfaceHeight / 2.0f;
+	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
+
+	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
+
+	point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+
+	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
+	GetComposite()->SetOrientation(qOrigin);
+
+	m_ptComposite = GetComposite()->GetPosition();
+
+//Error:
 	return r;
 }
 

@@ -16,10 +16,34 @@ Error:
 	return nullptr;
 }
 
+RESULT DreamUserHandle::SendHapticImpulse(VirtualObj *pEventObj) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(CreateHapticImpulse(pEventObj));
+Error:
+	return r;
+}
+
 RESULT DreamUserHandle::SendPresentApp(ActiveAppType type) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(PresentApp(type));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::RequestAppBasisPosition(point& ptOrigin) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(GetAppBasisPosition(ptOrigin));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::RequestAppBasisOrientation(quaternion& qOrigin) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(GetAppBasisOrientation(qOrigin));
 Error:
 	return r;
 }
@@ -63,6 +87,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
 	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
+	m_pAppBasis = pDreamOS->MakeComposite();
+
 Error:
 	return r;
 }
@@ -87,6 +113,10 @@ Error:
 
 DreamAppHandle* DreamUserApp::GetAppHandle() {
 	return (DreamUserHandle*)(this);
+}
+
+unsigned int DreamUserApp::GetHandleLimit() {
+	return -1;
 }
 
 RESULT DreamUserApp::Update(void *pContext) {
@@ -136,10 +166,6 @@ Error:
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	//CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
-	
-	//CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
-
 	if (mEvent->m_eventType == INTERACTION_EVENT_MENU) {
 
 		// get app ids
@@ -149,6 +175,9 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 		//auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
 		auto controlUIDs = pDreamOS->GetAppUID("DreamControlView");
+
+		//TODO: requesting the handles may need to be moved into the switch statements,
+		//		depending on how other applications handle capturing each other
 
 		CB(menuUIDs.size() == 1);
 		auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
@@ -167,7 +196,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 				if (pMenuHandle != nullptr) {
 					m_activeState = ActiveAppType::MENU;
-					//pMenuHandle->ShowApp();
+					UpdateCompositeWithHands(m_menuHeight);
 					pMenuHandle->SendShowRootMenu();
 				}
 				m_pLeftMallet->Show();
@@ -191,7 +220,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 					if (fHide) {
 						m_activeState = ActiveAppType::NONE;
-						pMenuHandle->HideApp();
+						pMenuHandle->SendHideApp();
 						m_pLeftMallet->Hide();
 						m_pRightMallet->Hide();
 					}
@@ -206,18 +235,17 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 				}
 
 				if (pMenuHandle != nullptr) {
-					//pMenuHandle->SendMenuUp(nullptr);
-					//pMenuHandle->ShowApp();
 					pMenuHandle->SendRequestMenu();
 				}
 
 			} break;
 
 			case ActiveAppType::CONTROL: {
-				m_activeState = ActiveAppType::MENU;
+				m_activeState = ActiveAppType::NONE;
+				m_pLeftMallet->Hide();
+				m_pRightMallet->Hide();
 
 				if (pMenuHandle != nullptr) {
-					//pMenuHandle->ShowApp();
 					pMenuHandle->SendRequestMenu();
 				}
 
@@ -247,11 +275,58 @@ Error:
 
 RESULT DreamUserApp::PresentApp(ActiveAppType type) {
 	RESULT r = R_PASS;
-
 	//TODO: potentially move more logic from the apps into here
+
+	auto pDreamOS = GetDOS();
+
+	//*
+	switch (type) {
+
+		case (ActiveAppType::KB_CONTROL):
+		case (ActiveAppType::KB_MENU): {
+			point ptOrigin;
+			quaternion qOrigin;
+
+			auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+			CB(keyUIDs.size() == 1);
+			auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
+
+			CN(pKeyboardHandle);
+
+			GetAppBasisPosition(ptOrigin);
+			GetAppBasisOrientation(qOrigin);
+			pKeyboardHandle->SendUpdateComposite(m_menuDepth, ptOrigin, qOrigin);
+			pKeyboardHandle->Show();
+			GetDOS()->ReleaseApp(pKeyboardHandle, keyUIDs[0], this);
+		} break;
+	
+		case (ActiveAppType::CONTROL): {
+			auto viewUIDs = pDreamOS->GetAppUID("DreamControlView");
+			CB(viewUIDs.size() == 1);
+			auto pControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(viewUIDs[0], this));
+			CN(pControlViewHandle);
+
+			CR(pControlViewHandle->ShowApp());
+			CR(GetDOS()->ReleaseApp(pControlViewHandle, viewUIDs[0], this));
+		} break;
+	}
+
+	
+	//*/
 	m_activeState = type;
 
+Error:
 	return r;
+}
+
+RESULT DreamUserApp::GetAppBasisPosition(point& ptOrigin) {
+	ptOrigin = m_pAppBasis->GetPosition();
+	return R_PASS;
+}
+
+RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
+	qOrigin = m_pAppBasis->GetOrientation();
+	return R_PASS;
 }
 
 RESULT DreamUserApp::SetHand(hand *pHand) {
@@ -277,6 +352,20 @@ UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
 	return nullptr;
 }
 
+RESULT DreamUserApp::CreateHapticImpulse(VirtualObj *pEventObj) {
+	RESULT r = R_PASS;
+
+	if (pEventObj == m_pLeftMallet->GetMalletHead()) {
+		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+	}
+	else if (pEventObj == m_pRightMallet->GetMalletHead()) {
+		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
 
 	composite *pComposite = GetComposite();
@@ -286,8 +375,6 @@ RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
 
 	m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
 	m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-	//pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
-	//pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
 
 	return R_PASS;
 }
@@ -300,21 +387,15 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	vector vLookXZ = GetCameraLookXZ();
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
-	hand *pLeftHand = GetDOS()->GetHand(HAND_TYPE::HAND_LEFT);
-	hand *pRightHand = GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT);
-
-	//TODO: use axes enum to define plane, cylinder, or sphere surface
-	//uint16_t axes = static_cast<uint16_t>(handAxes);
-
 	CN(pCamera);
-	CN(pLeftHand);
-	CN(pRightHand);
+	CN(m_pLeftHand);
+	CN(m_pRightHand);
 	{
 		float dist = 0.0f;
 
 		point ptCamera = pCamera->GetPosition();
 		vector vPos;
-		for (auto& hand : { pLeftHand, pRightHand }) {
+		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
 			float handDist = 0.0f;
 			point ptHand = hand->GetPosition(true);
 			vector vHand = ptHand - pCamera->GetOrigin(true);
@@ -327,8 +408,6 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
 		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-		//pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
-		//pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
 	}
 
 Error:

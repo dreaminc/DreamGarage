@@ -59,22 +59,18 @@ enum class MenuState {
 
 class DreamUIBarHandle : public DreamAppHandle {
 public:
-	virtual RESULT ShowApp() = 0;
-	virtual RESULT HideApp() = 0;
-
-public:
-	RESULT SendMenuUp(void *pContext);
 	RESULT RequestPathEmpty(bool &fPathEmpty);
 	RESULT SendPopPath();
 	RESULT SendShowRootMenu();
 	RESULT SendRequestMenu();
+	RESULT SendHideApp();
 
 private:
-	virtual RESULT HandleMenuUp(void *pContext) = 0;
 	virtual RESULT IsPathEmpty(bool &fPathEmpty) = 0;
 	virtual RESULT PopPath() = 0;
 	virtual RESULT RequestMenu() = 0;
 	virtual RESULT ShowRootMenu() = 0;
+	virtual RESULT HideApp() = 0;
 };
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
@@ -105,7 +101,7 @@ public:
 
 	// Animations
 	virtual RESULT HideApp() override;
-	virtual RESULT ShowApp() override;
+	RESULT ShowApp();
 
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
@@ -113,10 +109,8 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
-	virtual RESULT HandleMenuUp(void* pContext) override;
 	virtual RESULT IsPathEmpty(bool &fPathEmpty) override;
 	virtual RESULT PopPath() override;
-	//virtual RESUL-
 	virtual RESULT RequestMenu() override;
 	virtual RESULT ShowRootMenu() override;
 

@@ -955,7 +955,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 					pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
 					CR(GetDOS()->ReleaseApp(pUserHandle, userUID, this));
 				}
-//*
+/*
 				auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
 				CB(viewUIDs.size() == 1);
 				{

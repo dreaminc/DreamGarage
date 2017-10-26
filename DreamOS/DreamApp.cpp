@@ -78,3 +78,8 @@ RESULT DreamAppBase::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage)
 Error:
 	return r;
 }
+
+unsigned int DreamAppBase::GetHandleLimit() {
+	return 1;
+}
+
