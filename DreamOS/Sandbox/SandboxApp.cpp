@@ -1590,10 +1590,10 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	CBM((m_pDreamAppManager->FindDreamAppWithName(strDreamAppName)), "Cannot find dream app name %s", strDreamAppName.c_str());
+	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
 
 	CR(BroadcastDataMessage(pDreamAppMessage));
 

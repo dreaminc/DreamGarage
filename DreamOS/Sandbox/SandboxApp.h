@@ -341,7 +341,7 @@ public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
-	RESULT BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage);
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 

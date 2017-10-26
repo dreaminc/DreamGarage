@@ -46,7 +46,7 @@ CloudController::~CloudController() {
 	}
 }
 
-RESULT CloudController::ProcessingThread() {
+RESULT CloudController::CloudThreadProcess() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("ProcessingThread start");
@@ -68,7 +68,53 @@ RESULT CloudController::ProcessingThread() {
 	}
 #endif
 
-	DEBUG_LINEOUT("ProcessingThread end");
+	DEBUG_LINEOUT("CloudThreadProcess End");
+
+Error:
+	return r;
+}
+
+RESULT CloudController::CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CloudThreadProcess start");
+
+	if (m_fLoginOnStart) {
+		DEBUG_LINEOUT("Logging into server with user credentials");
+
+		CN(m_pUserController);
+		CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+
+		DEBUG_LINEOUT("Loading user profile");
+
+		// Get user profile
+		CRM(m_pUserController->LoadProfile(), "Failed to load profile");
+		CRM(m_pUserController->LoadTwilioNTSInformation(), "Failed to load Twilio NTS information");
+
+		// Set this in the cloud implementation
+		m_pEnvironmentController->SetTwilioNTSInformation(m_pUserController->GetTwilioNTSInformation());
+		m_pEnvironmentController->SetUser(m_pUserController->GetUser());
+
+		DEBUG_LINEOUT("Connecting to Environment ID %d", environmentID);
+
+		// Connect to environment 
+		CN(m_pEnvironmentController);
+		CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser(), environmentID));
+	}
+
+	m_fRunning = true;
+
+	// Message pump goes here
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::ThreadBlockingMessageLoop();
+#else
+#pragma message ("not implemented message loop")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	DEBUG_LINEOUT("CloudThreadProcess End");
 
 Error:
 	return r;
@@ -82,7 +128,23 @@ RESULT CloudController::Start(bool fLoginOnStart) {
 	DEBUG_LINEOUT("CloudController::Start");
 
 	m_fLoginOnStart = fLoginOnStart;
-	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
+
+	m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Start(std::string strUsername, std::string strPassword, long environmentID) {
+	RESULT r = R_PASS;
+
+	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
+
+	DEBUG_LINEOUT("CloudController::Start");
+
+	m_fLoginOnStart = true;
+
+	m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
 
 Error:
 	return r;
@@ -92,7 +154,6 @@ RESULT CloudController::Stop() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CloudController::Stop");
-	HUD_OUT("login into Relativity ...");
 
 	m_fRunning = false;
 
@@ -422,8 +483,8 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 	long environmentID;
 
 	if (strOTK == "INVALIDONETIMEKEY") {
-		HUD_OUT(("Login user " + strUsername + "...").c_str());
-		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
+		DEBUG_LINEOUT(("Login user " + strUsername + "...").c_str());
+		DEBUG_LINEOUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		// TODO: command line / config file - right now hard coded
 		CN(m_pUserController);
@@ -431,14 +492,14 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 	}
 	else {
 		// TODO: If OTK provided log in with that instead
-		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
-		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
+		DEBUG_LINEOUT(("Login with OTK " + strOTK + "...").c_str());
+		DEBUG_LINEOUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		CN(m_pUserController);
 		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
 	}
 
-	HUD_OUT("Loading user profile...");
+	DEBUG_LINEOUT("Loading user profile...");
 
 	// Get user profile
 	// TODO: This should go into an API controller
@@ -458,13 +519,13 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 		environmentID = (long)(atoi(strEnvironment.c_str()));
 	}
 
-	HUD_OUT("Connecting to Environment ID %d", environmentID);
+	DEBUG_LINEOUT("Connecting to Environment ID %d", environmentID);
 
 	// Connect to environment 
 	CN(m_pEnvironmentController);
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser(), environmentID));
 
-	HUD_OUT("User is loaded and logged in");
+	DEBUG_LINEOUT("User is loaded and logged in");
 
 Error:
 	return r;

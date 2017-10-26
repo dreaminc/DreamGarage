@@ -60,6 +60,7 @@ class DreamOS :
 	public DreamPeerApp::DreamPeerAppObserver
 {
 	friend class CloudTestSuite;
+	friend class DreamAppBase;
 
 	// TODO: this needs to be revisited
 	friend class UIModule;
@@ -308,7 +309,7 @@ protected:
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
 	// Dream App Messaging 
-	RESULT BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage);
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	// IO
 //protected:

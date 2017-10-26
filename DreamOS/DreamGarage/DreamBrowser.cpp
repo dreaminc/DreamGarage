@@ -626,6 +626,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::BroadcastDreamBrowserMessage() {
+	RESULT r = R_PASS;
+
+	DreamBrowserMessage *pDreamBrowserMessage = new DreamBrowserMessage(0, 0, GetAppUID());
+	CN(pDreamBrowserMessage);
+
+	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
@@ -643,7 +655,7 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
-			//SendDreamAppMessage()
+			CR(BroadcastDreamBrowserMessage());
 		} break;
 	}
 

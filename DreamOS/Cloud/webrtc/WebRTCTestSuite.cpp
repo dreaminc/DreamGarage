@@ -429,7 +429,9 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
 
-			CRM(pTestContext->pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			//CRM(pTestContext->pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+
+			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, 6), "Failed to log in");
 		}
 
 		// Create the 2D Mouse App

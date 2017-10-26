@@ -132,6 +132,8 @@ public:
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
 
+	RESULT BroadcastDreamBrowserMessage();
+
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);

@@ -928,8 +928,8 @@ RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT DreamOS::BroadcastDreamAppMessage(std::string strDreamAppName, DreamAppMessage *pDreamAppMessage) {
-	return m_pSandbox->BroadcastDreamAppMessage(strDreamAppName, pDreamAppMessage);
+RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {

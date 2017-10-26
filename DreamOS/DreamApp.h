@@ -34,6 +34,7 @@ public:
 
 	virtual composite *GetComposite() = 0;
 	virtual DreamAppHandle* GetAppHandle();
+	virtual DreamOS *GetDOS() = 0;
 
 protected:
 	virtual void *GetAppContext() = 0;
@@ -77,6 +78,8 @@ protected:
 	UID GetAppUID() {
 		return m_uid;
 	}
+
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 private:
 	double m_usTimeRun = 0.0;
@@ -166,7 +169,7 @@ protected:
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};
 
-	DreamOS *GetDOS() {
+	virtual DreamOS *GetDOS() override {
 		return m_pDreamOS;
 	}
 

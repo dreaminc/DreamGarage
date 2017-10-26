@@ -110,6 +110,7 @@ public:
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
 	RESULT Start(bool fLogin = true);
+	RESULT Start(std::string strUsername, std::string strPassword, long environmentID);
 	RESULT Stop();
 
 	RESULT Initialize();
@@ -193,7 +194,8 @@ private:
 	bool m_fRunning;
 	bool m_fLoginOnStart = true;
 
-	RESULT ProcessingThread();
+	RESULT CloudThreadProcess();
+	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);
 };
 
 #endif
