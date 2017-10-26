@@ -1,7 +1,7 @@
 #include "DreamAppMessage.h"
 
-DreamAppMessage::DreamAppMessage(long senderUserID, long receiverUserID, std::string strSenderDreamAppName, UID uidSenderDreamApp) :
-	DreamMessage(senderUserID, receiverUserID, DreamMessage::type::APP, sizeof(DreamAppMessage))
+DreamAppMessage::DreamAppMessage(long senderUserID, long receiverUserID, std::string strSenderDreamAppName, UID uidSenderDreamApp, long messageSize) :
+	DreamMessage(senderUserID, receiverUserID, DreamMessage::type::APP, messageSize)
 {
 	m_dreamAppMessageHeader.strSenderDreamAppName = strSenderDreamAppName;
 	m_dreamAppMessageHeader.uidSenderDreamApp;

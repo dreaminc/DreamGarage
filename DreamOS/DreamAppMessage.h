@@ -20,7 +20,7 @@ private:
 	} m_dreamAppMessageHeader;
 
 public:
-	DreamAppMessage(long senderUserID, long receiverUserID, std::string strSenderDreamAppName, UID uidSenderDreamApp);
+	DreamAppMessage(long senderUserID, long receiverUserID, std::string strSenderDreamAppName, UID uidSenderDreamApp, long messageSize);
 
 	~DreamAppMessage();
 

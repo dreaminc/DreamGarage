@@ -34,6 +34,8 @@ class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
 
+#include "DreamBrowserMessage.h"
+
 class DreamBrowserHandle : public DreamAppHandle {
 public:
 	RESULT SetScope(std::string strScope);
@@ -132,7 +134,7 @@ public:
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
 
-	RESULT BroadcastDreamBrowserMessage();
+	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
 
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

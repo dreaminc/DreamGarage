@@ -16,8 +16,6 @@
 
 #include "WebBrowser/DOMNode.h"
 
-#include "DreamBrowserMessage.h"
-
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -618,18 +616,27 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	DreamBrowserMessage *pDreamBrowserMessage = dynamic_cast<DreamBrowserMessage*>(pDreamAppMessage);
+	CN(pDreamBrowserMessage);
 
-	// TODO: this
+	switch (pDreamBrowserMessage->GetMessageType()) {
+		case DreamBrowserMessage::type::PING: {
+			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::PING));
+		} break;
+
+		case DreamBrowserMessage::type::ACK: {
+			// COOL
+		} break;
+	}
 
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::BroadcastDreamBrowserMessage() {
+RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	DreamBrowserMessage *pDreamBrowserMessage = new DreamBrowserMessage(0, 0, GetAppUID());
+	DreamBrowserMessage *pDreamBrowserMessage = new DreamBrowserMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
@@ -655,7 +662,7 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
-			CR(BroadcastDreamBrowserMessage());
+			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 		} break;
 	}
 
