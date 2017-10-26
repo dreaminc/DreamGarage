@@ -18,6 +18,8 @@
 
 #include "Primitives/hand.h"
 
+#define NAME_DELAY 3
+
 class User;
 class PeerConnection;
 class composite;
@@ -85,6 +87,8 @@ protected:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	RESULT ShowName();
+	RESULT HideName();
 
 public:
 	RESULT OnDataChannel();
@@ -134,13 +138,23 @@ private:
 
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserMode = false;
+	bool m_fShowTime = false;
 
 	sphere *m_pSphere = nullptr;
 
 	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
+	
+	std::chrono::steady_clock::duration tNow;
+	double m_sNow;
+	double m_goTime;
+
+	std::shared_ptr<composite> m_pNameComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
+
+	std::shared_ptr<quad> m_pNameBackground = nullptr;
+	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};

@@ -1,6 +1,11 @@
 #include "DreamPeerApp.h"
 #include "DreamOS.h"
 
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
+
+#include "Primitives/font.h"
+
 #include "Cloud/HTTP/HTTPController.h"
 #include "Cloud/Environment/PeerConnection.h"
 
@@ -104,30 +109,61 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	}
 
 	///*
+	if (m_pNameComposite == nullptr) {
+		m_pNameComposite = GetComposite()->AddComposite();
+		//GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
+	}
+
+	if (m_pNameBackground == nullptr) {
+		m_pNameBackground = m_pNameComposite->AddQuad(0.73f, 0.23f);
+		CN(m_pNameBackground);
+		m_pNameBackground->SetPosition(point(0.0f, 0.5f, -0.01f));
+		m_pNameBackground->SetOrientationOffsetDeg(90.0f, 0.0f, 0.0f);
+		
+		m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
+		m_pNameBackground->SetVisible(true);
+	}
+
 	if (m_pFont == nullptr) {
 		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 		CN(m_pFont);
 	}
-
+	// TODO: How to handle abnormally large or small usernames
 	if (m_pTextUserName == nullptr) {
 		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
 			m_strScreenName,
-			1.0,
-			0.25,
+			0.7,
+			0.2,
 			text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD));
 		CN(m_pTextUserName);
 
-		CR(GetComposite()->AddObject(m_pTextUserName));
-
-		m_pTextUserName->SetPosition(point(0.0f, 1.0f, 0.0f));
-		m_pTextUserName->SetOrientationOffsetDeg(90.0f, 180.0f, 0.0f);
-		m_pTextUserName->SetVisible(false);
+		CR(m_pNameComposite->AddObject(m_pTextUserName));
+		m_pTextUserName->SetPosition(point(0.0f, 0.5f, 0.0f));
+		m_pTextUserName->SetOrientationOffsetDeg(90.0f, 0.0f, 0.0f);
+				
+		m_pTextUserName->SetVisible(true);
 	}
 
 	if (m_pTextUserName->GetText() == "") {
 		m_pTextUserName->SetText(m_strScreenName);
 	}
+	if (m_pUserModel != nullptr) {
+		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+	}
+	
+	
+	if ((m_goTime / m_sNow) <= 1.0 && m_fShowTime) {
+		ShowName();
+		m_fShowTime = false;
+	}
+
+	m_pNameComposite->SetOrientation(GetDOS()->GetCameraOrientation());	// name tag faces user
+
+	tNow = std::chrono::high_resolution_clock::now().time_since_epoch(); //need to update m_sNow
+	m_sNow = std::chrono::duration_cast<std::chrono::seconds>(tNow).count();
+
 	//*/
 
 Error:
@@ -148,7 +184,9 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			m_pTextUserName->SetVisible(true);
+			m_goTime = m_sNow + NAME_DELAY;
+			m_fShowTime = true;
+
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
@@ -156,7 +194,8 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_pTextUserName->SetVisible(false);
+			m_fShowTime = false;
+			HideName();
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -175,6 +214,64 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 			// stub
 		} break;
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::HideName() {
+	RESULT r = R_PASS;
+	
+	auto fnStartCallback = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		
+		return R_PASS;
+	};
+
+	color cColor = color(1.0f, 1.0f, 1.0f, 0.0f);
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pNameComposite.get(),
+		cColor,
+		1.0,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::ShowName() {
+	RESULT r = R_PASS;
+
+	auto fnStartCallback = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		
+		return R_PASS;
+	};
+
+	color cColor = color(1.0f, 1.0f, 1.0f, 1.0f);
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pNameComposite.get(),
+		cColor,
+		1.0,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
 
 Error:
 	return r;
@@ -288,7 +385,6 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 
 	CN(m_pUserModel);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
-	m_pTextUserName->SetOrientation(qOrientation);
 
 Error:
 	return r;
