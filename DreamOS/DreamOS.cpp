@@ -952,12 +952,13 @@ long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }
 
-RESULT DreamOS::RegisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+RESULT DreamOS::RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
 	RESULT r = R_PASS;
 
 	CN(pVideoStreamSubscriber);
 	CBM((m_pVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
 
+	m_pVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
 	m_pVideoStreamSubscriber = pVideoStreamSubscriber;
 
 Error:
@@ -979,7 +980,7 @@ Error:
 RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_HANDLED;
 
-	if (m_pVideoStreamSubscriber != nullptr) {
+	if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
 		CR(m_pVideoStreamSubscriber->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 

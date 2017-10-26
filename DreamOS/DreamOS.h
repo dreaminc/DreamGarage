@@ -77,8 +77,9 @@ class DreamOS :
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
+	PeerConnection *m_pVideoSteamPeerConnectionSource = nullptr;
 
-	RESULT RegisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	RESULT RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 
 public:

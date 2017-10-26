@@ -549,13 +549,15 @@ Error:
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	ray rCast;
-
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
 	}
 	else {
 		SetVisible(false);
+	}
+
+	if (m_fRecievingStream && m_pendingFrame.fPending) {
+		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
 Error:
@@ -622,19 +624,69 @@ Error:
 RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	/*
-	CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
-
-	m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
-	m_pendingVideoBuffer.pxWidth = pxWidth;
-	m_pendingVideoBuffer.pxHeight = pxHeight;
-	m_pendingVideoBuffer.fPendingBufferReady = true;
-	*/
-
 	// TODO: Create a pending frame thing
-	CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+	//CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+
+	if (m_fRecievingStream) {
+		r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
+
+		if (r == R_OVERFLOW) {
+			DEBUG_LINEOUT("Overflow frame!");
+			return R_PASS;
+		}
+
+		CRM(r, "Failed for other reason");
+	}
 
 Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	// TODO: programmatic 
+	int channels = 4;
+
+	CBRM((m_pendingFrame.fPending == false), R_OVERFLOW, "Buffer already pending");
+
+	m_pendingFrame.fPending = true;
+	m_pendingFrame.pxWidth = pxWidth;
+	m_pendingFrame.pxHeight = pxHeight;
+
+	// Allocate
+	// TODO: Might be able to avoid this if the video buffer is not changing size
+	// and just keep the memory allocated instead
+	m_pendingFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+	//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+	m_pendingFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+	CNM(m_pendingFrame.pDataBuffer, "Failed to allocate video buffer mem");
+
+	// Copy
+	//memcpy(m_pendingFrame.pDataBuffer, pVideoFrameDataBuffer, m_pendingFrame.pDataBuffer_n);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
+	RESULT r = R_PASS;
+
+	CBM(m_pendingFrame.fPending, "No frame pending");
+	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
+
+	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, texture::PixelFormat::RGBA), "Failed to update texture from pending frame");
+
+Error:
+	if (m_pendingFrame.pDataBuffer != nullptr) {
+		//delete m_pendingFrame.pDataBuffer;
+		m_pendingFrame.pDataBuffer = nullptr;
+
+		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
+	}
+
 	return r;
 }
 
@@ -672,8 +724,9 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 				// TODO: Turn off streamer etc
 			}
 
-			// Register for Video
-			CR(GetDOS()->RegisterVideoStreamSubscriber(this));
+			// Register for Video for the requester peer connection
+			// (this buffers against multi-casts that are incorrect)
+			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 			m_fRecievingStream = true;
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));

@@ -188,6 +188,16 @@ private:
 public:
 	// Video Stream Subscriber
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
+	RESULT UpdateFromPendingVideoFrame();
+
+	struct PendingFrame {
+		bool fPending = false;
+		int pxWidth = 0;
+		int pxHeight = 0;
+		uint8_t *pDataBuffer = nullptr;
+		size_t pDataBuffer_n = 0;
+	} m_pendingFrame;
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

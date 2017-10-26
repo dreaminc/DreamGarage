@@ -392,7 +392,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
-		std::string strURL = "http://urlme.me/troll/dream_test/";
+		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 
 		CR(SetupSkyboxPipeline("environment"));
 
@@ -421,7 +421,9 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
 
-			strURL += pCommandLineManager->GetParameterValue("testval") + ".jpg";
+			if (pCommandLineManager->GetParameterValue("testval") != "1") {
+				strURL = "https://www.youtube.com/watch?v=5vZ4lCKv1ik";
+			}
 
 			std::string strPassword = "nightmare";
 
