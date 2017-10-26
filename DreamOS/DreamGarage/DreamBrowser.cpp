@@ -349,18 +349,6 @@ std::shared_ptr<texture> DreamBrowser::BrowserTexture() {
 	return m_pBrowserTexture;
 }
 
-// TODO: Only update the rect
-RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
-	RESULT r = R_PASS;
-
-	CN(m_pBrowserTexture);
-
-	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
-	
-Error:
-	return r;
-}
-
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
 	return R_NOT_IMPLEMENTED;
 }
@@ -613,6 +601,43 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 	return webPt;
 }
 
+// TODO: Only update the rect
+// TODO: Turn off CEF when we're not using it
+RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+
+	if (m_fRecievingStream == false) {
+		CN(m_pBrowserTexture);
+		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
+
+		if (m_fStreaming) {
+			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	/*
+	CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
+
+	m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+	m_pendingVideoBuffer.pxWidth = pxWidth;
+	m_pendingVideoBuffer.pxHeight = pxHeight;
+	m_pendingVideoBuffer.fPendingBufferReady = true;
+	*/
+
+	// TODO: Create a pending frame thing
+	CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
@@ -625,7 +650,33 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 		} break;
 
 		case DreamBrowserMessage::type::ACK: {
-			// COOL
+			switch (pDreamBrowserMessage->GetAckType()) {
+				// We get a request streaming start ACK when we requested to start streaming
+				// This will begin broadcasting
+				case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
+					m_fRecievingStream = false;
+					m_fStreaming = true;
+
+					// For non-changing stuff we need to send the current frame
+					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, texture::PixelFormat::BGRA));
+
+				} break;
+			}
+		} break;
+
+		case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
+			// Switch to input
+			if (m_fStreaming) {
+				m_fStreaming = false;
+
+				// TODO: Turn off streamer etc
+			}
+
+			// Register for Video
+			CR(GetDOS()->RegisterVideoStreamSubscriber(this));
+			m_fRecievingStream = true;
+
+			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 		} break;
 	}
 
@@ -662,7 +713,16 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 		} break;
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
-			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
+
+			if (m_fRecievingStream) {
+				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+				m_fRecievingStream = false;
+			}
+
+			m_fStreaming = false;
+
+			//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
+			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
 		} break;
 	}
 

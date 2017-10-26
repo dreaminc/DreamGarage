@@ -24,6 +24,8 @@
 
 #include "Primitives/TextEntryString.h"
 
+#include "DreamVideoStreamSubscriber.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -95,7 +97,8 @@ class DreamBrowser :
 	public DreamApp<DreamBrowser>, 
 	public DreamBrowserHandle,
 	public Subscriber<InteractionObjectEvent>, 
-	public WebBrowserController::observer
+	public WebBrowserController::observer,
+	public DreamVideoStreamSubscriber
 {
 	friend class DreamAppManager;
 
@@ -182,6 +185,10 @@ public:
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
+public:
+	// Video Stream Subscriber
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -213,6 +220,9 @@ private:
 	int m_pxYPosition = 0;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
+
+	bool m_fStreaming = false;
+	bool m_fRecievingStream = false;
 
 	TextEntryString m_strEntered;
 

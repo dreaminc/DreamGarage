@@ -951,3 +951,38 @@ RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Sub
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }
+
+RESULT DreamOS::RegisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
+
+	m_pVideoStreamSubscriber = pVideoStreamSubscriber;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pVideoStreamSubscriber == pVideoStreamSubscriber), "Video Steam Subscriber is not set to this object");
+
+	m_pVideoStreamSubscriber = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_NOT_HANDLED;
+
+	if (m_pVideoStreamSubscriber != nullptr) {
+		CR(m_pVideoStreamSubscriber->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}

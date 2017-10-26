@@ -1988,6 +1988,9 @@
     <ClInclude Include="..\..\..\DreamBrowserMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
