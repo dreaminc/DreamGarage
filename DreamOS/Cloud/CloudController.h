@@ -98,11 +98,11 @@ public:
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
 	// Video
-	RESULT StartVideoStreaming();
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
 	RESULT StopVideoStreaming();
 	bool IsVideoStreamingRunning();
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat);
+	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
 
 	// Audio 
 

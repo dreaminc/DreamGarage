@@ -21,6 +21,8 @@
 
 #include "Primitives/Proxy.h"
 
+#include "Primitives/color.h"
+
 class WebRTConductor;
 class User;
 class TwilioNTSInformation;
@@ -132,7 +134,12 @@ public:
 
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	// Video
 	RESULT SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
 
 protected:
 	// TODO: Move to peer Connection

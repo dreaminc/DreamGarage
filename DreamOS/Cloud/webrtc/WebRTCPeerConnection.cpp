@@ -29,6 +29,8 @@
 
 #include "WebRTCCustomVideoCapturer.h"
 
+#include "Primitives/texture.h"
+
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
@@ -391,11 +393,14 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 			
 			//track->GetSource()->Restart();
 
-			// Kick off our stream (testing)
+			// Kick off our capturer (testing)
+			///*
 			if (m_pCricketVideoCapturer != nullptr) {
 				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
 				m_pCricketVideoCapturer->Start(videoCaptureFormat);
 			}
+			//*/
+
 		}
 		else {
 			DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
@@ -1064,6 +1069,90 @@ RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWi
 
 Error:
 	return r;
+}
+
+uint32_t GetCricketVideoFormatColorSpace(PIXEL_FORMAT pixelFormat) {
+	switch (pixelFormat) {
+		case PIXEL_FORMAT::RGB: {
+			cricket::FOURCC_RGB3;
+		} break;
+
+		case PIXEL_FORMAT::RGBA: {
+			cricket::FOURCC_RGBA;
+		} break;
+
+		case PIXEL_FORMAT::BGR: {
+			cricket::FOURCC_BGR3;
+		} break;
+
+		case PIXEL_FORMAT::BGRA: {
+			cricket::FOURCC_BGRA;
+		} break;
+	}
+
+	return cricket::FOURCC_24BG;
+}
+
+// TODO: The start / stop and IsRunning pathways are being maintained as pathways, 
+// but currently don't do anything (although the IsRunning is working correctly)
+// this is because WebRTC doesn't really seem to work this way.  Not providing frames
+// to the video source is the same as not streaming. 
+
+RESULT WebRTCPeerConnection::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	return R_DEPRECATED;
+
+	CN(m_pCricketVideoCapturer);
+
+	{
+		cricket::VideoFormat desiredVideoFormat;
+
+		cricket::VideoFormat videoCaptureFormat(
+			pxDesiredWidth,
+			pxDesiredHeight,
+			cricket::VideoFormat::FpsToInterval(desiredFPS),
+			GetCricketVideoFormatColorSpace(pixelFormat)
+		);
+
+		cricket::VideoFormat streamingVideoFormat;
+		CB(m_pCricketVideoCapturer->GetBestCaptureFormat(desiredVideoFormat, &streamingVideoFormat));
+
+		m_pCricketVideoCapturer->Start(streamingVideoFormat);
+
+		CB((IsVideoStreamingRunning()));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCPeerConnection::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	return R_DEPRECATED;
+
+	CN(m_pCricketVideoCapturer);
+
+	{
+		m_pCricketVideoCapturer->Stop();
+
+		CB((IsVideoStreamingRunning() == false));
+	}
+
+Error:
+	return r;
+}
+
+bool WebRTCPeerConnection::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+
+	CN(m_pCricketVideoCapturer);
+
+	return m_pCricketVideoCapturer->IsRunning();
+
+Error:
+	return false; 
 }
 
 // TODO: This is not ideal, should be replaced with more robust flag

@@ -172,7 +172,7 @@ public:
 
 	// Video
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT StartVideoStreaming();
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
 	RESULT StopVideoStreaming();
 	bool IsVideoStreamingRunning();
 

@@ -132,7 +132,7 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	GLenum glFormat = GetOGLPixelFormat();
 
 	//GLint internalGLFormat = static_cast<GLint>(glFormat);
-	GLint internalGLFormat = GetOGLPixelFormat(PixelFormat::Unspecified, m_channels);
+	GLint internalGLFormat = GetOGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);
 
 	unsigned char *pImageBuffer = nullptr;
 
@@ -402,7 +402,7 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, texture::PixelFormat format, void *pBuffer, size_t pBuffer_n) {
+OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, PIXEL_FORMAT pixelFormat, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -418,10 +418,10 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels));
-	CR(pTexture->SetFormat(format));
+	CR(pTexture->SetFormat(pixelFormat));
 
 	GLenum glFormat = pTexture->GetOGLPixelFormat();
-	GLint internalGLFormat = GetOGLPixelFormat(PixelFormat::Unspecified, channels);
+	GLint internalGLFormat = GetOGLPixelFormat(PIXEL_FORMAT::Unspecified, channels);
 
 	//CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
 	//CR(pTexture->AllocateGLTexture());
@@ -612,7 +612,7 @@ GLuint OGLTexture::GetOGLTextureIndex() {
 	return m_textureIndex;
 }
 
-RESULT OGLTexture::LoadImageFromTexture(int level, texture::PixelFormat pixelFormat) {
+RESULT OGLTexture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	// Create the buffer in memory
@@ -652,7 +652,7 @@ Error:
 	return r;
 }
 
-RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
+RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CR(Bind());
@@ -675,31 +675,31 @@ Error:
 }
 
 GLenum OGLTexture::GetOGLPixelFormat() {
-	return GetOGLPixelFormat(m_format, m_channels);
+	return GetOGLPixelFormat(m_pixelFormat, m_channels);
 }
 
-GLenum OGLTexture::GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels) {
+GLenum OGLTexture::GetOGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels) {
 	switch (pixelFormat) {
-		case texture::PixelFormat::Unspecified: {
+		case PIXEL_FORMAT::Unspecified: {
 			if (channels == 3)
 				return GL_RGB; 
 			else 
 				return GL_RGBA;
 		} break;
 
-		case texture::PixelFormat::RGB: {
+		case PIXEL_FORMAT::RGB: {
 			return GL_RGB; 
 		} break;
 
-		case texture::PixelFormat::RGBA: {
+		case PIXEL_FORMAT::RGBA: {
 			return GL_RGBA;
 		} break;
 
-		case texture::PixelFormat::BGR: {
+		case PIXEL_FORMAT::BGR: {
 			return GL_BGR;
 		} break;
 
-		case texture::PixelFormat::BGRA: {
+		case PIXEL_FORMAT::BGRA: {
 			return GL_BGRA;
 		} break;
 	}

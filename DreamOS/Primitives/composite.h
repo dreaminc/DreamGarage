@@ -166,7 +166,7 @@ public:
 	std::shared_ptr<UIView> AddUIView(DreamOS *pDreamOS);
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 
 	// TODO: This is temporary - should move all textures to 
 	// shared pointers or use a central store / special texture object handle

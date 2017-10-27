@@ -678,7 +678,7 @@ Error:
 	return r;
 }
 
-RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat) {
+RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
@@ -697,13 +697,13 @@ Error:
 	return r;
 }
 
-RESULT CloudController::StartVideoStreaming() {
+RESULT CloudController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 	CN(m_pEnvironmentController);
 
-	CR(m_pEnvironmentController->StartVideoStreaming());
+	CR(m_pEnvironmentController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;

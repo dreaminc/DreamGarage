@@ -832,11 +832,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::StartVideoStreaming() {
+RESULT EnvironmentController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CR(m_pPeerConnectionController->StartVideoStreaming());
+	CR(m_pPeerConnectionController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
 
 Error:
 	return r;

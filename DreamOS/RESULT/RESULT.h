@@ -47,6 +47,7 @@ typedef enum {
 	R_NO_EFFECT,
 	R_RESET,
 	R_NOT_HANDLED,
+	R_DEPRECATED,				// This is not a failure persay, but function may not do anything or work correctly 
 
 	R_FILE_FOUND,
 	R_DIRECTORY_FOUND,

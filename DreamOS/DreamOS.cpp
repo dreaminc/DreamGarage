@@ -784,8 +784,8 @@ texture* DreamOS::MakeTexture(const texture &srcTexture) {
 	return m_pSandbox->MakeTexture(srcTexture);
 }
 
-texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pSandbox->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n);
+texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pSandbox->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
 skybox *DreamOS::AddSkybox() {

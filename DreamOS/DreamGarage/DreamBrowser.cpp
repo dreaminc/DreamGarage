@@ -475,7 +475,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
 	
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
@@ -617,7 +617,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 			DEBUG_LINEOUT("Changed chrome texture dimensions");
 		}
 
-		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
+		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
 		if (m_fStreaming) {
 			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
@@ -692,7 +692,7 @@ RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
 		DEBUG_LINEOUT("Changed texture dimensions");
 	}
 
-	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, texture::PixelFormat::BGRA), "Failed to update texture from pending frame");
+	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 
 Error:
 	if (m_pendingFrame.pDataBuffer != nullptr) {
@@ -723,7 +723,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 				case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
 					if (m_fStreaming) {
 						// For non-changing stuff we need to send the current frame
-						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, texture::PixelFormat::BGRA));
+						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
 					}
 
 
@@ -744,6 +744,15 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
 				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
 			}
+
+			/*
+			// TODO: May not be needed, if not streaming no video is actually being transmitted
+			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+			// Stop video streaming if we're streaming
+			if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
+				CR(GetDOS()->GetCloudController()->StopVideoStreaming());
+			}
+			*/
 
 			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 			m_fRecievingStream = true;
@@ -792,6 +801,10 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 			}
 
 			m_fStreaming = false;
+
+			// TODO: May not be needed, if not streaming no video is actually being transmitted 
+			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+			//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
 			//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));

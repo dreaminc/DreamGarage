@@ -196,7 +196,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
 			pxWidth, 
 			pxHeight, 
-			texture::PixelFormat::RGBA, 
+			PIXEL_FORMAT::RGBA,
 			4, 
 			&vectorByteBuffer[0], 
 			pxWidth * pxHeight * 4
@@ -209,7 +209,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
 			pxWidth,
 			pxHeight,
-			texture::PixelFormat::RGBA,
+			PIXEL_FORMAT::RGBA,
 			4,
 			&vectorByteBuffer[0],
 			pxWidth * pxHeight * 4
@@ -250,10 +250,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			(unsigned char*)(pTestContext->pTestVideoFrameBuffer),
 			pxWidth,
 			pxHeight,
-			texture::PixelFormat::RGBA)
+			PIXEL_FORMAT::RGBA)
 		);
 
-		CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, texture::PixelFormat::BGRA));
+		CR(pTestContext->pSourceTexture->LoadImageFromTexture(0, PIXEL_FORMAT::BGRA));
 
 		//*/
 
@@ -318,14 +318,14 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 				(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
 				pTestContext->m_pendingVideoBuffer.pxWidth,
 				pTestContext->m_pendingVideoBuffer.pxHeight,
-				texture::PixelFormat::RGBA)
+				PIXEL_FORMAT::RGBA)
 			);
 		}
 
 		// Replace with BroadcastTexture
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - g_lastTestUpdate).count() > UPDATE_SCREENCAST_MS) {
 			if (pTestContext->pCloudController != nullptr) {
-				pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, texture::PixelFormat::RGBA);
+				pTestContext->pCloudController->BroadcastTextureFrame(pTestContext->pSourceTexture, 0, PIXEL_FORMAT::RGBA);
 
 				/*
 				HALImp *pHAL = m_pDreamOS->GetHALImp();

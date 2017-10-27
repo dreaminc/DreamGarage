@@ -554,3 +554,39 @@ RESULT WebRTCConductor::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFra
 Error:
 	return r;
 }
+
+RESULT WebRTCConductor::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::StopVideoStreaming(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->StopVideoStreaming());
+
+Error:
+	return r;
+}
+
+bool WebRTCConductor::IsVideoStreamingRunning(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	return pWebRTCPeerConnection->IsVideoStreamingRunning();
+
+Error:
+	return false;
+}

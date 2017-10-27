@@ -127,6 +127,9 @@ public:
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(long peerConnectionID);
+	bool IsVideoStreamingRunning(long peerConnectionID);
 
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
