@@ -634,6 +634,24 @@ Error:
 	return r;
 }
 
+RESULT OGLTexture::UpdateDimensions(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CBR((pxWidth != m_width || pxHeight != m_height), R_NOT_HANDLED);
+
+	// Re-alloc the texture
+	m_width = pxWidth;
+	m_height = pxHeight;
+
+	CR(Bind());
+
+	// TODO: Pull deeper settings from texture object
+	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
+
+Error:
+	return r;
+}
+
 RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	RESULT r = R_PASS;
 

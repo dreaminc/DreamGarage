@@ -472,6 +472,10 @@ Error:
 	*/
 }
 
+RESULT texture::UpdateDimensions(int width, int height) {
+	return R_NOT_HANDLED;
+}
+
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	return R_NOT_IMPLEMENTED;
 }

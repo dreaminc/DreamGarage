@@ -977,6 +977,10 @@ Error:
 	return r;
 }
 
+bool DreamOS::IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	return (m_pVideoStreamSubscriber == pVideoStreamSubscriber);
+}
+
 RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_NOT_HANDLED;
 

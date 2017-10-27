@@ -96,6 +96,7 @@ public:
 	virtual RESULT LoadImageFromTexture(int level, texture::PixelFormat pixelFormat);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
+	virtual RESULT UpdateDimensions(int width, int height);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 

@@ -610,6 +610,13 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	if (m_fRecievingStream == false) {
 		CN(m_pBrowserTexture);
+
+		// Update texture dimensions if needed
+		CR(m_pBrowserTexture->UpdateDimensions(width, height));
+		if (r != R_NOT_HANDLED) {
+			DEBUG_LINEOUT("Changed chrome texture dimensions");
+		}
+
 		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 
 		if (m_fStreaming) {
@@ -677,7 +684,15 @@ RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
 	CBM(m_pendingFrame.fPending, "No frame pending");
 	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
 
-	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, texture::PixelFormat::RGBA), "Failed to update texture from pending frame");
+	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
+
+	// Update texture dimensions if needed
+	CR(m_pBrowserTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+	if (r != R_NOT_HANDLED) {
+		DEBUG_LINEOUT("Changed texture dimensions");
+	}
+
+	CRM(m_pBrowserTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, texture::PixelFormat::BGRA), "Failed to update texture from pending frame");
 
 Error:
 	if (m_pendingFrame.pDataBuffer != nullptr) {
@@ -706,11 +721,11 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 				// We get a request streaming start ACK when we requested to start streaming
 				// This will begin broadcasting
 				case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
-					m_fRecievingStream = false;
-					m_fStreaming = true;
+					if (m_fStreaming) {
+						// For non-changing stuff we need to send the current frame
+						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, texture::PixelFormat::BGRA));
+					}
 
-					// For non-changing stuff we need to send the current frame
-					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, texture::PixelFormat::BGRA));
 
 				} break;
 			}
@@ -726,6 +741,10 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			// Register for Video for the requester peer connection
 			// (this buffers against multi-casts that are incorrect)
+			if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+			}
+
 			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 			m_fRecievingStream = true;
 
@@ -776,6 +795,9 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 
 			//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+
+			m_fStreaming = true;
 		} break;
 	}
 

@@ -72,6 +72,7 @@ public:
 	RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override;
+	virtual RESULT UpdateDimensions(int width, int height) override;
 
 	static GLenum GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels = 3);
 

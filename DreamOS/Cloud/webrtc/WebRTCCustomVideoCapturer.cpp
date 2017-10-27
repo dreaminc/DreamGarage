@@ -66,7 +66,8 @@ RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFram
 
 	capturedVideoframe.width = pxWidth;
 	capturedVideoframe.height = pxHeight;
-	capturedVideoframe.fourcc = cricket::FOURCC_RGBA;
+	capturedVideoframe.fourcc = cricket::FOURCC_ARGB;
+	//capturedVideoframe.fourcc = cricket::FOURCC_I420;
 	capturedVideoframe.data_size = (uint32_t)frameSize;
 	capturedVideoframe.time_stamp = rtc::TimeNanos();
 
