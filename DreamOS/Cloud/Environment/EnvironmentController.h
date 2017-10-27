@@ -170,7 +170,11 @@ public:
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
+	// Video
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming();
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
 
 	RESULT SetUser(User currentUser);
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);

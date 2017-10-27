@@ -665,7 +665,7 @@ Error:
 	return r;
 }
 
-// Submit Video Frame
+// Video
 RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
@@ -695,6 +695,42 @@ RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, text
 
 Error:
 	return r;
+}
+
+RESULT CloudController::StartVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	CR(m_pEnvironmentController->StartVideoStreaming());
+
+Error:
+	return r;
+}
+
+RESULT CloudController::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	CR(m_pEnvironmentController->StopVideoStreaming());
+
+Error:
+	return r;
+}
+
+bool CloudController::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	return m_pEnvironmentController->IsVideoStreamingRunning();
+
+Error:
+	return false;
 }
 
 RESULT CloudController::Notify(CmdPromptEvent *event) {

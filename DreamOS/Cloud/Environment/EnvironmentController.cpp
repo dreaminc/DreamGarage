@@ -821,6 +821,7 @@ Error:
 	return r;
 }
 
+// Video
 RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
@@ -829,6 +830,36 @@ RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, in
 
 Error:
 	return r;
+}
+
+RESULT EnvironmentController::StartVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->StartVideoStreaming());
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->StopVideoStreaming());
+
+Error:
+	return r;
+}
+
+bool EnvironmentController::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	return m_pPeerConnectionController->IsVideoStreamingRunning();
+
+Error:
+	return false;
 }
 
 RESULT EnvironmentController::SetUser(User currentUser) {

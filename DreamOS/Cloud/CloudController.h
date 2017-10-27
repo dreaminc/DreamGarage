@@ -96,8 +96,19 @@ private:
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+
+	// Video
+	RESULT StartVideoStreaming();
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat);
+
+	// Audio 
+
+	// TODO: Generalize channels
+
+	// TODO: Allow creation / deletion of channels ad-hoc
 
 public:
 	CloudController();
