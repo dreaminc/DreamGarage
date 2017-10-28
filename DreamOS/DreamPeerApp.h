@@ -18,11 +18,15 @@
 
 #include "Primitives/hand.h"
 
-#define NAME_DELAY 3
+#define NAME_DELAY	1.25
+#define NAMETAG_BORDER 0.1f
+#define NAMETAG_HEIGHT 0.3f
+#define NAME_LINE_HEIGHT .12f
 
 class User;
 class PeerConnection;
 class composite;
+class UIView;
 class DreamOS;
 class user;
 class text;
@@ -122,7 +126,7 @@ public:
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
-
+		
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
@@ -148,6 +152,10 @@ private:
 	std::chrono::steady_clock::duration tNow;
 	double m_sNow;
 	double m_goTime;
+
+	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
+	color m_opaqueColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::shared_ptr<composite> m_pNameComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;

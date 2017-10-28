@@ -302,8 +302,8 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
 		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
 
-		if (peerUserID = jsonResponse["/data/id"_json_pointer].get<long>()) {
-			m_strPeerScreenName = jsonResponse["/data/public_name"_json_pointer].get<std::string>();
+		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
+			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
 		}
 		
 		DEBUG_LINEOUT("User Profile Loaded");
