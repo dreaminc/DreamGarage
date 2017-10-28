@@ -110,7 +110,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
-			m_pUserHandle->SendHapticImpulse(pInteractionEvent->m_pInteractionObject);
+			m_pUserHandle->RequestHapticImpulse(pInteractionEvent->m_pInteractionObject);
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));

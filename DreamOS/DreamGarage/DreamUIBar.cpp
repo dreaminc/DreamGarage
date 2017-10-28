@@ -96,12 +96,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
-//	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
 	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
-
-	//CB(keyUIDs.size() == 1);
-	//m_keyboardUID = keyUIDs[0];
 
 	CB(browserUIDs.size() == 1);
 	m_browserUID = browserUIDs[0];
@@ -390,7 +386,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
 
-	m_pUserHandle->SendHapticImpulse(pSelected->GetInteractionObject());
+	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
 
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
@@ -436,7 +432,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
 				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 
-				//m_pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -445,8 +440,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
-
-				//m_pUserHandle->SendPresentApp(ActiveAppType::KB_MENU);
 
 				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 				m_pKeyboardHandle->Show();
@@ -539,11 +532,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 		if (pMenuNodeTitle == "root_menu_title") {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 			//TODO: May want to move downloading outside of DreamUIBar
-			//auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
-			//CN(pKeyboardHandle);
 			//TODO: the only time the title view is used is to show the chrome icon and "Website" title
-			//pKeyboardHandle->UpdateTitleView(pTexture, "Website");
-			//CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+			}
 		}
 		
 		if (pBufferVector != nullptr) {

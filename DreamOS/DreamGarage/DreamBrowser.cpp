@@ -934,42 +934,6 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				SetVisible(true);
 
 				std::string strScope = m_strScope;
-				/*
-				auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
-				
-				CB(keyUIDs.size() == 1);
-				{
-					UID keyUID = keyUIDs[0];
-					auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUID, this));
-					CN(pKeyboardHandle);
-
-					pKeyboardHandle->Hide();
-					CR(GetDOS()->ReleaseApp(pKeyboardHandle, keyUID, this));
-
-				}
-
-				//auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-				CB(userUIDs.size() == 1);
-				{
-					UID userUID = userUIDs[0];
-					auto pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userUID, this));
-					//pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
-					CR(GetDOS()->ReleaseApp(pUserHandle, userUID, this));
-				}
-				//*/
-/*
-				auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
-				CB(viewUIDs.size() == 1);
-				{
-					UID viewUID = viewUIDs[0];
-					auto pControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(viewUID, this));
-					CN(pControlViewHandle);
-
-					CR(pControlViewHandle->ShowApp());
-					CR(GetDOS()->ReleaseApp(pControlViewHandle, viewUID, this));
-				}
-				//*/
-
 				std::string strTitle = "website";
 				std::string strPath = strURL;
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));

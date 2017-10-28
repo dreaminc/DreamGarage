@@ -16,18 +16,10 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamUserHandle::SendHapticImpulse(VirtualObj *pEventObj) {
+RESULT DreamUserHandle::RequestHapticImpulse(VirtualObj *pEventObj) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(CreateHapticImpulse(pEventObj));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendPresentApp(ActiveAppType type) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PresentApp(type));
 Error:
 	return r;
 }
@@ -261,17 +253,6 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 	}
 Error:
-	return r;
-}
-
-RESULT DreamUserApp::PresentApp(ActiveAppType type) {
-	RESULT r = R_PASS;
-	//TODO: potentially move more logic from the apps into here
-
-	auto pDreamOS = GetDOS();
-	m_activeState = type;
-
-//Error:
 	return r;
 }
 

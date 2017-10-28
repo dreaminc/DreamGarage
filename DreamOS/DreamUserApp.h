@@ -58,9 +58,7 @@ public:
 	//TODO: this is unsafe, since the mallets can be used later, 
 	// this function could return a handle to a mallet
 	UIMallet *RequestMallet(HAND_TYPE type);
-	RESULT SendHapticImpulse(VirtualObj *pEventObj);
-
-	RESULT SendPresentApp(ActiveAppType type);
+	RESULT RequestHapticImpulse(VirtualObj *pEventObj);
 
 	RESULT RequestAppBasisPosition(point& ptOrigin);
 	RESULT RequestAppBasisOrientation(quaternion& qOrigin);
@@ -76,8 +74,6 @@ public:
 private:
 	virtual UIMallet *GetMallet(HAND_TYPE type) = 0;
 	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) = 0;
-
-	virtual RESULT PresentApp(ActiveAppType type) = 0;
 
 	virtual RESULT GetAppBasisPosition(point& ptOrigin) = 0;
 	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) = 0;
@@ -118,7 +114,6 @@ public:
 
 	virtual UIMallet *GetMallet(HAND_TYPE type) override;
 	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) override;
-	virtual RESULT PresentApp(ActiveAppType type) override;
 
 	virtual RESULT GetAppBasisPosition(point& ptOrigin) override;
 	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) override;
