@@ -24,38 +24,6 @@
 
 #include "HAL/UIStageProgram.h"
 
-RESULT DreamUIBarHandle::RequestPathEmpty(bool &fPathEmpty) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(IsPathEmpty(fPathEmpty));
-Error:
-	return r;
-}
-
-RESULT DreamUIBarHandle::SendPopPath() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PopPath());
-Error:
-	return r;
-}
-
-RESULT DreamUIBarHandle::SendRequestMenu() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(RequestMenu());
-Error:
-	return r;
-}
-
-RESULT DreamUIBarHandle::SendHideApp() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HideApp());
-Error:
-	return r;
-}
-
 RESULT DreamUIBarHandle::SendShowRootMenu() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -200,11 +168,6 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 	RESULT r = R_PASS;
 
 	return r;
-}
-
-RESULT DreamUIBar::IsPathEmpty(bool &fPathEmpty) {
-	fPathEmpty = m_pathStack.empty();
-	return R_PASS;
 }
 
 RESULT DreamUIBar::PopPath() {
@@ -749,16 +712,7 @@ std::vector<std::string> DreamUIBar::GetStringHeaders() {
 }
 
 RESULT DreamUIBar::Notify(UIEvent *pEvent) {
-	RESULT r = R_PASS;
-
-	switch (pEvent->m_eventType) {
-	case (UIEventType::UI_MENU): {
-		//CR(HandleMenuUp(pEvent->m_pObj));
-	} break;
-	}
-
-//Error:
-	return r;
+	return R_PASS;
 }
 
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {

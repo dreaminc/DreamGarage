@@ -30,23 +30,11 @@ class UIKeyboardHandle;
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 
-// determines the app that handles the controller "menu up" event
-enum class ActiveAppType {
-	MENU,		// menu is visible
-	KB_MENU,	// kb presents when "share website" is pressed in the menu
-	CONTROL,	// control presents when "enter" is pressed on the kb (browser) 
-	KB_CONTROL,	// kb (control) presents when there is text focus
-	NONE,		// no apps are visible
-	INVALID
-};
-
 enum class UserObserverEventType {
 	BACK,
 	KB_ENTER,
 	INVALID
 };
-
-//class DreamUserApp::observer;
 
 class DreamUserObserver {
 public:
@@ -142,8 +130,6 @@ private:
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
 
-	// the user app maintains an active app state to send events to the right app 
-	ActiveAppType m_activeState = ActiveAppType::NONE; 
 	std::stack<DreamUserObserver*> m_appStack;
 
 	// apps position themselves with this when they are presented
