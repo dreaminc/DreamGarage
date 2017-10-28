@@ -12,6 +12,8 @@
 
 #include "Primitives/Subscriber.h"
 
+#include "DreamUserApp.h"
+
 #include <functional>
 #include <stack>
 #include <queue>
@@ -24,8 +26,6 @@ class CloudController;
 class EnvironmentControllerProxy;
 class HTTPControllerProxy;
 class UserControllerProxy;
-
-class DreamUserHandle;
 
 class font;
 class texture;
@@ -57,13 +57,16 @@ enum class MenuState {
 	ANIMATING
 };
 
-class DreamUIBarHandle : public DreamAppHandle {
+class DreamUIBarHandle : public DreamAppHandle, public DreamUserObserver {
 public:
 	RESULT RequestPathEmpty(bool &fPathEmpty);
 	RESULT SendPopPath();
 	RESULT SendShowRootMenu();
 	RESULT SendRequestMenu();
 	RESULT SendHideApp();
+
+public:
+	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
 
 private:
 	virtual RESULT IsPathEmpty(bool &fPathEmpty) = 0;
@@ -113,6 +116,7 @@ public:
 	virtual RESULT PopPath() override;
 	virtual RESULT RequestMenu() override;
 	virtual RESULT ShowRootMenu() override;
+	virtual RESULT HandleEvent(UserObserverEventType type) override;
 
 	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
@@ -124,6 +128,7 @@ public:
 	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
 
 	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
+
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
@@ -184,6 +189,7 @@ private:
 	UID m_userUID;
 
 	DreamUserHandle *m_pUserHandle = nullptr;
+	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 };
 
 

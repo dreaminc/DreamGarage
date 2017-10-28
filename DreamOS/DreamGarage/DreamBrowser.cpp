@@ -934,6 +934,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				SetVisible(true);
 
 				std::string strScope = m_strScope;
+				/*
 				auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
 				
 				CB(keyUIDs.size() == 1);
@@ -947,14 +948,15 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 				}
 
-				auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+				//auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 				CB(userUIDs.size() == 1);
 				{
 					UID userUID = userUIDs[0];
 					auto pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userUID, this));
-					pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
+					//pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
 					CR(GetDOS()->ReleaseApp(pUserHandle, userUID, this));
 				}
+				//*/
 /*
 				auto viewUIDs = GetDOS()->GetAppUID("DreamControlView");
 				CB(viewUIDs.size() == 1);

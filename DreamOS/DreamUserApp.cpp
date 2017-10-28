@@ -48,6 +48,55 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendPopFocusStack() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PopFocusStack());
+Error:
+	return r;
+}
+
+
+RESULT DreamUserHandle::SendPushFocusStack(DreamUserObserver* pObserver) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PushFocusStack(pObserver));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::SendClearFocusStack() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ClearFocusStack());
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::SendKBEnterEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(HandleKBEnterEvent());
+Error:
+	return r;
+}
+
+UIKeyboardHandle* DreamUserHandle::RequestKeyboard() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return GetKeyboard();
+Error:
+	return nullptr;
+}
+
+RESULT DreamUserHandle::SendReleaseKeyboard() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ReleaseKeyboard());
+Error:
+	return r;
+}
+
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -89,6 +138,14 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	m_pAppBasis = pDreamOS->MakeComposite();
 
+	{
+		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+		CB(keyUIDs.size() == 1);
+		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
+
+		CN(m_pKeyboardHandle);
+	}
+
 Error:
 	return r;
 }
@@ -96,9 +153,8 @@ Error:
 RESULT DreamUserApp::OnAppDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -182,93 +238,28 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		CB(menuUIDs.size() == 1);
 		auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
 
-		CB(keyUIDs.size() == 1);
-		auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
-
 		CB(controlUIDs.size() == 1);
 		auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(pDreamOS->CaptureApp(controlUIDs[0], this));
 
-		switch (m_activeState) {
+		if (m_appStack.empty()) {
 
-			case ActiveAppType::NONE: {
+			if (pMenuHandle != nullptr) {
+				UpdateCompositeWithHands(m_menuHeight);
+				m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation());
+				pMenuHandle->SendShowRootMenu();
+			}
 
-				//TODO: set app basis
+			m_pLeftMallet->Show();
+			m_pRightMallet->Show();
 
-				if (pMenuHandle != nullptr) {
-					m_activeState = ActiveAppType::MENU;
-					UpdateCompositeWithHands(m_menuHeight);
-					pMenuHandle->SendShowRootMenu();
-				}
-				m_pLeftMallet->Show();
-				m_pRightMallet->Show();
-
-			} break;
-
-			case ActiveAppType::MENU: {
-				if (pMenuHandle != nullptr) {
-					bool fHide = false;
-					bool fPathEmpty;
-					CR(pMenuHandle->RequestPathEmpty(fPathEmpty));
-
-					fHide = fPathEmpty;
-					if (!fPathEmpty) {
-						pMenuHandle->SendPopPath();
-					}
-					
-					CR(pMenuHandle->RequestPathEmpty(fPathEmpty));
-					fHide = fHide || fPathEmpty;
-
-					if (fHide) {
-						m_activeState = ActiveAppType::NONE;
-						pMenuHandle->SendHideApp();
-						m_pLeftMallet->Hide();
-						m_pRightMallet->Hide();
-					}
-				}
-			} break;
-
-			case ActiveAppType::KB_MENU: {
-				m_activeState = ActiveAppType::MENU;
-
-				if (pKeyboardHandle != nullptr && pKeyboardHandle->IsVisible()) {
-					pKeyboardHandle->Hide();
-				}
-
-				if (pMenuHandle != nullptr) {
-					pMenuHandle->SendRequestMenu();
-				}
-
-			} break;
-
-			case ActiveAppType::CONTROL: {
-				m_activeState = ActiveAppType::NONE;
-				m_pLeftMallet->Hide();
-				m_pRightMallet->Hide();
-
-				if (pMenuHandle != nullptr) {
-					pMenuHandle->SendRequestMenu();
-				}
-
-				if (pControlHandle != nullptr && pControlHandle->IsAppVisible()) {
-					pControlHandle->HideApp();
-				}
-
-			} break;
-
-			case ActiveAppType::KB_CONTROL: {
-				m_activeState = ActiveAppType::CONTROL;
-				//TODO: transition between text focus keyboard and control view
-			} break;
-
-			default: break;
+			m_appStack.push(pMenuHandle);
 		}
 
+		m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
+
 		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-		GetDOS()->ReleaseApp(pKeyboardHandle, keyUIDs[0], this);
 		GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 	}
-
-
 Error:
 	return r;
 }
@@ -278,44 +269,9 @@ RESULT DreamUserApp::PresentApp(ActiveAppType type) {
 	//TODO: potentially move more logic from the apps into here
 
 	auto pDreamOS = GetDOS();
-
-	//*
-	switch (type) {
-
-		case (ActiveAppType::KB_CONTROL):
-		case (ActiveAppType::KB_MENU): {
-			point ptOrigin;
-			quaternion qOrigin;
-
-			auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
-			CB(keyUIDs.size() == 1);
-			auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
-
-			CN(pKeyboardHandle);
-
-			GetAppBasisPosition(ptOrigin);
-			GetAppBasisOrientation(qOrigin);
-			pKeyboardHandle->SendUpdateComposite(m_menuDepth, ptOrigin, qOrigin);
-			pKeyboardHandle->Show();
-			GetDOS()->ReleaseApp(pKeyboardHandle, keyUIDs[0], this);
-		} break;
-	
-		case (ActiveAppType::CONTROL): {
-			auto viewUIDs = pDreamOS->GetAppUID("DreamControlView");
-			CB(viewUIDs.size() == 1);
-			auto pControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(viewUIDs[0], this));
-			CN(pControlViewHandle);
-
-			CR(pControlViewHandle->ShowApp());
-			CR(GetDOS()->ReleaseApp(pControlViewHandle, viewUIDs[0], this));
-		} break;
-	}
-
-	
-	//*/
 	m_activeState = type;
 
-Error:
+//Error:
 	return r;
 }
 
@@ -326,6 +282,37 @@ RESULT DreamUserApp::GetAppBasisPosition(point& ptOrigin) {
 
 RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
 	qOrigin = m_pAppBasis->GetOrientation();
+	return R_PASS;
+}
+
+RESULT DreamUserApp::PopFocusStack() {
+	RESULT r = R_PASS;
+
+	m_appStack.pop();
+	if (m_appStack.empty()) {
+		m_pLeftMallet->Hide();
+		m_pRightMallet->Hide();
+	}
+
+//Error:
+	return r;
+}
+
+RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	m_appStack.push(pObserver);
+
+//Error:
+	return r;
+}
+
+RESULT DreamUserApp::ClearFocusStack() {
+	m_appStack = std::stack<DreamUserObserver*>();
+
+	m_pLeftMallet->Hide();
+	m_pRightMallet->Hide();
+
 	return R_PASS;
 }
 
@@ -413,4 +400,20 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 Error:
 	return r;
 
+}
+
+RESULT DreamUserApp::HandleKBEnterEvent() {
+	RESULT r = R_PASS;
+	CB(!m_appStack.empty());
+	m_appStack.top()->HandleEvent(UserObserverEventType::KB_ENTER);
+Error:
+	return r;
+}
+
+UIKeyboardHandle *DreamUserApp::GetKeyboard() {
+	return m_pKeyboardHandle;
+}
+
+RESULT DreamUserApp::ReleaseKeyboard() {
+	return R_PASS;
 }

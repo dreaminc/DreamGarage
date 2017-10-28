@@ -78,10 +78,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
 
-	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-	CB(userUIDs.size() == 1);
-	m_userAppUID = userUIDs[0];
-
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
@@ -167,6 +163,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
+
 
 Error:
 	return r;
@@ -294,7 +291,15 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	// skip keyboard interaction if not visible
 	CBR((IsVisible()), R_SKIPPED);
-	CBR(m_pUserHandle != nullptr, R_SKIPPED);
+	if (m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+		CB(userUIDs.size() == 1);
+		m_userAppUID = userUIDs[0];
+
+		//Capture user app
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+		CN(m_pUserHandle);
+	}
 	//CBR(m_pUserHandle != nullptr && m_pUserHandle->GetAppState(), R_SKIPPED);
 
 	CN(pDOS);
@@ -435,18 +440,6 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT UIKeyboard::ShowKeyboard() {
 	RESULT r = R_PASS;
 
-	//Capture user app
-	//point ptOrigin;
-	//quaternion qOrigin;
-
-	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
-	CN(m_pUserHandle);
-
-	//CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-	//CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
-	
-	//GetComposite()->SetPosition(ptOrigin);
-	//GetComposite()->SetOrientation(qOrigin);
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -647,6 +640,7 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		// DreamUIBar in some way in the future
 
 		//HideKeyboard();
+		m_pUserHandle->SendKBEnterEvent();
 	}
 
 	else if (chkey == 0x01) {

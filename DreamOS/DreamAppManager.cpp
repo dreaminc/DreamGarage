@@ -216,7 +216,7 @@ DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingAp
 	RESULT r = R_PASS;
 
 	CN(pRequestingApp);
-	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
+//	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
 	CB(m_appRegistry.count(uid) > 0);
 	auto pApp = m_appRegistry[uid];
 	CN(pApp);

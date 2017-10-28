@@ -96,12 +96,12 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
-	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+//	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
 	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
 
-	CB(keyUIDs.size() == 1);
-	m_keyboardUID = keyUIDs[0];
+	//CB(keyUIDs.size() == 1);
+	//m_keyboardUID = keyUIDs[0];
 
 	CB(browserUIDs.size() == 1);
 	m_browserUID = browserUIDs[0];
@@ -287,6 +287,56 @@ Error:
 	return r;
 }
 
+RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
+	RESULT r = R_PASS;
+
+	switch (type) {
+		case UserObserverEventType::BACK: {
+			if (m_pKeyboardHandle != nullptr) {
+				CR(m_pKeyboardHandle->Hide());
+				CR(m_pUserHandle->SendReleaseKeyboard());
+				m_pKeyboardHandle = nullptr;
+
+				CR(RequestMenu());
+				break;
+			}
+
+			if (!m_pathStack.empty()) {
+				CR(PopPath());
+				CBR(m_pathStack.empty(), R_SKIPPED);
+				CR(HideApp());
+				CR(m_pUserHandle->SendPopFocusStack());
+				break;
+			}
+
+			CR(ShowRootMenu());
+
+		} break;
+
+		case UserObserverEventType::KB_ENTER: {
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->Hide();
+				m_pUserHandle->SendReleaseKeyboard();
+				m_pKeyboardHandle = nullptr;
+			} 
+			{
+				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
+				CB(controlUIDs.size() == 1);
+				auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
+				CN(pControlHandle);
+				CN(m_pUserHandle);
+				CR(pControlHandle->ShowApp());
+				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+			}
+		} break;
+	}
+
+
+Error:
+	return r;
+}
+
 RESULT DreamUIBar::RequestMenu() {
 	RESULT r = R_PASS;
 
@@ -315,7 +365,6 @@ Error:
 
 RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-
 	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
@@ -369,14 +418,27 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-				//brow
+
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
-				m_pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
+				//TODO: this feels questionable, the focus stack will contain an invalid handle.
+				//		DreamUserObserver::HandleEvent is pure virtual at the handle level, so 
+				//		the code still executes correctly.
+				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
+				CB(controlUIDs.size() == 1);
+				auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
+				CN(pControlHandle);
+				CN(m_pUserHandle);
+				CR(pControlHandle->ShowApp());
+				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+
+				//m_pUserHandle->SendPresentApp(ActiveAppType::CONTROL);
 			}
+//*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
@@ -384,8 +446,11 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
-				m_pUserHandle->SendPresentApp(ActiveAppType::KB_MENU);
-		
+				//m_pUserHandle->SendPresentApp(ActiveAppType::KB_MENU);
+
+				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+				m_pKeyboardHandle->Show();
+
 				//TODO: why does this need to happen
 				{
 					auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
@@ -395,6 +460,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CR(GetDOS()->ReleaseApp(pBrowserHandle, m_browserUID, this));
 				}
 			}
+//*/
 		}
 	}
 
@@ -473,11 +539,11 @@ RESULT DreamUIBar::Update(void *pContext) {
 		if (pMenuNodeTitle == "root_menu_title") {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 			//TODO: May want to move downloading outside of DreamUIBar
-			auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
-			CN(pKeyboardHandle);
+			//auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+			//CN(pKeyboardHandle);
 			//TODO: the only time the title view is used is to show the chrome icon and "Website" title
-			pKeyboardHandle->UpdateTitleView(pTexture, "Website");
-			CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+			//pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+			//CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
 		}
 		
 		if (pBufferVector != nullptr) {

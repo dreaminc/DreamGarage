@@ -303,8 +303,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
 	// UIKeyboard App
-	CR(InitializeDreamUser());
 	CR(InitializeKeyboard());
+	CR(InitializeDreamUser());
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -317,13 +317,14 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamBrowser->SetVisible(false);
 #endif
 
+	//*
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
 	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
 	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
 	CN(m_pDreamControlView);
-
+//*/
 	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
 
 	//TODO: collisions doesn't follow properly
