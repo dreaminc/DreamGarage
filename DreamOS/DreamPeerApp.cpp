@@ -156,13 +156,13 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
 	}
 	
-	if ((m_goTime / m_sNow) <= 1.0 && m_fShowTime) {
+	if ((m_msShowTime / m_msNow) <= 1.0 && m_fShowTime) {
 		ShowName();
 		m_fShowTime = false;
 	}
 
 	tNow = std::chrono::high_resolution_clock::now().time_since_epoch(); 
-	m_sNow = std::chrono::duration_cast<std::chrono::seconds>(tNow).count();
+	m_msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	//*/
 
 Error:
@@ -184,7 +184,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			m_goTime = m_sNow + NAME_DELAY;
+			m_msShowTime = m_msNow + NAME_DELAY;
 			m_fShowTime = true;
 		} break;
 
@@ -369,7 +369,7 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	CN(pPeerConnection);
 
 	m_pPeerConnection = pPeerConnection;
-	m_peerUserID = m_pPeerConnection->GetPeerUserID();	// this may not need to be member- was for testing
+	m_peerUserID = m_pPeerConnection->GetPeerUserID();	
 	
 	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);

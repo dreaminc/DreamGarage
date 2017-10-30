@@ -18,7 +18,7 @@
 
 #include "Primitives/hand.h"
 
-#define NAME_DELAY	1.25
+#define NAME_DELAY	1250
 #define NAMETAG_BORDER 0.1f
 #define NAMETAG_HEIGHT 0.3f
 #define NAME_LINE_HEIGHT .12f
@@ -150,8 +150,8 @@ private:
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
 	std::chrono::steady_clock::duration tNow;
-	double m_sNow;
-	double m_goTime;
+	double m_msNow;
+	double m_msShowTime;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
