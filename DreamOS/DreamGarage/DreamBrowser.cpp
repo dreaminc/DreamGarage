@@ -529,6 +529,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_UP, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_WHEEL, this));
 #endif
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_UP, this));
 
 Error:
 	return r;
@@ -830,8 +832,10 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	if (pEvent->m_pObject == m_pTestQuad.get() || m_fTestQuadActive) {
 		return HandleTestQuadInteractionEvents(pEvent);
 	}
+#endif
 
 	switch (pEvent->m_eventType) {
+#ifdef _USE_TEST_APP
 		case ELEMENT_INTERSECT_BEGAN: {
 			if (m_pBrowserQuad->IsVisible()) {
 				m_pPointerCursor->SetVisible(true);
@@ -875,6 +879,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			fUpdateMouse = true;
 		} break;
+#endif
 
 		case INTERACTION_EVENT_SELECT_UP: {
 			WebBrowserMouseEvent webBrowserMouseEvent;
@@ -948,6 +953,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		} break;
 	}
 	
+#ifdef _USE_TEST_APP
 	// First point of contact
 	if (fUpdateMouse) {
 		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
