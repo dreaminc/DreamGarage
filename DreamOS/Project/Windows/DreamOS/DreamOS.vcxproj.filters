@@ -887,6 +887,9 @@
     <ClCompile Include="..\..\..\DreamBrowserMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1990,6 +1993,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
       <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\LeapHand.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

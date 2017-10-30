@@ -195,12 +195,15 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 
+	CBR(m_pLeftHand, R_SKIPPED);
+
 	// Update Mallet Positions
 	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(m_pLeftHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
+	CBR(m_pRightHand, R_SKIPPED);
 	qOffset = RotationMatrix();
 	qOffset.SetQuaternionRotationMatrix(m_pRightHand->GetOrientation());
 
@@ -214,7 +217,9 @@ Error:
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	if (mEvent->m_eventType == INTERACTION_EVENT_MENU) {
+	switch (mEvent->m_eventType) {
+
+	case INTERACTION_EVENT_MENU: {
 
 		// get app ids
 		auto pDreamOS = GetDOS();
@@ -251,6 +256,13 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 		GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
+	} break;
+	case (ELEMENT_INTERSECT_BEGAN): {
+
+	} break;
+	case (ELEMENT_INTERSECT_ENDED): {
+
+	} break;
 	}
 Error:
 	return r;
