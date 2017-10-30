@@ -121,7 +121,7 @@ private:
 	std::deque<std::shared_ptr<DreamAppBase>> m_appQueueAlreadyRun;
 	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
 
-	std::map<UID, std::pair<DreamAppHandle*, DreamAppBase*>> m_capturedApps;
+	std::map<UID, std::vector<std::pair<DreamAppHandle*, DreamAppBase*>>> m_appHandleRegistry;
 	std::map<UID, DreamAppBase*> m_appRegistry;
 	DreamOS *m_pDreamOS;
 

@@ -60,6 +60,12 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	SetAppName("DreamControlView");
 	
+	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+	CB(userUIDs.size() == 1);
+	m_userUID = userUIDs[0];
+	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+	CN(m_pUserHandle);
+
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
 
@@ -104,13 +110,9 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
-			// This GetSenseController crashes in testing if fUseHMD is false
-			if (GetDOS()->GetHMD() != nullptr) {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			}
+			m_pUserHandle->RequestHapticImpulse(pInteractionEvent->m_pInteractionObject);
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-
 			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
 
 		} break;
@@ -140,6 +142,18 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 		} break;
 		}
 	}
+Error:
+	return r;
+}
+
+RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
+	RESULT r = R_PASS;
+
+	if (type == UserObserverEventType::BACK) {
+		CR(m_pUserHandle->SendClearFocusStack());
+		CR(HideApp());
+	}
+
 Error:
 	return r;
 }

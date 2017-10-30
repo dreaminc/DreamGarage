@@ -216,7 +216,7 @@ DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingAp
 	RESULT r = R_PASS;
 
 	CN(pRequestingApp);
-	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
+//	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
 	CB(m_appRegistry.count(uid) > 0);
 	auto pApp = m_appRegistry[uid];
 	CN(pApp);
@@ -224,12 +224,16 @@ DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingAp
 
 	//TODO: the real thing limiting getting a handle is whether there
 	//stored in the map, not whether the 'AppState' is true or not
-	CB(m_capturedApps.count(uid) == 0);
+	//CB(m_appHandleRegistry.count(uid) == 0);
+	CB(	m_appHandleRegistry.count(uid) == 0 || 
+		pApp->GetHandleLimit() == -1 ||
+		m_appHandleRegistry[uid].size() < pApp->GetHandleLimit());
+	
 	pAppHandle = pApp->GetAppHandle();
 	pAppHandle->SetAppState(true);
 
 	CB(pAppHandle->GetAppState());
-	m_capturedApps[uid] = std::pair<DreamAppHandle*, DreamAppBase*>(pAppHandle, pRequestingApp);
+	m_appHandleRegistry[uid].emplace_back(std::pair<DreamAppHandle*, DreamAppBase*>(pAppHandle, pRequestingApp));
 
 	return pAppHandle;
 Error:
@@ -244,8 +248,15 @@ RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBas
 	CN(pHandle);
 	pHandle->SetAppState(false);
 
-	CB(m_capturedApps.count(uid) > 0);
-	m_capturedApps.erase(uid);
+	CB(m_appHandleRegistry.count(uid) > 0);
+
+	auto regBegin = m_appHandleRegistry[uid].begin();
+	auto regEnd = m_appHandleRegistry[uid].end();
+	auto appPair = std::pair<DreamAppHandle*, DreamAppBase*>(pHandle, pRequestingApp);
+
+	auto appPairIt = std::find(regBegin, regEnd, appPair);
+	CB(appPairIt != regEnd);
+	m_appHandleRegistry[uid].erase(appPairIt);
 
 Error:
 	return r;

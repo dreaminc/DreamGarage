@@ -12,6 +12,8 @@
 
 #include "Primitives/Subscriber.h"
 
+#include "DreamUserApp.h"
+
 #include <functional>
 #include <stack>
 #include <queue>
@@ -55,10 +57,15 @@ enum class MenuState {
 	ANIMATING
 };
 
-class DreamUIBarHandle : public DreamAppHandle {
+class DreamUIBarHandle : public DreamAppHandle, public DreamUserObserver {
 public:
-	virtual RESULT ShowApp() = 0;
-	virtual RESULT HideApp() = 0;
+	RESULT SendShowRootMenu();
+
+public:
+	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+
+private:
+	virtual RESULT ShowRootMenu() = 0;
 };
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
@@ -84,15 +91,12 @@ public:
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
-	UIMallet* GetRightMallet();
-	UIMallet* GetLeftMallet();
-
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
 	// Animations
-	virtual RESULT HideApp() override;
-	virtual RESULT ShowApp() override;
+	RESULT HideApp();
+	RESULT ShowApp();
 
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
@@ -100,7 +104,11 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
-	RESULT HandleMenuUp(void* pContext);
+	RESULT PopPath();
+	RESULT RequestMenu();
+	virtual RESULT ShowRootMenu() override;
+	virtual RESULT HandleEvent(UserObserverEventType type) override;
+
 	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
@@ -111,6 +119,7 @@ public:
 	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
 
 	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
+
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
@@ -128,10 +137,6 @@ private:
 
 	std::shared_ptr<UIView> m_pView; // not used for anything yet, but would be used for other UI elements
 	std::shared_ptr<UIScrollView> m_pScrollView;
-
-	//TODO: Mallets should probably become a system app, like keyboard
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
 
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;
@@ -172,6 +177,10 @@ private:
 
 	UID m_keyboardUID;
 	UID m_browserUID;
+	UID m_userUID;
+
+	DreamUserHandle *m_pUserHandle = nullptr;
+	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 };
 
 

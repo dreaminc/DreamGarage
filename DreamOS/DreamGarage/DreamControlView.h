@@ -8,6 +8,7 @@
 #include "Sense/SenseController.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "WebBrowser/WebBrowserController.h"
+#include "DreamUserApp.h"
 
 #include "Primitives/Subscriber.h"
 #include <functional>
@@ -29,12 +30,15 @@ class UIScrollView;
 class texture;
 class DreamBrowserHandle;
 
-class DreamControlViewHandle : public DreamAppHandle {
+class DreamControlViewHandle : public DreamAppHandle, public DreamUserObserver {
 public:
 	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
 	RESULT ShowApp();
 	RESULT HideApp();
 	bool IsAppVisible();
+
+public:
+	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
@@ -73,6 +77,8 @@ public:
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
+	virtual RESULT HandleEvent(UserObserverEventType type) override;
+
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -100,8 +106,11 @@ private:
 	std::shared_ptr<UIView> m_pView;
 	std::shared_ptr<UIScrollView> m_pScrollView;
 
-	DreamBrowserHandle* m_pBrowserHandle;
+	DreamBrowserHandle* m_pBrowserHandle = nullptr;
+	DreamUserHandle *m_pUserHandle = nullptr;
+
 	UID m_browserUID;
+	UID m_userUID;
 
 	State m_viewState;
 

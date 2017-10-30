@@ -35,6 +35,7 @@ public:
 	virtual composite *GetComposite() = 0;
 	virtual DreamAppHandle* GetAppHandle();
 	virtual DreamOS *GetDOS() = 0;
+	virtual unsigned int GetHandleLimit();
 
 protected:
 	virtual void *GetAppContext() = 0;

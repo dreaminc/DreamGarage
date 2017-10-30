@@ -746,7 +746,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			}
 			if (eventType == SENSE_CONTROLLER_MENU_UP) {
 				//hardcoded values taken from DreamUIBar
-				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
+				CR(pKeyboard->UpdateComposite(/*-0.23f,*/ -0.30f));
 			}
 		Error:
 			return r;
@@ -794,8 +794,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 			pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pTestContext->pKeyboard->ShowKeyboard();
-			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
-			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
+//			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
+//			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
 			m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
 			m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
 			//*

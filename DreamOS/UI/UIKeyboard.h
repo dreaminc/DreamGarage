@@ -9,6 +9,7 @@
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
+#include "DreamUserApp.h"
 
 #include <vector>
 #include <string>
@@ -44,14 +45,16 @@ class UIKeyboardHandle : public DreamAppHandle {
 public:
 	RESULT Show();
 	RESULT Hide();
-	RESULT UpdateComposite(float height, float depth);
+	RESULT SendUpdateComposite(float depth);
+	RESULT SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
 	bool IsVisible();
 	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
 
 private:
 	virtual RESULT ShowKeyboard() = 0;
 	virtual RESULT HideKeyboard() = 0;
-	virtual RESULT UpdateKeyboardComposite(float height, float depth) = 0;
+	virtual RESULT UpdateComposite(float depth) = 0;
+	virtual RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) = 0;
 	virtual bool IsKeyboardVisible() = 0;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
 };
@@ -86,7 +89,6 @@ public:
 	virtual RESULT ShowKeyboard() override;
 	virtual RESULT HideKeyboard() override;
 
-	virtual RESULT UpdateKeyboardComposite(float height, float depth) override;
 	virtual bool IsKeyboardVisible() override;
 
 	bool IsVisible();
@@ -118,8 +120,6 @@ public:
 	RESULT SetHeight(float height);
 	float GetAngle();
 	RESULT SetSurfaceAngle(float angle);
-	UIMallet* GetRightMallet();
-	UIMallet* GetLeftMallet();
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
@@ -132,10 +132,8 @@ private:
 public:
 	RESULT UpdateTextBox(int chkey);
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
-	RESULT UpdateComposite(float height, float depth); // update position/orientation
-
-	//temp
-	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
+	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
+	RESULT UpdateComposite(float depth); // update position/orientation
 
 private:
 	// layout variables
@@ -160,10 +158,6 @@ private:
 	float m_animationOffsetHeight = ANIMATION_OFFSET_HEIGHT;
 
 	float m_ambientIntensity = AMBIENT_INTENSITY;
-
-	// objects
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
 
 	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
@@ -195,6 +189,9 @@ private:
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
+
+	DreamUserHandle *m_pUserHandle = nullptr;
+	UID m_userAppUID;
 };
 
 #endif // ! UI_KEYBOARD_H_
