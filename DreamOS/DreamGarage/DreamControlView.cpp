@@ -60,13 +60,14 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	SetAppName("DreamControlView");
 	
+	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 	CN(m_pUserHandle);
-
-	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+	
 	CB(keyUIDs.size() == 1);
 	m_keyboardUID = keyUIDs[0];
 
@@ -121,16 +122,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
-			
-			//if (getfocusedframe == textbox)
-			if (m_viewState != State::TYPING) {
-				auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
-				CN(pKeyboardHandle);
-				pKeyboardHandle->Show();
-				CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
-			}
-				HandleTextBox();
-				// 
+			 
 		} break;
 		}
 	}
@@ -163,7 +155,7 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 
 		} break;
 		case SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN: {
-			m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
+			m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float) CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
 			m_pViewQuad->SetPosition(0.0f, 0.0f, 0.0f);
 			m_viewState = State::SHOW;
 		} break;
@@ -287,6 +279,14 @@ bool DreamControlView::IsVisible() {
 RESULT DreamControlView::HandleTextBox() {
 	RESULT r = R_PASS;
 
+	if (m_viewState != State::TYPING) {
+		auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
+		CN(pKeyboardHandle);
+
+		pKeyboardHandle->Show();
+		CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+	}
+	
 	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f));
 	m_ptTypingPosition = point(0.0f, 0.25f, -0.5f);
 

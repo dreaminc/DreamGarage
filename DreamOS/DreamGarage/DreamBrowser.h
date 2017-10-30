@@ -65,7 +65,6 @@ public:
 	int GetWidthOfBrowser();
 	float GetAspectRatioFromBrowser();
 
-	// GetFrameFocused();		//textbox detection
 	std::shared_ptr<texture> GetBrowserTexture();
 
 private:

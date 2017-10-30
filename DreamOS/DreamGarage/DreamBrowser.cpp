@@ -427,6 +427,18 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+		CB(vControlViewUID.size() == 1);
+		UID controlViewUID = vControlViewUID[0];
+		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+
+		pDreamControlViewHandle->HandleTextBox();
+
+		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+	}
+
+	
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
@@ -437,7 +449,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		m_pPointerCursor->SetVisible(true);
 	}
 #endif
-	
+
 	CR(r);
 
 Error:

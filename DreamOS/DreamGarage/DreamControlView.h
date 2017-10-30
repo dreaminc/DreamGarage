@@ -40,6 +40,7 @@ public:
 
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual RESULT HandleTextBox() = 0;
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
@@ -80,6 +81,7 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
+	virtual RESULT HandleTextBox() override;
 
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -98,8 +100,6 @@ public:
 	RESULT SetSharedViewContext();
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
-
-	RESULT HandleTextBox();
 
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
