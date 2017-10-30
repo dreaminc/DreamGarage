@@ -9,11 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-<<<<<<< HEAD
     <LocalDebuggerCommandArguments>-u defaulttestuser@dreamos.com -p Nightmare479!</LocalDebuggerCommandArguments>
-=======
-    <LocalDebuggerCommandArguments>-u john@dreamos.com -p LightningX7</LocalDebuggerCommandArguments>
->>>>>>> waiting for cef events
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
