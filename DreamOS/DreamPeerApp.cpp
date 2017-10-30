@@ -128,10 +128,12 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CN(m_pNameBackground);
 
 		m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
-
+		
+		m_pNameBackground->SetVisible(false);
+		
 		m_pTextBoxTexture = GetComposite()->MakeTexture(L"user-nametag-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
-		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
+		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 	}
 
 	if (m_pTextUserName == nullptr && m_strScreenName != "") {
@@ -143,11 +145,11 @@ RESULT DreamPeerApp::Update(void *pContext) {
 			text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 		CN(m_pTextUserName);
 
-		//CR(m_pNameComposite->AddObject(m_pTextUserName));
+		m_pTextUserName->SetVisible(false);
+
 		m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
 		CR(m_pNameComposite->AddObject(m_pTextUserName));	
-
 	}
 	
 	if (m_pUserModel != nullptr) {
@@ -159,8 +161,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_fShowTime = false;
 	}
 
-	//if(m_strScreenName == "")
-	tNow = std::chrono::high_resolution_clock::now().time_since_epoch(); //need to update m_sNow
+	tNow = std::chrono::high_resolution_clock::now().time_since_epoch(); 
 	m_sNow = std::chrono::duration_cast<std::chrono::seconds>(tNow).count();
 	//*/
 
@@ -403,11 +404,13 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::SetVisible(bool fVisibile) {
+RESULT DreamPeerApp::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	CR(m_pUserModel->SetVisible(fVisibile));
+	CR(m_pUserModel->SetVisible(fVisible));
+	CR(m_pNameBackground->SetVisible(fVisible));
+	CR(m_pTextUserName->SetVisible(fVisible));
 
 Error:
 	return r;
