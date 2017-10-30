@@ -105,7 +105,9 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
 			// This GetSenseController crashes in testing if fUseHMD is false
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			if (GetDOS()->GetHMD() != nullptr) {
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			}
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
@@ -126,7 +128,10 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
 			int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
 
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
+			// This GetSenseController crashes in testing if fUseHMD is false
+			if (GetDOS()->GetHMD() != nullptr) {
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
+			}
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 

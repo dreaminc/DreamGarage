@@ -411,6 +411,7 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
+#ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
 		m_pPointerCursor->SetVisible(false);
@@ -419,8 +420,11 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		DEBUG_LINEOUT("non editable!");
 		m_pPointerCursor->SetVisible(true);
 	}
+#endif
+	
+	CR(r);
 
-//Error:
+Error:
 	return r;
 }
 
@@ -818,6 +822,7 @@ Error:
 RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
+#ifdef _USE_TEST_APP
 	bool fUpdateMouse = false;
 
 	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
@@ -979,6 +984,9 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
+#endif 
+
+	CR(r);
 
 Error:
 	return r;
