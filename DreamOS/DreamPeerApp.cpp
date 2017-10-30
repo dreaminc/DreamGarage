@@ -298,7 +298,7 @@ RESULT DreamPeerApp::ShowName() {
 	///*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameBackground.get(),
-		m_opaqueColor,
+		m_backgroundColor,
 		0.3,
 		AnimationCurveType::LINEAR,
 		AnimationFlags(),

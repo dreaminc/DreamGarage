@@ -154,7 +154,7 @@ private:
 	double m_goTime;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
-	color m_opaqueColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::shared_ptr<composite> m_pNameComposite = nullptr;
