@@ -112,6 +112,7 @@ private:
 
 	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
+	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;

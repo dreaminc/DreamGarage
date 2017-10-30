@@ -168,10 +168,17 @@ Error:
 RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
-	if (type == UserObserverEventType::BACK) {
+	//*
+	switch (type) {
+	case (UserObserverEventType::BACK): 
+	case (UserObserverEventType::KB_ENTER): {
 		CR(m_pUserHandle->SendClearFocusStack());
 		CR(HideApp());
-	}
+	} break;
+
+	} 
+	//*/
+
 
 Error:
 	return r;
@@ -280,11 +287,13 @@ RESULT DreamControlView::HandleTextBox() {
 	RESULT r = R_PASS;
 
 	if (m_viewState != State::TYPING) {
-		auto pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(m_keyboardUID, this));
-		CN(pKeyboardHandle);
+		CN(m_pUserHandle);
+		m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+		CN(m_pKeyboardHandle);
 
-		pKeyboardHandle->Show();
-		CR(GetDOS()->ReleaseApp(pKeyboardHandle, m_keyboardUID, this));
+		m_pKeyboardHandle->Show();
+		CR(m_pUserHandle->SendReleaseKeyboard());
+		m_pKeyboardHandle = nullptr;
 	}
 	
 	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f));
