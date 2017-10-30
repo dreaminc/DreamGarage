@@ -453,19 +453,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	CN(m_pBrowserQuad);
 
-	// Test code
-	///*
-	m_pTestQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
-	CN(m_pTestQuad);
-	m_pTestQuad->translateX(GetWidth() + 0.5f + 0.1f);
-
-	/*
-	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereAbsolute->SetColor(COLOR_RED);
-
-	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereRelative->SetColor(COLOR_RED);
-	//*/
 	
 	// Flip UV vertically
 	///*
@@ -482,6 +469,21 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	// Set up mouse / hand cursor model
 	///*
 	GetComposite()->InitializeOBB();
+	
+#ifdef _USE_TEST_APP
+	// Test code
+	
+	/*
+	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereAbsolute->SetColor(COLOR_RED);
+	
+	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereRelative->SetColor(COLOR_RED);
+	//*/
+
+	m_pTestQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
+	CN(m_pTestQuad);
+	m_pTestQuad->translateX(GetWidth() + 0.5f + 0.1f);
 
 	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
 	CN(m_pPointerCursor);
@@ -491,17 +493,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
 	m_pPointerCursor->SetMaterialAmbient(1.0f);
 	m_pPointerCursor->SetVisible(false);
-	//*/
 
-	/*
-	m_pHandCursor = GetComposite()->AddModel(L"\\Models\\mouse-hand\\mouse-hand.obj",
-											 nullptr,
-											 point(0.0f, 0.0f, 0.0f),
-											 0.002f,
-											 vector(0.0f, 0.0f, 0.0f));
-	//*/
-
-	//GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	// Subscribers (children)
@@ -532,6 +524,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_DOWN, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_UP, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_WHEEL, this));
+#endif
 
 Error:
 	return r;
@@ -821,6 +814,7 @@ Error:
 }
 
 // InteractionObjectEvent
+// Note that all of this will only occur if we're in testing mode
 RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 

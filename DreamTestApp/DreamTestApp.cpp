@@ -114,6 +114,23 @@ RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pA
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamTestApp::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+	// Uncomment the below for use with Dream Peer testing (should iron this out in general)
+
+	//// Create a new peer
+	//auto pDreamPeer = CreateNewPeer(pPeerConnection);
+	//CN(pDreamPeer);
+	//
+	//CR(pDreamPeer->RegisterDreamPeerObserver(this));
+
+Error:
+	return r;
+}
+
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 	

@@ -38,6 +38,8 @@ public:
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	//virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) override;
