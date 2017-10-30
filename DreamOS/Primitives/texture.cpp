@@ -21,7 +21,7 @@ texture::texture(const texture& tex) :
 	m_height(tex.m_height),
 	m_channels(tex.m_channels),
 	m_samples(tex.m_samples),
-	m_format(tex.m_format),
+	m_pixelFormat(tex.m_pixelFormat),
 	m_type(tex.m_type)
 {
 	// NOTE: this will not copy buffers on either GPU or CPU side
@@ -78,12 +78,12 @@ Error:
 	return;
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT format, int channels, void *pBuffer, int pBuffer_n, int samples) :
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
 	m_samples(samples),
-	m_format(format),
+	m_pixelFormat(format),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -272,7 +272,7 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadImageFromTexture(int level, texture::PixelFormat pixelFormat) {
+RESULT texture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	return R_NOT_HANDLED;
 }
 
@@ -293,7 +293,7 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 
 		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
 		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
-		m_format = PixelFormat::BGRA;	// TODO: move this into image
+		m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
 	}
 	else {
 		CR(GetTextureFilePath(pszFilename, pszFilePath));
@@ -304,7 +304,7 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 
 		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
 		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
-		m_format = PixelFormat::BGRA;	// TODO: move this into image
+		m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
 	}
 
 	// Update sizing
@@ -338,7 +338,7 @@ RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	m_height = m_pImage->GetHeight();
 	m_channels = m_pImage->GetChannels();
 
-	m_format = PixelFormat::BGRA;	// TODO: move this into image
+	m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
 
 	// Flip image
 	//CR(m_pImage->FlipVertical());
@@ -472,7 +472,11 @@ Error:
 	*/
 }
 
-RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
+RESULT texture::UpdateDimensions(int width, int height) {
+	return R_NOT_HANDLED;
+}
+
+RESULT texture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
 	return R_NOT_IMPLEMENTED;
 }
 

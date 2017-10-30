@@ -17,7 +17,8 @@
 class DreamOS;
 class composite;
 class DreamAppHandle;
-//class vector;
+class PeerConnection;
+class DreamAppMessage;
 
 class DreamAppBase {
 	friend class DreamAppManager;
@@ -28,8 +29,12 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
+
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
+
 	virtual composite *GetComposite() = 0;
 	virtual DreamAppHandle* GetAppHandle();
+	virtual DreamOS *GetDOS() = 0;
 
 protected:
 	virtual void *GetAppContext() = 0;
@@ -73,6 +78,8 @@ protected:
 	UID GetAppUID() {
 		return m_uid;
 	}
+
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 private:
 	double m_usTimeRun = 0.0;
@@ -162,7 +169,7 @@ protected:
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};
 
-	DreamOS *GetDOS() {
+	virtual DreamOS *GetDOS() override {
 		return m_pDreamOS;
 	}
 

@@ -29,6 +29,15 @@ enum COLOR_TYPE {
 	COLOR_INVALID
 };
 
+enum class PIXEL_FORMAT {
+	Unspecified, // this will generate an RGB/RGBA based on the number of channels
+	RGB,
+	RGBA,
+	BGR,
+	BGRA,
+	INVALID
+};
+
 class color : public matrix <color_precision, 4, 1> {
 public:
 	color() {

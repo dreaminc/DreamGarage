@@ -96,8 +96,19 @@ private:
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+
+	// Video
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
-	RESULT BroadcastTextureFrame(texture *pTexture, int level, texture::PixelFormat pixelFormat);
+	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
+
+	// Audio 
+
+	// TODO: Generalize channels
+
+	// TODO: Allow creation / deletion of channels ad-hoc
 
 public:
 	CloudController();
@@ -110,6 +121,7 @@ public:
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
 	RESULT Start(bool fLogin = true);
+	RESULT Start(std::string strUsername, std::string strPassword, long environmentID);
 	RESULT Stop();
 
 	RESULT Initialize();
@@ -193,7 +205,8 @@ private:
 	bool m_fRunning;
 	bool m_fLoginOnStart = true;
 
-	RESULT ProcessingThread();
+	RESULT CloudThreadProcess();
+	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);
 };
 
 #endif

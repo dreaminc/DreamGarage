@@ -48,6 +48,7 @@ class skybox;
 class model;
 class user;
 class Message;
+class DreamAppMessage;
 
 class UIKeyboardLayout;
 
@@ -309,7 +310,7 @@ public:
 	text* AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
 
@@ -339,6 +340,10 @@ public:
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 	// IO
 public:

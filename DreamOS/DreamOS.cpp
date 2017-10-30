@@ -8,6 +8,8 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
+#include "DreamAppMessage.h"
+
 // Messages
 #include "PeerHandshakeMessage.h"
 #include "PeerAckMessage.h"
@@ -190,6 +192,7 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
+
 	CR(pDreamPeer->RegisterDreamPeerObserver(this));
 	
 Error:
@@ -241,6 +244,16 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	// Send the dream app message to the dream app manager
+	CR(m_pSandbox->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	
@@ -276,7 +289,7 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		CR(OnDreamMessage(pPeerConnection, (DreamMessage*)(pDataMessage)));
 	}
 	else if (dreamMsgType >= DreamMessage::type::APP) {
-		// TODO: App messages
+		CR(OnDreamAppMessage(pPeerConnection, (DreamAppMessage*)(pDataMessage)));
 	}
 	else {
 		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);
@@ -768,8 +781,8 @@ texture* DreamOS::MakeTexture(const texture &srcTexture) {
 	return m_pSandbox->MakeTexture(srcTexture);
 }
 
-texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pSandbox->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n);
+texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pSandbox->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
 skybox *DreamOS::AddSkybox() {
@@ -912,6 +925,10 @@ RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
 }
 
+RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage);
+}
+
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
 }
@@ -930,4 +947,44 @@ RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Sub
 
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
+}
+
+RESULT DreamOS::RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pVideoStreamSubscriber == nullptr), "Video Steam Subscriber is already set");
+
+	m_pVideoSteamPeerConnectionSource = pVideoSteamPeerConnectionSource;
+	m_pVideoStreamSubscriber = pVideoStreamSubscriber;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	RESULT r = R_PASS;
+
+	CN(pVideoStreamSubscriber);
+	CBM((m_pVideoStreamSubscriber == pVideoStreamSubscriber), "Video Steam Subscriber is not set to this object");
+
+	m_pVideoStreamSubscriber = nullptr;
+
+Error:
+	return r;
+}
+
+bool DreamOS::IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber) {
+	return (m_pVideoStreamSubscriber == pVideoStreamSubscriber);
+}
+
+RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_NOT_HANDLED;
+
+	if (m_pVideoStreamSubscriber != nullptr && pPeerConnection == m_pVideoSteamPeerConnectionSource) {
+		CR(m_pVideoStreamSubscriber->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
 }

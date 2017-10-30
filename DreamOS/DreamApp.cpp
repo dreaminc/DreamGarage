@@ -67,3 +67,14 @@ DreamAppHandle* DreamAppBase::GetAppHandle() {
 	return nullptr;
 }
 
+RESULT DreamAppBase::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	DreamOS *pDOS = GetDOS();
+
+	CN(pDOS);
+	CR(pDOS->BroadcastDreamAppMessage(pDreamAppMessage));
+
+Error:
+	return r;
+}

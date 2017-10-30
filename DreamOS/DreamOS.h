@@ -45,11 +45,13 @@
 
 class UIKeyboardLayout;
 class DreamMessage;
+class DreamAppMessage;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
 
+#include "DreamVideoStreamSubscriber.h"
 
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
@@ -59,6 +61,7 @@ class DreamOS :
 	public DreamPeerApp::DreamPeerAppObserver
 {
 	friend class CloudTestSuite;
+	friend class DreamAppBase;
 
 	// TODO: this needs to be revisited
 	friend class UIModule;
@@ -71,6 +74,14 @@ class DreamOS :
 	friend class DreamOSTestSuite;
 	friend class CollisionTestSuite;
 	friend class WebRTCTestSuite;
+
+public:
+	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
+	PeerConnection *m_pVideoSteamPeerConnectionSource = nullptr;
+
+	RESULT RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	bool IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 
 public:
 	DreamOS();
@@ -96,7 +107,7 @@ public:
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
-	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
@@ -112,6 +123,9 @@ public:
 	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) = 0;
 	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
+
+	// Handle the Dream App Messages
+	RESULT OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 	// Peers
 	RESULT HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage);
@@ -245,7 +259,7 @@ public:
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
 
@@ -302,6 +316,9 @@ protected:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+
+	// Dream App Messaging 
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	// IO
 //protected:

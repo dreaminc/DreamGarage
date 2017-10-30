@@ -19,7 +19,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
-	sandboxconfig.fInitCloud = false;
+	sandboxconfig.fInitCloud = true;
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:
@@ -46,11 +46,11 @@ RESULT DreamTestApp::LoadScene() {
 	// Push to a test suite factory in testing
 
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
@@ -114,8 +114,21 @@ RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pA
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
-	return R_NOT_IMPLEMENTED;
+RESULT DreamTestApp::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+	// Uncomment the below for use with Dream Peer testing (should iron this out in general)
+
+	//// Create a new peer
+	//auto pDreamPeer = CreateNewPeer(pPeerConnection);
+	//CN(pDreamPeer);
+	//
+	//CR(pDreamPeer->RegisterDreamPeerObserver(this));
+
+Error:
+	return r;
 }
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {

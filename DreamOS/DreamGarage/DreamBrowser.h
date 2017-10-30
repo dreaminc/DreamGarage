@@ -24,6 +24,8 @@
 
 #include "Primitives/TextEntryString.h"
 
+#include "DreamVideoStreamSubscriber.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -33,6 +35,8 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
+
+#include "DreamBrowserMessage.h"
 
 class DreamBrowserHandle : public DreamAppHandle {
 public:
@@ -93,7 +97,8 @@ class DreamBrowser :
 	public DreamApp<DreamBrowser>, 
 	public DreamBrowserHandle,
 	public Subscriber<InteractionObjectEvent>, 
-	public WebBrowserController::observer
+	public WebBrowserController::observer,
+	public DreamVideoStreamSubscriber
 {
 	friend class DreamAppManager;
 
@@ -106,6 +111,8 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
@@ -130,8 +137,12 @@ public:
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
 
+	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
+
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
+	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
+	bool m_fTestQuadActive = false;
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
@@ -174,17 +185,34 @@ public:
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
+public:
+	// Video Stream Subscriber
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
+	RESULT UpdateFromPendingVideoFrame();
+
+	struct PendingFrame {
+		bool fPending = false;
+		int pxWidth = 0;
+		int pxHeight = 0;
+		uint8_t *pDataBuffer = nullptr;
+		size_t pDataBuffer_n = 0;
+	} m_pendingFrame;
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
-	sphere *m_pTestSphereAbsolute = nullptr;
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
+#ifdef _USE_TEST_APP
+	// Test Stuff
+	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
+	sphere *m_pTestSphereAbsolute = nullptr;
+	std::shared_ptr<quad> m_pTestQuad = nullptr;
 	std::shared_ptr<composite> m_pPointerCursor = nullptr;
-	std::shared_ptr<composite> m_pHandCursor = nullptr;
+#endif
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
@@ -202,6 +230,9 @@ private:
 	int m_pxYPosition = 0;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
+
+	bool m_fStreaming = false;
+	bool m_fRecievingStream = false;
 
 	TextEntryString m_strEntered;
 

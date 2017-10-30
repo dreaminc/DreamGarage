@@ -19,7 +19,7 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 	RESULT r = R_PASS;
 
 	int cefBrowserID = pCEFBrowser->GetIdentifier();
-	int cefFrameID = pCEFFrame->GetIdentifier();
+	int64 cefFrameID = pCEFFrame->GetIdentifier();
 
 	// Create the message object.
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::OnFocusedNodeChanged");

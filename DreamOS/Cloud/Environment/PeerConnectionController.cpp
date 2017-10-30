@@ -790,6 +790,65 @@ Error:
 	return r;
 }
 
+RESULT PeerConnectionController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->StartVideoStreaming(pPeerConnection->GetPeerConnectionID(), pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->StopVideoStreaming(pPeerConnection->GetPeerConnectionID()));
+		}
+	}
+
+Error:
+	return r;
+}
+
+bool PeerConnectionController::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+	bool fRetVal = false;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			fRetVal = m_pWebRTCImp->IsVideoStreamingRunning(pPeerConnection->GetPeerConnectionID());
+
+			if (fRetVal == false) {
+				return fRetVal;
+			}
+		}
+	}
+
+Error:
+	return fRetVal;
+}
+
 long PeerConnectionController::GetUserID() {
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		return m_pPeerConnectionControllerObserver->GetUserID();
