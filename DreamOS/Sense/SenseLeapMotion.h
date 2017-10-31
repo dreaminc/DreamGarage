@@ -24,6 +24,7 @@
 #include "Primitives/composite.h"
 
 #include "SenseLeapMotionHand.h"
+#include "Primitives/LeapHand.h"
 
 typedef enum SenseLeapMotionEventType {
 	SENSE_LEAPMOTION_EVENT_HAND_LEFT,
@@ -78,7 +79,7 @@ public:
 	}
 	*/
 
-	RESULT AttachHand(hand *pHand, HAND_TYPE handType) {
+	RESULT AttachHand(LeapHand *pHand, HAND_TYPE handType) {
 		if(handType == HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
 		else if (handType == HAND_TYPE::HAND_RIGHT)
@@ -100,7 +101,7 @@ public:
 		return R_PASS;
 	}
 
-	hand *GetHand(HAND_TYPE handType) {
+	LeapHand *GetHand(HAND_TYPE handType) {
 		if (handType == HAND_TYPE::HAND_LEFT)
 			return m_pLeftHand;
 		else if (handType == HAND_TYPE::HAND_RIGHT)
@@ -124,8 +125,8 @@ public:
 private:
 	std::unique_ptr<Leap::Controller> m_pLeapController;
 	//VirtualObj *m_pVirtualObj;	// temp
-	hand *m_pLeftHand;
-	hand *m_pRightHand;
+	LeapHand *m_pLeftHand;
+	LeapHand *m_pRightHand;
 
 	composite *m_pLeftModel;
 	composite *m_pRightModel;
