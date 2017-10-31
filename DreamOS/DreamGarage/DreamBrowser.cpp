@@ -344,6 +344,22 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::SendURL(std::string strURL) {
+	RESULT r = R_PASS;
+	SetVisible(true);
+
+	std::string strScope = m_strScope;
+	std::string strTitle = "website";
+	std::string strPath = strURL;
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	RESULT r = R_PASS;
 
@@ -433,11 +449,10 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		UID controlViewUID = vControlViewUID[0];
 		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
 
-		pDreamControlViewHandle->HandleTextBox();
+		pDreamControlViewHandle->HandleKeyboardUp();
 
 		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
-
 	
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
@@ -957,6 +972,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		// TODO: haven't seen any issues with KEY_UP being a no-op
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
+			/*
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 			std::string strURL = "";
 
@@ -968,13 +984,13 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 				std::string strScope = m_strScope;
 				std::string strTitle = "website";
-				//std::string strPath = strURL;
+				std::string strPath = strURL;
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-				//CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
-
+				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
 			}
+			//*/
 
 			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 

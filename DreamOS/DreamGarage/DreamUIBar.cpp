@@ -284,9 +284,11 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
 				CN(pControlHandle);
 				CN(m_pUserHandle);
-				CR(pControlHandle->ShowApp());
-				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
-				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+				if (!pControlHandle->IsAppVisible()) {
+					CR(pControlHandle->ShowApp());
+					CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+					GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+				}
 			}
 		} break;
 	}

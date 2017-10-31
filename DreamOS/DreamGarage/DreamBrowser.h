@@ -54,7 +54,8 @@ public:
 	RESULT SendClickToBrowserAtPoint(WebBrowserPoint ptContact);
 
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
-	
+	virtual RESULT SendURL (std::string strURL) = 0;
+
 	int GetScrollPixelsX();
 	int GetScrollPixelsY();
 
@@ -138,6 +139,7 @@ public:
 	virtual int GetPageWidth() override;
 
 	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown);
+	virtual RESULT SendURL(std::string strURL);
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;

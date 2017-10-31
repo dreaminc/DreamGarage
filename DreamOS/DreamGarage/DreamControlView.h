@@ -40,7 +40,7 @@ public:
 
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual RESULT HandleTextBox() = 0;
+	virtual RESULT HandleKeyboardUp() = 0;
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
@@ -81,7 +81,8 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
-	virtual RESULT HandleTextBox() override;
+	virtual RESULT HandleKeyboardUp() override;
+	virtual RESULT HandleKeyboardDown();
 
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -110,6 +111,8 @@ private:
 	std::shared_ptr<UIView> m_pView;
 	std::shared_ptr<UIScrollView> m_pScrollView;
 
+	std::string m_strURL = "";
+
 	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
@@ -125,7 +128,9 @@ private:
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
-	point m_ptTypingPosition;
+	
+	quaternion m_qViewQuadOrientation;
+
 	float m_showThreshold;
 	float m_hideThreshold;
 };
