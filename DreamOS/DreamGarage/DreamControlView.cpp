@@ -215,13 +215,11 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	if (m_pBrowserHandle == nullptr) {
-		std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
-		CB(uids.size() == 1);
-		m_browserUID = uids[0];
+	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
+	CB(uids.size() == 1);
+	m_browserUID = uids[0];
 
-		m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));	
-	}
+	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));	
 
 	if (m_strURL != "") {
 		CR(m_pBrowserHandle->SendURL(m_strURL));
@@ -322,7 +320,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
 		point(0.0f, 0.0f, 0.0f),
-		quaternion(1.0f, 0.0f, 0.0f, 0.0f),
+		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -339,7 +337,7 @@ Error:
 RESULT DreamControlView::HandleKeyboardUp() {
 	RESULT r = R_PASS;
 
-	point ptTypingPosition = point(0.0f, 0.25f, -0.5f);
+	point ptTypingPosition = point(0.0f, 0.25f, -0.15f);
 
 	CBR(IsVisible(), R_SKIPPED);
 
