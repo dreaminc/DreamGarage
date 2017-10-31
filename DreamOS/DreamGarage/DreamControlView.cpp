@@ -145,7 +145,7 @@ Error:
 
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
-	if (m_viewState == State::VISIBLE) {
+	if (IsVisible()) {
 		switch (pEvent->type) {
 		case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
