@@ -278,7 +278,7 @@ Error:
 RESULT UserController::GetPeerProfile(long peerUserID) {
 	RESULT r = R_PASS;
 
-	std::cout << "load peer profile..." << std::endl;
+	DEBUG_LINEOUT("Loading peer profile");
 	{
 		HTTPResponse httpResponse;
 

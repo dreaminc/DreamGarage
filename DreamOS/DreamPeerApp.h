@@ -18,7 +18,6 @@
 
 #include "Primitives/hand.h"
 
-#define NAME_DELAY	1250
 #define NAMETAG_BORDER 0.1f
 #define NAMETAG_HEIGHT 0.3f
 #define NAME_LINE_HEIGHT .12f
@@ -91,8 +90,8 @@ protected:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
-	RESULT ShowName();
-	RESULT HideName();
+	RESULT ShowUserNameField();
+	RESULT HideUserNameField();
 
 public:
 	RESULT OnDataChannel();
@@ -142,16 +141,15 @@ private:
 
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserMode = false;
-	bool m_fShowTime = false;
+	bool m_fGazeInteraction = false;
 
 	sphere *m_pSphere = nullptr;
 
 	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
-	std::chrono::steady_clock::duration tNow;
-	double m_msNow;
-	double m_msShowTime;
+	double m_msTimeGazeStart;
+	double m_msTimeUserNameDelay = 1250;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);

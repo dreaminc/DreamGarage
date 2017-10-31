@@ -124,6 +124,8 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	}
 
 	if (m_pNameBackground == nullptr) {
+		CN(m_pNameComposite);
+
 		m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
 		CN(m_pNameBackground);
 
@@ -156,13 +158,15 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
 	}
 	
-	if ((m_msShowTime / m_msNow) <= 1.0 && m_fShowTime) {
-		ShowName();
-		m_fShowTime = false;
+	if (m_fGazeInteraction) {
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay) {
+			ShowUserNameField();
+			m_fGazeInteraction = false;
+		}
 	}
 
-	tNow = std::chrono::high_resolution_clock::now().time_since_epoch(); 
-	m_msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	//*/
 
 Error:
@@ -184,8 +188,9 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			m_msShowTime = m_msNow + NAME_DELAY;
-			m_fShowTime = true;
+			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			m_fGazeInteraction = true;
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
@@ -193,8 +198,8 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_fShowTime = false;
-			HideName();
+			m_fGazeInteraction = false;
+			HideUserNameField();
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -218,7 +223,7 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::HideName() {
+RESULT DreamPeerApp::HideUserNameField() {
 	RESULT r = R_PASS;
 	
 	auto fnStartCallback = [&](void *pContext) {
@@ -268,7 +273,7 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::ShowName() {
+RESULT DreamPeerApp::ShowUserNameField() {
 	RESULT r = R_PASS;
 	
 	auto fnStartCallback = [&](void *pContext) {
