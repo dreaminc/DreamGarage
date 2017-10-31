@@ -2,3 +2,17 @@ DreamOS/External/CEF/CEF_BINARY_3.2924.1570/Debug/* filter=lfs diff=lfs merge=lf
 DreamOS/External/CEF/CEF_BINARY_3.2924.1570/Release/* filter=lfs diff=lfs merge=lfs -text
 DreamOS/External/assimp/3.3.1/bin/Debug/*.pdb filter=lfs diff=lfs merge=lfs -text
 DreamOS/External/assimp/3.3.1/bin/Debug/*.ilk filter=lfs diff=lfs merge=lfs -text
+
+# Declare files that will always have CRLF line endings on checkout.
+*.c text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.tpp text eol=crlf
+*.css text eol=crlf
+*.hpp text eol=crlf
+*.cc text eol=crlf
+*.html text eol=crlf
+*.js text eol=crlf
+*.py text eol=crlf
+*.sh text eol=crlf
+*.vcxproj* text eol=crlf
