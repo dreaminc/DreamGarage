@@ -26,6 +26,7 @@ public:
 	// Tests
 	RESULT AddTestDreamApps();
 	RESULT AddTestUserApp();
+	RESULT AddTestPeerApps();
 
 	// Apps
 	RESULT AddTestUIKeyboard();

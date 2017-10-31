@@ -60,7 +60,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fInitCloud = true;

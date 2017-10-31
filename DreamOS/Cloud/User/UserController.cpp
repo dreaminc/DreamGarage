@@ -275,6 +275,44 @@ Error:
 	return r;
 }
 
+RESULT UserController::GetPeerProfile(long peerUserID) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Loading peer profile");
+	{
+		HTTPResponse httpResponse;
+
+		std::string strAuthorizationToken = "Authorization: Token " + GetUserToken();
+
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+		std::string strPeerID = std::to_string(peerUserID);
+		std::string	strURI = strAPIURL + "/user/" + strPeerID + "/";
+
+		HTTPController *pHTTPController = HTTPController::instance();
+
+		auto headers = HTTPController::ContentAcceptJson();
+		headers.push_back(strAuthorizationToken);
+
+		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
+		
+		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+		
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
+		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
+			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
+		}
+		
+		DEBUG_LINEOUT("User Profile Loaded");
+	}
+
+Error:
+	return r;
+}
+
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
 }
@@ -285,6 +323,11 @@ UserControllerProxy* UserController::GetUserControllerProxy() {
 
 std::string UserController::GetUserToken() {
 	return m_strToken;
+}
+
+std::string UserController::GetPeerScreenName(long peerUserID) {
+	GetPeerProfile(peerUserID);
+	return m_strPeerScreenName;
 }
 
 CLOUD_CONTROLLER_TYPE UserController::GetControllerType() {

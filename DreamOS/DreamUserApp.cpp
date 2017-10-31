@@ -196,6 +196,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 	}
 
 	// Update Mallet Positions
+	CNR(m_pLeftHand, R_SKIPPED);
+	CNR(m_pRightHand, R_SKIPPED);
+
 	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
 
 	if (m_pLeftMallet)
@@ -299,13 +302,17 @@ RESULT DreamUserApp::ClearFocusStack() {
 
 RESULT DreamUserApp::SetHand(hand *pHand) {
 	RESULT r = R_PASS;
+	CNR(pHand, R_OBJECT_NOT_FOUND);
+
 	if (pHand->GetHandState().handType == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
 	}
 	else if (pHand->GetHandState().handType == HAND_TYPE::HAND_RIGHT) {
 		m_pRightHand = pHand;
 	}
-	return R_PASS;
+
+Error:
+	return r;
 }
 
 UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
@@ -322,6 +329,8 @@ UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
 
 RESULT DreamUserApp::CreateHapticImpulse(VirtualObj *pEventObj) {
 	RESULT r = R_PASS;
+
+	CNR(GetDOS()->GetHMD(), R_OBJECT_NOT_FOUND);
 
 	if (pEventObj == m_pLeftMallet->GetMalletHead()) {
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
