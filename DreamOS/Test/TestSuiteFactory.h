@@ -21,6 +21,7 @@ public:
 		MATH,
 		ANIMATION,
 		OS,
+		SOUND,
 		INVALID
 	} ;
 
