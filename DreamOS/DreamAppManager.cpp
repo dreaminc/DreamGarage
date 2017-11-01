@@ -248,15 +248,17 @@ RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBas
 	CN(pHandle);
 	pHandle->SetAppState(false);
 
-	CB(m_appHandleRegistry.count(uid) > 0);
+	{
+		CB(m_appHandleRegistry.count(uid) > 0);
 
-	auto regBegin = m_appHandleRegistry[uid].begin();
-	auto regEnd = m_appHandleRegistry[uid].end();
-	auto appPair = std::pair<DreamAppHandle*, DreamAppBase*>(pHandle, pRequestingApp);
+		auto regBegin = m_appHandleRegistry[uid].begin();
+		auto regEnd = m_appHandleRegistry[uid].end();
+		auto appPair = std::pair<DreamAppHandle*, DreamAppBase*>(pHandle, pRequestingApp);
 
-	auto appPairIt = std::find(regBegin, regEnd, appPair);
-	CB(appPairIt != regEnd);
-	m_appHandleRegistry[uid].erase(appPairIt);
+		auto appPairIt = std::find(regBegin, regEnd, appPair);
+		CB(appPairIt != regEnd);
+		m_appHandleRegistry[uid].erase(appPairIt);
+	}
 
 Error:
 	return r;
