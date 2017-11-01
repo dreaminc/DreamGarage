@@ -215,8 +215,8 @@ RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 		pxYDiff = m_pxYPosition - pxYScroll;
 	}
 
-	m_pxXPosition = pxXScroll;
-	m_pxYPosition = pxYScroll;
+	m_pxXPosition += pxXDiff;
+	m_pxYPosition += pxYDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
 
@@ -239,7 +239,7 @@ RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
 		pxXDiff = m_pxXPosition - pxXScroll;
 	}
 
-	m_pxXPosition = pxXScroll;
+	m_pxXPosition += pxXDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, 0));
 
@@ -262,7 +262,7 @@ RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
 		pxYDiff = m_pxYPosition - pxYScroll;
 	}
 
-	m_pxYPosition = pxYScroll;
+	m_pxYPosition += pxYDiff;
 	
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, 0, pxYDiff));
 
@@ -443,13 +443,14 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable() && m_lastWebBrowserPoint.y != -1) {
 		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
 		CB(vControlViewUID.size() == 1);
 		UID controlViewUID = vControlViewUID[0];
 		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-
-		pDreamControlViewHandle->HandleKeyboardUp();
+		std::string strTextField = pDOMNode->GetValue();
+		point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
+		pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox);
 
 		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
@@ -480,6 +481,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
+	m_lastWebBrowserPoint.y = -1;
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	SetAppName(DREAM_BROWSER_APP_NAME);

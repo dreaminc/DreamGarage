@@ -40,7 +40,7 @@ public:
 
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual RESULT HandleKeyboardUp() = 0;
+	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) = 0;
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
@@ -81,7 +81,7 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
-	virtual RESULT HandleKeyboardUp() override;
+	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
 	virtual RESULT HandleKeyboardDown();
 
 protected:
@@ -101,7 +101,7 @@ public:
 	RESULT SetSharedViewContext();
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
-
+	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 private:
@@ -125,6 +125,7 @@ private:
 
 	float m_hiddenScale; 
 	float m_visibleScale;
+	float m_keyboardAnimationDuration = 0.1f;
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;

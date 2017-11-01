@@ -42,7 +42,7 @@ class DreamBrowserHandle : public DreamAppHandle {
 public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
-	
+
 	RESULT ScrollTo(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
 	RESULT ScrollToX(int pxXScroll);
 	RESULT ScrollToY(int pyYScroll);
@@ -120,7 +120,7 @@ public:
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
-	// DreamBrowserHandle
+	// DreamBrowserHandle 
 	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) override;		// Absolute- scroll to this point
 	virtual RESULT ScrollBrowserToX(int pxXScroll) override;
 	virtual RESULT ScrollBrowserToY(int pyYScroll) override;

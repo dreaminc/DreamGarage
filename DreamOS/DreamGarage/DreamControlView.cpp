@@ -297,6 +297,12 @@ bool DreamControlView::IsVisible() {
 	return m_viewState == State::SHOW || m_viewState == State::VISIBLE || m_viewState == State::TYPING;
 }
 
+RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
+	RESULT r = R_PASS;
+	m_keyboardAnimationDuration = animationDuration;
+	return r;
+}
+
 RESULT DreamControlView::HandleKeyboardDown() {
 	RESULT r = R_PASS;
 	
@@ -322,7 +328,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 		point(0.0f, 0.0f, 0.0f),
 		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		0.5f,
+		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		fnStartCallback,
@@ -334,11 +340,11 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardUp() {
+RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptTextBox) {
 	RESULT r = R_PASS;
 
-	point ptTypingPosition = point(0.0f, 0.25f, -0.15f);
-
+	int y = ptTextBox.y() / 2000;	// see #Controlviewquad dimensions
+	point ptTypingPosition = point(0.0f, -0.1f, -0.15f) + point(0.0f, y, 0.0f);
 	CBR(IsVisible(), R_SKIPPED);
 
 	if (m_viewState != State::TYPING) {
@@ -347,6 +353,8 @@ RESULT DreamControlView::HandleKeyboardUp() {
 		CN(m_pKeyboardHandle);
 
 		m_pKeyboardHandle->Show();
+		m_pKeyboardHandle->PopulateTextBox("test test");
+
 		CR(m_pUserHandle->SendReleaseKeyboard());
 		m_pKeyboardHandle = nullptr;
 	}
@@ -369,7 +377,7 @@ RESULT DreamControlView::HandleKeyboardUp() {
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f),
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		0.5f,
+		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		fnStartCallback,

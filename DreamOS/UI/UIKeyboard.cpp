@@ -60,6 +60,14 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardHandle::PopulateTextBox(std::string strText) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PopulateKeyboardTextBox(strText));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -679,6 +687,11 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 
 Error:
 	return r;
+}
+
+RESULT UIKeyboard::PopulateKeyboardTextBox(std::string strText) {
+	m_pTextBoxText->SetText(m_pTextBoxText->GetText() + strText);	// maybe this should just wipe and set
+	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
