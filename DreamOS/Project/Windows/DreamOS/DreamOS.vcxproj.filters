@@ -903,6 +903,15 @@
     <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2014,6 +2023,15 @@
       <Filter>External\easyloggingpp</Filter>
 	</ClInclude>
     <ClInclude Include="..\..\..\Sound\SoundTestSuite.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClientFactory.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
       <Filter>Sound</Filter>
     </ClInclude>
   </ItemGroup>
