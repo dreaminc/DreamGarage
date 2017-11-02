@@ -137,12 +137,6 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
 		//pMesh->SetVisible(false);
-
-		m_pTestQuad = m_pRightControllerModel->AddQuad(0.057f, 0.057f);
-		m_pTestQuad->SetPosition(point(0.0f, 0.0f, -0.0045f));
-		//m_pTestQuadTexture = m_pRightControllerModel->MakeTexture(L"Controller-Overlay-Fake.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		m_pTestQuadTexture = m_pRightControllerModel->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		m_pTestQuad->SetDiffuseTexture(m_pTestQuadTexture.get());
 	}
 
 #endif
@@ -159,7 +153,7 @@ Error:
 
 
 
-DimObj *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
+composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {
 		case CONTROLLER_LEFT: {
 			#ifdef _USE_TEST_APP
@@ -334,8 +328,8 @@ RESULT OVRHMD::UpdateHMD() {
 
 			if (trackingState.HandStatusFlags[i] != 3) {
 				hand->SetTracked(false);
-				hand->SetVisible(false);
-				pModel->SetVisible(false);
+				//hand->SetVisible(false);
+				//pModel->SetVisible(false);
 				continue;
 			}
 

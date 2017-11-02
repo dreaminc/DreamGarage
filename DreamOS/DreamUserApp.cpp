@@ -138,6 +138,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 		CN(m_pKeyboardHandle);
 	}
 
+	m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
 Error:
 	return r;
 }
@@ -221,15 +223,75 @@ RESULT DreamUserApp::Update(void *pContext) {
 		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 
 		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
-			auto dObj = dynamic_cast<DimObj*>(m_pInteractionObj);
-			dObj->SetVisible(false);
-			m_pLeftController->SetVisible(false);
+			m_pQuadOverlayRight->SetDiffuseTexture(m_pTextureDefaultGaze);
+			m_pQuadOverlayRight->SetVisible(true);
 
+			if (m_appStack.empty()) {
+				m_pLeftHand->SetVisible(false);
+				m_pRightHand->SetVisible(false);
+
+				m_pLeftController->SetVisible(true);
+				m_pRightController->SetVisible(true);
+			}
 		}
 	}
 
+	CR(UpdateHands());
+/*
+	if (m_pLeftHand->IsTracked() && !m_fGazeInteraction) {
+		//m_pLeftController->SetVisible(true);
+		m_pLeftHand->SetVisible(true);
+	}
+	else if (!m_pLeftHand->IsTracked()) {
+		//m_pLeftController->SetVisible(false);
+		m_pLeftHand->SetVisible(false);
+	}
+
+	if (m_pRightHand->IsTracked() && !m_fGazeInteraction) {
+		//m_pRightController->SetVisible(true);
+		m_pRightHand->SetVisible(true);
+		//m_pQuadOverlayRight->SetVisible(false);
+	}
+	else if (!m_pRightHand->IsTracked()) {
+		//m_pRightController->SetVisible(false);
+		m_pRightHand->SetVisible(false);
+	}
+	//*/
+
 Error:
 	return r;
+}
+
+RESULT DreamUserApp::UpdateHands() {
+	RESULT r = R_PASS;
+/*
+	for (int i = 0; i < 2; i++) {
+		auto pHand = i == 0 ? m_pLeftHand : m_pRightHand;
+		auto pController = i == 0 ? m_pLeftController : m_pRightController;
+
+		auto pObject = m_appStack.empty() ? pHand : pController;
+
+		pObject->SetVisible(pHand->IsTracked());
+	}
+	//*/
+
+	for (int i = 0; i < 2; i++) {
+		auto pHand = i == 0 ? m_pLeftHand : m_pRightHand;
+		auto pController = i == 0 ? m_pLeftController : m_pRightController;
+
+		if (m_appStack.empty() && !m_fGazeInteraction) {
+			//if (pHand->IsTracked()) {
+			//	pHand->SetVisible(true);
+			//}
+			pHand->SetVisible(pHand->IsTracked());
+		}
+		else {
+			pController->GetFirstChild<mesh>()->SetVisible(pHand->IsTracked());
+			//m_pQuadOverlayRight->SetVisible(m_fGazeCurrent);
+		}
+	}
+
+	return R_PASS;
 }
 
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
@@ -267,6 +329,16 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			m_pLeftMallet->Show();
 			m_pRightMallet->Show();
 
+			m_pLeftHand->SetVisible(false);
+			m_pRightHand->SetVisible(false);
+
+			m_pLeftController->SetVisible(true);
+			m_pRightController->SetVisible(true);
+
+			if (!m_fGazeInteraction) {
+				m_pQuadOverlayRight->SetVisible(false);
+			}
+
 			m_appStack.push(pMenuHandle);
 		}
 
@@ -287,9 +359,19 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	} break;
 	case (ELEMENT_INTERSECT_ENDED): {
 		m_fGazeInteraction = false;
-		auto dObj = dynamic_cast<DimObj*>(m_pInteractionObj);
-		dObj->SetVisible(true);
-		m_pLeftController->SetVisible(true);
+	//	auto dObj = dynamic_cast<DimObj*>(m_pInteractionObj);
+	//	dObj->SetVisible(true);
+	//	m_pLeftController->SetVisible(true);
+		m_pQuadOverlayRight->SetVisible(false);
+
+		if (m_appStack.empty()) {
+			m_pLeftHand->SetVisible(true);
+			m_pRightHand->SetVisible(true);
+
+			m_pLeftController->SetVisible(false);
+			m_pRightController->SetVisible(false);
+		}
+
 	} break;
 	}
 Error:
@@ -313,6 +395,12 @@ RESULT DreamUserApp::PopFocusStack() {
 	if (m_appStack.empty()) {
 		m_pLeftMallet->Hide();
 		m_pRightMallet->Hide();
+
+		m_pLeftHand->SetVisible(true);
+		m_pRightHand->SetVisible(true);
+
+		m_pLeftController->SetVisible(false);
+		m_pRightController->SetVisible(false);
 	}
 
 //Error:
@@ -357,11 +445,24 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
+		GetDOS()->AddObject(m_pLeftHand);
 		m_pLeftController = pController;
+		//m_pLeftPhantomVolume = m_pLeftHand->AddVolume(0.25f);
+		//m_pLeftPhantomVolume->SetVisible(false);
 	}
 	else {
 		m_pRightHand = pHand;
+		GetDOS()->AddObject(m_pRightHand);
 		m_pRightController = pController;
+
+		//m_pRightPhantomVolume = m_pLeftHand->AddVolume(0.25f);
+		//m_pRightPhantomVolume->SetVisible(false);
+
+		m_pQuadOverlayRight = m_pRightController->MakeQuad(0.057f, 0.057f);
+		GetDOS()->AddObjectToUIGraph(m_pQuadOverlayRight.get());
+		m_pQuadOverlayRight->SetPosition(point(0.0f, 0.0f, -0.0045f));
+		m_pQuadOverlayRight->SetVisible(false);
+		//m_pTestQuadTexture = m_pRightControllerModel->MakeTexture(L"Controller-Overlay-Fake.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	}
 
 	//CR(pDreamOS->RegisterEventSubscriber(pController, ELEMENT_INTERSECT_BEGAN, this));
@@ -371,13 +472,17 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	auto pMesh = pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 	pDreamOS->AddObjectToInteractionGraph(pMesh);
-
 	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_BEGAN, this));
 	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_MOVED, this));
 	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_ENDED, this));
-	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_BEGAN, this));
-	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_MOVED, this));
-	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_ENDED, this));
+
+	/*
+	auto pPhantomVolume = pHand->GetFirstChild<volume>().get();
+
+	CR(pDreamOS->RegisterEventSubscriber(pPhantomVolume, ELEMENT_INTERSECT_BEGAN, this));
+	CR(pDreamOS->RegisterEventSubscriber(pPhantomVolume, ELEMENT_INTERSECT_MOVED, this));
+	CR(pDreamOS->RegisterEventSubscriber(pPhantomVolume, ELEMENT_INTERSECT_ENDED, this));
+	//*/
 
 Error:
 	return r;

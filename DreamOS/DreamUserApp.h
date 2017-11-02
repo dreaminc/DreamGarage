@@ -20,6 +20,8 @@
 struct InteractionObjectEvent;
 
 class volume;
+class quad; 
+class texture;
 class hand;
 class UIMallet;
 class DimRay;
@@ -119,6 +121,8 @@ public:
 
 protected:
 
+	RESULT UpdateHands();
+
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
 
@@ -130,11 +134,14 @@ private:
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
 
+	std::shared_ptr<volume> m_pLeftPhantomVolume = nullptr;
+	std::shared_ptr<volume> m_pRightPhantomVolume = nullptr;
+
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
 
-	DimObj *m_pLeftController = nullptr;
-	DimObj *m_pRightController = nullptr;
+	composite *m_pLeftController = nullptr;
+	composite *m_pRightController = nullptr;
 
 	std::stack<DreamUserObserver*> m_appStack;
 
@@ -153,6 +160,10 @@ private:
 	VirtualObj *m_pInteractionObj;
 
 	bool m_fGazeInteraction = false;
+	//bool m_fGazeCurrent = false;
+
+	texture *m_pTextureDefaultGaze = nullptr;
+	std::shared_ptr<quad> m_pQuadOverlayRight;
 };
 
 #endif // ! DREAM_USER_APP_H_
