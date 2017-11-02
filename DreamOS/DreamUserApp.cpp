@@ -112,9 +112,9 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	pDreamOS->AddObjectToInteractionGraph(GetComposite());
 
-	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
+	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
+	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
+	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
 
 	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 
@@ -182,14 +182,17 @@ RESULT DreamUserApp::Update(void *pContext) {
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
 
+	/*
 	if (m_pVolume == nullptr) {
 		m_pVolume = GetComposite()->AddVolume(1.0f);
 		CN(m_pVolume);
 		m_pVolume->SetVisible(false);
 	}
+	//*/
 	
 	if (m_pOrientationRay == nullptr) {
-		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
+		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f);
+		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
 		m_pOrientationRay->SetVisible(false);
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
@@ -212,6 +215,18 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 	if (m_pRightMallet)
 		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
+
+	if (m_fGazeInteraction) {
+		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
+			auto dObj = dynamic_cast<DimObj*>(m_pInteractionObj);
+			dObj->SetVisible(false);
+			m_pLeftController->SetVisible(false);
+
+		}
+	}
 
 Error:
 	return r;
@@ -260,11 +275,21 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 		GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 	} break;
-	case (ELEMENT_INTERSECT_BEGAN): {
 
+	case (ELEMENT_INTERSECT_BEGAN): {
+		//if (m_pInteractionObj == m_pLeftController || m_pInteractionObj == m_pRightController) {
+			auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			m_fGazeInteraction = true;
+			m_pInteractionObj = mEvent->m_pEventObject;
+			//m_pInteractionObj = mEvent->m_pInteractionObject;
+		//}
 	} break;
 	case (ELEMENT_INTERSECT_ENDED): {
-
+		m_fGazeInteraction = false;
+		auto dObj = dynamic_cast<DimObj*>(m_pInteractionObj);
+		dObj->SetVisible(true);
+		m_pLeftController->SetVisible(true);
 	} break;
 	}
 Error:
@@ -314,14 +339,45 @@ RESULT DreamUserApp::ClearFocusStack() {
 
 RESULT DreamUserApp::SetHand(hand *pHand) {
 	RESULT r = R_PASS;
+	auto pDreamOS = GetDOS();
+	HAND_TYPE type;
+
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
-	if (pHand->GetHandState().handType == HAND_TYPE::HAND_LEFT) {
+	type = pHand->GetHandState().handType;
+	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
+
+	auto pHMD = pDreamOS->GetHMD();
+	CNR(pHMD, R_SKIPPED);
+
+	auto controllerType = type == HAND_TYPE::HAND_LEFT ? CONTROLLER_TYPE::CONTROLLER_LEFT : CONTROLLER_TYPE::CONTROLLER_RIGHT;
+	auto pController = pHMD->GetSenseControllerObject(controllerType);
+	CNR(pController, R_SKIPPED);
+	//pDreamOS->AddObjectToInteractionGraph(pController);
+
+	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
+		m_pLeftController = pController;
 	}
-	else if (pHand->GetHandState().handType == HAND_TYPE::HAND_RIGHT) {
+	else {
 		m_pRightHand = pHand;
+		m_pRightController = pController;
 	}
+
+	//CR(pDreamOS->RegisterEventSubscriber(pController, ELEMENT_INTERSECT_BEGAN, this));
+	//CR(pDreamOS->RegisterEventSubscriber(pController, ELEMENT_INTERSECT_MOVED, this));
+	//CR(pDreamOS->RegisterEventSubscriber(pController, ELEMENT_INTERSECT_ENDED, this));
+
+	auto pMesh = pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
+	pDreamOS->AddObjectToInteractionGraph(pMesh);
+
+	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_BEGAN, this));
+	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_MOVED, this));
+	CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_INTERSECT_ENDED, this));
+	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_BEGAN, this));
+	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_MOVED, this));
+	//CR(pDreamOS->RegisterEventSubscriber(pMesh, ELEMENT_COLLIDE_ENDED, this));
 
 Error:
 	return r;

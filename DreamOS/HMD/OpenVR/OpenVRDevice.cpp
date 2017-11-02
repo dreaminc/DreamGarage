@@ -257,7 +257,7 @@ Error:
 	return r;
 }
 
-VirtualObj *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType) {
+DimObj *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType) {
 	/*
 	switch (controllerType) {
 	case CONTROLLER_LEFT: {

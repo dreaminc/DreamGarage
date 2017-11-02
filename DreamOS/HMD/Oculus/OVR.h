@@ -59,7 +59,7 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
-	virtual VirtualObj *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual DimObj *GetSenseControllerObject(ControllerType controllerType) override;
 
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }
@@ -82,6 +82,9 @@ public:
 
 	composite *m_pLeftControllerModel;
 	composite *m_pRightControllerModel;
+
+	std::shared_ptr<texture> m_pTestQuadTexture;
+	std::shared_ptr<quad> m_pTestQuad;
 
 private:
 	OVRHMDSinkNode *m_pOVRHMDSinkNode = nullptr;

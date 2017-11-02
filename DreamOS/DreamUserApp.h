@@ -26,9 +26,12 @@ class DimRay;
 class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
+class DimObj;
 
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
+
+#define GAZE_OVERLAY_MS 1250.0
 
 enum class UserObserverEventType {
 	BACK,
@@ -130,6 +133,9 @@ private:
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
 
+	DimObj *m_pLeftController = nullptr;
+	DimObj *m_pRightController = nullptr;
+
 	std::stack<DreamUserObserver*> m_appStack;
 
 	// apps position themselves with this when they are presented
@@ -140,6 +146,13 @@ private:
 private:
 	float m_menuDepth = MENU_DEPTH;
 	float m_menuHeight = MENU_HEIGHT;
+
+	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;
+	double m_msGazeStart;
+
+	VirtualObj *m_pInteractionObj;
+
+	bool m_fGazeInteraction = false;
 };
 
 #endif // ! DREAM_USER_APP_H_

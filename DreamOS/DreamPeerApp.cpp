@@ -93,6 +93,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	//	CN(m_pSphere);
 	//}
 
+	/*
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
@@ -102,6 +103,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		// event when the peer is looking at something that consumes these events
 		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
+	//*/
 
 	if (m_pPhantomVolume == nullptr) {
 		m_pPhantomVolume = GetComposite()->AddVolume(2.0f);

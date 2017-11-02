@@ -130,11 +130,19 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		auto pMesh = m_pLeftControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(-0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		//pMesh->SetVisible(false);
 
 		m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
 		pMesh = m_pRightControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
 		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		//pMesh->SetVisible(false);
+
+		m_pTestQuad = m_pRightControllerModel->AddQuad(0.057f, 0.057f);
+		m_pTestQuad->SetPosition(point(0.0f, 0.0f, -0.0045f));
+		//m_pTestQuadTexture = m_pRightControllerModel->MakeTexture(L"Controller-Overlay-Fake.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pTestQuadTexture = m_pRightControllerModel->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pTestQuad->SetDiffuseTexture(m_pTestQuadTexture.get());
 	}
 
 #endif
@@ -151,7 +159,7 @@ Error:
 
 
 
-VirtualObj *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
+DimObj *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {
 		case CONTROLLER_LEFT: {
 			#ifdef _USE_TEST_APP
@@ -350,7 +358,7 @@ RESULT OVRHMD::UpdateHMD() {
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
-			pModel->SetVisible(true);
+			//pModel->SetVisible(true);
 
 			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
 			UpdateSenseController(type, inputState);
