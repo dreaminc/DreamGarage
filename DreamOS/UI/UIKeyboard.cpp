@@ -456,6 +456,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
+		m_pTitleIcon->SetVisible(false);
+		m_pTitleText->SetVisible(false);
 
 	Error:
 		return r;
@@ -465,6 +467,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
+		CR(UpdateKeyState((SenseVirtualKey)(0), 1));
+		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
 	Error:
 		return r;
 	};
@@ -690,13 +694,16 @@ Error:
 }
 
 RESULT UIKeyboard::PopulateKeyboardTextBox(std::string strText) {
-	m_pTextBoxText->SetText(m_pTextBoxText->GetText() + strText);	// maybe this should just wipe and set
-	return R_PASS;
+	RESULT r = R_PASS;
+	CR(m_pTextBoxText->SetText(strText));
+Error:
+	return r;
 }
 
 RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
-
+	m_pTitleIcon->SetVisible(true);
+	m_pTitleText->SetVisible(true);
 	if (pIconTexture != nullptr) {
 		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}

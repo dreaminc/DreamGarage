@@ -135,7 +135,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			m_pBrowserHandle->SendKeyCharacter(chKey, true);
 		}
 
-		if (m_viewState == State::HIDDEN) {		//i.e. only keyboard is up- this will probably need to change when we get more apps that use keyboard
+		if (!IsVisible()) {		//i.e. only keyboard is up- this will probably need to change when we get more apps that use keyboard
 			m_strURL += chKey;
 		}
 	}
@@ -215,6 +215,10 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
+	point ptcvOffset = point(0.0f, 0.0f, -.35f);
+
+	point ptOrigin;
+	quaternion qOrigin;
 	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
 	CB(uids.size() == 1);
 	m_browserUID = uids[0];
@@ -227,10 +231,12 @@ RESULT DreamControlView::Show() {
 	}
 
 	SetSharedViewContext();
-	UpdateCompositeWithCameraLook(CONTROL_VIEW_DEPTH, CONTROL_VIEW_HEIGHT);
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
 
-	m_ptVisiblePosition = GetComposite()->GetPosition();
-	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
+	GetComposite()->SetPosition(ptOrigin + ptcvOffset);
+	GetComposite()->SetOrientation(qOrigin);
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
@@ -244,9 +250,9 @@ RESULT DreamControlView::Show() {
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		m_ptVisiblePosition,
-		GetComposite()->GetOrientation(),
+		m_pViewQuad.get(),
+		m_pViewQuad->GetPosition(),
+		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -271,13 +277,14 @@ RESULT DreamControlView::Hide() {
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
 		SetViewState(State::HIDDEN);
+		m_strURL = "";
 		return R_PASS;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		m_ptHiddenPosition,
-		GetComposite()->GetOrientation(),
+		m_pViewQuad.get(),
+		m_pViewQuad->GetPosition(),
+		m_qViewQuadOrientation,
 		vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -343,23 +350,20 @@ Error:
 RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptTextBox) {
 	RESULT r = R_PASS;
 
-	int y = ptTextBox.y() / 2000;	// see #Controlviewquad dimensions
-	point ptTypingPosition = point(0.0f, -0.1f, -0.15f) + point(0.0f, y, 0.0f);
+	float y = ptTextBox.y() / 2000;	// scaled with ControlViewQuad dimensions
+	point ptTypingPosition = point(0.0f, -0.2f, -0.15f) + point(0.0f, y, 0.0f);
 	CBR(IsVisible(), R_SKIPPED);
 
 	if (m_viewState != State::TYPING) {
 		CN(m_pUserHandle);
 		m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 		CN(m_pKeyboardHandle);
-
+		CR(m_pKeyboardHandle->PopulateTextBox(strTextField));
 		m_pKeyboardHandle->Show();
-		m_pKeyboardHandle->PopulateTextBox("test test");
 
 		CR(m_pUserHandle->SendReleaseKeyboard());
 		m_pKeyboardHandle = nullptr;
 	}
-	
-	//m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f));
 
 	auto fnStartCallback = [&](void *pContext) {
 		SetViewState(State::SHOW);	// might want to just make an "ANIMATING" state

@@ -422,6 +422,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		//m_pBrowserQuad->SetVisible(true);
+		//m_fLoadedNewPage = true;
 		return r;
 	};
 
@@ -442,19 +443,23 @@ Error:
 
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
+	
+	m_pCurrentNode = pDOMNode;
 
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable() && m_lastWebBrowserPoint.y != -1) {
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
 		CB(vControlViewUID.size() == 1);
+
 		UID controlViewUID = vControlViewUID[0];
 		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+		
 		std::string strTextField = pDOMNode->GetValue();
 		point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
 		pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox);
 
 		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
-	
+
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
