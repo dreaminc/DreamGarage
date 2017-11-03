@@ -376,8 +376,6 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
 
-	
-
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
 	ptTypingPosition = point(0.0f, -0.2f, -0.15f) + point(0.0f, textBoxYOffset, 0.0f);
 
