@@ -633,6 +633,8 @@ Error:
 RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	RESULT r = R_PASS;
 
+	CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox
+
 	//TODO: this logic should probably be in UIKeyboardLayout
 	if (chkey == SVK_SHIFT) {
 		LayoutType newType;
@@ -687,7 +689,6 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 		}
 	}
-
 
 Error:
 	return r;

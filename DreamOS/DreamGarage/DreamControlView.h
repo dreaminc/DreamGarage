@@ -23,6 +23,8 @@
 #define CONTROL_VIEW_HEIGHT -0.20f
 #define TYPING_ROTATION (M_PI / 2.0f)
 
+#define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
+
 class quad; 
 class sphere;
 class UIView;
@@ -125,15 +127,12 @@ private:
 
 	float m_hiddenScale; 
 	float m_visibleScale;
-	float m_keyboardAnimationDuration = 0.1f;
+	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
 	
 	quaternion m_qViewQuadOrientation;
-
-	float m_showThreshold;
-	float m_hideThreshold;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

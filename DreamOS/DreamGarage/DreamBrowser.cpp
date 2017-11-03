@@ -365,6 +365,7 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 
 	WebBrowserMouseEvent mouseEvent;
 
+	m_fDidUserClick = true;
 	mouseEvent.pt = ptContact;
 	m_lastWebBrowserPoint = ptContact;
 
@@ -422,7 +423,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		//m_pBrowserQuad->SetVisible(true);
-		//m_fLoadedNewPage = true;
+		m_fDidUserClick = false;
 		return r;
 	};
 
@@ -443,19 +444,18 @@ Error:
 
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
-	
-	m_pCurrentNode = pDOMNode;
 
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable() && m_fDidUserClick) {
 		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
 		CB(vControlViewUID.size() == 1);
 
 		UID controlViewUID = vControlViewUID[0];
 		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-		
+		CN(pDreamControlViewHandle);
+
 		std::string strTextField = pDOMNode->GetValue();
 		point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
-		pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox);
+		CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
 
 		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
@@ -486,7 +486,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
-	m_lastWebBrowserPoint.y = -1;
+
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	SetAppName(DREAM_BROWSER_APP_NAME);

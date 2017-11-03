@@ -240,12 +240,10 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fRecievingStream = false;
-	//bool m_fLoadedNewPage = false;
+	bool m_fDidUserClick = false;
 
 	TextEntryString m_strEntered;
 	
-	DOMNode *m_pCurrentNode;
-
 	std::string m_strScope;
 	std::string m_strPath;
 };
