@@ -8,6 +8,14 @@
 
 #include "SoundClient.h"
 
+
+#include <Windows.h>
+#include <AudioClient.h>
+#include <mmdeviceapi.h>
+#include <audiopolicy.h>
+#include <avrt.h>
+#include <functiondiscoverykeys.h>
+
 class WASAPISoundClient : public SoundClient {
 
 public:
