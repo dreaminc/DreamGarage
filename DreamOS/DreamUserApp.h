@@ -35,6 +35,8 @@ class DimObj;
 
 #define GAZE_OVERLAY_MS 1250.0
 
+#define OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
+
 enum class UserObserverEventType {
 	BACK,
 	KB_ENTER,
@@ -114,6 +116,7 @@ public:
 	virtual RESULT PopFocusStack() override;
 	virtual RESULT PushFocusStack(DreamUserObserver* pObserver) override;
 	virtual RESULT ClearFocusStack() override;
+	RESULT OnFocusStackEmpty();
 
 	virtual RESULT HandleKBEnterEvent() override;
 	virtual UIKeyboardHandle *GetKeyboard() override;
@@ -134,14 +137,8 @@ private:
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
 
-	std::shared_ptr<volume> m_pLeftPhantomVolume = nullptr;
-	std::shared_ptr<volume> m_pRightPhantomVolume = nullptr;
-
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
-
-	composite *m_pLeftController = nullptr;
-	composite *m_pRightController = nullptr;
 
 	std::stack<DreamUserObserver*> m_appStack;
 
@@ -162,7 +159,8 @@ private:
 	bool m_fGazeInteraction = false;
 	//bool m_fGazeCurrent = false;
 
-	texture *m_pTextureDefaultGaze = nullptr;
+	texture *m_pTextureDefaultGazeLeft = nullptr;
+	texture *m_pTextureDefaultGazeRight = nullptr;
 	std::shared_ptr<quad> m_pQuadOverlayRight;
 };
 

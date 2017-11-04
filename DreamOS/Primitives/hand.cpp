@@ -3,6 +3,9 @@
 #include "DreamConsole/DreamConsole.h"
 #include "Primitives/sphere.h"
 #include "Primitives/model/model.h"
+#include "Primitives/DimObj.h"
+#include "Primitives/model/mesh.h"
+#include "DreamOS.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
@@ -26,10 +29,10 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	float palmRadius = 0.01f;
-	point ptModel = point(0.0f, 0.0f, 0.0f);
+	point ptModel = point(0.0f, 0.0f, 0.08f);
 	float scaleModel = 0.015f;
 
-	m_pPalm = AddSphere(palmRadius, 10, 10);
+	//m_pPalm = AddSphere(palmRadius, 10, 10);
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
@@ -68,6 +71,109 @@ Error:
 	return r;
 }
 
+RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
+	RESULT r = R_PASS;
+
+	CN(pDreamOS);
+	m_pDreamOS = pDreamOS;
+
+	auto pHMD = m_pDreamOS->GetHMD();
+	CNR(pHMD, R_SKIPPED);
+
+	m_pController = pHMD->GetSenseControllerObject((ControllerType)(m_handType));
+	CN(m_pController);
+	m_pController->SetVisible(false);
+
+	float scale = 0.035f;
+	float overlayAspect = (332.0f / 671.0f);
+	float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+	m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+	m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+	m_pOverlayQuad->SetPosition(point(-scale * 0.575f * t, 0.0f, -scale * 0.575f));
+	m_pOverlayQuad->SetVisible(false);
+
+	m_pPhantomVolume = AddVolume(0.25);
+	CN(m_pPhantomVolume);
+	m_pPhantomVolume->SetVisible(false);
+	CR(m_pPhantomVolume->InitializeOBB());
+
+Error:
+	return r;
+}
+
+hand::ModelState hand::GetModelState() {
+	return m_modelState;
+}
+
+RESULT hand::SetModelState(ModelState modelState) {
+	RESULT r = R_PASS;
+
+	switch (m_modelState) {
+	case ModelState::HAND: {
+		m_pModel->SetVisible(false);
+	} break;
+	case ModelState::CONTROLLER: {
+		m_pController->SetVisible(false);
+	} break;
+	}
+
+	switch (modelState) {
+	case ModelState::HAND: {
+		m_pModel->SetVisible(true);
+	} break;
+	case ModelState::CONTROLLER: {
+		m_pController->SetVisible(true);
+		m_pOverlayQuad->SetVisible(m_fOverlayVisible);
+	} break;
+	}
+
+	m_modelState = modelState;
+
+//Error:
+	return r;
+}
+
+RESULT hand::Update() {
+	RESULT r = R_PASS;
+
+	switch (m_modelState) {
+	case ModelState::HAND: {
+		m_pModel->SetVisible(m_fTracked);
+	} break;
+	case ModelState::CONTROLLER: {
+		m_pController->SetVisible(m_fTracked);
+		m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
+	} break;
+	}
+
+	return r;
+}
+
+RESULT hand::SetOverlayVisible(bool fVisible) {
+	RESULT r = R_PASS;
+
+	m_fOverlayVisible = fVisible;
+	CNR(m_pOverlayQuad, R_SKIPPED);
+	m_pOverlayQuad->SetVisible(fVisible);
+
+Error:
+	return r;
+}
+
+RESULT hand::SetOverlayTexture(texture *pOverlayTexture) {
+	RESULT r = R_PASS;
+
+	CN(pOverlayTexture);
+	m_pOverlayQuad->SetDiffuseTexture(pOverlayTexture);
+
+Error:
+	return r;
+}
+
+std::shared_ptr<volume> hand::GetPhantomVolume() {
+	return m_pPhantomVolume;
+}
+
 RESULT hand::SetOriented(bool fOriented) {
 	m_fOriented = fOriented;
 	return R_PASS;
@@ -91,7 +197,7 @@ RESULT hand::OnLostTrack() {
 	
 	m_pModel->SetVisible(m_fTracked);
 	
-	m_pPalm->SetVisible(m_fTracked);
+	//m_pPalm->SetVisible(m_fTracked);
 
 	return R_PASS;
 }
