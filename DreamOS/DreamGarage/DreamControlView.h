@@ -24,7 +24,7 @@
 #define TYPING_ROTATION (M_PI / 2.0f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-class text;
+
 class quad; 
 class sphere;
 class UIView;
@@ -111,7 +111,6 @@ private:
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
 	std::shared_ptr<UIView> m_pView;
-	std::shared_ptr<UIScrollView> m_pScrollView;
 
 	std::string m_strURL = "";
 
@@ -130,8 +129,7 @@ private:
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
 	point m_ptHiddenPosition;
-	point m_ptVisiblePosition;
-	std::shared_ptr<text> pTextBoxText;
+	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
 };
 
