@@ -90,6 +90,9 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;
 
+	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
 
@@ -204,6 +207,19 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	
 Error:
 	return r;
+}
+
+texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
+	texture *pTexture = nullptr;
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pTexture = m_pOverlayLeft;
+	}
+	else {
+		pTexture = m_pOverlayRight;
+	}
+
+	return pTexture;
 }
 
 RESULT DreamControlView::Shutdown(void *pContext) {

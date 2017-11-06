@@ -63,6 +63,7 @@ public:
 
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
 
 private:
 	virtual RESULT ShowRootMenu() = 0;
@@ -108,6 +109,7 @@ public:
 	RESULT RequestMenu();
 	virtual RESULT ShowRootMenu() override;
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
+	virtual texture *GetOverlayTexture(HAND_TYPE type) override;
 
 	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
@@ -154,6 +156,8 @@ private:
 	std::shared_ptr<texture> m_pDefaultIcon;
 	std::shared_ptr<texture> m_pShareIcon;
 	std::shared_ptr<texture> m_pMenuItemBg;
+	texture* m_pOverlayLeft;
+	texture* m_pOverlayRight;
 
 	std::shared_ptr<font> m_pFont;
 

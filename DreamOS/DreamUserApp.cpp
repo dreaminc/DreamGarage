@@ -6,6 +6,10 @@
 
 #include "UI/UIMallet.h"
 
+texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
+	return nullptr;
+}
+
 UIMallet *DreamUserHandle::RequestMallet(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
@@ -238,13 +242,21 @@ RESULT DreamUserApp::Update(void *pContext) {
 				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 			}
 			else {
-				/*
-				auto pTexture = m_appStack.top()->GetOverlayTexture();
+				//*
+				auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
 				if (pTexture == nullptr) {
 					m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
 				}
 				else {
 					m_pRightHand->SetOverlayTexture(pTexture);
+				}
+
+				pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
+				if (pTexture == nullptr) {
+					m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
+				}
+				else {
+					m_pLeftHand->SetOverlayTexture(pTexture);
 				}
 				//*/
 			}

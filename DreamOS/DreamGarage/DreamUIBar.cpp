@@ -78,6 +78,9 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
+	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
 	CR(GetComposite()->InitializeOBB());
@@ -296,6 +299,19 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 Error:
 	return r;
+}
+
+texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
+	texture *pTexture = nullptr;
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pTexture = m_pOverlayLeft;
+	}
+	else {
+		pTexture = m_pOverlayRight;
+	}
+
+	return pTexture;
 }
 
 RESULT DreamUIBar::RequestMenu() {

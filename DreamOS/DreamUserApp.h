@@ -46,6 +46,7 @@ enum class UserObserverEventType {
 class DreamUserObserver {
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual texture* GetOverlayTexture(HAND_TYPE type);
 };
 
 class DreamUserHandle : public DreamAppHandle {

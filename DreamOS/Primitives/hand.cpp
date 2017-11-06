@@ -52,6 +52,11 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
 						
+	m_pPhantomVolume = MakeVolume(0.25);
+	CN(m_pPhantomVolume);
+	m_pPhantomVolume->SetVisible(false);
+	AddObject(m_pPhantomVolume);
+
 #else
 	//m_pModel = AddComposite();
 	//m_pModel->AddVolume(0.02f);
@@ -91,11 +96,6 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
 	m_pOverlayQuad->SetPosition(point(-scale * 0.575f * t, 0.0f, -scale * 0.575f));
 	m_pOverlayQuad->SetVisible(false);
-
-	m_pPhantomVolume = AddVolume(0.25);
-	CN(m_pPhantomVolume);
-	m_pPhantomVolume->SetVisible(false);
-	CR(m_pPhantomVolume->InitializeOBB());
 
 Error:
 	return r;
