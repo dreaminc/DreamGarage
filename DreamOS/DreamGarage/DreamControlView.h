@@ -24,7 +24,7 @@
 #define TYPING_ROTATION (M_PI / 2.0f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-
+class text;
 class quad; 
 class sphere;
 class UIView;
@@ -131,7 +131,7 @@ private:
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
-	
+	std::shared_ptr<text> pTextBoxText;
 	quaternion m_qViewQuadOrientation;
 };
 
