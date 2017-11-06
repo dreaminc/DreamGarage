@@ -135,14 +135,17 @@ RESULT DreamControlView::Update(void *pContext) {
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 		ptCollisions[i] = ptSphereOrigin;
 
-		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
+		if (ptSphereOrigin.y() >= mallet->GetRadius()) {
+			mallet->CheckAndCleanDirty();
+		}
 
 		// if the sphere is lower than its own radius, there must be an interaction
 		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);		
 			CR(mallet->SetDirty());
 
-			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 || ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 || 
+				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
 	
 			if (mallet == pLMallet) {
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));

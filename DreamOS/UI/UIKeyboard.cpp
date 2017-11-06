@@ -337,7 +337,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
 			// if it accounted for the radius, it would be able to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
-			if (!key) continue;
+			if (!key) {
+				CR(mallet->SetDirty());
+				continue;
+			}
 			CR(AddActiveKey(key));
 			keyCollisions[i] = key;
 
