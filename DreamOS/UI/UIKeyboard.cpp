@@ -60,6 +60,14 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardHandle::PopulateTextBox(std::string strText) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PopulateKeyboardTextBox(strText));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -448,6 +456,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
+		m_pTitleIcon->SetVisible(false);
+		m_pTitleText->SetVisible(false);
 
 	Error:
 		return r;
@@ -457,6 +467,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
+		CR(UpdateKeyState((SenseVirtualKey)(0), 1));
+		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
 	Error:
 		return r;
 	};
@@ -676,14 +688,21 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		}
 	}
 
+Error:
+	return r;
+}
 
+RESULT UIKeyboard::PopulateKeyboardTextBox(std::string strText) {
+	RESULT r = R_PASS;
+	CR(m_pTextBoxText->SetText(strText));
 Error:
 	return r;
 }
 
 RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
-
+	m_pTitleIcon->SetVisible(true);
+	m_pTitleText->SetVisible(true);
 	if (pIconTexture != nullptr) {
 		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}

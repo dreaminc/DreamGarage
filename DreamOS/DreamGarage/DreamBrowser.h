@@ -42,7 +42,7 @@ class DreamBrowserHandle : public DreamAppHandle {
 public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
-	
+
 	RESULT ScrollTo(int pxXScroll, int pxYScroll);		// Absolute- scroll to this point
 	RESULT ScrollToX(int pxXScroll);
 	RESULT ScrollToY(int pyYScroll);
@@ -52,7 +52,10 @@ public:
 	RESULT ScrollYByDiff(int pxYDiff);
 
 	RESULT SendClickToBrowserAtPoint(WebBrowserPoint ptContact);
-	
+
+	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
+	virtual RESULT SendURL (std::string strURL) = 0;
+
 	int GetScrollPixelsX();
 	int GetScrollPixelsY();
 
@@ -63,7 +66,6 @@ public:
 	int GetWidthOfBrowser();
 	float GetAspectRatioFromBrowser();
 
-	// GetFrameFocused();		//textbox detection
 	std::shared_ptr<texture> GetBrowserTexture();
 
 private:
@@ -78,6 +80,8 @@ private:
 	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) = 0;
 	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) = 0;
 	
+	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) = 0;
+
 	virtual RESULT ClickBrowser(WebBrowserPoint ptContact) = 0;
 
 	virtual int GetScrollX() = 0;
@@ -116,7 +120,7 @@ public:
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
-	// DreamBrowserHandle
+	// DreamBrowserHandle 
 	virtual RESULT ScrollBrowserToPoint(int pxXScroll, int pxYScroll) override;		// Absolute- scroll to this point
 	virtual RESULT ScrollBrowserToX(int pxXScroll) override;
 	virtual RESULT ScrollBrowserToY(int pyYScroll) override;
@@ -133,6 +137,9 @@ public:
 
 	virtual int GetPageHeight() override;	// get page context
 	virtual int GetPageWidth() override;
+
+	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown);
+	virtual RESULT SendURL(std::string strURL);
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
@@ -233,9 +240,10 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fRecievingStream = false;
+	bool m_fDidUserClick = false;
 
 	TextEntryString m_strEntered;
-
+	
 	std::string m_strScope;
 	std::string m_strPath;
 };

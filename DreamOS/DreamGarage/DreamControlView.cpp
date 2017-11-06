@@ -60,34 +60,41 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	SetAppName("DreamControlView");
 	
+	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 	CN(m_pUserHandle);
+	
+	CB(keyUIDs.size() == 1);
+	m_keyboardUID = keyUIDs[0];
 
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
 
 	m_pViewQuad = m_pView->AddQuad(CONTROL_VIEWQUAD_WIDTH, CONTROL_VIEWQUAD_HEIGHT, 1, 1, nullptr);
-	m_pViewQuad->SetOrientation(quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f));
 	CN(m_pViewQuad);
 
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f);
+	m_pViewQuad->SetOrientation(m_qViewQuadOrientation);
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
 
-	m_viewState = State::HIDDEN;
+	m_viewState = State::HIDDEN;		
 
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
 
-	m_hideThreshold = 0.20f;
-	m_showThreshold = -0.35f;
+	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
+	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
 
 Error:
 	return r;
@@ -105,18 +112,39 @@ RESULT DreamControlView::Update(void *pContext) {
 
 RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
-	if (pInteractionEvent->m_pObject == m_pViewQuad.get()) {
-		switch (pInteractionEvent->m_eventType) {
-		case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
+
+	switch (m_viewState) {
+	case(State::VISIBLE): {
+		if (pInteractionEvent->m_eventType == ELEMENT_COLLIDE_BEGAN) {
 			point ptContact = pInteractionEvent->m_ptContact[0];
 
-			m_pUserHandle->RequestHapticImpulse(pInteractionEvent->m_pInteractionObject);
+			CR(m_pUserHandle->RequestHapticImpulse(pInteractionEvent->m_pInteractionObject));
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-			m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact));
-
-		} break;
+			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact)));
 		}
+	} break;
+
+	case(State::HIDDEN): {
+		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
+			char chkey = (char)(pInteractionEvent->m_value);
+
+			CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
+			
+			m_strURL += chkey;
+		}
+	} break;
+
+	case(State::TYPING): {
+		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
+			char chkey = (char)(pInteractionEvent->m_value);
+
+			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
+			CR(m_pBrowserHandle->SendKeyCharacter(chkey, true));
+		}
+
+	} break;
+
 	}
 Error:
 	return r;
@@ -124,7 +152,7 @@ Error:
 
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
-	if (m_viewState == State::VISIBLE) {
+	if (IsVisible()) {
 		switch (pEvent->type) {
 		case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
@@ -137,7 +165,7 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-			m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff);
+			CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff));
 
 		} break;
 		}
@@ -149,11 +177,31 @@ Error:
 RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
-	if (type == UserObserverEventType::BACK) {
-		CR(m_pUserHandle->SendClearFocusStack());
-		CR(HideApp());
+	switch (type) {
+	case (UserObserverEventType::BACK): {
+		if (m_viewState == State::VISIBLE) {
+			CR(m_pUserHandle->SendClearFocusStack());
+			CR(Hide());
+		}
+		if (m_viewState == State::TYPING) {
+			CN(m_pBrowserHandle);			// This unfocuses the text box so that node change event
+			WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
+			unFocusText.x = -1;				// to go back into the same textbox
+			unFocusText.y = -1;
+			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(unFocusText));
+
+			HandleKeyboardDown();
+		}
 	}
 
+	case (UserObserverEventType::KB_ENTER): {
+		if (m_viewState == State::TYPING) {
+			HandleKeyboardDown();
+		}
+	} break;
+
+	} 
+	
 Error:
 	return r;
 }
@@ -179,17 +227,31 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
+	point ptcvOffset = point(0.0f, 0.0f, -.35f);
+
+	point ptAppBasisPosition;
+	quaternion qAppBasisOrientation;
+
 	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
 	CB(uids.size() == 1);
 	m_browserUID = uids[0];
 
-	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));	
+	CN(m_pBrowserHandle);
+
+	if (m_strURL != "") {
+		CR(m_pBrowserHandle->SendURL(m_strURL));
+		m_strURL = "";
+	}
 
 	SetSharedViewContext();
-	UpdateCompositeWithCameraLook(CONTROL_VIEW_DEPTH, CONTROL_VIEW_HEIGHT);	
 
-	m_ptVisiblePosition = GetComposite()->GetPosition();
-	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
+
+	GetComposite()->SetPosition(ptAppBasisPosition + ptcvOffset);
+	GetComposite()->SetOrientation(qAppBasisOrientation);
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
@@ -203,9 +265,9 @@ RESULT DreamControlView::Show() {
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		m_ptVisiblePosition,
-		GetComposite()->GetOrientation(),
+		m_pViewQuad.get(),
+		m_pViewQuad->GetPosition(),
+		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -230,13 +292,14 @@ RESULT DreamControlView::Hide() {
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
 		SetViewState(State::HIDDEN);
+		m_strURL = "";
 		return R_PASS;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		m_ptHiddenPosition,
-		GetComposite()->GetOrientation(),
+		m_pViewQuad.get(),
+		m_pViewQuad->GetPosition(),
+		m_qViewQuadOrientation,
 		vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -253,7 +316,106 @@ Error:
 }
 
 bool DreamControlView::IsVisible() {
-	return m_viewState == State::SHOW || m_viewState == State::VISIBLE;
+	bool fIsVisible = false;
+	
+	if (m_viewState == State::SHOW || m_viewState == State::VISIBLE || m_viewState == State::TYPING) {
+		fIsVisible = true;
+	}
+	
+	return fIsVisible;
+}
+
+RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
+	m_keyboardAnimationDuration = animationDuration;
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleKeyboardDown() {
+	RESULT r = R_PASS;
+	
+	CN(m_pUserHandle);
+	m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+	CN(m_pKeyboardHandle);
+
+	CR(m_pKeyboardHandle->Hide());
+	CR(m_pUserHandle->SendReleaseKeyboard());
+	m_pKeyboardHandle = nullptr;
+
+	auto fnStartCallback = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		SetViewState(State::VISIBLE);	
+		return R_PASS;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pViewQuad.get(),
+		point(0.0f, 0.0f, 0.0f),
+		m_qViewQuadOrientation,
+		vector(m_visibleScale, m_visibleScale, m_visibleScale),
+		m_keyboardAnimationDuration,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
+RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptTextBox) {
+	RESULT r = R_PASS;
+
+	point ptTypingPosition;
+	float textBoxYOffset;
+
+	CN(m_pBrowserHandle);
+	CBR(IsVisible(), R_SKIPPED);
+
+	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
+	ptTypingPosition = point(0.0f, -0.2f, -0.15f) + point(0.0f, textBoxYOffset, 0.0f);
+
+	if (m_viewState != State::TYPING) {
+		CN(m_pUserHandle);
+		m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+		CN(m_pKeyboardHandle);
+		CR(m_pKeyboardHandle->PopulateTextBox(strTextField));
+		CR(m_pKeyboardHandle->Show());
+
+		CR(m_pUserHandle->SendReleaseKeyboard());
+		m_pKeyboardHandle = nullptr;
+	}
+
+	auto fnStartCallback = [&](void *pContext) {
+		SetViewState(State::SHOW);	// might want to just make an "ANIMATING" state
+
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		SetViewState(State::TYPING);
+		return R_PASS;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pViewQuad.get(),
+		ptTypingPosition,
+		quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f),
+		vector(m_visibleScale, m_visibleScale, m_visibleScale),
+		m_keyboardAnimationDuration,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
 }
 
 ///*

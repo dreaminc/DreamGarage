@@ -21,6 +21,9 @@
 #define CONTROL_VIEWQUAD_ANGLE (M_PI / 3.0f)
 #define CONTROL_VIEW_DEPTH 0.6f
 #define CONTROL_VIEW_HEIGHT -0.20f
+#define TYPING_ROTATION (M_PI / 2.0f)
+
+#define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
 class quad; 
 class sphere;
@@ -39,6 +42,7 @@ public:
 
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) = 0;
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
@@ -60,7 +64,8 @@ public:
 		HIDDEN,
 		HIDE,
 		VISIBLE,
-		SHOW
+		SHOW,
+		TYPING
 	};
 
 // DreamApp
@@ -78,6 +83,8 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
+	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
+	virtual RESULT HandleKeyboardDown();
 
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -96,7 +103,7 @@ public:
 	RESULT SetSharedViewContext();
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
-
+	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 private:
@@ -106,22 +113,26 @@ private:
 	std::shared_ptr<UIView> m_pView;
 	std::shared_ptr<UIScrollView> m_pScrollView;
 
+	std::string m_strURL = "";
+
 	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
+	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;
+	UID m_keyboardUID;
 
 	State m_viewState;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
+	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;
-
-	float m_showThreshold;
-	float m_hideThreshold;
+	
+	quaternion m_qViewQuadOrientation;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

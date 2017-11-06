@@ -76,6 +76,15 @@ RESULT DreamBrowserHandle::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetBrowserPath(strPath));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SendKeyCharacter(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SendKeyPressed(chKey, fkeyDown));
 Error:
 	return r;
 }
@@ -206,8 +215,8 @@ RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 		pxYDiff = m_pxYPosition - pxYScroll;
 	}
 
-	m_pxXPosition = pxXScroll;
-	m_pxYPosition = pxYScroll;
+	m_pxXPosition += pxXDiff;
+	m_pxYPosition += pxYDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
 
@@ -230,7 +239,7 @@ RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
 		pxXDiff = m_pxXPosition - pxXScroll;
 	}
 
-	m_pxXPosition = pxXScroll;
+	m_pxXPosition += pxXDiff;
 
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, 0));
 
@@ -253,7 +262,7 @@ RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
 		pxYDiff = m_pxYPosition - pxYScroll;
 	}
 
-	m_pxYPosition = pxYScroll;
+	m_pxYPosition += pxYDiff;
 	
 	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, 0, pxYDiff));
 
@@ -328,11 +337,35 @@ int DreamBrowser::GetBrowserWidth() {
 	return m_browserWidth;
 }
 
+RESULT DreamBrowser::SendKeyPressed(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SendURL(std::string strURL) {
+	RESULT r = R_PASS;
+	SetVisible(true);
+
+	std::string strScope = m_strScope;
+	std::string strTitle = "website";
+	std::string strPath = strURL;
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	RESULT r = R_PASS;
 
 	WebBrowserMouseEvent mouseEvent;
 
+	m_fDidUserClick = true;
 	mouseEvent.pt = ptContact;
 	m_lastWebBrowserPoint = ptContact;
 
@@ -390,6 +423,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		//m_pBrowserQuad->SetVisible(true);
+		m_fDidUserClick = false;
 		return r;
 	};
 
@@ -411,6 +445,21 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable() && m_fDidUserClick) {
+		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+		CB(vControlViewUID.size() == 1);
+
+		UID controlViewUID = vControlViewUID[0];
+		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+		CN(pDreamControlViewHandle);
+
+		std::string strTextField = pDOMNode->GetValue();
+		point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
+		CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
+
+		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+	}
+
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
@@ -421,7 +470,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		m_pPointerCursor->SetVisible(true);
 	}
 #endif
-	
+
 	CR(r);
 
 Error:
@@ -437,6 +486,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
+
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	SetAppName(DREAM_BROWSER_APP_NAME);
@@ -929,8 +979,9 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		// TODO: haven't seen any issues with KEY_UP being a no-op
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
+			/*
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
-			std::string strURL = m_strEntered.GetString();
+			std::string strURL = "";
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
@@ -945,8 +996,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
-
 			}
+			//*/
 
 			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 

@@ -1027,22 +1027,47 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		
+
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::string strURL = "http://www.youtube.com";
 
+		std::shared_ptr<UIKeyboard> pUIKeyboard = nullptr;
+
+		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
-		CN(m_pDreamOS);
 
 		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			quad *pQuad = nullptr;
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			CN(pDreamUIBar);
+			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
+
+			//CR(m_pDreamOS->InitializeKeyboard());
+	
 			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);	// setup browser
 			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 			pDreamBrowser->SetDiagonalSize(10.0f);
 			pDreamBrowser->SetURI(strURL);
 
-			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+			pUIKeyboard->SetVisible(true);
 
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			
 		}
 
 	Error:
@@ -1061,7 +1086,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
 	CN(pUITest);
 	pUITest->SetTestName("Local UIView Test");
-	pUITest->SetTestDescription("Test of DreamControlView");
+	pUITest->SetTestDescription("Full Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 
