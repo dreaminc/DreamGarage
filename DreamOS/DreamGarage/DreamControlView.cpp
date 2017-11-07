@@ -106,7 +106,59 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
+	//  Note: this duplicates predictive collision implementation from Keyboard
+	point ptCollisions[2];
+	
+	CBR((IsVisible()), R_SKIPPED);
+	if (m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+		CB(userUIDs.size() == 1);
+		m_userUID = userUIDs[0];
 
+		//Capture user app
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle);
+	}
+
+	int i = 0;
+	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	CNR(pLMallet, R_SKIPPED);
+	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	CNR(pRMallet, R_SKIPPED);
+
+	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+	for (auto &mallet : { pLMallet, pRMallet })
+	{
+		point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
+		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
+		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
+		ptCollisions[i] = ptSphereOrigin;
+
+		if (ptSphereOrigin.y() >= mallet->GetRadius()) {
+			mallet->CheckAndCleanDirty();
+		}
+
+		// if the sphere is lower than its own radius, there must be an interaction
+		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
+			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);		
+			CR(mallet->SetDirty());
+
+			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 || 
+				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+	
+			if (mallet == pLMallet) {
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			}
+			else {
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			}
+			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(ptContact));		
+		}
+
+		i++;
+	}
+Error:
 	return r;
 }
 
@@ -114,17 +166,6 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
 
 	switch (m_viewState) {
-	case(State::VISIBLE): {
-		if (pInteractionEvent->m_eventType == ELEMENT_COLLIDE_BEGAN) {
-			point ptContact = pInteractionEvent->m_ptContact[0];
-
-			CR(m_pUserHandle->RequestHapticImpulse(pInteractionEvent->m_pInteractionObject));
-
-			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(GetRelativePointofContact(ptContact)));
-		}
-	} break;
-
 	case(State::HIDDEN): {
 		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 			char chkey = (char)(pInteractionEvent->m_value);
@@ -437,8 +478,8 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	WebBrowserPoint ptRelative;
 
 	// First apply transforms to the ptIntersectionContact 
-	point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
-
+	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
+	point ptAdjustedContact = ptIntersectionContact;
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
 

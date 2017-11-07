@@ -111,7 +111,6 @@ private:
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
 	std::shared_ptr<UIView> m_pView;
-	std::shared_ptr<UIScrollView> m_pScrollView;
 
 	std::string m_strURL = "";
 
@@ -130,8 +129,7 @@ private:
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
 	point m_ptHiddenPosition;
-	point m_ptVisiblePosition;
-	
+	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
 };
 

@@ -321,6 +321,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);
 
+	//  Note: this predictive collision functionality is duplicated in control view
 	for (auto &mallet : { pLMallet, pRMallet })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
@@ -337,7 +338,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
 			// if it accounted for the radius, it would be able to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
-			if (!key) continue;
+			if (!key) {
+				CR(mallet->SetDirty());
+				continue;
+			}
 			CR(AddActiveKey(key));
 			keyCollisions[i] = key;
 
