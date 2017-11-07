@@ -66,14 +66,9 @@ RESULT AnimationItem::Update(DimObj *pObj, AnimationState& state, double msNow) 
 
 	AnimationState updateState;
 		
-//	if (m_startState.ptPosition != m_endState.ptPosition)
-		updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
-	
-//	if (m_startState.qRotation != m_endState.qRotation)
-		updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
-
-//	if (m_startState.vScale != m_endState.vScale)
-		updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
+	updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
+	updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
+	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
 
 	if (m_startState.cColor != m_endState.cColor) {
 		auto vColor = ((float)(1.0 - prog) * m_startState.cColor + (float)(prog)* m_endState.cColor);

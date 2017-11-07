@@ -15,8 +15,8 @@
 
 #include <memory>
 
-#define HAND_ANIMATION_DURATION 0.1
-#define OVERLAY_ANIMATION_DURATION 0.1
+#define HAND_ANIMATION_DURATION 0.5
+#define OVERLAY_ANIMATION_DURATION 0.5
 
 class SenseLeapMotionHand;
 class model;
@@ -113,7 +113,7 @@ protected:
 	bool m_fOverlayVisible = false;
 
 	// collision volume
-	std::shared_ptr<volume> m_pPhantomVolume;
+	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 
 	ModelState m_modelState = ModelState::HAND;
 };

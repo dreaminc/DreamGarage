@@ -126,8 +126,8 @@ RESULT hand::SetModelState(ModelState modelState) {
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
+		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
-		//m_pOverlayQuad->SetVisible(m_fOverlayVisible);
 	} break;
 	}
 
@@ -336,8 +336,12 @@ RESULT hand::HideController() {
 		return r;
 	};
 
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
+
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pController, 
+//		m_pController, 
+		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
 		HAND_ANIMATION_DURATION, 
 		AnimationCurveType::SIGMOID, 
@@ -357,11 +361,16 @@ RESULT hand::ShowController() {
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		m_pController->SetVisible(true && m_fTracked);
+		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 		return r;
 	};
 
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
+
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pController, 
+//		m_pController, 
+		pMesh,
 		color(1.0f, 1.0f, 1.0f, 1.0f), 
 		HAND_ANIMATION_DURATION, 
 		AnimationCurveType::SIGMOID, 
@@ -404,7 +413,7 @@ RESULT hand::ShowOverlay() {
 
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pOverlayQuad->SetVisible(true && m_fTracked);
+		m_pOverlayQuad->SetVisible(true && m_fTracked && m_fOverlayVisible);
 		return r;
 	};
 

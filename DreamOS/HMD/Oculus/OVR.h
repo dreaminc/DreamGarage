@@ -83,9 +83,6 @@ public:
 	composite *m_pLeftControllerModel;
 	composite *m_pRightControllerModel;
 
-	std::shared_ptr<texture> m_pTestQuadTexture;
-	std::shared_ptr<quad> m_pTestQuad;
-
 private:
 	OVRHMDSinkNode *m_pOVRHMDSinkNode = nullptr;
 	//OVRHMDSourceNode *m_pOVRHMDSourceNode = nullptr;

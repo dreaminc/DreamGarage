@@ -146,6 +146,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"right-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"right-controller-overlay-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pTextureDefaultGazeLeft);
+	CN(m_pTextureDefaultGazeRight);
 
 Error:
 	return r;
@@ -272,11 +274,11 @@ Error:
 RESULT DreamUserApp::UpdateHands() {
 	RESULT r = R_PASS;
 
-	for (auto pHand : { m_pLeftHand, m_pRightHand }) {
-		pHand->Update();
-	}
+	CR(m_pLeftHand->Update());
+	CR(m_pRightHand->Update());
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
@@ -302,6 +304,9 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 		CB(controlUIDs.size() == 1);
 		auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(pDreamOS->CaptureApp(controlUIDs[0], this));
+
+		CN(pMenuHandle);
+		CN(pControlHandle);
 
 		if (m_appStack.empty()) {
 

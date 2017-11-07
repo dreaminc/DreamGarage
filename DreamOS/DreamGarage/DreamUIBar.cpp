@@ -80,6 +80,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pOverlayLeft);
+	CN(m_pOverlayRight);
 
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
