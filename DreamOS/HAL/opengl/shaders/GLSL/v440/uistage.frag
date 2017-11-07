@@ -81,6 +81,9 @@ void main(void) {
 	}
 
 	out_vec4Color = material.m_colorDiffuse * color + g_ambient;
+	if (out_vec4Color.a == 0.0f) {
+		discard;	
+	}
 
 	//out_vec4Color = material.m_colorDiffuse;
 	//out_vec4Color = DataIn.color * textureColor + g_ambient;

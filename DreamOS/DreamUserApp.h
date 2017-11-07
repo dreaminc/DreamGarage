@@ -20,15 +20,22 @@
 struct InteractionObjectEvent;
 
 class volume;
+class quad; 
+class texture;
 class hand;
 class UIMallet;
 class DimRay;
 class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
+class DimObj;
 
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
+
+#define GAZE_OVERLAY_MS 800.0 //1250.0
+
+#define OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
 
 enum class UserObserverEventType {
 	BACK,
@@ -39,6 +46,7 @@ enum class UserObserverEventType {
 class DreamUserObserver {
 public:
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual texture* GetOverlayTexture(HAND_TYPE type);
 };
 
 class DreamUserHandle : public DreamAppHandle {
@@ -109,12 +117,15 @@ public:
 	virtual RESULT PopFocusStack() override;
 	virtual RESULT PushFocusStack(DreamUserObserver* pObserver) override;
 	virtual RESULT ClearFocusStack() override;
+	RESULT OnFocusStackEmpty();
 
 	virtual RESULT HandleKBEnterEvent() override;
 	virtual UIKeyboardHandle *GetKeyboard() override;
 	virtual RESULT ReleaseKeyboard() override;
 
 protected:
+
+	RESULT UpdateHands();
 
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
@@ -133,13 +144,24 @@ private:
 	std::stack<DreamUserObserver*> m_appStack;
 
 	// apps position themselves with this when they are presented
-	VirtualObj *m_pAppBasis;
+	VirtualObj *m_pAppBasis = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 private:
 	float m_menuDepth = MENU_DEPTH;
 	float m_menuHeight = MENU_HEIGHT;
+
+	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;
+	double m_msGazeStart;
+
+	VirtualObj *m_pInteractionObj = nullptr;
+
+	bool m_fGazeInteraction = false;
+	//bool m_fGazeCurrent = false;
+
+	texture *m_pTextureDefaultGazeLeft = nullptr;
+	texture *m_pTextureDefaultGazeRight = nullptr;
 };
 
 #endif // ! DREAM_USER_APP_H_

@@ -41,7 +41,10 @@ public:
 	bool IsAppVisible();
 
 public:
+	//User Observer
 	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
+	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
+
 	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) = 0;
 
 private:
@@ -83,6 +86,8 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
+	virtual texture *GetOverlayTexture(HAND_TYPE type);
+
 	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
 	virtual RESULT HandleKeyboardDown();
 
@@ -113,6 +118,9 @@ private:
 	std::shared_ptr<UIView> m_pView;
 
 	std::string m_strURL = "";
+
+	texture* m_pOverlayLeft;
+	texture* m_pOverlayRight;
 
 	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;

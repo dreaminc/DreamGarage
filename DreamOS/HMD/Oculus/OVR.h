@@ -59,7 +59,7 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
-	virtual VirtualObj *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }

@@ -15,6 +15,9 @@
 
 #include <memory>
 
+#define HAND_ANIMATION_DURATION 0.5
+#define OVERLAY_ANIMATION_DURATION 0.5
+
 class SenseLeapMotionHand;
 class model;
 
@@ -35,10 +38,17 @@ public:
 		}
 	};
 
+	enum class ModelState {
+		HAND,
+		CONTROLLER,
+		INVALID
+	};
+
 public:
 	hand(HALImp* pHALImp, HAND_TYPE type);
 
 	RESULT Initialize(HAND_TYPE type);
+	RESULT InitializeWithContext(DreamOS *pDreamOS);
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	virtual RESULT OnLostTrack();
@@ -58,6 +68,25 @@ public:
 
 	std::shared_ptr<composite> GetModel(HAND_TYPE handType);
 
+	RESULT SetModelState(ModelState modelState);
+	ModelState GetModelState();
+	RESULT SetOverlayVisible(bool fVisible);
+	RESULT SetOverlayTexture(texture *pOverlayTexture);
+	std::shared_ptr<volume> GetPhantomVolume();
+	RESULT Update(); // TODO: app?
+
+protected:
+	//Animations
+	//TODO: generalize
+	RESULT ShowModel();
+	RESULT HideModel();
+
+	RESULT ShowController();
+	RESULT HideController();
+
+	RESULT ShowOverlay();
+	RESULT HideOverlay();
+
 protected:
 
 	HAND_TYPE m_handType;
@@ -72,6 +101,21 @@ protected:
 	// this is a state of the hand to represent whether the hand is tracked or not.
 	// For example when using a leap motion, a hand is not tracked when it goes out of the sensor.
 	bool	m_fTracked;
+
+
+	// context for animations, HMD controllers, etc.
+	DreamOS *m_pDreamOS = nullptr;
+
+	// handle to HMD controller
+	composite *m_pController = nullptr;
+
+	std::shared_ptr<quad> m_pOverlayQuad = nullptr;
+	bool m_fOverlayVisible = false;
+
+	// collision volume
+	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
+
+	ModelState m_modelState = ModelState::HAND;
 };
 
 #endif	// ! HAND_H_

@@ -132,3 +132,9 @@ RESULT AnimationItem::SetCallbackContext(void* context) {
 bool AnimationItem::ShouldAnimateColor() {
 	return m_startState.cColor != m_endState.cColor;
 }
+
+bool AnimationItem::ShouldAnimateObject() {
+	return	m_startState.ptPosition != m_endState.ptPosition ||
+			m_startState.qRotation != m_endState.qRotation ||
+			m_startState.vScale != m_endState.vScale;
+}

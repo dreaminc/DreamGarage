@@ -4,6 +4,7 @@
 #define EASING_CONSTANT 1.70158f
 
 enum class AnimationCurveType {
+	SIGMOID,
 	EASE_OUT_QUAD,
 	EASE_OUT_QUART,
 	EASE_OUT_EXPO,

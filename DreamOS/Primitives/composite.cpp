@@ -439,6 +439,7 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHo
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
+	CN(pQuad);
 	CR(AddObject(pQuad));
 
 //Success:
