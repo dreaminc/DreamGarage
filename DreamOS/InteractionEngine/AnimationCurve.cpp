@@ -11,6 +11,8 @@ AnimationCurve::~AnimationCurve() {
 
 float AnimationCurve::GetAnimationProgress(float progress) {
 	switch (m_curveType) {
+	case AnimationCurveType::SIGMOID:
+		return (tanh(6.0f*(progress - 0.5f)) + 1.0f) / 2.0f;
 	case AnimationCurveType::EASE_OUT_QUART:
 		return -1.0f * (pow((progress - 1), 4) - 1); break;
 	case AnimationCurveType::EASE_IN_QUART:

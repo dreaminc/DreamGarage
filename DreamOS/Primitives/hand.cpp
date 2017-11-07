@@ -126,6 +126,7 @@ RESULT hand::SetModelState(ModelState modelState) {
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
+	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
 		//m_pOverlayQuad->SetVisible(m_fOverlayVisible);
 	} break;
 	}
@@ -292,8 +293,8 @@ RESULT hand::HideModel() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(), 
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
-		0.25, 
-		AnimationCurveType::LINEAR, 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		nullptr,
 		fnVisibleCallback,
@@ -314,8 +315,8 @@ RESULT hand::ShowModel() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(), 
 		color(1.0f, 1.0f, 1.0f, 1.0f), 
-		0.25, 
-		AnimationCurveType::LINEAR, 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		fnVisibleCallback,
 		nullptr,
@@ -338,8 +339,8 @@ RESULT hand::HideController() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pController, 
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
-		0.25, 
-		AnimationCurveType::LINEAR, 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		nullptr,
 		fnVisibleCallback,
@@ -362,8 +363,8 @@ RESULT hand::ShowController() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pController, 
 		color(1.0f, 1.0f, 1.0f, 1.0f), 
-		0.25, 
-		AnimationCurveType::LINEAR, 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		fnVisibleCallback,
 		nullptr,
@@ -386,8 +387,8 @@ RESULT hand::HideOverlay() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pOverlayQuad.get(), 
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
-		0.1, 
-		AnimationCurveType::LINEAR, 
+		OVERLAY_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		nullptr,
 		fnVisibleCallback,
@@ -410,8 +411,8 @@ RESULT hand::ShowOverlay() {
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pOverlayQuad.get(), 
 		color(1.0f, 1.0f, 1.0f, 1.0f), 
-		0.1, 
-		AnimationCurveType::LINEAR, 
+		OVERLAY_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		fnVisibleCallback,
 		nullptr,

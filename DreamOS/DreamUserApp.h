@@ -33,7 +33,7 @@ class DimObj;
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 
-#define GAZE_OVERLAY_MS 1250.0
+#define GAZE_OVERLAY_MS 500.0 //1250.0
 
 #define OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
 
