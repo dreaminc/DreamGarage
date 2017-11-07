@@ -321,6 +321,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);
 
+	//  Note: this predictive collision functionality is duplicated in control view
 	for (auto &mallet : { pLMallet, pRMallet })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);

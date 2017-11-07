@@ -106,9 +106,9 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
-
+	//  Note: this duplicates predictive collision implementation from Keyboard
 	point ptCollisions[2];
-
+	
 	CBR((IsVisible()), R_SKIPPED);
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
