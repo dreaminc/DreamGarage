@@ -104,7 +104,7 @@ protected:
 
 
 	// context for animations, HMD controllers, etc.
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
 
 	// handle to HMD controller
 	composite *m_pController = nullptr;
