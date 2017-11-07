@@ -123,8 +123,9 @@ RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
 	//  Note: this duplicates predictive collision implementation from Keyboard
 	point ptCollisions[2];
-	
-	CBR((IsVisible()), R_SKIPPED);
+
+	CBR((m_viewState == State::VISIBLE), R_SKIPPED);
+
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 		CB(userUIDs.size() == 1);
@@ -297,7 +298,7 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	point ptcvOffset = point(0.0f, 0.0f, -.35f);
+	point ptcvOffset = point(0.0f, CONTROL_VIEW_HEIGHT, CONTROL_VIEW_DEPTH);
 
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;
@@ -341,7 +342,7 @@ RESULT DreamControlView::Show() {
 		m_pViewQuad->GetPosition(),
 		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		0.1f,
+		0.5f,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		fnStartCallback,
@@ -475,7 +476,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	CBR(IsVisible(), R_SKIPPED);
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
-	ptTypingPosition = point(0.0f, -0.2f, -0.15f) + point(0.0f, textBoxYOffset, 0.0f);
+	ptTypingPosition = point(0.0f, 0.0f, -0.15f) + point(0.0f, textBoxYOffset, 0.0f);
 
 	if (m_viewState != State::TYPING) {
 		CN(m_pUserHandle);

@@ -219,9 +219,9 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	//CR(AddTestKeyboardAngle());
+	CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
-	CR(AddTestDreamControlView());
+	//CR(AddTestDreamControlView());
 
 Error:
 	return r;
@@ -796,8 +796,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pKeyboard->ShowKeyboard();
 //			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
 //			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
-			m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
-			m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
+			//m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
+			//m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
