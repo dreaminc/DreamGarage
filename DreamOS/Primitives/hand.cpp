@@ -6,6 +6,7 @@
 #include "Primitives/DimObj.h"
 #include "Primitives/model/mesh.h"
 #include "DreamOS.h"
+#include "InteractionEngine/AnimationItem.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
@@ -108,28 +109,30 @@ hand::ModelState hand::GetModelState() {
 RESULT hand::SetModelState(ModelState modelState) {
 	RESULT r = R_PASS;
 
+	CBR(m_modelState != modelState, R_SKIPPED);
+
 	switch (m_modelState) {
 	case ModelState::HAND: {
-		m_pModel->SetVisible(false);
+		HideModel();
 	} break;
 	case ModelState::CONTROLLER: {
-		m_pController->SetVisible(false);
+		HideController();
 	} break;
 	}
 
 	switch (modelState) {
 	case ModelState::HAND: {
-		m_pModel->SetVisible(true);
+		ShowModel();
 	} break;
 	case ModelState::CONTROLLER: {
-		m_pController->SetVisible(true);
-		m_pOverlayQuad->SetVisible(m_fOverlayVisible);
+		ShowController();
+		//m_pOverlayQuad->SetVisible(m_fOverlayVisible);
 	} break;
 	}
 
 	m_modelState = modelState;
 
-//Error:
+Error:
 	return r;
 }
 
@@ -142,7 +145,8 @@ RESULT hand::Update() {
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
-		m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
+		if (!m_pOverlayQuad->IsVisible())
+			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
 	} break;
 	}
 
@@ -152,11 +156,19 @@ RESULT hand::Update() {
 RESULT hand::SetOverlayVisible(bool fVisible) {
 	RESULT r = R_PASS;
 
+	if (m_fOverlayVisible != fVisible && m_pOverlayQuad != nullptr) {
+		if (fVisible) {
+			ShowOverlay();
+		}
+		else {
+			HideOverlay();
+		}
+	}
 	m_fOverlayVisible = fVisible;
-	CNR(m_pOverlayQuad, R_SKIPPED);
-	m_pOverlayQuad->SetVisible(fVisible);
+//	CNR(m_pOverlayQuad, R_SKIPPED);
+//	m_pOverlayQuad->SetVisible(fVisible);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -266,4 +278,145 @@ hand::HandState hand::GetDebugHandState(HAND_TYPE handType) {
 	};
 
 	return handState;
+}
+
+RESULT hand::HideModel() {
+	RESULT r = R_PASS;
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pModel->SetVisible(false);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		0.25, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+Error:
+	return r;
+}
+
+RESULT hand::ShowModel() {
+	RESULT r = R_PASS;
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pModel->SetVisible(true && m_fTracked);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		0.25, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::HideController() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pController->SetVisible(false);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pController, 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		0.25, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::ShowController() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pController->SetVisible(true && m_fTracked);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pController, 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		0.25, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::HideOverlay() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pOverlayQuad->SetVisible(false);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pOverlayQuad.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::ShowOverlay() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pOverlayQuad->SetVisible(true && m_fTracked);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pOverlayQuad.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
 }

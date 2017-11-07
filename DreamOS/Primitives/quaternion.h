@@ -124,6 +124,9 @@ public:
 	quaternion& operator-=(const quaternion& rhs);
 	const quaternion& operator-(const quaternion& arg) const;
 
+	bool operator==(const quaternion& rhs);
+	bool operator!=(const quaternion& rhs);
+
 	// Utility
 public:
 	static quaternion iQuaternion(quaternion_precision theta);

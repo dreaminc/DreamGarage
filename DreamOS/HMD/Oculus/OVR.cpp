@@ -129,14 +129,16 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		m_pLeftControllerModel = m_pParentSandbox->MakeModel(L"\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj");
 		auto pMesh = m_pLeftControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(-0.00629f, 0.02522f, -0.03469f) + ptAdjust);
-		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
 		m_pParentSandbox->AddObject(pMesh.get());
 		//pMesh->SetVisible(false);
 
 		m_pRightControllerModel = m_pParentSandbox->MakeModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
 		pMesh = m_pRightControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
-		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
 		m_pParentSandbox->AddObject(pMesh.get());
 		//pMesh->SetVisible(false);
 	}

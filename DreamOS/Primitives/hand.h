@@ -73,6 +73,18 @@ public:
 	RESULT Update(); // TODO: app?
 
 protected:
+	//Animations
+	//TODO: generalize
+	RESULT ShowModel();
+	RESULT HideModel();
+
+	RESULT ShowController();
+	RESULT HideController();
+
+	RESULT ShowOverlay();
+	RESULT HideOverlay();
+
+protected:
 
 	HAND_TYPE m_handType;
 
