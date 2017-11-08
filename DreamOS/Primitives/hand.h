@@ -15,8 +15,8 @@
 
 #include <memory>
 
-#define HAND_ANIMATION_DURATION 0.25
-#define OVERLAY_ANIMATION_DURATION 0.5
+#define HAND_ANIMATION_DURATION 0.25f
+#define OVERLAY_ANIMATION_DURATION 0.5f
 
 class SenseLeapMotionHand;
 class model;
