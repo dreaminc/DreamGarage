@@ -155,10 +155,8 @@ private:
 	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;
 	double m_msGazeStart;
 
-	VirtualObj *m_pInteractionObj = nullptr;
-
-	bool m_fGazeInteraction = false;
-	//bool m_fGazeCurrent = false;
+	bool m_fCollisionLeft = false;
+	bool m_fCollisionRight = false;
 
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;

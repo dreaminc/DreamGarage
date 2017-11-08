@@ -413,11 +413,20 @@ Error:
 
 RESULT DreamPeerApp::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
+	std::shared_ptr<hand> pHand = nullptr;
 
 	CN(m_pUserModel);
-	CR(m_pUserModel->SetVisible(fVisible));
 	CR(m_pNameBackground->SetVisible(fVisible));
 	CR(m_pTextUserName->SetVisible(fVisible));
+	CR(m_pUserModel->SetVisible(fVisible, false));
+
+	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
+	CN(pHand);
+	pHand->SetVisible(fVisible);
+
+	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT);
+	CN(pHand);
+	pHand->SetVisible(fVisible);
 
 Error:
 	return r;
