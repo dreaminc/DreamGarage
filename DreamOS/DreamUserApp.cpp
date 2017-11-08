@@ -335,16 +335,16 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		auto pEventObj = mEvent->m_pEventObject;
 
-		auto pVL = m_pLeftHand->GetPhantomVolume().get();
-		auto pVR = m_pRightHand->GetPhantomVolume().get();
+		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
+		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
 
-		if (pEventObj == pVL || pEventObj == pVR) {
+		if (pEventObj == pLeftVolume || pEventObj == pRightVolume) {
 			m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 
-			if (pEventObj == pVL) {
+			if (pEventObj == pLeftVolume) {
 				m_fCollisionLeft = true;
 			}
-			else if (pEventObj == pVR) {
+			else if (pEventObj == pRightVolume) {
 				m_fCollisionRight = true;
 			}
 		}
@@ -353,13 +353,13 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	case (ELEMENT_INTERSECT_ENDED): {
 
 		auto pEventObj = mEvent->m_pEventObject;
-		auto pVL = m_pLeftHand->GetPhantomVolume().get();
-		auto pVR = m_pRightHand->GetPhantomVolume().get();
-		if (pEventObj == pVL || pEventObj == pVR) {
-			if (pEventObj == pVL) {
+		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
+		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
+		if (pEventObj == pLeftVolume || pEventObj == pRightVolume) {
+			if (pEventObj == pLeftVolume) {
 				m_fCollisionLeft = false;
 			}
-			else if (pEventObj == pVR) {
+			else if (pEventObj == pRightVolume) {
 				m_fCollisionRight = false;
 			}
 		}
