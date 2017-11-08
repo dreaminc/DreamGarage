@@ -227,7 +227,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	if (m_pRightMallet)
 		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
-	if (m_fGazeInteraction) {
+	if (m_fCollisionLeft || m_fCollisionRight) {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 
@@ -333,19 +333,45 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	case (ELEMENT_INTERSECT_BEGAN): {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-		m_fGazeInteraction = true;
-		m_pInteractionObj = mEvent->m_pEventObject;
+		auto pEventObj = mEvent->m_pEventObject;
+
+		auto pVL = m_pLeftHand->GetPhantomVolume().get();
+		auto pVR = m_pRightHand->GetPhantomVolume().get();
+
+		if (pEventObj == pVL || pEventObj == pVR) {
+			m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+			if (pEventObj == pVL) {
+				m_fCollisionLeft = true;
+			}
+			else if (pEventObj == pVR) {
+				m_fCollisionRight = true;
+			}
+		}
+
 	} break;
 	case (ELEMENT_INTERSECT_ENDED): {
-		m_fGazeInteraction = false;
-		m_pLeftHand->SetOverlayVisible(false);
-		m_pRightHand->SetOverlayVisible(false);
 
-		if (m_appStack.empty()) {
-			m_pLeftHand->SetModelState(hand::ModelState::HAND);
-			m_pRightHand->SetModelState(hand::ModelState::HAND);
+		auto pEventObj = mEvent->m_pEventObject;
+		auto pVL = m_pLeftHand->GetPhantomVolume().get();
+		auto pVR = m_pRightHand->GetPhantomVolume().get();
+		if (pEventObj == pVL || pEventObj == pVR) {
+			if (pEventObj == pVL) {
+				m_fCollisionLeft = false;
+			}
+			else if (pEventObj == pVR) {
+				m_fCollisionRight = false;
+			}
 		}
+		if (!m_fCollisionLeft && !m_fCollisionRight) {
+			m_pLeftHand->SetOverlayVisible(false);
+			m_pRightHand->SetOverlayVisible(false);
+			if (m_appStack.empty()) {
+				m_pLeftHand->SetModelState(hand::ModelState::HAND);
+				m_pRightHand->SetModelState(hand::ModelState::HAND);
+			}
+		}
+
 
 	} break;
 	}
@@ -400,7 +426,7 @@ RESULT DreamUserApp::OnFocusStackEmpty() {
 	CR(m_pLeftMallet->Hide());
 	CR(m_pRightMallet->Hide());
 
-	if (!m_fGazeInteraction) {
+	if (!(m_fCollisionLeft || m_fCollisionRight)) {
 		CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 		CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
 	}

@@ -67,6 +67,16 @@ std::shared_ptr<composite> user::GetHead() {
 	return m_pHead;
 }
 
+std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
+	if (type == HAND_TYPE::HAND_LEFT) {
+		return m_pLeftHand;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		return m_pRightHand;
+	}
+	return nullptr;
+}
+
 RESULT user::Activate(user::CONTROLLER_TYPE type) {
 
 	SetVisible(true);

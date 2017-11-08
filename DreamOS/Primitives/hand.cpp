@@ -110,6 +110,13 @@ RESULT hand::SetModelState(ModelState modelState) {
 	RESULT r = R_PASS;
 
 	CBR(m_modelState != modelState, R_SKIPPED);
+	//CNR(m_modelState)
+	/*
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pModel.get());
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pMesh);
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pOverlayQuad.get());
+	//*/
 
 	switch (m_modelState) {
 	case ModelState::HAND: {
@@ -151,6 +158,18 @@ RESULT hand::Update() {
 	} break;
 	}
 
+	return r;
+}
+
+RESULT hand::SetVisible(bool fVisible, bool fSetChildren /* = true */) {
+	RESULT r = R_PASS;
+
+	//Ensure hand is not set to visible while not tracked
+	CR(DimObj::SetVisible(fVisible && m_fTracked, fSetChildren));
+	//Ensure phantom volume is not set to visible
+	m_pPhantomVolume->SetVisible(false);
+
+Error:
 	return r;
 }
 
@@ -313,6 +332,13 @@ RESULT hand::ShowModel() {
 	};
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(),
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags()));
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(), 
 		color(1.0f, 1.0f, 1.0f, 1.0f), 
 		HAND_ANIMATION_DURATION, 
@@ -367,6 +393,13 @@ RESULT hand::ShowController() {
 
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		pMesh,
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags()));
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 

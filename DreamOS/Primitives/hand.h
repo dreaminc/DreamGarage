@@ -15,7 +15,7 @@
 
 #include <memory>
 
-#define HAND_ANIMATION_DURATION 0.5
+#define HAND_ANIMATION_DURATION 0.25
 #define OVERLAY_ANIMATION_DURATION 0.5
 
 class SenseLeapMotionHand;
@@ -74,6 +74,7 @@ public:
 	RESULT SetOverlayTexture(texture *pOverlayTexture);
 	std::shared_ptr<volume> GetPhantomVolume();
 	RESULT Update(); // TODO: app?
+	RESULT SetVisible(bool fVisible = true, bool fSetChildren = true);
 
 protected:
 	//Animations
