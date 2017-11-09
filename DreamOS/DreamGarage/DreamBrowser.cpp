@@ -821,7 +821,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
 			CN(pDreamControlViewHandle);
 
-			CR(pDreamControlViewHandle->HideApp());
+			CR(pDreamControlViewHandle->DismissApp());
 
 			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 

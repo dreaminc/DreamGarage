@@ -38,6 +38,7 @@ public:
 	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
 	RESULT ShowApp();
 	RESULT HideApp();
+	RESULT DismissApp();
 	bool IsAppVisible();
 
 public:
@@ -51,6 +52,7 @@ private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
 	virtual RESULT Show() = 0;
 	virtual RESULT Hide() = 0;
+	virtual RESULT Dismiss() = 0;
 	virtual bool IsVisible() = 0;
 };
 
@@ -99,6 +101,7 @@ private:
 
 	virtual RESULT Show() override;
 	virtual RESULT Hide() override;
+	virtual RESULT Dismiss() override;
 
 	virtual bool IsVisible() override;
 
