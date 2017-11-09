@@ -303,6 +303,8 @@ RESULT DreamControlView::Show() {
 		m_strURL = "";
 	}
 
+	CR(m_pBrowserHandle->RequestBeginStream());
+
 	SetSharedViewContext();
 
 	CN(m_pUserHandle);
