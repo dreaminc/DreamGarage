@@ -162,6 +162,14 @@ Error:
 	return nullptr;
 }
 
+RESULT DreamBrowserHandle::RequestBeginStream() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(BeginStream());
+Error:
+	return r;
+}
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -807,6 +815,16 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			m_fRecievingStream = true;
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			UID controlViewUID = vControlViewUID[0];
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			CN(pDreamControlViewHandle);
+
+			CR(pDreamControlViewHandle->HideApp());
+
+			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+
 		} break;
 	}
 
@@ -864,6 +882,29 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 	}
 
 	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::BeginStream() {
+	RESULT r = R_PASS;
+
+	if (m_fRecievingStream) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+		m_fRecievingStream = false;
+	}
+
+	m_fStreaming = false;
+
+	// TODO: May not be needed, if not streaming no video is actually being transmitted 
+	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+	//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
+
+	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
+	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+	m_fStreaming = true;
 
 Error:
 	return r;

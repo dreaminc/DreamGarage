@@ -68,6 +68,8 @@ public:
 
 	std::shared_ptr<texture> GetBrowserTexture();
 
+	RESULT RequestBeginStream();
+
 private:
 	virtual RESULT SetBrowserScope(std::string strScope) = 0;
 	virtual RESULT SetBrowserPath(std::string strPath) = 0;
@@ -95,6 +97,8 @@ private:
 	virtual float GetAspectRatio() = 0;
 
 	virtual std::shared_ptr<texture> BrowserTexture() = 0;
+
+	virtual RESULT BeginStream() = 0;
 };
 
 class DreamBrowser : 
@@ -143,6 +147,8 @@ public:
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
 	virtual std::shared_ptr<texture> BrowserTexture() override;
+
+	virtual RESULT BeginStream() override;
 
 	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
 

@@ -160,19 +160,11 @@ Error:
 composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {
 		case CONTROLLER_LEFT: {
-			#ifdef _USE_TEST_APP
-				return m_pLeftControllerModel->GetFirstChild<sphere>().get();
-			#else
-				return m_pLeftControllerModel;
-			#endif
+			return m_pLeftControllerModel;
 		} break;
 
 		case CONTROLLER_RIGHT: {
-			#ifdef _USE_TEST_APP
-				return m_pRightControllerModel->GetFirstChild<sphere>().get();
-			#else
-				return m_pRightControllerModel;
-			#endif
+			return m_pRightControllerModel;
 		} break;
 	}
 
