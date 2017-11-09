@@ -119,8 +119,7 @@ private:
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
 	std::shared_ptr<UIView> m_pView;
-	DimRay *m_pMalletRay = nullptr;
-	std::shared_ptr<sphere> phantomSphere = nullptr;
+
 	std::string m_strURL = "";
 
 	texture* m_pOverlayLeft;
@@ -140,7 +139,8 @@ private:
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
-	WebBrowserPoint m_ptMalletPointing;
+	WebBrowserPoint m_ptLMalletPointing;
+	WebBrowserPoint m_ptRMalletPointing;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;

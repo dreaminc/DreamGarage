@@ -190,9 +190,11 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-			m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-			m_fGazeInteraction = true;
+			if (m_pUserModel->IsVisible()) {
+				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+				m_fGazeInteraction = true;
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {

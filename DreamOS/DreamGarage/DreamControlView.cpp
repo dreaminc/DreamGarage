@@ -73,7 +73,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-	phantomSphere = GetComposite()->AddSphere(0.005f, 10, COLOR_BLUE);
+	
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
@@ -170,24 +170,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_SKIPPED);
-
-	if (m_pMalletRay == nullptr) {
-		m_pMalletRay = GetDOS()->AddRay(pRMallet->GetMalletHead()->GetPosition(true), 
-			(m_pViewQuad->GetNormal().RotateByQuaternion(m_qViewQuadOrientation.GetConjugate())), 1.0f);
-		CN(m_pMalletRay);
-		m_pMalletRay->SetVisible(false);
-
-		CR(GetDOS()->AddInteractionObject(m_pMalletRay));
-	}
-
-	if (m_pMalletRay != nullptr && pRMallet != nullptr)
-	{
-		m_pMalletRay->SetPosition(pRMallet->GetMalletHead()->GetPosition() - point(-0.2f, 4.5f, -0.75f));
-		m_pMalletRay->SetOrientation(m_pViewQuad->GetNormal().RotateByQuaternion(m_qViewQuadOrientation.GetConjugate()));
-	//	m_pMalletRay->SetRayVertices();
-	}
-	
+	CNR(pRMallet, R_SKIPPED);	
 
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
@@ -202,7 +185,12 @@ RESULT DreamControlView::Update(void *pContext) {
 
 			if (ptSphereOrigin.y() >= mallet->GetRadius()) {
 				mallet->CheckAndCleanDirty();
-				m_ptMalletPointing = GetRelativePointofContact(ptSphereOrigin);
+				if (mallet == pLMallet) {
+					m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
+				}
+				else if (mallet == pRMallet) {
+					m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
+				}
 			}
 
 			// if the sphere is lower than its own radius, there must be an interaction
@@ -282,18 +270,6 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		}
 	} break;
 
-	case(State::VISIBLE): {
-		if (pInteractionEvent->m_eventType == ELEMENT_INTERSECT_BEGAN) {
-			m_pMalletRay->SetVisible(true);
-		}
-		if (pInteractionEvent->m_eventType == ELEMENT_INTERSECT_MOVED) {
-			m_ptMalletPointing = GetRelativePointofContact(pInteractionEvent->m_ptContact[0]);
-			pTextBoxText->SetText(std::to_string(m_ptMalletPointing.x) + ", " + std::to_string(m_ptMalletPointing.y));
-		}
-		if (pInteractionEvent->m_eventType == ELEMENT_INTERSECT_ENDED) {
-			//m_pMalletRay->SetVisible(false);
-		}
-	} break;
 	}
 
 Error:
@@ -313,10 +289,20 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 			}
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-
-			CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff));
-			//CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptMalletPointing));
-
+			if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
+			{
+				if (m_ptLMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptLMalletPointing.x > 0 &&
+					m_ptLMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptLMalletPointing.y > 0) {
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptLMalletPointing));
+				}
+			}
+			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
+			{
+				if (m_ptRMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptRMalletPointing.x > 0 &&
+					m_ptRMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptRMalletPointing.y > 0) {
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptRMalletPointing));
+				}
+			}
 		} break;
 		}	
 	}
@@ -635,8 +621,7 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 
 	float posX = ptAdjustedContact.x() / (width / 2.0f);	
 	float posY = ptAdjustedContact.z() / (height / 2.0f);
-	ptAdjustedContact.y() = CONTROL_VIEW_HEIGHT + sin(32 * (float)(M_PI) / 180.0f);
-	phantomSphere->SetPosition(ptAdjustedContact);
+
 	//float posZ = ptAdjustedContact.z();	// 3D browser when
 
 	posX = (posX + 1.0f) / 2.0f;	// flip it
