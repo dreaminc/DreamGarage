@@ -73,7 +73,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-
+	phantomSphere = GetComposite()->AddSphere(0.005f, 10, COLOR_BLUE);
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
@@ -176,7 +176,7 @@ RESULT DreamControlView::Update(void *pContext) {
 		m_pMalletRay = GetDOS()->AddRay(pRMallet->GetMalletHead()->GetPosition(true), 
 			(m_pViewQuad->GetNormal().RotateByQuaternion(m_qViewQuadOrientation.GetConjugate())), 1.0f);
 		CN(m_pMalletRay);
-		m_pMalletRay->SetVisible(true);
+		m_pMalletRay->SetVisible(false);
 
 		CR(GetDOS()->AddInteractionObject(m_pMalletRay));
 	}
@@ -202,6 +202,7 @@ RESULT DreamControlView::Update(void *pContext) {
 
 			if (ptSphereOrigin.y() >= mallet->GetRadius()) {
 				mallet->CheckAndCleanDirty();
+				m_ptMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 			}
 
 			// if the sphere is lower than its own radius, there must be an interaction
@@ -628,11 +629,14 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	// First apply transforms to the ptIntersectionContact 
 	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
 	point ptAdjustedContact = ptIntersectionContact;
+	
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
 
 	float posX = ptAdjustedContact.x() / (width / 2.0f);	
 	float posY = ptAdjustedContact.z() / (height / 2.0f);
+	ptAdjustedContact.y() = CONTROL_VIEW_HEIGHT + sin(32 * (float)(M_PI) / 180.0f);
+	phantomSphere->SetPosition(ptAdjustedContact);
 	//float posZ = ptAdjustedContact.z();	// 3D browser when
 
 	posX = (posX + 1.0f) / 2.0f;	// flip it
