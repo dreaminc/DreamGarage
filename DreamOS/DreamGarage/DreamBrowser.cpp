@@ -765,7 +765,7 @@ Error:
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	DreamBrowserMessage *pDreamBrowserMessage = dynamic_cast<DreamBrowserMessage*>(pDreamAppMessage);
+	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
 
 	switch (pDreamBrowserMessage->GetMessageType()) {
