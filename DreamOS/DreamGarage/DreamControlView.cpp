@@ -38,6 +38,16 @@ Error:
 	return r;
 }
 
+RESULT DreamControlViewHandle::DismissApp() {
+	RESULT r = R_PASS;	
+
+	CB(GetAppState());
+	CR(Dismiss());
+
+Error:
+	return r;
+}
+
 bool DreamControlViewHandle::IsAppVisible() {
 	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
 
@@ -226,8 +236,9 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	switch (type) {
 	case (UserObserverEventType::BACK): {
 		if (m_viewState == State::VISIBLE) {
-			CR(m_pUserHandle->SendClearFocusStack());
 			CR(Hide());
+			CN(m_pUserHandle);
+			CR(m_pUserHandle->SendClearFocusStack());
 		}
 		if (m_viewState == State::TYPING) {
 			CN(m_pBrowserHandle);			// This unfocuses the text box so that node change event
@@ -337,6 +348,32 @@ RESULT DreamControlView::Show() {
 		fnEndCallback,
 		this
 	));
+
+Error:
+	return r;
+}
+
+RESULT DreamControlView::Dismiss() {
+	RESULT r = R_PASS;
+
+	switch (m_viewState) {
+		case State::TYPING: {
+			CN(m_pUserHandle);
+			m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+			CN(m_pKeyboardHandle);
+			if (m_pKeyboardHandle->IsVisible()) {
+				CR(m_pKeyboardHandle->Hide());
+			}
+			CR(m_pUserHandle->SendReleaseKeyboard());
+			m_pKeyboardHandle = nullptr;
+		} //break;
+		case State::SHOW:
+		case State::VISIBLE: {
+			CR(Hide());
+			CN(m_pUserHandle);
+			CR(m_pUserHandle->SendClearFocusStack());
+		} break;
+	}
 
 Error:
 	return r;
