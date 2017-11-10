@@ -77,6 +77,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendUserObserverEvent(UserObserverEventType type) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(HandleUserObserverEvent(type));
+Error:
+	return r;
+}
+
 UIKeyboardHandle* DreamUserHandle::RequestKeyboard() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -549,8 +557,16 @@ Error:
 
 RESULT DreamUserApp::HandleKBEnterEvent() {
 	RESULT r = R_PASS;
-	CB(!m_appStack.empty());
-	m_appStack.top()->HandleEvent(UserObserverEventType::KB_ENTER);
+	CBR(!m_appStack.empty(), R_SKIPPED);
+	CR(m_appStack.top()->HandleEvent(UserObserverEventType::KB_ENTER));
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
+	RESULT r = R_PASS;
+	CBR(!m_appStack.empty(), R_SKIPPED);
+	CR(m_appStack.top()->HandleEvent(type));
 Error:
 	return r;
 }

@@ -640,6 +640,8 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	if (!m_fSeated) {
 		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
+		CR(m_pDreamUser->HandleUserObserverEvent(UserObserverEventType::DISMISS));
+		CR(m_pDreamUser->ClearFocusStack());
 		CR(SetRoundtablePosition(localSeatingPosition));
 		m_fSeated = true;
 	}

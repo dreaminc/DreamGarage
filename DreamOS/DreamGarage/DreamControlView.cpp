@@ -249,6 +249,10 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 			HandleKeyboardDown();
 		}
+	} break;
+
+	case (UserObserverEventType::DISMISS): {
+		CR(Dismiss());
 	}
 
 	case (UserObserverEventType::KB_ENTER): {

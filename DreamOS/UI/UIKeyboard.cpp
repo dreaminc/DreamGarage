@@ -665,9 +665,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 
 	else if (chkey == SVK_BACK) {
 		auto strTextbox = m_pTextBoxText->GetText();
-		if (strTextbox.size() > 0)
+		if (strTextbox.size() > 0) {
 			strTextbox.pop_back();
 			m_pTextBoxText->SetText(strTextbox);
+		}
 	}
 
 	else if (chkey == SVK_CONTROL) {
