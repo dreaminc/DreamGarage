@@ -69,10 +69,11 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 
 	SetAppName("DreamControlView");
-	
+	GetDOS()->AddObjectToUIGraph(GetComposite());
+
 	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
 	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-
+	
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
@@ -87,7 +88,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pViewQuad = m_pView->AddQuad(CONTROL_VIEWQUAD_WIDTH, CONTROL_VIEWQUAD_HEIGHT, 1, 1, nullptr);
 	CN(m_pViewQuad);
 
-	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler((float)CONTROL_VIEWQUAD_ANGLE, 0.0f, 0.0f);
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(CONTROL_VIEWQUAD_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 	m_pViewQuad->SetOrientation(m_qViewQuadOrientation);
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
@@ -95,10 +96,12 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_viewState = State::HIDDEN;		
 
+	m_ptVisiblePosition = point(0.0f, CONTROL_VIEW_HEIGHT, CONTROL_VIEW_DEPTH);
+
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
 
-	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;
+	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;	
 
 	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -120,11 +123,10 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamControlView::Update(void *pContext) {
-	RESULT r = R_PASS;
-	//  Note: this duplicates predictive collision implementation from Keyboard
-	point ptCollisions[2];
-	
-	CBR((IsVisible()), R_SKIPPED);
+	RESULT r = R_PASS;	
+		
+	CBR((m_viewState == State::VISIBLE || m_viewState == State::TYPING), R_SKIPPED);
+
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 		CB(userUIDs.size() == 1);
@@ -134,45 +136,79 @@ RESULT DreamControlView::Update(void *pContext) {
 		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 		CN(m_pUserHandle);
 	}
-
-	int i = 0;
+	
 	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_SKIPPED);
+	CNR(pRMallet, R_SKIPPED);	
 
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
-	for (auto &mallet : { pLMallet, pRMallet })
-	{
-		point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
-		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
-		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
-		ptCollisions[i] = ptSphereOrigin;
+	//  Note: this duplicates predictive collision implementation from Keyboard
+	if (m_viewState == State::VISIBLE) {
+		int i = 0;
+		for (auto &pMallet : { pLMallet, pRMallet })
+		{
+			point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
+			point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+			ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
-		if (ptSphereOrigin.y() >= mallet->GetRadius()) {
-			mallet->CheckAndCleanDirty();
-		}
-
-		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
-			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);		
-			CR(mallet->SetDirty());
-
-			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 || 
-				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
-	
-			if (mallet == pLMallet) {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+				pMallet->CheckAndCleanDirty();
+				if (pMallet == pLMallet) {
+					m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
+				}
+				else {
+					m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
+				}
 			}
-			else {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			}
-			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(ptContact));		
-		}
 
-		i++;
+			// if the sphere is lower than its own radius, there must be an interaction
+			if (ptSphereOrigin.y() < pMallet->GetRadius() && !pMallet->IsDirty()) {
+				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
+				CR(pMallet->SetDirty());
+				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
+					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+
+				if (pMallet == pLMallet) {
+					CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+				}
+				else {
+					CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+				}
+
+				(m_pBrowserHandle->SendClickToBrowserAtPoint(ptContact));
+			}
+			i++;
+		}
+		
 	}
+
+	if (m_viewState == State::TYPING) {
+		int i = 0;
+		for (auto &pMallet : { pLMallet, pRMallet })
+		{
+			point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
+			point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+			ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
+
+			if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+				pMallet->CheckAndCleanDirty();
+			}
+
+			// if the sphere is lower than its own radius, there must be an interaction
+			if (ptSphereOrigin.y() < pMallet->GetRadius() && !pMallet->IsDirty()) {
+				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
+				CR(pMallet->SetDirty());
+				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
+					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+
+				HandleKeyboardDown();
+			}
+			i++;
+		}
+	}
+
 Error:
 	return r;
 }
@@ -186,7 +222,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			char chkey = (char)(pInteractionEvent->m_value);
 
 			CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
-			
+
 			m_strURL += chkey;
 		}
 	} break;
@@ -198,10 +234,10 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			CR(m_pBrowserHandle->SendKeyCharacter(chkey, true));
 		}
-
 	} break;
 
 	}
+
 Error:
 	return r;
 }
@@ -214,17 +250,27 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
 			int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
 
-			// This GetSenseController crashes in testing if fUseHMD is false
 			if (GetDOS()->GetHMD() != nullptr) {
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
 			}
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-
-			CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff));
-
+			if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
+			{
+				if (m_ptLMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptLMalletPointing.x > 0 &&
+					m_ptLMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptLMalletPointing.y > 0) {
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptLMalletPointing));
+				}
+			}
+			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
+			{
+				if (m_ptRMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptRMalletPointing.x > 0 &&
+					m_ptRMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptRMalletPointing.y > 0) {
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptRMalletPointing));
+				}
+			}
 		} break;
-		}
+		}	
 	}
 Error:
 	return r;
@@ -301,8 +347,6 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	point ptcvOffset = point(0.0f, 0.0f, -.35f);
-
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;
 
@@ -326,7 +370,7 @@ RESULT DreamControlView::Show() {
 	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
 	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
 
-	GetComposite()->SetPosition(ptAppBasisPosition + ptcvOffset);
+	GetComposite()->SetPosition(ptAppBasisPosition);
 	GetComposite()->SetOrientation(qAppBasisOrientation);
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -342,7 +386,7 @@ RESULT DreamControlView::Show() {
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
-		m_pViewQuad->GetPosition(),
+		m_ptVisiblePosition,
 		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		0.1f,
@@ -454,7 +498,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
-		point(0.0f, 0.0f, 0.0f),
+		m_ptVisiblePosition,	
 		m_qViewQuadOrientation,
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		m_keyboardAnimationDuration,
@@ -464,7 +508,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 		fnEndCallback,
 		this
 	));
-
+	
 Error:
 	return r;
 }
@@ -474,12 +518,16 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	point ptTypingPosition;
 	float textBoxYOffset;
+	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
+	point ptTypingOffset;
 
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
-	ptTypingPosition = point(0.0f, -0.2f, -0.15f) + point(0.0f, textBoxYOffset, 0.0f);
+	ptTypingOffset = point(0.0f, -CONTROL_VIEWQUAD_HEIGHT / 2.0f, -0.35f);
+
+	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
 
 	if (m_viewState != State::TYPING) {
 		CN(m_pUserHandle);
@@ -502,7 +550,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		SetViewState(State::TYPING);
 		return R_PASS;
 	};
-
+	
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
 		ptTypingPosition,
@@ -541,11 +589,13 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	// First apply transforms to the ptIntersectionContact 
 	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
 	point ptAdjustedContact = ptIntersectionContact;
+	
 	float width = m_pViewQuad->GetWidth();
 	float height = m_pViewQuad->GetHeight();
 
 	float posX = ptAdjustedContact.x() / (width / 2.0f);	
 	float posY = ptAdjustedContact.z() / (height / 2.0f);
+
 	//float posZ = ptAdjustedContact.z();	// 3D browser when
 
 	posX = (posX + 1.0f) / 2.0f;	// flip it

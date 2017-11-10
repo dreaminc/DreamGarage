@@ -48,10 +48,10 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowserHandle::ScrollByDiff(int pxXDiff, int pxYDiff) {
+RESULT DreamBrowserHandle::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	CR(ScrollBrowserByDiff(pxXDiff, pxYDiff));
+	CR(ScrollBrowserByDiff(pxXDiff, pxYDiff, scrollPoint));
 Error:
 	return r;
 }
@@ -278,11 +278,11 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff) {
+RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
 	RESULT r = R_PASS;
 	
 	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt = m_lastWebBrowserPoint;
+	mouseEvent.pt = scrollPoint;
 
 	m_pxXPosition += pxXDiff;
 	m_pxYPosition += pxYDiff;

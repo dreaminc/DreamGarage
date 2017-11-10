@@ -47,7 +47,7 @@ public:
 	RESULT ScrollToX(int pxXScroll);
 	RESULT ScrollToY(int pyYScroll);
 	
-	RESULT ScrollByDiff(int pxXDiff, int pxYDiff);			// Relative- scroll this far
+	RESULT ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint);			// Relative- scroll this far
 	RESULT ScrollXByDiff(int pxXDiff);
 	RESULT ScrollYByDiff(int pxYDiff);
 
@@ -78,7 +78,7 @@ private:
 	virtual RESULT ScrollBrowserToX(int pxXScroll) = 0;
 	virtual RESULT ScrollBrowserToY(int pyYScroll) = 0;
 	
-	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff) = 0;			// Relative- scroll this far
+	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) = 0;			// Relative- scroll this far
 	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) = 0;
 	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) = 0;
 	
@@ -129,7 +129,7 @@ public:
 	virtual RESULT ScrollBrowserToX(int pxXScroll) override;
 	virtual RESULT ScrollBrowserToY(int pyYScroll) override;
 
-	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff) override;			// Relative- scroll this far
+	virtual RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) override;		// Relative- scroll this far
 	virtual RESULT ScrollBrowserXByDiff(int pxXDiff) override;
 	virtual RESULT ScrollBrowserYByDiff(int pxYDiff) override;
 

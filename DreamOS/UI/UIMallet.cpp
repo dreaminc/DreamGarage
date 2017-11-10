@@ -8,7 +8,7 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 	m_radius = 0.015f;
 	m_pHead = m_pDreamOS->AddSphere(m_radius, 20.0f, 20.0f);
 	m_pHead->SetVisible(false);
-	m_headOffset = point(0.0f, 0.0f, -0.2f);
+	m_headOffset = point(0.0f, MALLET_RADIUS * sin(MALLET_ANGLE), -MALLET_RADIUS * cos(MALLET_RADIUS));
 }
 
 UIMallet::~UIMallet() {}
@@ -54,9 +54,4 @@ sphere *UIMallet::GetMalletHead() {
 
 point UIMallet::GetHeadOffset() {
 	return m_headOffset;
-}
-
-RESULT UIMallet::SetHeadOffset(point p) {
-	m_headOffset = p;
-	return R_PASS;
 }

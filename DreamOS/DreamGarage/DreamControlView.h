@@ -16,12 +16,12 @@
 
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
-#define CONTROL_VIEWQUAD_WIDTH 0.96f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
-#define CONTROL_VIEWQUAD_HEIGHT 0.54f
-#define CONTROL_VIEWQUAD_ANGLE (M_PI / 3.0f)
-#define CONTROL_VIEW_DEPTH 0.6f
-#define CONTROL_VIEW_HEIGHT -0.20f
-#define TYPING_ROTATION (M_PI / 2.0f)
+#define CONTROL_VIEWQUAD_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
+#define CONTROL_VIEWQUAD_HEIGHT 0.3375f
+#define CONTROL_VIEWQUAD_ANGLE 32.0f
+#define CONTROL_VIEW_DEPTH -0.19f
+#define CONTROL_VIEW_HEIGHT -0.22f
+#define TYPING_ROTATION (M_PI / 2.1f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
@@ -139,6 +139,8 @@ private:
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
+	WebBrowserPoint m_ptLMalletPointing;
+	WebBrowserPoint m_ptRMalletPointing;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
