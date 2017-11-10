@@ -277,6 +277,17 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 		} break;
 
+		case UserObserverEventType::DISMISS: {
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->Hide();
+				m_pUserHandle->SendReleaseKeyboard();
+				m_pKeyboardHandle = nullptr;
+			} 
+			CR(HideApp());
+			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+				
+		} break;
+
 		case UserObserverEventType::KB_ENTER: {
 			if (m_pKeyboardHandle != nullptr) {
 				m_pKeyboardHandle->Hide();

@@ -39,6 +39,7 @@ class DimObj;
 
 enum class UserObserverEventType {
 	BACK,
+	DISMISS,
 	KB_ENTER,
 	INVALID
 };
@@ -64,6 +65,7 @@ public:
 	RESULT SendClearFocusStack();
 
 	RESULT SendKBEnterEvent();
+	RESULT SendUserObserverEvent(UserObserverEventType type);
 	UIKeyboardHandle *RequestKeyboard();
 	RESULT SendReleaseKeyboard();
 
@@ -79,6 +81,7 @@ private:
 	virtual RESULT ClearFocusStack() = 0;
 
 	virtual RESULT HandleKBEnterEvent() = 0;
+	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) = 0;
 	virtual UIKeyboardHandle *GetKeyboard() = 0;
 	virtual RESULT ReleaseKeyboard() = 0;
 
@@ -120,6 +123,7 @@ public:
 	RESULT OnFocusStackEmpty();
 
 	virtual RESULT HandleKBEnterEvent() override;
+	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) override;
 	virtual UIKeyboardHandle *GetKeyboard() override;
 	virtual RESULT ReleaseKeyboard() override;
 

@@ -342,6 +342,9 @@ private:
 // System Applications
 private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
+
+	// currently used by DreamGarage to dismiss UI when being seated (temporary)
+protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 
 private:
