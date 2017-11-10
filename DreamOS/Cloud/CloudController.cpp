@@ -496,7 +496,8 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 		DEBUG_LINEOUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		CN(m_pUserController);
-		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
+		CRM(m_pUserController->LoginWithOTK(strOTK, environmentID), "Failed to login with OTK");
+		strEnvironment = std::to_string(environmentID);
 	}
 
 	DEBUG_LINEOUT("Loading user profile...");

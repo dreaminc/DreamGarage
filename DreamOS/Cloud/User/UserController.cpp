@@ -61,7 +61,7 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 }
 
 // //https://api.develop.dreamos.com/one-time-key/404d642e34e74d68a401f126f5b327c2
-RESULT UserController::LoginWithOTK(std::string& strOTK) {
+RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("Login using OTK");
@@ -88,6 +88,7 @@ RESULT UserController::LoginWithOTK(std::string& strOTK) {
 		// Get the token
 		//CBM((jsonResponse["/data/token"_json_pointer].is_null()), "Token is missing from JSON");
 		m_strToken = jsonResponse["/data/token"_json_pointer].get<std::string>();
+		environmentID = jsonResponse["/data/environment"_json_pointer].get<long>();
 
 		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 		m_fLoggedIn = true;
@@ -252,7 +253,7 @@ RESULT UserController::LoadProfile() {
 
 		m_user = User(
 			jsonResponse["/data/id"_json_pointer].get<long>(),
-			jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			-1,//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
 			jsonResponse["/data/email"_json_pointer].get<std::string>(),
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
