@@ -873,9 +873,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pTextBoxText->SetText(strCurrentAngle);
 			float rotationAngle = (pTestContext->malletAngle * (float)(M_PI) / 180.0f);
 
-			pTestContext->pKLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-		}
+	}
 
 	Error:
 		return R_PASS;
