@@ -196,7 +196,7 @@ RESULT DreamControlView::Update(void *pContext) {
 			if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				CR(mallet->SetDirty());
-				pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
+				//pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
 				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
 
@@ -232,7 +232,7 @@ RESULT DreamControlView::Update(void *pContext) {
 			if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				CR(mallet->SetDirty());
-				pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
+				//pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
 				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
 

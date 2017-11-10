@@ -24,7 +24,7 @@
 #define TYPING_ROTATION (M_PI / 2.1f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-class text;
+//class text;
 class quad; 
 class sphere;
 class UIView;
@@ -134,7 +134,7 @@ private:
 	UID m_keyboardUID;
 
 	State m_viewState;
-	std::shared_ptr<text> pTextBoxText;
+	//std::shared_ptr<text> pTextBoxText;
 	float m_hiddenScale; 
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
