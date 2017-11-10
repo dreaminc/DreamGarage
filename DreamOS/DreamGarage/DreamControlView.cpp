@@ -113,33 +113,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
-	
-	/*	Textbox for testing
-	{
-		composite *pComposite = GetDOS()->AddComposite();
-		CN(pComposite);
-		pComposite->SetPosition(GetDOS()->GetCameraPosition() - point(0.0f, -2.5f, 0.0f));	//with hmd
-
-		auto pView = pComposite->AddUIView(GetDOS());
-		CN(pView);
-
-		//Setup textbox
-		auto pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		{
-			pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
-				pFont,
-				"hi",
-				2.5f,
-				.050,
-				text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
-			CN(pTextBoxText);
-			pView->AddObject(pTextBoxText);
-			pTextBoxText->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pTextBoxText->RotateXByDeg(180.0f);
-
-		}
-	}
-	*/
 
 Error:
 	return r;
@@ -194,7 +167,6 @@ RESULT DreamControlView::Update(void *pContext) {
 			if (ptSphereOrigin.y() < pMallet->GetRadius() && !pMallet->IsDirty()) {
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				CR(pMallet->SetDirty());
-				//pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
 				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
 
@@ -228,7 +200,6 @@ RESULT DreamControlView::Update(void *pContext) {
 			if (ptSphereOrigin.y() < pMallet->GetRadius() && !pMallet->IsDirty()) {
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				CR(pMallet->SetDirty());
-				//pTextBoxText->SetText(std::to_string(ptContact.x) + ", " + std::to_string(ptContact.y));
 				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
 
@@ -544,13 +515,14 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	point ptTypingPosition;
 	float textBoxYOffset;
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
-	point ptTypingOffset = point(0.0f, -(CONTROL_VIEWQUAD_HEIGHT * (2/3)), -0.35);
+	point ptTypingOffset;
 
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
-	
+	ptTypingOffset = point(0.0f, -CONTROL_VIEWQUAD_HEIGHT / 2.0f, -0.35f);
+
 	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
 
 	if (m_viewState != State::TYPING) {
