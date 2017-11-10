@@ -130,8 +130,7 @@ private:
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	UID m_browserUID;
-	UID m_userUID;
-	UID m_keyboardUID;
+	UID m_userUID;	
 
 	State m_viewState;
 

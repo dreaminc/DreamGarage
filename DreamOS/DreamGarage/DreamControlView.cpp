@@ -115,16 +115,12 @@ RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
 
 	if (m_pUserHandle == nullptr) {
-		auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 
 		CBR(userUIDs.size() == 1, R_SKIPPED);
 		m_userUID = userUIDs[0];
 		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 		CN(m_pUserHandle);
-
-		CBR(keyUIDs.size() == 1, R_SKIPPED);
-		m_keyboardUID = keyUIDs[0];
 	}
 		
 	CBR((m_viewState == State::VISIBLE || m_viewState == State::TYPING), R_SKIPPED);
