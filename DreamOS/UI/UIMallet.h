@@ -4,6 +4,9 @@
 #include "Primitives/point.h"
 #include "Primitives/dirty.h"
 
+#define MALLET_ANGLE 203.0f * (float)(M_PI) / 180.0f
+#define MALLET_RADIUS 0.2f
+
 class DreamOS;
 class sphere;
 class point;
@@ -16,7 +19,6 @@ public:
 public:
 	RESULT Show();
 	RESULT Hide();
-	RESULT SetHeadOffset(point p);
 	sphere* GetMalletHead();
 	float GetRadius();
 	point GetHeadOffset();

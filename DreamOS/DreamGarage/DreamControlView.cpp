@@ -110,13 +110,11 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
-	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), ELEMENT_INTERSECT_BEGAN, this);
-	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), ELEMENT_INTERSECT_MOVED, this);
-	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), ELEMENT_INTERSECT_ENDED, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
-
+	
+	/*	Textbox for testing
 	{
 		composite *pComposite = GetDOS()->AddComposite();
 		CN(pComposite);
@@ -141,6 +139,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 		}
 	}
+	*/
 
 Error:
 	return r;
@@ -151,8 +150,7 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamControlView::Update(void *pContext) {
-	RESULT r = R_PASS;
-	//  Note: this duplicates predictive collision implementation from Keyboard
+	RESULT r = R_PASS;	
 		
 	CBR((m_viewState == State::VISIBLE || m_viewState == State::TYPING), R_SKIPPED);
 
@@ -165,8 +163,7 @@ RESULT DreamControlView::Update(void *pContext) {
 		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
 		CN(m_pUserHandle);
 	}
-
-	int i = 0;
+	
 	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
@@ -174,8 +171,10 @@ RESULT DreamControlView::Update(void *pContext) {
 
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
+	//  Note: this duplicates predictive collision implementation from Keyboard
 	if (m_viewState == State::VISIBLE) {
 		point ptCollisions[2];
+		int i = 0;
 		for (auto &mallet : { pLMallet, pRMallet })
 		{
 			point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
@@ -188,7 +187,7 @@ RESULT DreamControlView::Update(void *pContext) {
 				if (mallet == pLMallet) {
 					m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 				}
-				else if (mallet == pRMallet) {
+				else {
 					m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 				}
 			}
@@ -215,9 +214,9 @@ RESULT DreamControlView::Update(void *pContext) {
 		
 	}
 
-	// This is really dirty
 	if (m_viewState == State::TYPING) {
 		point ptCollisions[2];
+		int i = 0;
 		for (auto &mallet : { pLMallet, pRMallet })
 		{
 			point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
@@ -548,12 +547,15 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	point ptTypingPosition;
 	float textBoxYOffset;
+	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
+	point ptTypingOffset = point(0.0f, -(CONTROL_VIEWQUAD_HEIGHT * (2/3)), -0.35);
 
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
-	ptTypingPosition = point(0.0f, -0.10f, -0.35f) + point(0.0f, textBoxYOffset, 0.0f);
+	
+	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
 
 	if (m_viewState != State::TYPING) {
 		CN(m_pUserHandle);

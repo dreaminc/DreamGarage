@@ -322,7 +322,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamUIBar);
 	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
-	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
+	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
 	CN(m_pDreamControlView);
 //*/
 	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
