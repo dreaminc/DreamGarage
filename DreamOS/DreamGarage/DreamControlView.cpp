@@ -69,18 +69,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 
 	SetAppName("DreamControlView");
-	GetDOS()->AddObjectToUIGraph(GetComposite());
-
-	auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
-	auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-	
-	CB(userUIDs.size() == 1);
-	m_userUID = userUIDs[0];
-	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-	CN(m_pUserHandle);
-	
-	CB(keyUIDs.size() == 1);
-	m_keyboardUID = keyUIDs[0];
+	GetDOS()->AddObjectToUIGraph(GetComposite());	
 
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
@@ -124,6 +113,15 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
+
+	if (m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
+		CBR(userUIDs.size() == 1, R_SKIPPED);
+		m_userUID = userUIDs[0];
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle);
+	}
 		
 	CBR((m_viewState == State::VISIBLE || m_viewState == State::TYPING), R_SKIPPED);
 
@@ -262,7 +260,7 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptLMalletPointing));
 				}
 			}
-			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
+			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT)
 			{
 				if (m_ptRMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptRMalletPointing.x > 0 &&
 					m_ptRMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptRMalletPointing.y > 0) {
