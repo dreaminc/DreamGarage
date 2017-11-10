@@ -420,6 +420,8 @@ RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 
 RESULT DreamUserApp::ClearFocusStack() {
 	RESULT r = R_PASS;
+
+	CBR(!m_appStack.empty(), R_SKIPPED);
 	m_appStack = std::stack<DreamUserObserver*>();
 
 	CR(OnFocusStackEmpty());
