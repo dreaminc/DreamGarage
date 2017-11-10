@@ -302,6 +302,10 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	// ControlView App
+	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
+	CN(m_pDreamControlView);
+
 	// UIKeyboard App
 	CR(InitializeKeyboard());
 	CR(InitializeDreamUser());
@@ -320,10 +324,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	//*
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
-
-	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
-	CN(m_pDreamControlView);
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
 //*/
 	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
 
