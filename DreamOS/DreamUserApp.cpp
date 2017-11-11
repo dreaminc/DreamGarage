@@ -142,20 +142,21 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	m_pAppBasis = pDreamOS->MakeComposite();
 
-	{
-		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
-		CB(keyUIDs.size() == 1);
-		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
-
-		CN(m_pKeyboardHandle);
-	}
-
 	m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"left-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"right-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"right-controller-overlay-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pTextureDefaultGazeLeft);
 	CN(m_pTextureDefaultGazeRight);
+
+	{
+		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
+		CBR(keyUIDs.size() == 1, R_SKIPPED);
+		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
+
+		CN(m_pKeyboardHandle);
+	}
+
 
 Error:
 	return r;

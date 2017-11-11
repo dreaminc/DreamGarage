@@ -884,6 +884,8 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	CR(m_pSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
 	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
+
+	m_pInteractionEngine->RemoveObject(pObject, m_pInteractionGraph);
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:

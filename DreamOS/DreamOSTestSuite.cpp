@@ -28,11 +28,11 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUserApp());	
+
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestCaptureApp());
-
-	CR(AddTestUserApp());	
 
 	CR(AddTestDreamApps());
 
