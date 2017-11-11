@@ -418,9 +418,11 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 	std::shared_ptr<hand> pHand = nullptr;
 
 	CN(m_pUserModel);
-	CR(m_pNameBackground->SetVisible(fVisible));
-	CR(m_pTextUserName->SetVisible(fVisible));
 	CR(m_pUserModel->SetVisible(fVisible, false));
+	if (m_pNameBackground != nullptr)
+		CR(m_pNameBackground->SetVisible(fVisible));
+	if (m_pTextUserName != nullptr)
+		CR(m_pTextUserName->SetVisible(fVisible));
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
 	CN(pHand);
