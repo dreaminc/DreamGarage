@@ -284,7 +284,20 @@ RESULT DreamUserApp::UpdateHands() {
 	RESULT r = R_PASS;
 
 	CR(m_pLeftHand->Update());
+	if (!m_pLeftHand->IsTracked() && m_pLeftMallet->GetMalletHead()->IsVisible()) {
+		m_pLeftMallet->Hide();
+	} 
+	else if (m_pLeftHand->IsTracked() && !m_appStack.empty() && !m_pLeftMallet->GetMalletHead()->IsVisible()) {
+		m_pLeftMallet->Show();
+	}
+
 	CR(m_pRightHand->Update());
+	if (!m_pRightHand->IsTracked() && m_pRightMallet->GetMalletHead()->IsVisible()) {
+		m_pRightMallet->Hide();
+	} 
+	else if (m_pRightHand->IsTracked() && !m_appStack.empty() && !m_pRightMallet->GetMalletHead()->IsVisible()) {
+		m_pRightMallet->Show();
+	}
 
 Error:
 	return r;
