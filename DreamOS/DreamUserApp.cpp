@@ -101,6 +101,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendStreamingState(bool fStreaming) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetStreamingState(fStreaming));
+Error:
+	return r;
+}
+
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -592,5 +600,10 @@ UIKeyboardHandle *DreamUserApp::GetKeyboard() {
 }
 
 RESULT DreamUserApp::ReleaseKeyboard() {
+	return R_PASS;
+}
+
+RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
+	m_fStreaming = fStreaming;
 	return R_PASS;
 }

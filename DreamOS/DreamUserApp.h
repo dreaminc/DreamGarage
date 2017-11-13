@@ -69,6 +69,8 @@ public:
 	UIKeyboardHandle *RequestKeyboard();
 	RESULT SendReleaseKeyboard();
 
+	RESULT SendStreamingState(bool fStreaming);
+
 private:
 	virtual UIMallet *GetMallet(HAND_TYPE type) = 0;
 	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) = 0;
@@ -84,6 +86,8 @@ private:
 	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) = 0;
 	virtual UIKeyboardHandle *GetKeyboard() = 0;
 	virtual RESULT ReleaseKeyboard() = 0;
+
+	virtual RESULT SetStreamingState(bool fStreaming) = 0;
 
 };
 
@@ -127,6 +131,8 @@ public:
 	virtual UIKeyboardHandle *GetKeyboard() override;
 	virtual RESULT ReleaseKeyboard() override;
 
+	virtual RESULT SetStreamingState(bool fStreaming) override;
+
 protected:
 
 	RESULT UpdateHands();
@@ -151,6 +157,9 @@ private:
 	VirtualObj *m_pAppBasis = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+
+	// reflection of the member 
+	bool m_fStreaming = false;
 
 private:
 	float m_menuDepth = MENU_DEPTH;

@@ -616,6 +616,14 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
+	if (m_pDreamUserHandle == nullptr) {
+		auto pDreamOS = GetDOS();
+		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
+		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
+		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
+		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
+	}
+
 Error:
 	return r;
 }
@@ -790,7 +798,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 		case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
 			// Switch to input
 			if (m_fStreaming) {
-				m_fStreaming = false;
+				SetStreamingState(false);
 
 				// TODO: Turn off streamer etc
 			}
@@ -866,7 +874,7 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 				m_fRecievingStream = false;
 			}
 
-			m_fStreaming = false;
+			SetStreamingState(false);
 
 			// TODO: May not be needed, if not streaming no video is actually being transmitted 
 			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
@@ -875,8 +883,8 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 			//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
+			SetStreamingState(true);
 
-			m_fStreaming = true;
 		} break;
 	}
 
@@ -894,7 +902,7 @@ RESULT DreamBrowser::BeginStream() {
 		m_fRecievingStream = false;
 	}
 
-	m_fStreaming = false;
+	SetStreamingState(false);
 
 	// TODO: May not be needed, if not streaming no video is actually being transmitted 
 	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
@@ -903,7 +911,19 @@ RESULT DreamBrowser::BeginStream() {
 	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-	m_fStreaming = true;
+	SetStreamingState(true);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetStreamingState(bool fStreaming) {
+	RESULT r = R_PASS;
+
+	m_fStreaming = fStreaming;
+
+	CNR(m_pDreamUserHandle, R_SKIPPED);
+	m_pDreamUserHandle->SendStreamingState(fStreaming);
 
 Error:
 	return r;
