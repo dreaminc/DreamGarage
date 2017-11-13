@@ -246,7 +246,6 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fRecievingStream = false;
-	bool m_fDidUserClick = false;
 
 	TextEntryString m_strEntered;
 	
