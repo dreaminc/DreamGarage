@@ -21,6 +21,7 @@
 #define NAMETAG_BORDER 0.1f
 #define NAMETAG_HEIGHT 0.3f
 #define NAME_LINE_HEIGHT .12f
+#define USERNAME_ANIMATION_DURATION 0.3f
 
 class User;
 class PeerConnection;
@@ -125,7 +126,8 @@ public:
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
-		
+	
+	RESULT SetUsernameAnimationDuration(float animationDuration);
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
@@ -150,6 +152,9 @@ private:
 	
 	double m_msTimeGazeStart;
 	double m_msTimeUserNameDelay = 1250;
+
+	// appear and disappear duration in seconds (direct plug into PushAnimation)
+	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);

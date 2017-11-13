@@ -227,6 +227,11 @@ Error:
 	return r;
 }
 
+RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
+	m_userNameAnimationDuration = animationDuration;
+	return R_PASS;
+}
+
 RESULT DreamPeerApp::HideUserNameField() {
 	RESULT r = R_PASS;
 	
@@ -254,8 +259,8 @@ RESULT DreamPeerApp::HideUserNameField() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pTextUserName.get(),
 		m_hiddenColor,
-		0.3,
-		AnimationCurveType::LINEAR,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		fnStartCallback,
 		fnEndCallback,
@@ -265,8 +270,8 @@ RESULT DreamPeerApp::HideUserNameField() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameBackground.get(),
 		m_hiddenColor,
-		0.3,
-		AnimationCurveType::LINEAR,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		fnStartCallback,
 		fnEndCallback,
@@ -308,8 +313,8 @@ RESULT DreamPeerApp::ShowUserNameField() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameBackground.get(),
 		m_backgroundColor,
-		0.3,
-		AnimationCurveType::LINEAR,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		fnStartCallback,
 		fnEndCallback,
@@ -319,8 +324,8 @@ RESULT DreamPeerApp::ShowUserNameField() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pTextUserName.get(),
 		m_visibleColor,
-		0.3,
-		AnimationCurveType::LINEAR,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		fnStartCallback,
 		fnEndCallback,

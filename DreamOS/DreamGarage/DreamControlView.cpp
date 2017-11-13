@@ -285,12 +285,6 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			CR(m_pUserHandle->SendClearFocusStack());
 		}
 		if (m_viewState == State::TYPING) {
-			CN(m_pBrowserHandle);			// This unfocuses the text box so that node change event
-			WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
-			unFocusText.x = -1;				// to go back into the same textbox
-			unFocusText.y = -1;
-			CR(m_pBrowserHandle->SendClickToBrowserAtPoint(unFocusText));
-
 			HandleKeyboardDown();
 		}
 	} break;
@@ -485,6 +479,12 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	CR(m_pUserHandle->SendReleaseKeyboard());
 	m_pKeyboardHandle = nullptr;
 
+	CN(m_pBrowserHandle);			// This unfocuses the text box so that node change event
+	WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
+	unFocusText.x = -1;				// to go back into the same textbox
+	unFocusText.y = -1;
+	CR(m_pBrowserHandle->SendClickToBrowserAtPoint(unFocusText));
+
 	auto fnStartCallback = [&](void *pContext) {
 		return R_PASS;
 	};
@@ -521,6 +521,11 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
+
+	// TODO: get textbox location from node, for now just defaulting to the middle
+	if (ptTextBox.y() == -1) {
+		ptTextBox.y() = m_pBrowserHandle->GetHeightOfBrowser() / 2.0f;
+	}
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
 	ptTypingOffset = point(0.0f, -CONTROL_VIEWQUAD_HEIGHT / 2.0f, -0.35f);
