@@ -86,6 +86,7 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 	return R_PASS;
 }
 
+//TODO: why doesn't this use hand::SetHandState(pHandState)
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
@@ -110,6 +111,8 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 
 	pHand->SetPosition(ptHand);
 	pHand->SetOrientation(qHandOrientation);
+	pHand->SetTracked(pHandState.fTracked);
+	pHand->SetVisible(pHand->IsTracked());
 
 Error:
 	return r;
