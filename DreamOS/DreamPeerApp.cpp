@@ -158,6 +158,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	
 	if (m_pUserModel != nullptr) {
 		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
 	}
 	
 	if (m_fGazeInteraction) {
