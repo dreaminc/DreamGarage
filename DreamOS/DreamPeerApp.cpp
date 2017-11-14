@@ -153,12 +153,12 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 		m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-		CR(m_pNameComposite->AddObject(m_pTextUserName));	
+		CR(m_pNameComposite->AddObject(m_pTextUserName));
+		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
 	}
 	
 	if (m_pUserModel != nullptr) {
 		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
-		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
 	}
 	
 	if (m_fGazeInteraction) {
