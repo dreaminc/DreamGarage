@@ -32,9 +32,12 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <queue>
 
 #include <list>
 #include <future>
+
+#include "Sound/AudioPacket.h"
 
 // Theirs 
 class CefBrowser;
@@ -56,7 +59,8 @@ public:
 
 	// WebBrowserController
 	RESULT PollFrame();
-	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;
+	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;		// TODO: This should be reviewed 
+	virtual RESULT PollPendingAudioPackets(int &numAudioPacketsProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
 	virtual RESULT LoadURL(const std::string& strURL) override;
 	virtual RESULT LoadRequest(const WebRequest &webRequest) override;
@@ -108,8 +112,16 @@ private:
 
 	// Represented new dirty frames since last time they were polled
 	CefRenderHandler::RectList m_NewDirtyFrames;
-
 	std::mutex m_BufferMutex;
+
+	std::queue<AudioPacket> m_pendingAudioPackets;
+
+public:
+	AudioPacket PopPendingAudioPacket();
+	RESULT PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBfufer);
+	bool IsAudioPacketPending();
+	RESULT ClearPendingAudioPacketQueue();
+	size_t PendingAudioPacketQueueLength();
 
 	//IMPLEMENT_REFCOUNTING(CEFBrowserController);
 };

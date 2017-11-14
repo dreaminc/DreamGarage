@@ -13,6 +13,7 @@
 
 class DOMNode;
 class DOMDocument;
+class AudioPacket;
 
 struct WebBrowserPoint {
 	int x;
@@ -54,6 +55,7 @@ public:
 	class observer {
 	public:
 		virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) = 0;
 		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode) = 0;
@@ -84,6 +86,9 @@ public:
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
 	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) = 0;
+
+	// Get the pending audio packets
+	virtual RESULT PollPendingAudioPackets(int &numAudioPacketsProcessed) = 0;
 
 	// Resize the browser.
 	virtual RESULT Resize(unsigned int width, unsigned int height) = 0;

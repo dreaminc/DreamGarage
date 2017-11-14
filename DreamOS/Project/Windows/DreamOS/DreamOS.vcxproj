@@ -853,6 +853,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
+    <ClCompile Include="..\..\..\Sound\AudioPacket.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp" />
@@ -1223,6 +1224,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
+    <ClInclude Include="..\..\..\Sound\AudioPacket.h" />
     <ClInclude Include="..\..\..\Sound\SoundClient.h" />
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h" />
     <ClInclude Include="..\..\..\Sound\SoundTestSuite.h" />

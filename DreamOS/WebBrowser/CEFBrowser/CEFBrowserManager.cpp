@@ -44,9 +44,13 @@ RESULT CEFBrowserManager::Update() {
 	RESULT r = R_PASS;
 
 	for (auto& pWebBrowserController : m_webBrowserControllers) {
+		
 		// TODO: optimize with actual dirty rects copy
+		
 		int numFramesProcessed = 0;
 		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
+
+		CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
 	}
 
 Error:

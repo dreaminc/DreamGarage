@@ -96,6 +96,27 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::PollPendingAudioPackets(int &numAudioPacketsProcessed) {
+	RESULT r = R_PASS;
+
+	numAudioPacketsProcessed = 0;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		while (IsAudioPacketPending()) {
+			auto pendingAudioPacket = PopPendingAudioPacket();
+			
+			CR(m_pWebBrowserControllerObserver->OnAudioPacket(pendingAudioPacket));
+			
+			numAudioPacketsProcessed++;
+		}
+	}
+
+	CR(ClearPendingAudioPacketQueue());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::Resize(unsigned int width, unsigned int height) {
 	RESULT r = R_PASS;
 
@@ -333,13 +354,48 @@ RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){
 	return r;
 }
 
+RESULT CEFBrowserController::ClearPendingAudioPacketQueue() {
+	while (m_pendingAudioPackets.size() > 0)
+		m_pendingAudioPackets.pop();
+
+	return R_PASS;
+}
+
+size_t CEFBrowserController::PendingAudioPacketQueueLength() {
+	return m_pendingAudioPackets.size();
+}
+
+AudioPacket CEFBrowserController::PopPendingAudioPacket() {
+	AudioPacket pendingAudioPacket = m_pendingAudioPackets.front();
+	
+	m_pendingAudioPackets.pop();
+
+	return pendingAudioPacket;
+}
+
+RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
+	AudioPacket newPendingPacket(
+		frames,
+		channels,
+		bitsPerSample,
+		pDataBuffer
+	);
+
+	m_pendingAudioPackets.push(newPendingPacket);
+
+	return R_PASS;
+}
+
+bool CEFBrowserController::IsAudioPacketPending() {
+	return (m_pendingAudioPackets.size() > 0) ? true : false;
+}
+
 RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+	DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
 
-	// TODO: Queue up new audio packets 
-
-	CR(r);
+	// Queue up new audio packet 
+	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
 
 Error:
 	return r;

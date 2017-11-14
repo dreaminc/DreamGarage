@@ -912,6 +912,9 @@
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sound\AudioPacket.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2032,6 +2035,9 @@
       <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\AudioPacket.h">
       <Filter>Sound</Filter>
     </ClInclude>
   </ItemGroup>

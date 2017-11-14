@@ -727,6 +727,17 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+	// TODO: Handle this (if streaming we broadcast into webrtc
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
