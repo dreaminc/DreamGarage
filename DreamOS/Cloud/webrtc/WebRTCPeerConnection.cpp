@@ -115,32 +115,51 @@ Error:
 RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
+	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pUserMediaStreamInterface = nullptr;
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pChromeMediaStreamInterface = nullptr;
-	
 
+	// User Stream (Voice)
 	CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
 
-	// User Stream (Voice and Data)
 	pUserMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
+	CNM(pUserMediaStreamInterface, "Failed to create user media stream");
 
 	CR(AddAudioStream(pUserMediaStreamInterface, kUserAudioLabel));
-	CR(AddVideoStream(pUserMediaStreamInterface));
 
-	// TODO: Do this moar bettar
-	if (fAddDataChannel) {
-		CR(AddDataChannel());
-	}
-
-	// Add User stream
+	// Add user stream to peer connection interface
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pUserMediaStreamInterface)) {
 		DEBUG_LINEOUT("Adding user media stream to PeerConnection failed");
 	}
 
-	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+	// Insert it into our local active streams (referenced in OnAddStream
 	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pUserMediaStreamInterface->label(), pUserMediaStreamInterface));
 
 	// Chrome Media Stream
+	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
+
+	// TODO: For this we may need to have a separate factory here 
+	pChromeMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kChromeStreamLabel);
+	CNM(pChromeMediaStreamInterface, "Failed to create chrome media stream");
+
+	CR(AddVideoStream(pChromeMediaStreamInterface));
+
+	// Add user stream to peer connection interface
+	if (!m_pWebRTCPeerConnectionInterface->AddStream(pChromeMediaStreamInterface)) {
+		DEBUG_LINEOUT("Adding chrome media stream to PeerConnection failed");
+	}
+
+	// Insert it into our local active streams (referenced in OnAddStream
+	//typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pChromeMediaStreamInterface->label(), pChromeMediaStreamInterface));
+
+	// Data Channel
+	// TODO: Do this moar bettar
+	// This is not in the media streaming interface
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;
