@@ -434,7 +434,7 @@ RESULT WebRTCConductor::OnAddStream(long peerConnectionID, rtc::scoped_refptr<we
 
 	//if (pMediaStream->label() == kAudioLabel) {
 
-	if(pMediaStream->FindAudioTrack(kAudioLabel)) {
+	if(pMediaStream->FindAudioTrack(kUserAudioLabel)) {
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnAudioChannel(peerConnectionID);
 		}

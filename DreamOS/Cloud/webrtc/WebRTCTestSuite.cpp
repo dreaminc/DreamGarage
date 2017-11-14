@@ -591,11 +591,14 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
 
-			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
+			long environmentID = 168;
+
+			//CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
+			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(environmentID)));
 
 			//CRM(pTestContext->pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 
-			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, 6), "Failed to log in");
+			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
 		}
 
 		// Create the 2D Mouse App

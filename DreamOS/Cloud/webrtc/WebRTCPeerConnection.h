@@ -77,9 +77,11 @@ public:
 	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
 	~WebRTCPeerConnection();
 
-	RESULT AddStreams();
+	// TODO: Generalize this when we add renegotiation 
+	// so that they're not hard coded per WebRTCCommon
+	RESULT AddStreams(bool fAddDataChannel = true);
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
+	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);

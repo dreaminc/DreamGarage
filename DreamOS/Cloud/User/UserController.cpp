@@ -254,7 +254,8 @@ RESULT UserController::LoadProfile() {
 
 		m_user = User(
 			jsonResponse["/data/id"_json_pointer].get<long>(),
-			-1,//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			-1,
 			jsonResponse["/data/email"_json_pointer].get<std::string>(),
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
