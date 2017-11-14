@@ -262,18 +262,30 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 
 				CR(RequestMenu());
-				break;
+				//break;
 			}
 
-			if (!m_pathStack.empty()) {
+			else if (!m_pathStack.empty()) {
 				CR(PopPath());
+
+				// if the stack is empty after popping from the path, hide the app
 				CBR(m_pathStack.empty(), R_SKIPPED);
 				CR(HideApp());
 				CR(m_pUserHandle->SendPopFocusStack());
-				break;
+				{
+					// if the user is currently streaming, show the control view
+					bool fStreaming = false;
+					CR(m_pUserHandle->RequestStreamingState(fStreaming));
+					if (fStreaming) {
+						CR(ShowControlView());
+					}
+				}
+				//break;
 			}
 
-			CR(ShowRootMenu());
+			else {
+				CR(ShowRootMenu());
+			}
 
 		} break;
 
@@ -294,6 +306,8 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
+			CR(ShowControlView());
+			/*
 			{
 				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
 				CB(controlUIDs.size() == 1);
@@ -306,9 +320,28 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 					GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 				}
 			}
+//*/
 		} break;
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ShowControlView() {
+	RESULT r = R_PASS;
+
+	auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
+	CB(controlUIDs.size() == 1);
+	auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
+	CN(pControlHandle);
+	CN(m_pUserHandle);
+	if (!pControlHandle->IsAppVisible()) {
+		CR(pControlHandle->ShowApp());
+		CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+	}
 
 Error:
 	return r;

@@ -69,6 +69,7 @@ public:
 	UIKeyboardHandle *RequestKeyboard();
 	RESULT SendReleaseKeyboard();
 
+	RESULT RequestStreamingState(bool& fStreaming);
 	RESULT SendStreamingState(bool fStreaming);
 
 private:
@@ -87,6 +88,7 @@ private:
 	virtual UIKeyboardHandle *GetKeyboard() = 0;
 	virtual RESULT ReleaseKeyboard() = 0;
 
+	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
 	virtual RESULT SetStreamingState(bool fStreaming) = 0;
 
 };
@@ -131,6 +133,7 @@ public:
 	virtual UIKeyboardHandle *GetKeyboard() override;
 	virtual RESULT ReleaseKeyboard() override;
 
+	virtual RESULT GetStreamingState(bool& fStreaming) override;
 	virtual RESULT SetStreamingState(bool fStreaming) override;
 
 protected:

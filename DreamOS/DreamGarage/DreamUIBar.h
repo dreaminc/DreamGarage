@@ -99,6 +99,8 @@ public:
 	RESULT HideApp();
 	RESULT ShowApp();
 
+	RESULT ShowControlView();
+
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
