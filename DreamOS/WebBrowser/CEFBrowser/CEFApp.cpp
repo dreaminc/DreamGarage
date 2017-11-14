@@ -224,6 +224,7 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	//cefWindowInfo.SetAsPopup(nullptr, "cefsimple");
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;
+	cefWindowInfo.transparent_painting_enabled = 0;// false;
 
 	// Set up the promise (Will be set in OnBrowserCreated)
 	
