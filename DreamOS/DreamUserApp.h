@@ -72,6 +72,8 @@ public:
 	RESULT RequestStreamingState(bool& fStreaming);
 	RESULT SendStreamingState(bool fStreaming);
 
+	RESULT RequestResetAppComposite();
+
 private:
 	virtual UIMallet *GetMallet(HAND_TYPE type) = 0;
 	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) = 0;
@@ -90,6 +92,8 @@ private:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
 	virtual RESULT SetStreamingState(bool fStreaming) = 0;
+
+	virtual RESULT ResetAppComposite() = 0;
 
 };
 
@@ -135,6 +139,8 @@ public:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) override;
 	virtual RESULT SetStreamingState(bool fStreaming) override;
+
+	virtual RESULT ResetAppComposite() override;
 
 protected:
 

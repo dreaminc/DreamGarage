@@ -683,7 +683,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-		if (m_fStreaming) {
+		if (IsStreaming()) {
 			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
 		}
 	}
@@ -785,7 +785,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 				// We get a request streaming start ACK when we requested to start streaming
 				// This will begin broadcasting
 				case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
-					if (m_fStreaming) {
+					if (IsStreaming()) {
 						// For non-changing stuff we need to send the current frame
 						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
 					}
@@ -797,7 +797,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 		case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
 			// Switch to input
-			if (m_fStreaming) {
+			if (IsStreaming()) {
 				SetStreamingState(false);
 
 				// TODO: Turn off streamer etc
@@ -927,6 +927,10 @@ RESULT DreamBrowser::SetStreamingState(bool fStreaming) {
 
 Error:
 	return r;
+}
+
+bool DreamBrowser::IsStreaming() {
+	return m_fStreaming;
 }
 
 // InteractionObjectEvent

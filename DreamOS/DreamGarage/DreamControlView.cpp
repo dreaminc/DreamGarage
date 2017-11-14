@@ -297,6 +297,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 					CB(menuUIDs.size() == 1);
 					auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
 					if (pMenuHandle != nullptr) {
+						CR(m_pUserHandle->RequestResetAppComposite());
 						CR(pMenuHandle->SendShowRootMenu());
 						CR(m_pUserHandle->SendPushFocusStack(pMenuHandle));
 					}

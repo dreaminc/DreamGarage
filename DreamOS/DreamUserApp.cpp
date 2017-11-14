@@ -117,6 +117,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::RequestResetAppComposite() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ResetAppComposite());
+Error:
+	return r;
+}
+
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -349,8 +357,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			CN(pControlHandle);
 
 			if (pMenuHandle != nullptr) {
-				UpdateCompositeWithHands(m_menuHeight);
-				m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation());
+				ResetAppComposite();
 				pMenuHandle->SendShowRootMenu();
 			}
 
@@ -625,4 +632,15 @@ RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
 RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
 	m_fStreaming = fStreaming;
 	return R_PASS;
+}
+
+RESULT DreamUserApp::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	CR(UpdateCompositeWithHands(m_menuHeight));
+	CNR(m_pKeyboardHandle, R_SKIPPED);
+	CR(m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation()));
+
+Error:
+	return r;
 }

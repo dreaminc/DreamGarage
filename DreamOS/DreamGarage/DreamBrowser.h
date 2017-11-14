@@ -153,6 +153,7 @@ public:
 
 	// Set streaming state in both the browser and the user app
 	RESULT SetStreamingState(bool fStreaming);
+	bool IsStreaming();
 
 	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
 
