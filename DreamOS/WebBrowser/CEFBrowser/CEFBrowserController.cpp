@@ -333,6 +333,18 @@ RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){
 	return r;
 }
 
+RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+
+	// TODO: Queue up new audio packets 
+
+	CR(r);
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");

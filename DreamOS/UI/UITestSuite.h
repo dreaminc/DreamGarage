@@ -50,6 +50,7 @@ public:
 
 	RESULT Initialize();
 
+	RESULT AddTestBrowserURL();
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
 	RESULT AddTestBrowserRequest();
@@ -74,7 +75,7 @@ public:
 	virtual RESULT Notify(UIEvent *mEvent) override;
 
 private:
-	RESULT SetupPipeline();
+	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupUINodePipeline();
 
 private:

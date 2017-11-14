@@ -41,6 +41,16 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
+
+Error:
+	return r;
+}
+
 RESULT CEFApp::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
@@ -220,7 +230,8 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	CefWindowInfo cefWindowInfo;
 	CefBrowserSettings cefBrowserSettings;
 
-	cefWindowInfo.SetAsWindowless(0, true);
+	//cefWindowInfo.SetAsWindowless(0, true);
+	cefWindowInfo.SetAsWindowless(NULL);
 	//cefWindowInfo.SetAsPopup(nullptr, "cefsimple");
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;

@@ -55,6 +55,11 @@ Error:
 
 // Handler Routing
 // Render handler is done at CEFApp to get access to all of the Browser Controllers
+
+CefRefPtr<CefAudioHandler> CEFHandler::GetAudioHandler() {
+	return this;
+}
+
 CefRefPtr<CefRenderHandler> CEFHandler::GetRenderHandler() { 
 	return this;
 }
@@ -321,3 +326,15 @@ Error:
 	return;
 }
 
+// Audio Handler
+void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int channels, int bits_per_sample, const void* data_buffer) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEFHandle: OnAudioData");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnAudioData(browser, frames, channels, bits_per_sample, data_buffer));
+
+Error:
+	return;
+}
