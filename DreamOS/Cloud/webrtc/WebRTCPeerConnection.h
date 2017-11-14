@@ -74,7 +74,7 @@ public:
 	friend class WebRTCConductor;
 
 public:
-	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCUserPeerConnectionFactory, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCChromePeerConnectionFactory);
 	~WebRTCPeerConnection();
 
 	// TODO: Generalize this when we add renegotiation 
@@ -84,7 +84,9 @@ public:
 	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
-	RESULT SetPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	RESULT SetChromePeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	
 	RESULT ClearSessionDescriptionProtocols();
 	RESULT ClearLocalSessionDescriptionProtocol();
 	RESULT ClearRemoteSessionDescriptionProtocol();
@@ -214,7 +216,8 @@ private:
 	std::list<WebRTCICECandidate> m_webRTCICECandidates;
 
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCUserPeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCChromePeerConnectionFactory;
 
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;

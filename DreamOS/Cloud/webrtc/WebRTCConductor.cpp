@@ -25,7 +25,7 @@
 
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
-	m_pWebRTCPeerConnectionFactory(nullptr)
+	m_pWebRTCUserPeerConnectionFactory(nullptr)
 {
 	ClearPeerConnections();
 }
@@ -45,7 +45,8 @@ rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::AddNewPeerConnection(l
 	CBM((FindPeerConnectionByID(peerConnectionID) == false), "Peer Conncetion ID %d already present", peerConnectionID);
 	
 	//pWebRTCPeerConnection = std::make_shared<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCPeerConnectionFactory);
-	pWebRTCPeerConnection = rtc::scoped_refptr<WebRTCPeerConnection>(new rtc::RefCountedObject<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCPeerConnectionFactory));
+	pWebRTCPeerConnection = 
+		rtc::scoped_refptr<WebRTCPeerConnection>(new rtc::RefCountedObject<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCUserPeerConnectionFactory, m_pWebRTCChromePeerConnectionFactory));
 	
 	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
 
@@ -272,16 +273,27 @@ Error:
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
-	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
-	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
-	m_pWebRTCPeerConnectionFactory->AddRef();
-	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+	// User Peer Connection Factory
+	CBM((m_pWebRTCUserPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+
+	m_pWebRTCUserPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCUserPeerConnectionFactory->AddRef();
+	
+	CNM(m_pWebRTCUserPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+
+	// Chrome Peer Connection Factory (testing)
+	CBM((m_pWebRTCChromePeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+
+	m_pWebRTCChromePeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCChromePeerConnectionFactory->AddRef();
+
+	CNM(m_pWebRTCChromePeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
 //Success:
 	return r;
 
 Error:
-	m_pWebRTCPeerConnectionFactory->Release();
+	m_pWebRTCUserPeerConnectionFactory->Release();
 
 	return r;
 }

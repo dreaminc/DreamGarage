@@ -135,7 +135,9 @@ private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
 	WebRTCConductorObserver *m_pParentObserver;
 
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCUserPeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCChromePeerConnectionFactory;
+
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 };
 
