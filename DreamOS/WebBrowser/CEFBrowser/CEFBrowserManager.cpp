@@ -187,6 +187,8 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
+	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
+	
 
 #ifdef _DEBUG
 	cefSettings.single_process = true;
