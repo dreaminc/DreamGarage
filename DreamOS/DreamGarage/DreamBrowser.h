@@ -35,6 +35,7 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
+class DreamUserHandle;
 
 #include "DreamBrowserMessage.h"
 
@@ -150,6 +151,10 @@ public:
 
 	virtual RESULT BeginStream() override;
 
+	// Set streaming state in both the browser and the user app
+	RESULT SetStreamingState(bool fStreaming);
+	bool IsStreaming();
+
 	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
 
 	// InteractionObjectEvent
@@ -229,6 +234,7 @@ private:
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
+	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 	bool m_fBrowserActive = false;

@@ -101,6 +101,30 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::RequestStreamingState(bool& fStreaming) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(GetStreamingState(fStreaming));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::SendStreamingState(bool fStreaming) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetStreamingState(fStreaming));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::RequestResetAppComposite() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ResetAppComposite());
+Error:
+	return r;
+}
+
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -321,20 +345,19 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		//TODO: requesting the handles may need to be moved into the switch statements,
 		//		depending on how other applications handle capturing each other
 
-		CB(menuUIDs.size() == 1);
-		auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
-
-		CB(controlUIDs.size() == 1);
-		auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(pDreamOS->CaptureApp(controlUIDs[0], this));
-
-		CN(pMenuHandle);
-		CN(pControlHandle);
 
 		if (m_appStack.empty()) {
+			CB(menuUIDs.size() == 1);
+			auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
+
+			CB(controlUIDs.size() == 1);
+			auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(pDreamOS->CaptureApp(controlUIDs[0], this));
+
+			CN(pMenuHandle);
+			CN(pControlHandle);
 
 			if (pMenuHandle != nullptr) {
-				UpdateCompositeWithHands(m_menuHeight);
-				m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation());
+				ResetAppComposite();
 				pMenuHandle->SendShowRootMenu();
 			}
 
@@ -345,12 +368,13 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 
 			m_appStack.push(pMenuHandle);
+			GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+			GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
+		}
+		else {
+			m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
 		}
 
-		m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
-
-		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-		GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 	} break;
 
 	case (ELEMENT_INTERSECT_BEGAN): {
@@ -388,7 +412,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		if (!m_fCollisionLeft && !m_fCollisionRight) {
 			m_pLeftHand->SetOverlayVisible(false);
 			m_pRightHand->SetOverlayVisible(false);
-			if (m_appStack.empty()) {
+			if (m_appStack.empty() && !m_fStreaming) {
 				m_pLeftHand->SetModelState(hand::ModelState::HAND);
 				m_pRightHand->SetModelState(hand::ModelState::HAND);
 			}
@@ -447,12 +471,17 @@ Error:
 RESULT DreamUserApp::OnFocusStackEmpty() {
 	RESULT r = R_PASS;
 
-	CR(m_pLeftMallet->Hide());
-	CR(m_pRightMallet->Hide());
+	if (!m_fStreaming) {
+		CR(m_pLeftMallet->Hide());
+		CR(m_pRightMallet->Hide());
 
-	if (!(m_fCollisionLeft || m_fCollisionRight)) {
-		CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
-		CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
+		if (!(m_fCollisionLeft || m_fCollisionRight)) {
+			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
+			CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
+		}
+	}
+	else {
+		// show app that wasn't dismissed...
 	}
 
 Error:
@@ -593,4 +622,25 @@ UIKeyboardHandle *DreamUserApp::GetKeyboard() {
 
 RESULT DreamUserApp::ReleaseKeyboard() {
 	return R_PASS;
+}
+
+RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
+	fStreaming = m_fStreaming;
+	return R_PASS;
+}
+
+RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
+	m_fStreaming = fStreaming;
+	return R_PASS;
+}
+
+RESULT DreamUserApp::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	CR(UpdateCompositeWithHands(m_menuHeight));
+	CNR(m_pKeyboardHandle, R_SKIPPED);
+	CR(m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation()));
+
+Error:
+	return r;
 }

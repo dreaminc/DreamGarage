@@ -1,5 +1,6 @@
 #include "DreamControlView.h"
 #include "DreamBrowser.h"
+#include "DreamUIBar.h"
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
@@ -279,11 +280,32 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	switch (type) {
 	case (UserObserverEventType::BACK): {
+
 		if (m_viewState == State::VISIBLE) {
 			CR(Hide());
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
+
+			// if the user is streaming show the menu
+			{
+				bool fStreaming = false;
+				CR(m_pUserHandle->RequestStreamingState(fStreaming));
+				if (fStreaming) {
+					auto pDreamOS = GetDOS();
+
+					auto menuUIDs = pDreamOS->GetAppUID("DreamUIBar");
+					CB(menuUIDs.size() == 1);
+					auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
+					if (pMenuHandle != nullptr) {
+						CR(m_pUserHandle->RequestResetAppComposite());
+						CR(pMenuHandle->SendShowRootMenu());
+						CR(m_pUserHandle->SendPushFocusStack(pMenuHandle));
+					}
+					pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
+				}
+			}
 		}
+
 		if (m_viewState == State::TYPING) {
 			HandleKeyboardDown();
 		}
