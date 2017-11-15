@@ -90,13 +90,24 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	CN(m_pController);
 	m_pController->SetVisible(false);
 
-	float scale = 0.035f;
-	float overlayAspect = (332.0f / 671.0f);
-	float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-	m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
-	m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
-	m_pOverlayQuad->SetPosition(point(-scale * 0.575f * t, 0.0f, -scale * 0.575f));
-	m_pOverlayQuad->SetVisible(false);
+	switch (pHMD->GetDeviceType()) {
+	case (OCULUS): {
+
+		float scale = 0.035f;
+		float overlayAspect = (332.0f / 671.0f);
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(-scale * 0.575f * t, 0.0f, -scale * 0.575f));
+		m_pOverlayQuad->SetVisible(false);
+
+	} break;
+	case (VIVE): {
+		// TODO: implement vive overlay positioning here
+
+	} break;
+	}
+
 
 Error:
 	return r;

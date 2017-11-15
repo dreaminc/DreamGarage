@@ -65,6 +65,7 @@ public:
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual HMDDeviceType GetDeviceType() override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);

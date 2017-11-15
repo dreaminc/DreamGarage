@@ -300,6 +300,10 @@ composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType)
 	return nullptr;
 }
 
+HMDDeviceType OpenVRDevice::GetDeviceType() {
+	return HMDDeviceType::VIVE;
+}
+
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 	RESULT r = R_PASS;
 
