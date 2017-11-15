@@ -25,10 +25,18 @@ class WebRTCICECandidate;
 class PeerConnection;
 class User;
 class TwilioNTSInformation;
+class AudioPacket;
 
 #include "WebRTCPeerConnection.h"
 
-class WebRTCConductor : public WebRTCPeerConnection::WebRTCPeerConnectionObserver {
+#include "webrtc/modules/audio_device/include/audio_device.h"
+
+#include "WebRTCAudioCaptureDevice.h"
+
+class WebRTCConductor : 
+	public WebRTCPeerConnection::WebRTCPeerConnectionObserver,
+	public AudioDeviceDataCapturer
+{
 public:
 	class WebRTCConductorObserver {
 	public:
@@ -89,6 +97,8 @@ public:
 	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
+	// TODO: AudioDeviceCapturer
+
 private:
 	RESULT ClearPeerConnections();
 	rtc::scoped_refptr<WebRTCPeerConnection> AddNewPeerConnection(long peerConnectionID);
@@ -144,6 +154,12 @@ private:
 	// TODO: Might need to close these down on exit
 	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
+
+	// Audio Device Module
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+
+public:
+	RESULT PushAudioPacket(const AudioPacket audioPacket);
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

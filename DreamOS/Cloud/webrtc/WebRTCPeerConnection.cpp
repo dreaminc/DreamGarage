@@ -137,7 +137,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	pUserMediaStreamInterface = m_pWebRTCUserPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
 	CNM(pUserMediaStreamInterface, "Failed to create user media stream");
 
-	CR(AddAudioStream(pUserMediaStreamInterface, kUserAudioLabel));
+	//CR(AddAudioStream(pUserMediaStreamInterface, kUserAudioLabel));
 	//CR(AddVideoStream(pUserMediaStreamInterface));
 
 	// Add user stream to peer connection interface
@@ -155,6 +155,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	pChromeMediaStreamInterface = m_pWebRTCChromePeerConnectionFactory->CreateLocalMediaStream(kChromeStreamLabel);
 	CNM(pChromeMediaStreamInterface, "Failed to create chrome media stream");
 
+	CR(AddAudioStream(pChromeMediaStreamInterface, kChromeAudioLabel));
 	CR(AddVideoStream(pChromeMediaStreamInterface));
 
 	// Add user stream to peer connection interface
@@ -401,20 +402,41 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		return;
 	}
 
+	// User
 	// Audio track
-	auto pAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
-	if (pAudioTrack != nullptr) {
-		auto pAudioTrackSource = pAudioTrack->GetSource();
+	auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
+	if (pUserAudioTrack != nullptr) {
+		auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
 
-		if (pAudioTrackSource != nullptr) {
+		if (pUserAudioTrackSource != nullptr) {
 			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			pAudioTrackSource->AddSink(this);
+			pUserAudioTrackSource->AddSink(this);
 
 			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
 			//SetAudioVolume(0.0f);
 
-			DEBUG_LINEOUT("Added audio Sink");
+			DEBUG_LINEOUT("Added user audio sink");
+		}
+		else {
+			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+		}
+	}
+
+	// Chrome
+	auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
+	if (pChromeAudioTrack != nullptr) {
+		auto pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
+
+		if (pChromeAudioTrackSource != nullptr) {
+			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
+
+			//pAudioTrackSource->AddSink(this);
+
+			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
+			//SetAudioVolume(0.0f);
+
+			DEBUG_LINEOUT("Added chrome audio sink");
 		}
 		else {
 			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");

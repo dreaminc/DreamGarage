@@ -7,10 +7,32 @@
 // DreamOS/Sound/AudioPacket.h
 // This object represents an audio packet 
 
+#define DEFAULT_SAMPLING_RATE 44100
+
 class AudioPacket {
 public:
 	AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer);
 	~AudioPacket();
+
+	uint8_t *GetDataBuffer() const {
+		return m_pDataBuffer;
+	}
+
+	int GetNumFrames() const {
+		return m_frames;
+	}
+
+	int GetNumChannels() const {
+		return m_channels;
+	}
+
+	int GetBitsPerSample() const {
+		return m_bitsPerSample;
+	}
+
+	int GetSamplingRate() const {
+		return m_samplingRate;
+	}
 
 private:
 	int m_frames;
@@ -18,6 +40,8 @@ private:
 	int m_bitsPerSample;
 	uint8_t *m_pDataBuffer;
 	size_t m_pDataBuffer_n;
+
+	int m_samplingRate = DEFAULT_SAMPLING_RATE;
 };
 
 

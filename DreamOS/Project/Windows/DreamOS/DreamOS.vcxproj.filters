@@ -915,6 +915,9 @@
     <ClCompile Include="..\..\..\Sound\AudioPacket.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioCaptureDevice.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2039,6 +2042,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\AudioPacket.h">
       <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioCaptureDevice.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

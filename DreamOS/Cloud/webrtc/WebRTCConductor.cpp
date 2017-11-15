@@ -23,6 +23,11 @@
 #include "Cloud/User/User.h"
 #include "Cloud//User/TwilioNTSInformation.h"
 
+#include "Sound/AudioPacket.h"
+
+#define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
+#include "webrtc/modules/audio_device/audio_device_impl.h"
+
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
 	m_pWebRTCUserPeerConnectionFactory(nullptr)
@@ -275,6 +280,28 @@ Error:
 	return nullptr;
 }
 
+
+/*
+RESULT WebRTCConductor::PushAudioPacket(const AudioPacket audioPacket) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<webrtc::AudioDeviceModuleImpl> pAudioDeviceModuleImpl = rtc::scoped_refptr<webrtc::AudioDeviceModuleImpl>(m_pAudioDeviceModule);
+	CN(pAudioDeviceModuleImpl);
+
+	pAudioDeviceModuleImpl->GetAudioDeviceBuffer()->_ptrCbAudioTransport
+		->PushCaptureData(15, 
+			              static_cast<void*>(audioPacket.GetDataBuffer()), 
+			              audioPacket.GetBitsPerSample(), 
+						  audioPacket.GetSamplingRate(), 
+						  audioPacket.GetNumChannels(), 
+						  audioPacket.GetNumFrames()
+		);
+
+Error:
+	return r;
+}
+*/
+
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
@@ -301,11 +328,25 @@ RESULT WebRTCConductor::Initialize() {
 	CN(m_workerThread);
 	m_workerThread->Start();
 
+	// Custom Audio Device Module
+	//m_pAudioDeviceModule = 
+	//	m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[]()
+	//{
+	//	//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
+	//	return webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::kDummyAudio);
+	//});
+
+	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
+	m_pAudioDeviceModule = CreateAudioDeviceWithDataCapturer(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+	CN(m_pAudioDeviceModule);
+	
+	//m_pAudioDeviceModule->RegisterAudioCallback(this);
+
 	m_pWebRTCChromePeerConnectionFactory =
 		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
 											m_workerThread.get(),	// worker thread
 											rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
-											nullptr,	// TODO: Default ADM
+											m_pAudioDeviceModule,	// TODO: Default ADM
 											nullptr,	// Video Encoder Factory
 											nullptr		// Audio Encoder Factory
 		);

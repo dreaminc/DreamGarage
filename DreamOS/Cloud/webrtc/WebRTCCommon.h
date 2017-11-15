@@ -27,7 +27,7 @@ const char kUserDataLabel[] = "user_data_label";
 // Chrome Stream
 const char kChromeStreamLabel[] = "chrome_stream_label";
 const char kChromeVideoLabel[] = "chrome_video_label";
-const char kChromeAudioStreamLabel[] = "chrome_audio_label";
+const char kChromeAudioLabel[] = "chrome_audio_label";
 
 
 const uint16_t kDefaultServerPort = 8888;
