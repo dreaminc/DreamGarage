@@ -101,6 +101,9 @@ public:
 	RESULT StopVideoStreaming(long peerConnectionID);
 	bool IsVideoStreamingRunning(long peerConnectionID);
 
+	// Audio
+	RESULT CaptureAudioPacket(const AudioPacket &pendingAudioPacket);
+
 	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
 	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 

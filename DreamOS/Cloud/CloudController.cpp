@@ -642,6 +642,8 @@ Error:
 	return r;
 }
 
+
+
 // Broadcast some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
@@ -666,6 +668,20 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 Error:
 	return r;
 }
+
+// Audio 
+RESULT CloudController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CN(m_pEnvironmentController->CaptureAudioPacket(pendingAudioPacket));
+
+Error:
+	return r;
+}
+
 
 // Video
 RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {

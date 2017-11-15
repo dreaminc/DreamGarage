@@ -3,6 +3,78 @@
 #include "webrtc/base/refcount.h"
 #include "webrtc/base/checks.h"
 
+#define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
+#include "webrtc/modules/audio_device/audio_device_impl.h"
+
+RESULT AudioDeviceDataCapturer::Initialize() {
+	//m_pendingAudioPackets = std::queue<AudioPacket>();
+	return R_PASS;
+}
+
+RESULT AudioDeviceDataCapturer::PushAudioPacket(const AudioPacket audioPacket) {
+	RESULT r = R_PASS;
+
+	if (m_pAudioTransport != nullptr) {
+		DEBUG_LINEOUT("ADDC: PushCaptureData: %d", (int)(audioPacket.GetNumFrames()));
+
+
+		//m_pAudioTransport->PushCaptureData(
+		//	0,
+		//	audioPacket.GetDataBuffer(),
+		//	audioPacket.GetBitsPerSample(),
+		//	audioPacket.GetSamplingRate(),
+		//	audioPacket.GetNumChannels(),
+		//	audioPacket.GetNumFrames()
+		//);
+
+		int kClockDriftMs = 0;
+		uint32_t newMicLevel = 0;
+		
+		/*
+		int samples_per_sec = 44100;
+		int nSamples = 441;
+		static int count = 0;
+		int16_t *pDataBuffer = new int16_t[nSamples];
+
+		for (int i = 0; i < nSamples; i++) {
+			pDataBuffer[i] = sin((count*4200.0f) / samples_per_sec) * 30000;
+			count++;
+		}
+		
+		int32_t res = m_pAudioTransport->RecordedDataIsAvailable(
+			pDataBuffer, 
+			nSamples,
+			sizeof(int16_t), 
+			1, 
+			samples_per_sec,
+			kClockDriftMs, 0,
+			255, 
+			false, 
+			newMicLevel);
+			*/
+
+		int32_t res = m_pAudioTransport->RecordedDataIsAvailable(
+			audioPacket.GetDataBuffer(),
+			audioPacket.GetNumFrames(),
+			audioPacket.GetBytesPerSample(),
+			audioPacket.GetNumChannels(),
+			audioPacket.GetSamplingRate(),
+			kClockDriftMs, 0,
+			255,
+			false,
+			newMicLevel);
+	}
+	
+
+	///Error:
+	return r;
+}
+
+RESULT AudioDeviceDataCapturer::SetAudioTransport(webrtc::AudioTransport* pAudioTransport) {
+	m_pAudioTransport = pAudioTransport;
+	return R_PASS;
+}
+
 // A wrapper over AudioDeviceModule that registers itself as AudioTransport
 // callback and redirects the PCM data to AudioDeviceDataObserver callback.
 class ADMWrapper : 
@@ -13,10 +85,13 @@ class ADMWrapper :
 public:
 	ADMWrapper(const int32_t id, const AudioLayer audioLayer, AudioDeviceDataCapturer* pAudioDeviceCapturer) : 
 		m_pAudioDeviceModuleImp(AudioDeviceModule::Create(id, audioLayer)), 
-		m_pAudioDeviceCapturer(pAudioDeviceCapturer) {
+		m_pAudioDeviceCapturer(pAudioDeviceCapturer) 
+	{
+		pAudioDeviceCapturer->Initialize();
 
 		// Register self as the audio transport callback for underlying ADM impl.
 		auto res = m_pAudioDeviceModuleImp->RegisterAudioCallback(this);
+
 		m_fValid = (m_pAudioDeviceModuleImp.get() != nullptr) && (res == 0);
 	}
 
@@ -36,7 +111,7 @@ public:
 	}
 
 	void Process() override { 
-		return m_pAudioDeviceModuleImp->Process(); 
+		m_pAudioDeviceModuleImp->Process();
 	}
 
 	// AudioTransport methods overrides.
@@ -53,18 +128,34 @@ public:
 	{
 		int32_t res = 0;
 		
+		DEBUG_LINEOUT("Recorded Data is Avail: %d", (int)(nSamples));
+
 		// Capture PCM data of locally captured audio.
 		//if (observer_) {
 		//	observer_->OnCaptureData(audioSamples, nSamples, nBytesPerSample,
 		//		nChannels, samples_per_sec);
 		//}
 
+		//static int count = 0;
+		//int16_t *pDataBuffer = new int16_t[nSamples];
+		//for (int i = 0; i < nSamples; i++) {
+		//	pDataBuffer[i] = sin((count*4200.0f) / samples_per_sec) * 30000;
+		//	count++;
+		//}
+		//
+		//// Send to the actual audio transport (this part makes soundz)
+		//if (m_pAudioTransport) {
+		//	res = m_pAudioTransport->RecordedDataIsAvailable(
+		//		pDataBuffer, nSamples, sizeof(int16_t), 1, samples_per_sec,
+		//		0, clockDrift, currentMicLevel, keyPressed, newMicLevel);
+		//}
+
 		// Send to the actual audio transport (this part makes soundz)
-		if (m_pAudioTransport) {
-			res = m_pAudioTransport->RecordedDataIsAvailable(
-				audioSamples, nSamples, nBytesPerSample, nChannels, samples_per_sec,
-				total_delay_ms, clockDrift, currentMicLevel, keyPressed, newMicLevel);
-		}
+		//if (m_pAudioTransport) {
+		//	res = m_pAudioTransport->RecordedDataIsAvailable(
+		//		audioSamples, nSamples, nBytesPerSample, nChannels, samples_per_sec,
+		//		total_delay_ms, clockDrift, currentMicLevel, keyPressed, newMicLevel);
+		//}
 
 		return res;
 	}
@@ -79,6 +170,8 @@ public:
 		int64_t* ntp_time_ms) override 
 	{
 		int32_t res = 0;
+
+		DEBUG_LINEOUT("NeedMorePlayData: %d", (int)(nSamples));
 
 		// Request data from audio transport (this part gets sound)
 		if (m_pAudioTransport) {
@@ -103,6 +196,10 @@ public:
 						 size_t number_of_channels,
 						 size_t number_of_frames) override
 	{
+		//int32_t res = 0;
+
+		DEBUG_LINEOUT("PushCaptureData: %d", (int)(number_of_frames));
+
 		// Capture PCM data of locally captured audio.
 		//if (m_pAudioDeviceCapturer) {
 		//	m_pAudioDeviceCapturer->PushCaptureData(voe_channel, 
@@ -112,7 +209,17 @@ public:
 		//											number_of_channels, 
 		//											number_of_frames);
 		//}
+		
 		RTC_NOTREACHED();
+
+		//if (m_pAudioTransport) {
+		//	m_pAudioTransport->PushCaptureData(voe_channel,
+		//											 audio_data,
+		//											 bits_per_sample, 
+		//											 sample_rate, 
+		//											 number_of_channels, 
+		//											 number_of_frames);
+		//}
 	}
 
 	void PullRenderData(int bits_per_sample,
@@ -123,8 +230,9 @@ public:
 		int64_t* elapsed_time_ms,
 		int64_t* ntp_time_ms) override
 	{
+		DEBUG_LINEOUT("PullRenderData: %d", (int)(number_of_frames));
+
 		RTC_NOTREACHED();
-		// TODO: do this?
 
 	}
 
@@ -133,6 +241,7 @@ public:
 	int32_t RegisterAudioCallback(AudioTransport* pAudioCallback) override {
 		// Remember the audio callback to forward PCM data
 		m_pAudioTransport = pAudioCallback;
+		m_pAudioDeviceCapturer->SetAudioTransport(m_pAudioTransport);
 
 		return 0;
 	}
@@ -198,7 +307,9 @@ public:
 		return m_pAudioDeviceModuleImp->PlayoutIsAvailable(available);
 	}
 	
-	int32_t InitPlayout() override { return m_pAudioDeviceModuleImp->InitPlayout(); }
+	int32_t InitPlayout() override { 
+		return m_pAudioDeviceModuleImp->InitPlayout(); 
+	}
 	
 	bool PlayoutIsInitialized() const override {
 		return m_pAudioDeviceModuleImp->PlayoutIsInitialized();

@@ -36,6 +36,7 @@ class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
 class DreamUserHandle;
+class AudioPacket;
 
 #include "DreamBrowserMessage.h"
 

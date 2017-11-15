@@ -238,6 +238,18 @@ Error:
 	return false;
 }
 
+// Audio
+
+RESULT WebRTCImp::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->PushAudioPacket(pendingAudioPacket));
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage) {
 	RESULT r = R_PASS;
 

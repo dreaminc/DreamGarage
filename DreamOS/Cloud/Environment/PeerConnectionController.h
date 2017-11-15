@@ -124,6 +124,9 @@ public:
 	RESULT StopVideoStreaming();
 	bool IsVideoStreamingRunning();
 
+	// Audio
+	RESULT CaptureAudioPacket(const AudioPacket &pendingAudioPacket);
+
 	long GetUserID();
 
 	RESULT SetUser(User currentUser);

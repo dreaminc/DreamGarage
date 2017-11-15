@@ -854,6 +854,18 @@ Error:
 	return false;
 }
 
+// Audio
+RESULT EnvironmentController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CN(m_pPeerConnectionController->CaptureAudioPacket(pendingAudioPacket));
+
+Error:
+	return r;
+}
+
+
 RESULT EnvironmentController::SetUser(User currentUser) {
 	return m_pPeerConnectionController->SetUser(currentUser);
 }

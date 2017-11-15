@@ -30,6 +30,10 @@ public:
 		return m_bitsPerSample;
 	}
 
+	int GetBytesPerSample() const {
+		return (m_bitsPerSample / 8);
+	}
+
 	int GetSamplingRate() const {
 		return m_samplingRate;
 	}

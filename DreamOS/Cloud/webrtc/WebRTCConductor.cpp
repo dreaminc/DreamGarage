@@ -28,6 +28,8 @@
 #define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
 #include "webrtc/modules/audio_device/audio_device_impl.h"
 
+#include "Sound/AudioPacket.h"
+
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
 	m_pWebRTCUserPeerConnectionFactory(nullptr)
@@ -302,6 +304,16 @@ Error:
 }
 */
 
+RESULT WebRTCConductor::PushAudioPacket(const AudioPacket audioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pAudioDeviceModule);
+	CR(AudioDeviceDataCapturer::PushAudioPacket(audioPacket));
+
+Error:
+	return r;
+}
+
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
@@ -329,16 +341,24 @@ RESULT WebRTCConductor::Initialize() {
 	m_workerThread->Start();
 
 	// Custom Audio Device Module
-	//m_pAudioDeviceModule = 
-	//	m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[]()
-	//{
-	//	//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-	//	return webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::kDummyAudio);
-	//});
+	m_pAudioDeviceModule = 
+		m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[&]()
+	{
+		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
+		return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+	});
 
 	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-	m_pAudioDeviceModule = CreateAudioDeviceWithDataCapturer(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+	while (m_pAudioDeviceModule == nullptr) {
+		// wait;
+	}
+
 	CN(m_pAudioDeviceModule);
+
+	m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
+	m_pAudioDeviceModule->SetRecordingSampleRate(44100);
+	m_pAudioDeviceModule->SetStereoRecording(true);
+	m_pAudioDeviceModule->SetStereoPlayout(true);
 	
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);
 

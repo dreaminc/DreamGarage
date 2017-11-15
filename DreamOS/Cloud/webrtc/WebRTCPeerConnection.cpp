@@ -67,7 +67,8 @@ WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParent
 {
 	if (pWebRTCUserPeerConnectionFactory != nullptr) {
 		pWebRTCUserPeerConnectionFactory->AddRef();
-		m_pWebRTCUserPeerConnectionFactory = pWebRTCUserPeerConnectionFactory;
+		//m_pWebRTCUserPeerConnectionFactory = pWebRTCUserPeerConnectionFactory;
+		m_pWebRTCUserPeerConnectionFactory = pWebRTCChromePeerConnectionFactory;
 	}
 
 	if (pWebRTCChromePeerConnectionFactory != nullptr) {
@@ -131,6 +132,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pUserMediaStreamInterface = nullptr;
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pChromeMediaStreamInterface = nullptr;
 
+	/*
 	// User Stream (Voice)
 	CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
 
@@ -150,6 +152,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// Chrome Media Stream
 	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
+	*/
 
 	// TESTING: Different factory here
 	pChromeMediaStreamInterface = m_pWebRTCChromePeerConnectionFactory->CreateLocalMediaStream(kChromeStreamLabel);
@@ -413,7 +416,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 			pUserAudioTrackSource->AddSink(this);
 
-			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
 			//SetAudioVolume(0.0f);
 
 			DEBUG_LINEOUT("Added user audio sink");
@@ -433,7 +435,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 			//pAudioTrackSource->AddSink(this);
 
-			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
 			//SetAudioVolume(0.0f);
 
 			DEBUG_LINEOUT("Added chrome audio sink");

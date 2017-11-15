@@ -857,6 +857,16 @@ Error:
 	return fRetVal;
 }
 
+RESULT PeerConnectionController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+	CR(m_pWebRTCImp->CaptureAudioPacket(pendingAudioPacket));
+
+Error:
+	return r;
+}
+
 long PeerConnectionController::GetUserID() {
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		return m_pPeerConnectionControllerObserver->GetUserID();

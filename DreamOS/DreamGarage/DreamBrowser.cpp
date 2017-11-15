@@ -15,6 +15,7 @@
 #include "Cloud/WebRequest.h"
 
 #include "WebBrowser/DOMNode.h"
+#include "Sound/AudioPacket.h"
 
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
@@ -730,9 +731,10 @@ Error:
 RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CR(r);
-
 	// TODO: Handle this (if streaming we broadcast into webrtc
+	if (m_fStreaming) {
+		CR(GetDOS()->GetCloudController()->CaptureAudioPacket(pendingAudioPacket));
+	}
 
 Error:
 	return r;

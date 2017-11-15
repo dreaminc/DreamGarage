@@ -105,6 +105,7 @@ public:
 	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
 
 	// Audio 
+	RESULT CaptureAudioPacket(const AudioPacket &pendingAudioPacket);
 
 	// TODO: Generalize channels
 
