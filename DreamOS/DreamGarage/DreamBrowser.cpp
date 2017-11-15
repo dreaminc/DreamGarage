@@ -498,7 +498,10 @@ Error:
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	std::string strURL = "http://www.google.com";
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	std::string strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
+
+	std::string strURL = strAPIURL + "/client/loading/";
 
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
