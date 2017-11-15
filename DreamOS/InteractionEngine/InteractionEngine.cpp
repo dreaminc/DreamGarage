@@ -780,6 +780,16 @@ RESULT InteractionEngine::RemoveObject(VirtualObj *pEventObject, ObjectStore *pO
 		}
 	}
 
+	for (auto& capturePair : m_capturedObjects) {
+		for (auto& capturedObj : capturePair.second) {
+			if (capturedObj->GetObject() == pEventObject) {
+				m_capturedObjectsToRelease.emplace_back(std::pair<VirtualObj*, CapturedObj*>(capturePair.first, capturedObj));
+			}
+		}
+	}
+
+	UpdateCapturedObjectStore();
+
 Error:
 	return r;
 }
