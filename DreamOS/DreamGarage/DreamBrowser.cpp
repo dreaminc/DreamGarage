@@ -347,6 +347,10 @@ Error:
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
+	if (!IsVisible()) {
+		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+	}
+
 	SetVisible(true);
 
 	std::string strScope = m_strScope;
@@ -532,6 +536,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
+
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 
 	// Set up mouse / hand cursor model
