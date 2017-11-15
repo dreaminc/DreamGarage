@@ -238,8 +238,8 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 
 			CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
 
-			if (chkey == 0x01) {
-				m_strURL = "";
+			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
+				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
 			}
 
 			else if (chkey == SVK_BACK) {
@@ -258,9 +258,10 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 			char chkey = (char)(pInteractionEvent->m_value);
 			
-			CBR(chkey != SVK_SHIFT, R_SKIPPED);
+			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
 			CBR(chkey != 0, R_SKIPPED);
 			CBR(chkey != SVK_CONTROL, R_SKIPPED);
+			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			CR(m_pBrowserHandle->SendKeyCharacter(chkey, true));
@@ -350,7 +351,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	case (UserObserverEventType::KB_ENTER): {
 		if (m_viewState == State::TYPING) {
 			CN(m_pBrowserHandle);
-			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));
+			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
 			
 			HandleKeyboardDown();
 		}	

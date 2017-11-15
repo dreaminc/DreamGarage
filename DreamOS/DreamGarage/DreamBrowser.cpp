@@ -347,10 +347,6 @@ Error:
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
-	if (!IsVisible()) {
-		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-	}
-
 	SetVisible(true);
 
 	std::string strScope = m_strScope;
