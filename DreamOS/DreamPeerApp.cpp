@@ -401,6 +401,7 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
+	m_pUserModel->SetVisible(true);
 	m_fPendingAssignedUserMode = true;
 
 Error:
