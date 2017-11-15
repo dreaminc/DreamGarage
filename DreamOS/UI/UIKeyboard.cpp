@@ -471,7 +471,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		CR(UpdateKeyState((SenseVirtualKey)(0), 1));
+		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
 	Error:
 		return r;
@@ -662,6 +662,13 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	else if (chkey == 0x01) {
 		m_pTextBoxText->SetText("");
 	}
+	
+	// TODO: better way to refresh textbox using text dirty flag
+	else if (chkey == 0) {
+		auto strCurrentText = m_pTextBoxText->GetText();
+		m_pTextBoxText->SetText("");
+		m_pTextBoxText->SetText(strCurrentText);
+	}
 
 	else if (chkey == SVK_BACK) {
 		auto strTextbox = m_pTextBoxText->GetText();
@@ -681,14 +688,15 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		}
 		CR(UpdateKeyboardLayout(newType));
 
-	}
+	}	
 
 	else {
 		std::string strNew = m_pTextBoxText->GetText();
 		strNew += chkey;
-		m_pTextBoxText->SetText(strNew);
+		m_pTextBoxText->SetText(strNew);	
 
 		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
+			CR(UpdateKeyState((SenseVirtualKey)(chkey), 0));
 			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 		}
 	}

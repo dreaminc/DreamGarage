@@ -49,6 +49,16 @@ Error:
 	return r;
 }
 
+RESULT DreamControlViewHandle::SendURLtoBrowser() {
+	RESULT r = R_PASS;
+
+	CB(GetAppState());
+	CR(SendURL());
+
+Error:
+	return r;
+}
+
 bool DreamControlViewHandle::IsAppVisible() {
 	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
 
@@ -84,7 +94,13 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
 
+	// Texture needs to be upside down, and flipped on y-axis
+	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pLoadingScreenTexture);
+
+	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	m_viewState = State::HIDDEN;		
+	
 
 	m_ptVisiblePosition = point(0.0f, CONTROL_VIEW_HEIGHT, CONTROL_VIEW_DEPTH);
 
@@ -222,13 +238,30 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 
 			CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
 
-			m_strURL += chkey;
+			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
+				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
+			}
+
+			else if (chkey == SVK_BACK) {
+				if (m_strURL.size() > 0) {
+					m_strURL.pop_back();
+				}
+			}
+			
+			else {
+				m_strURL += chkey;
+			}
 		}
 	} break;
 
 	case(State::TYPING): {
 		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 			char chkey = (char)(pInteractionEvent->m_value);
+			
+			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
+			CBR(chkey != 0, R_SKIPPED);
+			CBR(chkey != SVK_CONTROL, R_SKIPPED);
+			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			CR(m_pBrowserHandle->SendKeyCharacter(chkey, true));
@@ -317,8 +350,11 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::KB_ENTER): {
 		if (m_viewState == State::TYPING) {
+			CN(m_pBrowserHandle);
+			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
+			
 			HandleKeyboardDown();
-		}
+		}	
 	} break;
 
 	} 
@@ -327,6 +363,27 @@ Error:
 	return r;
 }
 
+RESULT DreamControlView::SendURL() {
+	RESULT r = R_PASS;
+
+	if (m_pBrowserHandle == nullptr) {
+		std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
+		CB(uids.size() == 1);
+		m_browserUID = uids[0];
+
+		m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+		CN(m_pBrowserHandle);
+	}
+
+	if (m_strURL != "") {
+		m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		CR(m_pBrowserHandle->SendURL(m_strURL));
+		m_strURL = "";
+	}
+	
+Error:
+	return r;
+}
 texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
 
@@ -362,23 +419,17 @@ RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
 	point ptAppBasisPosition;
-	quaternion qAppBasisOrientation;
+	quaternion qAppBasisOrientation;	
 
 	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
 	CB(uids.size() == 1);
 	m_browserUID = uids[0];
 
-	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));	
+	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
 	CN(m_pBrowserHandle);
-
-	if (m_strURL != "") {
-		CR(m_pBrowserHandle->SendURL(m_strURL));
-		m_strURL = "";
-	}
-
 	CR(m_pBrowserHandle->RequestBeginStream());
 
-	SetSharedViewContext();
+	//SetSharedViewContext();
 
 	CN(m_pUserHandle);
 	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
@@ -593,7 +644,7 @@ Error:
 	return r;
 }
 
-///*
+/*
 RESULT DreamControlView::SetSharedViewContext() {
 	RESULT r = R_PASS;
 

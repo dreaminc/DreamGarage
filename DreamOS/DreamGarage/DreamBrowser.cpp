@@ -154,14 +154,6 @@ Error:
 	return -1;
 }
 
-std::shared_ptr<texture> DreamBrowserHandle::GetBrowserTexture() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return BrowserTexture();
-Error:
-	return nullptr;
-}
-
 RESULT DreamBrowserHandle::RequestBeginStream() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -354,6 +346,7 @@ Error:
 
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
+
 	SetVisible(true);
 
 	std::string strScope = m_strScope;
@@ -383,10 +376,6 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 
 Error:
 	return r;
-}
-
-std::shared_ptr<texture> DreamBrowser::BrowserTexture() {
-	return m_pBrowserTexture;
 }
 
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
@@ -419,7 +408,7 @@ Error:
 }
 
 RESULT DreamBrowser::OnLoadStart() {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	return r;
 }
@@ -429,6 +418,23 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
+		
+		{
+			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			CBR(vControlViewUID.size() == 1, R_SKIPPED);
+
+			UID controlViewUID = vControlViewUID[0];
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			CN(pDreamControlViewHandle);
+
+			pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+
+			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+		}
+
+		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+
+	Error:
 		return r;
 	};
 
@@ -488,7 +494,9 @@ Error:
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	std::string strURL = "http://www.google.com";
+	CommandLineManager *pCommandLineManager = nullptr;
+	std::string strAPIURL;
+	std::string strURL;	
 
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
@@ -503,6 +511,12 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+
+	// Get loading screen URL
+	pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
+	strURL = strAPIURL + "/client/loading/";
 
 	// Initialize new browser
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
@@ -524,8 +538,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pLoadingScreenTexture);
+
+	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 
 	// Set up mouse / hand cursor model
 	///*
