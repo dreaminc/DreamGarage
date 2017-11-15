@@ -138,6 +138,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CNM(pUserMediaStreamInterface, "Failed to create user media stream");
 
 	CR(AddAudioStream(pUserMediaStreamInterface, kUserAudioLabel));
+	//CR(AddVideoStream(pUserMediaStreamInterface));
 
 	// Add user stream to peer connection interface
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pUserMediaStreamInterface)) {
@@ -411,7 +412,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 			pAudioTrackSource->AddSink(this);
 
 			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
-			SetAudioVolume(0.0f);
+			//SetAudioVolume(0.0f);
 
 			DEBUG_LINEOUT("Added audio Sink");
 		}

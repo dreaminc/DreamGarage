@@ -591,7 +591,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
 
-			long environmentID = 168;
+			long environmentID = 170;
 
 			//CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
 			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(environmentID)));

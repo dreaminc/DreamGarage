@@ -139,6 +139,11 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCChromePeerConnectionFactory;
 
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
+
+	// Worker and Network Threads
+	// TODO: Might need to close these down on exit
+	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
+	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

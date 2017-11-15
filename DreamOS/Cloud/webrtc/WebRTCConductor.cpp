@@ -31,6 +31,11 @@ WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 }
 
 WebRTCConductor::~WebRTCConductor() {
+	if (m_networkThread)
+		m_networkThread = nullptr;
+
+	if (m_workerThread)
+		m_workerThread = nullptr;
 }
 
 RESULT WebRTCConductor::ClearPeerConnections() {
@@ -281,13 +286,34 @@ RESULT WebRTCConductor::Initialize() {
 	
 	CNM(m_pWebRTCUserPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
+	///*
 	// Chrome Peer Connection Factory (testing)
 	CBM((m_pWebRTCChromePeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
-	m_pWebRTCChromePeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	//m_pWebRTCChromePeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+
+	// Potentially share with above 
+	m_networkThread = rtc::Thread::CreateWithSocketServer();
+	CNM(m_networkThread, "failed to start network thread");
+	m_networkThread->Start();
+
+	m_workerThread = rtc::Thread::Create();
+	CN(m_workerThread);
+	m_workerThread->Start();
+
+	m_pWebRTCChromePeerConnectionFactory =
+		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+											m_workerThread.get(),	// worker thread
+											rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+											nullptr,	// TODO: Default ADM
+											nullptr,	// Video Encoder Factory
+											nullptr		// Audio Encoder Factory
+		);
+
 	m_pWebRTCChromePeerConnectionFactory->AddRef();
 
 	CNM(m_pWebRTCChromePeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+	//*/
 
 //Success:
 	return r;
