@@ -287,7 +287,11 @@ RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStre
 	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-		m_pWebRTCUserPeerConnectionFactory->CreateAudioTrack(strAudioTrackLabel, m_pWebRTCUserPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
+		m_pWebRTCUserPeerConnectionFactory->CreateAudioTrack(
+			strAudioTrackLabel, 
+			m_pWebRTCUserPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints))
+		);
+
 	pAudioTrack->AddRef();
 	
 	pMediaStreamInterface->AddTrack(pAudioTrack);
