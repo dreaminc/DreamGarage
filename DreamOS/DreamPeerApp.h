@@ -121,6 +121,8 @@ public:
 	RESULT ReleaseUserModel();
 
 	RESULT SetVisible(bool fVisibile = true);
+	bool IsVisible();
+	bool IsUserNameVisible();
 	RESULT SetPosition(const point& ptPosition);
 	RESULT SetOrientation(const quaternion& qOrientation);
 	RESULT UpdateHand(const hand::HandState& pHandState);
@@ -142,8 +144,9 @@ private:
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
 	std::shared_ptr<user> m_pUserModel = nullptr;
-	bool m_fPendingAssignedUserMode = false;
+	bool m_fPendingAssignedUserModel = false;
 	bool m_fGazeInteraction = false;
+	bool m_fVisible = false;
 
 	sphere *m_pSphere = nullptr;
 
