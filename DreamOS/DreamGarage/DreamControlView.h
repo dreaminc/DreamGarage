@@ -116,11 +116,10 @@ public:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 private:
-	std::shared_ptr<quad> m_pViewQuad;
-	vector m_vNormal;
-	std::shared_ptr<texture> m_pViewTexture;
-	std::shared_ptr<texture> m_pLoadingScreenTexture;
-	std::shared_ptr<UIView> m_pView;
+	std::shared_ptr<quad> m_pViewQuad = nullptr;
+	std::shared_ptr<texture> m_pViewTexture = nullptr;
+	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
+	std::shared_ptr<UIView> m_pView = nullptr;
 
 	std::string m_strURL = "";
 

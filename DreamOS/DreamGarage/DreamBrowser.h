@@ -231,7 +231,7 @@ private:
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
-	std::shared_ptr<texture> m_pLoadingScreenTexture;
+	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 	bool m_fBrowserActive = false;

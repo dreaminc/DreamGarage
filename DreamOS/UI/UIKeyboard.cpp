@@ -663,11 +663,11 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		m_pTextBoxText->SetText("");
 	}
 	
-	// TODO: better way to refresh textbox
+	// TODO: better way to refresh textbox using text dirty flag
 	else if (chkey == 0) {
-		auto temp = m_pTextBoxText->GetText();
+		auto strCurrentText = m_pTextBoxText->GetText();
 		m_pTextBoxText->SetText("");
-		m_pTextBoxText->SetText(temp);
+		m_pTextBoxText->SetText(strCurrentText);
 	}
 
 	else if (chkey == SVK_BACK) {
@@ -693,9 +693,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	else {
 		std::string strNew = m_pTextBoxText->GetText();
 		strNew += chkey;
-		m_pTextBoxText->SetText(strNew);
+		m_pTextBoxText->SetText(strNew);	
 
 		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
+			CR(UpdateKeyState((SenseVirtualKey)(chkey), 0));
 			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 		}
 	}

@@ -494,10 +494,9 @@ Error:
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	std::string strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
-
-	std::string strURL = strAPIURL + "/client/loading/";
+	CommandLineManager *pCommandLineManager = nullptr;
+	std::string strAPIURL;
+	std::string strURL;	
 
 	int pxWidth = m_browserWidth;
 	int pxHeight = m_browserHeight;
@@ -512,6 +511,12 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+
+	// Get loading screen URL
+	pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
+	strURL = strAPIURL + "/client/loading/";
 
 	// Initialize new browser
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
