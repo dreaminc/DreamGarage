@@ -67,8 +67,6 @@ public:
 	int GetWidthOfBrowser();
 	float GetAspectRatioFromBrowser();
 
-	RESULT SetBrowserTexture(std::shared_ptr<texture> pTexture);
-
 	RESULT RequestBeginStream();
 
 private:
@@ -96,8 +94,6 @@ private:
 	virtual int GetBrowserHeight() = 0;
 	virtual int GetBrowserWidth() = 0;
 	virtual float GetAspectRatio() = 0;
-
-	virtual RESULT BrowserTexture(std::shared_ptr<texture> pTexture) = 0;
 
 	virtual RESULT BeginStream() = 0;
 };
@@ -147,7 +143,6 @@ public:
 	virtual RESULT SendURL(std::string strURL);
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
-	virtual RESULT BrowserTexture(std::shared_ptr<texture> pTexture) override;
 
 	virtual RESULT BeginStream() override;
 

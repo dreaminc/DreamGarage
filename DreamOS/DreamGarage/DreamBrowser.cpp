@@ -154,14 +154,6 @@ Error:
 	return -1;
 }
 
-RESULT DreamBrowserHandle::SetBrowserTexture(std::shared_ptr<texture> pTexture) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(BrowserTexture(pTexture));
-Error:
-	return r;
-}
-
 RESULT DreamBrowserHandle::RequestBeginStream() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -355,7 +347,6 @@ Error:
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
-	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	SetVisible(true);
 
 	std::string strScope = m_strScope;
@@ -382,15 +373,6 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 	
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));		// mouse down
 	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, true, 1));		// mouse up
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::BrowserTexture(std::shared_ptr<texture> pTexture) {
-	RESULT r = R_PASS;
-
-	CR(m_pBrowserQuad->SetDiffuseTexture(pTexture.get()));
 
 Error:
 	return r;

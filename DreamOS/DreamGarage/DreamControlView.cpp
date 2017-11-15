@@ -351,9 +351,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		if (m_viewState == State::TYPING) {
 			CN(m_pBrowserHandle);
 			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));
-			CR(m_pBrowserHandle->SetBrowserTexture(m_pLoadingScreenTexture));
-
-			m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+			
 			HandleKeyboardDown();
 		}	
 	} break;
