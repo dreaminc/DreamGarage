@@ -154,12 +154,12 @@ Error:
 	return -1;
 }
 
-std::shared_ptr<texture> DreamBrowserHandle::GetBrowserTexture() {
+RESULT DreamBrowserHandle::SetBrowserTexture(std::shared_ptr<texture> pTexture) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	return BrowserTexture();
+	CR(BrowserTexture(pTexture));
 Error:
-	return nullptr;
+	return r;
 }
 
 RESULT DreamBrowserHandle::RequestBeginStream() {
@@ -354,6 +354,8 @@ Error:
 
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
+
+	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	SetVisible(true);
 
 	std::string strScope = m_strScope;
@@ -385,8 +387,13 @@ Error:
 	return r;
 }
 
-std::shared_ptr<texture> DreamBrowser::BrowserTexture() {
-	return m_pBrowserTexture;
+RESULT DreamBrowser::BrowserTexture(std::shared_ptr<texture> pTexture) {
+	RESULT r = R_PASS;
+
+	CR(m_pBrowserQuad->SetDiffuseTexture(pTexture.get()));
+
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
@@ -419,7 +426,7 @@ Error:
 }
 
 RESULT DreamBrowser::OnLoadStart() {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	return r;
 }
@@ -429,6 +436,23 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
+		
+		{
+			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			CBR(vControlViewUID.size() == 1, R_SKIPPED);
+
+			UID controlViewUID = vControlViewUID[0];
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			CN(pDreamControlViewHandle);
+
+			pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+
+			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+		}
+
+		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+
+	Error:
 		return r;
 	};
 
@@ -524,8 +548,9 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pLoadingScreenTexture);
+	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 
 	// Set up mouse / hand cursor model
 	///*

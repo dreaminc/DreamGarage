@@ -48,14 +48,15 @@ RESULT SenseKeyboard::SetKeyState(SenseVirtualKey KeyCode, uint8_t KeyState) {
 
 	if (KeyState != m_KeyStates[KeyCode]) {
 		m_KeyStates[KeyCode] = KeyState;
-
-		// Notify Observers
-		SenseKeyboardEvent kbEvent(KeyCode, KeyState, this);
-		Publisher<SenseVirtualKey, SenseKeyboardEvent>::NotifySubscribers(KeyCode, &kbEvent);
-
-		SenseKeyboardEvent kbEventAll(KeyCode, KeyState, this);
-		Publisher<SenseVirtualKey, SenseKeyboardEvent>::NotifySubscribers(SVK_ALL, &kbEventAll);
 	}
+	// Moved out in order to allow capital letters through
+	// Notify Observers
+	SenseKeyboardEvent kbEvent(KeyCode, KeyState, this);
+	Publisher<SenseVirtualKey, SenseKeyboardEvent>::NotifySubscribers(KeyCode, &kbEvent);
+
+	SenseKeyboardEvent kbEventAll(KeyCode, KeyState, this);
+	Publisher<SenseVirtualKey, SenseKeyboardEvent>::NotifySubscribers(SVK_ALL, &kbEventAll);
+	
 
 //Error:
 	return r;

@@ -277,7 +277,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 					bool fStreaming = false;
 					CR(m_pUserHandle->RequestStreamingState(fStreaming));
 					if (fStreaming) {
-						CR(ShowControlView());
+						CR(ShowControlView(false));
 					}
 				}
 				//break;
@@ -306,7 +306,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			CR(ShowControlView());
+			CR(ShowControlView(true));
 			/*
 			{
 				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
@@ -329,7 +329,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowControlView() {
+RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 	RESULT r = R_PASS;
 
 	auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
@@ -340,6 +340,9 @@ RESULT DreamUIBar::ShowControlView() {
 	if (!pControlHandle->IsAppVisible()) {
 		CR(pControlHandle->ShowApp());
 		CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+		if (fSendURL) {
+			(pControlHandle->SendURLtoBrowser());
+		}	
 		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 	}
 

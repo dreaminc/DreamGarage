@@ -67,7 +67,7 @@ public:
 	int GetWidthOfBrowser();
 	float GetAspectRatioFromBrowser();
 
-	std::shared_ptr<texture> GetBrowserTexture();
+	RESULT SetBrowserTexture(std::shared_ptr<texture> pTexture);
 
 	RESULT RequestBeginStream();
 
@@ -97,7 +97,7 @@ private:
 	virtual int GetBrowserWidth() = 0;
 	virtual float GetAspectRatio() = 0;
 
-	virtual std::shared_ptr<texture> BrowserTexture() = 0;
+	virtual RESULT BrowserTexture(std::shared_ptr<texture> pTexture) = 0;
 
 	virtual RESULT BeginStream() = 0;
 };
@@ -147,7 +147,7 @@ public:
 	virtual RESULT SendURL(std::string strURL);
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff) override;
-	virtual std::shared_ptr<texture> BrowserTexture() override;
+	virtual RESULT BrowserTexture(std::shared_ptr<texture> pTexture) override;
 
 	virtual RESULT BeginStream() override;
 
@@ -235,6 +235,8 @@ private:
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
+
+	std::shared_ptr<texture> m_pLoadingScreenTexture;
 
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 	bool m_fBrowserActive = false;

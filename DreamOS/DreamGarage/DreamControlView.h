@@ -39,6 +39,7 @@ public:
 	RESULT ShowApp();
 	RESULT HideApp();
 	RESULT DismissApp();
+	RESULT SendURLtoBrowser();
 	bool IsAppVisible();
 
 public:
@@ -53,6 +54,7 @@ private:
 	virtual RESULT Show() = 0;
 	virtual RESULT Hide() = 0;
 	virtual RESULT Dismiss() = 0;
+	virtual RESULT SendURL() = 0;
 	virtual bool IsVisible() = 0;
 };
 
@@ -92,6 +94,7 @@ public:
 
 	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
 	virtual RESULT HandleKeyboardDown();
+	virtual RESULT SendURL() override;
 
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -107,8 +110,6 @@ private:
 
 // View Context
 public:
-	//When update is called the screen texture is updated to the texture of this object
-	RESULT SetSharedViewContext();
 	std::shared_ptr<quad> GetViewQuad();
 	RESULT SetViewState(State state);
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
@@ -118,6 +119,7 @@ private:
 	std::shared_ptr<quad> m_pViewQuad;
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
+	std::shared_ptr<texture> m_pLoadingScreenTexture;
 	std::shared_ptr<UIView> m_pView;
 
 	std::string m_strURL = "";
