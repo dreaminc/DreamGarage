@@ -649,9 +649,10 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	//*/
 
 	// Assign Model From Pool and position peer
+	pDreamPeer->SetVisible(false);
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
 	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
-	pDreamPeer->SetVisible();
+	pDreamPeer->SetVisible(true);
 
 	// Turn on sound
 	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);

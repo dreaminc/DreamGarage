@@ -82,10 +82,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	// If pending user mode - add to composite here
-	if (m_fPendingAssignedUserMode) {
+	if (m_fPendingAssignedUserModel) {
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
-		m_fPendingAssignedUserMode = false;
+		m_fPendingAssignedUserModel = false;
 	}
 
 	//if (m_pSphere == nullptr) {
@@ -138,6 +138,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pTextBoxTexture = GetComposite()->MakeTexture(L"user-nametag-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+		m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
 	}
 
 	if (m_pTextUserName == nullptr && m_strScreenName != "") {
@@ -155,6 +156,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
 		CR(m_pNameComposite->AddObject(m_pTextUserName));
 		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+		m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 	}
 	
 	if (m_pUserModel != nullptr) {
@@ -191,7 +193,8 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			if (m_pUserModel->IsVisible()) {
+			// can't rely on m_pUserModel existing as the peer enters and leaves
+			if (IsVisible() && !IsUserNameVisible()) {
 				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 				m_fGazeInteraction = true;
@@ -199,12 +202,18 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			// stub
+			if (IsVisible() && !IsUserNameVisible() && !m_fGazeInteraction) {
+				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+				m_fGazeInteraction = true;
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
 			m_fGazeInteraction = false;
-			HideUserNameField();
+			if (IsUserNameVisible()) {
+				HideUserNameField();
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -241,7 +250,7 @@ RESULT DreamPeerApp::HideUserNameField() {
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		
+		m_pNameComposite->SetVisible(false);
 		return R_PASS;
 	};
 	/*
@@ -285,9 +294,9 @@ Error:
 
 RESULT DreamPeerApp::ShowUserNameField() {
 	RESULT r = R_PASS;
-	
-	auto fnStartCallback = [&](void *pContext) {
 
+	auto fnStartCallback = [&](void *pContext) {
+		m_pNameComposite->SetVisible(true);
 		return R_PASS;
 	};
 
@@ -402,8 +411,8 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
-	m_pUserModel->SetVisible(true);
-	m_fPendingAssignedUserMode = true;
+	m_pUserModel->SetVisible(m_fVisible);
+	m_fPendingAssignedUserModel = true;
 
 Error:
 	return r;
@@ -424,12 +433,14 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 	std::shared_ptr<hand> pHand = nullptr;
 
+	m_fVisible = fVisible;
+
 	CN(m_pUserModel);
-	CR(m_pUserModel->SetVisible(fVisible, false));
-	if (m_pNameBackground != nullptr)
-		CR(m_pNameBackground->SetVisible(fVisible));
-	if (m_pTextUserName != nullptr)
-		CR(m_pTextUserName->SetVisible(fVisible));
+	CR(m_pUserModel->SetVisible(fVisible));
+	
+	if (m_pNameComposite != nullptr) {
+		m_pNameComposite->SetVisible(fVisible, false);
+	}
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
 	CN(pHand);
@@ -441,6 +452,14 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 Error:
 	return r;
+}
+
+bool DreamPeerApp::IsVisible() {
+	return m_fVisible;
+}
+
+bool DreamPeerApp::IsUserNameVisible() {
+	return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
 }
 
 RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
