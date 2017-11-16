@@ -459,7 +459,12 @@ bool DreamPeerApp::IsVisible() {
 }
 
 bool DreamPeerApp::IsUserNameVisible() {
-	return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
+	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
+		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
+	}
+	else {
+		return false;
+	}
 }
 
 RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
