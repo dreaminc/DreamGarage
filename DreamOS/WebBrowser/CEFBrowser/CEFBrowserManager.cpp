@@ -191,7 +191,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	
 
 #ifdef _DEBUG
-	cefSettings.single_process = true;
+//	cefSettings.single_process = true;
 #endif
 
 	cefSettings.multi_threaded_message_loop = true;
