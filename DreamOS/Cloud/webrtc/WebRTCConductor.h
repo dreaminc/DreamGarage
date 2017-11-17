@@ -59,7 +59,7 @@ public:
 	~WebRTCConductor();
 	
 	RESULT Initialize();
-	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel);
+	RESULT InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer, bool fAddDataChannel);
 
 	RESULT Shutdown();
 

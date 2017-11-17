@@ -1,5 +1,6 @@
-#include "Logger/Logger.h"
 #include "WebRTCImp.h"
+
+#include "DreamLogger/DreamLogger.h"
 
 #include "webrtc/base/ssladapter.h"
 #include "webrtc/base/win32socketinit.h"
@@ -253,10 +254,10 @@ Error:
 // Functionality
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer) {
+RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer) {
 	RESULT r = R_PASS;
 
-	CRM(m_pWebRTCConductor->InitializeNewPeerConnection(peerConnectionID, fCreateOffer, true), "Failed to initialize WebRTC Peer Connection");
+	CRM(m_pWebRTCConductor->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, fCreateOffer, true), "Failed to initialize WebRTC Peer Connection");
 
 Error:
 	return r;

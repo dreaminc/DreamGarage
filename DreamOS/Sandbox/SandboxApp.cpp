@@ -576,10 +576,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
-	CommandLineManager::instance()->ForEach([](const std::string& arg) {
-		HUD_OUT(("arg :" + arg).c_str());
-	});
-
 	// Auto Login Handling
 	// This is done in DreamOS now
 	//if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {

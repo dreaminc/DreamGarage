@@ -1,8 +1,7 @@
 #include "EnvironmentController.h"
 #include "Cloud/CloudController.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/User/User.h"
 
@@ -163,8 +162,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 
 	m_fConnected = true;
 
-	LOG(INFO) << "(Cloud) user connected to socket:user=" << user;
-	OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(environmentID));
+	DOSLOG(INFO, "[EnvironmentController] user connected to socket:user=%v", user);
 
 Error:
 	return r;
@@ -275,7 +273,7 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 
 	CR(SendEnvironmentSocketData(strData, state::SET_SDP_OFFER));
 
-	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
+	DOSLOG(INFO, "[EnvironmentController] offer was sent to cloud, msg=%v", strData);
 
 Error:
 	return r;
@@ -542,7 +540,7 @@ RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection)
 	CBM((pPeerConnection->GetOfferUserID() == s_user.GetUserID()), "User ID mismatch offer user ID of peer connection");
 	CR(SetSDPOffer(s_user, pPeerConnection));
 
-	LOG(INFO) << "OnSDPOfferSuccess";
+	DOSLOG(INFO, "OnSDPOfferSuccess");
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -557,7 +555,7 @@ RESULT EnvironmentController::OnSDPAnswerSuccess(PeerConnection *pPeerConnection
 	CBM((pPeerConnection->GetAnswerUserID() == s_user.GetUserID()), "User ID mismatch answer user ID of peer connection");
 	CR(SetSDPAnswer(s_user, pPeerConnection));
 
-	LOG(INFO) << "OnSDPAnswerSuccess";
+	DOSLOG(INFO, "OnSDPAnswerSuccess");
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -604,8 +602,6 @@ Error:
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
-	LOG(INFO) << "(Cloud) websocket msg" << strMessage;
-
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 
 	std::shared_ptr<CloudMessage> pCloudMessage = CloudMessage::Create(GetCloudController(), strMessage);
@@ -613,8 +609,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
 		// message error
 
-		LOG(ERROR) << "(cloud) websocket msg error (could be a user already logged in)";
-		HUD_OUT("websocket msg error (could be a user already logged in)");
+		DOSLOG(ERR, "[EnvironmentController] websocket msg error (could be a user already logged in)");
 
 		return;
 	}
@@ -633,21 +628,21 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
-			LOG(INFO) << "(cloud) HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod ,jsonPayload);
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
-			LOG(INFO) << "(cloud) HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage RESPONSE %v, %v", strMethod ,jsonPayload);
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
 		else {
-			LOG(ERROR) << "(cloud) websocket msg type unknown";
+			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
 		}
 	}
 	else {
-		LOG(ERROR) << "(cloud) websocket msg method unknown";
+		DOSLOG(ERR, "[EnvironmentController] websocket msg method unknown");
 	}
 
 	if (pCloudMessage->GetController() == "menu") {
@@ -761,7 +756,6 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionOpen");
-	HUD_OUT("HandleWebsocketConnectionOpen");
 
 	m_state = state::SOCKET_CONNECTED;
 
@@ -773,12 +767,10 @@ void EnvironmentController::HandleWebsocketConnectionOpen() {
 
 void EnvironmentController::HandleWebsocketConnectionClose() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionClose");
-	HUD_OUT("HandleWebsocketConnectionClose");
 }
 
 void EnvironmentController::HandleWebsocketConnectionFailed() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionFailed");
-	HUD_OUT("HandleWebsocketConnectionFailed");
 }
 
 RESULT EnvironmentController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {

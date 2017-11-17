@@ -1,5 +1,5 @@
 #include "UserController.h"
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -74,6 +74,7 @@ RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 
 	CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadTwilioNTSInformation failed to post request");
 	DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+	
 	{
 		std::string strHttpResponse(httpResponse.PullResponse());
 		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
@@ -93,7 +94,7 @@ RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 		m_fLoggedIn = true;
 
-		LOG(INFO) << "(Cloud) user logged in with OTK";
+		DOSLOG(INFO, "[UserController] User logged in with OTK");
 	}
 
 Error:
@@ -127,7 +128,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 	m_fLoggedIn = true;
 
-	LOG(INFO) << "(Cloud) user logged in:user=" << strUsername;
+	DOSLOG(INFO, "[UserController] User %v logged in", strUsername);
 
 Error:
 	return r;
@@ -266,10 +267,11 @@ RESULT UserController::LoadProfile() {
 		DEBUG_LINEOUT("User Profile Loaded");
 		m_user.PrintUser();
 
-		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
-
-		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
+		//HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
+		//OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
 		//OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
+
+		DOSLOG(INFO, "User %v is connected", m_user.GetUserID());
 	}
 
 Error:

@@ -160,7 +160,18 @@ public:
 	bool IsOfferer() { return (m_fOffer == true); }
 	bool IsAnswerer() { return (m_fOffer == false); }
 
+	long GetUserID() { return m_userID; }
+	RESULT SetUserID(long userID) { m_userID = userID; return R_PASS; }
+
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> GetWebRTCPeerConnectionInterface() { return m_pWebRTCPeerConnectionInterface; }
+
+	// Convenience Function
+	std::string GetLogSignature() {
+		return (std::string("[WebRTCPeerConnection] PID:") + std::to_string(GetPeerConnectionID()) + 
+			" UserID:" + std::to_string(GetUserID()) +
+			" PeerID:" + std::to_string(GetPeerUserID() )
+		);
+	}
 
 public:
 	std::string GetPeerConnectionString();
@@ -187,6 +198,7 @@ private:
 
 	long m_peerConnectionID;
 	int m_WebRTCPeerID;
+	long m_userID;
 
 	bool m_fOffer;	// TODO: this needs to be generalized
 	bool m_fSDPSet;	// TODO: temp

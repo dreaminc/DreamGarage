@@ -92,7 +92,7 @@ public:
 
 	// Functionality
 	// TODO: Hand around PeerConnection object instead of peerConnectionID?
-	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer);
+	RESULT InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer);
 
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

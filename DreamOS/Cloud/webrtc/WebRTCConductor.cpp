@@ -1,6 +1,6 @@
-#include "Logger/Logger.h"
-
 #include "WebRTCConductor.h"
+
+#include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCImp.h"
 
@@ -286,11 +286,14 @@ Error:
 	return r;
 }
 
-RESULT WebRTCConductor::InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel) {
+RESULT WebRTCConductor::InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = AddNewPeerConnection(peerConnectionID);
 	CNM(pWebRTCPeerConnection, "Failed to add new peer connection %d", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->SetPeerUserID(peerUserID));
+	CR(pWebRTCPeerConnection->SetUserID(userID));
 
 	CRM(pWebRTCPeerConnection->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
 
@@ -333,7 +336,7 @@ RESULT WebRTCConductor::Shutdown() {
 }
 
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
-	LOG(INFO) << "OnSDPOfferSuccess";
+	DOSLOG(INFO, "[WebRTCConductor] OnSDPOfferSuccess");
 
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnSDPOfferSuccess(peerConnectionID);
@@ -344,7 +347,7 @@ RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Con
 
 
 RESULT WebRTCConductor::OnSDPAnswerSuccess(long peerConnectionID) {	// TODO: Consolidate with below
-	LOG(INFO) << "OnSDPAnswerSuccess"; 
+	DOSLOG(INFO, "[WebRTCConductor] OnSDPAnswerSuccess"); 
 	
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnSDPAnswerSuccess(peerConnectionID);
@@ -358,7 +361,7 @@ RESULT WebRTCConductor::OnSDPSuccess(long peerConnectionID, bool fOffer) {
 
 	DEBUG_LINEOUT("SDP Success on peer connection ID %d %s", peerConnectionID, fOffer ? "offerer" : "answerer");
 
-	LOG(INFO) << "SDP Success on peer connection ID " << peerConnectionID << " " << (fOffer ? "offerer" : "answerer");
+	DOSLOG(INFO, "[WebRTCConductor] SDP Success on peer connection %v : %v", peerConnectionID, (fOffer ? "offerer" : "answerer"));
 
 //Error:
 	return r;

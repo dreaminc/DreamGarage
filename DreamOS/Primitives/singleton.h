@@ -13,17 +13,37 @@
 
 template <class typeName>
 class singleton {
-protected:
+public:
 	static typeName *s_pInstance;
 
 public:
 	// Note: constructor must be public for this to work
 	static typeName *instance() {
-		if (!s_pInstance)
-			s_pInstance = new typeName();
+		RESULT r = R_PASS;
 
+		if (!s_pInstance) {
+			s_pInstance = new typeName();
+			CN(s_pInstance);
+
+			// This allows the singleton to run an initialization function that
+			// can fail (unlike the constructor)
+			CR(s_pInstance->InitializeSingleton());
+		}
+
+	// Success:
 		return s_pInstance;
+
+	Error:
+		if (s_pInstance != nullptr) {
+			delete s_pInstance;
+			s_pInstance = nullptr;
+		}
+
+		return nullptr;
 	}
+
+protected:
+	virtual RESULT InitializeSingleton() { return R_NOT_IMPLEMENTED; }
 };
 
 #endif	// ! SINGLETON_H_

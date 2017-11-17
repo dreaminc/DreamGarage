@@ -11,6 +11,14 @@
 
 // We use window subsystem in PRODUCTION build to allow Dream to run without a console window
 
+#define ELPP_THREAD_SAFE 1
+//#define ELPP_FORCE_USE_STD_THREAD 1
+#define ELPP_NO_DEFAULT_LOG_FILE
+
+#include "easylogging++.h"
+
+//INITIALIZE_EASYLOGGINGPP
+
 #ifdef _WINDOWS
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,

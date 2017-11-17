@@ -1,7 +1,6 @@
 #include "DreamGarage.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include <string>
 #include <array>
@@ -54,7 +53,6 @@ Error:
 	return r;
 }
 */
-
 
 RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
@@ -636,8 +634,8 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
 	remoteSeatingPosition -= 1;
 
-	LOG(INFO) << "HandlePeersUpdate " << localSeatingPosition;
-	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
+	DOSLOG(INFO, "OnNewDreamPeer local seat position %v", localSeatingPosition);
+	//OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
 	if (!m_fSeated) {
 		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
@@ -667,7 +665,7 @@ Error:
 
 RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	RESULT r = R_PASS;
-	//LOG(INFO) << "data received";
+	//DOSLOG(INFO, "[DreamGarage] Data received");
 
 	/*
 	if (pDataMessage) {
