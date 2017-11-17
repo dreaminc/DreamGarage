@@ -191,7 +191,9 @@ RESULT DreamOS::CheckDreamPeerAppStates() {
 		CN(pDreamPeerApp);
 
 		// Detect handshake request hung
-		if (pDreamPeerApp->GetState() == DreamPeerApp::state::PENDING) {
+		if (pDreamPeerApp->IsDataChannel() && 
+			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED) 
+		{
 		//if (pDreamPeerApp->IsHandshakeRequestHung()) {
 			long userID = GetUserID();
 			long peerUserID = pDreamPeerApp->GetPeerUserID();

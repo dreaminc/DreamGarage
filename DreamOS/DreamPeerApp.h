@@ -105,6 +105,7 @@ public:
 
 	RESULT UpdatePeerHandshakeState();
 	bool IsPeerReady();
+	bool IsDataChannel();
 
 	DreamPeerApp::state GetState();
 

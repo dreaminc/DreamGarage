@@ -565,6 +565,10 @@ Error:
 	return r;
 }
 
+bool DreamPeerApp::IsDataChannel() {
+	return m_peerConnectionState.fDataChannel;
+}
+
 RESULT DreamPeerApp::OnAudioChannel() {
 	RESULT r = R_PASS;
 
