@@ -173,6 +173,10 @@ composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	return nullptr;
 }
 
+HMDDeviceType OVRHMD::GetDeviceType() {
+	return HMDDeviceType::OCULUS;
+}
+
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
 	

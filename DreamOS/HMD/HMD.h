@@ -40,6 +40,12 @@ typedef enum HMDEventType {
 	HMD_EVENT_INVALID
 } HMD_EVENT_TYPE;
 
+enum class HMDDeviceType {
+	OCULUS,
+	VIVE,
+	NONE	
+};
+
 enum EYE_TYPE;
 
 typedef struct HMDEvent {
@@ -131,6 +137,7 @@ public:
 
 	SenseController* GetSenseController();
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) = 0;
+	virtual HMDDeviceType GetDeviceType() = 0;
 
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }

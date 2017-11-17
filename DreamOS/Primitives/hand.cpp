@@ -90,13 +90,36 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	CN(m_pController);
 	m_pController->SetVisible(false);
 
-	float scale = 0.035f;
-	float overlayAspect = (332.0f / 671.0f);
-	float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-	m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
-	m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
-	m_pOverlayQuad->SetPosition(point(-scale * 0.575f * t, 0.0f, -scale * 0.575f));
-	m_pOverlayQuad->SetVisible(false);
+	//TODO: several unique positioning variables per device here that aren't used anywhere else
+	switch (pHMD->GetDeviceType()) {
+	case (HMDDeviceType::OCULUS): {
+
+		float scale = OVR_OVERLAY_SCALE;
+		float overlayAspect = OVR_OVERLAY_ASPECT_RATIO;
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(scale * t * OVR_OVERLAY_POSITION_X, 
+										scale * OVR_OVERLAY_POSITION_Y, 
+										scale * OVR_OVERLAY_POSITION_Z));
+		m_pOverlayQuad->SetVisible(false);
+
+	} break;
+	case (HMDDeviceType::VIVE): {
+
+		float scale = VIVE_OVERLAY_SCALE;
+		float overlayAspect = VIVE_ASPECT_RATIO;
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X, 
+										scale * VIVE_OVERLAY_POSITION_Y, 
+										scale * VIVE_OVERLAY_POSITION_Z));
+		m_pOverlayQuad->SetVisible(false);
+
+	} break;
+	}
+
 
 Error:
 	return r;

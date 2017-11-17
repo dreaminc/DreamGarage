@@ -60,6 +60,7 @@ public:
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual HMDDeviceType GetDeviceType() override;
 
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }

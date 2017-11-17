@@ -166,12 +166,27 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	m_pAppBasis = pDreamOS->MakeComposite();
 
-	m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"left-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"right-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"right-controller-overlay-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	CN(m_pTextureDefaultGazeLeft);
-	CN(m_pTextureDefaultGazeRight);
+	auto pHMD = GetDOS()->GetHMD();
+	if (pHMD != nullptr) {
+		auto deviceType = pHMD->GetDeviceType();
+		switch (deviceType) {
+		case HMDDeviceType::OCULUS: {
+			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"right-controller-overlay-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"left-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"right-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		case HMDDeviceType::VIVE: {
+			//m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		}
+		CN(m_pTextureDefaultGazeLeft);
+		CN(m_pTextureDefaultGazeRight);
+
+	}
 
 	{
 		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
