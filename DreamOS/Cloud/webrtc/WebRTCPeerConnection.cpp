@@ -132,14 +132,14 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pUserMediaStreamInterface = nullptr;
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pChromeMediaStreamInterface = nullptr;
 
-	/*
+	///*
 	// User Stream (Voice)
 	CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
 
 	pUserMediaStreamInterface = m_pWebRTCUserPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
 	CNM(pUserMediaStreamInterface, "Failed to create user media stream");
 
-	//CR(AddAudioStream(pUserMediaStreamInterface, kUserAudioLabel));
+	CR(AddAudioStream(m_pWebRTCUserPeerConnectionFactory, pUserMediaStreamInterface, kUserAudioLabel));
 	//CR(AddVideoStream(pUserMediaStreamInterface));
 
 	// Add user stream to peer connection interface
@@ -152,13 +152,13 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// Chrome Media Stream
 	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
-	*/
+	//*/
 
 	// TESTING: Different factory here
 	pChromeMediaStreamInterface = m_pWebRTCChromePeerConnectionFactory->CreateLocalMediaStream(kChromeStreamLabel);
 	CNM(pChromeMediaStreamInterface, "Failed to create chrome media stream");
 
-	CR(AddAudioStream(pChromeMediaStreamInterface, kChromeAudioLabel));
+	CR(AddAudioStream(m_pWebRTCChromePeerConnectionFactory, pChromeMediaStreamInterface, kChromeAudioLabel));
 	CR(AddVideoStream(pChromeMediaStreamInterface));
 
 	// Add user stream to peer connection interface
@@ -266,7 +266,7 @@ Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
+RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pPeerConnectionFactory, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
@@ -287,9 +287,9 @@ RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStre
 	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-		m_pWebRTCUserPeerConnectionFactory->CreateAudioTrack(
+		pPeerConnectionFactory->CreateAudioTrack(
 			strAudioTrackLabel, 
-			m_pWebRTCUserPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints))
+			pPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints))
 		);
 
 	pAudioTrack->AddRef();

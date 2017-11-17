@@ -30,7 +30,7 @@ RESULT AudioDeviceDataCapturer::PushAudioPacket(const AudioPacket audioPacket) {
 		int kClockDriftMs = 0;
 		uint32_t newMicLevel = 0;
 		
-		/*
+		///*
 		int samples_per_sec = 44100;
 		int nSamples = 441;
 		static int count = 0;
@@ -51,8 +51,10 @@ RESULT AudioDeviceDataCapturer::PushAudioPacket(const AudioPacket audioPacket) {
 			255, 
 			false, 
 			newMicLevel);
-			*/
+		
+		//*/
 
+		/*
 		int32_t res = m_pAudioTransport->RecordedDataIsAvailable(
 			audioPacket.GetDataBuffer(),
 			audioPacket.GetNumFrames(),
@@ -63,6 +65,7 @@ RESULT AudioDeviceDataCapturer::PushAudioPacket(const AudioPacket audioPacket) {
 			255,
 			false,
 			newMicLevel);
+			*/
 	}
 	
 

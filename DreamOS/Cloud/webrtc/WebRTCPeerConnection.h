@@ -81,7 +81,7 @@ public:
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pPeerConnectionFactory, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
