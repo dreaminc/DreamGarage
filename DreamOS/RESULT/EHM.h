@@ -23,7 +23,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 */
 
 // Logging (needs DreamLogger included)
-#define _ENABLE_LOGGING
+//#define _ENABLE_LOGGING
 #ifdef _ENABLE_LOGGING
 	#define DOSLOG(level, strMsg, ...) do { \
 		DreamLogger::instance()->Log(DreamLogger::Level::level, strMsg, ##__VA_ARGS__); \

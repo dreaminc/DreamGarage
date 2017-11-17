@@ -44,8 +44,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Initialize logger
 	// DreamLogger::InitializeLogger();
 	//DOSLOG(INFO, "DreamOS Starting...");
-	auto pLoggerInstance = DreamLogger::instance();
-	CN(pLoggerInstance);
+//	auto pLoggerInstance = DreamLogger::instance();
+//	CN(pLoggerInstance);
 
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);

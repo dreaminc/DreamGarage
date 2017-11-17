@@ -609,7 +609,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeRequest() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == false));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == false));
 	m_peerConnectionState.fSentHandshakeRequest = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -621,9 +621,9 @@ Error:
 RESULT DreamPeerApp::ReceivedHandshakeACK() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == true));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == true));
 
-	m_peerConnectionState.fSentHandshakeRequest = false;
+//	m_peerConnectionState.fSentHandshakeRequest = false;
 	m_peerConnectionState.fReceivedHandshakeAck = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -646,7 +646,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeACK() {
 	RESULT r = R_PASS;
 
-	m_peerConnectionState.fReceivedHandshakeRequest = false;
+	//m_peerConnectionState.fReceivedHandshakeRequest = false;
 	m_peerConnectionState.fSentHandshakeRequestACK = true;
 
 	CR(UpdatePeerHandshakeState());
