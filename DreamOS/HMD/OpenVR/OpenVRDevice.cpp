@@ -93,11 +93,6 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CN(m_pSenseController);
 	CR(m_pSenseController->Initialize());
 
-	m_pLeftController = m_pParentSandbox->MakeComposite();
-	m_pRightController = m_pParentSandbox->MakeComposite();
-	CN(m_pLeftController);
-	CN(m_pRightController);
-
 	DOSLOG(INFO, "HMD Vive Initialized");
 
 Error:
@@ -119,6 +114,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
 		m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
 		m_pControllerMeshLeftTexture = pTexture;
+		if (m_pLeftController == nullptr) {
+			m_pLeftController = m_pParentSandbox->MakeComposite();
+		}
 		if (!m_pLeftController->HasChildren()) {
 			m_pLeftController->AddObject(m_pControllerMeshLeft);
 		}
@@ -126,6 +124,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		m_pControllerMeshRight = std::shared_ptr<mesh>(pMesh);
 		m_pControllerMeshRightTexture = pTexture;
+		if (m_pRightController == nullptr) {
+			m_pRightController = m_pParentSandbox->MakeComposite();
+		}
 		if (!m_pRightController->HasChildren()) {
 			m_pRightController->AddObject(m_pControllerMeshRight);
 		}
@@ -134,6 +135,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		if (m_pControllerMeshLeft == nullptr) {
 			m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
 			m_pControllerMeshLeftTexture = pTexture;
+			if (m_pLeftController == nullptr) {
+				m_pLeftController = m_pParentSandbox->MakeComposite();
+			}
 			if (!m_pLeftController->HasChildren()) {
 				m_pLeftController->AddObject(m_pControllerMeshLeft);
 			}
@@ -141,6 +145,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		else if (m_pControllerMeshRight == nullptr) {
 			m_pControllerMeshRight = std::shared_ptr<mesh>(pMesh);
 			m_pControllerMeshRightTexture = pTexture;
+			if (m_pRightController == nullptr) {
+				m_pRightController = m_pParentSandbox->MakeComposite();
+			}
 			if (!m_pRightController->HasChildren()) {
 				m_pRightController->AddObject(m_pControllerMeshRight);
 			}

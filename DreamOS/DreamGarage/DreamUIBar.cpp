@@ -78,10 +78,22 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
-	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	CN(m_pOverlayLeft);
-	CN(m_pOverlayRight);
+	//TODO: could move this logic up to DreamUserObserver, and then only 
+	if (GetDOS()->GetHMD() != nullptr) {
+		switch (GetDOS()->GetHMD()->GetDeviceType()) {
+		case HMDDeviceType::OCULUS: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		case HMDDeviceType::VIVE: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		}
+
+		CN(m_pOverlayLeft);
+		CN(m_pOverlayRight);
+	}
 
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)

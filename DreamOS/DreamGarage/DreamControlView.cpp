@@ -109,10 +109,21 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;	
 
-	m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	CN(m_pOverlayLeft);
-	CN(m_pOverlayRight);
+	if (GetDOS()->GetHMD() != nullptr) {
+		switch (GetDOS()->GetHMD()->GetDeviceType()) {
+		case HMDDeviceType::OCULUS: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		case HMDDeviceType::VIVE: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		}
+
+		CN(m_pOverlayLeft);
+		CN(m_pOverlayRight);
+	}
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
@@ -281,10 +292,6 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 		case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
 			int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
-
-			if (GetDOS()->GetHMD() != nullptr) {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 2.0f, 1));
-			}
 
 			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 			if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)

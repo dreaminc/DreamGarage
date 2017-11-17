@@ -90,8 +90,9 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	CN(m_pController);
 	m_pController->SetVisible(false);
 
+	//TODO: several unique positioning variables per device here that aren't used anywhere else
 	switch (pHMD->GetDeviceType()) {
-	case (OCULUS): {
+	case (HMDDeviceType::OCULUS): {
 
 		float scale = 0.035f;
 		float overlayAspect = (332.0f / 671.0f);
@@ -102,8 +103,15 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		m_pOverlayQuad->SetVisible(false);
 
 	} break;
-	case (VIVE): {
-		// TODO: implement vive overlay positioning here
+	case (HMDDeviceType::VIVE): {
+
+		float scale = 0.055f;
+		float overlayAspect = (541.0f / 599.0f);
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(-scale * 0.42f * t, scale * 0.15f, scale * 0.44f));
+		m_pOverlayQuad->SetVisible(false);
 
 	} break;
 	}

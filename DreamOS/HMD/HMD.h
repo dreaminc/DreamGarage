@@ -40,10 +40,10 @@ typedef enum HMDEventType {
 	HMD_EVENT_INVALID
 } HMD_EVENT_TYPE;
 
-typedef enum HMDDeviceType {
+enum class HMDDeviceType {
 	OCULUS,
 	VIVE,
-	INVALID
+	NONE	
 };
 
 enum EYE_TYPE;
