@@ -98,13 +98,13 @@ public:
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
 
-	composite *m_pLeftController;
-	std::shared_ptr<mesh> m_pControllerMeshLeft;
-	texture *m_pControllerMeshLeftTexture;
+	composite *m_pLeftController = nullptr;
+	std::shared_ptr<mesh> m_pControllerMeshLeft = nullptr;
+	texture *m_pControllerMeshLeftTexture = nullptr;
 	
-	composite *m_pRightController;
-	std::shared_ptr<mesh> m_pControllerMeshRight;
-	texture *m_pControllerMeshRightTexture;
+	composite *m_pRightController = nullptr;
+	std::shared_ptr<mesh> m_pControllerMeshRight = nullptr;
+	texture *m_pControllerMeshRightTexture = nullptr;
 
 	uint32_t m_vrFrameCount;
 

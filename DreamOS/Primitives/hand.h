@@ -18,6 +18,20 @@
 #define HAND_ANIMATION_DURATION 0.25f
 #define OVERLAY_ANIMATION_DURATION 0.5f
 
+// oculus values
+#define OVR_OVERLAY_SCALE 0.035f
+#define OVR_OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
+#define OVR_OVERLAY_POSITION_X -0.575f
+#define OVR_OVERLAY_POSITION_Y 0.0f
+#define OVR_OVERLAY_POSITION_Z -0.575f
+
+// vive values
+#define VIVE_OVERLAY_SCALE 0.055f
+#define VIVE_ASPECT_RATIO (541.0f / 599.0f)
+#define VIVE_OVERLAY_POSITION_X -0.42f
+#define VIVE_OVERLAY_POSITION_Y 0.15f
+#define VIVE_OVERLAY_POSITION_Z 0.44f
+
 class SenseLeapMotionHand;
 class model;
 

@@ -225,6 +225,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	
 	//model *pModel = nullptr;
 	mesh *pControllerMesh = m_pParentSandbox->AddMesh(verts, indices);
+
+	//TODO: looks a little better, but there is still likely a problem with how the controllers are positioned
+	pControllerMesh->SetScale(vector(0.9f));
 	//pModel->SetMaterialAmbient(1.0f);
 	CNM(pControllerMesh, "Open VR Controller Models failed to load");
 
