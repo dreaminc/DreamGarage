@@ -44,8 +44,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Initialize logger
 	// DreamLogger::InitializeLogger();
 	//DOSLOG(INFO, "DreamOS Starting...");
-	auto pLoggerInstance = DreamLogger::instance();
-	CN(pLoggerInstance);
+//	auto pLoggerInstance = DreamLogger::instance();
+//	CN(pLoggerInstance);
 
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
@@ -166,11 +166,45 @@ RESULT DreamOS::OnDataChannel(PeerConnection* pPeerConnection) {
 		long userID = GetUserID();
 		long peerUserID = pPeerConnection->GetPeerUserID();
 
+		DOSLOG(INFO, "[DreamOS] SEND_PEER_HANDSHAKE user: %v peer: %v", userID, peerUserID);
 		// Initialize handshake - only add user when peer connection stabilized 
 		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
 		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
 
 		pDreamPeer->SentHandshakeRequest();
+	}
+
+Error:
+	return r;
+}
+
+// Create a catch for incomplete handshakes
+RESULT DreamOS::CheckDreamPeerAppStates() {
+	RESULT r = R_PASS;
+
+	// use a copy to prevent iterator issues
+	auto dreamPeerApps = m_dreamPeerApps;
+	DOSLOG(INFO, "[DreamOS] check peer app states");
+
+	for (auto &dreamPeerAppPair : dreamPeerApps) {
+		auto pDreamPeerApp = dreamPeerAppPair.second;
+		CN(pDreamPeerApp);
+
+		// Detect handshake request hung
+		if (pDreamPeerApp->IsDataChannel() && 
+			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED) 
+		{
+		//if (pDreamPeerApp->IsHandshakeRequestHung()) {
+			long userID = GetUserID();
+			long peerUserID = pDreamPeerApp->GetPeerUserID();
+
+			DOSLOG(INFO, "[DreamOS] HANDSHAKE_REQUEST_HUNG userid:%v peerid:%v", userID, peerUserID);
+
+			// Initialize handshake - only add user when peer connection stabilized 
+			PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+			CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+		}
+
 	}
 
 Error:
@@ -268,6 +302,7 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		// DREAM OS Messages
 		switch (dreamMsgType) {
 			case DreamMessage::type::PEER_HANDSHAKE: {
+				DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
 				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
 				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
 			} break;
@@ -368,6 +403,7 @@ RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMes
 	switch (pPeerAckMessage->GetACKType()) {
 		case PeerAckMessage::type::PEER_HANDSHAKE: {
 			pDreamPeer->ReceivedHandshakeACK();
+			DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE_ACK, user: %v, peer: %v", userID, peerUserID);
 
 			/*
 			if (pDreamPeer->IsPeerReady()) {

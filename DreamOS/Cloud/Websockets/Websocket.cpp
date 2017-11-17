@@ -198,10 +198,14 @@ RESULT Websocket::ProcessingThread() {
 					ctx->load_verify_file("ca-cert.pem");
 					*/
 				}
+				//*
 				catch (std::exception& e) {
+					(void)e;
 					DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
 					DEBUG_LINEOUT("%s", e.what());
+					//ACBM(0, "%s", e.what());
 				}
+				//*/
 				return ctx;
 			});
 

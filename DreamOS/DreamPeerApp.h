@@ -105,8 +105,13 @@ public:
 
 	RESULT UpdatePeerHandshakeState();
 	bool IsPeerReady();
+	bool IsDataChannel();
 
 	DreamPeerApp::state GetState();
+
+	// Not the most eloquent, revisit in the future
+	bool IsHandshakeRequestHung();
+	bool IsHandshakeRequestAckHung();
 
 	long GetPeerUserID();
 

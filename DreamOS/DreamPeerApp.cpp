@@ -361,6 +361,22 @@ DreamPeerApp::state DreamPeerApp::GetState() {
 	return m_state;
 }
 
+bool DreamPeerApp::IsHandshakeRequestHung() {
+	if (m_peerConnectionState.fSentHandshakeRequest == true && m_peerConnectionState.fReceivedHandshakeAck == false) {
+		return true;
+	}
+
+	return false;
+}
+
+bool DreamPeerApp::IsHandshakeRequestAckHung() {
+	if (m_peerConnectionState.fReceivedHandshakeAck == true && m_peerConnectionState.fSentHandshakeRequestACK == false) {
+		return true;
+	}
+
+	return false;
+}
+
 RESULT DreamPeerApp::SetState(DreamPeerApp::state peerState) {
 	RESULT r = R_PASS;
 
@@ -549,6 +565,10 @@ Error:
 	return r;
 }
 
+bool DreamPeerApp::IsDataChannel() {
+	return m_peerConnectionState.fDataChannel;
+}
+
 RESULT DreamPeerApp::OnAudioChannel() {
 	RESULT r = R_PASS;
 
@@ -589,7 +609,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeRequest() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == false));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == false));
 	m_peerConnectionState.fSentHandshakeRequest = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -601,9 +621,9 @@ Error:
 RESULT DreamPeerApp::ReceivedHandshakeACK() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == true));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == true));
 
-	m_peerConnectionState.fSentHandshakeRequest = false;
+//	m_peerConnectionState.fSentHandshakeRequest = false;
 	m_peerConnectionState.fReceivedHandshakeAck = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -626,7 +646,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeACK() {
 	RESULT r = R_PASS;
 
-	m_peerConnectionState.fReceivedHandshakeRequest = false;
+	//m_peerConnectionState.fReceivedHandshakeRequest = false;
 	m_peerConnectionState.fSentHandshakeRequestACK = true;
 
 	CR(UpdatePeerHandshakeState());
