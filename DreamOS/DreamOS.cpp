@@ -166,6 +166,7 @@ RESULT DreamOS::OnDataChannel(PeerConnection* pPeerConnection) {
 		long userID = GetUserID();
 		long peerUserID = pPeerConnection->GetPeerUserID();
 
+		DOSLOG(INFO, "[DreamOS] SEND_PEER_HANDSHAKE user: %v peer: %v", userID, peerUserID);
 		// Initialize handshake - only add user when peer connection stabilized 
 		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
 		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
@@ -293,6 +294,7 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 		// DREAM OS Messages
 		switch (dreamMsgType) {
 			case DreamMessage::type::PEER_HANDSHAKE: {
+				DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
 				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
 				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
 			} break;
