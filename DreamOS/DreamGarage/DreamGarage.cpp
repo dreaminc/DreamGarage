@@ -480,6 +480,10 @@ std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
+// Hands update time	
+#define CHECK_PEER_APP_STATE_INTERVAL_MS (3000.0f) 
+std::chrono::system_clock::time_point g_lastPeerStateCheckTime = std::chrono::system_clock::now();
+
 // For testing
 std::chrono::system_clock::time_point g_lastDebugUpdate = std::chrono::system_clock::now();
 
@@ -534,7 +538,13 @@ RESULT DreamGarage::Update(void) {
 	}
 	//*/
 
-//Error:
+	// Periodically check peer app states
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
+		CR(CheckDreamPeerAppStates());
+		g_lastPeerStateCheckTime = timeNow;
+	}
+
+Error:
 	return r;
 }
 

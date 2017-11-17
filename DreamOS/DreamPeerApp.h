@@ -108,6 +108,10 @@ public:
 
 	DreamPeerApp::state GetState();
 
+	// Not the most eloquent, revisit in the future
+	bool IsHandshakeRequestHung();
+	bool IsHandshakeRequestAckHung();
+
 	long GetPeerUserID();
 
 	PeerConnection *GetPeerConnection();

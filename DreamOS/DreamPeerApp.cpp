@@ -361,6 +361,22 @@ DreamPeerApp::state DreamPeerApp::GetState() {
 	return m_state;
 }
 
+bool DreamPeerApp::IsHandshakeRequestHung() {
+	if (m_peerConnectionState.fSentHandshakeRequest == true && m_peerConnectionState.fReceivedHandshakeAck == false) {
+		return true;
+	}
+
+	return false;
+}
+
+bool DreamPeerApp::IsHandshakeRequestAckHung() {
+	if (m_peerConnectionState.fReceivedHandshakeAck == true && m_peerConnectionState.fSentHandshakeRequestACK == false) {
+		return true;
+	}
+
+	return false;
+}
+
 RESULT DreamPeerApp::SetState(DreamPeerApp::state peerState) {
 	RESULT r = R_PASS;
 

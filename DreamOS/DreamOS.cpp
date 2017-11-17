@@ -177,6 +177,31 @@ Error:
 	return r;
 }
 
+// Create a catch for incomplete handshakes
+RESULT DreamOS::CheckDreamPeerAppStates() {
+	RESULT r = R_PASS;
+
+	for (auto &dreamPeerAppPair : m_dreamPeerApps) {
+		auto pDreamPeerApp = dreamPeerAppPair.second;
+		CN(pDreamPeerApp);
+
+		// Detect handshake request hung
+		if (pDreamPeerApp->IsHandshakeRequestHung()) {
+			long userID = GetUserID();
+			long peerUserID = pDreamPeerApp->GetPeerUserID();
+
+			DOSLOG(INFO, "[DreamOS] HANDSHAKE_REQUEST_HUNG userid:%v peerid:%v", userID, peerUserID);
+
+			// Initialize handshake - only add user when peer connection stabilized 
+			PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+			CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnAudioChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 

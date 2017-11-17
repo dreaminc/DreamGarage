@@ -142,6 +142,8 @@ protected:
 	RESULT RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer);
 	DreamPeerApp::state GetPeerState(long peerUserID);
 
+	RESULT CheckDreamPeerAppStates();
+
 private:
 	std::map<long, std::shared_ptr<DreamPeerApp>> m_dreamPeerApps;
 
