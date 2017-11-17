@@ -19,8 +19,7 @@ std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/R
 
 // the following methods need a bit of organizing into a class
 
-bool CheckForUpdate(bool& updated)
-{
+bool CheckForUpdate(bool& updated) {
 	SquirrelEvent res;
 
 	std::wstring loadingGif;

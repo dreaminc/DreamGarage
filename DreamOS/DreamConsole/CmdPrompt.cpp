@@ -66,7 +66,7 @@ RESULT CmdPrompt::Notify(CmdPromptEvent *event) {
 	if (event->GetArg(1).compare("list") == 0) {
 		// list of registered commands
 		for (auto& cmd : m_registeredCommands) {
-			HUD_OUT(cmd.c_str());
+			//HUD_OUT(cmd.c_str());
 		}
 	}
 

@@ -1,5 +1,4 @@
 #include "CloudController.h"
-#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -736,12 +735,13 @@ Error:
 	return false;
 }
 
+// TODO: Get rid of this stuff 
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
 	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("login : login to Dream");
-		HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
+		//HUD_OUT("login : login to Dream");
+		//HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
 	}
 
 	if (event->GetArg(1).compare("login") == 0) {

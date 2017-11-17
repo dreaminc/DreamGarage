@@ -117,9 +117,6 @@
     <Filter Include="DreamConsole">
       <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Logger">
-      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Texture">
       <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
     </Filter>
@@ -191,6 +188,12 @@
     </Filter>
     <Filter Include="Primitives\image">
       <UniqueIdentifier>{598b61e9-4fb8-41df-97ab-dd5da1438cc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamLogger">
+      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\easyloggingpp">
+      <UniqueIdentifier>{9349b760-9d5c-476f-9dc4-086ec2b7ffca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -409,9 +412,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
       <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Logger\Logger.cpp">
-      <Filter>Logger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
       <Filter>Sandbox\Windows</Filter>
@@ -889,6 +889,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
+      <Filter>DreamLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc">
+      <Filter>External\easyloggingpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1393,9 +1399,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
       <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Logger\Logger.h">
-      <Filter>Logger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
@@ -1996,6 +1999,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\LeapHand.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h">
+      <Filter>DreamLogger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h">
+      <Filter>External\easyloggingpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

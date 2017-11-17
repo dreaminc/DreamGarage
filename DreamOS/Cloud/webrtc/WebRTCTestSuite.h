@@ -27,11 +27,15 @@ public:
 
 public:
 
+	// WebRTC Testing
+	RESULT AddTestWebRTCMultiPeer();
+	
 	// Tests
 	RESULT AddTestWebRTCVideoStream();
 
 	// Apps
 	RESULT AddTestChromeMultiBrowser();
+	
 
 private:
 	CloudController *GetCloudController();

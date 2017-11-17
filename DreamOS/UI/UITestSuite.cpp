@@ -1176,43 +1176,44 @@ Error:
 	return r;
 }
 
+// TODO: fix with new console 
 RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	OVERLAY_DEBUG_SET("event", "none");
+	//OVERLAY_DEBUG_SET("event", "none");
 
 	if (event->state.type == CONTROLLER_RIGHT) {
 		if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
-			OVERLAY_DEBUG_SET("event", "trigger move");
+			//OVERLAY_DEBUG_SET("event", "trigger move");
 		}
 		else if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
-			OVERLAY_DEBUG_SET("event", "pad move");
+			//OVERLAY_DEBUG_SET("event", "pad move");
 		}
 
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			OVERLAY_DEBUG_SET("event", "trigger down");
+			//OVERLAY_DEBUG_SET("event", "trigger down");
 		}
 
 		// TODO:  soon this code will be replaced with api requests, 
 		// as opposed to accessing the hard coded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			OVERLAY_DEBUG_SET("event", "trigger up");
+			//OVERLAY_DEBUG_SET("event", "trigger up");
 //			CR(m_pDreamUIBar->HandleSelect());
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			OVERLAY_DEBUG_SET("event", "menu up");
+			//OVERLAY_DEBUG_SET("event", "menu up");
 //			CR(m_pDreamUIBar->HandleMenuUp());
 		}
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
-		OVERLAY_DEBUG_SET("event", "grip down");
+		//OVERLAY_DEBUG_SET("event", "grip down");
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_UP) {
-		OVERLAY_DEBUG_SET("event", "grip up");
+		//OVERLAY_DEBUG_SET("event", "grip up");
 	}
 	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
-		OVERLAY_DEBUG_SET("event", "menu down");
+		//OVERLAY_DEBUG_SET("event", "menu down");
 	}
 //Error:
 	return r;

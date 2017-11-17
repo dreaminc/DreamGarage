@@ -1,7 +1,6 @@
 #include "WebRTCPeerConnection.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCConductor.h"
 
@@ -53,7 +52,7 @@ public:
 	}
 
 	virtual void OnFailure(const std::string& strError) {
-		//LOG(INFO) << __FUNCTION__ << " " << error;
+		DOSLOG(INFO, "[DummySetSessionDescriptionObserver] On Failure: %v", strError);
 		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Failure: %s", strError.c_str());
 	}
 };
@@ -523,7 +522,8 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kStable: {
 		DEBUG_LINEOUT("WebRTC Connection Stable");
-		LOG(INFO) << "WebRTC Connection Stable";
+		DOSLOG(INFO, "%v WebRTC Connection Stable", GetLogSignature());
+
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionStable(m_peerConnectionID);
 		}
@@ -534,27 +534,27 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 
 	case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
 		DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
-		LOG(INFO) << "WebRTC Connection Has Local Offer";
+		DOSLOG(INFO, "%v WebRTC Connection Has Local Offer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
 		DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
-		LOG(INFO) << "WebRTC Connection Has Local Answer";
+		DOSLOG(INFO, "%v WebRTC Connection Has Local Answer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
 		DEBUG_LINEOUT("WebRTC Connection has remote offer");
-		LOG(INFO) << "WebRTC Connection Has remote Offer";
+		DOSLOG(INFO, "%v WebRTC Connection Has remote Offer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
 		DEBUG_LINEOUT("WebRTC Connection has remote answer");
-		LOG(INFO) << "WebRTC Connection Has remote answer";
+		DOSLOG(INFO, "%v WebRTC Connection Has remote answer", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kClosed: {
 		DEBUG_LINEOUT("WebRTC Connection closed");
-		LOG(INFO) << "WebRTC Connection closed";
+		DOSLOG(INFO, "%v WebRTC Connection closed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionClosed(m_peerConnectionID);
@@ -572,7 +572,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kIceConnectionNew: {
 		DEBUG_LINEOUT("ICE Connection New");
-		LOG(INFO) << "ICE Connection New";
+		DOSLOG(INFO, "%v ICE Connection New", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::NEW);
@@ -581,7 +581,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionChecking: {
 		DEBUG_LINEOUT("ICE Connection Checking");
-		LOG(INFO) << "ICE Connection Checking";
+		DOSLOG(INFO, "%v ICE Connection Checking", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CHECKING);
@@ -590,7 +590,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionConnected: {
 		DEBUG_LINEOUT("ICE Connection Connected");
-		LOG(INFO) << "ICE Connection Connected";
+		DOSLOG(INFO, "%v ICE Connection Connected", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CONNECTED);
@@ -599,7 +599,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionCompleted: {
 		DEBUG_LINEOUT("ICE Connection Completed");
-		LOG(INFO) << "ICE Connection Completed";
+		DOSLOG(INFO, "%v ICE Connection Completed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::COMPLETED);
@@ -608,7 +608,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionFailed: {
 		DEBUG_LINEOUT("ICE Connection Failed");
-		LOG(INFO) << "ICE Connection Failed";
+		DOSLOG(INFO, "%v ICE Connection Failed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::FAILED);
@@ -617,7 +617,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionDisconnected: {
 		DEBUG_LINEOUT("ICE Connection Disconnected");
-		LOG(INFO) << "ICE Connection Disconnected";
+		DOSLOG(INFO, "%v ICE Connection Disconnected", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::DISCONNECTED);
@@ -626,7 +626,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionClosed: {
 		DEBUG_LINEOUT("ICE Connection Closed");
-		LOG(INFO) << "ICE Connection Closed";
+		DOSLOG(INFO, "%v ICE Connection Closed", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CLOSED);
@@ -635,7 +635,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 	case webrtc::PeerConnectionInterface::kIceConnectionMax: {
 		DEBUG_LINEOUT("ICE Connection Max");
-		LOG(INFO) << "ICE Connection Max";
+		DOSLOG(INFO, "%v ICE Connection Max", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::MAX);
@@ -647,22 +647,21 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 
 void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
 	DEBUG_OUT("ICE Gathering Change: ");
-	LOG(INFO) << "OnIceGatheringChange";
 
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kIceGatheringNew: {
 		DEBUG_LINEOUT("ICE Gathering New");
-		LOG(INFO) << "ICE Gathering New";
+		DOSLOG(INFO, "%v ICE Gathering New", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceGatheringGathering: {
 		DEBUG_LINEOUT("ICE Garthering");
-		LOG(INFO) << "ICE Gathering";
+		DOSLOG(INFO, "%v ICE Gathering", GetLogSignature());
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
 		DEBUG_LINEOUT("ICE Gathering Complete");
-		LOG(INFO) << "ICE Gathering Complete";
+		DOSLOG(INFO, "%v ICE Gathering Complete", GetLogSignature());
 
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
@@ -676,12 +675,12 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 
 void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
 	DEBUG_LINEOUT("ICE Receiving %s", (fReceiving) ? "true" : "false");
-	LOG(INFO) << "OnIceConnectionReceivingChange: " << ((fReceiving) ? "true" : "false");
+	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceConnectionReceivingChange: %v", ((fReceiving) ? "true" : "false"));
 }
 
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
-	LOG(INFO) << "OnIceCandidate: " << pICECandidate->sdp_mid() << " " << pICECandidate->sdp_mline_index();
+	DOSLOG(INFO, "[WebRTCPeerConnection] OnIceCandidate: %v %v", pICECandidate->sdp_mid(), pICECandidate->sdp_mline_index());
 
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
@@ -691,7 +690,7 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* p
 	iceCandidate.m_strSDPMediaID = pICECandidate->sdp_mid();
 
 	if (!pICECandidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
-		LOG(ERROR) << "Failed to serialize candidate";
+		DOSLOG(ERR, "Failed to serialize candidate");
 		return;
 	}
 
@@ -803,7 +802,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 		}
 		else {
 			DEBUG_LINEOUT("SDP Offer Success");
-			LOG(INFO) << "SDP Offer Success";
+			DOSLOG(INFO, "%v SDP Offer Success", GetLogSignature());
 		}
 	}
 	else {
@@ -812,7 +811,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 		}
 		else {
 			DEBUG_LINEOUT("SDP Answer Success");
-			LOG(INFO) << "SDP Answer Success";
+			DOSLOG(INFO, "%v SDP Answer Success", GetLogSignature());
 		}
 	}
 
@@ -820,7 +819,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 	m_pWebRTCPeerConnectionInterface->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
 	m_fSDPSet = true;
 
-	LOG(INFO) << "(cloud) set local description for " << (m_fOffer?"offer":"answer");
+	DOSLOG(INFO, "[WebRTCPeerConnection] set local description for %v", (m_fOffer ? "offer" : "answer"));
 
 	CR(PrintSDP());	
 
@@ -835,14 +834,14 @@ void WebRTCPeerConnection::OnFailure(const std::string& strError) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTC Error: %s", strError.c_str());
-	LOG(INFO) << "(cloud) WebRTC Error: " << strError.c_str();
+	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTC Error: %v", strError.c_str());
 
 	if (m_pParentObserver != nullptr) {
 		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));
 	}
 	else {
 		DEBUG_LINEOUT("SDP %s Failure", m_fOffer ? "offer" : "answer");
-		LOG(INFO) << "SDP " << (m_fOffer ? "offer" : "answer") << " failure";
+		DOSLOG(INFO, "[WebRTCPeerConnection] SDP %v failure", (m_fOffer ? "offer" : "answer")); 
 	}
 
 Error:
@@ -1009,19 +1008,20 @@ RESULT WebRTCPeerConnection::AddIceCandidate(WebRTCICECandidate iceCandidate) {
 
 	std::unique_ptr<webrtc::IceCandidateInterface> candidate(
 		webrtc::CreateIceCandidate(iceCandidate.m_strSDPMediaID, iceCandidate.m_SDPMediateLineIndex,
-			iceCandidate.m_strSDPCandidate, &sdpError));
+			iceCandidate.m_strSDPCandidate, &sdpError)
+	);
 
 	CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
 	CBM((m_pWebRTCPeerConnectionInterface->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
 	DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
-	LOG(INFO) << "Received candidate : " << iceCandidate.m_strSDPCandidate.c_str();
+	DOSLOG(INFO, "%v Received candidate: %v", GetLogSignature(), iceCandidate.m_strSDPCandidate);
 	
 // Success:
 	return r;
 
 Error:
-	LOG(INFO) << "Candidate " << iceCandidate.m_strSDPCandidate.c_str() << " failed with error: " << sdpError.description.c_str();
+	DOSLOG(INFO, "%v Candidate %v failed with error: %v", GetLogSignature(), iceCandidate.m_strSDPCandidate, sdpError.description);
 	return r;
 }
 
@@ -1208,10 +1208,9 @@ std::string WebRTCPeerConnection::GetSDPJSONString(std::string strSessionDescrip
 
 RESULT WebRTCPeerConnection::PrintLocalSDP() {
 	DEBUG_LINEOUT("WebRTCConductor: Local SDP:");
-	LOG(INFO) << "WebRTCConductor: Local SDP:";
-
 	DEBUG_LINEOUT("%s", m_strLocalSessionDescriptionProtocol.c_str());
-	LOG(INFO) << m_strLocalSessionDescriptionProtocol.c_str();
+
+	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTCConductor: Local SDP: %v", m_strLocalSessionDescriptionProtocol);
 
 	return R_PASS;
 }
@@ -1229,11 +1228,10 @@ std::string WebRTCPeerConnection::GetLocalSDPJSONString() {
 }
 
 RESULT WebRTCPeerConnection::PrintRemoteSDP() {
-	DEBUG_LINEOUT("WebRTCConductor: Remote SDP:");
-	LOG(INFO) << "WebRTCConductor: Remote SDP:";
-
+	DEBUG_LINEOUT("WebRTCPeerConnection: Remote SDP:");
 	DEBUG_LINEOUT("%s", m_strRemoteSessionDescriptionProtocol.c_str());
-	LOG(INFO) << m_strRemoteSessionDescriptionProtocol.c_str();
+
+	DOSLOG(INFO, "[WebRTCPeerConnection] WebRTCConductor: Remote SDP: %v", m_strRemoteSessionDescriptionProtocol);
 
 	return R_PASS;
 }

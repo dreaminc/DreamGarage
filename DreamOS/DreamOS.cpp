@@ -1,6 +1,6 @@
 #include "DreamOS.h"
 
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
 
 #include "Primitives/font.h"
@@ -42,7 +42,10 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	srand(static_cast <unsigned> (time(0)));
 
 	// Initialize logger
-	Logger::InitializeLogger();
+	// DreamLogger::InitializeLogger();
+	//DOSLOG(INFO, "DreamOS Starting...");
+	auto pLoggerInstance = DreamLogger::instance();
+	CN(pLoggerInstance);
 
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
@@ -62,7 +65,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		 (std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
 		//  Dream is launching from a web page
 		
-		LOG(INFO) << "Dream runs from web";
+		DOSLOG(INFO, "[DreamOS] Dream launched from web");
 
 		// Decide if to split args or not
 		if ((std::string(argv[1]).compare("dreamos:run") != 0) &&
@@ -94,7 +97,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		}
 	}
 	else {
-		LOG(INFO) << "Dream runs from EXE";
+		DOSLOG(INFO, "[DreamOS] Dream runs from EXE");
 
 		// Initialize the sandbox
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
@@ -145,7 +148,7 @@ RESULT DreamOS::OnDataStringMessage(PeerConnection* pPeerConnection, const std::
 	CN(pPeerConnection);
 
 	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage.c_str());
-	LOG(INFO) << "DataString: " << strDataChannelMessage;
+	DOSLOG(INFO, "[DreamOS] DataString: %v", strDataChannelMessage);
 
 Error:
 	return r;

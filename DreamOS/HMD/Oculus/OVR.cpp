@@ -12,6 +12,7 @@
 #include "Extras/OVR_Math.h"
 
 #include "DreamConsole/DreamConsole.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "OVRHMDSinkNode.h"
 
@@ -98,7 +99,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
-	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+	//OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+	DOSLOG(INFO, "HMD Oculus Rift Initialized ");
 
 	// Controller
 

@@ -1,6 +1,7 @@
 #include "SenseLeapMotion.h"
 
 #include "DreamConsole/DreamConsole.h"
+#include "DreamLogger/DreamLogger.h"
 
 SenseLeapMotion::SenseLeapMotion() :
 	m_pLeapController(nullptr),
@@ -23,7 +24,8 @@ RESULT SenseLeapMotion::InitLeapMotion() {
 
 	m_pLeapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
 
-	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Detected...");
+	//OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Detected...");
+	DOSLOG(INFO, "Leap Motion Controller Detected ... ");
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Leap, this);
 
@@ -51,22 +53,22 @@ RESULT SenseLeapMotion::Resume() {
 // Leap Motion Callbacks
 void SenseLeapMotion::onInit(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Initialized");
-	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Init...");
+	DOSLOG(INFO, "LeapMotion", "Controller Leap Motion - Init...");
 }
 
 void SenseLeapMotion::onConnect(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Connected");
-	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Connected");
+	DOSLOG(INFO, "LeapMotion", "Controller Leap Motion - Connected");
 }
 
 void SenseLeapMotion::onDisconnect(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Disconnected");
-	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Disconnected");
+	DOSLOG(INFO, "LeapMotion", "Controller Leap Motion - Disconnected");
 }
 
 void SenseLeapMotion::onExit(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Exited");
-	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Exited");
+	DOSLOG(INFO, "LeapMotion", "Controller Leap Motion - Exited");
 }
 
 void SenseLeapMotion::onFrame(const Leap::Controller&) {
@@ -211,7 +213,7 @@ RESULT SenseLeapMotion::Notify(CmdPromptEvent *event) {
 	RESULT r =  R_PASS;
 
 	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("swap : toggle leap motion skeleton hands / hand model");
+		//HUD_OUT("swap : toggle leap motion skeleton hands / hand model");
 	}
 
 	if (event->GetArg(1).compare("swap") == 0) {

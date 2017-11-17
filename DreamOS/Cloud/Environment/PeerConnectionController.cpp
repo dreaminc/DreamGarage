@@ -1,5 +1,4 @@
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
@@ -222,7 +221,7 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 
 
 	if ((pPeerConnectionTemp = GetPeerConnectionByID(pPeerConnection->GetPeerConnectionID())) != nullptr) {
-		LOG(INFO) << "(cloud) creating a peer already found by connection";
+		DOSLOG(INFO, "[PeerConnectionController] creating a peer already found by connection");
 		DEBUG_LINEOUT("Peer Connection %d already exists", pPeerConnection->GetPeerConnectionID());
 
 		delete pPeerConnection;
@@ -242,7 +241,7 @@ RESULT PeerConnectionController::OnNewPeerConnection(long userID, long peerUserI
 
 	long position = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
 	
-	LOG(INFO) << "myUserID" << (fOfferor ? "(Offerer)" : "(Answerer)") << "=" << userID << " peerUserID=" << peerUserID << " position=" << position;
+	DOSLOG(INFO, "[PeerConnectionController] OnNewPeerConnection %v: myUserID: %v peerUserID: %v, position: %v", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
 	DEBUG_LINEOUT("%s: myUserID: %d peerUserID: %d, position: %d", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
@@ -306,16 +305,18 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 	if (strMethod == "create_offer") {
 		if (userID != offerUserID) {
-			LOG(ERROR) << "(cloud) requested offer for wrong user. payload=" << jsonPayload;
+			DOSLOG(ERR, "[PeerConnectionController] requested offer for wrong user. payload=%v", jsonPayload);
 			return R_FAIL;
 		}
 
-		LOG(INFO) << "(cloud) creating a new peer (id=" << peerConnectionID << ") between user ids (" << userID << "[offeror,self]->" << answerUserId << "[answerer])";
+		DOSLOG(INFO, "[PeerConnectionController] create_offer peer connection %v users offeror(self): %v and answerer: %v", peerConnectionID, userID, answerUserId);
 
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
+
+		long peerUserID = pPeerConnection->GetPeerUserID();
 
 		// New peer connection (from server)
 		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
@@ -323,11 +324,11 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// Initialize SDP Peer Connection and Offer
 		CN(m_pWebRTCImp);
 		//m_pWebRTCImp->InitializePeerConnection(true);
-		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
+		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, true);
 
 	}
 	else if (strMethod == "set_offer") {
-		LOG(ERROR) << "(cloud) set offer should not be a request";
+		DOSLOG(ERR, "[PeerConnectionController] set offer should not be a request");
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
 		// DEADBEEF: No longer true
@@ -337,17 +338,19 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	}
 	else if (strMethod == "create_answer") {
 		if (userID != answerUserId) {
-			LOG(ERROR) << "(cloud) requested answer for wrong user. payload=" << jsonPayload;
+			DOSLOG(ERR, "[PeerConnectionController] requested answer for wrong user. payload=%v", jsonPayload);
 			return R_FAIL;
 		}
 
-		LOG(INFO) << "(cloud) creating a new peer (id=" << peerConnectionID << ") between user ids (" << offerUserID << "[offeror]->" << answerUserId << "[answerer,self])";
+		DOSLOG(INFO, "[PeerConnectionController] create_answer peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
 
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
 		
+		long peerUserID = pPeerConnection->GetPeerUserID();
+
 		// New peer connection (from server)
 		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 
@@ -356,13 +359,15 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// Initialize SDP Peer Connection Offer and Create Answer
 		CN(m_pWebRTCImp);
 		//CR(m_pWebRTCImp->InitializePeerConnection(false));
-		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
+		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 
 	}
 	else if (strMethod == "set_offer_candidates") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 		
+		DOSLOG(INFO, "[PeerConnectionController] set_offer_candidates peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+
 		// DEADBEEF: No longer true
 		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 		
@@ -385,6 +390,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	else if (strMethod == "set_answer") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
+
+		DOSLOG(INFO, "[PeerConnectionController] set_answer peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
 		// DEADBEEF:
 		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
@@ -419,6 +426,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// DEADBEEF:
 		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
+		DOSLOG(INFO, "[PeerConnectionController] set_answer_candidates peer connection %v offeror(self): %v answerer: %v", peerConnectionID, offerUserID, answerUserId);
+
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
 		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
@@ -449,9 +458,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		
 		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	}
-	else
-	{
-		LOG(ERROR) << "(cloud) method unknown";
+	else {
+		DOSLOG(ERR, "[PeerConnectionController] method unknown");
 	}
 
 Error:

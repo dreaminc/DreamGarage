@@ -11,6 +11,14 @@
 
 #include "test/MatrixTestSuite.h"
 
+#define ELPP_THREAD_SAFE 1
+//#define ELPP_FORCE_USE_STD_THREAD 1
+#define ELPP_NO_DEFAULT_LOG_FILE
+
+#include "easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
+
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
     

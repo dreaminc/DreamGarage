@@ -15,6 +15,8 @@
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 
+#include "DreamLogger/DreamLogger.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -27,6 +29,8 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestChromeMultiBrowser());
 
@@ -83,6 +87,164 @@ RESULT WebRTCTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	CR(pHAL->ReleaseCurrentContext());
 
 	g_pRenderProg = (OGLProgram*)(pRenderScreenQuad);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public CloudController::PeerConnectionObserver {
+
+		CloudController *pCloudController = nullptr;
+
+		// PeerConnectionObserver
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnNewPeerConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+			DEVENV_LINEOUT("OnPeerConnectionClosed");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+			DEVENV_LINEOUT("OnDataMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+			DEVENV_LINEOUT("OnDataStringMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			//DEVENV_LINEOUT(L"OnAudioData");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnDataChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnAudioChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame");
+
+			return R_NOT_HANDLED;
+		}
+
+	} *pTestContext = new TestContext();
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+
+		CR(SetupSkyboxPipeline("environment"));
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects 
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+
+		//*/
+
+		// Command Line Manager
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		// Cloud Controller
+		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+
+		// Log in 
+		{
+			// TODO: This way to start the cloud controller thread is not great
+			std::string strUsername = "test";
+			strUsername += pCommandLineManager->GetParameterValue("testval");
+			strUsername += "@dreamos.com";
+
+			long environmentID = 170;
+			std::string strPassword = "nightmare";
+
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", strPassword));
+
+			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Testing multi-peer connection of WebRTC");
+	pNewTest->SetTestDescription("Test multi-peer connections of WebRTc");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

@@ -1,6 +1,6 @@
 #include "OpenGLImp.h"
 
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 #include "easylogging++.h"
 
 #include "OGLObj.h"

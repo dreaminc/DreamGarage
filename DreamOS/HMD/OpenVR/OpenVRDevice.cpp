@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#include "DreamConsole/DreamConsole.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "OpenVRHMDSinkNode.h"
 
@@ -93,7 +93,7 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CN(m_pSenseController);
 	CR(m_pSenseController->Initialize());
 
-	OVERLAY_DEBUG_OUT("HMD Vive - On");
+	DOSLOG(INFO, "HMD Vive Initialized");
 
 Error:
 	return r;

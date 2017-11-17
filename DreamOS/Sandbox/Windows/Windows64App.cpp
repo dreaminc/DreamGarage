@@ -1,6 +1,8 @@
-#include "Logger/Logger.h"
-#include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
+
+#include "DreamLogger/DreamLogger.h"
+
+#include "Project/Windows/DreamOS/resource.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
 #include "Cloud/CloudControllerFactory.h"
@@ -463,7 +465,7 @@ RESULT Windows64App::Show() {
 
 	// Show the window
 	//CBM(ShowWindow(m_hwndWindow, SW_SHOWDEFAULT), "Failed to show win64app window");
-	//CBM(UpdateWindow(m_hwndWindow), "Faield to update win64app window");
+	//CBM(UpdateWindow(m_hwndWindow), "Failed to update win64app window");
 
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
@@ -474,9 +476,8 @@ RESULT Windows64App::Show() {
 		FALSE,      // not signaled
 		(LPTSTR)L"CloseSplashScreenEvent"); // event name
 
-	BOOL res = SetEvent(hCloseSplashScreenEvent);
-
-	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
+	BOOL fResult = SetEvent(hCloseSplashScreenEvent);
+	DOSLOG(INFO, "[Windows64App] signaling splash to close %v", (fResult ? "OK" : "FAIL"));
 
 	CloseHandle(hCloseSplashScreenEvent);
 	

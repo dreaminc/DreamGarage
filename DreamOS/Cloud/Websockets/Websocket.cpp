@@ -1,7 +1,6 @@
 #include "Websocket.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 Websocket::Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 					 const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
@@ -200,7 +199,8 @@ RESULT Websocket::ProcessingThread() {
 					*/
 				}
 				catch (std::exception& e) {
-					LOG(INFO) << "set_tls_init_handler exception " << e.what();
+					DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
+					DEBUG_LINEOUT("%s", e.what());
 				}
 				return ctx;
 			});
@@ -214,7 +214,7 @@ RESULT Websocket::ProcessingThread() {
 			m_pWebsocketConnection = m_websocketClient.get_connection(m_strURI, websocketError);
 
 			if (websocketError) {
-				LOG(INFO) << "websocketError " << websocketError.message().c_str();
+				DOSLOG(INFO, "websocketError %v", websocketError.message().c_str());
 			}
 
 			CBM((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());

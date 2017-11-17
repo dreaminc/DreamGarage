@@ -1,4 +1,3 @@
-#include "Logger/Logger.h"
 #include "User.h"
 
 std::ostream& operator<<(std::ostream& os, const User& user) {

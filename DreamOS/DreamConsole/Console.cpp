@@ -168,7 +168,8 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 
 			case SVK_RETURN: {
 				// Process a carriage return. 
-				HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+				//HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+
 				CMDPROMPT_EXECUTE(m_cmdText);
 				m_cmdText.erase();
 				TextCursorMoveBack();
@@ -190,17 +191,17 @@ RESULT DreamConsole::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
 	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("graph fps/off : show / hide fps graph");
+		//HUD_OUT("graph fps/off : show / hide fps graph");
 	}
 
 	if (event->GetArg(1).compare("graph") == 0) {
 		if (event->GetArg(2).compare("fps") == 0) {
 			m_configuration.graph = GraphConfiguration::FPS;
-			HUD_OUT("consol graph <- fps");
+			//HUD_OUT("console graph <- fps");
 		}
 		else if (event->GetArg(2).compare("off") == 0) {
 			m_configuration.graph = GraphConfiguration::FPSMinimal;
-			HUD_OUT("consol graph <- off");
+			//HUD_OUT("console graph <- off");
 		}
 	}
 

@@ -1,4 +1,4 @@
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 #include "DreamTestApp.h"
 #include <string>
 
@@ -46,11 +46,11 @@ RESULT DreamTestApp::LoadScene() {
 	// Push to a test suite factory in testing
 
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
@@ -137,7 +137,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	switch (kbEvent->KeyCode) {
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
-				HUD_OUT("Key 'N' is pressed - next test");
+				//HUD_OUT("Key 'N' is pressed - next test");
 				m_pTestSuite->NextTest();
 			}
 		} break;
@@ -164,7 +164,7 @@ RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
 RESULT DreamTestApp::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
-	HUD_OUT("DreamAPP command");
+	//HUD_OUT("DreamAPP command");
 
 //Error:
 	return r;
