@@ -17,7 +17,10 @@
 
 #include "easylogging++.h"
 
+#ifndef _EASY_LOGGINGPP_INITIALIZED
 INITIALIZE_EASYLOGGINGPP
+#define _EASY_LOGGINGPP_INITIALIZED
+#endif
 
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;

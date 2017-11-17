@@ -1,8 +1,6 @@
 #include "Logger.h"
 #include <ctime>
 
-INITIALIZE_EASYLOGGINGPP
-
 #if (defined(_WIN32) || defined(_WIN64))
 #include <string>
 #include <windows.h>

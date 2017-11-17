@@ -425,6 +425,7 @@
     <ResourceCompile Include="DreamLauncher.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc" />
     <ClCompile Include="src\callback.cpp" />
     <ClCompile Include="src\launcher.cpp" />
     <ClCompile Include="src\Logger.cpp" />
