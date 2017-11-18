@@ -199,6 +199,18 @@ Error:
 	return r;
 }
 
+// Audio
+
+RESULT WebRTCImp::SendAudioPacket(long peerConnectionID, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->SendAudioPacket(peerConnectionID, pendingAudioPacket));
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
@@ -236,18 +248,6 @@ bool WebRTCImp::IsVideoStreamingRunning(long peerConnectionID) {
 
 Error:
 	return false;
-}
-
-// Audio
-
-RESULT WebRTCImp::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
-	RESULT r = R_PASS;
-
-	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->PushAudioPacket(pendingAudioPacket));
-
-Error:
-	return r;
 }
 
 RESULT WebRTCImp::SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage) {

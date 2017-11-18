@@ -855,11 +855,11 @@ Error:
 }
 
 // Audio
-RESULT EnvironmentController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT EnvironmentController::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CN(m_pPeerConnectionController->CaptureAudioPacket(pendingAudioPacket));
+	CN(m_pPeerConnectionController->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

@@ -125,7 +125,7 @@ public:
 	bool IsVideoStreamingRunning();
 
 	// Audio
-	RESULT CaptureAudioPacket(const AudioPacket &pendingAudioPacket);
+	RESULT BroadcastAudioPacket(const AudioPacket &pendingAudioPacket);
 
 	long GetUserID();
 

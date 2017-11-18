@@ -141,12 +141,13 @@ public:
 	RESULT StopVideoStreaming(long peerConnectionID);
 	bool IsVideoStreamingRunning(long peerConnectionID);
 
+	RESULT SendAudioPacket(long peerConnectionID, const AudioPacket &pendingAudioPacket);
+
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
 	WebRTCConductorObserver *m_pParentObserver;
 
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCUserPeerConnectionFactory;
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCChromePeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 
@@ -157,9 +158,6 @@ private:
 
 	// Audio Device Module
 	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
-
-public:
-	RESULT PushAudioPacket(const AudioPacket audioPacket);
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

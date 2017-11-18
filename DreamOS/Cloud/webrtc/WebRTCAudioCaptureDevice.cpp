@@ -11,7 +11,7 @@ RESULT AudioDeviceDataCapturer::Initialize() {
 	return R_PASS;
 }
 
-RESULT AudioDeviceDataCapturer::PushAudioPacket(const AudioPacket audioPacket) {
+RESULT AudioDeviceDataCapturer::BroadcastAudioPacket(const AudioPacket audioPacket) {
 	RESULT r = R_PASS;
 
 	if (m_pAudioTransport != nullptr) {

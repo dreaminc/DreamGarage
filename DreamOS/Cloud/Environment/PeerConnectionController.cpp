@@ -798,6 +798,24 @@ Error:
 	return r;
 }
 
+RESULT PeerConnectionController::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendAudioPacket(pPeerConnection->GetPeerConnectionID(), pendingAudioPacket));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT PeerConnectionController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
@@ -855,16 +873,6 @@ bool PeerConnectionController::IsVideoStreamingRunning() {
 
 Error:
 	return fRetVal;
-}
-
-RESULT PeerConnectionController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
-	RESULT r = R_PASS;
-
-	CN(m_pWebRTCImp);
-	CR(m_pWebRTCImp->CaptureAudioPacket(pendingAudioPacket));
-
-Error:
-	return r;
 }
 
 long PeerConnectionController::GetUserID() {

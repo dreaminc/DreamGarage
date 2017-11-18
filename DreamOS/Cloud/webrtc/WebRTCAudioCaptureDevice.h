@@ -58,7 +58,7 @@ public:
 
 	RESULT Initialize();
 
-	RESULT PushAudioPacket(const AudioPacket audioPacket);
+	RESULT BroadcastAudioPacket(const AudioPacket audioPacket);
 
 	RESULT SetAudioTransport(webrtc::AudioTransport* pAudioTransport);
 

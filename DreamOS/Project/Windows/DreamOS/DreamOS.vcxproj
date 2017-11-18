@@ -673,6 +673,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
@@ -925,6 +927,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\User\User.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />

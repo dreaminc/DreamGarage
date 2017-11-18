@@ -32,7 +32,7 @@
 
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
-	m_pWebRTCUserPeerConnectionFactory(nullptr)
+	m_pWebRTCPeerConnectionFactory(nullptr)
 {
 	ClearPeerConnections();
 }
@@ -58,7 +58,12 @@ rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::AddNewPeerConnection(l
 	
 	//pWebRTCPeerConnection = std::make_shared<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCPeerConnectionFactory);
 	pWebRTCPeerConnection = 
-		rtc::scoped_refptr<WebRTCPeerConnection>(new rtc::RefCountedObject<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCUserPeerConnectionFactory, m_pWebRTCChromePeerConnectionFactory));
+		rtc::scoped_refptr<WebRTCPeerConnection>(
+			new rtc::RefCountedObject<WebRTCPeerConnection>(
+				this, 
+				peerConnectionID, 
+				m_pWebRTCPeerConnectionFactory) 
+			);
 	
 	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
 
@@ -304,32 +309,20 @@ Error:
 }
 */
 
-RESULT WebRTCConductor::PushAudioPacket(const AudioPacket audioPacket) {
-	RESULT r = R_PASS;
-
-	CN(m_pAudioDeviceModule);
-	CR(AudioDeviceDataCapturer::PushAudioPacket(audioPacket));
-
-Error:
-	return r;
-}
-
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
 	// User Peer Connection Factory
-	CBM((m_pWebRTCUserPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
-	m_pWebRTCUserPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
-	m_pWebRTCUserPeerConnectionFactory->AddRef();
+	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCPeerConnectionFactory->AddRef();
 	
-	CNM(m_pWebRTCUserPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
-	///*
+	/*
 	// Chrome Peer Connection Factory (testing)
 	CBM((m_pWebRTCChromePeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
-
-	//m_pWebRTCChromePeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
 	// Potentially share with above 
 	m_networkThread = rtc::Thread::CreateWithSocketServer();
@@ -380,7 +373,7 @@ RESULT WebRTCConductor::Initialize() {
 	return r;
 
 Error:
-	m_pWebRTCUserPeerConnectionFactory->Release();
+	m_pWebRTCPeerConnectionFactory->Release();
 
 	return r;
 }
@@ -640,6 +633,18 @@ RESULT WebRTCConductor::SendDataChannelMessage(long peerConnectionID, uint8_t *p
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
 	CR(pWebRTCPeerConnection->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::SendAudioPacket(long peerConnectionID, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+
+	CR(pWebRTCPeerConnection->SendAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

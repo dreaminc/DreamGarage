@@ -23,9 +23,14 @@
 
 #include "Primitives/color.h"
 
+#include "webrtc/api/localaudiosource.h"
+
 class WebRTConductor;
+class WebRTCLocalAudioSource;
+class WebRTCLocalAudioTrack;
 class User;
 class TwilioNTSInformation;
+class AudioPacket;
 
 class WebRTCPeerConnectionProxy : public Proxy<WebRTCPeerConnectionProxy> {
 public:
@@ -74,18 +79,18 @@ public:
 	friend class WebRTCConductor;
 
 public:
-	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCUserPeerConnectionFactory, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCChromePeerConnectionFactory);
+	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
 	~WebRTCPeerConnection();
 
 	// TODO: Generalize this when we add renegotiation 
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pPeerConnectionFactory, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
-	RESULT SetChromePeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
 	
 	RESULT ClearSessionDescriptionProtocols();
 	RESULT ClearLocalSessionDescriptionProtocol();
@@ -144,6 +149,9 @@ public:
 	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
 	RESULT StopVideoStreaming();
 	bool IsVideoStreamingRunning();
+
+	// Audio
+	RESULT SendAudioPacket(const AudioPacket &pendingAudioPacket);
 
 protected:
 	// TODO: Move to peer Connection
@@ -216,8 +224,7 @@ private:
 	std::list<WebRTCICECandidate> m_webRTCICECandidates;
 
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCUserPeerConnectionFactory;
-	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCChromePeerConnectionFactory;
+	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
@@ -227,6 +234,9 @@ private:
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
+
+	rtc::scoped_refptr<WebRTCLocalAudioSource> m_pWebRTCLocalAudioSource = nullptr;
+	rtc::scoped_refptr<WebRTCLocalAudioTrack> m_pWebRTCLocalAudioTrack = nullptr;
 };
 
 

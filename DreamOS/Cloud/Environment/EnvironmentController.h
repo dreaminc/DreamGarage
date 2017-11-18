@@ -177,7 +177,7 @@ public:
 	bool IsVideoStreamingRunning();
 
 	// Audio
-	RESULT CaptureAudioPacket(const AudioPacket &pendingAudioPacket);
+	RESULT BroadcastAudioPacket(const AudioPacket &pendingAudioPacket);
 
 	RESULT SetUser(User currentUser);
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);

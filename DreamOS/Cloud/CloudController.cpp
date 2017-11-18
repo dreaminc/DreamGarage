@@ -670,13 +670,13 @@ Error:
 }
 
 // Audio 
-RESULT CloudController::CaptureAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT CloudController::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 
 	CN(m_pEnvironmentController);
-	CN(m_pEnvironmentController->CaptureAudioPacket(pendingAudioPacket));
+	CN(m_pEnvironmentController->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;
