@@ -8,7 +8,6 @@
 
 #include "SoundClient.h"
 
-
 #include <Windows.h>
 #include <AudioClient.h>
 #include <mmdeviceapi.h>
@@ -23,9 +22,25 @@ public:
 	~WASAPISoundClient();
 
 	virtual RESULT Initialize() override;
+	virtual RESULT AudioProcess() override;
 
 private:
+	RESULT InitializeAudioClient();
 
+	RESULT EnumerateWASAPIDevices();
+	RESULT EnumerateWASAPISessions();
+	std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex);
+
+
+private:
+	// TODO: Move these to member vars
+	IMMDeviceEnumerator *m_pEnumerator = nullptr;
+	IMMDevice *m_pAudioEndpointDevice = nullptr;
+	IAudioClient *m_pAudioClient = nullptr;
+	IAudioCaptureClient *m_pCaptureClient = nullptr;
+	IAudioRenderClient *m_pRenderClient = nullptr;
+	IAudioSessionManager2* m_pSessionManager = nullptr;
+	WAVEFORMATEX *m_pWaveFormatX = nullptr;
 };
 
 #endif WASAPI_SOUND_CLIENT_H_

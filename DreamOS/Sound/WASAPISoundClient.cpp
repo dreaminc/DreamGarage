@@ -5,6 +5,20 @@
 
 #include <string>
 
+
+// File specific utilities
+template <class T> RESULT SafeRelease(T **ppT) {
+	RESULT r = R_PASS;
+
+	CN(*ppT);
+
+	(*ppT)->Release();
+	*ppT = nullptr;
+
+Error:
+	return r;
+}
+
 WASAPISoundClient::WASAPISoundClient() {
 	// empty
 }
@@ -13,7 +27,7 @@ WASAPISoundClient::~WASAPISoundClient() {
 	// empty
 }
 
-RESULT EnumerateWASAPISessions(IAudioSessionManager2* pSessionManager) {
+RESULT WASAPISoundClient::EnumerateWASAPISessions() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
 
@@ -27,11 +41,12 @@ RESULT EnumerateWASAPISessions(IAudioSessionManager2* pSessionManager) {
 	IAudioSessionControl* pSessionControl = nullptr;
 	IAudioSessionControl2* pSessionControl2 = nullptr;
 
-	// Set up the manager
-	CN(pSessionManager);
+	// Sessions
+	CRM((RESULT)m_pAudioEndpointDevice->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (void**)&m_pSessionManager), "Failed to activate session manager 2 interface");
+	CN(m_pSessionManager);
 
 	// Get the current list of sessions.
-	CR((RESULT)pSessionManager->GetSessionEnumerator(&pSessionList));
+	CR((RESULT)m_pSessionManager->GetSessionEnumerator(&pSessionList));
 	CN(pSessionList);
 
 	// Get the session count.
@@ -68,20 +83,7 @@ Error:
 	return r;
 }
 
-
-template <class T> RESULT SafeRelease(T **ppT) {
-	RESULT r = R_PASS;
-
-	CN(*ppT);
-
-	(*ppT)->Release();
-	*ppT = nullptr;
-
-Error:
-	return r;
-}
-
-std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
+std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
 	RESULT r = R_PASS;
 
 	IMMDevice *pDevice;
@@ -114,16 +116,20 @@ Error:
 	return wstrResult;
 }
 
-RESULT EnumerateWASAPIDevices(IMMDeviceEnumerator *pEnumerator) {
+// TODO: This simply enumerates the devices but doesn't select one
+RESULT WASAPISoundClient::EnumerateWASAPIDevices() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
 
+	// TODO: Do we want to keep the collection as member?
 	IMMDeviceCollection *pDeviceCollection = nullptr;
 	IMMDevice *pDevice = nullptr;
 
-	CR((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pEnumerator)));
+	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_pEnumerator),
+		"CoCreateInstance Failed");
+	CN(m_pEnumerator);
 
-	CR((RESULT)pEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &pDeviceCollection));
+	CR((RESULT)m_pEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &pDeviceCollection));
 
 	UINT deviceCount;
 	CR((RESULT)pDeviceCollection->GetCount(&deviceCount));
@@ -151,62 +157,75 @@ Error:
 	return r;
 }
 
+RESULT WASAPISoundClient::AudioProcess() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioProcess Start");
+
+	// Implement the audio loop here
+	CR(r);
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioProcess Finish");
+
+Error:
+	return r;
+}
+
+RESULT WASAPISoundClient::InitializeAudioClient() {
+	RESULT r = R_PASS;
+
+	REFERENCE_TIME hnsRequestedDuration = REFTIMES_PER_SEC;
+	//REFERENCE_TIME hnsActualDuration;
+
+	// Default Endpoint
+	CRM((RESULT)m_pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pAudioEndpointDevice), "Failed to get default audio endpoint");
+	CN(m_pAudioEndpointDevice);
+
+	// Audio Client Device
+	CRM((RESULT)m_pAudioEndpointDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioClient), "Failed to active audio client");
+	CN(m_pAudioClient);
+
+	CR((RESULT)m_pAudioClient->GetMixFormat(&m_pWaveFormatX));
+	CN(m_pWaveFormatX);
+
+	// Initialize Audio Client
+	CRM((RESULT)m_pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, hnsRequestedDuration, 0, m_pWaveFormatX, nullptr), "Failed to init client");
+
+Error:
+	return r;
+}
+
 RESULT WASAPISoundClient::Initialize() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
 
-	IMMDeviceEnumerator *pEnumerator = nullptr;
-	IMMDevice *pAudioEndpointDevice = nullptr;
-	IAudioClient *pAudioClient = nullptr;
-	IAudioCaptureClient *pCaptureClient = nullptr;
-	IAudioSessionManager2* pSessionManager = nullptr;
-	WAVEFORMATEX *pwfx = nullptr;
+	//UINT32 bufferFrameCount;
+	//UINT32 numFramesAvailable;
+	//UINT32 packetLength = 0;
 
-	REFERENCE_TIME hnsRequestedDuration = REFTIMES_PER_SEC;
-	REFERENCE_TIME hnsActualDuration;
+	//BYTE *pData = nullptr;
 
-	UINT32 bufferFrameCount;
-	UINT32 numFramesAvailable;
-	UINT32 packetLength = 0;
-
-	BYTE *pData = nullptr;
-
-	bool fDone = false;
-
-	DWORD captureFlags;
+	//DWORD captureFlags;
 
 	DEBUG_LINEOUT("Initializing WASAPI Sound Client");
 
-	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&pEnumerator),
-		"CoCreateInstance Failed");
-	CN(pEnumerator);
-
 	// Enumerate end points 
-	CR(EnumerateWASAPIDevices(pEnumerator));
+	// TODO: Member function - allow for better selection
+	CR(EnumerateWASAPIDevices());
 
-	// Default Endpoint
-	//CRM((RESULT)pEnumerator->GetDefaultAudioEndpoint(eCapture, eConsole, &pDevice), "Failed to get default audio endpoint");
-	CRM((RESULT)pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &pAudioEndpointDevice), "Failed to get default audio endpoint");
-	CN(pAudioEndpointDevice);
+	
+	//CR(EnumerateWASAPISessions(pSessionManager));
 
-	// Sessions
-	CRM((RESULT)pAudioEndpointDevice->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (void**)&pSessionManager), "Failed to activate session manager 2 interface");
-	CN(pSessionManager);
+	// Initialize the audio client
+	CR(InitializeAudioClient());
+	
 
-	CR(EnumerateWASAPISessions(pSessionManager));
+	// Test: Try to play something
 
-	// Audio Client Device
-	CRM((RESULT)pAudioEndpointDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&pAudioClient), "Failed to active audio client");
-	CN(pAudioClient);
 
-	CR((RESULT)pAudioClient->GetMixFormat(&pwfx));
-	CN(pwfx);
 
-	CRM((RESULT)pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, 0, hnsRequestedDuration, 0, pwfx, nullptr), "Failed to init client");
-
-	// Get the size of the allocated buffer.
-	CRM((RESULT)pAudioClient->GetBufferSize(&bufferFrameCount), "GetBufferSize failed");
-
+	/*
+	// This is for recording stuff
 	CRM((RESULT)pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get service");
 	
 	// Notify the audio sink which format to use.
@@ -219,7 +238,7 @@ RESULT WASAPISoundClient::Initialize() {
 	CR((RESULT)pAudioClient->Start());  
 
 	// Each loop fills about half of the shared buffer.
-	while (fDone == FALSE) {
+	while (fDone == false) {
 
 		// Sleep for half the buffer duration.
 		Sleep(hnsActualDuration / REFTIMES_PER_MILLISEC / 2);
@@ -245,6 +264,7 @@ RESULT WASAPISoundClient::Initialize() {
 
 	// Stop recording.
 	CR((RESULT)pAudioClient->Stop());
+	*/
 
 Error:
 	return r;

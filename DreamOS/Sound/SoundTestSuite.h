@@ -26,6 +26,13 @@ public:
 	// Enumerate
 	RESULT AddTestEnumerateDevices();
 
+	// Play Sound
+	RESULT AddTestPlaySound();
+	RESULT AddTestPlaySoundHRTF();
+
+	// Record Sound
+	//TODO: RESULT AddTestRecordSound();
+
 private:
 	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 

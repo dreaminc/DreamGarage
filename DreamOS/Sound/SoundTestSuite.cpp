@@ -21,6 +21,8 @@ SoundTestSuite::~SoundTestSuite() {
 RESULT SoundTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	// Add the tests
+	CR(AddTestPlaySound());
 	CR(AddTestEnumerateDevices());
 
 Error:
@@ -80,6 +82,91 @@ RESULT SoundTestSuite::SetupPipeline(std::string strRenderProgramName) {
 
 Error:
 	return r;
+}
+
+RESULT SoundTestSuite::AddTestPlaySound() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		SoundClient *pSoundClient = nullptr;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("environment"));
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+
+		// Create the sound client
+		pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+		CN(pTestContext->pSoundClient);
+
+		CR(pTestContext->pSoundClient->Start());
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Do stuff
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Audio Play Sound WASAPI");
+	pUITest->SetTestDescription("Basic test of playing a sound utilizing WASAPI");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT SoundTestSuite::AddTestPlaySoundHRTF() {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT SoundTestSuite::AddTestEnumerateDevices() {
