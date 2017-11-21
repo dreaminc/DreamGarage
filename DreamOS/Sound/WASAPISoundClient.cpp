@@ -272,33 +272,40 @@ RESULT WASAPISoundClient::AudioProcess() {
 
 		numFramesAvailable = bufferFrameCount - numFramesPadding;
 
-		// Grab the next empty buffer from the audio device.
-		hr = pRenderClient->GetBuffer(numFramesAvailable, &pAudioClientBufferData);
-		CRM((RESULT)hr, "Failed to get buffer: %s", GetAudioClientErrorCodeString(hr));
+		if (numFramesAvailable > 0) {
+			// Grab the next empty buffer from the audio device.
+			hr = pRenderClient->GetBuffer(numFramesAvailable, &pAudioClientBufferData);
+			CRM((RESULT)hr, "Failed to get buffer: %s", GetAudioClientErrorCodeString(hr));
 
-		///*
-		// TEST: Fake audio output
-		DEBUG_LINEOUT("hi %d", numFramesAvailable);
-		
-		static float theta = 0.0f;
+			///*
+			// TEST: Fake audio output
+			//DEBUG_LINEOUT("hi %d", numFramesAvailable);
 
-		float *pDataBuffer = (float*)(pAudioClientBufferData);
+			static double theta = 0.0f;
+			static double freq = 440.0f;
 
-		for (uint16_t i = 0; i < (numFramesAvailable * 2); i += 2) {
-			float val = sin((theta * 4200.0f) / 44100.0f);
-			val *= 0.5f;
+			float *pDataBuffer = (float*)(pAudioClientBufferData);
 
-			pDataBuffer[i] = val;
-			pDataBuffer[i + 1] = val;
-			
-			theta += (1.0f / 44100.0f);
+			for (uint16_t i = 0; i < (numFramesAvailable * 2); i += 2) {
+				float val = sin(theta);
+				val *= 0.25f;
+
+				pDataBuffer[i] = val;
+				pDataBuffer[i + 1] = val;
+
+				// increment theta
+				theta += ((2.0f * M_PI) / 44100.0f) * freq;
+				if (theta >= 2.0f * M_PI) {
+					theta = theta - (2.0f * M_PI);
+				}
+			}
+			//*/
+
+			//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
+
+			hr = pRenderClient->ReleaseBuffer(numFramesAvailable, audioDeviceFlags);
+			CRM((RESULT)hr, "Failed to release buffer: %s", GetAudioClientErrorCodeString(hr));
 		}
-		//*/
-
-		//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
-
-		hr = pRenderClient->ReleaseBuffer(numFramesAvailable, audioDeviceFlags);
-		CRM((RESULT)hr, "Failed to release buffer: %s", GetAudioClientErrorCodeString(hr));
 	}
 
 	// Wait for the last buffer to play before stopping.
