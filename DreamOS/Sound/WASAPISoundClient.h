@@ -15,6 +15,10 @@
 #include <avrt.h>
 #include <functiondiscoverykeys.h>
 
+#define REFTIMES_PER_MILLISEC  10000
+#define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
+#define WASAPI_WAIT_BUFFER_TIMEOUT_MS 2000
+
 class WASAPISoundClient : public SoundClient {
 
 public:
@@ -31,6 +35,7 @@ private:
 	RESULT EnumerateWASAPISessions();
 	std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex);
 
+	RESULT PrintWaveFormat();
 
 private:
 	// TODO: Move these to member vars
@@ -41,6 +46,8 @@ private:
 	IAudioRenderClient *m_pRenderClient = nullptr;
 	IAudioSessionManager2* m_pSessionManager = nullptr;
 	WAVEFORMATEX *m_pWaveFormatX = nullptr;
+
+	REFERENCE_TIME m_hnsRequestedDuration = REFTIMES_PER_SEC;
 };
 
 #endif WASAPI_SOUND_CLIENT_H_
