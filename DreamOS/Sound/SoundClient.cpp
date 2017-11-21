@@ -14,7 +14,6 @@ bool SoundClient::IsRunning() {
 	return (m_renderState == state::RUNNING);
 }
 
-/*
 RESULT SoundClient::StartCapture() {
 	DEBUG_LINEOUT("SoundClient::StartCapture");
 
@@ -37,7 +36,6 @@ RESULT SoundClient::StopCapture() {
 
 	return R_PASS;
 }
-*/
 
 RESULT SoundClient::StartRender() {
 	DEBUG_LINEOUT("SoundClient::StartRender");
@@ -68,7 +66,8 @@ RESULT SoundClient::Start() {
 	DEBUG_LINEOUT("SoundClient::Start");
 
 	CR(StartRender());
-	//CR(StartCapture());
+
+	CR(StartCapture());
 
 Error:
 	return r;
@@ -80,7 +79,8 @@ RESULT SoundClient::Stop() {
 	DEBUG_LINEOUT("SoundClient::Stop");
 
 	CR(StopRender());
-	//CR(StopCapture());
+
+	CR(StopCapture());
 
 Error:
 	return r;

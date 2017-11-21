@@ -26,29 +26,37 @@ public:
 	~WASAPISoundClient();
 
 	virtual RESULT Initialize() override;
+
 	virtual RESULT AudioRenderProcess() override;
-	//virtual RESULT AudioCaptureProcess() override;
+	virtual RESULT AudioCaptureProcess() override;
 
 private:
-	RESULT InitializeAudioClient();
+	RESULT InitializeRenderAudioClient();
+	RESULT InitializeCaptureAudioClient();
 
 	RESULT EnumerateWASAPIDevices();
 	RESULT EnumerateWASAPISessions();
 	std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex);
 
-	RESULT PrintWaveFormat();
+	RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
 
 private:
-	// TODO: Move these to member vars
-	IMMDeviceEnumerator *m_pEnumerator = nullptr;
-	IMMDevice *m_pAudioEndpointDevice = nullptr;
-	IAudioClient *m_pAudioClient = nullptr;
-	IAudioCaptureClient *m_pCaptureClient = nullptr;
-	IAudioRenderClient *m_pRenderClient = nullptr;
+	IMMDeviceEnumerator *m_pDeviceEnumerator = nullptr;
 	IAudioSessionManager2* m_pSessionManager = nullptr;
-	WAVEFORMATEX *m_pWaveFormatX = nullptr;
 
-	REFERENCE_TIME m_hnsRequestedDuration = REFTIMES_PER_SEC;
+	// Render
+	IMMDevice *m_pAudioEndpointRenderDevice = nullptr;
+	IAudioClient *m_pAudioRenderClient = nullptr;
+	IAudioRenderClient *m_pRenderClient = nullptr;
+	WAVEFORMATEX *m_pRenderWaveFormatX = nullptr;
+	REFERENCE_TIME m_hnsRequestedRenderDuration = REFTIMES_PER_SEC;
+
+	// Capture
+	IMMDevice *m_pAudioEndpointCaptureDevice = nullptr;
+	IAudioClient *m_pAudioCaptureClient = nullptr;
+	IAudioCaptureClient *m_pCaptureClient = nullptr;
+	WAVEFORMATEX *m_pCaptureWaveFormatX = nullptr;
+	REFERENCE_TIME m_hnsRequestedCaptureDuration = REFTIMES_PER_SEC;
 };
 
 #endif WASAPI_SOUND_CLIENT_H_

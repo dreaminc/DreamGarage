@@ -21,11 +21,11 @@ WASAPISoundClient::WASAPISoundClient() {
 }
 
 WASAPISoundClient::~WASAPISoundClient() {
-	CoTaskMemFree(m_pWaveFormatX);
+	CoTaskMemFree(m_pRenderWaveFormatX);
 
-	SafeRelease<IMMDeviceEnumerator>(&m_pEnumerator);
-	SafeRelease<IMMDevice>(&m_pAudioEndpointDevice);
-	SafeRelease<IAudioClient>(&m_pAudioClient);
+	SafeRelease<IMMDeviceEnumerator>(&m_pDeviceEnumerator);
+	SafeRelease<IMMDevice>(&m_pAudioEndpointRenderDevice);
+	SafeRelease<IAudioClient>(&m_pAudioRenderClient);
 }
 
 RESULT WASAPISoundClient::EnumerateWASAPISessions() {
@@ -43,7 +43,7 @@ RESULT WASAPISoundClient::EnumerateWASAPISessions() {
 	IAudioSessionControl2* pSessionControl2 = nullptr;
 
 	// Sessions
-	CRM((RESULT)m_pAudioEndpointDevice->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (void**)&m_pSessionManager), "Failed to activate session manager 2 interface");
+	CRM((RESULT)m_pAudioEndpointRenderDevice->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (void**)&m_pSessionManager), "Failed to activate session manager 2 interface");
 	CN(m_pSessionManager);
 
 	// Get the current list of sessions.
@@ -126,11 +126,11 @@ RESULT WASAPISoundClient::EnumerateWASAPIDevices() {
 	IMMDeviceCollection *pDeviceCollection = nullptr;
 	IMMDevice *pDevice = nullptr;
 
-	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_pEnumerator),
+	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_pDeviceEnumerator),
 		"CoCreateInstance Failed");
-	CN(m_pEnumerator);
+	CN(m_pDeviceEnumerator);
 
-	CR((RESULT)m_pEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &pDeviceCollection));
+	CR((RESULT)m_pDeviceEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &pDeviceCollection));
 
 	UINT deviceCount;
 	CR((RESULT)pDeviceCollection->GetCount(&deviceCount));
@@ -198,15 +198,129 @@ const char* GetAudioClientErrorCodeString(HRESULT hr) {
 	return "Non-handled HR value";
 }
 
+RESULT WASAPISoundClient::AudioCaptureProcess() {
+	RESULT r = R_PASS;
+	HRESULT hr = S_OK;
+
+	// TODO: Move to member?
+	IAudioCaptureClient *pCaptureClient = nullptr;
+
+	HANDLE hCaptureBufferEvent = nullptr;
+	HANDLE hAudioCaptureProcessTask = nullptr;
+
+	UINT32 bufferFrameCount = 0;
+	DWORD audioDeviceFlags = 0;
+	BYTE *pAudioCaptureBufferData = nullptr;
+	UINT32 packetLength = 0;
+	UINT32 numFramesAvailable;
+
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioCaptureProcess Start");
+
+	CNM(m_pAudioCaptureClient, "Audio Capture Client not initialized");
+
+	// Create an event handle and register it for
+	// buffer-event notifications.
+	hCaptureBufferEvent = CreateEvent(nullptr, false, false, nullptr);
+	CNM(hCaptureBufferEvent, "Failed to create capture event");
+
+	CRM((RESULT)m_pAudioCaptureClient->SetEventHandle(hCaptureBufferEvent), "Failed to register capture event with audio client");
+
+	// Get the actual size of the two allocated buffers.
+	CRM((RESULT)m_pAudioCaptureClient->GetBufferSize(&bufferFrameCount), "Failed to retrieve buffer size");
+	CB((bufferFrameCount != 0));
+
+	// Capture Client
+	CRM((RESULT)m_pAudioCaptureClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get capture audio client");
+	CN(pCaptureClient);
+
+	// Ask MMCSS to temporarily boost the thread priority
+	// to reduce glitches while the low-latency stream plays.
+	DWORD taskIndex = 0;
+	hAudioCaptureProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+	CNM(hAudioCaptureProcessTask, "Failed to set up audio capture process task");
+
+	CRM((RESULT)m_pAudioCaptureClient->Start(), "Failed to start capture audio device");
+
+	// Each loop fills one of the two buffers.
+	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+
+		// Wait for next buffer event to be signaled.
+		DWORD retval = WaitForSingleObject(hCaptureBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
+
+		// Event handle timed out after the default time out
+		if (retval != WAIT_OBJECT_0) {
+			m_pAudioCaptureClient->Stop();
+			CRM((RESULT)(ERROR_TIMEOUT), "Capture audio thread is hung and exited");
+		}
+
+		// Check Capture
+		hr = pCaptureClient->GetNextPacketSize(&packetLength);
+		CR((RESULT)hr);
+
+		if (packetLength > 0) {
+			//DEBUG_LINEOUT("capture %d", packetLength);
+
+			while (packetLength != 0) {
+				// Get the available data in the shared buffer.
+				hr = pCaptureClient->GetBuffer(&pAudioCaptureBufferData, &numFramesAvailable, &audioDeviceFlags, nullptr, nullptr);
+				CR((RESULT)hr);
+
+				// Convert to float data buffer
+				float *pDataBuffer = (float*)(pAudioCaptureBufferData);
+
+				// Check for silence
+				if (audioDeviceFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
+					pAudioCaptureBufferData = nullptr;  
+				}
+
+				// TODO: Save to internal capture buffer
+				//hr = pMySink->CopyData(pData, numFramesAvailable, &bDone);
+				//CR((RESULT)hr);
+
+				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
+				CR((RESULT)hr);
+
+				hr = pCaptureClient->GetNextPacketSize(&packetLength);
+				CR((RESULT)hr);
+			}
+
+		}
+	}
+
+	// Wait for the last buffer to play before stopping.
+	Sleep((DWORD)(m_hnsRequestedCaptureDuration / REFTIMES_PER_MILLISEC));
+
+	CRM((RESULT)m_pAudioCaptureClient->Stop(), "Failed to stop audio capture client");
+
+Error:
+	DEBUG_LINEOUT("WASAPISoundClient::AudioCaptureProcess Finish");
+
+	if (hCaptureBufferEvent != nullptr) {
+		CloseHandle(hCaptureBufferEvent);
+		hCaptureBufferEvent = nullptr;
+	}
+
+	if (hAudioCaptureProcessTask != nullptr) {
+		AvRevertMmThreadCharacteristics(hAudioCaptureProcessTask);
+		hAudioCaptureProcessTask = nullptr;
+	}
+
+	if (pCaptureClient != nullptr) {
+		SafeRelease<IAudioCaptureClient>(&pCaptureClient);
+	}
+
+	return r;
+}
+
 RESULT WASAPISoundClient::AudioRenderProcess() {
 	RESULT r = R_PASS;
 
 	// TODO: Move to member?
 	IAudioRenderClient *pRenderClient = nullptr;
-	IAudioCaptureClient *pCaptureClient = nullptr;
 
-	HANDLE hBufferEvent = nullptr;
-	HANDLE hAudioProcessTask = nullptr;
+	HANDLE hRenderBufferEvent = nullptr;
+	HANDLE hAudioRenderProcessTask = nullptr;
 	UINT32 bufferFrameCount = 0;
 	DWORD audioDeviceFlags = 0;
 	BYTE *pAudioClientBufferData;
@@ -216,28 +330,24 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 	UINT32 numFramesPadding;
 	UINT32 packetLength = 0;
 
-	DEBUG_LINEOUT("WASAPISoundClient::AudioProcess Start");
+	DEBUG_LINEOUT("WASAPISoundClient::AudioRenderProcess Start");
 
-	CNM(m_pAudioClient, "Audio Client not initialized");
+	CNM(m_pAudioRenderClient, "Audio Render Client not initialized");
 
 	// Create an event handle and register it for
 	// buffer-event notifications.
-	hBufferEvent = CreateEvent(nullptr, false, false, nullptr);
-	CNM(hBufferEvent, "Failed to create event");
+	hRenderBufferEvent = CreateEvent(nullptr, false, false, nullptr);
+	CNM(hRenderBufferEvent, "Failed to create event");
 
-	CRM((RESULT)m_pAudioClient->SetEventHandle(hBufferEvent), "Failed to register event with audio client");
+	CRM((RESULT)m_pAudioRenderClient->SetEventHandle(hRenderBufferEvent), "Failed to register event with audio client");
 
 	// Get the actual size of the two allocated buffers.
-	CRM((RESULT)m_pAudioClient->GetBufferSize(&bufferFrameCount), "Failed to retrieve buffer size");
+	CRM((RESULT)m_pAudioRenderClient->GetBufferSize(&bufferFrameCount), "Failed to retrieve buffer size");
 	CB((bufferFrameCount != 0));
 
 	// Render Client
-	CRM((RESULT)m_pAudioClient->GetService(__uuidof(IAudioRenderClient), (void**)&pRenderClient), "Failed to get render audio client");
+	CRM((RESULT)m_pAudioRenderClient->GetService(__uuidof(IAudioRenderClient), (void**)&pRenderClient), "Failed to get render audio client");
 	CN(pRenderClient);
-
-	// Capture Client
-	CRM((RESULT)m_pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get capture audio client");
-	CN(pCaptureClient);
 
 	/*
 	// TODO: Potentially package the below into a call (since duplicated in audio loop)
@@ -255,48 +365,37 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 	// Ask MMCSS to temporarily boost the thread priority
 	// to reduce glitches while the low-latency stream plays.
 	DWORD taskIndex = 0;
-	hAudioProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
-	CNM(hAudioProcessTask, "Failed to set up audio process task");
+	hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+	CNM(hAudioRenderProcessTask, "Failed to set up audio process task");
 
-	CRM((RESULT)m_pAudioClient->Start(), "Failed to start audio device");
+	CRM((RESULT)m_pAudioRenderClient->Start(), "Failed to start audio device");
 
 	// Each loop fills one of the two buffers.
 	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
 
 		// Wait for next buffer event to be signaled.
-		DWORD retval = WaitForSingleObject(hBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
+		DWORD retval = WaitForSingleObject(hRenderBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
 
 		// Event handle timed out after the default time out
 		if (retval != WAIT_OBJECT_0) {
-			m_pAudioClient->Stop();
-			CRM((RESULT)(ERROR_TIMEOUT), "Audio thread is hung and exited");
-		}
-
-		// Check Capture
-		hr = pCaptureClient->GetNextPacketSize(&packetLength);
-		CR((RESULT)hr);
-
-		if (packetLength > 0) {
-			DEBUG_LINEOUT("capture %d", packetLength);
-
-			// TODO: Capture
-
+			m_pAudioRenderClient->Stop();
+			CRM((RESULT)(ERROR_TIMEOUT), "Render audio thread is hung and exited");
 		}
 
 		// See how much buffer space is available.
-		hr = m_pAudioClient->GetCurrentPadding(&numFramesPadding);
+		hr = m_pAudioRenderClient->GetCurrentPadding(&numFramesPadding);
 		CR((RESULT)hr);
 
 		numFramesAvailable = bufferFrameCount - numFramesPadding;
 
 		if (numFramesAvailable > 0) {
-			DEBUG_LINEOUT("render %d", numFramesAvailable);
+			//DEBUG_LINEOUT("render %d", numFramesAvailable);
 
 			// Grab the next empty buffer from the audio device.
 			hr = pRenderClient->GetBuffer(numFramesAvailable, &pAudioClientBufferData);
 			CRM((RESULT)hr, "Failed to get buffer: %s", GetAudioClientErrorCodeString(hr));
 
-			///*
+			/*
 			// TEST: Fake audio output
 
 			static double theta = 0.0f;
@@ -327,23 +426,23 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 	}
 
 	// Wait for the last buffer to play before stopping.
-	Sleep((DWORD)(m_hnsRequestedDuration / REFTIMES_PER_MILLISEC));
+	Sleep((DWORD)(m_hnsRequestedRenderDuration / REFTIMES_PER_MILLISEC));
 
-	CRM((RESULT)m_pAudioClient->Stop(), "Failed to stop audio client"); 
+	CRM((RESULT)m_pAudioRenderClient->Stop(), "Failed to stop audio render client"); 
 
 		
 Error:
 
-	DEBUG_LINEOUT("WASAPISoundClient::AudioProcess Finish");
+	DEBUG_LINEOUT("WASAPISoundClient::AudioRenderProcess Finish");
 
-	if (hBufferEvent != nullptr) {
-		CloseHandle(hBufferEvent);
-		hBufferEvent = nullptr;
+	if (hRenderBufferEvent != nullptr) {
+		CloseHandle(hRenderBufferEvent);
+		hRenderBufferEvent = nullptr;
 	}
 
-	if (hAudioProcessTask != nullptr) {
-		AvRevertMmThreadCharacteristics(hAudioProcessTask);
-		hAudioProcessTask = nullptr;
+	if (hAudioRenderProcessTask != nullptr) {
+		AvRevertMmThreadCharacteristics(hAudioRenderProcessTask);
+		hAudioRenderProcessTask = nullptr;
 	}
 	
 	SafeRelease<IAudioRenderClient>(&pRenderClient);
@@ -385,24 +484,25 @@ const char *GetSubFormatString(GUID waveFormatSubFormat) {
 	return "UNDEFINED SUBFORMAT";
 }
 
-RESULT WASAPISoundClient::PrintWaveFormat() {
+RESULT WASAPISoundClient::PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo) {
 	RESULT r = R_PASS;
 
 	int channels;
 	int bitsPerSample;
 	int samplingRate;
 
-	CN(m_pWaveFormatX);
+	CN(pWaveFormatX);
 
-	channels = m_pWaveFormatX->nChannels;
-	bitsPerSample = m_pWaveFormatX->wBitsPerSample;
-	samplingRate = m_pWaveFormatX->nSamplesPerSec;
+	channels = pWaveFormatX->nChannels;
+	bitsPerSample = pWaveFormatX->wBitsPerSample;
+	samplingRate = pWaveFormatX->nSamplesPerSec;
 
-	DEBUG_LINEOUT("Audio Format %s, %d channels, %d bits per sample, %d sampling rate",
-		GetFormatTagString(m_pWaveFormatX->wFormatTag), channels, bitsPerSample, samplingRate);
+	DEBUG_LINEOUT("%s: Audio Format %s, %d channels, %d bits per sample, %d sampling rate", strInfo.c_str(),
+		GetFormatTagString(pWaveFormatX->wFormatTag), channels, bitsPerSample, samplingRate);
 
-	if (m_pWaveFormatX->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
-		WAVEFORMATEXTENSIBLE *pWaveFormatExtensible = (WAVEFORMATEXTENSIBLE*)m_pWaveFormatX;
+	if (pWaveFormatX->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+		WAVEFORMATEXTENSIBLE *pWaveFormatExtensible = (WAVEFORMATEXTENSIBLE*)pWaveFormatX;
+		CN(pWaveFormatExtensible);
 
 		GUID waveFormatSubFormat = pWaveFormatExtensible->SubFormat;
 		DEBUG_LINEOUT("Audio sub format: %s", GetSubFormatString(waveFormatSubFormat));
@@ -414,40 +514,75 @@ Error:
 	return r;
 }
 
-RESULT WASAPISoundClient::InitializeAudioClient() {
+RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	RESULT r = R_PASS;
 
 	//REFERENCE_TIME hnsActualDuration;
 
-	m_hnsRequestedDuration = REFTIMES_PER_SEC;
+	m_hnsRequestedRenderDuration = REFTIMES_PER_SEC;
 
-	// Default Endpoint
-	CRM((RESULT)m_pEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pAudioEndpointDevice), "Failed to get default audio endpoint");
-	CN(m_pAudioEndpointDevice);
+	// Default Render Endpoint
+	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pAudioEndpointRenderDevice), "Failed to get default audio render endpoint");
+	CN(m_pAudioEndpointRenderDevice);
 
-	// Audio Client Device
-	CRM((RESULT)m_pAudioEndpointDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioClient), "Failed to active audio client");
-	CN(m_pAudioClient);
+	// Audio Render Client Device
+	CRM((RESULT)m_pAudioEndpointRenderDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioRenderClient), "Failed to activate audio render client");
+	CN(m_pAudioRenderClient);
 
-	CR((RESULT)m_pAudioClient->GetMixFormat(&m_pWaveFormatX));
-	CN(m_pWaveFormatX);
+	// Render Format 
+	CR((RESULT)m_pAudioRenderClient->GetMixFormat(&m_pRenderWaveFormatX));
+	CN(m_pRenderWaveFormatX);
 
 	// Print out format
-	CR(PrintWaveFormat());
+	CR(PrintWaveFormat(m_pRenderWaveFormatX, "render"));
 
 	//// Initialize the stream to play at the minimum latency.
 	//CR((RESULT)m_pAudioClient->GetDevicePeriod(NULL, &m_hnsRequestedDuration));
 	//CR((RESULT)m_pAudioClient->GetDevicePeriod(&m_hnsRequestedDuration, nullptr));
 
-	// Initialize Audio Client
-	CRM((RESULT)m_pAudioClient->Initialize(
+	// Initialize Render Audio Client
+	CRM((RESULT)m_pAudioRenderClient->Initialize(
 		AUDCLNT_SHAREMODE_SHARED, 
 		AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
-		m_hnsRequestedDuration, 
+		m_hnsRequestedRenderDuration, 
 		0,
-		m_pWaveFormatX, 
+		m_pRenderWaveFormatX, 
 		nullptr), 
-	"Failed to init client");
+	"Failed to init render client");
+
+Error:
+	return r;
+}
+
+RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
+	RESULT r = R_PASS;
+
+	m_hnsRequestedCaptureDuration = REFTIMES_PER_SEC;
+
+	// Default Capture Endpoint
+	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eCapture, eConsole, &m_pAudioEndpointCaptureDevice), "Failed to get default audio capture endpoint");
+	CN(m_pAudioEndpointCaptureDevice);
+
+	// Audio Capture Client Device
+	CRM((RESULT)m_pAudioEndpointCaptureDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioCaptureClient), "Failed to activate audio capture client");
+	CN(m_pAudioRenderClient);
+
+	// Capture Format 
+	CR((RESULT)m_pAudioCaptureClient->GetMixFormat(&m_pCaptureWaveFormatX));
+	CN(m_pCaptureWaveFormatX);
+
+	// Print out format
+	CR(PrintWaveFormat(m_pCaptureWaveFormatX, "capture"));
+
+	// Initialize Capture Audio Client
+	CRM((RESULT)m_pAudioCaptureClient->Initialize(
+		AUDCLNT_SHAREMODE_SHARED,
+		AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
+		m_hnsRequestedCaptureDuration,
+		0,
+		m_pCaptureWaveFormatX,
+		nullptr),
+		"Failed to init capture client");
 
 Error:
 	return r;
@@ -474,9 +609,12 @@ RESULT WASAPISoundClient::Initialize() {
 	
 	//CR(EnumerateWASAPISessions(pSessionManager));
 
-	// Initialize the audio client
-	CR(InitializeAudioClient());
+	// Initialize the render audio client
+	CR(InitializeRenderAudioClient());
 	
+	// Initialize the capture audio client
+	CR(InitializeCaptureAudioClient());
+
 
 	// Test: Try to play something
 
