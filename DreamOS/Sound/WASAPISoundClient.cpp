@@ -198,11 +198,12 @@ const char* GetAudioClientErrorCodeString(HRESULT hr) {
 	return "Non-handled HR value";
 }
 
-RESULT WASAPISoundClient::AudioProcess() {
+RESULT WASAPISoundClient::AudioRenderProcess() {
 	RESULT r = R_PASS;
 
 	// TODO: Move to member?
 	IAudioRenderClient *pRenderClient = nullptr;
+	IAudioCaptureClient *pCaptureClient = nullptr;
 
 	HANDLE hBufferEvent = nullptr;
 	HANDLE hAudioProcessTask = nullptr;
@@ -213,6 +214,7 @@ RESULT WASAPISoundClient::AudioProcess() {
 
 	UINT32 numFramesAvailable;
 	UINT32 numFramesPadding;
+	UINT32 packetLength = 0;
 
 	DEBUG_LINEOUT("WASAPISoundClient::AudioProcess Start");
 
@@ -229,9 +231,13 @@ RESULT WASAPISoundClient::AudioProcess() {
 	CRM((RESULT)m_pAudioClient->GetBufferSize(&bufferFrameCount), "Failed to retrieve buffer size");
 	CB((bufferFrameCount != 0));
 
-	// Get the render client
+	// Render Client
 	CRM((RESULT)m_pAudioClient->GetService(__uuidof(IAudioRenderClient), (void**)&pRenderClient), "Failed to get render audio client");
 	CN(pRenderClient);
+
+	// Capture Client
+	CRM((RESULT)m_pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get capture audio client");
+	CN(pCaptureClient);
 
 	/*
 	// TODO: Potentially package the below into a call (since duplicated in audio loop)
@@ -266,6 +272,17 @@ RESULT WASAPISoundClient::AudioProcess() {
 			CRM((RESULT)(ERROR_TIMEOUT), "Audio thread is hung and exited");
 		}
 
+		// Check Capture
+		hr = pCaptureClient->GetNextPacketSize(&packetLength);
+		CR((RESULT)hr);
+
+		if (packetLength > 0) {
+			DEBUG_LINEOUT("capture %d", packetLength);
+
+			// TODO: Capture
+
+		}
+
 		// See how much buffer space is available.
 		hr = m_pAudioClient->GetCurrentPadding(&numFramesPadding);
 		CR((RESULT)hr);
@@ -273,13 +290,14 @@ RESULT WASAPISoundClient::AudioProcess() {
 		numFramesAvailable = bufferFrameCount - numFramesPadding;
 
 		if (numFramesAvailable > 0) {
+			DEBUG_LINEOUT("render %d", numFramesAvailable);
+
 			// Grab the next empty buffer from the audio device.
 			hr = pRenderClient->GetBuffer(numFramesAvailable, &pAudioClientBufferData);
 			CRM((RESULT)hr, "Failed to get buffer: %s", GetAudioClientErrorCodeString(hr));
 
 			///*
 			// TEST: Fake audio output
-			//DEBUG_LINEOUT("hi %d", numFramesAvailable);
 
 			static double theta = 0.0f;
 			static double freq = 440.0f;

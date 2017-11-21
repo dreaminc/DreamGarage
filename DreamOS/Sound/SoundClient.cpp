@@ -11,7 +11,55 @@ SoundClient::~SoundClient() {
 //m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
 
 bool SoundClient::IsRunning() {
-	return (m_state == state::RUNNING);
+	return (m_renderState == state::RUNNING);
+}
+
+/*
+RESULT SoundClient::StartCapture() {
+	DEBUG_LINEOUT("SoundClient::StartCapture");
+
+	// This will kick off the audio capture process defined in the sound client implementation
+	m_captureState = state::RUNNING;
+	m_audioCaptureProcessingThread = std::thread(&SoundClient::AudioCaptureProcess, this);
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StopCapture() {
+	DEBUG_LINEOUT("SoundClient::StopCapture");
+
+	m_captureState = state::STOPPED;
+
+	// Join thread
+	if (m_audioCaptureProcessingThread.joinable()) {
+		m_audioCaptureProcessingThread.join();
+	}
+
+	return R_PASS;
+}
+*/
+
+RESULT SoundClient::StartRender() {
+	DEBUG_LINEOUT("SoundClient::StartRender");
+
+	// This will kick off the audio render process defined in the sound client implementation
+	m_renderState = state::RUNNING;
+	m_audioRenderProcessingThread = std::thread(&SoundClient::AudioRenderProcess, this);
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StopRender() {
+	DEBUG_LINEOUT("SoundClient::StopRender");
+
+	m_renderState = state::STOPPED;
+
+	// Join thread
+	if (m_audioRenderProcessingThread.joinable()) {
+		m_audioRenderProcessingThread.join();
+	}
+
+	return R_PASS;
 }
 
 RESULT SoundClient::Start() {
@@ -19,12 +67,10 @@ RESULT SoundClient::Start() {
 
 	DEBUG_LINEOUT("SoundClient::Start");
 
-	m_state = state::RUNNING;
+	CR(StartRender());
+	//CR(StartCapture());
 
-	// This will kick off the audio process defined in the sound client implementation
-	m_audioProcessingThread = std::thread(&SoundClient::AudioProcess, this);
-
-//Error:
+Error:
 	return r;
 }
 
@@ -33,25 +79,9 @@ RESULT SoundClient::Stop() {
 
 	DEBUG_LINEOUT("SoundClient::Stop");
 
-	m_state = state::STOPPED;
-	
-	/*
-#if (defined(_WIN32) || defined(_WIN64))
-	#include "Sandbox/Windows/Win32Helper.h"
-	Win32Helper::PostQuitMessage(m_audioProcessingThread);
-#else
-#pragma message ("not implemented post quit to thread")
-	while (m_state == state::RUNNING) {
+	CR(StopRender());
+	//CR(StopCapture());
 
-	}
-#endif
-	*/
-
-	// Join thread
-	if (m_audioProcessingThread.joinable()) {
-		m_audioProcessingThread.join();
-	}
-
-//Error:
+Error:
 	return r;
 }

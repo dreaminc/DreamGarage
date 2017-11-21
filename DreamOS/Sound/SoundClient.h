@@ -24,17 +24,27 @@ public:
 	virtual RESULT Initialize() = 0;
 	
 protected:
-	virtual RESULT AudioProcess() = 0;
+	virtual RESULT AudioRenderProcess() = 0;
+	//virtual RESULT AudioCaptureProcess() = 0;
 
-	SoundClient::state m_state = SoundClient::state::UNINITIALIZED;
+	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
+	//SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
 
 public:
 	bool IsRunning();
+
 	RESULT Start();
 	RESULT Stop();
 
+	//RESULT StartCapture();
+	//RESULT StopCapture();
+
+	RESULT StartRender();
+	RESULT StopRender();
+
 private:
-	std::thread	m_audioProcessingThread;
+	std::thread	m_audioRenderProcessingThread;
+	//std::thread	m_audioCaptureProcessingThread;
 };
 
 #endif SOUND_CLIENT_H_

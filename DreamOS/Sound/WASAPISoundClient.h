@@ -26,7 +26,8 @@ public:
 	~WASAPISoundClient();
 
 	virtual RESULT Initialize() override;
-	virtual RESULT AudioProcess() override;
+	virtual RESULT AudioRenderProcess() override;
+	//virtual RESULT AudioCaptureProcess() override;
 
 private:
 	RESULT InitializeAudioClient();
