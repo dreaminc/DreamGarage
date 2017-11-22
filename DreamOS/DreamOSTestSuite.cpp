@@ -27,7 +27,7 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
-
+	
 	CR(AddTestUserApp());	
 
 	CR(AddTestDreamBrowser());
@@ -170,6 +170,7 @@ RESULT DreamOSTestSuite::AddTestDreamUIBar() {
 		CR(SetupDreamAppPipeline());
 		{
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			//CN(pDreamUIBar);	// still fails because it needs a user
 		}
 
 	Error:

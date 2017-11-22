@@ -15,7 +15,7 @@
 typedef float light_precision;
 
 typedef enum LightType {
-	LIGHT_DIRECITONAL = 0,
+	LIGHT_DIRECITONAL = 0,	// this typo? is everywhere?
 	LIGHT_SPOT,
 	LIGHT_POINT,
 	LIGHT_INVALID = 2147483647	// define to ensure size of enum as 4 bytes
