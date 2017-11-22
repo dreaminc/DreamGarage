@@ -628,7 +628,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		SetVisible(false);
 	}
 
-	if (m_fRecievingStream && m_pendingFrame.fPending) {
+	if (m_fReceivingStream && m_pendingFrame.fPending) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
@@ -688,7 +688,7 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	if (m_fRecievingStream == false) {
+	if (m_fReceivingStream == false) {
 		CN(m_pBrowserTexture);
 
 		// Update texture dimensions if needed
@@ -714,7 +714,7 @@ RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVid
 	// TODO: Create a pending frame thing
 	//CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
 
-	if (m_fRecievingStream) {
+	if (m_fReceivingStream) {
 		r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
 
 		if (r == R_OVERFLOW) {
@@ -835,7 +835,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			*/
 
 			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
-			m_fRecievingStream = true;
+			m_fReceivingStream = true;
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
@@ -885,9 +885,9 @@ RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEv
 
 		case INTERACTION_EVENT_SELECT_DOWN: {
 
-			if (m_fRecievingStream) {
+			if (m_fReceivingStream) {
 				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-				m_fRecievingStream = false;
+				m_fReceivingStream = false;
 			}
 
 			SetStreamingState(false);
@@ -913,9 +913,9 @@ Error:
 RESULT DreamBrowser::BeginStream() {
 	RESULT r = R_PASS;
 
-	if (m_fRecievingStream) {
+	if (m_fReceivingStream) {
 		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-		m_fRecievingStream = false;
+		m_fReceivingStream = false;
 	}
 
 	SetStreamingState(false);

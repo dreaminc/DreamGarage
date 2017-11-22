@@ -15,7 +15,7 @@
 typedef float light_precision;
 
 typedef enum LightType {
-	LIGHT_DIRECITONAL = 0,	// this typo? is everywhere?
+	LIGHT_DIRECTIONAL = 0,	
 	LIGHT_SPOT,
 	LIGHT_POINT,
 	LIGHT_INVALID = 2147483647	// define to ensure size of enum as 4 bytes
@@ -61,7 +61,7 @@ public:
 		quaternion qOrientation = quaternion::jQuaternion(0.0f);
 		//qOrientation.RotateByVector(m_vectorDirection, 0.0f); //quaternion(0.0f, m_vectorDirection).RotateVector(vector::kVector(-1.0f));
 
-		if (m_type == LIGHT_DIRECITONAL) {
+		if (m_type == LIGHT_DIRECTIONAL) {
 			matVP = ProjectionMatrix(width, height, nearPlane, farPlane);
 		}
 		else if (m_type == LIGHT_SPOT) {
