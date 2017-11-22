@@ -1149,6 +1149,12 @@ RESULT UIViewTestSuite::AddTestDreamBaseUI() {
 
 	double sTestTime = 10000.0;
 
+	struct TestContext {
+		quad* app_basis = nullptr;
+		std::shared_ptr<DreamUserApp> pUser = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
@@ -1156,7 +1162,13 @@ RESULT UIViewTestSuite::AddTestDreamBaseUI() {
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		CN(m_pDreamOS);
+
+		pTestContext->app_basis = m_pDreamOS->AddQuad(1.5f, 0.5f);
+
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
 		{
@@ -1178,7 +1190,11 @@ RESULT UIViewTestSuite::AddTestDreamBaseUI() {
 
 		// UIKeyboard App
 		CR(m_pDreamOS->InitializeKeyboard());
-		CR(m_pDreamOS->InitializeDreamUser());
+		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		CN(pTestContext->pUser);
+
+		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
+		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
 
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(pDreamBrowser, "Failed to create dream browser");
@@ -1204,7 +1220,21 @@ RESULT UIViewTestSuite::AddTestDreamBaseUI() {
 
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		quaternion qAppBasis;
+		point ptAppBasis;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		pTestContext->pUser->GetAppBasisPosition(ptAppBasis);
+		pTestContext->pUser->GetAppBasisOrientation(qAppBasis);
+
+		pTestContext->app_basis->SetPosition(ptAppBasis);
+		pTestContext->app_basis->SetOrientation(qAppBasis);
+
+	Error:
+		return r;
 	};
 
 	// Reset Code
@@ -1219,7 +1249,7 @@ RESULT UIViewTestSuite::AddTestDreamBaseUI() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local UIView Test");
