@@ -8,7 +8,35 @@ SoundClient::~SoundClient() {
 	// empty
 }
 
-//m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
+
+RESULT SoundClient::InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pCaptureSoundBuffer == nullptr));
+
+	m_pCaptureSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	CN(m_pCaptureSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Capture Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+
+RESULT SoundClient::InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pRenderSoundBuffer == nullptr));
+
+	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	CN(m_pRenderSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Render Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+
 
 bool SoundClient::IsRunning() {
 	return (m_renderState == state::RUNNING);

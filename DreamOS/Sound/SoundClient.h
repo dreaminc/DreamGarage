@@ -32,6 +32,9 @@ protected:
 	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
 	SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
 
+	RESULT InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	RESULT InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+
 public:
 	bool IsRunning();
 
@@ -47,6 +50,9 @@ public:
 private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
+
+	SoundBuffer *m_pCaptureSoundBuffer = nullptr;
+	SoundBuffer *m_pRenderSoundBuffer = nullptr;
 
 };
 

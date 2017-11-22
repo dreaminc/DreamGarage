@@ -924,6 +924,12 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CircularBuffer.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2057,6 +2063,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.h">
       <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CircularBuffer.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundBuffer.h">
+      <Filter>Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

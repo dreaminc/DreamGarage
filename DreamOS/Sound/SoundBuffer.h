@@ -1,5 +1,6 @@
 #ifndef SOUND_BUFFER_H_
 #define SOUND_BUFFER_H_
+#pragma once
 
 #include "RESULT/EHM.h"
 
@@ -9,7 +10,7 @@
 
 #include "Primitives/CircularBuffer.h"
 
-class SoundBufferBase {
+class SoundBuffer {
 public:
 	enum class type {
 		UNSIGNED_8_BIT,
@@ -19,47 +20,44 @@ public:
 		INVALID
 	};
 
-protected:
-	SoundBufferBase(int numChannels, SoundBufferBase::type bufferType) :
-		m_channels(numChannels),
-		m_bufferType(bufferType)
-	{
-		// empty
-	}
-
-	~SoundBufferBase() {
-		// empty
-	}
-
-	virtual SoundBufferBase::type GetType() = 0;
+	static const char * TypeString(SoundBuffer::type bufferType);
 
 public:
+	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	~SoundBuffer();
+
+	virtual SoundBuffer::type GetType() = 0;
 	virtual RESULT Initialize() = 0;
+
+	static SoundBuffer* Make(int numChannels, SoundBuffer::type bufferType);
 
 protected:
 	int m_channels;
-	SoundBufferBase::type m_bufferType = type::INVALID;
+	SoundBuffer::type m_bufferType = type::INVALID;
 };
 
+// Type specific stuff
 template <class CBType>
-class SoundBuffer : public SoundBufferBase {
-	SoundBuffer(int numChannels, SoundBufferBase::type bufferType) :
-		SoundBuffer(numChannels, SoundBufferBase::type bufferType)
+class SoundBufferTyped : public SoundBuffer {
+public:
+	SoundBufferTyped(int numChannels) :
+		SoundBuffer(numChannels, GetType())
 	{
 		// empty
 	}
 
-	~SoundBuffer() {
-		if (m_pCircularBuffers != nullptr) {
+public:
+	~SoundBufferTyped() {
+		if (m_ppCircularBuffers != nullptr) {
 			for (int i = 0; i < m_channels; i++) {
-				if (m_pCircularBuffers[i] != nullptr) {
-					delete m_pCircularBuffers[i];
-					m_pCircularBuffers[i] = nullptr;
+				if (m_ppCircularBuffers[i] != nullptr) {
+					delete m_ppCircularBuffers[i];
+					m_ppCircularBuffers[i] = nullptr;
 				}
 			}
 			
-			delete [] m_pCircularBuffers;
-			m_pCircularBuffers = nullptr;
+			delete [] m_ppCircularBuffers;
+			m_ppCircularBuffers = nullptr;
 
 		}
 	}
@@ -71,11 +69,14 @@ class SoundBuffer : public SoundBufferBase {
 		CB((m_channels >= 1 && m_channels <= 2));
 		CB((m_bufferType != SoundBuffer::type::INVALID));
 
-		m_pCircularBuffers = new CircularBuffer<CBType>[m_channels];
-		CN(m_pCircularBuffers);
+		m_ppCircularBuffers = new CircularBuffer<CBType>*[m_channels];
+		CN(m_ppCircularBuffers);
 
 		for (int i = 0; i < m_channels; i++) {
-			m_pCircularBuffers[i].InitializePendingBuffer();
+			m_ppCircularBuffers[i] = new CircularBuffer<CBType>();
+			CN(m_ppCircularBuffers[i]);
+				
+			CR(m_ppCircularBuffers[i]->InitializePendingBuffer());
 		}
 
 	Error:
@@ -83,43 +84,54 @@ class SoundBuffer : public SoundBufferBase {
 	}
 
 	// This is sub-typed below
-	virtual SoundBufferBase::type GetType() override;
-
-	static SoundBuffer *Make(int numChannels) {
-		RESULT r = R_PASS;
-
-		SoundBufferBase::type bufferType = GetType();
-
-		SoundBuffer<CBType> pSoundBufferReturn = new SoundBuffer<CBType>(numChannels, bufferType);
-		CN(pSoundBufferReturn);
-
-		CR(pSoundBufferReturn->Initialize());
-
-		return pSoundBufferReturn;
-
-	Error:
-		if (pSoundBufferReturn != nullptr) {
-			delete pSoundBufferReturn;
-			pSoundBufferReturn = nullptr;
-		}
-
-		return nullptr;
+	virtual SoundBuffer::type GetType() override {
+		return SoundBuffer::type::INVALID;
 	}
 
 private:
-	CircularBuffer<CBType> *m_pCircularBuffers = nullptr;
+	CircularBuffer<CBType> **m_ppCircularBuffers = nullptr;
 };
 
 template<>
-SoundBufferBase::type SoundBuffer<uint8_t>::GetType() { return SoundBufferBase::type::UNSIGNED_8_BIT; }
+SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() { 
+	return SoundBuffer::type::UNSIGNED_8_BIT; 
+}
 
 template<>
-SoundBufferBase::type SoundBuffer<int16_t>::GetType() { return SoundBufferBase::type::UNSIGNED_8_BIT; }
+SoundBuffer::type SoundBufferTyped<int16_t>::GetType() { 
+	return SoundBuffer::type::UNSIGNED_8_BIT; 
+}
 
 template<>
-SoundBufferBase::type SoundBuffer<float>::GetType() { return SoundBufferBase::type::FLOATING_POINT_32_BIT; }
+SoundBuffer::type SoundBufferTyped<float>::GetType() { 
+	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
+}
 
 template<>
-SoundBufferBase::type SoundBuffer<double>::GetType() { return SoundBufferBase::type::FLOATING_POINT_64_BIT; }
+SoundBuffer::type SoundBufferTyped<double>::GetType() { 
+	return SoundBuffer::type::FLOATING_POINT_64_BIT; 
+}
+
+template <class CBType>
+SoundBuffer *MakeSoundBuffer(int numChannels) {
+	RESULT r = R_PASS;
+
+	SoundBufferTyped<CBType> *pSoundBufferReturn = new SoundBufferTyped<CBType>(numChannels);
+	CN(pSoundBufferReturn);
+
+	CR(pSoundBufferReturn->Initialize());
+
+	return pSoundBufferReturn;
+
+Error:
+	if (pSoundBufferReturn != nullptr) {
+		delete pSoundBufferReturn;
+		pSoundBufferReturn = nullptr;
+	}
+
+	return nullptr;
+}
+
+
 
 #endif // SOUND_BUFFER_H_

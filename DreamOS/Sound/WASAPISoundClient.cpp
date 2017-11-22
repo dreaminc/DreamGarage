@@ -484,6 +484,33 @@ const char *GetSubFormatString(GUID waveFormatSubFormat) {
 	return "UNDEFINED SUBFORMAT";
 }
 
+SoundBuffer::type GetFormatSoundBufferType(WAVEFORMATEX *pWaveFormatX) {
+	RESULT r = R_PASS;
+
+	if (pWaveFormatX->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
+		WAVEFORMATEXTENSIBLE *pWaveFormatExtensible = (WAVEFORMATEXTENSIBLE*)pWaveFormatX;
+		CN(pWaveFormatExtensible);
+		
+		GUID waveFormatSubFormat = pWaveFormatExtensible->SubFormat;
+		
+		if (waveFormatSubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT) {
+			if (pWaveFormatX->wBitsPerSample == 32)
+				return SoundBuffer::type::FLOATING_POINT_32_BIT;
+			else if(pWaveFormatX->wBitsPerSample == 64)
+				return SoundBuffer::type::FLOATING_POINT_64_BIT;
+		}
+		else if (waveFormatSubFormat == KSDATAFORMAT_SUBTYPE_PCM) {
+			if (pWaveFormatX->wBitsPerSample == 8)
+				return SoundBuffer::type::UNSIGNED_8_BIT;
+			else if (pWaveFormatX->wBitsPerSample == 16)
+				return SoundBuffer::type::SIGNED_16_BIT;
+		}
+	}
+
+Error:
+	return SoundBuffer::type::INVALID;
+}
+
 RESULT WASAPISoundClient::PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo) {
 	RESULT r = R_PASS;
 
@@ -508,8 +535,6 @@ RESULT WASAPISoundClient::PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::strin
 		DEBUG_LINEOUT("Audio sub format: %s", GetSubFormatString(waveFormatSubFormat));
 	}
 
-	
-
 Error:
 	return r;
 }
@@ -533,6 +558,9 @@ RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	CR((RESULT)m_pAudioRenderClient->GetMixFormat(&m_pRenderWaveFormatX));
 	CN(m_pRenderWaveFormatX);
 
+	SoundBuffer::type bufferType = GetFormatSoundBufferType(m_pRenderWaveFormatX);
+	int numChannels = m_pRenderWaveFormatX->nChannels;
+
 	// Print out format
 	CR(PrintWaveFormat(m_pRenderWaveFormatX, "render"));
 
@@ -549,6 +577,9 @@ RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 		m_pRenderWaveFormatX, 
 		nullptr), 
 	"Failed to init render client");
+
+	// Set up the render Sound buffer
+	CR(InitializeRenderSoundBuffer(numChannels, bufferType));
 
 Error:
 	return r;
@@ -571,6 +602,9 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 	CR((RESULT)m_pAudioCaptureClient->GetMixFormat(&m_pCaptureWaveFormatX));
 	CN(m_pCaptureWaveFormatX);
 
+	SoundBuffer::type bufferType = GetFormatSoundBufferType(m_pCaptureWaveFormatX);
+	int numChannels = m_pCaptureWaveFormatX->nChannels;
+
 	// Print out format
 	CR(PrintWaveFormat(m_pCaptureWaveFormatX, "capture"));
 
@@ -583,6 +617,9 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 		m_pCaptureWaveFormatX,
 		nullptr),
 		"Failed to init capture client");
+
+	// Set up the capture Sound buffer
+	CR(InitializeCaptureSoundBuffer(numChannels, bufferType));
 
 Error:
 	return r;
