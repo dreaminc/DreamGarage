@@ -51,6 +51,7 @@ private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
 
+protected:
 	SoundBuffer *m_pCaptureSoundBuffer = nullptr;
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
 

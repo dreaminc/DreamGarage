@@ -67,6 +67,7 @@ typedef enum {
 	R_INVALID_OBJECT,			// Wrong Object passed to function
 	R_OVERFLOW,					// Overflow error of some kind
 	R_POOL_FULL,				// Pool has no more objects left
+	R_BUFFER_FULL,
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

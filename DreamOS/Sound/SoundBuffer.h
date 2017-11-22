@@ -31,6 +31,15 @@ public:
 
 	static SoundBuffer* Make(int numChannels, SoundBuffer::type bufferType);
 
+	virtual bool IsFull() = 0;
+
+public:
+	// These are stubs to be picked up by the appropriate template implementation
+	virtual RESULT PushData(uint8_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(int16_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(float *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushData(double *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+
 protected:
 	int m_channels;
 	SoundBuffer::type m_bufferType = type::INVALID;
@@ -83,30 +92,69 @@ public:
 		return r;
 	}
 
+	virtual bool IsFull() override {
+		for (int i = 0; i < m_channels; i++) {
+			if (m_ppCircularBuffers[i]->IsFull())
+				return true;
+		}
+
+		return false;
+	}
+
 	// This is sub-typed below
 	virtual SoundBuffer::type GetType() override {
 		return SoundBuffer::type::INVALID;
+	}
+
+	RESULT PushData(CBType *pDataBuffer, int numFrames) {
+		RESULT r = R_PASS;
+
+		CN(m_ppCircularBuffers);
+
+		// Make sure the buffers have enough space
+		for (int i = 0; i < m_channels; i++) {
+			CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
+			CN(pChannelCircBuf);
+
+			CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
+		}
+
+		// This will de-interlace the samples
+		int sampleCount = 0;
+		for (int i = 0; i < numFrames; i++) {
+			for (int j = 0; j < m_channels; j++) {
+				m_ppCircularBuffers[i]->WriteToBuffer(pDataBuffer[sampleCount++]);
+			}
+		}
+
+	Error:
+		return r;
 	}
 
 private:
 	CircularBuffer<CBType> **m_ppCircularBuffers = nullptr;
 };
 
+// Unsigned 8 bit int
 template<>
-SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() { 
+SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() { ;
 	return SoundBuffer::type::UNSIGNED_8_BIT; 
 }
 
+// Signed 16 bit int
 template<>
 SoundBuffer::type SoundBufferTyped<int16_t>::GetType() { 
 	return SoundBuffer::type::UNSIGNED_8_BIT; 
 }
 
+// 32 bit floating point
 template<>
 SoundBuffer::type SoundBufferTyped<float>::GetType() { 
 	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
 }
 
+
+// 64 bit floating point
 template<>
 SoundBuffer::type SoundBufferTyped<double>::GetType() { 
 	return SoundBuffer::type::FLOATING_POINT_64_BIT; 

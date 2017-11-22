@@ -278,6 +278,13 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				//hr = pMySink->CopyData(pData, numFramesAvailable, &bDone);
 				//CR((RESULT)hr);
 
+				if (m_pCaptureSoundBuffer->IsFull() == false) {
+					CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
+				}
+				else {
+					DEBUG_LINEOUT("Capture buffer is full");
+				}
+
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);
 
