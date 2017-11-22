@@ -8,6 +8,8 @@
 
 #include <thread>
 
+#include "SoundBuffer.h"
+
 class SoundClient {
 public:
 	enum class state {
@@ -45,6 +47,7 @@ public:
 private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
+
 };
 
 #endif SOUND_CLIENT_H_

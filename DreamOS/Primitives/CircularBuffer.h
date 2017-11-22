@@ -15,7 +15,7 @@ class CircularBuffer {
 
 public:
 	CircularBuffer() {
-		InitializePendingBuffer();
+		// InitializePendingBuffer();
 	}
 
 	~CircularBuffer() {
