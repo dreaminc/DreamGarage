@@ -55,6 +55,7 @@ typedef enum {
 
 	R_OBJECT_NOT_FOUND,
 	R_COMPLETE,
+	R_BUFFER_NOT_READY,
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,

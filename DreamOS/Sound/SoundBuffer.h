@@ -8,6 +8,8 @@
 // DreamOS/Sound/SoundBuffer.h
 // Sound Buffer object (always PCM, simply different types
 
+#include <mutex>
+
 #include "Primitives/CircularBuffer.h"
 
 class SoundBuffer {
@@ -43,6 +45,7 @@ public:
 protected:
 	int m_channels;
 	SoundBuffer::type m_bufferType = type::INVALID;
+	std::mutex m_bufferLock;
 };
 
 // Type specific stuff
@@ -106,10 +109,37 @@ public:
 		return SoundBuffer::type::INVALID;
 	}
 
+	RESULT ReadData(CBType **ppDataBuffer, int channels, int bytesToRead, int &framesRead) {
+		RESULT r = R_PASS;
+
+		pDataBuffer = nullptr;
+		framesRead = 0;
+
+		CB((m_channels == channels));
+
+		// If lock fails it means we're currently writing the buffer so return 
+		// null buffer and zero frames read
+		CBR(m_bufferLock.try_lock(), R_BUFFER_NOT_READY);
+
+		for (int i = 0; i < m_channels; i++) {
+			int bytesRead;
+			m_ppCircularBuffers[i]->ReadFromBuffer(ppDataBuffer[i], bytesToRead, bytesRead);
+			CN(ppDataBuffer[i]);
+			framesRead = bytesRead;
+		}
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
 	RESULT PushData(CBType *pDataBuffer, int numFrames) {
 		RESULT r = R_PASS;
 
 		CN(m_ppCircularBuffers);
+
+		m_bufferLock.lock();
 
 		// Make sure the buffers have enough space
 		for (int i = 0; i < m_channels; i++) {
@@ -126,6 +156,8 @@ public:
 				m_ppCircularBuffers[i]->WriteToBuffer(pDataBuffer[sampleCount++]);
 			}
 		}
+
+		m_bufferLock.unlock();
 
 	Error:
 		return r;
