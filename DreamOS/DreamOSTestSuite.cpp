@@ -5,6 +5,7 @@
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
+#include "HAL/UIStageProgram.h"
 
 #include "DreamTestingApp.h"
 #include "DreamUserApp.h"
@@ -28,6 +29,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestDreamBaseUI());
+
 	CR(AddTestUserApp());	
 
 	CR(AddTestDreamBrowser());
@@ -81,13 +84,15 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));	
 
 	//TODO: Matrix node
 	//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
 	// Connect output as pass-thru to internal blend program
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 	
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
@@ -141,6 +146,7 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	// Connect output as pass-thru to internal blend program
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	//*/
+	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -663,6 +669,124 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 	pUITest->SetTestDescription("Basic test of shared content view working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+// A test that includes all the basic UI apps in a functional state.
+// User, ControlView, Keyboard, Browser, UIBar
+RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	struct TestContext {
+		quad* app_basis = nullptr;
+		std::shared_ptr<DreamUserApp> pUser = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(m_pDreamOS);
+
+		pTestContext->app_basis = m_pDreamOS->AddQuad(1.5f, 0.5f);
+	
+		CR(SetupDreamAppPipeline());
+		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			quad *pQuad = nullptr;
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+		}
+		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
+		CN(pDreamControlView);
+
+		// UIKeyboard App
+		CR(m_pDreamOS->InitializeKeyboard());
+		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		CN(pTestContext->pUser);
+
+		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
+		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(9.0f);
+		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+
+		pDreamBrowser->SetVisible(true);
+
+		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+		CN(pDreamUIBar);
+		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		quaternion qAppBasis;
+		point ptAppBasis;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		pTestContext->pUser->GetAppBasisPosition(ptAppBasis);
+		pTestContext->pUser->GetAppBasisOrientation(qAppBasis);
+
+		pTestContext->app_basis->SetPosition(ptAppBasis);
+		pTestContext->app_basis->SetOrientation(qAppBasis);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Full test of uiview working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;

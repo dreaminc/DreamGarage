@@ -214,7 +214,7 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
+	CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
@@ -222,7 +222,6 @@ RESULT UIViewTestSuite::AddTests() {
 	//CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
 	//CR(AddTestDreamControlView());
-	CR(AddTestDreamBaseUI());
 
 Error:
 	return r;
@@ -1139,124 +1138,5 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 	}
 
 //Error:
-	return r;
-}
-
-// A test that includes all the basic UI apps in a functional state.
-// User, ControlView, Keyboard, Browser, UIBar
-RESULT UIViewTestSuite::AddTestDreamBaseUI() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 10000.0;
-
-	struct TestContext {
-		quad* app_basis = nullptr;
-		std::shared_ptr<DreamUserApp> pUser = nullptr;
-	};
-	TestContext *pTestContext = new TestContext();
-
-	auto fnInitialize = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-
-		CN(m_pDreamOS);
-
-		pTestContext->app_basis = m_pDreamOS->AddQuad(1.5f, 0.5f);
-
-		UIStageProgram *pUIStageProgram = nullptr;
-		CR(SetupUIStagePipeline(pUIStageProgram));
-		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
-			DEBUG_LINEOUT("Initializing Cloud Controller");
-			quad *pQuad = nullptr;
-			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-			{
-				std::string strUsername = pCommandLineManager->GetParameterValue("username");
-				std::string strPassword = pCommandLineManager->GetParameterValue("password");
-				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-
-				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-			}
-		}
-		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
-		CN(pDreamControlView);
-
-		// UIKeyboard App
-		CR(m_pDreamOS->InitializeKeyboard());
-		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
-		CN(pTestContext->pUser);
-
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
-
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
-
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(9.0f);
-		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-
-		pDreamBrowser->SetVisible(false);
-
-		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-		CN(pDreamUIBar);
-		CR(pDreamUIBar->SetUIStageProgram(pUIStageProgram));
-
-	Error:
-		return r;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code
-	auto fnUpdate = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		quaternion qAppBasis;
-		point ptAppBasis;
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-		pTestContext->pUser->GetAppBasisPosition(ptAppBasis);
-		pTestContext->pUser->GetAppBasisOrientation(qAppBasis);
-
-		pTestContext->app_basis->SetPosition(ptAppBasis);
-		pTestContext->app_basis->SetOrientation(qAppBasis);
-
-	Error:
-		return r;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
-	};
-
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	CN(pUITest);
-
-	pUITest->SetTestName("Local UIView Test");
-	pUITest->SetTestDescription("Full test of uiview working locally");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
-
-Error:
 	return r;
 }
