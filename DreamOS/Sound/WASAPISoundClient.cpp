@@ -427,6 +427,13 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 
 			//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
 
+			if (m_pRenderSoundBuffer->NumPendingBytes() > 0) {
+				float *pDataBuffer = (float*)(pAudioClientBufferData);
+
+				// Get the bytes (this will interlace them)
+				CRM(m_pRenderSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFramesAvailable), "Failed to load render sound buffer");
+			}
+
 			hr = pRenderClient->ReleaseBuffer(numFramesAvailable, audioDeviceFlags);
 			CRM((RESULT)hr, "Failed to release buffer: %s", GetAudioClientErrorCodeString(hr));
 		}

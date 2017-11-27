@@ -34,6 +34,13 @@ public:
 	static SoundBuffer* Make(int numChannels, SoundBuffer::type bufferType);
 
 	virtual bool IsFull() = 0;
+	virtual size_t NumPendingBytes() = 0;
+
+public:
+	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(float *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBuffer(double *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 
 public:
 	// These are stubs to be picked up by the appropriate template implementation
@@ -104,6 +111,34 @@ public:
 		return false;
 	}
 
+	virtual size_t NumPendingBytes() override {
+		size_t numPendingBytes = -1;
+		bool fFirst = true;
+
+		// TODO: Right now a lot of work is going into maintaining 
+		// the two channel buffers as separate entities and it might 
+		// make more sense to just have ONE circular buffer and simply 
+		// have SoundBuffer manage the frame structure 
+
+		for (int i = 0; i < m_channels; i++) {
+			if (fFirst) {
+				numPendingBytes = m_ppCircularBuffers[i]->NumPendingBufferBytes();
+				fFirst = false;
+			}
+			else {
+				if (numPendingBytes != m_ppCircularBuffers[i]->NumPendingBufferBytes()) {
+					return -1;
+				}
+			}
+		}
+
+		return numPendingBytes;
+	}
+
+	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// This is sub-typed below
 	virtual SoundBuffer::type GetType() override {
 		return SoundBuffer::type::INVALID;
@@ -153,7 +188,7 @@ public:
 		int sampleCount = 0;
 		for (int i = 0; i < numFrames; i++) {
 			for (int j = 0; j < m_channels; j++) {
-				m_ppCircularBuffers[i]->WriteToBuffer(pDataBuffer[sampleCount++]);
+				m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
 			}
 		}
 
@@ -185,6 +220,27 @@ SoundBuffer::type SoundBufferTyped<float>::GetType() {
 	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
 }
 
+template<>
+RESULT SoundBufferTyped<float>::LoadDataToInterlacedTargetBuffer(float *pTargetDataBuffer, int numFrameCount) {
+	RESULT r = R_PASS;
+
+	CB((NumPendingBytes() >= numFrameCount));
+
+	size_t bufferCounter = 0;
+	float tempVal = 0.0f;
+
+	for (int j = 0; j < numFrameCount; j++) {
+		for (int i = 0; i < m_channels; i++) {
+			CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
+
+			pTargetDataBuffer[bufferCounter] = tempVal;
+			bufferCounter++;
+		}
+	}
+
+Error:
+	return r;
+}
 
 // 64 bit floating point
 template<>

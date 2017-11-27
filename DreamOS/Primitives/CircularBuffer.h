@@ -25,6 +25,27 @@ private:
 	}
 
 public:
+	inline RESULT ReadNextValue(CBType &retVal) {
+		retVal = 0;
+		
+		if (m_circularBuffer_c == m_circularBuffer_e) {
+			return R_BUFFER_EMPTY;
+		}
+			
+		retVal = m_circularBuffer[m_circularBuffer_c];
+
+		m_circularBuffer_c++;
+		m_numPendingBytes--;
+
+		// Circle up
+		if (m_circularBuffer_c >= m_circularBuffer_n) {
+			m_circularBuffer_c = 0;
+		}
+
+		return R_PASS;
+	}
+
+public:
 	CircularBuffer() {
 		// InitializePendingBuffer();
 	}
@@ -93,7 +114,7 @@ public:
 	}
 
 	bool IsFull() {
-		if (m_numPendingBytes != 0)
+		if (m_numPendingBytes >= m_circularBuffer_n)
 			return true;
 		else
 			return false;
