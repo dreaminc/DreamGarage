@@ -682,7 +682,7 @@ RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
 	double sTestTime = 10000.0;
 
 	struct TestContext {
-		quad* app_basis = nullptr;
+		quad* appBasis = nullptr;
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -699,7 +699,7 @@ RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
 
 		CN(m_pDreamOS);
 
-		pTestContext->app_basis = m_pDreamOS->AddQuad(1.5f, 0.5f);
+		pTestContext->appBasis = m_pDreamOS->AddQuad(1.5f, 0.5f);
 	
 		CR(SetupDreamAppPipeline());
 		{
@@ -761,8 +761,8 @@ RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
 		pTestContext->pUser->GetAppBasisPosition(ptAppBasis);
 		pTestContext->pUser->GetAppBasisOrientation(qAppBasis);
 
-		pTestContext->app_basis->SetPosition(ptAppBasis);
-		pTestContext->app_basis->SetOrientation(qAppBasis);
+		pTestContext->appBasis->SetPosition(ptAppBasis);
+		pTestContext->appBasis->SetOrientation(qAppBasis);
 
 	Error:
 		return r;
