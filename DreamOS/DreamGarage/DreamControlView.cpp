@@ -434,7 +434,10 @@ RESULT DreamControlView::Show() {
 
 	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
 	CN(m_pBrowserHandle);
+
+#ifndef _USE_TEST_APP
 	CR(m_pBrowserHandle->RequestBeginStream());
+#endif
 
 	//SetSharedViewContext();
 

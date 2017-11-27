@@ -33,7 +33,7 @@ public:
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestDreamBrowser();
-	RESULT AddTestDreamBaseUI();
+	RESULT AddTestDreamOS();
 
 	// Capturing Apps
 	RESULT AddTestCaptureApp();

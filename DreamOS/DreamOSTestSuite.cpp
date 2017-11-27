@@ -29,7 +29,7 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamBaseUI());
+	CR(AddTestDreamOS());
 
 	CR(AddTestUserApp());	
 
@@ -676,13 +676,12 @@ Error:
 
 // A test that includes all the basic UI apps in a functional state.
 // User, ControlView, Keyboard, Browser, UIBar
-RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
+RESULT DreamOSTestSuite::AddTestDreamOS() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
 
 	struct TestContext {
-		quad* appBasis = nullptr;
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -698,8 +697,6 @@ RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
-
-		pTestContext->appBasis = m_pDreamOS->AddQuad(1.5f, 0.5f);
 	
 		CR(SetupDreamAppPipeline());
 		{
@@ -752,19 +749,7 @@ RESULT DreamOSTestSuite::AddTestDreamBaseUI() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-
-		quaternion qAppBasis;
-		point ptAppBasis;
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-		pTestContext->pUser->GetAppBasisPosition(ptAppBasis);
-		pTestContext->pUser->GetAppBasisOrientation(qAppBasis);
-
-		pTestContext->appBasis->SetPosition(ptAppBasis);
-		pTestContext->appBasis->SetOrientation(qAppBasis);
-
-	Error:
+	
 		return r;
 	};
 
