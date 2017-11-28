@@ -210,17 +210,7 @@ RESULT DreamUIBar::PopPath() {
 	CBR(!m_pathStack.empty(), R_SKIPPED);
 	pNode = m_pathStack.top();
 
-	if (pNode->GetTitle() == "Share") {
-		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
-	}
-	else {
-		auto strURI = pNode->GetThumbnailURL();
-		if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-			MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
-			pTempMenuNode->SetName("root_menu_title");
-			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
-		}
-	}
+	CR(RequestIconFile(pNode));
 
 	CR(m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle()));
 
@@ -241,7 +231,8 @@ RESULT DreamUIBar::ShowRootMenu() {
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+	m_pPendingIconTexture = m_pShareIcon.get();
 	{
 		
 		point ptOrigin;
@@ -384,20 +375,31 @@ RESULT DreamUIBar::RequestMenu() {
 	CBR(!m_pathStack.empty(), R_SKIPPED);
 
 	pNode = m_pathStack.top();
-	if (pNode->GetTitle() == "Share") {
-		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+
+	CR(RequestIconFile(pNode));
+
+	m_pathStack.pop();
+	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
+	RESULT r = R_PASS;
+
+	if (pMenuNode->GetTitle() == "Share") {
+	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+		m_pPendingIconTexture = m_pShareIcon.get();
 	}
 	else {
-		auto strURI = pNode->GetThumbnailURL();
-		if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-			MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
+		auto strURI = pMenuNode->GetIconURL();
+		if (strURI != "") {
+			MenuNode* pTempMenuNode = new MenuNode();
 			pTempMenuNode->SetName("root_menu_title");
 			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 		}
 	}
-
-	m_pathStack.pop();
-	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 
 Error:
 	return r;
@@ -438,12 +440,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 			const std::string& strPath = pSubMenuNode->GetPath();
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
-			auto strURI = pSubMenuNode->GetIconURL();
-			if (strURI != "") {
-				MenuNode* pTempMenuNode = new MenuNode();
-				pTempMenuNode->SetName("root_menu_title");
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
-			}
+			CR(RequestIconFile(pSubMenuNode));
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
@@ -578,7 +575,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 		}
 
 		if (pMenuNodeTitle == "root_menu_title") {
-			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
+			//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
+			m_pPendingIconTexture = pTexture;
 			//TODO: May want to move downloading outside of DreamUIBar
 			//TODO: the only time the title view is used is to show the chrome icon and "Website" title
 			if (m_pKeyboardHandle != nullptr) {
@@ -629,7 +627,13 @@ RESULT DreamUIBar::Update(void *pContext) {
 		if (m_pMenuNode->GetNodeType() != MenuNode::type::ACTION) {
 			m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
 			CR(m_pScrollView->UpdateMenuButtons(pButtons));
+			if (m_pPendingIconTexture != nullptr) {
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
+				m_pPendingIconTexture = nullptr;
+			}
 		}
+
+
 		CR(ShowApp());
 
 	}

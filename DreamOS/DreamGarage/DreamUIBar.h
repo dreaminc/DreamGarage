@@ -113,6 +113,8 @@ public:
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type) override;
 
+	RESULT RequestIconFile(std::shared_ptr<MenuNode> pMenuNode);
+
 	RESULT HandleSelect(UIButton* pButtonContext, void* pContext);
 
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
@@ -154,12 +156,13 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 
-	std::shared_ptr<texture> m_pDefaultThumbnail;
-	std::shared_ptr<texture> m_pDefaultIcon;
-	std::shared_ptr<texture> m_pShareIcon;
-	std::shared_ptr<texture> m_pMenuItemBg;
-	texture* m_pOverlayLeft;
-	texture* m_pOverlayRight;
+	std::shared_ptr<texture> m_pDefaultThumbnail = nullptr;
+	std::shared_ptr<texture> m_pDefaultIcon = nullptr;
+	std::shared_ptr<texture> m_pShareIcon = nullptr;
+	std::shared_ptr<texture> m_pMenuItemBg = nullptr;
+	texture* m_pOverlayLeft = nullptr;
+	texture* m_pOverlayRight = nullptr;
+	texture* m_pPendingIconTexture = nullptr;
 
 	std::shared_ptr<font> m_pFont;
 
