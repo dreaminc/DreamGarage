@@ -165,7 +165,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		CN(pTestContext);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 		CN(pSphere);
@@ -340,7 +340,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		CN(pTestContext);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		
 		pTestContext->pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1);
 		CN(pTestContext->pQuad);
@@ -565,7 +565,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();

@@ -597,7 +597,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 		point ptCamera = pCamera->GetPosition();
 		vector vPos;
-		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
+		for (auto& hand : { m_pLeftHand, m_pRightHand }) {	// which hand is closer
 			float handDist = 0.0f;
 			point ptHand = hand->GetPosition(true);
 			vector vHand = ptHand - pCamera->GetOrigin(true);

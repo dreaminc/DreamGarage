@@ -12,6 +12,7 @@
 #include <memory>
 
 class DreamOS;
+class UIStageProgram;
 
 class DreamOSTestSuite : public TestSuite
 {
@@ -32,6 +33,7 @@ public:
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestDreamBrowser();
+	RESULT AddTestDreamOS();
 
 	// Capturing Apps
 	RESULT AddTestCaptureApp();
@@ -42,6 +44,7 @@ private:
 
 private:
 	DreamOS *m_pDreamOS = nullptr;
+	UIStageProgram *m_pUIProgramNode;
 };
 
 #endif // ! DREAM_OS_TEST_SUITE_H_

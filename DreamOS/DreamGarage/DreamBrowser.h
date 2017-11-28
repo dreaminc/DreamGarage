@@ -248,7 +248,7 @@ private:
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	bool m_fStreaming = false;
-	bool m_fRecievingStream = false;
+	bool m_fReceivingStream = false;
 
 	TextEntryString m_strEntered;
 	

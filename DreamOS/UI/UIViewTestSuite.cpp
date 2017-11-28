@@ -214,12 +214,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
+	CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	CR(AddTestKeyboardAngle());
+	//CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
 	//CR(AddTestDreamControlView());
 
@@ -655,6 +655,13 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
+			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+			CN(pDreamUser);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			CN(pDreamUIBar);
+		}
+
+		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
 			auto pCommandLineManager = CommandLineManager::instance();
 			DEBUG_LINEOUT("Initializing Cloud Controller");
@@ -667,20 +674,12 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 			}
-			//*
-			for (int i = -4; i < 5; i++) {
-				pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
-				CN(pQuad);
-				pQuad->RotateXByDeg(90.0f);
-				pQuad->SetPosition(i * 1.05f, 0.0f, 3.5f);
-				CR(m_pDreamOS->AddObjectToUIGraph(pQuad));
-			}
-			//*/
 
+			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+			CN(pDreamUser);
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
 			CN(pDreamUIBar);
-			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
-			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
+			
 
 			CR(m_pDreamOS->InitializeKeyboard());
 			
@@ -696,15 +695,34 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pSphere->SetPosition(ptcam + point(-0.5f, 1.0f, 0.0f));
 		}
 
+
 	Error:
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
-		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
-		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
-		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
-		nullptr);
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local UIView Test");

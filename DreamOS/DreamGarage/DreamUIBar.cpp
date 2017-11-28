@@ -63,13 +63,10 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
-
-	auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
+	
+	// Makes sense for UIBar to always have a user run with it for now
 	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
-
-	CB(browserUIDs.size() == 1);
-	m_browserUID = browserUIDs[0];
-
+	
 	CB(userUIDs.size() == 1);
 	m_userUID = userUIDs[0];
 
@@ -246,7 +243,7 @@ RESULT DreamUIBar::ShowRootMenu() {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	{
-			
+		
 		point ptOrigin;
 		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		quaternion qOrigin;
@@ -493,7 +490,11 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				//TODO: why does this need to happen
 				{
-					auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+					auto browserUIDs = GetDOS()->GetAppUID("DreamBrowser");	// moving this here for better isolation
+					DreamBrowserHandle* pBrowserHandle = nullptr;
+					CB(browserUIDs.size() == 1);
+					m_browserUID = browserUIDs[0];
+					pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
 					CN(pBrowserHandle);
 					pBrowserHandle->SetScope(strScope);
 					pBrowserHandle->SetPath(strPath);
