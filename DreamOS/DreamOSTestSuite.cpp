@@ -709,8 +709,11 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 				std::string strUsername = pCommandLineManager->GetParameterValue("username");
 				std::string strPassword = pCommandLineManager->GetParameterValue("password");
 				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+				long environmentID = 168;
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+				CRM(pCloudController->Start(false), "Failed to Start Cloud Controller");
+
 			}
 		}
 		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
@@ -731,7 +734,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		pDreamBrowser->SetDiagonalSize(9.0f);
 		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
-		pDreamBrowser->SetVisible(true);
+		pDreamBrowser->SetVisible(false);
 
 		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(pDreamUIBar);
