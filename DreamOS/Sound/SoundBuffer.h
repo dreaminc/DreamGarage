@@ -36,6 +36,10 @@ public:
 	virtual bool IsFull() = 0;
 	virtual size_t NumPendingBytes() = 0;
 
+	int NumChannels() {
+		return m_channels;
+	}
+
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -48,6 +52,12 @@ public:
 	virtual RESULT PushData(int16_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushData(float *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushData(double *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
+
+public:
+	virtual RESULT PushDataToChannel(int channel, uint8_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, float *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+	virtual RESULT PushDataToChannel(int channel, double *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 
 protected:
 	int m_channels;
@@ -169,6 +179,7 @@ public:
 		return r;
 	}
 
+	// Pushes interlaced data
 	RESULT PushData(CBType *pDataBuffer, int numFrames) {
 		RESULT r = R_PASS;
 
@@ -191,6 +202,29 @@ public:
 				m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
 			}
 		}
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
+	// Pushes de-interlaced data to a specific channel
+	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n) override {
+		RESULT r = R_PASS;
+
+		CN(m_ppCircularBuffers);
+		CBM((channel < m_channels), "Channel %d does not exist in SoundBuffer of width %d", channel, m_channels);
+
+		m_bufferLock.lock();
+
+		// Make sure the buffer has enough space
+		CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[channel];
+		CN(pChannelCircBuf);
+
+		CB((pChannelCircBuf->NumAvailableBufferBytes() >= pDataBuffer_n));
+	
+		pChannelCircBuf->WriteToBuffer(pDataBuffer, pDataBuffer_n);
 
 		m_bufferLock.unlock();
 

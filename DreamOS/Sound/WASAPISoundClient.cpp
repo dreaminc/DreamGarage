@@ -278,11 +278,28 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				//hr = pMySink->CopyData(pData, numFramesAvailable, &bDone);
 				//CR((RESULT)hr);
 
-				if (m_pCaptureSoundBuffer->IsFull() == false) {
-					CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
+				
+				//if (m_pCaptureSoundBuffer->IsFull() == false) {
+				//	CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
+				//}
+				//else {
+				//	DEBUG_LINEOUT("Capture buffer is full");
+				//}
+
+				// TESTING: Pushing capture audio directly into render buffer
+				if (m_pRenderSoundBuffer->IsFull() == false) {
+					int numChannels = m_pRenderSoundBuffer->NumChannels();
+
+					// Push the same data to both channels
+					DEBUG_LINEOUT("Captured %d frames", numFramesAvailable);
+
+					for (int i = 0; i < numChannels; i++) {
+						CR(m_pRenderSoundBuffer->PushDataToChannel(i, pDataBuffer, numFramesAvailable));
+					}
+
 				}
 				else {
-					DEBUG_LINEOUT("Capture buffer is full");
+					DEBUG_LINEOUT("Render buffer is full");
 				}
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
@@ -426,8 +443,10 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			//*/
 
 			//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
+			int readBytes = 0;
+			if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {
+				DEBUG_LINEOUT("Rendering %d frames", readBytes);
 
-			if (m_pRenderSoundBuffer->NumPendingBytes() > 0) {
 				float *pDataBuffer = (float*)(pAudioClientBufferData);
 
 				// Get the bytes (this will interlace them)
