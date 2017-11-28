@@ -40,6 +40,22 @@ public:
 		return m_channels;
 	}
 
+	// This will block
+	RESULT LockBuffer() {
+		m_bufferLock.lock();
+		return R_PASS;
+	}
+
+	// This will not block
+	bool PeekAndLockBuffer() {
+		return m_bufferLock.try_lock();
+	}
+
+	RESULT UnlockBuffer() {
+		m_bufferLock.unlock();
+		return R_PASS;
+	}
+
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -62,7 +78,8 @@ public:
 protected:
 	int m_channels;
 	SoundBuffer::type m_bufferType = type::INVALID;
-	std::mutex m_bufferLock;
+	//std::mutex m_bufferLock;
+	std::recursive_mutex m_bufferLock;
 };
 
 // Type specific stuff
@@ -185,6 +202,7 @@ public:
 
 		CN(m_ppCircularBuffers);
 
+		// This will block
 		m_bufferLock.lock();
 
 		// Make sure the buffers have enough space
@@ -216,6 +234,7 @@ public:
 		CN(m_ppCircularBuffers);
 		CBM((channel < m_channels), "Channel %d does not exist in SoundBuffer of width %d", channel, m_channels);
 
+		// This will block
 		m_bufferLock.lock();
 
 		// Make sure the buffer has enough space

@@ -287,20 +287,24 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				//}
 
 				// TESTING: Pushing capture audio directly into render buffer
-				if (m_pRenderSoundBuffer->IsFull() == false) {
-					int numChannels = m_pRenderSoundBuffer->NumChannels();
+				m_pRenderSoundBuffer->LockBuffer();
+				{
+					if (m_pRenderSoundBuffer->IsFull() == false) {
+						int numChannels = m_pRenderSoundBuffer->NumChannels();
 
-					// Push the same data to both channels
-					DEBUG_LINEOUT("Captured %d frames", numFramesAvailable);
+						// Push the same data to both channels
+						//DEBUG_LINEOUT("Captured %d frames", numFramesAvailable);
 
-					for (int i = 0; i < numChannels; i++) {
-						CR(m_pRenderSoundBuffer->PushDataToChannel(i, pDataBuffer, numFramesAvailable));
+						for (int i = 0; i < numChannels; i++) {
+							CR(m_pRenderSoundBuffer->PushDataToChannel(i, pDataBuffer, numFramesAvailable));
+						}
+
 					}
-
+					else {
+						DEBUG_LINEOUT("Render buffer is full");
+					}
 				}
-				else {
-					DEBUG_LINEOUT("Render buffer is full");
-				}
+				m_pRenderSoundBuffer->UnlockBuffer();
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);
@@ -443,15 +447,25 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			//*/
 
 			//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
+
+			// If there are pending buffer bytes in the render buffer
+			// play it back
 			int readBytes = 0;
-			if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {
-				DEBUG_LINEOUT("Rendering %d frames", readBytes);
+			
+			
 
-				float *pDataBuffer = (float*)(pAudioClientBufferData);
+			m_pRenderSoundBuffer->LockBuffer(); 
+			{
+				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {
+					//DEBUG_LINEOUT("Rendering %d frames", readBytes);
 
-				// Get the bytes (this will interlace them)
-				CRM(m_pRenderSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFramesAvailable), "Failed to load render sound buffer");
+					float *pDataBuffer = (float*)(pAudioClientBufferData);
+
+					// Get the bytes (This will interlace them)
+					CRM(m_pRenderSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFramesAvailable), "Failed to load render sound buffer");
+				}
 			}
+			m_pRenderSoundBuffer->UnlockBuffer();
 
 			hr = pRenderClient->ReleaseBuffer(numFramesAvailable, audioDeviceFlags);
 			CRM((RESULT)hr, "Failed to release buffer: %s", GetAudioClientErrorCodeString(hr));
