@@ -586,14 +586,18 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
-	vector vLookXZ = GetCameraLookXZ();
+	vector vCamera;
+	point ptMid;
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
 	CN(pCamera);
 	CN(m_pLeftHand);
 	CN(m_pRightHand);
+
 	{
 		float dist = 0.0f;
+		ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
+		vCamera = ptMid - pCamera->GetOrigin(true);
 
 		point ptCamera = pCamera->GetPosition();
 		vector vPos;
@@ -601,7 +605,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 			float handDist = 0.0f;
 			point ptHand = hand->GetPosition(true);
 			vector vHand = ptHand - pCamera->GetOrigin(true);
-			vector vTempPos = vLookXZ * (vHand.dot(vLookXZ));
+			vector vTempPos = vCamera * (vHand.dot(vCamera));
 			if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
 				vPos = vTempPos;
 		}
@@ -609,7 +613,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 
 		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCamera));
 	}
 
 Error:
