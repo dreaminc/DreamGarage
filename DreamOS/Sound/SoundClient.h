@@ -20,6 +20,12 @@ public:
 	};
 
 public:
+	class observer {
+	public:
+		virtual RESULT OnAudioDataCaptured(SoundBuffer *pCapturedSoundBuffer) = 0;
+	};
+
+public:
 	SoundClient();
 	~SoundClient();
 
