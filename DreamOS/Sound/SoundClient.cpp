@@ -149,3 +149,29 @@ RESULT SoundClient::HandleAudioDataCaptured(int numFrames) {
 Error:
 	return r;
 }
+
+RESULT SoundClient::PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer) {
+	RESULT r = R_PASS;
+
+	CBM((pSourceBuffer->NumChannels() == 1), "Source buffer is not mono");
+
+	m_pRenderSoundBuffer->LockBuffer();
+	{
+		if (m_pRenderSoundBuffer->IsFull() == false) {
+			//int numChannels = m_pRenderSoundBuffer->NumChannels();
+
+			//for (int i = 0; i < numChannels; i++) {
+			//	CR(m_pRenderSoundBuffer->PushDataToChannel(i, pDataBuffer, numFrames));
+			//
+			m_pRenderSoundBuffer->PushMonoAudioBuffer(numFrames, pSourceBuffer);
+
+		}
+		else {
+			DEBUG_LINEOUT("Render buffer is full");
+		}
+	}
+	m_pRenderSoundBuffer->UnlockBuffer();
+
+Error:
+	return r;
+}

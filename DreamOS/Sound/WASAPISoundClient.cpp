@@ -462,8 +462,6 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			// play it back
 			int readBytes = 0;
 			
-			
-
 			m_pRenderSoundBuffer->LockBuffer(); 
 			{
 				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {

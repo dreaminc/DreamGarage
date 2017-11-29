@@ -22,7 +22,7 @@ public:
 public:
 	class observer {
 	public:
-		virtual RESULT OnAudioDataCaptured(int numFrames, const SoundBuffer *pCaptureBuffer) = 0;
+		virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) = 0;
 	};
 
 	RESULT RegisterObserver(SoundClient::observer *pObserver);
@@ -60,6 +60,8 @@ public:
 
 	RESULT StartRender();
 	RESULT StopRender();
+
+	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
 private:
 	std::thread	m_audioRenderProcessingThread;

@@ -28,7 +28,7 @@ public:
 	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
 	~SoundBuffer();
 
-	virtual SoundBuffer::type GetType() = 0;
+	virtual SoundBuffer::type GetType() const = 0;
 	virtual RESULT Initialize() = 0;
 
 	static SoundBuffer* Make(int numChannels, SoundBuffer::type bufferType);
@@ -55,6 +55,8 @@ public:
 		m_bufferLock.unlock();
 		return R_PASS;
 	}
+	
+	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) = 0;
 
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -74,6 +76,12 @@ public:
 	virtual RESULT PushDataToChannel(int channel, int16_t *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushDataToChannel(int channel, float *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushDataToChannel(int channel, double *pDataBuffer, size_t numFrames) { return R_INVALID_PARAM; }
+
+public:
+	inline virtual RESULT ReadNextValue(int channel, uint8_t &value) { return R_INVALID_PARAM; }
+	inline virtual RESULT ReadNextValue(int channel, int16_t &value) { return R_INVALID_PARAM; }
+	inline virtual RESULT ReadNextValue(int channel, float &value) { return R_INVALID_PARAM; }
+	inline virtual RESULT ReadNextValue(int channel, double &value) { return R_INVALID_PARAM; }
 
 protected:
 	int m_channels;
@@ -167,9 +175,14 @@ public:
 	}
 
 	// This is sub-typed below
-	virtual SoundBuffer::type GetType() override {
+	virtual SoundBuffer::type GetType() const override {
 		return SoundBuffer::type::INVALID;
 	}
+
+	inline virtual RESULT ReadNextValue(int channel, CBType &value) { 
+		return m_ppCircularBuffers[channel]->ReadNextValue(value);
+	}
+	
 
 	RESULT ReadData(CBType **ppDataBuffer, int channels, int bytesToRead, int &framesRead) {
 		RESULT r = R_PASS;
@@ -191,6 +204,25 @@ public:
 		}
 
 		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
+	RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) {
+		RESULT r = R_PASS;
+
+		CBM((pSourceBuffer->GetType() == GetType()), "Don't currently support different type buffer pushes");
+		CB((pSourceBuffer->NumChannels() == 1));
+
+		for (int j = 0; j < numFrames; j++) {
+			CBType value = 0;
+			pSourceBuffer->ReadNextValue(0, value);
+
+			for (int i = 0; i < m_channels; i++) {
+				m_ppCircularBuffers[i]->WriteToBuffer(value);
+			}
+		}
 
 	Error:
 		return r;
@@ -257,19 +289,19 @@ private:
 
 // Unsigned 8 bit int
 template<>
-SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() { ;
+SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() const { ;
 	return SoundBuffer::type::UNSIGNED_8_BIT; 
 }
 
 // Signed 16 bit int
 template<>
-SoundBuffer::type SoundBufferTyped<int16_t>::GetType() { 
+SoundBuffer::type SoundBufferTyped<int16_t>::GetType() const { 
 	return SoundBuffer::type::UNSIGNED_8_BIT; 
 }
 
 // 32 bit floating point
 template<>
-SoundBuffer::type SoundBufferTyped<float>::GetType() { 
+SoundBuffer::type SoundBufferTyped<float>::GetType() const { 
 	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
 }
 
@@ -297,7 +329,7 @@ Error:
 
 // 64 bit floating point
 template<>
-SoundBuffer::type SoundBufferTyped<double>::GetType() { 
+SoundBuffer::type SoundBufferTyped<double>::GetType() const { 
 	return SoundBuffer::type::FLOATING_POINT_64_BIT; 
 }
 

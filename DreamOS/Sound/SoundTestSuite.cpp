@@ -96,13 +96,14 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 	struct TestContext : public SoundClient::observer {
 		SoundClient *pSoundClient = nullptr;
 
-		RESULT OnAudioDataCaptured(int numFrames, const SoundBuffer *pCaptureBuffer) {
+		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 
-			CR(r);
-
-			// TODO: 
-			DEBUG_LINEOUT("Captured %d frames", numFrames);
+			
+			// Simply pushes the capture buffer to the render buffer
+			if (pSoundClient != nullptr) {
+				CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			}
 
 		Error:
 			return r;
