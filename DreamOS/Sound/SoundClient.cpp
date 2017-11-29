@@ -113,3 +113,39 @@ RESULT SoundClient::Stop() {
 Error:
 	return r;
 }
+
+RESULT SoundClient::RegisterObserver(SoundClient::observer *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pSoundClientObserver == nullptr), "SoundClient Observer already registered");
+
+	m_pSoundClientObserver = pObserver;
+
+Error:
+	return r;
+}
+
+RESULT SoundClient::UnregisterObserver(SoundClient::observer *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CNM(m_pSoundClientObserver, "SoundClient observer not registered");
+
+	m_pSoundClientObserver = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT SoundClient::HandleAudioDataCaptured(int numFrames) {
+	RESULT r = R_PASS;
+
+	// TODO: Handle other stuff if needed
+	if (m_pSoundClientObserver != nullptr) {
+		CR(m_pSoundClientObserver->OnAudioDataCaptured(numFrames, m_pCaptureSoundBuffer));
+	}
+
+Error:
+	return r;
+}

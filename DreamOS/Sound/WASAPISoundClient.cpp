@@ -274,18 +274,27 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 					pAudioCaptureBufferData = nullptr;  
 				}
 
+				//CR(HandleAudioDataCaptured(dataType, numFramesAvailable, channels, pDataBuffer, pDataBuffer_n)
+
 				// TODO: Save to internal capture buffer
 				//hr = pMySink->CopyData(pData, numFramesAvailable, &bDone);
 				//CR((RESULT)hr);
 
-				
-				//if (m_pCaptureSoundBuffer->IsFull() == false) {
-				//	CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
-				//}
-				//else {
-				//	DEBUG_LINEOUT("Capture buffer is full");
-				//}
+				m_pCaptureSoundBuffer->LockBuffer();
+				{
+					if (m_pCaptureSoundBuffer->IsFull() == false) {
+						CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
 
+						// This will trigger the observer 
+						CR(HandleAudioDataCaptured(numFramesAvailable));
+					}
+					else {
+						DEBUG_LINEOUT("Capture buffer is full");
+					}
+				}
+				m_pCaptureSoundBuffer->UnlockBuffer();
+
+				/*
 				// TESTING: Pushing capture audio directly into render buffer
 				m_pRenderSoundBuffer->LockBuffer();
 				{
@@ -305,6 +314,7 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 					}
 				}
 				m_pRenderSoundBuffer->UnlockBuffer();
+				*/
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);

@@ -26,6 +26,11 @@ public:
 	// Enumerate
 	RESULT AddTestEnumerateDevices();
 
+	RESULT AddTestSoundClient();
+
+	// Capture Sound
+	RESULT AddTestCaptureSound();
+
 	// Play Sound
 	RESULT AddTestPlaySound();
 	RESULT AddTestPlaySoundHRTF();

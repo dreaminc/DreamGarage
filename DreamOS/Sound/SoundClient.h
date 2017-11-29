@@ -22,8 +22,14 @@ public:
 public:
 	class observer {
 	public:
-		virtual RESULT OnAudioDataCaptured(SoundBuffer *pCapturedSoundBuffer) = 0;
+		virtual RESULT OnAudioDataCaptured(int numFrames, const SoundBuffer *pCaptureBuffer) = 0;
 	};
+
+	RESULT RegisterObserver(SoundClient::observer *pObserver);
+	RESULT UnregisterObserver(SoundClient::observer *pObserver);
+
+private:
+	SoundClient::observer *m_pSoundClientObserver = nullptr;
 
 public:
 	SoundClient();
@@ -40,6 +46,8 @@ protected:
 
 	RESULT InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType);
 	RESULT InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+
+	RESULT HandleAudioDataCaptured(int numFrames);
 
 public:
 	bool IsRunning();
