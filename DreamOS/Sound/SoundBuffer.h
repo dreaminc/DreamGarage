@@ -24,10 +24,11 @@ public:
 
 	static const char * TypeString(SoundBuffer::type bufferType);
 
-public:
+private:
 	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
 	~SoundBuffer();
 
+public:
 	virtual SoundBuffer::type GetType() const = 0;
 	virtual RESULT Initialize() = 0;
 

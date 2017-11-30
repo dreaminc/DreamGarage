@@ -861,7 +861,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp" />
+    <ClCompile Include="..\..\..\Sound\SoundFile.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp" />
+    <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp" />
     <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp" />
     <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
@@ -1237,6 +1239,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sound\SoundBuffer.h" />
     <ClInclude Include="..\..\..\Sound\SoundClient.h" />
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h" />
+    <ClInclude Include="..\..\..\Sound\SoundFile.h" />
+    <ClInclude Include="..\..\..\Sound\SoundFileWave.h" />
     <ClInclude Include="..\..\..\Sound\SoundTestSuite.h" />
     <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h" />
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />

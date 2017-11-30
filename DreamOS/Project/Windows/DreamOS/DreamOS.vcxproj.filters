@@ -930,6 +930,12 @@
     <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2068,6 +2074,12 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\SoundBuffer.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFile.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFileWave.h">
       <Filter>Sound</Filter>
     </ClInclude>
   </ItemGroup>

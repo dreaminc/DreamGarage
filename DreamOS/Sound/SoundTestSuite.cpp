@@ -7,6 +7,7 @@
 #include "HAL/Pipeline/SourceNode.h"
 
 #include "SoundClientFactory.h"
+#include "SoundFile.h"
 
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -124,6 +125,10 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+
+		// Open a sound file
+		SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+		CN(pNewSoundFile);
 
 		// Create the sound client
 		pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);

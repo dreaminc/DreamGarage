@@ -666,3 +666,38 @@ Error:
 
 	return r;
 }
+
+FILE* PathManager::OpenFile(PATH_VALUE_TYPE type, wchar_t* pszFilename, wchar_t* pszOpenMode) {
+	RESULT r = R_PASS;
+	FILE *pFile = nullptr;
+
+	// TODO: Move this path code into path manager or something
+	wchar_t *pszFilePath = nullptr;
+
+	// Check if this is an absolute path
+	if (IsDreamPath(const_cast<wchar_t*>(pszFilename))) {
+		// TODO: Set Dream Path
+	}
+	else if (IsAbsolutePath(const_cast<wchar_t*>(pszFilename))) {
+		pszFilePath = pszFilename;
+	}
+	else {
+		// Move to key based file paths
+		CRM(GetFilePath(type, pszFilename, pszFilePath), "Failed to get path for %S", pszFilename);
+		CN(pszFilePath);
+	}
+
+	// Load file from path
+	pFile = _wfopen(pszFilePath, pszOpenMode);
+	CN(pFile);
+
+	return pFile;
+
+Error:
+	if (pFile != nullptr) {
+		fclose(pFile);
+		pFile = nullptr;
+	}
+
+	return nullptr;
+}
