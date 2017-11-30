@@ -99,7 +99,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	CN(m_pLoadingScreenTexture);
 
 	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-	m_viewState = State::HIDDEN;		
+	m_viewState = DreamControlView::state::HIDDEN;
 	
 
 	m_ptVisiblePosition = point(0.0f, CONTROL_VIEW_HEIGHT, CONTROL_VIEW_DEPTH);
@@ -151,7 +151,7 @@ RESULT DreamControlView::Update(void *pContext) {
 		CN(m_pUserHandle);
 	}
 		
-	CBR((m_viewState == State::VISIBLE || m_viewState == State::TYPING), R_SKIPPED);
+	CBR((m_viewState == DreamControlView::state::VISIBLE || m_viewState == DreamControlView::state::TYPING), R_SKIPPED);
 
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
@@ -171,7 +171,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
 	//  Note: this duplicates predictive collision implementation from Keyboard
-	if (m_viewState == State::VISIBLE) {
+	if (m_viewState == DreamControlView::state::VISIBLE) {
 		int i = 0;
 		for (auto &pMallet : { pLMallet, pRMallet })
 		{
@@ -210,7 +210,7 @@ RESULT DreamControlView::Update(void *pContext) {
 		
 	}
 
-	if (m_viewState == State::TYPING) {
+	if (m_viewState == DreamControlView::state::TYPING) {
 		int i = 0;
 		for (auto &pMallet : { pLMallet, pRMallet })
 		{
@@ -243,7 +243,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
 
 	switch (m_viewState) {
-	case(State::HIDDEN): {
+	case(DreamControlView::state::HIDDEN): {
 		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 			char chkey = (char)(pInteractionEvent->m_value);
 
@@ -265,7 +265,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 		}
 	} break;
 
-	case(State::TYPING): {
+	case(DreamControlView::state::TYPING): {
 		if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 			char chkey = (char)(pInteractionEvent->m_value);
 			
@@ -321,7 +321,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	switch (type) {
 	case (UserObserverEventType::BACK): {
 
-		if (m_viewState == State::VISIBLE) {
+		if (m_viewState == DreamControlView::state::VISIBLE) {
 			CR(Hide());
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
@@ -346,7 +346,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			}
 		}
 
-		if (m_viewState == State::TYPING) {
+		if (m_viewState == DreamControlView::state::TYPING) {
 			HandleKeyboardDown();
 		}
 	} break;
@@ -356,7 +356,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	}
 
 	case (UserObserverEventType::KB_ENTER): {
-		if (m_viewState == State::TYPING) {
+		if (m_viewState == DreamControlView::state::TYPING) {
 			CN(m_pBrowserHandle);
 			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
 			
@@ -448,12 +448,12 @@ RESULT DreamControlView::Show() {
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
-		SetViewState(State::SHOW);
+		SetViewState(DreamControlView::state::SHOW);
 		return R_PASS;
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		SetViewState(State::VISIBLE);
+		SetViewState(DreamControlView::state::VISIBLE);
 		return R_PASS;
 	};
 
@@ -478,7 +478,7 @@ RESULT DreamControlView::Dismiss() {
 	RESULT r = R_PASS;
 
 	switch (m_viewState) {
-		case State::TYPING: {
+		case DreamControlView::state::TYPING: {
 			CN(m_pUserHandle);
 			m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 			CN(m_pKeyboardHandle);
@@ -488,8 +488,8 @@ RESULT DreamControlView::Dismiss() {
 			CR(m_pUserHandle->SendReleaseKeyboard());
 			m_pKeyboardHandle = nullptr;
 		} //break;
-		case State::SHOW:
-		case State::VISIBLE: {
+		case DreamControlView::state::SHOW:
+		case DreamControlView::state::VISIBLE: {
 			CR(Hide());
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
@@ -504,13 +504,13 @@ RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
-		SetViewState(State::HIDE);
+		SetViewState(DreamControlView::state::HIDE);
 		return R_PASS;
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
-		SetViewState(State::HIDDEN);
+		SetViewState(DreamControlView::state::HIDDEN);
 		m_strURL = "";
 		return R_PASS;
 	};
@@ -537,7 +537,7 @@ Error:
 bool DreamControlView::IsVisible() {
 	bool fIsVisible = false;
 	
-	if (m_viewState == State::SHOW || m_viewState == State::VISIBLE || m_viewState == State::TYPING) {
+	if (m_viewState == DreamControlView::state::SHOW || m_viewState == DreamControlView::state::VISIBLE || m_viewState == DreamControlView::state::TYPING) {
 		fIsVisible = true;
 	}
 	
@@ -571,7 +571,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		SetViewState(State::VISIBLE);	
+		SetViewState(DreamControlView::state::VISIBLE);
 		return R_PASS;
 	};
 
@@ -613,7 +613,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
 
-	if (m_viewState != State::TYPING) {
+	if (m_viewState != DreamControlView::state::TYPING) {
 		CN(m_pUserHandle);
 		m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 		CN(m_pKeyboardHandle);
@@ -625,13 +625,13 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	}
 
 	auto fnStartCallback = [&](void *pContext) {
-		SetViewState(State::SHOW);	// might want to just make an "ANIMATING" state
+		SetViewState(DreamControlView::state::SHOW);	// might want to just make an "ANIMATING" state
 
 		return R_PASS;
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		SetViewState(State::TYPING);
+		SetViewState(DreamControlView::state::TYPING);
 		return R_PASS;
 	};
 	
@@ -695,7 +695,7 @@ std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
 }
 
-RESULT DreamControlView::SetViewState(State state) {
-	m_viewState = state;
+RESULT DreamControlView::SetViewState(DreamControlView::state viewState) {
+	m_viewState = viewState;
 	return R_PASS;
 }

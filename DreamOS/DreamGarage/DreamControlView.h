@@ -67,7 +67,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class State {
+	enum class state {
 		HIDDEN,
 		HIDE,
 		VISIBLE,
@@ -111,7 +111,7 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
-	RESULT SetViewState(State state);
+	RESULT SetViewState(DreamControlView::state viewState);
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
@@ -133,7 +133,7 @@ private:
 	UID m_browserUID;
 	UID m_userUID;	
 
-	State m_viewState;
+	DreamControlView::state m_viewState;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

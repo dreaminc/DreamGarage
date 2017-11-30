@@ -171,7 +171,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
-	CR(SetViewState(State::HIDDEN));
+	CR(SetKeyboardState(UIKeyboard::state::HIDDEN));
 
 Error:
 	return r;
@@ -298,7 +298,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	std::vector<UIKey*> activeKeysToRemove;
 
 	// skip keyboard interaction if not visible
-	CBR(m_viewState == State::VISIBLE, R_SKIPPED);
+	CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 		CB(userUIDs.size() == 1);
@@ -462,7 +462,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		pKeyboard->HideSurface();
 		m_pTitleIcon->SetVisible(false);
 		m_pTitleText->SetVisible(false);
-		CR(SetViewState(State::ANIMATING));
+		CR(SetKeyboardState(UIKeyboard::state::ANIMATING));
 
 	Error:
 		return r;
@@ -474,7 +474,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
-		CR(SetViewState(State::VISIBLE));
+		CR(SetKeyboardState(UIKeyboard::state::VISIBLE));
 
 		if (m_pUserHandle == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
@@ -528,7 +528,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
-		CR(SetViewState(State::HIDDEN));
+		CR(SetKeyboardState(UIKeyboard::state::HIDDEN));
 
 	Error:
 		return r;
@@ -557,7 +557,7 @@ RESULT UIKeyboard::HideSurface() {
 }
 
 bool UIKeyboard::IsVisible() {
-	if (m_viewState != State::HIDDEN) {
+	if (m_keyboardState != UIKeyboard::state::HIDDEN) {
 		return true;
 	}
 
@@ -643,8 +643,8 @@ RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT UIKeyboard::SetViewState(State state) {
-	m_viewState = state;
+RESULT UIKeyboard::SetKeyboardState(UIKeyboard::state keyboardState) {
+	m_keyboardState = keyboardState;
 	return R_PASS;
 }
 
