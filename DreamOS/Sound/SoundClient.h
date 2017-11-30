@@ -10,6 +10,8 @@
 
 #include "SoundBuffer.h"
 
+class SoundFile;
+
 class SoundClient {
 public:
 	enum class state {
@@ -62,6 +64,8 @@ public:
 	RESULT StopRender();
 
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
+
+	RESULT PlaySound(SoundFile *pSoundFile);
 
 private:
 	std::thread	m_audioRenderProcessingThread;

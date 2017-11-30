@@ -40,7 +40,3 @@ Error:
 
 	return pSoundFile;
 }
-
-SoundBuffer* SoundFile::GetSoundBuffer() {
-	return m_pSoundBuffer;
-}

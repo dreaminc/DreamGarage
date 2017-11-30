@@ -138,6 +138,8 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 
 		CR(pTestContext->pSoundClient->Start());
 
+		CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
+
 	Error:
 		return R_PASS;
 	};

@@ -1,5 +1,7 @@
 #include "SoundClient.h"
 
+#include "SoundFile.h"
+
 SoundClient::SoundClient() {
 	// empty
 }
@@ -173,5 +175,30 @@ RESULT SoundClient::PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer
 	m_pRenderSoundBuffer->UnlockBuffer();
 
 Error:
+	return r;
+}
+
+RESULT SoundClient::PlaySound(SoundFile *pSoundFile) {
+	RESULT r = R_PASS;
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundFile);
+	CBM((pSoundFile->NumChannels() == m_pRenderSoundBuffer->NumChannels()), 
+		"Don't currently support playing files that don't match render buffer channel count");
+
+	m_pRenderSoundBuffer->LockBuffer();
+	{
+		if (m_pRenderSoundBuffer->IsFull() == false) {
+			CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer));
+			CR(m_pRenderSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
+		}
+	}
+	m_pRenderSoundBuffer->UnlockBuffer();
+	
+Error:
+	if (pFloatAudioBuffer != nullptr) {
+		delete [] pFloatAudioBuffer;
+		pFloatAudioBuffer = nullptr;
+	}
 	return r;
 }

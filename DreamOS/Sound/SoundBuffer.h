@@ -24,7 +24,7 @@ public:
 
 	static const char * TypeString(SoundBuffer::type bufferType);
 
-private:
+protected:
 	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
 	~SoundBuffer();
 

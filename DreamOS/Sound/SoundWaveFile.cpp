@@ -15,6 +15,34 @@ SoundFileWave::~SoundFileWave() {
 	}
 }
 
+int SoundFileWave::NumChannels() {
+	return m_formatChunk.numChannels;
+}
+
+int SoundFileWave::SamplingRate() {
+	return m_formatChunk.sampleRate;
+}
+
+int SoundFileWave::BitsPerSample() {
+	return m_formatChunk.bitsPerSample;
+}
+
+void* SoundFileWave::GetDataBuffer() {
+	return m_dataChunk.pChunkData;
+}
+
+int SoundFileWave::GetNumFrames() {
+	int frameSize = ((m_formatChunk.bitsPerSample / 8) * m_formatChunk.numChannels);
+	int numFrames = m_dataChunk.header.size / frameSize;
+	return numFrames;
+}
+
+int SoundFileWave::GetNumSamples() {
+	int sampleSize = (m_formatChunk.bitsPerSample / 8);
+	int numSamples = m_dataChunk.header.size / sampleSize;
+	return numSamples;
+}
+
 RESULT SoundFileWave::Initialize() {
 	RESULT r = R_PASS;
 	size_t bytesRead = 0;
@@ -59,13 +87,41 @@ RESULT SoundFileWave::Initialize() {
 	bytesRead = fread(m_dataChunk.pChunkData, 1, dataSize, pSoundFile);
 	CBM((bytesRead == dataSize), "Mismatch in data chunk size to bytes read");
 
-	// Create a SoundBuffer from the data
-	//m_pSoundBuffer = SoundBuffer::Make(m_formatChunk.numChannels, )
-
 Error:
 	if (pSoundFile != nullptr) {
 		fclose(pSoundFile);
 		pSoundFile = nullptr;
 	}
+	return r;
+}
+
+RESULT SoundFileWave::GetAudioBuffer(float* &pAudioData_n) {
+	RESULT r = R_PASS;
+	int numSamples = 0;
+
+	CBM((pAudioData_n == nullptr), "Non-null pointer provided");
+	CBM((BitsPerSample() == 16), "Don't currently support conversion from %d bits", BitsPerSample());
+
+	numSamples = GetNumSamples();
+
+	pAudioData_n = new float[numSamples];
+	CN(pAudioData_n);
+
+	switch (BitsPerSample()) {
+	case 16: {
+		int16_t *pAudioData = (int16_t*)m_dataChunk.pChunkData;
+		CN(pAudioData);
+
+		for (int i = 0; i < numSamples; i++) {
+			pAudioData_n[i] = (float)pAudioData[i] / ((float)std::numeric_limits<uint16_t>::max() - 1);
+		}
+	} break;
+
+	default: {
+		CBM((0), "Don't currently support conversion from %d bits", BitsPerSample());
+	} break;
+	}
+
+Error:
 	return r;
 }
