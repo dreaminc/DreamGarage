@@ -89,6 +89,7 @@ public:
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 	virtual bool DoClose(CefRefPtr<CefBrowser> browser) override;
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+	virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access);
 
 	// CefLoadHandler
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,

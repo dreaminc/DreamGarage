@@ -210,6 +210,12 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 	}
 }
 
+bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
+	// false to allow pop up, true to cancel creation
+	frame->LoadURL(target_url);	// push URL to current frame
+	return true;
+}
+
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
 	const CefString& strError, const CefString& strFailedURL) 
 {
