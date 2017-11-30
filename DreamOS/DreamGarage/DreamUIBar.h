@@ -33,7 +33,6 @@ class UIButton;
 
 class UIStageProgram;
 
-#define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 #define KEYBOARD_OFFSET -0.07f
 

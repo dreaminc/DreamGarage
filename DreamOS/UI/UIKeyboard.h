@@ -69,6 +69,12 @@ class UIKeyboard :	public DreamApp<UIKeyboard>,
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
+	enum class State {
+		HIDDEN,
+		ANIMATING,
+		VISIBLE
+	};
+
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
@@ -132,6 +138,7 @@ private:
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
+	RESULT SetViewState(State state);
 	RESULT UpdateTextBox(int chkey);
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
@@ -172,6 +179,8 @@ private:
 	std::shared_ptr<composite> m_pHeaderContainer;
 
 	std::map<LayoutType, text*> m_layoutAtlas;
+
+	State m_viewState;
 
 	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];

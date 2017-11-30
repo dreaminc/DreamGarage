@@ -171,7 +171,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
-
+	CR(SetViewState(State::HIDDEN));
 
 Error:
 	return r;
@@ -298,7 +298,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	std::vector<UIKey*> activeKeysToRemove;
 
 	// skip keyboard interaction if not visible
-	CBR((IsVisible()), R_SKIPPED);
+	CBR(m_viewState == State::VISIBLE, R_SKIPPED);
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 		CB(userUIDs.size() == 1);
@@ -462,6 +462,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		pKeyboard->HideSurface();
 		m_pTitleIcon->SetVisible(false);
 		m_pTitleText->SetVisible(false);
+		CR(SetViewState(State::ANIMATING));
 
 	Error:
 		return r;
@@ -473,6 +474,25 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
+		CR(SetViewState(State::VISIBLE));
+
+		if (m_pUserHandle == nullptr) {
+			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+			CB(userUIDs.size() == 1);
+			m_userAppUID = userUIDs[0];
+
+			//Capture user app
+			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+			CN(m_pUserHandle);
+		}
+		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		CNR(pLMallet, R_SKIPPED);
+		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		CNR(pRMallet, R_SKIPPED);
+
+		pLMallet->SetDirty();
+		pRMallet->SetDirty();
+
 	Error:
 		return r;
 	};
@@ -508,7 +528,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
-
+		CR(SetViewState(State::HIDDEN));
 
 	Error:
 		return r;
@@ -537,7 +557,13 @@ RESULT UIKeyboard::HideSurface() {
 }
 
 bool UIKeyboard::IsVisible() {
-	return GetComposite()->IsVisible();
+	if (m_viewState != State::HIDDEN) {
+		return true;
+	}
+
+	else {
+		return false;
+	}
 }
 
 bool UIKeyboard::IsKeyboardVisible() {
@@ -615,6 +641,11 @@ RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 
 RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT UIKeyboard::SetViewState(State state) {
+	m_viewState = state;
+	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {

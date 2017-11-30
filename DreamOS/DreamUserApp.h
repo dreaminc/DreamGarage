@@ -30,7 +30,7 @@ class UIKeyboard;
 class UIKeyboardHandle;
 class DimObj;
 
-#define MENU_DEPTH -0.3f
+#define MENU_DEPTH -0.6f
 #define MENU_HEIGHT -0.16f
 
 #define GAZE_OVERLAY_MS 800.0 //1250.0

@@ -252,11 +252,13 @@ RESULT DreamUIBar::ShowRootMenu() {
 		GetComposite()->SetPosition(ptOrigin);
 		GetComposite()->SetOrientation(qOrigin);
 
-		vector vLookXZ = GetCameraLookXZ();
+		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+		vCameraToMenu.y() = 0.0f;
+		vCameraToMenu.Normalize();
 
-		m_pUIStageProgram->SetOriginDirection(vLookXZ);
+		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
 
-		ptOrigin += vLookXZ * (m_menuDepth);
+		ptOrigin += vCameraToMenu * (m_menuDepth);
 
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}
