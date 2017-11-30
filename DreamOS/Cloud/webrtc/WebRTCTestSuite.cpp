@@ -298,7 +298,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 			return R_NOT_HANDLED;
 		}
 
@@ -552,15 +552,25 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 
-
-			//// Simply pushes the capture buffer to the render buffer
-			//if (pSoundClient != nullptr) {
-			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
-			//}
+			/*
+			// Simply pushes the capture buffer to the render buffer
+			if (pSoundClient != nullptr) {
+				CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			}
+			//*/
 
 			CR(r);
 
+			///*
 			// TODO: Broadcast this audio
+			if (pCloudController != nullptr) {
+				// TODO: Retrieve audio packet from capture buffer (might need copy
+				// or convert to correct packet format
+				pCaptureBuffer->IncrementBuffer(numFrames);
+				AudioPacket pendingAudioPacket(0, 0, 0, nullptr);
+				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+			}
+			//*/
 
 		Error:
 			return r;

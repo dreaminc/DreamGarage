@@ -8,7 +8,7 @@
 // A template based circular buffer implementation
 
 // TODO: dynamic style
-#define MAX_PENDING_BUFFER_LENGTH (44100 * 15)
+#define MAX_PENDING_BUFFER_LENGTH (44100 * 5)
 
 template <class CBType>
 class CircularBuffer {
@@ -71,6 +71,26 @@ public:
 		m_numPendingBytes = 0;
 
 		return R_PASS;
+	}
+
+	inline RESULT IncrementBuffer(int count) {
+		RESULT r = R_PASS;
+
+		CB((NumPendingBufferBytes() >= count));
+
+		// Increment current by buffer size
+		m_circularBuffer_c += count;
+
+		// If current overflow overflow, move back to beginning of buffer
+		if (m_circularBuffer_c > m_circularBuffer_n) {
+			m_circularBuffer_c -= m_circularBuffer_n;
+		}
+
+		m_numPendingBytes -= count;
+		CBM((m_numPendingBytes >= 0), "ERROR: CIRCULAR BUFFER PENDING BYTES ERROR");
+
+	Error:
+		return r;
 	}
 
 	RESULT WriteToBuffer(CBType *pDataBuffer, size_t pDataBuffer_n) {
@@ -136,6 +156,7 @@ public:
 
 		pDataBuffer = (CBType*)(m_circularBuffer + m_circularBuffer_c);
 
+		/*
 		// Increment current by buffer size
 		m_circularBuffer_c += bytesRead;
 
@@ -146,6 +167,9 @@ public:
 
 		m_numPendingBytes -= bytesRead;
 		CBM((m_numPendingBytes >= 0), "ERROR: CIRCULAR BUFFER PENDING BYTES ERROR");
+		*/
+
+		CR(IncrementBuffer(bytesRead));
 
 	Error:
 		return r;

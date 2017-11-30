@@ -58,6 +58,7 @@ public:
 	}
 	
 	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) = 0;
+	virtual RESULT IncrementBuffer(int numFrames) = 0;
 
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -183,7 +184,22 @@ public:
 	inline virtual RESULT ReadNextValue(int channel, CBType &value) { 
 		return m_ppCircularBuffers[channel]->ReadNextValue(value);
 	}
-	
+
+	RESULT IncrementBuffer(int numFrames) {
+		RESULT r = R_PASS;
+
+		// This will block
+		m_bufferLock.lock();
+
+		for (int i = 0; i < m_channels; i++) {
+			CR(m_ppCircularBuffers[i]->IncrementBuffer(numFrames));
+		}
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
 
 	RESULT ReadData(CBType **ppDataBuffer, int channels, int bytesToRead, int &framesRead) {
 		RESULT r = R_PASS;

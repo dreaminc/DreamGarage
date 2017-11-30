@@ -201,11 +201,11 @@ Error:
 
 // Audio
 
-RESULT WebRTCImp::SendAudioPacket(long peerConnectionID, const AudioPacket &pendingAudioPacket) {
+RESULT WebRTCImp::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->SendAudioPacket(peerConnectionID, pendingAudioPacket));
+	CR(m_pWebRTCConductor->SendAudioPacket(strAudioTrackLabel, peerConnectionID, pendingAudioPacket));
 
 Error:
 	return r;
@@ -424,11 +424,11 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT WebRTCImp::OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnAudioData(peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pWebRTCObserver->OnAudioData(strAudioTrackLabel, peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:

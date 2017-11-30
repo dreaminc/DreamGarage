@@ -749,7 +749,7 @@ user* DreamGarage::ActivateUser(long userId) {
 	return nullptr;
 }
 
-RESULT DreamGarage::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();

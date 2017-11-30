@@ -855,11 +855,11 @@ Error:
 }
 
 // Audio
-RESULT EnvironmentController::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT EnvironmentController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CN(m_pPeerConnectionController);
-	CN(m_pPeerConnectionController->BroadcastAudioPacket(pendingAudioPacket));
+	CN(m_pPeerConnectionController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
 Error:
 	return r;
@@ -940,11 +940,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT EnvironmentController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pEnvironmentControllerObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:

@@ -389,14 +389,14 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
+RESULT CloudController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnAudioData(pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pPeerConnectionObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -670,13 +670,13 @@ Error:
 }
 
 // Audio 
-RESULT CloudController::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT CloudController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	CB(m_fRunning);
 
 	CN(m_pEnvironmentController);
-	CN(m_pEnvironmentController->BroadcastAudioPacket(pendingAudioPacket));
+	CN(m_pEnvironmentController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
 Error:
 	return r;

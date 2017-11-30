@@ -30,6 +30,7 @@ class AudioPacket;
 #include "WebRTCPeerConnection.h"
 
 #include "webrtc/modules/audio_device/include/audio_device.h"
+#include "webrtc/modules/audio_device/dummy/audio_device_dummy.h"
 
 #include "WebRTCAudioCaptureDevice.h"
 
@@ -56,7 +57,7 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 		
-		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
@@ -94,7 +95,7 @@ public:
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
-	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	// TODO: AudioDeviceCapturer
@@ -141,7 +142,7 @@ public:
 	RESULT StopVideoStreaming(long peerConnectionID);
 	bool IsVideoStreamingRunning(long peerConnectionID);
 
-	RESULT SendAudioPacket(long peerConnectionID, const AudioPacket &pendingAudioPacket);
+	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
 
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
@@ -157,7 +158,8 @@ private:
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
 
 	// Audio Device Module
-	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

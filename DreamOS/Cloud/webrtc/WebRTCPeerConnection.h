@@ -71,7 +71,7 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
-		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
@@ -151,7 +151,7 @@ public:
 	bool IsVideoStreamingRunning();
 
 	// Audio
-	RESULT SendAudioPacket(const AudioPacket &pendingAudioPacket);
+	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
 
 protected:
 	// TODO: Move to peer Connection
@@ -235,8 +235,9 @@ private:
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
 
-	rtc::scoped_refptr<WebRTCLocalAudioSource> m_pWebRTCLocalAudioSource = nullptr;
-	rtc::scoped_refptr<WebRTCLocalAudioTrack> m_pWebRTCLocalAudioTrack = nullptr;
+
+	// local audio sources
+	std::map<std::string, rtc::scoped_refptr<WebRTCLocalAudioSource>> m_pWebRTCLocalAudioSources;
 };
 
 

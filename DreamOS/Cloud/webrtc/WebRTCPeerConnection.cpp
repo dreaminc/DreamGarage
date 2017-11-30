@@ -129,12 +129,13 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CNM(pMediaStreamInterface, "Failed to create user media stream");
 
 	//CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
+	CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
-	CR(AddVideoStream(pMediaStreamInterface));
+	//CR(AddVideoStream(pMediaStreamInterface));
 
 	// Chrome Audio Source
-	CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
 
 	// Add user stream to peer connection interface
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
@@ -244,14 +245,13 @@ Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::SendAudioPacket(const AudioPacket &pendingAudioPacket) {
+RESULT WebRTCPeerConnection::SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	//CN(m_pWebRTCLocalAudioSource);
-	//CR(m_pWebRTCLocalAudioSource->SendAudioPacket(pendingAudioPacket));
+	CB((m_pWebRTCLocalAudioSources.find(strAudioTrackLabel) != m_pWebRTCLocalAudioSources.end()));
 
-	CN(m_pWebRTCLocalAudioTrack);
-	CR(m_pWebRTCLocalAudioTrack->SendAudioPacket(pendingAudioPacket));
+	CN(m_pWebRTCLocalAudioSources[strAudioTrackLabel]);
+	CR(m_pWebRTCLocalAudioSources[strAudioTrackLabel]->SendAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;
@@ -265,8 +265,10 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 
 	// Set up constraints
 	webrtc::FakeConstraints audioSourceConstraints;
-
 	webrtc::PeerConnectionFactoryInterface::Options fakeOptions;
+
+	// Ensure no duplicate names
+	CB((m_pWebRTCLocalAudioSources.find(strAudioTrackLabel) == m_pWebRTCLocalAudioSources.end()));
 
 	///*
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
@@ -276,41 +278,23 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 	//*/
 
-	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
-
-	m_pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
-	//m_pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(fakeOptions, &audioSourceConstraints);
-	//m_pWebRTCLocalAudioSource = webrtc::LocalAudioSource::Create(fakeOptions, &audioSourceConstraints);
-	//m_pWebRTCLocalAudioSource = m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints);
-	CN(m_pWebRTCLocalAudioSource);
+	auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
+	CN(pWebRTCLocalAudioSource);
 
 	///*
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
 			strAudioTrackLabel,
-			m_pWebRTCLocalAudioSource)
+			pWebRTCLocalAudioSource)
 		);
+	CN(pAudioTrack);
 
 	pAudioTrack->AddRef();
 
 	pMediaStreamInterface->AddTrack(pAudioTrack);
-	//*/
-
-	/*
-	m_pWebRTCLocalAudioTrack = WebRTCLocalAudioTrack::Create(strAudioTrackLabel, m_pWebRTCLocalAudioSource);
-	CN(m_pWebRTCLocalAudioTrack);
-
-	m_pWebRTCLocalAudioTrack->AddRef();
-
-	pMediaStreamInterface->AddTrack(m_pWebRTCLocalAudioTrack);
-	*/
-
-	//pAudioTrack->GetSource()
-
-	//Error:
-	return r;
 
 Error:
 	return r;
@@ -586,8 +570,12 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 }
 
 void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	
+	// TODO: Register local source as sink or something
+	std::string strAudioTrackLabel = "tempTrack";
+	
 	if (m_pParentObserver != nullptr) {
-		m_pParentObserver->OnAudioData(m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
+		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
 }
 
