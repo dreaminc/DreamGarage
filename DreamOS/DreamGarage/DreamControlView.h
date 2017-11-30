@@ -19,9 +19,9 @@
 #define CONTROL_VIEWQUAD_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define CONTROL_VIEWQUAD_HEIGHT 0.3375f
 #define CONTROL_VIEWQUAD_ANGLE 32.0f
-#define CONTROL_VIEW_DEPTH -0.19f
-#define CONTROL_VIEW_HEIGHT -0.22f
-#define TYPING_ROTATION (M_PI / 2.1f)
+#define CONTROL_VIEW_DEPTH -0.4f	// This could be calculated off of MENU_DEPTH as well.
+#define CONTROL_VIEW_HEIGHT -0.2f
+#define TYPING_ROTATION (M_PI / 2.0f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
@@ -67,7 +67,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class State {
+	enum class state {
 		HIDDEN,
 		HIDE,
 		VISIBLE,
@@ -111,7 +111,7 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
-	RESULT SetViewState(State state);
+	RESULT SetViewState(DreamControlView::state viewState);
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
@@ -133,7 +133,7 @@ private:
 	UID m_browserUID;
 	UID m_userUID;	
 
-	State m_viewState;
+	DreamControlView::state m_viewState;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
