@@ -171,7 +171,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
-	CR(SetKeyboardState(UIKeyboard::state::HIDDEN));
+	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 Error:
 	return r;
@@ -462,7 +462,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		pKeyboard->HideSurface();
 		m_pTitleIcon->SetVisible(false);
 		m_pTitleText->SetVisible(false);
-		CR(SetKeyboardState(UIKeyboard::state::ANIMATING));
+		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
 		return r;
@@ -474,7 +474,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
-		CR(SetKeyboardState(UIKeyboard::state::VISIBLE));
+		CR(SetAnimatingState(UIKeyboard::state::VISIBLE));
 
 		if (m_pUserHandle == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
@@ -528,7 +528,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
-		CR(SetKeyboardState(UIKeyboard::state::HIDDEN));
+		CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	Error:
 		return r;
@@ -643,7 +643,7 @@ RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT UIKeyboard::SetKeyboardState(UIKeyboard::state keyboardState) {
+RESULT UIKeyboard::SetAnimatingState(UIKeyboard::state keyboardState) {
 	m_keyboardState = keyboardState;
 	return R_PASS;
 }

@@ -69,7 +69,7 @@ class UIKeyboard :	public DreamApp<UIKeyboard>,
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class state {
+	enum class state {	// For tracking if keyboard is animating or not
 		HIDDEN,
 		ANIMATING,
 		VISIBLE
@@ -138,7 +138,7 @@ private:
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
-	RESULT SetKeyboardState(UIKeyboard::state keyboardState);
+	RESULT SetAnimatingState(UIKeyboard::state keyboardState);
 	RESULT UpdateTextBox(int chkey);
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
