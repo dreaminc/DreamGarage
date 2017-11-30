@@ -249,8 +249,6 @@ RESULT DreamUIBar::ShowRootMenu() {
 
 		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
 
-		ptOrigin += vCameraToMenu * (m_menuDepth);
-
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}
 
