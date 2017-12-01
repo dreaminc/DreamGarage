@@ -89,10 +89,18 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowserHandle::SendClickToBrowserAtPoint(WebBrowserPoint ptContact) {
+RESULT DreamBrowserHandle::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	CR(ClickBrowser(ptContact));
+	CR(SendMouseMoveEvent(mousePoint));
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ClickBrowser(ptContact, fMouseDown));
 Error:
 	return r;
 }
@@ -361,7 +369,19 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
+RESULT DreamBrowser::SendMouseMoveEvent(WebBrowserPoint mousePoint) {
+	RESULT r = R_PASS;
+
+	WebBrowserMouseEvent mouseEvent;
+	mouseEvent.pt.x = mousePoint.x;
+	mouseEvent.pt.y = mousePoint.y;
+
+	CR(m_pWebBrowserController->SendMouseMove(mouseEvent));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	WebBrowserMouseEvent mouseEvent;
@@ -371,8 +391,7 @@ RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact) {
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
 	
-	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, false, 1));		// mouse down
-	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, true, 1));		// mouse up
+	CR(m_pWebBrowserController->SendMouseClick(mouseEvent, fMouseDown, 1));		// mouse down
 
 Error:
 	return r;

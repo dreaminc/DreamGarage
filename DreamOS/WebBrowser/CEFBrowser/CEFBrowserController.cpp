@@ -279,11 +279,13 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount) {
+RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount) {
 	RESULT r = R_PASS;
 
 	CefMouseEvent cefMouseEvent;
 	CefBrowserHost::MouseButtonType cefMouseButtonType;
+	bool fMouseUp = !fMouseDown;
+
 	CN(m_pCEFBrowser);
 
 	cefMouseEvent.x = webBrowserMouseEvent.pt.x;

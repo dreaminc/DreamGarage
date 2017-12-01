@@ -180,13 +180,23 @@ RESULT DreamControlView::Update(void *pContext) {
 			ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
 			if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-				pMallet->CheckAndCleanDirty();
+				if (pMallet->CheckAndCleanDirty() && m_fMouseDown) {
+					m_fMouseDown = false;
+					WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
+					CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown));
+				}
+
 				if (pMallet == pLMallet) {
 					m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 				}
 				else {
 					m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 				}
+			}
+			
+			if (ptSphereOrigin.y() < pMallet->GetRadius() && m_fMouseDown) {
+				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
+				CR(m_pBrowserHandle->SendMalletMoveEvent(ptContact));
 			}
 
 			// if the sphere is lower than its own radius, there must be an interaction
@@ -195,6 +205,8 @@ RESULT DreamControlView::Update(void *pContext) {
 				CR(pMallet->SetDirty());
 				if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 					ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+				
+				m_fMouseDown = true;
 
 				if (pMallet == pLMallet) {
 					CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
@@ -203,7 +215,7 @@ RESULT DreamControlView::Update(void *pContext) {
 					CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 				}
 
-				(m_pBrowserHandle->SendClickToBrowserAtPoint(ptContact));
+				CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown));
 			}
 			i++;
 		}
@@ -300,12 +312,24 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 					m_ptLMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptLMalletPointing.y > 0) {
 					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptLMalletPointing));
 				}
+				else {
+					WebBrowserPoint middleOfBrowser;
+					middleOfBrowser.x = m_pBrowserHandle->GetWidthOfBrowser() / 2;
+					middleOfBrowser.y = m_pBrowserHandle->GetHeightOfBrowser() / 2;
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
+				}
 			}
 			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT)
 			{
 				if (m_ptRMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptRMalletPointing.x > 0 &&
 					m_ptRMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptRMalletPointing.y > 0) {
 					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptRMalletPointing));
+				}
+				else {
+					WebBrowserPoint middleOfBrowser;
+					middleOfBrowser.x = m_pBrowserHandle->GetWidthOfBrowser() / 2;
+					middleOfBrowser.y = m_pBrowserHandle->GetHeightOfBrowser() / 2;
+					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
 				}
 			}
 		} break;
@@ -453,8 +477,31 @@ RESULT DreamControlView::Show() {
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		if (m_pUserHandle == nullptr) {
+			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+			CB(userUIDs.size() == 1);
+			m_userUID = userUIDs[0];
+
+			//Capture user app
+			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+			CN(m_pUserHandle);
+		}
+
+		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		CNR(pLMallet, R_SKIPPED);
+		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		CNR(pRMallet, R_SKIPPED);
+
+		pLMallet->SetDirty();
+		pRMallet->SetDirty();
+		m_fMouseDown = false;
+
 		SetViewState(DreamControlView::state::VISIBLE);
-		return R_PASS;
+		
+	Error:
+		return r;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -564,7 +611,8 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
 	unFocusText.x = -1;				// to go back into the same textbox
 	unFocusText.y = -1;
-	CR(m_pBrowserHandle->SendClickToBrowserAtPoint(unFocusText));
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
 
 	auto fnStartCallback = [&](void *pContext) {
 		return R_PASS;

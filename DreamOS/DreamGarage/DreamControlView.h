@@ -135,6 +135,8 @@ private:
 
 	DreamControlView::state m_viewState;
 
+	bool m_fMouseDown;
+
 	float m_hiddenScale; 
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
