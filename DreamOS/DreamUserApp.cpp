@@ -587,6 +587,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
 	vector vCamera;
+	vector vBrowser;
 	point ptMid;
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
@@ -596,10 +597,22 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
+		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
+		auto sphere = GetDOS()->AddSphere(.5f);
+		sphere->SetPosition(0.0f, 2.0f, -2.0f);
 
 		ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
-		vCamera = ptMid - ptCameraOrigin;
-		vCamera.y() = 0.0f;
+		vCamera = ptMid - ptCameraOrigin;	
+
+		vBrowser = ptBrowserOrigin - ptCameraOrigin;
+
+		float depth = vCamera.magnitude();
+		if (depth < 0.5f) {
+			depth = 0.5f;
+		}
+
+		point newpoint = depth * vBrowser.Normalize();
+		vCamera = (ptCameraOrigin + newpoint) - ptCameraOrigin;
 
 		point ptCamera = pCamera->GetPosition();
 
@@ -615,7 +628,8 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 
 		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCamera));
+		//m_pAppBasis->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vBrowser));
 	}
 
 Error:
