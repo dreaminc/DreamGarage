@@ -53,7 +53,7 @@ public:
 	RESULT ScrollYByDiff(int pxYDiff);
 
 	RESULT SendMalletMoveEvent(WebBrowserPoint mousePoint);
-	RESULT SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool mouseDown);
+	RESULT SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown);
 
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	virtual RESULT SendURL (std::string strURL) = 0;
@@ -86,7 +86,7 @@ private:
 
 	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) = 0;
 
-	virtual RESULT ClickBrowser(WebBrowserPoint ptContact, bool fMouseUp) = 0;
+	virtual RESULT ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) = 0;
 
 	virtual int GetScrollX() = 0;
 	virtual int GetScrollY() = 0;
@@ -146,7 +146,7 @@ public:
 	virtual RESULT SendURL(std::string strURL);
 
 	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) override;
-	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff, bool fMouseUp) override;
+	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff, bool fMouseDown) override;
 
 	virtual RESULT BeginStream() override;
 
