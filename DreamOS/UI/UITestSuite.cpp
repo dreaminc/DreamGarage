@@ -492,8 +492,39 @@ RESULT UITestSuite::AddTestFont() {
 			pText = m_pDreamOS->AddText(pFont, "password", 1.3f, 0.6f, text::flags::PASSWORD | text::flags::RENDER_QUAD);
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
-			pText->SetPosition(point(0.0f, -1.0f, 0.0f));
-			pText->SetText("testing this thing");
+			pText->SetPosition(point(0.0f, -1.2f, 0.0f));
+
+			//expect "stestsword"
+			pText = m_pDreamOS->AddText(pFont, "password", 1.7f, 0.6f, text::flags::USE_CURSOR | text::flags::RENDER_QUAD);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 1.2f, 0.0f));
+			pText->SetCursorIndex(3);
+			pText->AddCharacter("t");
+			pText->AddCharacter("e");
+			pText->AddCharacter("s");
+			pText->AddCharacter("t");
+
+			pText->SetCursorIndex(2);
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			
+			// expect "passwordt"
+			pText = m_pDreamOS->AddText(pFont, "password", 2.0f, 0.6f, text::flags::RENDER_QUAD);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 2.2f, 0.0f));
+
+			// cursor index is not used while the USE_CURSOR flag is unset
+			pText->SetCursorIndex(3);
+			pText->AddCharacter("t");
+			pText->AddCharacter("e");
+			pText->AddCharacter("s");
+			pText->AddCharacter("t");
+			
+			pText->SetCursorIndex(2);
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
 			//*/
 
 			// Layout

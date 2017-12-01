@@ -285,6 +285,11 @@ RESULT text::SetBillboard(bool fBillboard) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT text::SetCursorIndex(int index) {
+	m_cursorIndex = index;
+	return R_PASS;
+}
+
 bool text::IsScaleToFit() {
 	return ((m_flags & text::flags::SCALE_TO_FIT) != text::flags::NONE);
 }
@@ -311,6 +316,10 @@ bool text::IsLeadingEllipsis() {
 
 bool text::IsPassword() {
 	return ((m_flags & text::flags::PASSWORD) != text::flags::NONE);
+}
+
+bool text::IsUsingCursor() {
+	return ((m_flags & text::flags::USE_CURSOR) != text::flags::NONE);
 }
 
 bool text::IsRenderToQuad() {
@@ -472,6 +481,56 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 
 	FlatContext::SetBounds(m_width, m_height);
 
+Error:
+	return r;
+}
+
+RESULT text::AddCharacter(const std::string& strChar) {
+	RESULT r = R_PASS;
+
+	std::string strText;
+	if (!IsUsingCursor()) {
+		strText = m_strText;
+		strText += strChar;
+	}
+	else {
+		for (int i = 0; i < m_strText.size(); i++) {
+			if (i == m_cursorIndex) {
+				//TODO: add cursor asset
+				strText += strChar;
+			}
+			strText += m_strText[i];
+		}
+//		m_strText = strText;
+		m_cursorIndex += 1;
+	}
+
+	CR(SetText(strText));
+Error:
+	return r;
+}
+
+RESULT text::RemoveCharacter() {
+	RESULT r = R_PASS;
+	
+	std::string strText;
+	if (!IsUsingCursor()) {
+		strText = m_strText;
+		strText.pop_back();
+	}
+	else {
+		for (int i = 0; i < m_strText.size(); i++) {
+			if (i != m_cursorIndex - 1) {
+				strText += m_strText[i];
+			}
+			else {
+				m_cursorIndex -= 1;
+			}
+		}
+//		m_strText = strText;
+	}
+
+	CR(SetText(strText));
 Error:
 	return r;
 }

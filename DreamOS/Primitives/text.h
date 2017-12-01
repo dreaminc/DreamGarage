@@ -53,6 +53,7 @@ public:
 		CURVE_QUAD_PARABOLIC	= 1 << 7,
 		LEAD_ELLIPSIS			= 1 << 8,
 		PASSWORD				= 1 << 9,
+		USE_CURSOR				= 1 << 10,
 		INVALID					= 0xFFFF
 	};
 
@@ -65,6 +66,10 @@ public:
 
 	virtual RESULT SetText(const std::string& strText);
 	RESULT CreateLayout(UIKeyboardLayout *pLayout, double marginRatio = 0.25f);
+
+	// SetText wrappers for cursor use
+	RESULT AddCharacter(const std::string& strChar); // add character at cursor index
+	RESULT RemoveCharacter(); // remove character at cursor index
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
@@ -96,6 +101,7 @@ public:
 	RESULT SetWrap(bool fWrap = true);
 	RESULT SetFitToSize(bool fFitToSize = true);
 	RESULT SetBillboard(bool fBillboard = true);
+	RESULT SetCursorIndex(int index);
 
 	virtual bool IsScaleToFit() override;
 	bool IsWrap();
@@ -104,6 +110,7 @@ public:
 	bool IsTrailingEllipsis();
 	bool IsLeadingEllipsis();
 	bool IsPassword();
+	bool IsUsingCursor();
 	bool IsRenderToQuad();
 	
 	RESULT SetBackgroundColor(color backgroundColor);
@@ -146,6 +153,8 @@ private:
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
 	color m_backgroundColor = COLOR_WHITE;
 	texture *m_pBackgroundColorTexture = nullptr;
+
+	unsigned int m_cursorIndex = 0;
 };
 
 
