@@ -567,7 +567,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 				// TODO: Retrieve audio packet from capture buffer (might need copy
 				// or convert to correct packet format
 				pCaptureBuffer->IncrementBuffer(numFrames);
-				AudioPacket pendingAudioPacket(0, 0, 0, nullptr);
+				//AudioPacket pendingAudioPacket = pCaptureBuffer->GetAudioPacket(numFrames);
+				
+				// Send a dummy audio packet (generating audio right now)
+				AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
 				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
 			}
 			//*/

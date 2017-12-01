@@ -132,7 +132,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
-	//CR(AddVideoStream(pMediaStreamInterface));
+	CR(AddVideoStream(pMediaStreamInterface));
 
 	// Chrome Audio Source
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
@@ -283,6 +283,9 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 
 	auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
 	CN(pWebRTCLocalAudioSource);
+
+	// Add to map
+	m_pWebRTCLocalAudioSources[strAudioTrackLabel] = pWebRTCLocalAudioSource;
 
 	///*
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
