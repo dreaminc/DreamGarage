@@ -52,6 +52,7 @@ public:
 		CURVE_QUAD_CIRCLE		= 1 << 6, 
 		CURVE_QUAD_PARABOLIC	= 1 << 7,
 		LEAD_ELLIPSIS			= 1 << 8,
+		PASSWORD				= 1 << 9,
 		INVALID					= 0xFFFF
 	};
 
@@ -102,6 +103,7 @@ public:
 	bool IsBillboard();
 	bool IsTrailingEllipsis();
 	bool IsLeadingEllipsis();
+	bool IsPassword();
 	bool IsRenderToQuad();
 	
 	RESULT SetBackgroundColor(color backgroundColor);

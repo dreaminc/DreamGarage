@@ -309,6 +309,10 @@ bool text::IsLeadingEllipsis() {
 	return ((m_flags & text::flags::LEAD_ELLIPSIS) != text::flags::NONE);
 }
 
+bool text::IsPassword() {
+	return ((m_flags & text::flags::PASSWORD) != text::flags::NONE);
+}
+
 bool text::IsRenderToQuad() {
 	return ((m_flags & text::flags::RENDER_QUAD) != text::flags::NONE);
 }
@@ -497,6 +501,15 @@ RESULT text::SetText(const std::string& strText) {
 	float fromStartOfWord = 0.0f;
 	float toWord = 0.0f;
 
+	if (IsPassword()) {
+		// set m_strText to all * characters during rendering
+		std::string strPassword;
+		for (int i = 0; i < strText.size(); i++) {
+			strPassword += "*";
+		}
+		m_strText = strPassword;
+	}
+
 	if (IsLeadingEllipsis() && !IsWrap() && !IsTrailingEllipsis()) { // TODO: wrap 
 		posX = GetDPM(m_width / m_scaleFactor);
 		bool fEllipsisUsed = false;
@@ -650,6 +663,11 @@ RESULT text::SetText(const std::string& strText) {
 
 	if (m_pBackgroundQuad != nullptr) {
 		CR(SetBackgroundColor(m_backgroundColor));
+	}
+
+	// switch m_strText back to regular characters
+	if (IsPassword()) {
+		m_strText = strText;
 	}
 
 	//m_width = maxRight - minLeft;

@@ -55,11 +55,11 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestFont());
+
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestBrowserRequest());
-
-	CR(AddTestFont());
 
 	CR(AddTestUIMenuItem());
 
@@ -419,7 +419,7 @@ RESULT UITestSuite::AddTestFont() {
 			CN(pFont);
 
 			// Fit to Scale
-			/*
+			//*
 			auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight * 4.0f , text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight, text::flags::TRAIL_ELLIPSIS);
 			CN(pText);
@@ -428,17 +428,19 @@ RESULT UITestSuite::AddTestFont() {
 
 			pTestContext->pText = pText;
 			pTestContext->timeLastUpdate = std::chrono::system_clock::now();
-			*/
+			//*/
 
+			/*
 			auto pText = m_pDreamOS->AddText(pFont, "abcdefghijklmnopqrstuvwxyz", lineHeight * 5.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, "abc def ghi jkl mno pqr stu vwx yz", lineHeight * 5.0f, lineHeight * 4.0f, text::flags::WRAP );
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
+			//*/
 
 			//pText->SetText("testing this \nthing");
 
-			/*
+			//*
 			pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
 			CN(pText);
 			//pText->RenderToQuad();
@@ -479,6 +481,18 @@ RESULT UITestSuite::AddTestFont() {
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.3f, 0.6f, text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, -2.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "password", 1.3f, 0.6f, text::flags::PASSWORD | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, -1.0f, 0.0f));
 			pText->SetText("testing this thing");
 			//*/
 
