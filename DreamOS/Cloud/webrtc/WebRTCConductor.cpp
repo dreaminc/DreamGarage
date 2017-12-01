@@ -336,7 +336,7 @@ RESULT WebRTCConductor::Initialize() {
 	CN(m_workerThread);
 	m_workerThread->Start();
 
-	/*
+	///*
 	// Custom Audio Device Module
 	m_pAudioDeviceModule = 
 		m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[&]()
@@ -358,8 +358,9 @@ RESULT WebRTCConductor::Initialize() {
 	m_pAudioDeviceModule->SetStereoPlayout(true);
 
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);
-	*/
+	//*/
 
+	/*
 	// Create a dummy module which will not actually capture / playback audio
 	// and we will handle the end points manually 
 	m_pAudioDeviceDummyModule = m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE, [&]() {
@@ -367,20 +368,23 @@ RESULT WebRTCConductor::Initialize() {
 	});
 
 	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-	while (m_pAudioDeviceDummyModule == nullptr) { /* wait for module to be available, TODO: replace with future? */}
+	while (m_pAudioDeviceDummyModule == nullptr) { 
+		// wait for module to be available, TODO: replace with future? 
+	}
 	CN(m_pAudioDeviceDummyModule);
 
 	m_pAudioDeviceDummyModule->SetPlayoutSampleRate(44100);
 	m_pAudioDeviceDummyModule->SetRecordingSampleRate(44100);
 	m_pAudioDeviceDummyModule->SetStereoRecording(true);
 	m_pAudioDeviceDummyModule->SetStereoPlayout(true);
+	*/
 
 	m_pWebRTCPeerConnectionFactory =
 		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
 											m_workerThread.get(),	// worker thread
 											rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
-											//m_pAudioDeviceModule,	// TODO: Default ADM
-											m_pAudioDeviceDummyModule,		// Dummy ADM
+											m_pAudioDeviceModule,	// TODO: Default ADM
+											//m_pAudioDeviceDummyModule,		// Dummy ADM
 											nullptr,	// Video Encoder Factory
 											nullptr		// Audio Encoder Factory
 		);

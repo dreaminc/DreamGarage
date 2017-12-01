@@ -153,7 +153,7 @@ public:
 		//		0, clockDrift, currentMicLevel, keyPressed, newMicLevel);
 		//}
 
-		// Send to the actual audio transport (this part makes soundz)
+		//// Send to the actual audio transport (this part makes soundz)
 		//if (m_pAudioTransport) {
 		//	res = m_pAudioTransport->RecordedDataIsAvailable(
 		//		audioSamples, nSamples, nBytesPerSample, nChannels, samples_per_sec,

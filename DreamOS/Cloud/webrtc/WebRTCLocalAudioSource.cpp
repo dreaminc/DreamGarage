@@ -40,15 +40,27 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 	int nSamples = pendingAudioPacket.GetNumFrames();
 	int channels = 1;
 	
-	static int count = 0;
-	static int16_t *pDataBuffer = nullptr;  
+	static double theta = 0.0f;
+	static double freq = 440.0f;
+
+	int16_t *pDataBuffer = nullptr;  
 	
 	if (pDataBuffer == nullptr) {
-		pDataBuffer = new int16_t[nSamples];
+		pDataBuffer = new int16_t[nSamples * channels];
 
-		for (int i = 0; i < nSamples; i++) {
-			pDataBuffer[i] = sin((count * 4200.0f) / samples_per_sec) * 10000;
-			count++;
+		for (int i = 0; i < nSamples * channels; i++) {
+			float val = sin(theta);
+			//val *= 0.25f;
+
+			for (int j = 0; j < channels; j++) {
+				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
+			}
+
+			// increment theta
+			theta += ((2.0f * M_PI) / 44100.0f) * freq;
+			if (theta >= 2.0f * M_PI) {
+				theta = theta - (2.0f * M_PI);
+			}
 		}
 	}
 

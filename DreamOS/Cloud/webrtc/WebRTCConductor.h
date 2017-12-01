@@ -158,8 +158,8 @@ private:
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
 
 	// Audio Device Module
-	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
-	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_
