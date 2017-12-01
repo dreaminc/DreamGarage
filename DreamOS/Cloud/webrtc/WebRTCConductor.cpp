@@ -313,14 +313,14 @@ RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
 	// User Peer Connection Factory
-	/* OLD
+	/* Standard way
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 	m_pWebRTCPeerConnectionFactory->AddRef();
 	
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
-	*/
+	//*/
 
 	///*
 	// Chrome Peer Connection Factory (testing)
@@ -343,6 +343,9 @@ RESULT WebRTCConductor::Initialize() {
 	{
 		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
 		return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio, this);
+		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
+		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
 	});
 
 	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
@@ -354,30 +357,11 @@ RESULT WebRTCConductor::Initialize() {
 
 	m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
 	m_pAudioDeviceModule->SetRecordingSampleRate(44100);
-	m_pAudioDeviceModule->SetStereoRecording(true);
+	m_pAudioDeviceModule->SetStereoRecording(false);
+	//m_pAudioDeviceModule->StopRecording();
 	m_pAudioDeviceModule->SetStereoPlayout(true);
 
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);
-	//*/
-
-	/*
-	// Create a dummy module which will not actually capture / playback audio
-	// and we will handle the end points manually 
-	m_pAudioDeviceDummyModule = m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE, [&]() {
-		return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
-	});
-
-	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-	while (m_pAudioDeviceDummyModule == nullptr) { 
-		// wait for module to be available, TODO: replace with future? 
-	}
-	CN(m_pAudioDeviceDummyModule);
-
-	m_pAudioDeviceDummyModule->SetPlayoutSampleRate(44100);
-	m_pAudioDeviceDummyModule->SetRecordingSampleRate(44100);
-	m_pAudioDeviceDummyModule->SetStereoRecording(true);
-	m_pAudioDeviceDummyModule->SetStereoPlayout(true);
-	*/
 
 	m_pWebRTCPeerConnectionFactory =
 		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread

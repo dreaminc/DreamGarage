@@ -131,13 +131,7 @@ public:
 	{
 		int32_t res = 0;
 		
-		DEBUG_LINEOUT("Recorded Data is Avail: %d", (int)(nSamples));
-
-		// Capture PCM data of locally captured audio.
-		//if (observer_) {
-		//	observer_->OnCaptureData(audioSamples, nSamples, nBytesPerSample,
-		//		nChannels, samples_per_sec);
-		//}
+		//DEBUG_LINEOUT("Recorded Data is Avail: %d", (int)(nSamples));
 
 		//static int count = 0;
 		//int16_t *pDataBuffer = new int16_t[nSamples];
@@ -154,11 +148,43 @@ public:
 		//}
 
 		//// Send to the actual audio transport (this part makes soundz)
-		//if (m_pAudioTransport) {
-		//	res = m_pAudioTransport->RecordedDataIsAvailable(
-		//		audioSamples, nSamples, nBytesPerSample, nChannels, samples_per_sec,
-		//		total_delay_ms, clockDrift, currentMicLevel, keyPressed, newMicLevel);
-		//}
+
+		// Test mixing in a signal
+
+		static double theta = 0.0f;
+		static double freq = 440.0f;
+
+		int16_t *pDataBuffer = (int16_t*)audioSamples;
+		if (pDataBuffer != nullptr) {
+			for (int i = 0; i < nSamples * nChannels; i++) {
+				float val = sin(theta);
+				//val *= 0.25f;
+
+				for (int j = 0; j < nChannels; j++) {
+					pDataBuffer[i + j] += (int16_t)(val * 10000.0f);
+				}
+
+				// increment theta
+				theta += ((2.0f * M_PI) / (double)(samples_per_sec)) * freq;
+				if (theta >= 2.0f * M_PI) {
+					theta = theta - (2.0f * M_PI);
+				}
+			}
+		}
+
+		if (m_pAudioTransport) {
+			res = m_pAudioTransport->RecordedDataIsAvailable(
+				audioSamples, 
+				nSamples, 
+				nBytesPerSample, 
+				nChannels, 
+				samples_per_sec,
+				total_delay_ms, 
+				clockDrift, 
+				currentMicLevel, 
+				keyPressed, 
+				newMicLevel);
+		}
 
 		return res;
 	}
@@ -182,12 +208,6 @@ public:
 				nSamples, nBytesPerSample, nChannels, samples_per_sec, audioSamples,
 				nSamplesOut, elapsed_time_ms, ntp_time_ms);
 		}
-
-		// Capture rendered data.
-		//if (observer_) {
-		//	observer_->OnRenderData(audioSamples, nSamples, nBytesPerSample,
-		//		nChannels, samples_per_sec);
-		//}
 
 		return res;
 	}

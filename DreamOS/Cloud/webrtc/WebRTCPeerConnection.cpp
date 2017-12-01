@@ -128,8 +128,8 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
 	CNM(pMediaStreamInterface, "Failed to create user media stream");
 
-	//CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
-	CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
+	CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
 	// CR(AddVideoStream(pMediaStreamInterface));
