@@ -135,7 +135,7 @@ private:
 
 	DreamControlView::state m_viewState;
 
-	bool m_fMouseUp;
+	bool m_fMouseDown;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
