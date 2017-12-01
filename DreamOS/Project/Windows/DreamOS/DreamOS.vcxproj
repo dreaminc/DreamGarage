@@ -665,7 +665,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\WebRequest.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp" />
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioCaptureDevice.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
@@ -915,7 +915,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\WebRequest.h" />
     <ClInclude Include="..\..\..\Cloud\WebRequestPostData.h" />
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h" />
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioCaptureDevice.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.h" />

@@ -32,7 +32,7 @@ class AudioPacket;
 #include "webrtc/modules/audio_device/include/audio_device.h"
 #include "webrtc/modules/audio_device/dummy/audio_device_dummy.h"
 
-#include "WebRTCAudioCaptureDevice.h"
+#include "WebRTCAudioDeviceModule.h"
 
 class WebRTCConductor : 
 	public WebRTCPeerConnection::WebRTCPeerConnectionObserver,
