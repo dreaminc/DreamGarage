@@ -128,14 +128,14 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
 	CNM(pMediaStreamInterface, "Failed to create user media stream");
 
-	//CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
-	CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
+	CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
 	// CR(AddVideoStream(pMediaStreamInterface));
 
 	// Chrome Audio Source
-	CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
 
 	// Add user stream to peer connection interface
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {

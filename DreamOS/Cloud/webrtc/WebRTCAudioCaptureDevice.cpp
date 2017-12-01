@@ -150,7 +150,7 @@ public:
 		//// Send to the actual audio transport (this part makes soundz)
 
 		// Test mixing in a signal
-		/*
+		///*
 		static double theta = 0.0f;
 		static double freq = 440.0f;
 
@@ -185,7 +185,7 @@ public:
 				keyPressed, 
 				newMicLevel);
 		}
-		*/
+		//*/
 
 		return res;
 	}

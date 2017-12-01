@@ -572,8 +572,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 				// Send a dummy audio packet (generating audio right now)
 				AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
 				//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
-				pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
-				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+				//pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+				//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
 			}
 			//*/
 
