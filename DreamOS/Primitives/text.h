@@ -51,6 +51,7 @@ public:
 		RENDER_QUAD 			= 1 << 5,
 		CURVE_QUAD_CIRCLE		= 1 << 6, 
 		CURVE_QUAD_PARABOLIC	= 1 << 7,
+		LEAD_ELLIPSIS			= 1 << 8,
 		INVALID					= 0xFFFF
 	};
 
@@ -100,6 +101,7 @@ public:
 	bool IsFitToSize();
 	bool IsBillboard();
 	bool IsTrailingEllipsis();
+	bool IsLeadingEllipsis();
 	bool IsRenderToQuad();
 	
 	RESULT SetBackgroundColor(color backgroundColor);
@@ -111,6 +113,8 @@ public:
 private:
 	std::shared_ptr<quad> AddGlyphQuad(CharacterGlyph glyph, float posX, float posY);
 	RESULT SetBackgroundQuad();
+	RESULT AddTrailingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads);
+	RESULT AddLeadingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads);
 
 private:
 	bool m_fScaleToFit = false;

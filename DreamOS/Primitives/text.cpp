@@ -305,6 +305,10 @@ bool text::IsTrailingEllipsis() {
 	return ((m_flags & text::flags::TRAIL_ELLIPSIS) != text::flags::NONE);
 }
 
+bool text::IsLeadingEllipsis() {
+	return ((m_flags & text::flags::LEAD_ELLIPSIS) != text::flags::NONE);
+}
+
 bool text::IsRenderToQuad() {
 	return ((m_flags & text::flags::RENDER_QUAD) != text::flags::NONE);
 }
@@ -493,143 +497,149 @@ RESULT text::SetText(const std::string& strText) {
 	float fromStartOfWord = 0.0f;
 	float toWord = 0.0f;
 
-	for(char &c : m_strText) {
-		CharacterGlyph glyph;
-		bool fInWord = false;
+	if (IsLeadingEllipsis() && !IsWrap() && !IsTrailingEllipsis()) { // TODO: wrap 
+		posX = GetDPM(m_width / m_scaleFactor);
+		bool fEllipsisUsed = false;
 
-		// This triggers a line break
-		if (c == '\n') {
-			posX = 0.0f;
-			posY += fontLineHeight;
-		}
-		else if (m_pFont->GetGlyphFromChar(c, glyph)) {
-			bool fQuitWrap = false;
+		CharacterGlyph periodGlyph; 
+		m_pFont->GetGlyphFromChar('.', periodGlyph);
 
-			if (std::isspace(c)) {
-				curWordQuads.clear();
-				posX += (float)(glyph.advance);
-				toWord = posX;
+		float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
+		float periodWidth = 0.0f;
 
-				fromStartOfWord = 0.0f;
-				continue;
-			}
+		for (int i = (int)(m_strText.size()) - 1; i >= 0; i--) {
+			char &c = m_strText[i];
+			CharacterGlyph glyph;
+			bool fInWord = false;
 
-			auto pQuad = AddGlyphQuad(glyph, posX, posY);
-			
-			curWordQuads.push_back(pQuad);
-			curLineQuads.push_back(pQuad);
+			if (m_pFont->GetGlyphFromChar(c, glyph) && !fEllipsisUsed) {
 
-			posX += (float)(glyph.advance);
-			fromStartOfWord += (float)(glyph.advance);
-
-			float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
-
-			// Wrapping
-			if (IsWrap() && posXM > m_width) {
-				// Test for ellipsis 
-				if (IsTrailingEllipsis() && (GetMSizeFromDots(posY + fontLineHeight * 2.0f) * m_scaleFactor) > m_height) {
-					// TODO: Move to func
-					CharacterGlyph periodGlyph;
-					m_pFont->GetGlyphFromChar('.', periodGlyph);
-
-					float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
-
-					// Remove characters so we have space for the ellipsis 
-					while (posXM > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
-						auto pQuad = curLineQuads.back();
-						curLineQuads.pop_back();
-
-						// Remove from flat context
-						RemoveChild(pQuad);
-
-						posXM = pQuad->GetPosition().x() - (pQuad->GetWidth() / 2.0f);
-					}
-
+				posX -= (float)(glyph.advance);
+				if (posX < (float)(periodGlyph.advance) * 3.0f) {
+					posX += (float)(glyph.advance);
 					for (int i = 0; i < 3; i++) {
+						posX -= (float)(periodGlyph.advance);
 						auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
-
-						// Adjust position
-						point ptPeriod = pPeriodQuad->GetPosition();
-						ptPeriod.x() = posXM + pPeriodQuad->GetWidth() / 2.0f;
-						pPeriodQuad->SetPosition(ptPeriod);
-
-						posXM += pPeriodQuad->GetWidth();
+						curLineQuads.push_back(pPeriodQuad);
 					}
+					fEllipsisUsed = true;
+					break;
+				}
+				else {
+					auto pQuad = AddGlyphQuad(glyph, posX, posY);
+					curLineQuads.push_back(pQuad);
+				}
+			}
+		}
+		if (curLineQuads.size() > 0) {
+			float left = curLineQuads.back()->GetPosition().x() - (curLineQuads.back()->GetWidth()/2.0f);
+			for (auto pQuad : curLineQuads) {
+				point ptPosition = pQuad->GetPosition();
+				ptPosition.x() -= left;
+				//ptPosition.x() += periodWidth * 3.0f;
+				pQuad->SetPosition(ptPosition);
+			}
+		}
+	}
+	else {
+		for (char &c : m_strText) {
+			CharacterGlyph glyph;
+			bool fInWord = false;
+
+			// This triggers a line break
+			if (c == '\n') {
+				posX = 0.0f;
+				posY += fontLineHeight;
+			}
+			else if (m_pFont->GetGlyphFromChar(c, glyph)) {
+				bool fQuitWrap = false;
+
+				if (std::isspace(c)) {
+					curWordQuads.clear();
+					posX += (float)(glyph.advance);
+					toWord = posX;
+
+					fromStartOfWord = 0.0f;
+					continue;
+				}
+
+				auto pQuad = AddGlyphQuad(glyph, posX, posY);
+
+				curWordQuads.push_back(pQuad);
+				curLineQuads.push_back(pQuad);
+
+				posX += (float)(glyph.advance);
+				fromStartOfWord += (float)(glyph.advance);
+
+				float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+				float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
+
+				// Wrapping
+				if (IsWrap() && posXM > m_width) {
+					// Test for ellipsis 
+					if (IsTrailingEllipsis() && (GetMSizeFromDots(posY + fontLineHeight * 2.0f) * m_scaleFactor) > m_height) {
+						// TODO: Move to func
+						AddTrailingEllipsisQuads(posX, posY, posXM, posYM, curLineQuads);
+
+						break;
+					}
+
+					// Move to func
+					if (curWordQuads.size() > 0) {
+						// Convert back from meters to dots 
+						if ((GetMSizeFromDots(fromStartOfWord) * m_scaleFactor) >= m_width) {
+							// Give up - if ellipsis is on lower test will catch it and break
+							// otherwise we give up
+							fQuitWrap = true;
+						}
+						else {
+							float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
+							float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
+
+							for (auto &pQuad : curWordQuads) {
+								pQuad->translateX(-xOffset);
+								pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
+							}
+
+							posX = fromStartOfWord;
+							toWord = 0.0f;
+						}
+					}
+
+					if (fQuitWrap == false) {
+						curLineQuads.clear();
+						posY += fontLineHeight;
+					}
+				}
+
+				posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+				posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
+
+				// Ellipsis
+				if (IsTrailingEllipsis() && (posXM > m_width)) {
+					AddTrailingEllipsisQuads(posX, posY, posXM, posYM, curLineQuads);
 
 					break;
 				}
 
-				// Move to func
-				if ( curWordQuads.size() > 0 ) {
-					// Convert back from meters to dots 
-					if ((GetMSizeFromDots(fromStartOfWord) * m_scaleFactor) >= m_width) {
-						// Give up - if ellipsis is on lower test will catch it and break
-						// otherwise we give up
-						fQuitWrap = true;
-					}
-					else {
-						float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
-						float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
-
-						for (auto &pQuad : curWordQuads) {
-							pQuad->translateX(-xOffset);
-							pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
-						}
-
-						posX = fromStartOfWord;
-						toWord = 0.0f;
-					}
+				// If wrapping has given up quit
+				if (fQuitWrap) {
+					break;
 				}
-
-				if (fQuitWrap == false) {
-					curLineQuads.clear();
-					posY += fontLineHeight;
-				}
-			}
-
-			posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
-
-			// Ellipsis
-			if (IsTrailingEllipsis() && (posXM > m_width)) {
-				CharacterGlyph periodGlyph; 
-				m_pFont->GetGlyphFromChar('.', periodGlyph);
-
-				float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
-
-				// Remove characters so we have space for the ellipsis 
-				while (posXM > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
-					auto pQuad = curLineQuads.back();
-					curLineQuads.pop_back();
-
-					// Remove from flat context
-					RemoveChild(pQuad);
-
-					posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
-				}
-				
-				for (int i = 0; i < 3; i++) {
-					auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
-					
-					// Adjust position
-					point ptPeriod = pPeriodQuad->GetPosition();
-					ptPeriod.x() = posXM + pPeriodQuad->GetWidth() / 2.0f;
-					pPeriodQuad->SetPosition(ptPeriod);
-
-					posXM += pPeriodQuad->GetWidth();
-				}
-
-				break;
-			}
-
-			// If wrapping has given up quit
-			if (fQuitWrap) {
-				break;
 			}
 		}
 	}
 	
+	/*
+	float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+	float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
+	
+	if (IsLeadingEllipsis() && (posXM > m_width)) {
+		AddLeadingEllipsisQuads(posX, posY, posXM, posYM, curLineQuads);
+		//break;
+	}
+	//*/
+
 	if (IsFitToSize()) {
 		m_width = FlatContext::GetWidth();
 		m_height = FlatContext::GetHeight();
@@ -648,6 +658,84 @@ RESULT text::SetText(const std::string& strText) {
 	//ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
 
 Error:
+	return r;
+}
+
+RESULT text::AddTrailingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads) {
+	RESULT r = R_PASS;
+
+	CharacterGlyph periodGlyph; 
+	m_pFont->GetGlyphFromChar('.', periodGlyph);
+
+	float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
+
+	// Remove characters so we have space for the ellipsis 
+	while (posXM > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
+		auto pQuad = curLineQuads.back();
+		curLineQuads.pop_back();
+
+		// Remove from flat context
+		RemoveChild(pQuad);
+
+		posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
+	}
+	
+	for (int i = 0; i < 3; i++) {
+		auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
+		
+		// Adjust position
+		point ptPeriod = pPeriodQuad->GetPosition();
+		ptPeriod.x() = posXM + pPeriodQuad->GetWidth() / 2.0f;
+		pPeriodQuad->SetPosition(ptPeriod);
+
+		posXM += pPeriodQuad->GetWidth();
+	}
+
+	return r;
+}
+
+RESULT text::AddLeadingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads) {
+	RESULT r = R_PASS;
+
+	CharacterGlyph periodGlyph; 
+	m_pFont->GetGlyphFromChar('.', periodGlyph);
+
+	float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
+
+	// Remove characters so we have space for the ellipsis 
+	float removedWidth = 0.0f;
+	while (posXM - removedWidth > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
+		auto pQuad = curLineQuads.front();
+		curLineQuads.erase(curLineQuads.begin());
+
+		// Remove from flat context
+		RemoveChild(pQuad);
+
+		//posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
+		//posXM -= pQuad->GetPosition().x()
+		removedWidth = pQuad->GetPosition().x() + (pQuad->GetWidth()/2.0f);
+	}
+
+	float periodWidth = 0.0f;
+	for (int i = 0; i < 3; i++) {
+		auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
+		periodWidth = pPeriodQuad->GetWidth();
+		// Adjust position
+		point ptPeriod = pPeriodQuad->GetPosition();
+		ptPeriod.x() = ((float)(i) + 0.5f) * periodWidth;
+		pPeriodQuad->SetPosition(ptPeriod);
+
+//		posXM += pPeriodQuad->GetWidth();
+	}
+
+	float shift = curLineQuads.front()->GetPosition().x() - (curLineQuads.front()->GetWidth() / 2.0f);
+	for (auto pQuad : curLineQuads) {
+		point ptQuadShift = pQuad->GetPosition();
+		ptQuadShift.x() = ptQuadShift.x() - shift + (3 * periodWidth);
+		pQuad->SetPosition(ptQuadShift);
+	}
+
+//Error:
 	return r;
 }
 
