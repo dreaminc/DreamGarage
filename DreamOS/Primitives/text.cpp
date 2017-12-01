@@ -701,16 +701,6 @@ RESULT text::SetText(const std::string& strText) {
 			}
 		}
 	}
-	
-	/*
-	float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-	float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
-	
-	if (IsLeadingEllipsis() && (posXM > m_width)) {
-		AddLeadingEllipsisQuads(posX, posY, posXM, posYM, curLineQuads);
-		//break;
-	}
-	//*/
 
 	if (IsFitToSize()) {
 		m_width = FlatContext::GetWidth();
@@ -768,51 +758,6 @@ RESULT text::AddTrailingEllipsisQuads(float posX, float posY, float posXM, float
 		posXM += pPeriodQuad->GetWidth();
 	}
 
-	return r;
-}
-
-RESULT text::AddLeadingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads) {
-	RESULT r = R_PASS;
-
-	CharacterGlyph periodGlyph; 
-	m_pFont->GetGlyphFromChar('.', periodGlyph);
-
-	float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
-
-	// Remove characters so we have space for the ellipsis 
-	float removedWidth = 0.0f;
-	while (posXM - removedWidth > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
-		auto pQuad = curLineQuads.front();
-		curLineQuads.erase(curLineQuads.begin());
-
-		// Remove from flat context
-		RemoveChild(pQuad);
-
-		//posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
-		//posXM -= pQuad->GetPosition().x()
-		removedWidth = pQuad->GetPosition().x() + (pQuad->GetWidth()/2.0f);
-	}
-
-	float periodWidth = 0.0f;
-	for (int i = 0; i < 3; i++) {
-		auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
-		periodWidth = pPeriodQuad->GetWidth();
-		// Adjust position
-		point ptPeriod = pPeriodQuad->GetPosition();
-		ptPeriod.x() = ((float)(i) + 0.5f) * periodWidth;
-		pPeriodQuad->SetPosition(ptPeriod);
-
-//		posXM += pPeriodQuad->GetWidth();
-	}
-
-	float shift = curLineQuads.front()->GetPosition().x() - (curLineQuads.front()->GetWidth() / 2.0f);
-	for (auto pQuad : curLineQuads) {
-		point ptQuadShift = pQuad->GetPosition();
-		ptQuadShift.x() = ptQuadShift.x() - shift + (3 * periodWidth);
-		pQuad->SetPosition(ptQuadShift);
-	}
-
-//Error:
 	return r;
 }
 

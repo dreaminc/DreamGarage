@@ -123,7 +123,6 @@ private:
 	std::shared_ptr<quad> AddGlyphQuad(CharacterGlyph glyph, float posX, float posY);
 	RESULT SetBackgroundQuad();
 	RESULT AddTrailingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads);
-	RESULT AddLeadingEllipsisQuads(float posX, float posY, float posXM, float posYM, std::vector<std::shared_ptr<quad>> curLineQuads);
 
 private:
 	bool m_fScaleToFit = false;
