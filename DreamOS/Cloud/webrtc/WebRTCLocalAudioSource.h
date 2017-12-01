@@ -33,8 +33,16 @@ public:
 
 	RESULT SendAudioPacket(const AudioPacket &pendingAudioPacket);
 
+	RESULT SetAudioSourceName(const std::string &strAudioTrackLabel) {
+		m_strAudioTrackLabel = strAudioTrackLabel;
+		return R_PASS;
+	}
+
 private:
 	webrtc::AudioTrackSinkInterface* m_pLocalAudioTrackSink = nullptr;
+
+private:
+	std::string m_strAudioTrackLabel;
 };
 
 #endif // WEBRTC_LOCAL_AUDIO_SOURCE_H_
