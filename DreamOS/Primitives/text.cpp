@@ -540,6 +540,7 @@ RESULT text::SetText(const std::string& strText) {
 	point ptCenter;
 	std::vector<std::shared_ptr<quad>> curWordQuads;
 	std::vector<std::shared_ptr<quad>> curLineQuads;
+	std::string strRender = strText;
 
 	CBR((m_strText.compare(strText) != 0), R_NO_EFFECT);
 
@@ -566,7 +567,7 @@ RESULT text::SetText(const std::string& strText) {
 		for (int i = 0; i < strText.size(); i++) {
 			strPassword += "*";
 		}
-		m_strText = strPassword;
+		strRender = strPassword;
 	}
 
 	if (IsLeadingEllipsis() && !IsWrap() && !IsTrailingEllipsis()) { // TODO: wrap 
@@ -579,8 +580,8 @@ RESULT text::SetText(const std::string& strText) {
 		float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
 		float periodWidth = 0.0f;
 
-		for (int i = (int)(m_strText.size()) - 1; i >= 0; i--) {
-			char &c = m_strText[i];
+		for (int i = (int)(strRender.size()) - 1; i >= 0; i--) {
+			char &c = strRender[i];
 			CharacterGlyph glyph;
 			bool fInWord = false;
 
@@ -614,7 +615,7 @@ RESULT text::SetText(const std::string& strText) {
 		}
 	}
 	else {
-		for (char &c : m_strText) {
+		for (char &c : strRender) {
 			CharacterGlyph glyph;
 			bool fInWord = false;
 
@@ -712,11 +713,6 @@ RESULT text::SetText(const std::string& strText) {
 
 	if (m_pBackgroundQuad != nullptr) {
 		CR(SetBackgroundColor(m_backgroundColor));
-	}
-
-	// switch m_strText back to regular characters
-	if (IsPassword()) {
-		m_strText = strText;
 	}
 
 	//m_width = maxRight - minLeft;
