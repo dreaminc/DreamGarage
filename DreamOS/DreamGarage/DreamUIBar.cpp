@@ -234,7 +234,6 @@ RESULT DreamUIBar::ShowRootMenu() {
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
 	{
-		
 		point ptOrigin;
 		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		quaternion qOrigin;
@@ -244,10 +243,11 @@ RESULT DreamUIBar::ShowRootMenu() {
 		GetComposite()->SetOrientation(qOrigin);
 
 		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
-		vCameraToMenu.y() = 0.0f;
 		vCameraToMenu.Normalize();
 
 		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
+
+		ptOrigin += vCameraToMenu * (m_menuDepth);
 
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}

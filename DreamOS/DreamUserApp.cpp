@@ -586,8 +586,9 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
-	vector vCamera;
-	vector vBrowser;
+	vector vCameraToMenu;
+	vector vCameraToBrowser;
+	vector vMenuToBrowser;
 	point ptMid;
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
@@ -598,21 +599,21 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
 		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
-		auto sphere = GetDOS()->AddSphere(.5f);
-		sphere->SetPosition(0.0f, 2.0f, -2.0f);
 
 		ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
-		vCamera = ptMid - ptCameraOrigin;	
+		vCameraToMenu = ptMid - ptCameraOrigin;	
 
-		vBrowser = ptBrowserOrigin - ptCameraOrigin;
+		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
 
-		float depth = vCamera.magnitude();
-		if (depth < 0.5f) {
-			depth = 0.5f;
+		float depth = vCameraToMenu.magnitude();
+		
+		if (depth < 0.3f) {
+			depth = 0.3f;
 		}
-
-		point newpoint = depth * vBrowser.Normalize();
-		vCamera = (ptCameraOrigin + newpoint) - ptCameraOrigin;
+		
+		// Reposition Menu to be on the vector between Camera and Browser
+		point newpoint = depth * vCameraToBrowser.Normal();
+		vCameraToMenu = (ptCameraOrigin + newpoint) - ptCameraOrigin;	
 
 		point ptCamera = pCamera->GetPosition();
 
@@ -620,16 +621,18 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		for (auto& hand : { m_pLeftHand, m_pRightHand }) {	// which hand is closer
 			point ptHand = hand->GetPosition(true);
 			vector vHand = ptHand - pCamera->GetOrigin(true);
-			vector vTempPos = vCamera * (vHand.dot(vCamera));
+			vector vTempPos = vCameraToMenu * (vHand.dot(vCameraToMenu));
 			if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
 				vPos = vTempPos;
 		}
 
 		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 
-		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		//m_pAppBasis->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vBrowser));
+		//m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
+		//sphere* abposition = GetDOS()->AddSphere(.05f);
+		//abposition->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
+		m_pAppBasis->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToBrowser));
 	}
 
 Error:
