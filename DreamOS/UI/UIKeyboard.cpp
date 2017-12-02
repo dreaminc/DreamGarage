@@ -133,8 +133,9 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 			m_pFont,
 			"",
 			m_surfaceWidth - 0.02f,
+			//0.25f,
 			m_lineHeight * m_numLines, 
-			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
 
 		m_pHeaderContainer->AddObject(m_pTextBoxText);
 

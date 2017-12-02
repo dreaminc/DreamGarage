@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestText());
+
 	CR(AddTestUserModel());
 
 	CR(AddTestModel());
@@ -57,8 +59,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestSenseHaptics());
 	
 	CR(AddTestBlinnPhongShader());
-
-	CR(AddTestText());
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
 
