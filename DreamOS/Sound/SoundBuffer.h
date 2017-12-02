@@ -67,6 +67,12 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(double *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 
 public:
+	virtual RESULT MixIntoInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT MixIntoInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT MixIntoInterlacedTargetBuffer(float *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT MixIntoInterlacedTargetBuffer(double *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+
+public:
 	// These are stubs to be picked up by the appropriate template implementation
 	virtual RESULT PushData(uint8_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
 	virtual RESULT PushData(int16_t *pDataBuffer, int numFrames) { return R_INVALID_PARAM; }
@@ -170,10 +176,6 @@ public:
 		}
 
 		return numPendingBytes;
-	}
-
-	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
-		return R_NOT_IMPLEMENTED;
 	}
 
 	// This is sub-typed below
@@ -300,6 +302,48 @@ public:
 		return r;
 	}
 
+	virtual RESULT MixIntoInterlacedTargetBuffer(CBType *pDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+
+		CB((NumPendingBytes() >= numFrameCount));
+
+		size_t bufferCounter = 0;
+		CBType tempVal = 0;
+
+		for (int j = 0; j < numFrameCount; j++) {
+			for (int i = 0; i < m_channels; i++) {
+				CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
+
+				pDataBuffer[bufferCounter] += tempVal;
+				bufferCounter++;
+			}
+		}
+
+	Error:
+		return r;
+	}
+
+	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+
+		CB((NumPendingBytes() >= numFrameCount));
+
+		size_t bufferCounter = 0;
+		CBType tempVal = 0;
+
+		for (int j = 0; j < numFrameCount; j++) {
+			for (int i = 0; i < m_channels; i++) {
+				CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
+
+				pTargetDataBuffer[bufferCounter] = tempVal;
+				bufferCounter++;
+			}
+		}
+
+	Error:
+		return r;
+	}
+
 private:
 	CircularBuffer<CBType> **m_ppCircularBuffers = nullptr;
 };
@@ -320,28 +364,6 @@ SoundBuffer::type SoundBufferTyped<int16_t>::GetType() const {
 template<>
 SoundBuffer::type SoundBufferTyped<float>::GetType() const { 
 	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
-}
-
-template<>
-RESULT SoundBufferTyped<float>::LoadDataToInterlacedTargetBuffer(float *pTargetDataBuffer, int numFrameCount) {
-	RESULT r = R_PASS;
-
-	CB((NumPendingBytes() >= numFrameCount));
-
-	size_t bufferCounter = 0;
-	float tempVal = 0.0f;
-
-	for (int j = 0; j < numFrameCount; j++) {
-		for (int i = 0; i < m_channels; i++) {
-			CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
-
-			pTargetDataBuffer[bufferCounter] = tempVal;
-			bufferCounter++;
-		}
-	}
-
-Error:
-	return r;
 }
 
 // 64 bit floating point

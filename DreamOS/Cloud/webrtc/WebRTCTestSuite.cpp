@@ -37,6 +37,8 @@ RESULT WebRTCTestSuite::AddTests() {
 
 	CR(AddTestChromeMultiBrowser());
 
+	CR(AddTestWebRTCAudio());
+
 	CR(AddTestWebRTCVideoStream());
 
 Error:

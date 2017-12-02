@@ -276,10 +276,6 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 
 				//CR(HandleAudioDataCaptured(dataType, numFramesAvailable, channels, pDataBuffer, pDataBuffer_n)
 
-				// TODO: Save to internal capture buffer
-				//hr = pMySink->CopyData(pData, numFramesAvailable, &bDone);
-				//CR((RESULT)hr);
-
 				m_pCaptureSoundBuffer->LockBuffer();
 				{
 					if (m_pCaptureSoundBuffer->IsFull() == false) {
@@ -293,28 +289,6 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 					}
 				}
 				m_pCaptureSoundBuffer->UnlockBuffer();
-
-				/*
-				// TESTING: Pushing capture audio directly into render buffer
-				m_pRenderSoundBuffer->LockBuffer();
-				{
-					if (m_pRenderSoundBuffer->IsFull() == false) {
-						int numChannels = m_pRenderSoundBuffer->NumChannels();
-
-						// Push the same data to both channels
-						//DEBUG_LINEOUT("Captured %d frames", numFramesAvailable);
-
-						for (int i = 0; i < numChannels; i++) {
-							CR(m_pRenderSoundBuffer->PushDataToChannel(i, pDataBuffer, numFramesAvailable));
-						}
-
-					}
-					else {
-						DEBUG_LINEOUT("Render buffer is full");
-					}
-				}
-				m_pRenderSoundBuffer->UnlockBuffer();
-				*/
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);
@@ -387,19 +361,6 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 	CRM((RESULT)m_pAudioRenderClient->GetService(__uuidof(IAudioRenderClient), (void**)&pRenderClient), "Failed to get render audio client");
 	CN(pRenderClient);
 
-	/*
-	// TODO: Potentially package the below into a call (since duplicated in audio loop)
-
-	// To reduce latency, load the first buffer with data
-	// from the audio source before starting the stream.
-	CRM((RESULT)pRenderClient->GetBuffer(bufferFrameCount, &pAudioClientBufferData), "Failed to get audio buffer");
-
-	// TODO: 
-	//pMySource->LoadData(bufferFrameCount, pData, &flags);
-
-	CRM((RESULT)pRenderClient->ReleaseBuffer(bufferFrameCount, audioDeviceFlags), "Failed to release buffer");
-	*/
-
 	// Ask MMCSS to temporarily boost the thread priority
 	// to reduce glitches while the low-latency stream plays.
 	DWORD taskIndex = 0;
@@ -456,12 +417,9 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			}
 			//*/
 
-			//CRM((RESULT)pMySource->LoadData(bufferFrameCount, pData, &flags);
-
 			// If there are pending buffer bytes in the render buffer
 			// play it back
 			int readBytes = 0;
-			
 			m_pRenderSoundBuffer->LockBuffer(); 
 			{
 				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {

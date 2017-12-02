@@ -17,6 +17,11 @@
 //#include "webrtc/rtc_base/scoped_ref_ptr.h"
 
 #include "Sound/AudioPacket.h"
+#include "Sound/SoundBuffer.h"
+
+// TODO: Shouldn't actually need capturer 
+// but lets get this to work first
+class WebRTCAudioDeviceModule;
 
 // This interface will capture the raw PCM data of both the local captured as
 // well as the mixed/rendered remote audio.
@@ -27,11 +32,13 @@ public:
 
 	RESULT Initialize();
 
-	RESULT BroadcastAudioPacket(const AudioPacket audioPacket);
+	RESULT BroadcastAudioPacket(const AudioPacket &audioPacket);
 
 	RESULT SetAudioTransport(webrtc::AudioTransport* pAudioTransport);
 
+public:
 	webrtc::AudioTransport* m_pAudioTransport = nullptr;
+	WebRTCAudioDeviceModule *m_pWebRTCAudioDeviceModule = nullptr;
 };
 
 // A wrapper over AudioDeviceModule that registers itself as AudioTransport
@@ -47,11 +54,14 @@ public:
 
 	// Make sure we have a valid ADM before returning it to user.
 	bool IsValid();
+	RESULT Initialize();
 
 	// RefCountedModule methods overrides.
 	int64_t TimeUntilNextProcess() override;
 
 	void Process() override;
+
+	RESULT BroadcastAudioPacket(const AudioPacket &audioPacket);
 
 	// AudioTransport methods overrides.
 	int32_t RecordedDataIsAvailable(const void* audioSamples,
@@ -229,6 +239,8 @@ protected:
 	AudioDeviceDataCapturer* m_pAudioDeviceCapturer = nullptr;
 	AudioTransport* m_pAudioTransport = nullptr;
 	bool m_fValid = false;
+
+	SoundBuffer *m_pPendingSoundBuffer = nullptr;
 };
 
 // Creates an ADM instance with AudioDeviceDataObserver registered.

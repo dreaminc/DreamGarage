@@ -650,10 +650,15 @@ Error:
 RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
-	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+	//rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	//CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+	//
+	//CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
-	CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+	WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
+	CN(pADM);
+	
+	CR(pADM->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

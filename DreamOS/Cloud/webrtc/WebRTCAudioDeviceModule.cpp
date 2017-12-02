@@ -11,65 +11,13 @@ RESULT AudioDeviceDataCapturer::Initialize() {
 	return R_PASS;
 }
 
-RESULT AudioDeviceDataCapturer::BroadcastAudioPacket(const AudioPacket audioPacket) {
+// TODO: AudioDeviceDataCapturer should be ixnays
+RESULT AudioDeviceDataCapturer::BroadcastAudioPacket(const AudioPacket &audioPacket) {
 	RESULT r = R_PASS;
 
-	if (m_pAudioTransport != nullptr) {
-		DEBUG_LINEOUT("ADDC: PushCaptureData: %d", (int)(audioPacket.GetNumFrames()));
+	CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(audioPacket));
 
-
-		//m_pAudioTransport->PushCaptureData(
-		//	0,
-		//	audioPacket.GetDataBuffer(),
-		//	audioPacket.GetBitsPerSample(),
-		//	audioPacket.GetSamplingRate(),
-		//	audioPacket.GetNumChannels(),
-		//	audioPacket.GetNumFrames()
-		//);
-
-		int kClockDriftMs = 0;
-		uint32_t newMicLevel = 0;
-		
-		///*
-		int samples_per_sec = 44100;
-		int nSamples = 441;
-		static int count = 0;
-		int16_t *pDataBuffer = new int16_t[nSamples];
-
-		for (int i = 0; i < nSamples; i++) {
-			pDataBuffer[i] = sin((count*4200.0f) / samples_per_sec) * 30000;
-			count++;
-		}
-		
-		int32_t res = m_pAudioTransport->RecordedDataIsAvailable(
-			pDataBuffer, 
-			nSamples,
-			sizeof(int16_t), 
-			1, 
-			samples_per_sec,
-			kClockDriftMs, 0,
-			255, 
-			false, 
-			newMicLevel);
-		
-		//*/
-
-		/*
-		int32_t res = m_pAudioTransport->RecordedDataIsAvailable(
-			audioPacket.GetDataBuffer(),
-			audioPacket.GetNumFrames(),
-			audioPacket.GetBytesPerSample(),
-			audioPacket.GetNumChannels(),
-			audioPacket.GetSamplingRate(),
-			kClockDriftMs, 0,
-			255,
-			false,
-			newMicLevel);
-			*/
-	}
-	
-
-	///Error:
+Error:
 	return r;
 }
 
@@ -83,13 +31,26 @@ rtc::scoped_refptr<webrtc::AudioDeviceModule>
 									  const webrtc::AudioDeviceModule::AudioLayer audio_layer, 
 									  AudioDeviceDataCapturer* pAudioDeviceCapturer) 
 {
-	rtc::scoped_refptr<WebRTCAudioDeviceModule> pAudioDeviceWrapper(new rtc::RefCountedObject<WebRTCAudioDeviceModule>(id, audio_layer, pAudioDeviceCapturer));
+	RESULT r = R_PASS;
 
-	if (!pAudioDeviceWrapper->IsValid()) {
-		return nullptr;
+	rtc::scoped_refptr<WebRTCAudioDeviceModule> pWebRTCAudioDeviceModule(new rtc::RefCountedObject<WebRTCAudioDeviceModule>(id, audio_layer, pAudioDeviceCapturer));
+	CN(pWebRTCAudioDeviceModule);
+
+	CBM((pWebRTCAudioDeviceModule->IsValid()), "ADM not valid");
+	CRM(pWebRTCAudioDeviceModule->Initialize(), "Failed to initialize WebRTCAudioDeviceModule");
+
+	// TODO: Temp
+	// This whole flow should be removed, capturer is not necessary (just this factory method)
+	pAudioDeviceCapturer->m_pWebRTCAudioDeviceModule = pWebRTCAudioDeviceModule.get();
+
+	return pWebRTCAudioDeviceModule;
+
+Error:
+	if (pWebRTCAudioDeviceModule) {
+		pWebRTCAudioDeviceModule = nullptr;
 	}
 
-	return pAudioDeviceWrapper;
+	return nullptr;
 }
 
 // WebRTCAudioDeviceModule
@@ -104,11 +65,24 @@ WebRTCAudioDeviceModule::WebRTCAudioDeviceModule(const int32_t id, const AudioLa
 	auto res = m_pAudioDeviceModuleImp->RegisterAudioCallback(this);
 
 	m_fValid = (m_pAudioDeviceModuleImp.get() != nullptr) && (res == 0);
+
+	
 }
 
 WebRTCAudioDeviceModule::~WebRTCAudioDeviceModule() {
 	m_pAudioTransport = nullptr;
 	m_pAudioDeviceCapturer = nullptr;
+}
+
+RESULT WebRTCAudioDeviceModule::Initialize() {
+	RESULT r = R_PASS;
+
+	// Sound Buffer
+	m_pPendingSoundBuffer = SoundBuffer::Make(2, SoundBuffer::type::SIGNED_16_BIT);
+	CN(m_pPendingSoundBuffer);
+
+Error:
+	return r;
 }
 
 // Make sure we have a valid ADM before returning it to user.
@@ -124,6 +98,56 @@ int64_t WebRTCAudioDeviceModule::TimeUntilNextProcess()  {
 // TODO: Perhaps we want to jump in here?
 void WebRTCAudioDeviceModule::Process()  {
 	m_pAudioDeviceModuleImp->Process();
+}
+
+RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPacket) {
+	RESULT r = R_PASS;
+
+	///*
+	// TEST: Fake audio output
+
+	int samples_per_sec = 44100;
+	int nFrames = audioPacket.GetNumFrames();
+	int channels = 1;
+
+	static double theta = 0.0f;
+	double freq = 440.0f;
+
+	int16_t *pDataBuffer = nullptr;
+
+	if (pDataBuffer == nullptr) {
+		pDataBuffer = new int16_t[nFrames * channels];
+
+		for (int i = 0; i < nFrames * channels; i++) {
+			float val = sin(theta);
+			//val *= 0.25f;
+
+			for (int j = 0; j < channels; j++) {
+				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
+			}
+
+			// increment theta
+			theta += ((2.0f * M_PI) / 44100.0f) * freq;
+			if (theta >= 2.0f * M_PI) {
+				theta = theta - (2.0f * M_PI);
+			}
+		}
+	}
+	//*/
+
+	m_pPendingSoundBuffer->LockBuffer();
+	{
+		if (m_pPendingSoundBuffer->IsFull() == false) {
+			CR(m_pPendingSoundBuffer->PushData(pDataBuffer, nFrames));
+		}
+		else {
+			DEBUG_LINEOUT("Pending buffer is full");
+		}
+	}
+	m_pPendingSoundBuffer->UnlockBuffer();
+
+Error:
+	return r;
 }
 
 // AudioTransport methods overrides.
@@ -143,7 +167,7 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	//// Send to the actual audio transport (this part makes soundz)
 
 	// Test mixing in a signal
-	///*
+	/*
 	static double theta = 0.0f;
 	static double freq = 440.0f;
 
@@ -164,6 +188,18 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 			}
 		}
 	}
+	//*/
+
+	int readBytes = 0;
+	m_pPendingSoundBuffer->LockBuffer();
+	{
+		if ((readBytes = (int)m_pPendingSoundBuffer->NumPendingBytes()) > 0) {
+			int16_t *pDataBuffer = (int16_t*)(audioSamples);
+			RESULT r = m_pPendingSoundBuffer->MixIntoInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
+			if(r < 0) DEBUG_LINEOUT("Failed to mix in pending values");
+		}
+	}
+	m_pPendingSoundBuffer->UnlockBuffer();
 
 	if (m_pAudioTransport) {
 		res = m_pAudioTransport->RecordedDataIsAvailable(
@@ -178,7 +214,6 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 			keyPressed,
 			newMicLevel);
 	}
-	//*/
 
 	return res;
 }

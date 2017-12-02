@@ -132,7 +132,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
-	// CR(AddVideoStream(pMediaStreamInterface));
+	CR(AddVideoStream(pMediaStreamInterface));
 
 	// Chrome Audio Source
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
@@ -152,9 +152,9 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// Data Channel
 	// TODO: Do this moar bettar
 	// This is not in the media streaming interface
-	//if (fAddDataChannel) {
-	//	CR(AddDataChannel());
-	//}
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;
@@ -245,6 +245,7 @@ Error:
 	return r;
 }
 
+// NOTE: This is not being used currently
 RESULT WebRTCPeerConnection::SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
