@@ -374,16 +374,28 @@ AudioPacket CEFBrowserController::PopPendingAudioPacket() {
 }
 
 RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
-	AudioPacket newPendingPacket(
-		frames,
-		channels,
-		bitsPerSample,
-		pDataBuffer
-	);
+	RESULT r = R_PASS;
 
-	m_pendingAudioPackets.push(newPendingPacket);
+	// Make a copy here
+	size_t pNewDataBuffer_n = (bitsPerSample / 8) * frames * channels;
+	uint8_t *pNewDataBuffer = (uint8_t*)malloc(pNewDataBuffer_n);
+	CN(pNewDataBuffer);
 
-	return R_PASS;
+	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
+	
+	{
+		AudioPacket newPendingPacket(
+			frames,
+			channels,
+			bitsPerSample,
+			pNewDataBuffer
+		);
+
+		m_pendingAudioPackets.push(newPendingPacket);
+	}
+
+Error:
+	return r;
 }
 
 bool CEFBrowserController::IsAudioPacketPending() {

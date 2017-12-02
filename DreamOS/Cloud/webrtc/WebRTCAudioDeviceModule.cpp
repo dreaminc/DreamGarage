@@ -140,17 +140,22 @@ RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPac
 	m_pPendingSoundBuffer->UnlockBuffer();
 	//*/
 
+	///*
 	m_pPendingSoundBuffer->LockBuffer();
 	{
 		if (m_pPendingSoundBuffer->IsFull() == false) {
+			
 			int16_t *pDataBuffer = (int16_t*)audioPacket.GetDataBuffer();
+
 			CR(m_pPendingSoundBuffer->PushData(pDataBuffer, audioPacket.GetNumFrames()));
+
 		}
 		else {
 			DEBUG_LINEOUT("Pending buffer is full");
 		}
 	}
 	m_pPendingSoundBuffer->UnlockBuffer();
+	//*/
 
 Error:
 	return r;
@@ -217,7 +222,7 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 				m_pPendingSoundBuffer->ReadNextValue(0, valLeft);
 				m_pPendingSoundBuffer->ReadNextValue(1, valRight);
 
-				pDataBuffer[i] = valLeft;
+				pDataBuffer[i] += valLeft;
 			}
 		}
 		else {
