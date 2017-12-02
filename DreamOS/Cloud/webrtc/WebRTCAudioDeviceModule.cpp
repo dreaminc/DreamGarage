@@ -103,42 +103,48 @@ void WebRTCAudioDeviceModule::Process()  {
 RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPacket) {
 	RESULT r = R_PASS;
 
-	///*
+	/*
 	// TEST: Fake audio output
 
 	int samples_per_sec = 44100;
 	int nFrames = audioPacket.GetNumFrames();
-	int channels = 1;
 
 	static double theta = 0.0f;
 	double freq = 440.0f;
 
-	int16_t *pDataBuffer = nullptr;
+	int16_t *pDataBuffer = new int16_t[nFrames];
 
-	if (pDataBuffer == nullptr) {
-		pDataBuffer = new int16_t[nFrames * channels];
+	for (int i = 0; i < nFrames; i++) {
+		float val = sin(theta);
+		//val *= 0.25f;
 
-		for (int i = 0; i < nFrames * channels; i++) {
-			float val = sin(theta);
-			//val *= 0.25f;
+		pDataBuffer[i] = (int16_t)(val * 10000.0f);
 
-			for (int j = 0; j < channels; j++) {
-				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
-			}
-
-			// increment theta
-			theta += ((2.0f * M_PI) / 44100.0f) * freq;
-			if (theta >= 2.0f * M_PI) {
-				theta = theta - (2.0f * M_PI);
-			}
+		// increment theta
+		theta += ((2.0f * M_PI) / 44100.0f) * freq;
+		if (theta >= 2.0f * M_PI) {
+			theta = theta - (2.0f * M_PI);
 		}
 	}
+
+	m_pPendingSoundBuffer->LockBuffer();
+	{
+		if (m_pPendingSoundBuffer->IsFull() == false) {
+			CR(m_pPendingSoundBuffer->PushDataToChannel(0, pDataBuffer, nFrames));
+			CR(m_pPendingSoundBuffer->PushDataToChannel(1, pDataBuffer, nFrames));
+		}
+		else {
+			DEBUG_LINEOUT("Pending buffer is full");
+		}
+	}
+	m_pPendingSoundBuffer->UnlockBuffer();
 	//*/
 
 	m_pPendingSoundBuffer->LockBuffer();
 	{
 		if (m_pPendingSoundBuffer->IsFull() == false) {
-			CR(m_pPendingSoundBuffer->PushData(pDataBuffer, nFrames));
+			int16_t *pDataBuffer = (int16_t*)audioPacket.GetDataBuffer();
+			CR(m_pPendingSoundBuffer->PushData(pDataBuffer, audioPacket.GetNumFrames()));
 		}
 		else {
 			DEBUG_LINEOUT("Pending buffer is full");
@@ -191,12 +197,31 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	//*/
 
 	int readBytes = 0;
+	size_t nFrames = nSamples / nChannels;
 	m_pPendingSoundBuffer->LockBuffer();
 	{
 		if ((readBytes = (int)m_pPendingSoundBuffer->NumPendingBytes()) > 0) {
 			int16_t *pDataBuffer = (int16_t*)(audioSamples);
-			RESULT r = m_pPendingSoundBuffer->MixIntoInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
+			int16_t valLeft = 0, valRight = 0;
+
+			/*
+			//RESULT r = m_pPendingSoundBuffer->MixIntoInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
+			//RESULT r = m_pPendingSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)nFrames);
+			RESULT r = m_pPendingSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
+			
 			if(r < 0) DEBUG_LINEOUT("Failed to mix in pending values");
+			*/
+
+			// TODO: Figure out how to do stereo
+			for (int i = 0; i < nSamples; i++) {
+				m_pPendingSoundBuffer->ReadNextValue(0, valLeft);
+				m_pPendingSoundBuffer->ReadNextValue(1, valRight);
+
+				pDataBuffer[i] = valLeft;
+			}
+		}
+		else {
+			DEBUG_LINEOUT("nothing there");
 		}
 	}
 	m_pPendingSoundBuffer->UnlockBuffer();

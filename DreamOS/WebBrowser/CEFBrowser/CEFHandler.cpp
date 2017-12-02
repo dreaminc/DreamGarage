@@ -317,7 +317,7 @@ Error:
 
 void CEFHandler::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFHANDLE: OnPaint");
+	//DEBUG_LINEOUT("CEFHANDLE: OnPaint");
 
 	CN(m_pCEFHandlerObserver);
 	CR(m_pCEFHandlerObserver->OnPaint(pCEFBrowser, type, dirtyRects, pBuffer, width, height));
@@ -330,7 +330,7 @@ Error:
 void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int channels, int bits_per_sample, const void* data_buffer) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("CEFHandle: OnAudioData");
+	//DEBUG_LINEOUT("CEFHandle: OnAudioData");
 
 	CN(m_pCEFHandlerObserver);
 	CR(m_pCEFHandlerObserver->OnAudioData(browser, frames, channels, bits_per_sample, data_buffer));

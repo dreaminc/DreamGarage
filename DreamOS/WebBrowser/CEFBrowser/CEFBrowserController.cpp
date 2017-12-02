@@ -392,7 +392,7 @@ bool CEFBrowserController::IsAudioPacketPending() {
 
 RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
+	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
 
 	// Queue up new audio packet 
 	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
@@ -403,7 +403,7 @@ Error:
 
 RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
