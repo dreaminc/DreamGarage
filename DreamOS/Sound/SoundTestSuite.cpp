@@ -24,6 +24,8 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestSpatialSound());
+
 	CR(AddTestCaptureSound());
 
 	CR(AddTestSoundClient());
@@ -83,6 +85,110 @@ RESULT SoundTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+// TODO: STUB
+RESULT SoundTestSuite::AddTestSpatialSound() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public SoundClient::observer {
+		SoundClient *pSoundClient = nullptr;
+
+		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+			RESULT r = R_PASS;
+
+			//// Simply pushes the capture buffer to the render buffer
+			//if (pSoundClient != nullptr) {
+			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("environment"));
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+
+		//// Open a sound file
+		//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+		//CN(pNewSoundFile);
+
+		// Create the sound client
+		pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+		CN(pTestContext->pSoundClient);
+
+		//CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
+		//CR(pTestContext->pSoundClient->Start());
+
+		//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Do stuff
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Audio Play Spatial Sound");
+	pUITest->SetTestDescription("Basic test of playing a spatial sound");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

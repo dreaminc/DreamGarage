@@ -33,6 +33,7 @@ public:
 
 	// Play Sound
 	RESULT AddTestPlaySound();
+	RESULT AddTestSpatialSound();
 	RESULT AddTestPlaySoundHRTF();
 
 	// Record Sound
