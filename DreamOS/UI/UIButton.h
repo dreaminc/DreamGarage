@@ -6,12 +6,16 @@
 
 class DreamOS;
 
+#define DEFAULT_WIDTH 0.25f
+#define ASPECT_RATIO (9.0f / 16.0f)
+#define DEFAULT_HEIGHT (DEFAULT_WIDTH * ASPECT_RATIO)
+
 class UIButton : public UIView, public Subscriber<UIEvent> {
 public:
-	UIButton(HALImp *pHALImp, DreamOS *pDreamOS);
+	UIButton(HALImp *pHALImp, DreamOS *pDreamOS, float width = DEFAULT_WIDTH, float height = DEFAULT_HEIGHT);
 	~UIButton();
 
-	RESULT Initialize();
+	RESULT Initialize(float width, float height);
 
 public:
 	RESULT RegisterToInteractionEngine(DreamOS *pDreamOS);

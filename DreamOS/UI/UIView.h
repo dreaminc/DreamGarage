@@ -14,6 +14,7 @@
 class UIButton;
 class UIScrollView;
 class UIMenuItem;
+class UIControlBar;
 class DreamOS;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
@@ -31,8 +32,14 @@ public:
 	std::shared_ptr<UIButton> MakeUIButton();
 	std::shared_ptr<UIButton> AddUIButton();
 
+	std::shared_ptr<UIButton> MakeUIButton(float width, float height);
+	std::shared_ptr<UIButton> AddUIButton(float width, float height);
+
 	std::shared_ptr<UIMenuItem> MakeUIMenuItem();
 	std::shared_ptr<UIMenuItem> AddUIMenuItem();
+
+	std::shared_ptr<UIControlBar> MakeUIControlBar();
+	std::shared_ptr<UIControlBar> AddUIControlBar();
 
 	std::shared_ptr<UIScrollView> MakeUIScrollView();
 	std::shared_ptr<UIScrollView> AddUIScrollView();

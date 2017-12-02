@@ -3,6 +3,7 @@
 #include "UIButton.h"
 #include "UIMenuItem.h"
 #include "UIScrollView.h"
+#include "UIControlBar.h"
 
 #include "DreamOS.h"
 
@@ -68,6 +69,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIButton> UIView::MakeUIButton(float width, float height) {
+	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, width, height));
+
+	return pButton;
+}
+
+std::shared_ptr<UIButton> UIView::AddUIButton(float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = MakeUIButton(width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS));
 
@@ -80,6 +97,22 @@ std::shared_ptr<UIMenuItem> UIView::AddUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton = MakeUIMenuItem();
 	CR(AddObject(pButton));
 	return pButton;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
+	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
+
+	return pControlBar;
+}
+
+std::shared_ptr<UIControlBar> UIView::AddUIControlBar() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar();
+	CR(AddObject(pControlBar));
+	return pControlBar;
 Error:
 	return nullptr;
 }

@@ -7,6 +7,7 @@
 
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
+#include "UI/UIControlBar.h"
 
 RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
 	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
@@ -84,14 +85,19 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
 
-	m_pViewQuad = m_pView->AddQuad(CONTROL_VIEWQUAD_WIDTH, CONTROL_VIEWQUAD_HEIGHT, 1, 1, nullptr);
+	m_pViewQuad = m_pView->AddQuad(VIEW_WIDTH, VIEW_HEIGHT, 1, 1, nullptr);
 	CN(m_pViewQuad);
 
-	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(CONTROL_VIEWQUAD_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
+
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 	m_pViewQuad->SetOrientation(m_qViewQuadOrientation);
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
+
+	m_pControlBar = m_pView->AddUIControlBar();
+	m_pControlBar->SetVisible(false);
 
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -100,8 +106,15 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	m_viewState = DreamControlView::state::HIDDEN;
 	
+	m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
 
-	m_ptVisiblePosition = point(0.0f, CONTROL_VIEW_HEIGHT, CONTROL_VIEW_DEPTH);
+	{
+		float controlBarOffset = m_pControlBar->GetSpacingOffset() - (VIEW_HEIGHT / 2.0f);
+		point ptBarOffset = point(0.0f, -sin(viewAngleRad) * controlBarOffset, cos(viewAngleRad) * controlBarOffset);
+		m_pControlBar->SetPosition(m_ptVisiblePosition -ptBarOffset);
+		m_pControlBar->SetOrientation(m_qViewQuadOrientation * quaternion::MakeQuaternionWithEuler(-(float)(M_PI) / 2.0f, 0.0f, 0.0f));
+		//m_pControlBar->SetPosition(m_ptVisiblePosition - point(0.0f, CONTROL_VIEWQUAD_HEIGHT / 2.0f, 0.0f));
+	}
 
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
@@ -472,13 +485,14 @@ RESULT DreamControlView::Show() {
 	{
 		auto fnStartCallback = [&](void *pContext) {
 			GetViewQuad()->SetVisible(true);
+			m_pControlBar->SetVisible(true);
 			SetViewState(DreamControlView::state::SHOW);
 			return R_PASS;
 		};
 
 		auto fnEndCallback = [&](void *pContext) {
 			RESULT r = R_PASS;
-
+			
 			if (m_pUserHandle == nullptr) {
 				auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 				CB(userUIDs.size() == 1);
@@ -553,6 +567,7 @@ RESULT DreamControlView::Hide() {
 
 	auto fnStartCallback = [&](void *pContext) {
 		SetViewState(DreamControlView::state::HIDE);
+		m_pControlBar->SetVisible(false);
 		return R_PASS;
 	};
 
@@ -661,8 +676,8 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		ptTextBox.y() = m_pBrowserHandle->GetHeightOfBrowser() / 2.0f;
 	}
 
-	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / CONTROL_VIEWQUAD_HEIGHT);	// scaled with ControlViewQuad dimensions
-	ptTypingOffset = point(0.0f, -CONTROL_VIEWQUAD_HEIGHT / 2.0f, -0.05f);	// so that it'll appear past the keyboard quad
+	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / VIEW_HEIGHT);	// scaled with ControlViewQuad dimensions
+	ptTypingOffset = point(0.0f, -VIEW_HEIGHT / 2.0f, -0.05f);	// so that it'll appear past the keyboard quad
 
 	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
 
@@ -692,7 +707,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 			m_pViewQuad.get(),
 			ptTypingPosition,
-			quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f),
+			quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
 			vector(m_visibleScale, m_visibleScale, m_visibleScale),
 			m_keyboardAnimationDuration,
 			AnimationCurveType::EASE_OUT_QUAD,

@@ -16,12 +16,13 @@
 
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
-#define CONTROL_VIEWQUAD_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
-#define CONTROL_VIEWQUAD_HEIGHT 0.3375f
-#define CONTROL_VIEWQUAD_ANGLE 32.0f
-#define CONTROL_VIEW_DEPTH 0.1f	
-#define CONTROL_VIEW_HEIGHT -0.2f
-#define TYPING_ROTATION (M_PI / 2.0f)
+#define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
+#define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
+#define VIEW_ANGLE 32.0f
+#define VIEW_POS_DEPTH 0.1f	
+#define VIEW_POS_HEIGHT -0.2f
+
+#define TYPING_ANGLE (M_PI / 2.0f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
@@ -29,7 +30,7 @@ class quad;
 class sphere;
 class UIView;
 class UIMallet;
-class UIScrollView;
+class UIControlBar;
 class texture;
 class DreamBrowserHandle;
 
@@ -120,6 +121,8 @@ private:
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIView> m_pView = nullptr;
+
+	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
 
