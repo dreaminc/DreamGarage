@@ -27,7 +27,6 @@ public:
 
 public:
 
-<<<<<<< 77790ebae92d0bcc7ce30bff84c7e5b826f0bff0
 	// WebRTC Testing
 	RESULT AddTestWebRTCMultiPeer();
 	

@@ -9,11 +9,19 @@ class DreamAppHandle {
 public:
 	DreamAppHandle() :
 		m_fAppState(true)
-	{};
-	~DreamAppHandle() {};
+	{
+		// empty
+	};
+
+	~DreamAppHandle() {
+		// empty
+	};
 
 protected:
-	virtual bool GetAppState() { return m_fAppState; };
+	virtual bool GetAppState() { 
+		return m_fAppState; 
+	};
+
 	RESULT SetAppState(bool fAppState) { 
 		m_fAppState = fAppState; 
 		return R_PASS;

@@ -452,7 +452,9 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 		}
 
+#ifndef _USE_TEST_APP
 		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+#endif
 
 	Error:
 		return r;
@@ -561,7 +563,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
 
+#ifndef _USE_TEST_APP
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+#else
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+#endif
 
 	// Set up mouse / hand cursor model
 	///*
@@ -873,14 +879,16 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-			UID controlViewUID = vControlViewUID[0];
-			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			CN(pDreamControlViewHandle);
+			//auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			//UID controlViewUID = vControlViewUID[0];
+			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			//CN(pDreamControlViewHandle);
 
-			CR(pDreamControlViewHandle->DismissApp());
-
-			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+			if (pDreamControlViewHandle != nullptr) {
+				CR(pDreamControlViewHandle->DismissApp());
+				CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+			}
 
 		} break;
 	}

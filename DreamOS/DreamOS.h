@@ -172,10 +172,14 @@ public:
 	template<class derivedAppType>
 	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp);
 
+	DreamAppHandle* RequestCaptureAppUnique(std::string strAppName, DreamAppBase* pHoldingApp);
 	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
-	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp);
+
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID appUID, DreamAppBase* pHoldingApp);
+	RESULT RequestReleaseAppUnique(DreamAppHandle* pHandle, DreamAppBase* pHoldingApp);
 
 	std::vector<UID> GetAppUID(std::string strAppName);
+	UID GetUniqueAppUID(std::string strAppName);
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
