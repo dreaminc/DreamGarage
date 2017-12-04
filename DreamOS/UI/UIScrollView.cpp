@@ -162,8 +162,33 @@ RESULT UIScrollView::Update() {
 				HideObject(m_pRightScrollButton.get());
 			}
 		}
+
 	}
+
+	
+	int index = m_yRotation / yRotationPerElement;
+
+	int minIndex = index - 1 > 0 ? index - 1 : 0;
+	int maxIndex = index + m_maxElements + 1 > pChildren.size() - 1 ? pChildren.size() - 1 : index + m_maxElements + 1;
+
+	for (int i = minIndex; i <= maxIndex; i++) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[i].get());
+		pObj->SetVisible(true);
+	}
+
+	if (minIndex - 1 >= 0) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[minIndex - 1].get());
+		pObj->SetVisible(false);
+	}
+	if (maxIndex + 1 <= pChildren.size() - 1) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[maxIndex + 1].get());
+		pObj->SetVisible(false);
+	}
+
+
 	m_frameMs = msNow;
+
+	
 
 Error:
 	return r; 
@@ -231,9 +256,9 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
 
-		//if (i > m_maxElements-1) {
-		//	pButton->SetVisible(false);
-		//}
+		if (i > m_maxElements-1) {
+			pButton->SetVisible(false);
+		}
 
 		i++;
 	}
@@ -330,7 +355,7 @@ RESULT UIScrollView::Show() {
 	RESULT r = R_PASS;
 
 	m_pTitleView->SetVisible(true, false);
-	m_pMenuButtonsContainer->SetVisible(true, true);
+	m_pMenuButtonsContainer->SetVisible(true, false);
 
 	return r;
 }
@@ -489,8 +514,6 @@ RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
 		if (m_velocity != 0.0f) {
 			if (m_pMenuButtonsContainer->HasChildren()) {
 				float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
-				if (m_yRotation > 0.0f && m_yRotation < maxRotation)
-					m_pMenuButtonsContainer->SetVisible(true, true);
 			}
 		}
 	} break;
