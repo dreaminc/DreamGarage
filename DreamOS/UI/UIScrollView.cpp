@@ -132,13 +132,13 @@ RESULT UIScrollView::Update() {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
-			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)) , maxRotation));
+			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)), maxRotation));
 			m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 		}
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pLeftScrollButton.get())) {
 			color leftColor = m_pLeftScrollButton->GetMaterial()->GetDiffuseColor();
-			if (m_yRotation > 0.0f && m_velocity < 0.0f && leftColor != m_visibleColor ) {
+			if (m_yRotation > 0.0f && m_velocity < 0.0f && leftColor != m_visibleColor) {
 				ShowObject(m_pLeftScrollButton.get(), m_visibleColor);
 			}
 			else if (m_yRotation > 0.0f && m_velocity >= 0.0f && leftColor != m_canScrollColor) {
@@ -162,8 +162,42 @@ RESULT UIScrollView::Update() {
 				HideObject(m_pRightScrollButton.get());
 			}
 		}
+
 	}
+
+
+	int index = m_yRotation / yRotationPerElement;
+	int arrayMaxIndex = (int)(pChildren.size()) - 1;
+
+	int minIndex = index - 1;
+	if (minIndex < 0) {
+		minIndex = 0;
+	}
+
+	int maxIndex = index + m_maxElements + 1;
+	if (maxIndex > arrayMaxIndex) {
+		maxIndex = arrayMaxIndex;
+	}
+
+	for (int i = minIndex; i <= maxIndex; i++) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[i].get());
+		pObj->SetVisible(true);
+	}
+
+	// Hide items that are far enough from the view
+	if (minIndex - 1 >= 0) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[minIndex - 1].get());
+		pObj->SetVisible(false);
+	}
+	if (maxIndex + 1 <= arrayMaxIndex) {
+		auto pObj = dynamic_cast<DimObj*>(pChildren[maxIndex + 1].get());
+		pObj->SetVisible(false);
+	}
+
+
 	m_frameMs = msNow;
+
+	
 
 Error:
 	return r; 
@@ -231,9 +265,9 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
 
-		//if (i > m_maxElements-1) {
-		//	pButton->SetVisible(false);
-		//}
+		if (i > m_maxElements-1) {
+			pButton->SetVisible(false);
+		}
 
 		i++;
 	}
@@ -330,7 +364,7 @@ RESULT UIScrollView::Show() {
 	RESULT r = R_PASS;
 
 	m_pTitleView->SetVisible(true, false);
-	m_pMenuButtonsContainer->SetVisible(true, true);
+	m_pMenuButtonsContainer->SetVisible(true, false);
 
 	return r;
 }
@@ -489,8 +523,6 @@ RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
 		if (m_velocity != 0.0f) {
 			if (m_pMenuButtonsContainer->HasChildren()) {
 				float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
-				if (m_yRotation > 0.0f && m_yRotation < maxRotation)
-					m_pMenuButtonsContainer->SetVisible(true, true);
 			}
 		}
 	} break;

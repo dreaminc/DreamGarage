@@ -87,8 +87,6 @@ private:
 	float m_scrollScale = SCROLL_SCALE;
 	float m_scrollBias = SCROLL_ARROW_BIAS;
 	float m_maxElements = MAX_ELEMENTS;
-	int m_objectIndexMin;
-	int m_objectIndexMax;
 	float m_yRotation;
 	float m_yRotationPerElement;
 	float m_velocity;
