@@ -237,6 +237,9 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	cefWindowInfo.height = height;
 	//cefWindowInfo.transparent_painting_enabled = 0;// false;
 
+	// Set background color to opaque white
+	cefBrowserSettings.background_color = 0xFFFFFFFF;
+
 	// Set up the promise (Will be set in OnBrowserCreated)
 	
 	m_promiseCEFBrowserController = std::promise<std::shared_ptr<CEFBrowserController>>();
