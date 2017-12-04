@@ -132,13 +132,13 @@ RESULT UIScrollView::Update() {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
-			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)) , maxRotation));
+			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)), maxRotation));
 			m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 		}
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pLeftScrollButton.get())) {
 			color leftColor = m_pLeftScrollButton->GetMaterial()->GetDiffuseColor();
-			if (m_yRotation > 0.0f && m_velocity < 0.0f && leftColor != m_visibleColor ) {
+			if (m_yRotation > 0.0f && m_velocity < 0.0f && leftColor != m_visibleColor) {
 				ShowObject(m_pLeftScrollButton.get(), m_visibleColor);
 			}
 			else if (m_yRotation > 0.0f && m_velocity >= 0.0f && leftColor != m_canScrollColor) {
@@ -165,22 +165,31 @@ RESULT UIScrollView::Update() {
 
 	}
 
-	
-	int index = m_yRotation / yRotationPerElement;
 
-	int minIndex = index - 1 > 0 ? index - 1 : 0;
-	int maxIndex = index + m_maxElements + 1 > pChildren.size() - 1 ? pChildren.size() - 1 : index + m_maxElements + 1;
+	int index = m_yRotation / yRotationPerElement;
+	int arrayMaxIndex = (int)(pChildren.size()) - 1;
+
+	int minIndex = index - 1;
+	if (minIndex < 0) {
+		minIndex = 0;
+	}
+
+	int maxIndex = index + m_maxElements + 1;
+	if (maxIndex > arrayMaxIndex) {
+		maxIndex = arrayMaxIndex;
+	}
 
 	for (int i = minIndex; i <= maxIndex; i++) {
 		auto pObj = dynamic_cast<DimObj*>(pChildren[i].get());
 		pObj->SetVisible(true);
 	}
 
+	// Hide items that are far enough from the view
 	if (minIndex - 1 >= 0) {
 		auto pObj = dynamic_cast<DimObj*>(pChildren[minIndex - 1].get());
 		pObj->SetVisible(false);
 	}
-	if (maxIndex + 1 <= pChildren.size() - 1) {
+	if (maxIndex + 1 <= arrayMaxIndex) {
 		auto pObj = dynamic_cast<DimObj*>(pChildren[maxIndex + 1].get());
 		pObj->SetVisible(false);
 	}
