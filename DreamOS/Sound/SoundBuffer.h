@@ -59,6 +59,7 @@ public:
 	
 	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) = 0;
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
+	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
 
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -196,6 +197,21 @@ public:
 		for (int i = 0; i < m_channels; i++) {
 			CR(m_ppCircularBuffers[i]->IncrementBuffer(numFrames));
 		}
+
+		m_bufferLock.unlock();
+
+	Error:
+		return r;
+	}
+
+	virtual RESULT IncrementBufferChannel(int channel, int numFrames) override {
+		RESULT r = R_PASS;
+
+		// This will block
+		m_bufferLock.lock();
+
+		CB((channel < m_channels));
+		CR(m_ppCircularBuffers[channel]->IncrementBuffer(numFrames));
 
 		m_bufferLock.unlock();
 

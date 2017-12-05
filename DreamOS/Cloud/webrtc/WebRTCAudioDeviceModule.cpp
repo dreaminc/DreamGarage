@@ -140,7 +140,10 @@ RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPac
 	m_pPendingSoundBuffer->UnlockBuffer();
 	//*/
 
-	///*
+	// TODO: Race condition here potentially
+	m_pendingAudioPackets.push_back(audioPacket);
+
+	/*
 	m_pPendingSoundBuffer->LockBuffer();
 	{
 		if (m_pPendingSoundBuffer->IsFull() == false) {
@@ -201,35 +204,57 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	}
 	//*/
 
+	/*
 	int readBytes = 0;
+	int pendingBytes = (int)m_pPendingSoundBuffer->NumPendingBytes();
 	size_t nFrames = nSamples / nChannels;
+
 	m_pPendingSoundBuffer->LockBuffer();
 	{
-		if ((readBytes = (int)m_pPendingSoundBuffer->NumPendingBytes()) > 0) {
+		if (pendingBytes > 0) {
 			int16_t *pDataBuffer = (int16_t*)(audioSamples);
 			int16_t valLeft = 0, valRight = 0;
 
-			/*
-			//RESULT r = m_pPendingSoundBuffer->MixIntoInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
-			//RESULT r = m_pPendingSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)nFrames);
-			RESULT r = m_pPendingSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)nSamples);
-			
-			if(r < 0) DEBUG_LINEOUT("Failed to mix in pending values");
-			*/
-
-			// TODO: Figure out how to do stereo
+			//// TODO: Figure out how to do stereo
 			for (int i = 0; i < nSamples; i++) {
 				m_pPendingSoundBuffer->ReadNextValue(0, valLeft);
-				m_pPendingSoundBuffer->ReadNextValue(1, valRight);
+				//m_pPendingSoundBuffer->ReadNextValue(1, valRight);
 
 				pDataBuffer[i] += valLeft;
+
+				readBytes++;
 			}
-		}
-		else {
-			DEBUG_LINEOUT("nothing there");
+
+			m_pPendingSoundBuffer->IncrementBufferChannel(1, readBytes);
+
+			// This is just a pass through
+			//m_pPendingSoundBuffer->IncrementBuffer(readBytes);
+
+			DEBUG_LINEOUT("Sent %d bytes %d pending bytes", readBytes, pendingBytes);
+
+			//m_pPendingSoundBuffer->IncrementBuffer(pendingBytes - readBytes);
 		}
 	}
 	m_pPendingSoundBuffer->UnlockBuffer();
+	*/
+
+	/*
+	if (m_pendingAudioPackets.size() > 0) {
+		AudioPacket pendingAudioPacket = m_pendingAudioPackets.front();
+		m_pendingAudioPackets.pop();
+
+		int16_t *pDataBuffer = (int16_t*)(audioSamples);
+
+		for (int i = 0; i < nSamples; i++) {
+			
+			pDataBuffer[i] += pendingAudioPacket.;
+
+			readBytes++;
+		}
+
+		DEBUG_LINEOUT("Popped packet, %d pending", m_pendingAudioPackets.size());
+	}
+	*/
 
 	if (m_pAudioTransport) {
 		res = m_pAudioTransport->RecordedDataIsAvailable(
@@ -259,7 +284,7 @@ int32_t WebRTCAudioDeviceModule::NeedMorePlayData(const size_t nSamples,
 {
 	int32_t res = 0;
 
-	DEBUG_LINEOUT("NeedMorePlayData: %d", (int)(nSamples));
+	//DEBUG_LINEOUT("NeedMorePlayData: %d", (int)(nSamples));
 
 	// Request data from audio transport (this part gets sound)
 	if (m_pAudioTransport) {

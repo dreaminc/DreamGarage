@@ -103,16 +103,19 @@ RESULT CEFBrowserController::PollPendingAudioPackets(int &numAudioPacketsProcess
 	numAudioPacketsProcessed = 0;
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
-		while (IsAudioPacketPending()) {
+		if(IsAudioPacketPending()) {
 			auto pendingAudioPacket = PopPendingAudioPacket();
 			
 			CR(m_pWebBrowserControllerObserver->OnAudioPacket(pendingAudioPacket));
 			
+			// This is done by the ADM right now
+			//pendingAudioPacket.DeleteBuffer();
+
 			numAudioPacketsProcessed++;
 		}
 	}
 
-	CR(ClearPendingAudioPacketQueue());
+	//CR(ClearPendingAudioPacketQueue());
 
 Error:
 	return r;
@@ -377,7 +380,7 @@ AudioPacket CEFBrowserController::PopPendingAudioPacket() {
 RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
 	RESULT r = R_PASS;
 
-	/*
+	///*
 	// Make a copy here
 	size_t pNewDataBuffer_n = (bitsPerSample / 8) * frames * channels;
 	uint8_t *pNewDataBuffer = (uint8_t*)malloc(pNewDataBuffer_n);
@@ -390,14 +393,14 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 			frames,
 			channels,
 			bitsPerSample,
-			//pNewDataBuffer
-			pDataBuffer
+			pNewDataBuffer
+			//pDataBuffer
 		);
 
-		//m_pendingAudioPackets.push(newPendingPacket);
+		m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer
-		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+		//CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
 	}
 
 Error:

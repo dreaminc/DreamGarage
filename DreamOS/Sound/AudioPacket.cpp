@@ -1,5 +1,7 @@
 #include "AudioPacket.h"
 
+#include <cstdlib>
+
 AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer) :
 	m_frames(frames),
 	m_channels(channels),
@@ -15,7 +17,7 @@ AudioPacket::~AudioPacket(){
 
 RESULT AudioPacket::DeleteBuffer() {
 	if (m_pDataBuffer != nullptr) {
-		delete [] m_pDataBuffer;
+		free(m_pDataBuffer);
 		m_pDataBuffer = nullptr;
 	}
 

@@ -357,8 +357,7 @@ RESULT WebRTCConductor::Initialize() {
 
 	m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
 	m_pAudioDeviceModule->SetRecordingSampleRate(44100);
-	m_pAudioDeviceModule->SetStereoRecording(false);
-	//m_pAudioDeviceModule->StopRecording();
+	m_pAudioDeviceModule->SetStereoRecording(true);
 	m_pAudioDeviceModule->SetStereoPlayout(true);
 
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);

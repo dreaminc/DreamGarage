@@ -1099,6 +1099,27 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		// TODO: haven't seen any issues with KEY_UP being a no-op
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
+
+#ifdef _USE_TEST_APP
+			if ((pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) && (pEvent->m_value == SVK_RETURN)) {
+				if (m_fReceivingStream) {
+					CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+					m_fReceivingStream = false;
+				}
+
+				SetStreamingState(false);
+
+				// TODO: May not be needed, if not streaming no video is actually being transmitted 
+				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
+
+				//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
+				CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+				SetStreamingState(true);
+			}
+#endif
+
 			/*
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 			std::string strURL = "";
