@@ -234,7 +234,6 @@ RESULT DreamUIBar::ShowRootMenu() {
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
 	{
-		
 		point ptOrigin;
 		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		quaternion qOrigin;
@@ -244,10 +243,12 @@ RESULT DreamUIBar::ShowRootMenu() {
 		GetComposite()->SetOrientation(qOrigin);
 
 		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
-		vCameraToMenu.y() = 0.0f;
 		vCameraToMenu.Normalize();
 
 		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
+		// TODO: This offset doesn't behave quite as expected, 
+		// will probably need corrections whenever we change menu position
+		ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
 
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}

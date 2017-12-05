@@ -33,18 +33,17 @@ class UIButton;
 
 class UIStageProgram;
 
-#define MENU_HEIGHT -0.16f
 #define KEYBOARD_OFFSET -0.07f
-
 #define SHOW_MENU_HEIGHT -0.5f
 #define SHOW_MENU_DEPTH 1.4f
-#define MENU_ANIMATION_DURATION 0.1f;
+#define MENU_ANIMATION_DURATION 0.1f
 
-#define ACTUATION_DEPTH 0.055f;
+#define ACTUATION_DEPTH 0.055f
 
 //Projection clipping values
 //TODO: optimize these values to reduce error,
 // once scrolling snap animation is determined
+#define CLIPPING_OFFSET -0.61f
 #define PROJECTION_WIDTH 0.575f
 #define PROJECTION_HEIGHT 0.25f
 #define PROJECTION_NEAR 0.0f
