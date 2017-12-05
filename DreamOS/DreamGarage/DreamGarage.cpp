@@ -305,8 +305,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamControlView);
 
 	// UIKeyboard App
-	CR(InitializeKeyboard());
-	CR(InitializeDreamUser());
+	CRM(InitializeKeyboard(), "Failed to initialize Keyboard");
+	CRM(InitializeDreamUser(), "Failed to initialize User App");
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
