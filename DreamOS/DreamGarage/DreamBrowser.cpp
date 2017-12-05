@@ -814,7 +814,7 @@ RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
 
 Error:
 	if (m_pendingFrame.pDataBuffer != nullptr) {
-		//delete m_pendingFrame.pDataBuffer;
+		delete [] m_pendingFrame.pDataBuffer;
 		m_pendingFrame.pDataBuffer = nullptr;
 
 		memset(&m_pendingFrame, 0, sizeof(PendingFrame));

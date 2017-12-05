@@ -15,7 +15,7 @@ AudioPacket::~AudioPacket(){
 
 RESULT AudioPacket::DeleteBuffer() {
 	if (m_pDataBuffer != nullptr) {
-		delete m_pDataBuffer;
+		delete [] m_pDataBuffer;
 		m_pDataBuffer = nullptr;
 	}
 
