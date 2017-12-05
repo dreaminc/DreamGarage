@@ -403,6 +403,11 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 	}
 
 Error:
+	if (pDataBuffer != nullptr) {
+		delete pDataBuffer;
+		pDataBuffer = nullptr;
+	}
+
 	return r;
 }
 

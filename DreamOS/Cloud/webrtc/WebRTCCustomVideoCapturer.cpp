@@ -70,8 +70,8 @@ RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFram
 	//capturedVideoframe.fourcc = cricket::FOURCC_I420;
 	capturedVideoframe.data_size = (uint32_t)frameSize;
 
-	//capturedVideoframe.time_stamp = rtc::TimeNanos();
-	capturedVideoframe.time_stamp = rtc::SystemTimeNanos();
+	capturedVideoframe.time_stamp = rtc::TimeNanos();
+	//capturedVideoframe.time_stamp = rtc::SystemTimeNanos();
 
 	// Set the buffer
 	// Not clear who deletes the buffer
