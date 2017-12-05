@@ -30,7 +30,6 @@ class UIKeyboard;
 class UIKeyboardHandle;
 class DimObj;
 
-#define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 
 #define GAZE_OVERLAY_MS 800.0 //1250.0
@@ -171,7 +170,7 @@ private:
 	bool m_fStreaming = false;
 
 private:
-	float m_menuDepth = MENU_DEPTH;
+	float m_menuDepth = 0.0f;
 	float m_menuHeight = MENU_HEIGHT;
 
 	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;

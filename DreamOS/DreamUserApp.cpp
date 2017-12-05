@@ -600,23 +600,29 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		point ptCameraOrigin = pCamera->GetOrigin(true);
 		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
 
-		ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
+		//ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
+		ptMid = ((m_pLeftMallet->GetMalletHead()->GetPosition(true) + m_pRightMallet->GetMalletHead()->GetPosition(true)) / 2);
 		vCameraToMenu = ptMid - ptCameraOrigin;	
 
 		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
 
-		float depth = vCameraToMenu.magnitude();
+		float menuDepth = vCameraToMenu.magnitude();
 		
-		if (depth < 0.3f) {
-			depth = 0.3f;
+		// min and max menu depths
+		if (menuDepth < 0.5f) {
+			menuDepth = 0.5f;
+		}
+		else if (menuDepth > 0.70f) {
+			menuDepth = 0.70f;
 		}
 		
 		// Reposition Menu to be on the vector between Camera and Browser
-		point newpoint = depth * vCameraToBrowser.Normal();
-		vCameraToMenu = (ptCameraOrigin + newpoint) - ptCameraOrigin;	
+		point ptMenuPosition = menuDepth * vCameraToBrowser.Normal();
+		vCameraToMenu = (ptCameraOrigin + ptMenuPosition) - ptCameraOrigin;	
 
 		point ptCamera = pCamera->GetPosition();
 
+		/*
 		vector vPos;
 		for (auto& hand : { m_pLeftHand, m_pRightHand }) {	// which hand is closer
 			point ptHand = hand->GetPosition(true);
@@ -624,14 +630,14 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 			vector vTempPos = vCameraToMenu * (vHand.dot(vCameraToMenu));
 			if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
 				vPos = vTempPos;
-		}
+		} 
+		*/
 
-		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
+		//point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 
 		//m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		//sphere* abposition = GetDOS()->AddSphere(.05f);
-		//abposition->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
-		m_pAppBasis->SetPosition(ptCameraOrigin + newpoint + point(0.0f, yPos, 0.0f));
+		
+		m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
 		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToBrowser));
 	}
 

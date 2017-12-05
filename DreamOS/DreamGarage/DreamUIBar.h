@@ -169,7 +169,7 @@ private:
 	point m_ptMenuShowOffset = point(0.0f, SHOW_MENU_HEIGHT, SHOW_MENU_DEPTH);
 	float m_menuHeight = MENU_HEIGHT;
 	float m_keyboardOffset = KEYBOARD_OFFSET;
-	float m_menuDepth = MENU_DEPTH;
+	float m_menuDepth = 0.0f;
 	float m_animationDuration = MENU_ANIMATION_DURATION;
 	float m_actuationDepth = ACTUATION_DEPTH;
 
