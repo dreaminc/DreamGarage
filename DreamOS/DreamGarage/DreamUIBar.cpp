@@ -246,8 +246,9 @@ RESULT DreamUIBar::ShowRootMenu() {
 		vCameraToMenu.Normalize();
 
 		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
-
-		ptOrigin += vCameraToMenu * (-.6f);
+		// TODO: This offset doesn't behave quite as expected, 
+		// will probably need corrections whenever we change menu position
+		ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
 
 		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 	}

@@ -691,7 +691,6 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-		sphere *centerOfBrowser;
 		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -734,8 +733,6 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		pDreamBrowser->SetDiagonalSize(9.0f);
 		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-		centerOfBrowser = m_pDreamOS->AddSphere(.05f);
-		centerOfBrowser->SetPosition(0.0f, 2.0f, -2.0f);
 
 		pDreamBrowser->SetVisible(false);
 
