@@ -742,8 +742,6 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeStreamLabel, pendingAudioPacket));
 	}
 
-	CR(r);
-
 Error:
 	return r;
 }

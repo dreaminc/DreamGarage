@@ -806,11 +806,14 @@ RESULT PeerConnectionController::BroadcastAudioPacket(const std::string &strAudi
 
 	CN(m_pWebRTCImp);
 
-	for (const auto &pPeerConnection : peerVectorCopy) {
-		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->SendAudioPacket(strAudioTrackLabel, pPeerConnection->GetPeerConnectionID(), pendingAudioPacket));
-		}
-	}
+	// Not doing per connection
+	//for (const auto &pPeerConnection : peerVectorCopy) {
+	//	if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+	//		CR(m_pWebRTCImp->SendAudioPacket(strAudioTrackLabel, pPeerConnection->GetPeerConnectionID(), pendingAudioPacket));
+	//	}
+	//}
+
+	CR(m_pWebRTCImp->SendAudioPacket(strAudioTrackLabel, -1, pendingAudioPacket));
 
 Error:
 	return r;

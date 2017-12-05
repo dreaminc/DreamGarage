@@ -650,6 +650,7 @@ Error:
 RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
+	// Not doing per connection with external ADM (mixing into recorded audio)
 	//rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
 	//CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 	//

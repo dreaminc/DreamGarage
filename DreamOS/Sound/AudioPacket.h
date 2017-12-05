@@ -38,6 +38,8 @@ public:
 		return m_samplingRate;
 	}
 
+	RESULT DeleteBuffer();
+
 private:
 	int m_frames;
 	int m_channels;

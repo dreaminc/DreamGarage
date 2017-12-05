@@ -96,6 +96,7 @@ Error:
 	return r;
 }
 
+// Might not be the way to go
 RESULT CEFBrowserController::PollPendingAudioPackets(int &numAudioPacketsProcessed) {
 	RESULT r = R_PASS;
 
@@ -376,22 +377,29 @@ AudioPacket CEFBrowserController::PopPendingAudioPacket() {
 RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
 	RESULT r = R_PASS;
 
+	/*
 	// Make a copy here
 	size_t pNewDataBuffer_n = (bitsPerSample / 8) * frames * channels;
 	uint8_t *pNewDataBuffer = (uint8_t*)malloc(pNewDataBuffer_n);
 	CN(pNewDataBuffer);
-
 	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
+	//*/
 	
 	{
 		AudioPacket newPendingPacket(
 			frames,
 			channels,
 			bitsPerSample,
-			pNewDataBuffer
+			//pNewDataBuffer
+			pDataBuffer
 		);
 
-		m_pendingAudioPackets.push(newPendingPacket);
+		//m_pendingAudioPackets.push(newPendingPacket);
+
+		// This will push directly into the pending buffer
+		CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+
+		//CR(newPendingPacket.DeleteBuffer());
 	}
 
 Error:

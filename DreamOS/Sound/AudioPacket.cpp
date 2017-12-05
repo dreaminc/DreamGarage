@@ -12,3 +12,12 @@ AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* p
 AudioPacket::~AudioPacket(){
 	// empty for now
 }
+
+RESULT AudioPacket::DeleteBuffer() {
+	if (m_pDataBuffer != nullptr) {
+		delete m_pDataBuffer;
+		m_pDataBuffer = nullptr;
+	}
+
+	return R_PASS;
+}

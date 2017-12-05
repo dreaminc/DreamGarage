@@ -459,7 +459,10 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 			pUserAudioTrackSource->AddSink(this);
 
+#ifndef _USE_TEST_APP
+			// Turn off audio for non-testing
 			SetAudioVolume(0.0f);
+#endif
 
 			DEBUG_LINEOUT("Added user audio sink");
 		}
