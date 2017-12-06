@@ -15,8 +15,7 @@ class CEFDOMNode : public DOMNode {
 public:
 	CEFDOMNode();
 	CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode);
-	CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable, bool fPassword);
-	CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string strValue, bool fEditable, bool fPassword);
+	CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable, std::string strNodeTypeAttributeValue);
 
 	~CEFDOMNode();
 
@@ -31,11 +30,11 @@ public:
 	virtual bool IsEditable() override;
 
 private:
-	bool m_fPassword = false;
 	bool m_fEditable = false;
 	std::string m_strElementTagName = "";
 	std::string m_strName = "";
 	std::string m_strValue = "";
+	std::string m_strNodeTypeAttributeValue = "";
 };
 
 
