@@ -8,6 +8,7 @@
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
 #include "UI/UIControlBar.h"
+#include "UI/UIButton.h"
 
 RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
 	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
@@ -98,6 +99,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_pControlBar = m_pView->AddUIControlBar();
 	m_pControlBar->SetVisible(false);
+	CN(m_pControlBar);
 
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -767,5 +769,29 @@ std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 
 RESULT DreamControlView::SetViewState(DreamControlView::state viewState) {
 	m_viewState = viewState;
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pContext) {
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleShowControlBar(UIButton* pButtonContext, void* pContext) {
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleHideControlBar(UIButton* pButtonContext, void* pContext) {
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleEnterURL(UIButton* pButtonContext, void* pContext) {
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleBack(UIButton* pButtonContext, void* pContext) {
+	return R_PASS;
+}
+
+RESULT DreamControlView::HandleForward(UIButton* pButtonContext, void* pContext) {
 	return R_PASS;
 }

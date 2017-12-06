@@ -14,6 +14,8 @@ class UIButton;
 #define URL_WIDTH 0.6875f
 #define ITEM_SPACING 0.015625f
 
+#define ITEM_ACTUATION_DEPTH 0.02f;
+
 class UIControlBar : public UIView {
 public:
 	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
@@ -22,6 +24,18 @@ public:
 	RESULT Initialize();
 
 	float GetSpacingOffset();
+
+	// Getters used for registering event behavior
+	std::shared_ptr<UIButton> GetBackButton();
+	std::shared_ptr<UIButton> GetForwardButton();
+	std::shared_ptr<UIButton> GetHideButton();
+	std::shared_ptr<UIButton> GetStopButton();
+	std::shared_ptr<UIButton> GetURLButton();
+	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
+
+// common behavior
+public:
+	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 
 private:
 	std::shared_ptr<UIButton> m_pBackButton;
@@ -42,6 +56,8 @@ private:
 	float m_itemSide = m_totalWidth * ITEM_SIDE;
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;
 	float m_urlWidth = m_totalWidth * URL_WIDTH;
+	float m_actuationDepth = ITEM_ACTUATION_DEPTH;
+
 };
 
 #endif UI_CONTROL_BAR_H_

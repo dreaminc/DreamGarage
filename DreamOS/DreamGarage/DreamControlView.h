@@ -31,6 +31,7 @@ class sphere;
 class UIView;
 class UIMallet;
 class UIControlBar;
+class UIButton;
 class texture;
 class DreamBrowserHandle;
 
@@ -108,6 +109,16 @@ private:
 	virtual RESULT Dismiss() override;
 
 	virtual bool IsVisible() override;
+
+// ControlBar events
+private:
+	RESULT HandleStopSharing(UIButton* pButtonContext, void* pContext);
+	RESULT HandleShowControlBar(UIButton* pButtonContext, void* pContext);
+	RESULT HandleHideControlBar(UIButton* pButtonContext, void* pContext);
+	RESULT HandleBack(UIButton* pButtonContext, void* pContext);
+	RESULT HandleForward(UIButton* pButtonContext, void* pContext);
+
+	RESULT HandleEnterURL(UIButton* pButtonContext, void* pContext);
 
 // View Context
 public:
