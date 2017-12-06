@@ -49,7 +49,7 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 		cefProcessMessageArguments->SetString(2, "");
 		cefProcessMessageArguments->SetBool(3, false);
 		cefProcessMessageArguments->SetInt(4, 0);
-		cefProcessMessageArguments->SetBool(5, false);
+		cefProcessMessageArguments->SetString(5, "");
 	}
 
 	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));

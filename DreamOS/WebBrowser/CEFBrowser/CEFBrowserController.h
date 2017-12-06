@@ -95,8 +95,8 @@ public:
 	// Browser Controls
 	virtual bool CanGoBack() override;
 	virtual bool CanGoForward() override;
-	virtual void GoBack() override;
-	virtual void GoForward() override;
+	virtual RESULT GoBack() override;
+	virtual RESULT GoForward() override;
 
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
