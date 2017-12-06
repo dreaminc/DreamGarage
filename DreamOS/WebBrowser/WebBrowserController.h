@@ -82,6 +82,12 @@ public:
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) = 0;
 	virtual RESULT SendKeySequence(const std::string& strKeySequence) = 0;
 
+	// Page controls
+	virtual void GoBack() = 0;
+	virtual void GoForward() = 0;
+	virtual bool CanGoBack() = 0;
+	virtual bool CanGoForward() = 0;
+
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.

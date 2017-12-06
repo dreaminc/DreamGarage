@@ -92,6 +92,12 @@ public:
 	// Frames
 	virtual size_t GetFrameCount() override;
 
+	// Browser Controls
+	virtual bool CanGoBack() override;
+	virtual bool CanGoForward() override;
+	virtual void GoBack() override;
+	virtual void GoForward() override;
+
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
 

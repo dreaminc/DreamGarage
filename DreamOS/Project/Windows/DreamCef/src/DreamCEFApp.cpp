@@ -40,7 +40,13 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 
 		int cefDOMNodeType = pCEFDOMNode->GetType();
 		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
-		cefProcessMessageArguments->SetBool(5, pCEFDOMNode->HasElementAttribute("password"));
+
+		std::string attributeType = pCEFDOMNode->GetElementAttribute("type");
+		bool IsPassword = false;
+		if (attributeType == "password") {
+			IsPassword = true;
+		}
+		cefProcessMessageArguments->SetBool(5, IsPassword);
 	}
 	else {
 		cefProcessMessageArguments->SetString(0, "");

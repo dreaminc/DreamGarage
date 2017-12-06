@@ -503,6 +503,22 @@ size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }
 
+bool CEFBrowserController::CanGoBack() {
+	return m_pCEFBrowser->CanGoBack();
+}
+
+bool CEFBrowserController::CanGoForward() {
+	return m_pCEFBrowser->CanGoForward();
+}
+
+void CEFBrowserController::GoBack() {
+	m_pCEFBrowser->GoBack();
+}
+
+void CEFBrowserController::GoForward() {
+	m_pCEFBrowser->GoForward();
+}
+
 /*
 // TODO: Put this somewhere better
 class CEFDOMVisitor : public CefDOMVisitor {
