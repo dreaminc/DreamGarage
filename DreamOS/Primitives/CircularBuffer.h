@@ -8,7 +8,7 @@
 // A template based circular buffer implementation
 
 // TODO: dynamic style
-#define MAX_PENDING_BUFFER_LENGTH (44100 * 5)
+#define MAX_PENDING_BUFFER_LENGTH (44100 * 20)
 
 template <class CBType>
 class CircularBuffer {
@@ -121,6 +121,9 @@ public:
 		return (m_circularBuffer_n - m_numPendingBytes);
 	}
 
+	size_t SizeOfCircularBuffer() {
+		return m_circularBuffer_n;
+	}
 	
 	size_t NumPendingBufferBytes() {
 		return m_numPendingBytes;

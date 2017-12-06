@@ -282,12 +282,13 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	int pendingFrames = (int)m_pendingAudioCircularBuffer.NumPendingBufferBytes() / 2;
 
 	// Speed up the audio a bit to keep up with delay
+	//float msTotalBufferTime = (((float)(m_pendingAudioCircularBuffer.SizeOfCircularBuffer() / 2.0f)) / 44100.0f) * 1000.0f;
 	float msBrowserPending = ((float)pendingFrames / 44100.0f) * 1000.0f;
 	float msToPlay = ((float)nSamples / 44100.0f) * 1000.0f;
 	float ratio = 1.00f;
 
 	if (msBrowserPending > total_delay_ms) {
-		ratio += (msBrowserPending / (float)total_delay_ms);
+		ratio += msBrowserPending / (1000.0f);
 
 		// Max 20% speed up
 		if (ratio > 1.20f)
