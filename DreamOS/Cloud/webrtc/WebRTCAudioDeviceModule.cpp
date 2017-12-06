@@ -324,7 +324,33 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 
 			int16_t newVal = (1.0f - interpolationRatio) * pTempBuffer[floorIndex] + interpolationRatio * pTempBuffer[ceilIndex];
 
-			pDataBuffer[i] += newVal;
+			// Pass 80% of the pending audio buffer through
+			// Use a temporary value to ensure we don't go into overflow - this is
+			// handled by the cut off limiter below
+			int32_t tempVal = pDataBuffer[i] + (int16_t)(newVal * 0.80f);
+
+			// Add 2x compression to the signal at the 90% point to the signal
+			// Fwd declare these to improve perf
+			int32_t valAbs = abs(tempVal);
+			int16_t valKnee = 0.90f * std::numeric_limits<int16_t>::max();
+
+			if (valAbs > valKnee) {
+				// Ensure we're not going into overflow mode
+				if (valAbs >= std::numeric_limits<int16_t>::max()) {
+					valAbs = std::numeric_limits<int16_t>::max() - 1;
+				}
+
+				int16_t overVal = valAbs - valKnee;
+				overVal *= 2.0f;
+
+				if (tempVal < 0)
+					pDataBuffer[i] = -valKnee - overVal;
+				else 
+					pDataBuffer[i] = valKnee + overVal;
+			}
+			else {
+				pDataBuffer[i] = (int16_t)tempVal;
+			}
 		}
 
 		DEBUG_LINEOUT("Sent %d bytes %d pending bytes %f ms browser %d ms of delay %d rate %f ratio", (int)framesToSend, pendingFrames, msBrowserPending, total_delay_ms, samples_per_sec, ratio);
