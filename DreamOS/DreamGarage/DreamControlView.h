@@ -113,8 +113,7 @@ private:
 // ControlBar events
 private:
 	RESULT HandleStopSharing(UIButton* pButtonContext, void* pContext);
-	RESULT HandleShowControlBar(UIButton* pButtonContext, void* pContext);
-	RESULT HandleHideControlBar(UIButton* pButtonContext, void* pContext);
+	RESULT HandleToggleControlBar(UIButton* pButtonContext, void* pContext);
 	RESULT HandleBack(UIButton* pButtonContext, void* pContext);
 	RESULT HandleForward(UIButton* pButtonContext, void* pContext);
 

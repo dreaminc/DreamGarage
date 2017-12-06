@@ -42,8 +42,8 @@ RESULT UIControlBar::Initialize() {
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
 
-	m_pHideButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pHideButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
+	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
 
 	m_pStopButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pStopButton->GetSurface()->SetDiffuseTexture(m_pStopTexture);
@@ -72,7 +72,7 @@ RESULT UIControlBar::Initialize() {
 		// URL button is centered at 0
 
 		point ptHide = point(m_urlWidth / 2.0f + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
-		m_pHideButton->SetPosition(ptHide);
+		m_pToggleButton->SetPosition(ptHide);
 
 		point ptStop = ptHide + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 		m_pStopButton->SetPosition(ptStop);
@@ -130,8 +130,8 @@ std::shared_ptr<UIButton> UIControlBar::GetForwardButton() {
 	return m_pForwardButton;
 }
 
-std::shared_ptr<UIButton> UIControlBar::GetHideButton() {
-	return m_pHideButton;
+std::shared_ptr<UIButton> UIControlBar::GetToggleButton() {
+	return m_pToggleButton;
 }
 
 std::shared_ptr<UIButton> UIControlBar::GetStopButton() {
@@ -143,5 +143,13 @@ std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
 }
 
 std::vector<std::shared_ptr<UIButton>> UIControlBar::GetControlButtons() {
-	return { m_pBackButton, m_pForwardButton, m_pHideButton, m_pStopButton, m_pURLButton };
+	return { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pStopButton, m_pURLButton };
+}
+
+texture *UIControlBar::GetHideTexture() {
+	return m_pHideTexture;
+}
+
+texture *UIControlBar::GetShowTexture() {
+	return m_pShowTexture;
 }

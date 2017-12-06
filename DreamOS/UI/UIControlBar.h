@@ -28,10 +28,14 @@ public:
 	// Getters used for registering event behavior
 	std::shared_ptr<UIButton> GetBackButton();
 	std::shared_ptr<UIButton> GetForwardButton();
-	std::shared_ptr<UIButton> GetHideButton();
+	std::shared_ptr<UIButton> GetToggleButton();
 	std::shared_ptr<UIButton> GetStopButton();
 	std::shared_ptr<UIButton> GetURLButton();
 	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
+
+	// Getters used for swapping the hide/show texture on the hide button
+	texture *GetHideTexture();
+	texture *GetShowTexture();
 
 // common behavior
 public:
@@ -40,7 +44,7 @@ public:
 private:
 	std::shared_ptr<UIButton> m_pBackButton;
 	std::shared_ptr<UIButton> m_pForwardButton;
-	std::shared_ptr<UIButton> m_pHideButton;
+	std::shared_ptr<UIButton> m_pToggleButton;
 	std::shared_ptr<UIButton> m_pStopButton;
 
 	std::shared_ptr<UIButton> m_pURLButton;
