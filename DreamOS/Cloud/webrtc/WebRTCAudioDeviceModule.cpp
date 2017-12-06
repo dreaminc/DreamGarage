@@ -289,30 +289,50 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	if (msBrowserPending > total_delay_ms) {
 		ratio += (msBrowserPending / (float)total_delay_ms);
 
-		// Max 25% speed up
-		if (ratio > 1.25f)
-			ratio = 1.25f;
+		// Max 20% speed up
+		if (ratio > 1.20f)
+			ratio = 1.20f;
 	}
 
 	int framesToSend = (nSamples * ratio);
 
+	// Pull the data out of the circular buffer
+	int16_t *pTempBuffer = new int16_t[framesToSend];
+	for (int i = 0; i < (framesToSend); i++) {
+		m_pendingAudioCircularBuffer.ReadNextValue(val);
+		pTempBuffer[i] = val;
+
+		m_pendingAudioCircularBuffer.ReadNextValue(val);
+	}
+
+	// This will down sample the buffer with linear interpolation
 	if (pendingFrames > 0) {
-		for (int i = 0; i < (framesToSend); i++) {
+		for (int i = 0; i < nSamples; i++) {
 
-			int sourceBufferIndex = (int)(i / ratio);
+			float sourceBufferIndex = ((float)(i) * ratio);
 
-			m_pendingAudioCircularBuffer.ReadNextValue(val);
+			int floorIndex = std::floor(sourceBufferIndex);
+			if (floorIndex < 0)
+				floorIndex = 0;
 
-			if (i < nSamples) {
-				pDataBuffer[i] += val;
-			}
+			int ceilIndex = std::ceil(sourceBufferIndex);
+			if (ceilIndex >= framesToSend)
+				ceilIndex = framesToSend - 1;
 
-			lastVal = val;
+			float interpolationRatio = sourceBufferIndex - floorIndex;
 
-			m_pendingAudioCircularBuffer.ReadNextValue(val);
+			int16_t newVal = (1.0f - interpolationRatio) * pTempBuffer[floorIndex] + interpolationRatio * pTempBuffer[ceilIndex];
+
+			pDataBuffer[i] += newVal;
 		}
 
 		DEBUG_LINEOUT("Sent %d bytes %d pending bytes %f ms browser %d ms of delay %d rate %f ratio", (int)framesToSend, pendingFrames, msBrowserPending, total_delay_ms, samples_per_sec, ratio);
+	}
+
+	// release temnp buffer
+	if (pTempBuffer != nullptr) {
+		delete[] pTempBuffer;
+		pTempBuffer = nullptr;
 	}
 
 	m_pendingBufferLock.unlock();
