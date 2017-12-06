@@ -112,6 +112,7 @@ private:
 
 // ControlBar events
 private:
+	bool CanPressButton(UIButton* pButtonContext);
 	RESULT HandleStopSharing(UIButton* pButtonContext, void* pContext);
 	RESULT HandleToggleControlBar(UIButton* pButtonContext, void* pContext);
 	RESULT HandleBack(UIButton* pButtonContext, void* pContext);

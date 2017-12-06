@@ -5,6 +5,7 @@
 #include <memory>
 
 class UIButton;
+class text;
 
 //TODO: member totalWidth variable with this value as default
 #define TOTAL_WIDTH 0.6f
@@ -37,6 +38,8 @@ public:
 	texture *GetHideTexture();
 	texture *GetShowTexture();
 
+	std::shared_ptr<text> GetURLText();
+
 // common behavior
 public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
@@ -48,6 +51,7 @@ private:
 	std::shared_ptr<UIButton> m_pStopButton;
 
 	std::shared_ptr<UIButton> m_pURLButton;
+	std::shared_ptr<text> m_pURLText;
 
 	texture *m_pBackTexture;
 	texture *m_pForwardTexture;

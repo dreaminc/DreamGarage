@@ -1,6 +1,8 @@
 #include "UIControlBar.h"
 #include "DreamOS.h"
 #include "UIButton.h"
+#include "Primitives/text.h"
+#include "Primitives/font.h"
 
 UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)
@@ -60,6 +62,21 @@ RESULT UIControlBar::Initialize() {
 	}
 
 	{
+		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
+		pFont->SetLineHeight(m_itemSide - m_itemSpacing);
+
+		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
+			"", 
+			m_urlWidth - m_itemSpacing, 
+			m_itemSide - m_itemSpacing, 
+			textFlags));
+
+		m_pURLText->RotateXByDeg(90.0f);
+		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+		m_pURLButton->AddObject(m_pURLText);
+
+
 		// set buttons positions based on spec
 		point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
@@ -152,4 +169,8 @@ texture *UIControlBar::GetHideTexture() {
 
 texture *UIControlBar::GetShowTexture() {
 	return m_pShowTexture;
+}
+
+std::shared_ptr<text> UIControlBar::GetURLText() {
+	return m_pURLText;
 }
