@@ -105,6 +105,7 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 
 				// Strings
 				std::string strElementTagName = pCEFProcessMessageArguments->GetString(0);
+
 				std::string strName = pCEFProcessMessageArguments->GetString(1);
 				std::string strValue = pCEFProcessMessageArguments->GetString(2);
 
@@ -113,9 +114,13 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 
 				// Type
 				cef_dom_node_type_t cefDOMNodeType = (cef_dom_node_type_t)(pCEFProcessMessageArguments->GetInt(4));
+				
+				// Attributes
+				bool fPassword = pCEFProcessMessageArguments->GetBool(5);
 
 				// Create the node
-				pCEFDOMNode = new CEFDOMNode(cefDOMNodeType, strName, strElementTagName, strValue, fEditable);
+				pCEFDOMNode = new CEFDOMNode(cefDOMNodeType, strName, strElementTagName, strValue, fEditable, fPassword);
+			
 
 				if (m_pCEFHandlerObserver != nullptr) {
 					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, -1, pCEFDOMNode));

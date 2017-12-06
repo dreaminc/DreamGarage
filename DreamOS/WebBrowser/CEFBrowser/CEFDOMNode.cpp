@@ -14,15 +14,17 @@ CEFDOMNode::CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode) :
 		m_strElementTagName = pCEFDOMNode->GetElementTagName();
 		m_strName = pCEFDOMNode->GetName();
 		m_strValue = pCEFDOMNode->GetValue();
+		m_fPassword = pCEFDOMNode->HasElementAttribute("password");	// This may not be necessary?
 	}
 }
 
-CEFDOMNode::CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable) :
+CEFDOMNode::CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable, bool fPassword) :
 	DOMNode(GetType(cefDOMNodeType)),
 	m_strName(strName),
 	m_strElementTagName(strElementTagName),
 	m_strValue(strValue),
-	m_fEditable(fEditable)
+	m_fEditable(fEditable),
+	m_fPassword(fPassword)
 {
 	// empty
 }
@@ -63,6 +65,9 @@ DOMNode::type CEFDOMNode::GetType(cef_dom_node_type_t cefDomNodeType) {
 	return domNodeType;
 }
 
+bool CEFDOMNode::IsPassword() {
+	return m_fPassword;
+}
 bool CEFDOMNode::IsEditable() {
 	return m_fEditable;
 }
