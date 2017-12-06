@@ -156,6 +156,7 @@ private:
 	// TODO: Might need to close these down on exit
 	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
+	std::unique_ptr<rtc::Thread> m_signalingThread = nullptr;
 
 	// Audio Device Module
 	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;

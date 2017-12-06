@@ -268,38 +268,48 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 	webrtc::FakeConstraints audioSourceConstraints;
 	webrtc::PeerConnectionFactoryInterface::Options fakeOptions;
 
+	cricket::AudioOptions fakeAudioOptions;
+
 	// Ensure no duplicate names
 	CB((m_pWebRTCLocalAudioSources.find(strAudioTrackLabel) == m_pWebRTCLocalAudioSources.end()));
 
-	///*
-	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
-	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
-	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
-	//*/
+	{
+		/*
+		audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
+		audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+		//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
+		//*/
 
-	auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
-	CN(pWebRTCLocalAudioSource);
-	pWebRTCLocalAudioSource->SetAudioSourceName(strAudioTrackLabel);
+		fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
+		fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
 
-	// Add to map
-	m_pWebRTCLocalAudioSources[strAudioTrackLabel] = pWebRTCLocalAudioSource;
+		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
+		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
+		auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, fakeAudioOptions);
+		CN(pWebRTCLocalAudioSource);
 
-	///*
-	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
-			strAudioTrackLabel,
-			pWebRTCLocalAudioSource)
-		);
-	CN(pAudioTrack);
+		pWebRTCLocalAudioSource->SetAudioSourceName(strAudioTrackLabel);
 
-	pAudioTrack->AddRef();
+		// Add to map
+		m_pWebRTCLocalAudioSources[strAudioTrackLabel] = pWebRTCLocalAudioSource;
 
-	pMediaStreamInterface->AddTrack(pAudioTrack);
+		///*
+		pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+			m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
+				strAudioTrackLabel,
+				pWebRTCLocalAudioSource)
+			);
+		CN(pAudioTrack);
+
+		pAudioTrack->AddRef();
+
+		pMediaStreamInterface->AddTrack(pAudioTrack);
+	}
 
 Error:
 	return r;
@@ -479,7 +489,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		if (pChromeAudioTrackSource != nullptr) {
 			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			//pAudioTrackSource->AddSink(this);
+			pChromeAudioTrackSource->AddSink(this);
 
 			//SetAudioVolume(0.0f);
 

@@ -78,10 +78,12 @@ RESULT WebRTCAudioDeviceModule::Initialize() {
 	RESULT r = R_PASS;
 
 	// Sound Buffer
-	m_pPendingSoundBuffer = SoundBuffer::Make(2, SoundBuffer::type::SIGNED_16_BIT);
-	CN(m_pPendingSoundBuffer);
+	//m_pPendingSoundBuffer = SoundBuffer::Make(2, SoundBuffer::type::SIGNED_16_BIT);
+	//CN(m_pPendingSoundBuffer);
 
-Error:
+	m_pendingAudioCircularBuffer.InitializePendingBuffer();
+
+//Error:
 	return r;
 }
 
@@ -98,6 +100,32 @@ int64_t WebRTCAudioDeviceModule::TimeUntilNextProcess()  {
 // TODO: Perhaps we want to jump in here?
 void WebRTCAudioDeviceModule::Process()  {
 	m_pAudioDeviceModuleImp->Process();
+
+	// TODO: Update WebRTC and do it right
+	/*
+	size_t nSamples = 441;
+	size_t nBytesPerSample = 2;
+	size_t nChannels = 2;
+	uint32_t samples_per_sec = 44100;
+
+	void* audioSamples = (void*)malloc(nBytesPerSample * nChannels * nSamples);
+	memset(audioSamples, 0, nBytesPerSample * nChannels * nSamples);
+	size_t nSamplesOut = 0;
+
+	int64_t elapsed_time_ms = 0;
+	int64_t ntp_time_ms = 0;
+
+	int32_t res = NeedMorePlayData(
+		nSamples,
+		nBytesPerSample,
+		nChannels,
+		samples_per_sec,
+		audioSamples,
+		nSamplesOut,
+		&elapsed_time_ms,
+		&ntp_time_ms
+	);
+	*/
 }
 
 RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPacket) {
@@ -141,7 +169,6 @@ RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPac
 	//*/
 
 	// TODO: Race condition here potentially
-	m_pendingAudioPackets.push_back(audioPacket);
 
 	/*
 	m_pPendingSoundBuffer->LockBuffer();
@@ -160,7 +187,15 @@ RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPac
 	m_pPendingSoundBuffer->UnlockBuffer();
 	//*/
 
-Error:
+	m_pendingBufferLock.lock();
+
+	int16_t *pDataBuffer = (int16_t*)audioPacket.GetDataBuffer();
+
+	m_pendingAudioCircularBuffer.WriteToBuffer(pDataBuffer, audioPacket.GetNumSamples());
+
+	m_pendingBufferLock.unlock();
+
+//Error:
 	return r;
 }
 
@@ -238,23 +273,49 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	m_pPendingSoundBuffer->UnlockBuffer();
 	*/
 
-	/*
-	if (m_pendingAudioPackets.size() > 0) {
-		AudioPacket pendingAudioPacket = m_pendingAudioPackets.front();
-		m_pendingAudioPackets.pop();
+	m_pendingBufferLock.lock();
 
-		int16_t *pDataBuffer = (int16_t*)(audioSamples);
+	int16_t *pDataBuffer = (int16_t*)(audioSamples);
+	int16_t val = 0;
+	int16_t lastVal = 0;
 
-		for (int i = 0; i < nSamples; i++) {
-			
-			pDataBuffer[i] += pendingAudioPacket.;
+	int pendingFrames = (int)m_pendingAudioCircularBuffer.NumPendingBufferBytes() / 2;
 
-			readBytes++;
+	// Speed up the audio a bit to keep up with delay
+	float msBrowserPending = ((float)pendingFrames / 44100.0f) * 1000.0f;
+	float msToPlay = ((float)nSamples / 44100.0f) * 1000.0f;
+	float ratio = 1.00f;
+
+	if (msBrowserPending > total_delay_ms) {
+		ratio += (msBrowserPending / (float)total_delay_ms);
+
+		// Max 25% speed up
+		if (ratio > 1.25f)
+			ratio = 1.25f;
+	}
+
+	int framesToSend = (nSamples * ratio);
+
+	if (pendingFrames > 0) {
+		for (int i = 0; i < (framesToSend); i++) {
+
+			int sourceBufferIndex = (int)(i / ratio);
+
+			m_pendingAudioCircularBuffer.ReadNextValue(val);
+
+			if (i < nSamples) {
+				pDataBuffer[i] += val;
+			}
+
+			lastVal = val;
+
+			m_pendingAudioCircularBuffer.ReadNextValue(val);
 		}
 
-		DEBUG_LINEOUT("Popped packet, %d pending", m_pendingAudioPackets.size());
+		DEBUG_LINEOUT("Sent %d bytes %d pending bytes %f ms browser %d ms of delay %d rate %f ratio", (int)framesToSend, pendingFrames, msBrowserPending, total_delay_ms, samples_per_sec, ratio);
 	}
-	*/
+
+	m_pendingBufferLock.unlock();
 
 	if (m_pAudioTransport) {
 		res = m_pAudioTransport->RecordedDataIsAvailable(

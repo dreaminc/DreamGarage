@@ -239,8 +239,12 @@ protected:
 	AudioDeviceDataCapturer* m_pAudioDeviceCapturer = nullptr;
 	AudioTransport* m_pAudioTransport = nullptr;
 	bool m_fValid = false;
+	
+	//std::queue<AudioPacket> m_pendingAudioPackets;
+	//SoundBuffer *m_pPendingSoundBuffer = nullptr;
 
-	SoundBuffer *m_pPendingSoundBuffer = nullptr;
+	std::mutex m_pendingBufferLock;
+	CircularBuffer<int16_t> m_pendingAudioCircularBuffer;
 };
 
 // Creates an ADM instance with AudioDeviceDataObserver registered.

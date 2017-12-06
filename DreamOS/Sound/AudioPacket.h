@@ -22,6 +22,10 @@ public:
 		return m_frames;
 	}
 
+	int GetNumSamples() const {
+		return m_frames * m_channels;
+	}
+
 	int GetNumChannels() const {
 		return m_channels;
 	}

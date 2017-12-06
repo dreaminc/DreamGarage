@@ -739,7 +739,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
 	if (m_fStreaming) {
-		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeStreamLabel, pendingAudioPacket));
+		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
 	}
 
 Error:

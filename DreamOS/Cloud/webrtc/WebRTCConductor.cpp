@@ -336,6 +336,11 @@ RESULT WebRTCConductor::Initialize() {
 	CN(m_workerThread);
 	m_workerThread->Start();
 
+	// Signaling Thread
+	m_signalingThread = rtc::Thread::Create();
+	CN(m_signalingThread);
+	m_signalingThread->Start();
+
 	///*
 	// Custom Audio Device Module
 	m_pAudioDeviceModule = 
@@ -355,17 +360,11 @@ RESULT WebRTCConductor::Initialize() {
 
 	CN(m_pAudioDeviceModule);
 
-	m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
-	m_pAudioDeviceModule->SetRecordingSampleRate(44100);
-	m_pAudioDeviceModule->SetStereoRecording(true);
-	m_pAudioDeviceModule->SetStereoPlayout(true);
-
-	//m_pAudioDeviceModule->RegisterAudioCallback(this);
-
 	m_pWebRTCPeerConnectionFactory =
 		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
 											m_workerThread.get(),	// worker thread
-											rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+											//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+											m_signalingThread.get(),
 											m_pAudioDeviceModule,	// TODO: Default ADM
 											//m_pAudioDeviceDummyModule,		// Dummy ADM
 											nullptr,	// Video Encoder Factory
@@ -376,6 +375,24 @@ RESULT WebRTCConductor::Initialize() {
 
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 	//*/
+
+	int32_t res;
+
+	res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
+	res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
+	res = m_pAudioDeviceModule->SetStereoRecording(true);
+	res = m_pAudioDeviceModule->SetStereoPlayout(true);
+
+	//m_pAudioDeviceModule->RegisterAudioCallback(this);
+
+	auto numRecordingDevices = m_pAudioDeviceModule->RecordingDevices();
+	for (int i = 0; i < numRecordingDevices; i++) {
+		char name[webrtc::kAdmMaxDeviceNameSize];
+		char guid[webrtc::kAdmMaxGuidSize];
+
+		m_pAudioDeviceModule->RecordingDeviceName(i, name, guid);
+		DEBUG_LINEOUT("ADM Recording Device %d: %s %s", i, name, guid);
+	}
 
 //Success:
 	return r;
