@@ -65,7 +65,9 @@ RESULT DreamGarage::ConfigureSandbox() {
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fUseLeap = false;
+	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fInitCloud = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -308,7 +310,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CR(InitializeKeyboard());
 	CR(InitializeDreamUser());
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
 
@@ -317,7 +319,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
 	m_pDreamBrowser->SetVisible(false);
-#endif
+//#endif
 
 	//*
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
