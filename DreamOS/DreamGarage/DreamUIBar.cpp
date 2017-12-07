@@ -156,7 +156,7 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	quaternion qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
-	
+	CBR(m_pScrollView->IsVisible(), R_SKIPPED);
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	//don't capture buttons that are out of view
@@ -243,6 +243,7 @@ RESULT DreamUIBar::ShowRootMenu() {
 		GetComposite()->SetOrientation(qOrigin);
 
 		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+		vCameraToMenu.y() = 0.0f;
 		vCameraToMenu.Normalize();
 
 		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);

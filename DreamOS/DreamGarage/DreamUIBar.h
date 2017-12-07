@@ -43,7 +43,7 @@ class UIStageProgram;
 //Projection clipping values
 //TODO: optimize these values to reduce error,
 // once scrolling snap animation is determined
-#define CLIPPING_OFFSET -0.61f
+#define CLIPPING_OFFSET -0.6f
 #define PROJECTION_WIDTH 0.575f
 #define PROJECTION_HEIGHT 0.25f
 #define PROJECTION_NEAR 0.0f

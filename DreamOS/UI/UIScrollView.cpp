@@ -472,6 +472,10 @@ RESULT UIScrollView::SetScrollVisible(bool fVisible) {
 
 bool UIScrollView::IsCapturable(UIButton *pButton) {
 
+	if (!m_fScrollButtonVisible) {
+		return false;
+	}
+
 	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
 	int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
 	int lowIndex = std::ceil(m_yRotation / yRotationPerElement);
