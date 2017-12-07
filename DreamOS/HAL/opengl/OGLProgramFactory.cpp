@@ -20,8 +20,6 @@
 #include "OGLProgramBlurQuad.h"
 #include "OGLProgramUIStage.h"
 
-#include "OGLDreamConsole.h"
-
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
 	{ "minimal_texture", OGLPROGRAM_MINIMAL_TEXTURE },
@@ -38,7 +36,6 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
-	{ "debugconsole", OGLPROGRAM_DEBUG_CONSOLE },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
@@ -152,13 +149,6 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), 
 				"Failed to initialize OGL shadow depth Program");
-		} break;
-
-		case OGLPROGRAM_DEBUG_CONSOLE: {
-			pOGLProgram = new OGLDreamConsole(pParentImp);
-			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"TextureBitBlit.vert", L"TextureBitBlit.frag", versionOGL),
-				"Failed to initialize OGL debug console overlay Program");
 		} break;
 
 		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
