@@ -682,6 +682,14 @@ Error:
 	return r;
 }
 
+float CloudController::GetRunTimeMicAverage() {
+	if (m_pEnvironmentController != nullptr) {
+		return m_pEnvironmentController->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
+
 
 // Video
 RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {

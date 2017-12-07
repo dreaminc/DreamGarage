@@ -706,10 +706,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp" />
-    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c" />
-    <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
-    <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
-    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
     <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
     <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
@@ -960,6 +956,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h" />
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
@@ -1017,12 +1014,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
-    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h" />
-    <ClInclude Include="..\..\..\External\SOIL\image_helper.h" />
-    <ClInclude Include="..\..\..\External\SOIL\SOIL.h" />
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h" />
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h" />
-    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
     <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />

@@ -865,6 +865,13 @@ Error:
 	return r;
 }
 
+float EnvironmentController::GetRunTimeMicAverage() {
+	if (m_pPeerConnectionController != nullptr) {
+		return m_pPeerConnectionController->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
 
 RESULT EnvironmentController::SetUser(User currentUser) {
 	return m_pPeerConnectionController->SetUser(currentUser);

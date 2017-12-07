@@ -143,6 +143,7 @@ public:
 	bool IsVideoStreamingRunning(long peerConnectionID);
 
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
 
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface

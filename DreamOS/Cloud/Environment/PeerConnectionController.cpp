@@ -819,6 +819,14 @@ Error:
 	return r;
 }
 
+float PeerConnectionController::GetRunTimeMicAverage() {
+	if (m_pWebRTCImp != nullptr) {
+		return m_pWebRTCImp->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
+
 RESULT PeerConnectionController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
