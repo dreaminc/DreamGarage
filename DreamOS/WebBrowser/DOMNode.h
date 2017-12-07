@@ -42,6 +42,7 @@ public:
 	virtual std::string GetName() = 0;
 	virtual std::string GetValue() = 0;
 	virtual bool IsEditable() = 0;
+	virtual bool IsPassword() = 0;
 
 	DOMNode::type GetType() {
 		return m_type;

@@ -4,7 +4,6 @@
 #include "RESULT/EHM.h"
 
 #include "include/cef_dom.h"
-
 // DREAM OS
 // DreamOS/WebBrowser/CEFBrowser/CEFDOMNode.h
 
@@ -16,7 +15,7 @@ class CEFDOMNode : public DOMNode {
 public:
 	CEFDOMNode();
 	CEFDOMNode(CefRefPtr<CefDOMNode> pCEFDOMNode);
-	CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable);
+	CEFDOMNode(cef_dom_node_type_t cefDOMNodeType, std::string strName, std::string  strElementTagName, std::string strValue, bool fEditable, std::string strNodeTypeAttributeValue);
 
 	~CEFDOMNode();
 
@@ -27,6 +26,7 @@ public:
 
 	static DOMNode::type GetType(cef_dom_node_type_t cefDomNodeType);
 
+	virtual bool IsPassword() override;
 	virtual bool IsEditable() override;
 
 private:
@@ -34,6 +34,7 @@ private:
 	std::string m_strElementTagName = "";
 	std::string m_strName = "";
 	std::string m_strValue = "";
+	std::string m_strNodeTypeAttributeValue = "";
 };
 
 

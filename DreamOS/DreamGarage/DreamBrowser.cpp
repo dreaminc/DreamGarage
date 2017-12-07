@@ -491,6 +491,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
 			CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
 		}
+		bool useAsterisk = pDOMNode->IsPassword();
 
 		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}

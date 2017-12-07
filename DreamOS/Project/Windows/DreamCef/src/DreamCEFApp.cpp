@@ -26,7 +26,7 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 
 	// Retrieve the argument list object.
 	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
-
+	cefProcessMessageArguments->SetSize(6);
 	// Populate the argument values.
 	//cefProcessMessageArguments->SetInt(0, cefBrowserID);
 	//cefProcessMessageArguments->SetInt(1, cefFrameID);
@@ -40,6 +40,8 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 
 		int cefDOMNodeType = pCEFDOMNode->GetType();
 		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
+
+		cefProcessMessageArguments->SetString(5, pCEFDOMNode->GetElementAttribute("type"));
 	}
 	else {
 		cefProcessMessageArguments->SetString(0, "");
@@ -47,6 +49,7 @@ void DreamCEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRef
 		cefProcessMessageArguments->SetString(2, "");
 		cefProcessMessageArguments->SetBool(3, false);
 		cefProcessMessageArguments->SetInt(4, 0);
+		cefProcessMessageArguments->SetString(5, "");
 	}
 
 	CB((pCEFBrowser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
