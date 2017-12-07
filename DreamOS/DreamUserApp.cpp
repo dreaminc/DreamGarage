@@ -616,7 +616,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		// Reposition Menu to be on the vector between Camera and Browser
 		point ptMenuPosition = menuDepth * vCameraToBrowser.Normal();
 		vCameraToMenu = (ptCameraOrigin + ptMenuPosition) - ptCameraOrigin;	
-
+		vCameraToMenu.y() = 0.0f;
 		point ptCamera = pCamera->GetPosition();
 
 		/*
@@ -634,7 +634,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		*/
 		
 		m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToBrowser));
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToMenu));
 	}
 
 Error:
