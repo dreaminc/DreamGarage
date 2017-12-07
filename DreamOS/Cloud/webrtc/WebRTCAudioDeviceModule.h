@@ -249,7 +249,7 @@ protected:
 	CircularBuffer<int16_t> m_pendingAudioCircularBuffer;
 	
 	float m_runTimeAvgMicValue = 0.0f;
-	float runTimeAvgFilterRatio = 0.90f;
+	float m_runTimeAvgFilterRatio = 0.95f;
 };
 
 // Creates an ADM instance with AudioDeviceDataObserver registered.

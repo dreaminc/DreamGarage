@@ -284,7 +284,7 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	// Run time avg
 	for (int i = 0; i < nSamples; i++) {
 		float absValClampedToOne = (float)(abs(pDataBuffer[i])) / (float)(std::numeric_limits<int16_t>::max());
-		m_runTimeAvgMicValue = (m_runTimeAvgMicValue * runTimeAvgFilterRatio) + (absValClampedToOne * (1.0f - runTimeAvgFilterRatio));
+		m_runTimeAvgMicValue = (m_runTimeAvgMicValue * m_runTimeAvgFilterRatio) + (absValClampedToOne * (1.0f - m_runTimeAvgFilterRatio));
 	}
 
 	m_pendingBufferLock.lock();
