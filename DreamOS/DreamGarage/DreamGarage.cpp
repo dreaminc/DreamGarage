@@ -465,7 +465,7 @@ RESULT DreamGarage::SendMouthSize() {
 	RESULT r = R_PASS;
 
 	// TODO: get actual mouth size from audio (or create observer pathway - prefer former)
-	float mouthSize = 0.4f;
+	float mouthSize = GetCloudController()->GetRunTimeMicAverage();
 
 	CR(BroadcastUpdateMouthMessage(mouthSize));
 

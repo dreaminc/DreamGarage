@@ -106,6 +106,7 @@ public:
 
 	// Audio 
 	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
 
 	// TODO: Generalize channels
 

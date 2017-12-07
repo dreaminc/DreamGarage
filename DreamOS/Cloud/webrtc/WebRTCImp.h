@@ -103,6 +103,7 @@ public:
 
 	// Audio
 	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
 
 	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
 	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

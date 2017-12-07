@@ -663,6 +663,15 @@ Error:
 	return r;
 }
 
+float WebRTCConductor::GetRunTimeMicAverage() {
+	
+	if (m_pWebRTCAudioDeviceModule != nullptr) {
+		return m_pWebRTCAudioDeviceModule->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
+
 RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
@@ -672,10 +681,10 @@ RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, l
 	//
 	//CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
-	WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
-	CN(pADM);
+	//WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
+	CN(m_pWebRTCAudioDeviceModule);
 	
-	CR(pADM->BroadcastAudioPacket(pendingAudioPacket));
+	CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

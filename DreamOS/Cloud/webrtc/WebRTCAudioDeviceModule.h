@@ -63,6 +63,8 @@ public:
 
 	RESULT BroadcastAudioPacket(const AudioPacket &audioPacket);
 
+	float GetRunTimeMicAverage();
+
 	// AudioTransport methods overrides.
 	int32_t RecordedDataIsAvailable(const void* audioSamples,
 		const size_t nSamples,
@@ -245,6 +247,9 @@ protected:
 
 	std::mutex m_pendingBufferLock;
 	CircularBuffer<int16_t> m_pendingAudioCircularBuffer;
+	
+	float m_runTimeAvgMicValue = 0.0f;
+	float runTimeAvgFilterRatio = 0.90f;
 };
 
 // Creates an ADM instance with AudioDeviceDataObserver registered.

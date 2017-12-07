@@ -200,6 +200,13 @@ Error:
 }
 
 // Audio
+float WebRTCImp::GetRunTimeMicAverage() {
+	if (m_pWebRTCConductor != nullptr) {
+		return m_pWebRTCConductor->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
 
 RESULT WebRTCImp::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;

@@ -128,6 +128,10 @@ void WebRTCAudioDeviceModule::Process()  {
 	*/
 }
 
+float WebRTCAudioDeviceModule::GetRunTimeMicAverage() {
+	return m_runTimeAvgMicValue;
+}
+
 RESULT WebRTCAudioDeviceModule::BroadcastAudioPacket(const AudioPacket &audioPacket) {
 	RESULT r = R_PASS;
 
@@ -309,6 +313,9 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	// This will down sample the buffer with linear interpolation
 	if (pendingFrames > 0) {
 		for (int i = 0; i < nSamples; i++) {
+
+			float absValClampedToOne = (float)(abs(pDataBuffer[i])) / (float)(std::numeric_limits<int16_t>::max());
+			m_runTimeAvgMicValue = (m_runTimeAvgMicValue * runTimeAvgFilterRatio) + (absValClampedToOne * (1.0f - runTimeAvgFilterRatio));
 
 			float sourceBufferIndex = ((float)(i) * ratio);
 
