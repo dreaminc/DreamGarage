@@ -747,6 +747,11 @@ RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage
 			CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
 		} break;
 
+		case DreamGarageMessage::type::UPDATE_MOUTH: {
+			UpdateMouthMessage *pUpdateMouthMessage = reinterpret_cast<UpdateMouthMessage*>(pDreamMessage);
+			CR(HandleMouthUpdateMessage(pPeerConnection, pUpdateMouthMessage));
+		} break;
+
 		case DreamGarageMessage::type::AUDIO_DATA: {
 			// empty
 		} break;
@@ -862,6 +867,22 @@ RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, Upd
 	CN(pDreamPeer);
 
 	pDreamPeer->UpdateHand(handState);
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage) {
+	RESULT r = R_PASS;
+
+	float mouthSize = pUpdateMouthMessage->GetMouthSize();
+	float mouthScale = mouthSize * 10.0f;
+	util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	pDreamPeer->UpdateMouth(mouthScale);
 
 Error:
 	return r;
