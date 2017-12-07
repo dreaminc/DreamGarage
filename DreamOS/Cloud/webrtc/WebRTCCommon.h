@@ -19,10 +19,16 @@ const char kSDPName[] = "sdp";
 const char kSessionDescriptionTypeName[] = "type";
 const char kSessionDescriptionSdpName[] = "sdp";
 
-const char kAudioLabel[] = "audio_label";
-const char kVideoLabel[] = "video_label";
-const char kStreamLabel[] = "stream_label";
-const char kDataLabel[] = "data_label";
+// User Stream
+const char kUserStreamLabel[] = "user_stream_label";
+const char kUserAudioLabel[] = "user_audio_label";
+const char kUserDataLabel[] = "user_data_label";
+
+// Chrome Stream
+const char kChromeStreamLabel[] = "chrome_stream_label";
+const char kChromeVideoLabel[] = "chrome_video_label";
+const char kChromeAudioLabel[] = "chrome_audio_label";
+
 
 const uint16_t kDefaultServerPort = 8888;
 

@@ -74,6 +74,7 @@ class DreamOS :
 	friend class DreamOSTestSuite;
 	friend class CollisionTestSuite;
 	friend class WebRTCTestSuite;
+	friend class SoundTestSuite;
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
@@ -106,7 +107,7 @@ public:
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
@@ -171,10 +172,14 @@ public:
 	template<class derivedAppType>
 	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp);
 
+	DreamAppHandle* RequestCaptureAppUnique(std::string strAppName, DreamAppBase* pHoldingApp);
 	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
-	RESULT ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp);
+
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID appUID, DreamAppBase* pHoldingApp);
+	RESULT RequestReleaseAppUnique(DreamAppHandle* pHandle, DreamAppBase* pHoldingApp);
 
 	std::vector<UID> GetAppUID(std::string strAppName);
+	UID GetUniqueAppUID(std::string strAppName);
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);

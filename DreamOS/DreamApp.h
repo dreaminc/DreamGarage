@@ -23,6 +23,7 @@ class DreamAppMessage;
 class DreamAppBase {
 	friend class DreamAppManager;
 	friend struct DreamAppBaseCompare;
+	friend class DreamOS;
 
 public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
@@ -58,7 +59,7 @@ protected:
 
 protected:
 
-	std::string GetAppName() {
+	virtual std::string GetAppName() {
 		return m_strAppName;
 	}
 

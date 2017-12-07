@@ -389,14 +389,14 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
+RESULT CloudController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnAudioData(pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pPeerConnectionObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -642,6 +642,8 @@ Error:
 	return r;
 }
 
+
+
 // Broadcast some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
@@ -666,6 +668,20 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 Error:
 	return r;
 }
+
+// Audio 
+RESULT CloudController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CN(m_pEnvironmentController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+
+Error:
+	return r;
+}
+
 
 // Video
 RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {

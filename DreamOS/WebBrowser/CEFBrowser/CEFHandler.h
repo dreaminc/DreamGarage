@@ -38,7 +38,8 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
-	public CefRenderHandler
+	public CefRenderHandler,
+	public CefAudioHandler
 	//public CefDownloadHandler
 {
 public:
@@ -52,6 +53,8 @@ public:
 		virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) = 0;
 		virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
 		virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) = 0;
+
 
 		virtual RESULT OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 		virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) = 0;
@@ -62,6 +65,7 @@ public:
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
 
 	// CefClient
+	virtual CefRefPtr<CefAudioHandler> GetAudioHandler() override;
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
@@ -108,6 +112,11 @@ public:
 	// CefRenderHandler
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
 	virtual void OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) override;
+
+	// CefAudioHandler
+	virtual void OnAudioData(CefRefPtr<CefBrowser> browser,
+		int frames, int channels, int bits_per_sample,
+		const void* data_buffer) override;
 
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;

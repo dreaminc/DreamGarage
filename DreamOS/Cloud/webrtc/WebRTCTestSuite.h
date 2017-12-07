@@ -31,7 +31,11 @@ public:
 	RESULT AddTestWebRTCMultiPeer();
 	
 	// Tests
+	
+	// Capabilities
+
 	RESULT AddTestWebRTCVideoStream();
+	RESULT AddTestWebRTCAudio();
 
 	// Apps
 	RESULT AddTestChromeMultiBrowser();

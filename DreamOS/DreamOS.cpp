@@ -584,16 +584,71 @@ ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controll
 	return GetCloudController()->GetControllerProxy(controllerType);
 }
 
+DreamAppHandle* DreamOS::RequestCaptureAppUnique(std::string strAppName, DreamAppBase* pHoldingApp) {
+	RESULT r = R_PASS;
+	DreamAppHandle* pDreamAppHandle = nullptr;
+
+	CN(pHoldingApp);
+
+	{
+		UID appUID = GetUniqueAppUID(strAppName);
+		CB((appUID.IsValid()));
+
+		pDreamAppHandle = CaptureApp(appUID, pHoldingApp);
+		CN(pDreamAppHandle);
+
+		return pDreamAppHandle;
+	}
+
+Error:
+	if (pDreamAppHandle) {
+		pDreamAppHandle = nullptr;
+	}
+	return nullptr;
+}
+
 DreamAppHandle* DreamOS::CaptureApp(UID uid, DreamAppBase* pHoldingApp) {
 	return m_pSandbox->m_pDreamAppManager->CaptureApp(uid, pHoldingApp);
 }
 
-RESULT DreamOS::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pHoldingApp) {
-	return m_pSandbox->m_pDreamAppManager->ReleaseApp(pHandle, uid, pHoldingApp);
+RESULT DreamOS::ReleaseApp(DreamAppHandle* pHandle, UID appUID, DreamAppBase* pHoldingApp) {
+	return m_pSandbox->m_pDreamAppManager->ReleaseApp(pHandle, appUID, pHoldingApp);
+}
+
+RESULT DreamOS::RequestReleaseAppUnique(DreamAppHandle* pHandle, DreamAppBase* pHoldingApp) {
+	RESULT r = R_PASS;
+
+	DreamAppBase *pTargetApp = nullptr;
+
+	CN(pHoldingApp);
+	CN(pHandle);
+
+	pTargetApp = dynamic_cast<DreamAppBase*>(pHandle);
+	CN(pTargetApp);
+
+	{
+		UID appUID = GetUniqueAppUID(pTargetApp->GetAppName());
+		CB((appUID.IsValid()));
+
+		CR(m_pSandbox->m_pDreamAppManager->ReleaseApp(pHandle, appUID, pHoldingApp));
+	}
+
+Error:
+	return r;
 }
 
 std::vector<UID> DreamOS::GetAppUID(std::string strAppName) {
 	return m_pSandbox->m_pDreamAppManager->GetAppUID(strAppName);
+}
+
+UID DreamOS::GetUniqueAppUID(std::string strAppName) {
+	std::vector<UID> vAppUID = m_pSandbox->m_pDreamAppManager->GetAppUID(strAppName);
+	if (vAppUID.size() == 1) {
+		return vAppUID[0];
+	}
+	else {
+		return UID::MakeInvalidUID();
+	}
 }
 
 HALImp* DreamOS::GetHALImp() {
@@ -614,10 +669,10 @@ RESULT DreamOS::InitializeDreamUser() {
 	RESULT r = R_PASS;
 
 	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
-	CN(m_pDreamUser);
+	CNM(m_pDreamUser, "Failed to launch dream user app");
 
-	CR(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)));
-	CR(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)));
+	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set left hand");
 
 Error:
 	return r;

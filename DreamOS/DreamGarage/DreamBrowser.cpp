@@ -15,6 +15,7 @@
 #include "Cloud/WebRequest.h"
 
 #include "WebBrowser/DOMNode.h"
+#include "Sound/AudioPacket.h"
 
 RESULT DreamBrowserHandle::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
@@ -451,7 +452,9 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 		}
 
+#ifndef _USE_TEST_APP
 		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+#endif
 
 	Error:
 		return r;
@@ -560,7 +563,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
 
+#ifndef _USE_TEST_APP
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+#else
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+#endif
 
 	// Set up mouse / hand cursor model
 	///*
@@ -727,6 +734,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	// TODO: Handle this (if streaming we broadcast into webrtc
+	if (m_fStreaming) {
+		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
@@ -795,7 +814,7 @@ RESULT DreamBrowser::UpdateFromPendingVideoFrame() {
 
 Error:
 	if (m_pendingFrame.pDataBuffer != nullptr) {
-		//delete m_pendingFrame.pDataBuffer;
+		delete [] m_pendingFrame.pDataBuffer;
 		m_pendingFrame.pDataBuffer = nullptr;
 
 		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
@@ -858,14 +877,16 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-			UID controlViewUID = vControlViewUID[0];
-			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			CN(pDreamControlViewHandle);
+			//auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			//UID controlViewUID = vControlViewUID[0];
+			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			//CN(pDreamControlViewHandle);
 
-			CR(pDreamControlViewHandle->DismissApp());
-
-			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+			if (pDreamControlViewHandle != nullptr) {
+				CR(pDreamControlViewHandle->DismissApp());
+				CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+			}
 
 		} break;
 	}
@@ -1078,6 +1099,27 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		// TODO: haven't seen any issues with KEY_UP being a no-op
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
+
+#ifdef _USE_TEST_APP
+			if ((pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) && (pEvent->m_value == SVK_RETURN)) {
+				if (m_fReceivingStream) {
+					CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+					m_fReceivingStream = false;
+				}
+
+				SetStreamingState(false);
+
+				// TODO: May not be needed, if not streaming no video is actually being transmitted 
+				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
+
+				//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
+				CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+				SetStreamingState(true);
+			}
+#endif
+
 			/*
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 			std::string strURL = "";

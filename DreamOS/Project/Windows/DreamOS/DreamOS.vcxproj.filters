@@ -194,6 +194,10 @@
     </Filter>
     <Filter Include="External\easyloggingpp">
       <UniqueIdentifier>{9349b760-9d5c-476f-9dc4-086ec2b7ffca}</UniqueIdentifier>
+	</Filter>
+
+    <Filter Include="Sound">
+      <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -895,6 +899,42 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc">
       <Filter>External\easyloggingpp</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\AudioPacket.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CircularBuffer.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp">
+      <Filter>Cloud\webrtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2005,6 +2045,42 @@
     </ClInclude>
     <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h">
       <Filter>External\easyloggingpp</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundTestSuite.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClientFactory.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\AudioPacket.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CircularBuffer.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundBuffer.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFile.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFileWave.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

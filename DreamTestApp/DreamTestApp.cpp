@@ -37,7 +37,7 @@ RESULT DreamTestApp::LoadScene() {
 	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -45,13 +45,14 @@ RESULT DreamTestApp::LoadScene() {
 
 	// Push to a test suite factory in testing
 
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
@@ -110,7 +111,7 @@ RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> p
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamTestApp::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	return R_NOT_IMPLEMENTED;
 }
 

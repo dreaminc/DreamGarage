@@ -75,7 +75,7 @@ public:
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
@@ -105,6 +105,7 @@ public:
 	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
 
 	// Audio 
+	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
 
 	// TODO: Generalize channels
 
@@ -161,7 +162,7 @@ public:
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;

@@ -230,7 +230,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		//std::string strURL = "http://www.youtube.com";
 
-		std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
+		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
+		std::string strURL = "http://ncu.rcnpv.com.tw/Uploads/20131231103232738561744.pdf";
 
 		CN(m_pDreamOS);
 

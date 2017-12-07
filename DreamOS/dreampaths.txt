@@ -13,3 +13,4 @@ TEXTURE_CUBE	./Texture/Cube/
 FONT			./Resources/Fonts/
 MODEL			./Models/
 DATA			./Data/
+SOUND			./Resources/Sounds/

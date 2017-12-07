@@ -27,6 +27,8 @@
 #include "Core/Utilities.h"
 
 #include "WebRTCCustomVideoCapturer.h"
+#include "WebRTCLocalAudioSource.h"
+#include "WebRTCLocalAudioTrack.h"
 
 #include "Primitives/texture.h"
 
@@ -88,37 +90,71 @@ WebRTCPeerConnection::~WebRTCPeerConnection(){
 	CloseWebRTCPeerConnection();
 }
 
-RESULT WebRTCPeerConnection::SetPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) {
+RESULT WebRTCPeerConnection::SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) {
 	m_pWebRTCPeerConnectionFactory = pWebRTCPeerConnectionFactory;
 	return R_PASS;
 }
 
-RESULT WebRTCPeerConnection::AddStreams() {
+// TODO: Remove arbitrary data channels etc
+RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
-	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
-	//rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
-	//rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
+	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
+	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));			// ensure peer connection uninitialized
 
-	CB((m_WebRTCLocalActiveStreams.find(kStreamLabel) == m_WebRTCLocalActiveStreams.end()));
+																		//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
+	CBM((CreatePeerConnection(DTLS_ON)), "Error CreatePeerConnection failed");
+	CN(m_pWebRTCPeerConnectionInterface.get());
 
-	/*
-	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-	m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(nullptr)));
-	*/
+#ifndef WEBRTC_NO_CANDIDATES
+	CR(AddStreams(fAddDataChannel));
+#endif
 
-	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
+Error:
+	return r;
+}
 
-	CR(AddAudioStream(pMediaStreamInterface));
-	CR(AddVideoStream(pMediaStreamInterface));
-
-	// Add streams
-	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
-		DEBUG_LINEOUT("Adding stream to PeerConnection failed");
-	}
+RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
+	RESULT r = R_PASS;
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+
+	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
+
+	///*
+	// User Stream (Voice)
+	CB((m_WebRTCLocalActiveStreams.find(kUserStreamLabel) == m_WebRTCLocalActiveStreams.end()));
+
+	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kUserStreamLabel);
+	CNM(pMediaStreamInterface, "Failed to create user media stream");
+
+	CR(AddAudioStream(pMediaStreamInterface, kUserAudioLabel));
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
+
+	// Chrome Video
+	CR(AddVideoStream(pMediaStreamInterface));
+
+	// Chrome Audio Source
+	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
+
+	// Add user stream to peer connection interface
+	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
+		DEBUG_LINEOUT("Adding user media stream to PeerConnection failed");
+	}
+
+	// Insert it into our local active streams (referenced in OnAddStream
 	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
+
+	// Chrome Media Stream
+	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
+	//*/
+
+	// Data Channel
+	// TODO: Do this moar bettar
+	// This is not in the media streaming interface
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;
@@ -198,7 +234,7 @@ RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStre
 	CN(pVideoTrackSource);
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, pVideoTrackSource)
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kChromeVideoLabel, pVideoTrackSource)
 	);
 	//CN(pVideoTrack);
 
@@ -209,7 +245,77 @@ Error:
 	return r;
 }
 
-RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+// NOTE: This is not being used currently
+RESULT WebRTCPeerConnection::SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CB((m_pWebRTCLocalAudioSources.find(strAudioTrackLabel) != m_pWebRTCLocalAudioSources.end()));
+
+	CN(m_pWebRTCLocalAudioSources[strAudioTrackLabel]);
+	CR(m_pWebRTCLocalAudioSources[strAudioTrackLabel]->SendAudioPacket(pendingAudioPacket));
+
+Error:
+	return r;
+}
+
+// TODO:
+RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
+
+	// Set up constraints
+	webrtc::FakeConstraints audioSourceConstraints;
+	webrtc::PeerConnectionFactoryInterface::Options fakeOptions;
+
+	cricket::AudioOptions fakeAudioOptions;
+
+	// Ensure no duplicate names
+	CB((m_pWebRTCLocalAudioSources.find(strAudioTrackLabel) == m_pWebRTCLocalAudioSources.end()));
+
+	{
+		/*
+		audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, true);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
+		audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
+		audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+		//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
+		//*/
+
+		fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
+		fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
+
+		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
+		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
+		auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, fakeAudioOptions);
+		CN(pWebRTCLocalAudioSource);
+
+		pWebRTCLocalAudioSource->SetAudioSourceName(strAudioTrackLabel);
+
+		// Add to map
+		m_pWebRTCLocalAudioSources[strAudioTrackLabel] = pWebRTCLocalAudioSource;
+
+		///*
+		pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+			m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
+				strAudioTrackLabel,
+				pWebRTCLocalAudioSource)
+			);
+		CN(pAudioTrack);
+
+		pAudioTrack->AddRef();
+
+		pMediaStreamInterface->AddTrack(pAudioTrack);
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
@@ -219,18 +325,22 @@ RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStre
 
 	///*
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, true);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, false);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, false);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, false);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, false);
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, false);
 	//*/
 
 	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
+		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(
+			strAudioTrackLabel, 
+			m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints))
+		);
+
 	pAudioTrack->AddRef();
 	
 	pMediaStreamInterface->AddTrack(pAudioTrack);
@@ -253,9 +363,9 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 	dataChannelInit.reliable = false;
 	dataChannelInit.ordered = false;
 
-	CB((m_WebRTCLocalActiveDataChannels.find(kDataLabel) == m_WebRTCLocalActiveDataChannels.end()));
+	CB((m_WebRTCLocalActiveDataChannels.find(kUserDataLabel) == m_WebRTCLocalActiveDataChannels.end()));
 
-	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kDataLabel, &dataChannelInit);
+	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kUserDataLabel, &dataChannelInit);
 	CN(m_pDataChannelInterface);
 	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
@@ -309,10 +419,10 @@ RESULT WebRTCPeerConnection::SetAudioVolume(double val) {
 
 	CB((m_WebRTCLocalActiveStreams.size() > 0));
 	{
-		auto pMediaStream = m_WebRTCRemoteActiveStreams[kStreamLabel];
+		auto pMediaStream = m_WebRTCRemoteActiveStreams[kUserStreamLabel];
 		CN(pMediaStream);
 
-		auto pAudioTrack = pMediaStream->FindAudioTrack(kAudioLabel);
+		auto pAudioTrack = pMediaStream->FindAudioTrack(kUserAudioLabel);
 		CN(pAudioTrack);
 
 		// Set volume
@@ -348,20 +458,42 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		return;
 	}
 
+	// User
 	// Audio track
-	auto pAudioTrack = pMediaStreamInterface->FindAudioTrack(kAudioLabel);
-	if (pAudioTrack != nullptr) {
-		auto pAudioTrackSource = pAudioTrack->GetSource();
+	auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
+	if (pUserAudioTrack != nullptr) {
+		auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
 
-		if (pAudioTrackSource != nullptr) {
+		if (pUserAudioTrackSource != nullptr) {
 			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			pAudioTrackSource->AddSink(this);
+			pUserAudioTrackSource->AddSink(this);
 
-			//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
+#ifndef _USE_TEST_APP
+			// Turn off audio for non-testing
 			SetAudioVolume(0.0f);
+#endif
 
-			DEBUG_LINEOUT("Added audio Sink");
+			DEBUG_LINEOUT("Added user audio sink");
+		}
+		else {
+			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+		}
+	}
+
+	// Chrome
+	auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
+	if (pChromeAudioTrack != nullptr) {
+		auto pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
+
+		if (pChromeAudioTrackSource != nullptr) {
+			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
+
+			pChromeAudioTrackSource->AddSink(this);
+
+			//SetAudioVolume(0.0f);
+
+			DEBUG_LINEOUT("Added chrome audio sink");
 		}
 		else {
 			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
@@ -369,7 +501,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	}
 
 	// Video track
-	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kVideoLabel);
+	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
 	if (pVideoTrack != nullptr) {
 		DEBUG_LINEOUT("Found VideoTrackSourceInterface");
 
@@ -456,8 +588,12 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 }
 
 void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	
+	// TODO: Register local source as sink or something
+	std::string strAudioTrackLabel = "tempTrack";
+	
 	if (m_pParentObserver != nullptr) {
-		m_pParentObserver->OnAudioData(m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
+		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
 }
 
@@ -848,30 +984,6 @@ Error:
 	return;
 }
 
-// TODO: Remove arbitrary data channels etc
-RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
-	RESULT r = R_PASS;
-
-	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
-	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));			// ensure peer connection uninitialized
-
-	//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
-	CBM((CreatePeerConnection(DTLS_ON)), "Error CreatePeerConnection failed");
-	CN(m_pWebRTCPeerConnectionInterface.get());
-
-#ifndef WEBRTC_NO_CANDIDATES
-	CR(AddStreams());
-
-	// TODO: Do this moar bettar
-	if (fAddDataChannel) {
-		CR(AddDataChannel());
-	}
-#endif
-
-Error:
-	return r;
-}
-
 RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
@@ -1030,7 +1142,7 @@ RESULT WebRTCPeerConnection::SendDataChannelStringMessage(std::string& strMessag
 
 	//m_SignalOnDataChannel
 
-	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kDataLabel];
+	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kUserDataLabel];
 	//CN(pWebRTCDataChannel);
 	CN(m_pDataChannelInterface);
 
@@ -1045,7 +1157,7 @@ Error:
 RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 	
-	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kDataLabel];
+	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kUserDataLabel];
 	CN(m_pDataChannelInterface);
 
 	if (m_pDataChannelInterface->buffered_amount() > 1000) {

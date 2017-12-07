@@ -57,6 +57,8 @@ RESULT UITestSuite::AddTests() {
 	
 	CR(AddTestFont());
 
+	CR(AddTestBrowserURL());
+
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestBrowserRequest());
@@ -728,6 +730,82 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestBrowserURL() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		//std::string strURL = "http://www.youtube.com";
+		std::string strURL = "https://www.youtube.com/watch?v=K0igLdIH-Zc";
+
+		WebRequest webRequest;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		// Light it up
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the Shared View App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(10.0f);
+
+		
+		pDreamBrowser->SetURI(strURL);
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser URL Test");
+	pUITest->SetTestDescription("Basic test of browser working with a URL");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestBrowserRequest() {
 	RESULT r = R_PASS;
 
@@ -866,7 +944,7 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::SetupPipeline() {
+RESULT UITestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -878,11 +956,7 @@ RESULT UITestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 	
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));

@@ -690,14 +690,14 @@ Error:
 }
 
 // Note: This will block on mutex
-RESULT PeerConnectionController::OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT PeerConnectionController::OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pPeerConnectionControllerObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -793,6 +793,27 @@ RESULT PeerConnectionController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer,
 			CR(m_pWebRTCImp->SendVideoFrame(pPeerConnection->GetPeerConnectionID(), pVideoFrameBuffer, pxWidth, pxHeight, channels));
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
+	CN(m_pWebRTCImp);
+
+	// Not doing per connection
+	//for (const auto &pPeerConnection : peerVectorCopy) {
+	//	if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+	//		CR(m_pWebRTCImp->SendAudioPacket(strAudioTrackLabel, pPeerConnection->GetPeerConnectionID(), pendingAudioPacket));
+	//	}
+	//}
+
+	CR(m_pWebRTCImp->SendAudioPacket(strAudioTrackLabel, -1, pendingAudioPacket));
 
 Error:
 	return r;

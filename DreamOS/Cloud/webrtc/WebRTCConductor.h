@@ -25,10 +25,19 @@ class WebRTCICECandidate;
 class PeerConnection;
 class User;
 class TwilioNTSInformation;
+class AudioPacket;
 
 #include "WebRTCPeerConnection.h"
 
-class WebRTCConductor : public WebRTCPeerConnection::WebRTCPeerConnectionObserver {
+#include "webrtc/modules/audio_device/include/audio_device.h"
+#include "webrtc/modules/audio_device/dummy/audio_device_dummy.h"
+
+#include "WebRTCAudioDeviceModule.h"
+
+class WebRTCConductor : 
+	public WebRTCPeerConnection::WebRTCPeerConnectionObserver,
+	public AudioDeviceDataCapturer
+{
 public:
 	class WebRTCConductorObserver {
 	public:
@@ -48,7 +57,7 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 		
-		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
@@ -86,8 +95,10 @@ public:
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
-	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+
+	// TODO: AudioDeviceCapturer
 
 private:
 	RESULT ClearPeerConnections();
@@ -131,12 +142,25 @@ public:
 	RESULT StopVideoStreaming(long peerConnectionID);
 	bool IsVideoStreamingRunning(long peerConnectionID);
 
+	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
+
 private:
 	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
 	WebRTCConductorObserver *m_pParentObserver;
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
+
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
+
+	// Worker and Network Threads
+	// TODO: Might need to close these down on exit
+	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
+	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
+	std::unique_ptr<rtc::Thread> m_signalingThread = nullptr;
+
+	// Audio Device Module
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

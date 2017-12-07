@@ -23,6 +23,13 @@
 #include "Cloud/User/User.h"
 #include "Cloud//User/TwilioNTSInformation.h"
 
+#include "Sound/AudioPacket.h"
+
+#define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
+#include "webrtc/modules/audio_device/audio_device_impl.h"
+
+#include "Sound/AudioPacket.h"
+
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
 	m_pWebRTCPeerConnectionFactory(nullptr)
@@ -31,6 +38,11 @@ WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 }
 
 WebRTCConductor::~WebRTCConductor() {
+	if (m_networkThread)
+		m_networkThread = nullptr;
+
+	if (m_workerThread)
+		m_workerThread = nullptr;
 }
 
 RESULT WebRTCConductor::ClearPeerConnections() {
@@ -45,7 +57,13 @@ rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::AddNewPeerConnection(l
 	CBM((FindPeerConnectionByID(peerConnectionID) == false), "Peer Conncetion ID %d already present", peerConnectionID);
 	
 	//pWebRTCPeerConnection = std::make_shared<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCPeerConnectionFactory);
-	pWebRTCPeerConnection = rtc::scoped_refptr<WebRTCPeerConnection>(new rtc::RefCountedObject<WebRTCPeerConnection>(this, peerConnectionID, m_pWebRTCPeerConnectionFactory));
+	pWebRTCPeerConnection = 
+		rtc::scoped_refptr<WebRTCPeerConnection>(
+			new rtc::RefCountedObject<WebRTCPeerConnection>(
+				this, 
+				peerConnectionID, 
+				m_pWebRTCPeerConnectionFactory) 
+			);
 	
 	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
 
@@ -269,13 +287,112 @@ Error:
 	return nullptr;
 }
 
+
+/*
+RESULT WebRTCConductor::PushAudioPacket(const AudioPacket audioPacket) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<webrtc::AudioDeviceModuleImpl> pAudioDeviceModuleImpl = rtc::scoped_refptr<webrtc::AudioDeviceModuleImpl>(m_pAudioDeviceModule);
+	CN(pAudioDeviceModuleImpl);
+
+	pAudioDeviceModuleImpl->GetAudioDeviceBuffer()->_ptrCbAudioTransport
+		->PushCaptureData(15, 
+			              static_cast<void*>(audioPacket.GetDataBuffer()), 
+			              audioPacket.GetBitsPerSample(), 
+						  audioPacket.GetSamplingRate(), 
+						  audioPacket.GetNumChannels(), 
+						  audioPacket.GetNumFrames()
+		);
+
+Error:
+	return r;
+}
+*/
+
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
+	// User Peer Connection Factory
+	/* Standard way
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 	m_pWebRTCPeerConnectionFactory->AddRef();
+	
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+	//*/
+
+	///*
+	// Chrome Peer Connection Factory (testing)
+	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+
+	// Network Thread
+	m_networkThread = rtc::Thread::CreateWithSocketServer();
+	CNM(m_networkThread, "failed to start network thread");
+	m_networkThread->Start();
+
+	// Worker Thread
+	m_workerThread = rtc::Thread::Create();
+	CN(m_workerThread);
+	m_workerThread->Start();
+
+	// Signaling Thread
+	m_signalingThread = rtc::Thread::Create();
+	CN(m_signalingThread);
+	m_signalingThread->Start();
+
+	///*
+	// Custom Audio Device Module
+	m_pAudioDeviceModule = 
+		m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[&]()
+	{
+		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
+		return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio, this);
+		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
+		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
+	});
+
+	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
+	while (m_pAudioDeviceModule == nullptr) {
+		// wait;
+	}
+
+	CN(m_pAudioDeviceModule);
+
+	m_pWebRTCPeerConnectionFactory =
+		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+											m_workerThread.get(),	// worker thread
+											//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+											m_signalingThread.get(),
+											m_pAudioDeviceModule,	// TODO: Default ADM
+											//m_pAudioDeviceDummyModule,		// Dummy ADM
+											nullptr,	// Video Encoder Factory
+											nullptr		// Audio Encoder Factory
+		);
+
+	m_pWebRTCPeerConnectionFactory->AddRef();
+
+	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+	//*/
+
+	int32_t res;
+
+	res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
+	res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
+	res = m_pAudioDeviceModule->SetStereoRecording(true);
+	res = m_pAudioDeviceModule->SetStereoPlayout(true);
+
+	//m_pAudioDeviceModule->RegisterAudioCallback(this);
+
+	auto numRecordingDevices = m_pAudioDeviceModule->RecordingDevices();
+	for (int i = 0; i < numRecordingDevices; i++) {
+		char name[webrtc::kAdmMaxDeviceNameSize];
+		char guid[webrtc::kAdmMaxGuidSize];
+
+		m_pAudioDeviceModule->RecordingDeviceName(i, name, guid);
+		DEBUG_LINEOUT("ADM Recording Device %d: %s %s", i, name, guid);
+	}
 
 //Success:
 	return r;
@@ -434,7 +551,7 @@ RESULT WebRTCConductor::OnAddStream(long peerConnectionID, rtc::scoped_refptr<we
 
 	//if (pMediaStream->label() == kAudioLabel) {
 
-	if(pMediaStream->FindAudioTrack(kAudioLabel)) {
+	if(pMediaStream->FindAudioTrack(kUserAudioLabel)) {
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnAudioChannel(peerConnectionID);
 		}
@@ -486,10 +603,10 @@ RESULT WebRTCConductor::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrame
 	return R_NOT_HANDLED;
 }
 
-RESULT WebRTCConductor::OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT WebRTCConductor::OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 		
 	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnAudioData(peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
+		return m_pParentObserver->OnAudioData(strAudioTrackLabel, peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
 
 	return R_NOT_HANDLED;
@@ -541,6 +658,24 @@ RESULT WebRTCConductor::SendDataChannelMessage(long peerConnectionID, uint8_t *p
 	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
 
 	CR(pWebRTCPeerConnection->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	// Not doing per connection with external ADM (mixing into recorded audio)
+	//rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	//CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+	//
+	//CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+
+	WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
+	CN(pADM);
+	
+	CR(pADM->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

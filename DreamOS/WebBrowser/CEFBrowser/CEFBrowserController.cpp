@@ -96,6 +96,31 @@ Error:
 	return r;
 }
 
+// Might not be the way to go
+RESULT CEFBrowserController::PollPendingAudioPackets(int &numAudioPacketsProcessed) {
+	RESULT r = R_PASS;
+
+	numAudioPacketsProcessed = 0;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		if(IsAudioPacketPending()) {
+			auto pendingAudioPacket = PopPendingAudioPacket();
+			
+			CR(m_pWebBrowserControllerObserver->OnAudioPacket(pendingAudioPacket));
+			
+			// This is done by the ADM right now
+			//pendingAudioPacket.DeleteBuffer();
+
+			numAudioPacketsProcessed++;
+		}
+	}
+
+	//CR(ClearPendingAudioPacketQueue());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::Resize(unsigned int width, unsigned int height) {
 	RESULT r = R_PASS;
 
@@ -333,9 +358,73 @@ RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){
 	return r;
 }
 
+RESULT CEFBrowserController::ClearPendingAudioPacketQueue() {
+	while (m_pendingAudioPackets.size() > 0)
+		m_pendingAudioPackets.pop();
+
+	return R_PASS;
+}
+
+size_t CEFBrowserController::PendingAudioPacketQueueLength() {
+	return m_pendingAudioPackets.size();
+}
+
+AudioPacket CEFBrowserController::PopPendingAudioPacket() {
+	AudioPacket pendingAudioPacket = m_pendingAudioPackets.front();
+	
+	m_pendingAudioPackets.pop();
+
+	return pendingAudioPacket;
+}
+
+RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
+	RESULT r = R_PASS;
+
+	///*
+	// Make a copy here
+	size_t pNewDataBuffer_n = (bitsPerSample / 8) * frames * channels;
+	uint8_t *pNewDataBuffer = (uint8_t*)malloc(pNewDataBuffer_n);
+	CN(pNewDataBuffer);
+	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
+	//*/
+	
+	{
+		AudioPacket newPendingPacket(
+			frames,
+			channels,
+			bitsPerSample,
+			pNewDataBuffer
+			//pDataBuffer
+		);
+
+		m_pendingAudioPackets.push(newPendingPacket);
+
+		// This will push directly into the pending buffer
+		//CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+	}
+
+Error:
+	return r;
+}
+
+bool CEFBrowserController::IsAudioPacketPending() {
+	return (m_pendingAudioPackets.size() > 0) ? true : false;
+}
+
+RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+	RESULT r = R_PASS;
+	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
+
+	// Queue up new audio packet 
+	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 

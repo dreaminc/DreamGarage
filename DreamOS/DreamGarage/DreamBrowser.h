@@ -36,6 +36,7 @@ class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
 class DreamUserHandle;
+class AudioPacket;
 
 #include "DreamBrowserMessage.h"
 
@@ -163,6 +164,7 @@ public:
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
+	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode) override;
