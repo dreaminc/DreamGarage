@@ -34,6 +34,7 @@ light *g_pLight = nullptr;
 #include "DreamGarageMessage.h"
 #include "UpdateHeadMessage.h"
 #include "UpdateHandMessage.h"
+#include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
 
 // TODO: Should this go into the DreamOS side?
@@ -404,12 +405,27 @@ Error:
 
 RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
 	RESULT r = R_PASS;
+
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
 	// Create the message
 	UpdateHandMessage updateHandMessage(GetUserID(), -1, handState);
 	CR(BroadcastDataMessage(&updateHandMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::BroadcastUpdateMouthMessage(float mouthSize) {
+	RESULT r = R_PASS;
+
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// Create the message
+	UpdateMouthMessage updateMouthMessage(GetUserID(), -1, mouthSize);
+	CR(BroadcastDataMessage(&updateMouthMessage));
 
 Error:
 	return r;
@@ -440,6 +456,18 @@ RESULT DreamGarage::SendHandPosition() {
 	if (pRightHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::SendMouthSize() {
+	RESULT r = R_PASS;
+
+	// TODO: get actual mouth size from audio (or create observer pathway - prefer former)
+	float mouthSize = 0.4f;
+
+	CR(BroadcastUpdateMouthMessage(mouthSize));
 
 Error:
 	return r;
@@ -480,6 +508,11 @@ std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
+// Mouth update time
+#define UPDATE_MOUTH_COUNT_THROTTLE 90	
+#define UPDATE_MOUTH_COUNT_MS ((1000.0f) / UPDATE_MOUTH_COUNT_THROTTLE)
+std::chrono::system_clock::time_point g_lastMouthUpdateTime = std::chrono::system_clock::now();
+
 // Hands update time	
 #define CHECK_PEER_APP_STATE_INTERVAL_MS (3000.0f) 
 std::chrono::system_clock::time_point g_lastPeerStateCheckTime = std::chrono::system_clock::now();
@@ -517,6 +550,13 @@ RESULT DreamGarage::Update(void) {
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHandUpdateTime).count() > UPDATE_HAND_COUNT_MS) {
 		SendHandPosition();
 		g_lastHandUpdateTime = timeNow;
+	}
+
+	// Mouth update
+	// TODO: this should go up into DreamOS or even sandbox
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastMouthUpdateTime).count() > UPDATE_MOUTH_COUNT_MS) {
+		SendMouthSize();
+		g_lastMouthUpdateTime = timeNow;
 	}
 	//*/
 	
@@ -827,6 +867,7 @@ Error:
 	return r;
 }
 
+// This function is currently defunct, but will be removed when the actual audio infrastructure is turned on
 RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 

@@ -2048,6 +2048,9 @@
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

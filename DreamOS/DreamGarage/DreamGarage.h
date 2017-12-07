@@ -37,6 +37,7 @@ public:
 
 	RESULT SendHeadPosition();
 	RESULT SendHandPosition();
+	RESULT SendMouthSize();
 
 	// TODO: this is just a debug test temp
 	//RESULT SendSwitchHeadMessage();
@@ -82,6 +83,7 @@ public:
 
 	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+	RESULT BroadcastUpdateMouthMessage(float mouthSize);
 
 	user* ActivateUser(long userId);
 

@@ -467,7 +467,9 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		if (pUserAudioTrackSource != nullptr) {
 			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			pUserAudioTrackSource->AddSink(this);
+			// Not currently using this as previous for mouth size
+			// We'll want to put this back in when we go to localaudiosource though
+			//pUserAudioTrackSource->AddSink(this);
 
 #ifndef _USE_TEST_APP
 			// Turn off audio for non-testing
@@ -489,7 +491,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		if (pChromeAudioTrackSource != nullptr) {
 			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
 
-			pChromeAudioTrackSource->AddSink(this);
+			//pChromeAudioTrackSource->AddSink(this);
 
 			//SetAudioVolume(0.0f);
 

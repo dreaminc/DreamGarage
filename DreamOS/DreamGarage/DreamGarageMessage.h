@@ -16,6 +16,7 @@ public:
 		CLIENT = (Message::DataType)(DreamMessage::type::CLIENT),
 		UPDATE_HEAD,
 		UPDATE_HAND,
+		UPDATE_MOUTH,
 		AUDIO_DATA,
 		UPDATE_CHAT,
 		CUSTOM,
