@@ -277,12 +277,18 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	m_pPendingSoundBuffer->UnlockBuffer();
 	*/
 
-	m_pendingBufferLock.lock();
-
-	int16_t *pDataBuffer = (int16_t*)(audioSamples);
 	int16_t val = 0;
 	int16_t lastVal = 0;
+	int16_t *pDataBuffer = (int16_t*)(audioSamples);
 
+	// Run time avg
+	for (int i = 0; i < nSamples; i++) {
+		float absValClampedToOne = (float)(abs(pDataBuffer[i])) / (float)(std::numeric_limits<int16_t>::max());
+		m_runTimeAvgMicValue = (m_runTimeAvgMicValue * runTimeAvgFilterRatio) + (absValClampedToOne * (1.0f - runTimeAvgFilterRatio));
+	}
+
+	m_pendingBufferLock.lock();
+	
 	int pendingFrames = (int)m_pendingAudioCircularBuffer.NumPendingBufferBytes() / 2;
 
 	// Speed up the audio a bit to keep up with delay
@@ -310,12 +316,11 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 		m_pendingAudioCircularBuffer.ReadNextValue(val);
 	}
 
+	m_pendingBufferLock.unlock();
+
 	// This will down sample the buffer with linear interpolation
 	if (pendingFrames > 0) {
 		for (int i = 0; i < nSamples; i++) {
-
-			float absValClampedToOne = (float)(abs(pDataBuffer[i])) / (float)(std::numeric_limits<int16_t>::max());
-			m_runTimeAvgMicValue = (m_runTimeAvgMicValue * runTimeAvgFilterRatio) + (absValClampedToOne * (1.0f - runTimeAvgFilterRatio));
 
 			float sourceBufferIndex = ((float)(i) * ratio);
 
@@ -368,8 +373,6 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 		delete[] pTempBuffer;
 		pTempBuffer = nullptr;
 	}
-
-	m_pendingBufferLock.unlock();
 
 	if (m_pAudioTransport) {
 		res = m_pAudioTransport->RecordedDataIsAvailable(
