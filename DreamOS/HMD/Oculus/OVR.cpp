@@ -11,7 +11,6 @@
 
 #include "Extras/OVR_Math.h"
 
-#include "DreamConsole/DreamConsole.h"
 #include "DreamLogger/DreamLogger.h"
 
 #include "OVRHMDSinkNode.h"

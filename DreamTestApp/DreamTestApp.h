@@ -2,7 +2,6 @@
 #define DREAM_TEST_APP_H_
 
 #include "RESULT/EHM.h"
-#include "DreamConsole/DreamConsole.h"
 
 // DREAM GARAGE
 // DreamGarage.h
@@ -15,7 +14,10 @@
 
 class TestSuite;
 
-class DreamTestApp : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
+class DreamTestApp : 
+	public DreamOS, 
+	public Subscriber<SenseKeyboardEvent>
+{
 public:
 	DreamTestApp() :
 		m_pTestSuite(nullptr)
@@ -43,9 +45,6 @@ public:
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) override;
-
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
 	user *m_pPeerUser;

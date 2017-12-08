@@ -167,16 +167,19 @@ RESULT AnimationTestSuite::AddTestRotate() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupPipeline());
+		quaternion qRotation;
 		sphere *m_pSphere1 = nullptr;
+		quaternion q;
+
+		CR(SetupPipeline());
 
 		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
 		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
-		quaternion q;
+		
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
 		m_pSphere1->SetOrientation(q);
 
-		quaternion qRotation = quaternion::MakeQuaternionWithEuler((float)(M_PI) / 2.0f, 0.0f, 0.0f);
+		qRotation = quaternion::MakeQuaternionWithEuler((float)(M_PI) / 2.0f, 0.0f, 0.0f);
 
 		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 			m_pSphere1,
@@ -221,6 +224,7 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		RESULT r = R_PASS;
 
 		auto cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
+		quaternion q;
 
 //		CR(SetupColorTestPipeline());
 		CR(SetupUINodePipeline());
@@ -239,7 +243,6 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		m_pQuad->SetDiffuseTexture(pTexturePNG);
 		m_pDreamOS->AddObjectToUIGraph(m_pQuad);
 
-		quaternion q;
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
 		m_pQuad->SetOrientation(q);
 		m_pQuad->RotateXByDeg(90.0f);

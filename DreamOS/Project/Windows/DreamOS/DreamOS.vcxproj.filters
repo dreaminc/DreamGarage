@@ -111,9 +111,6 @@
     <Filter Include="Cloud\Message">
       <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamConsole">
-      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Texture">
       <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
     </Filter>
@@ -388,18 +385,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
       <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\Console.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
-      <Filter>DreamConsole</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
       <Filter>Sandbox\Windows</Filter>
@@ -1387,24 +1372,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
       <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\Console.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
-      <Filter>DreamConsole</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>

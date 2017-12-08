@@ -8,8 +8,6 @@
 //#include "Cloud/Message/UpdateHeadMessage.h"
 //#include "Cloud/Message/AudioDataMessage.h"
 
-#include "DreamConsole/DreamConsole.h"
-
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"
 
@@ -33,7 +31,7 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelStringMessageCallback(nullptr),
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
+	// empty
 }
 
 CloudController::~CloudController() {
@@ -757,29 +755,6 @@ bool CloudController::IsVideoStreamingRunning() {
 
 Error:
 	return false;
-}
-
-// TODO: Get rid of this stuff 
-RESULT CloudController::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("list") == 0) {
-		//HUD_OUT("login : login to Dream");
-		//HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
-	}
-
-	if (event->GetArg(1).compare("login") == 0) {
-		//
-		Start();
-	}
-
-	if (event->GetArg(1).compare("msg") == 0) {
-		std::string st(event->GetArg(2));
-		BroadcastDataChannelStringMessage(st);
-	}
-
-//Error:
-	return r;
 }
 
 // TODO: Fix inconsistency with proxy pattern (webrtc is correct, proxy shouldn't include register observer for example)

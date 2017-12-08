@@ -684,9 +684,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
     <ClCompile Include="..\..\..\DreamBrowserMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
-    <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
-    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
@@ -713,7 +710,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
-    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp" />
@@ -941,11 +937,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
     <ClInclude Include="..\..\..\DreamBrowserMessage.h" />
-    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
-    <ClInclude Include="..\..\..\DreamConsole\Console.h" />
-    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
-    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
-    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
     <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
@@ -1033,7 +1024,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />

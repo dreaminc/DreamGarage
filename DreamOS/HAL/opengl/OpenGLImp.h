@@ -36,23 +36,11 @@ class mesh;
 
 class OpenGLImp : public HALImp {
 private:
-	// TODO: Create an OpenGL Program class which should combine
-	// the shaders since we might want to jump around OGL programs in the future
-	//OGLProgram *m_pOGLRenderProgram;
-	//OGLProgram *m_pOGLProgramShadowDepth;
-	//OGLProgram *m_pOGLProgramCapture;		// temp for testing
-	//OGLProgram *m_pOGLSkyboxProgram;
-	//OGLProgram *m_pOGLReferenceGeometryProgram;
-	//OGLProgram *m_pOGLOverlayProgram;
-	//OGLProgram *m_pOGLFlatProgram; 
-
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
 	version m_versionOGL;
 	version m_versionGLSL;
-
-	std::unique_ptr<OGLDreamConsole> m_pOGLDreamConsole;
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -63,7 +51,7 @@ public:
 	version GetOGLVersion() { return m_versionOGL; }
 	version GetGLSLVersion() { return m_versionGLSL; }
 
-	// TODO: Remove and use param pack fn
+	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(double width, double height, point ptOrigin, vector vNormal = vector::jVector()) override;

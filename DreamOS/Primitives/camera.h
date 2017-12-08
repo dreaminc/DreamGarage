@@ -2,7 +2,6 @@
 #define CAMERA_H_
 
 #include "RESULT/EHM.h"
-#include "DreamConsole/DreamConsole.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/camera.h

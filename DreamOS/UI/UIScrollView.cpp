@@ -10,8 +10,6 @@
 #include "DreamOS.h"
 #include "Primitives/font.h"
 
-#include "DreamConsole/DreamConsole.h"
-
 #include <chrono>
 
 UIScrollView::UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :

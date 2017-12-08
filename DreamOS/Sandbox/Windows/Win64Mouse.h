@@ -25,7 +25,7 @@ public:
 	virtual RESULT GetMousePosition(int& x, int& y) override;
 	virtual RESULT CenterMousePosition() override;
 	virtual RESULT GetCenterPosition(int& x, int& y) override;
-	virtual RESULT ShowCursor(bool show) override;
+	virtual RESULT ShowCursor(bool fShowCursor) override;
 
 	RESULT UpdateMousePosition();
 

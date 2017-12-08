@@ -58,7 +58,6 @@ class SandboxApp :
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
 	public Subscriber<SenseMouseEvent>,
-	public Subscriber<CmdPromptEvent>, 
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
 	public valid 
@@ -152,7 +151,6 @@ private:
 	RESULT SetMouseIntersectObjects(bool fMouseIntersectObjects);
 	bool IsMouseIntersectObjects();
 
-	RESULT Notify(CmdPromptEvent *event);
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseTypingEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
