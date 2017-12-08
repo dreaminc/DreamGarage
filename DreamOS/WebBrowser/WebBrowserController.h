@@ -56,7 +56,7 @@ public:
 	public:
 		virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) = 0;
 		virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) = 0;
-		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
+		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) = 0;
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode) = 0;
 		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;

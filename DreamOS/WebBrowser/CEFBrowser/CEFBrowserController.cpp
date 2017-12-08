@@ -446,12 +446,12 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
-RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
 
 	CN(m_pWebBrowserControllerObserver);
-	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward));
+	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
 
 Error:
 	return r;
@@ -473,7 +473,7 @@ Error:
 RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
-
+	
 	CN(m_pWebBrowserControllerObserver);
 	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode));
 

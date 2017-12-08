@@ -398,8 +398,15 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
-	return R_NOT_IMPLEMENTED;
+RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
+	RESULT r = R_PASS;
+
+	if (!fLoading) {
+		CR(r);	// URL in here is good
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::FadeQuadToBlack() {
