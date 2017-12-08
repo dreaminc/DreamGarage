@@ -152,7 +152,9 @@ private:
 
 	DreamControlView::state m_viewState;
 
-	bool m_fMouseDown;
+	bool m_fMouseDown[2];
+	point m_ptClick;
+	bool m_fIsShareURL = false;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

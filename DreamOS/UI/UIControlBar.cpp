@@ -63,13 +63,13 @@ RESULT UIControlBar::Initialize() {
 
 	{
 		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
-		pFont->SetLineHeight(m_itemSide - m_itemSpacing);
+		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
 
 		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
 		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
 			"", 
 			m_urlWidth - m_itemSpacing, 
-			m_itemSide - m_itemSpacing, 
+			m_itemSide - (2.0f*m_itemSpacing), 
 			textFlags));
 
 		m_pURLText->RotateXByDeg(90.0f);
@@ -106,16 +106,18 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	std::shared_ptr<quad> pSurface = nullptr;
 	vector vSurface;
 	vector vRotation;
+	quaternion qSurface;
+	quaternion qRotation;
 	CNR(pButtonContext, R_SKIPPED);
 	pSurface = pButtonContext->GetSurface();
 
 	//vector for captured object movement
-	quaternion qSurface = pButtonContext->GetOrientation() * (pSurface->GetOrientation());
+	qSurface = pButtonContext->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
 	//vector for captured object collisions
-	quaternion qRotation = pSurface->GetOrientation(true);
+	qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 

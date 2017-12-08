@@ -52,6 +52,14 @@ Error:
 	return nullptr;
 }
 
+RESULT UIKeyboardHandle::ShowTitleView() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ShowKeyboardTitleView());
+Error:
+	return r;
+}
+
 RESULT UIKeyboardHandle::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -753,6 +761,14 @@ RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string st
 	}
 	m_pTitleText->SetText(strTitle);
 
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::ShowKeyboardTitleView() {
+	RESULT r = R_PASS;
+	CR(m_pTitleIcon->SetVisible(true));
+	CR(m_pTitleText->SetVisible(true));
 Error:
 	return r;
 }
