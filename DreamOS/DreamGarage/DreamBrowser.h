@@ -263,6 +263,7 @@ private:
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	int m_pageDepth = 0; // hack to avoid the loading page on back
+	std::string m_strCurrentURL;
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;

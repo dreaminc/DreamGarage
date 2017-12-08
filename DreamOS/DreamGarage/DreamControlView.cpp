@@ -70,6 +70,16 @@ Error:
 	return false;
 }
 
+RESULT DreamControlViewHandle::SendURLText(std::string strURL) {
+	RESULT r = R_PASS;
+
+	CB(GetAppState());
+	CR(SetURLText(strURL));
+
+Error:
+	return r;
+}
+
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
 {
@@ -170,6 +180,13 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
+
+	auto pText = m_pControlBar->GetURLText();
+	if (pText->CheckAndCleanDirty()) {
+		//auto strText = pText->GetText();
+		pText->SetText("");
+		pText->SetText(m_strText);
+	}
 
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
@@ -631,6 +648,23 @@ bool DreamControlView::IsVisible() {
 	}
 	
 	return fIsVisible;
+}
+
+RESULT DreamControlView::SetURLText(std::string strURL) {
+	RESULT r = R_PASS;
+
+//	CBR(strURL != "", R_SKIPPED);
+	CNR(m_pControlBar, R_SKIPPED);
+	{
+		auto pText = m_pControlBar->GetURLText();
+		CNR(pText, R_SKIPPED);
+		pText->SetDirty();
+		m_strText = strURL;
+	//	pText->SetText(strURL);
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {

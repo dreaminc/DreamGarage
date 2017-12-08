@@ -43,6 +43,7 @@ public:
 	RESULT DismissApp();
 	RESULT SendURLtoBrowser();
 	bool IsAppVisible();
+	RESULT SendURLText(std::string strURL);
 
 public:
 	//User Observer
@@ -58,6 +59,7 @@ private:
 	virtual RESULT Dismiss() = 0;
 	virtual RESULT SendURL() = 0;
 	virtual bool IsVisible() = 0;
+	virtual RESULT SetURLText(std::string strURL) = 0;
 };
 
 class DreamControlView : public DreamApp<DreamControlView>, 
@@ -119,6 +121,7 @@ private:
 	RESULT HandleForward(UIButton* pButtonContext, void* pContext);
 
 	RESULT HandleEnterURL(UIButton* pButtonContext, void* pContext);
+	virtual RESULT SetURLText(std::string strURL) override;
 
 // View Context
 public:
@@ -160,6 +163,7 @@ private:
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
+	std::string m_strText;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_
