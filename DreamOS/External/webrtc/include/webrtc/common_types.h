@@ -8,27 +8,33 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_COMMON_TYPES_H_
-#define WEBRTC_COMMON_TYPES_H_
+#ifndef COMMON_TYPES_H_
+#define COMMON_TYPES_H_
 
-#include <assert.h>
 #include <stddef.h>
 #include <string.h>
-
+#include <ostream>
 #include <string>
 #include <vector>
 
-#include "webrtc/typedefs.h"
+#include "api/array_view.h"
+#include "api/optional.h"
+#include "api/video/video_content_type.h"
+#include "api/video/video_rotation.h"
+#include "api/video/video_timing.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/deprecation.h"
+#include "typedefs.h"  // NOLINT(build/include)
 
 #if defined(_MSC_VER)
 // Disable "new behavior: elements of array will be default initialized"
 // warning. Affects OverUseDetectorOptions.
-#pragma warning(disable:4351)
+#pragma warning(disable : 4351)
 #endif
 
-#ifdef WEBRTC_EXPORT
+#if defined(WEBRTC_EXPORT)
 #define WEBRTC_DLLEXPORT _declspec(dllexport)
-#elif WEBRTC_DLL
+#elif defined(WEBRTC_DLL)
 #define WEBRTC_DLLEXPORT _declspec(dllimport)
 #else
 #define WEBRTC_DLLEXPORT
@@ -52,8 +58,6 @@
 
 namespace webrtc {
 
-class Config;
-
 class RewindableStream {
  public:
   virtual ~RewindableStream() {}
@@ -74,83 +78,12 @@ class OutStream : public RewindableStream {
   virtual bool Write(const void* buf, size_t len) = 0;
 };
 
-enum TraceModule
-{
-    kTraceUndefined              = 0,
-    // not a module, triggered from the engine code
-    kTraceVoice                  = 0x0001,
-    // not a module, triggered from the engine code
-    kTraceVideo                  = 0x0002,
-    // not a module, triggered from the utility code
-    kTraceUtility                = 0x0003,
-    kTraceRtpRtcp                = 0x0004,
-    kTraceTransport              = 0x0005,
-    kTraceSrtp                   = 0x0006,
-    kTraceAudioCoding            = 0x0007,
-    kTraceAudioMixerServer       = 0x0008,
-    kTraceAudioMixerClient       = 0x0009,
-    kTraceFile                   = 0x000a,
-    kTraceAudioProcessing        = 0x000b,
-    kTraceVideoCoding            = 0x0010,
-    kTraceVideoMixer             = 0x0011,
-    kTraceAudioDevice            = 0x0012,
-    kTraceVideoRenderer          = 0x0014,
-    kTraceVideoCapture           = 0x0015,
-    kTraceRemoteBitrateEstimator = 0x0017,
-};
-
-enum TraceLevel
-{
-    kTraceNone               = 0x0000,    // no trace
-    kTraceStateInfo          = 0x0001,
-    kTraceWarning            = 0x0002,
-    kTraceError              = 0x0004,
-    kTraceCritical           = 0x0008,
-    kTraceApiCall            = 0x0010,
-    kTraceDefault            = 0x00ff,
-
-    kTraceModuleCall         = 0x0020,
-    kTraceMemory             = 0x0100,   // memory info
-    kTraceTimer              = 0x0200,   // timing info
-    kTraceStream             = 0x0400,   // "continuous" stream of data
-
-    // used for debug purposes
-    kTraceDebug              = 0x0800,  // debug
-    kTraceInfo               = 0x1000,  // debug info
-
-    // Non-verbose level used by LS_INFO of logging.h. Do not use directly.
-    kTraceTerseInfo          = 0x2000,
-
-    kTraceAll                = 0xffff
-};
-
-// External Trace API
-class TraceCallback {
- public:
-  virtual void Print(TraceLevel level, const char* message, int length) = 0;
-
- protected:
-  virtual ~TraceCallback() {}
-  TraceCallback() {}
-};
-
-enum FileFormats
-{
-    kFileFormatWavFile        = 1,
-    kFileFormatCompressedFile = 2,
-    kFileFormatPreencodedFile = 4,
-    kFileFormatPcm16kHzFile   = 7,
-    kFileFormatPcm8kHzFile    = 8,
-    kFileFormatPcm32kHzFile   = 9
-};
-
-enum ProcessingTypes
-{
-    kPlaybackPerChannel = 0,
-    kPlaybackAllChannelsMixed,
-    kRecordingPerChannel,
-    kRecordingAllChannelsMixed,
-    kRecordingPreprocessing
+// For the deprecated MediaFile module.
+enum FileFormats {
+  kFileFormatWavFile = 1,
+  kFileFormatPcm16kHzFile = 7,
+  kFileFormatPcm8kHzFile = 8,
+  kFileFormatPcm32kHzFile = 9,
 };
 
 enum FrameType {
@@ -164,14 +97,20 @@ enum FrameType {
 // Statistics for an RTCP channel
 struct RtcpStatistics {
   RtcpStatistics()
-    : fraction_lost(0),
-      cumulative_lost(0),
-      extended_max_sequence_number(0),
-      jitter(0) {}
+      : fraction_lost(0),
+        packets_lost(0),
+        extended_highest_sequence_number(0),
+        jitter(0) {}
 
   uint8_t fraction_lost;
-  uint32_t cumulative_lost;
-  uint32_t extended_max_sequence_number;
+  union {
+    int32_t packets_lost;  // Defined as a 24 bit signed integer in RTCP
+    RTC_DEPRECATED uint32_t cumulative_lost;
+  };
+  union {
+    uint32_t extended_highest_sequence_number;
+    RTC_DEPRECATED uint32_t extended_max_sequence_number;
+  };
   uint32_t jitter;
 };
 
@@ -187,12 +126,12 @@ class RtcpStatisticsCallback {
 // Statistics for RTCP packet types.
 struct RtcpPacketTypeCounter {
   RtcpPacketTypeCounter()
-    : first_packet_time_ms(-1),
-      nack_packets(0),
-      fir_packets(0),
-      pli_packets(0),
-      nack_requests(0),
-      unique_nack_requests(0) {}
+      : first_packet_time_ms(-1),
+        nack_packets(0),
+        fir_packets(0),
+        pli_packets(0),
+        nack_requests(0),
+        unique_nack_requests(0) {}
 
   void Add(const RtcpPacketTypeCounter& other) {
     nack_packets += other.nack_packets;
@@ -201,8 +140,8 @@ struct RtcpPacketTypeCounter {
     nack_requests += other.nack_requests;
     unique_nack_requests += other.unique_nack_requests;
     if (other.first_packet_time_ms != -1 &&
-       (other.first_packet_time_ms < first_packet_time_ms ||
-        first_packet_time_ms == -1)) {
+        (other.first_packet_time_ms < first_packet_time_ms ||
+         first_packet_time_ms == -1)) {
       // Use oldest time.
       first_packet_time_ms = other.first_packet_time_ms;
     }
@@ -230,15 +169,15 @@ struct RtcpPacketTypeCounter {
     if (nack_requests == 0) {
       return 0;
     }
-    return static_cast<int>(
-        (unique_nack_requests * 100.0f / nack_requests) + 0.5f);
+    return static_cast<int>((unique_nack_requests * 100.0f / nack_requests) +
+                            0.5f);
   }
 
-  int64_t first_packet_time_ms;  // Time when first packet is sent/received.
-  uint32_t nack_packets;   // Number of RTCP NACK packets.
-  uint32_t fir_packets;    // Number of RTCP FIR packets.
-  uint32_t pli_packets;    // Number of RTCP PLI packets.
-  uint32_t nack_requests;  // Number of NACKed RTP packets.
+  int64_t first_packet_time_ms;   // Time when first packet is sent/received.
+  uint32_t nack_packets;          // Number of RTCP NACK packets.
+  uint32_t fir_packets;           // Number of RTCP FIR packets.
+  uint32_t pli_packets;           // Number of RTCP PLI packets.
+  uint32_t nack_requests;         // Number of NACKed RTP packets.
   uint32_t unique_nack_requests;  // Number of unique NACKed RTP packets.
 };
 
@@ -254,8 +193,8 @@ class RtcpPacketTypeCounterObserver {
 struct BitrateStatistics {
   BitrateStatistics() : bitrate_bps(0), packet_rate(0) {}
 
-  uint32_t bitrate_bps;   // Bitrate in bits per second.
-  uint32_t packet_rate;   // Packet rate in packets per second.
+  uint32_t bitrate_bps;  // Bitrate in bits per second.
+  uint32_t packet_rate;  // Packet rate in packets per second.
 };
 
 // Callback, used to notify an observer whenever new rates have been estimated.
@@ -303,6 +242,14 @@ class SendPacketObserver {
                             uint32_t ssrc) = 0;
 };
 
+// Callback, used to notify an observer when the overhead per packet
+// has changed.
+class OverheadObserver {
+ public:
+  virtual ~OverheadObserver() = default;
+  virtual void OnOverheadChanged(size_t overhead_bytes_per_packet) = 0;
+};
+
 // ==================================================================
 // Voice specific types
 // ==================================================================
@@ -319,72 +266,91 @@ struct CodecInst {
   bool operator==(const CodecInst& other) const {
     return pltype == other.pltype &&
            (STR_CASE_CMP(plname, other.plname) == 0) &&
-           plfreq == other.plfreq &&
-           pacsize == other.pacsize &&
-           channels == other.channels &&
-           rate == other.rate;
+           plfreq == other.plfreq && pacsize == other.pacsize &&
+           channels == other.channels && rate == other.rate;
   }
 
-  bool operator!=(const CodecInst& other) const {
-    return !(*this == other);
+  bool operator!=(const CodecInst& other) const { return !(*this == other); }
+
+  friend std::ostream& operator<<(std::ostream& os, const CodecInst& ci) {
+    os << "{pltype: " << ci.pltype;
+    os << ", plname: " << ci.plname;
+    os << ", plfreq: " << ci.plfreq;
+    os << ", pacsize: " << ci.pacsize;
+    os << ", channels: " << ci.channels;
+    os << ", rate: " << ci.rate << "}";
+    return os;
   }
 };
 
 // RTP
-enum {kRtpCsrcSize = 15}; // RFC 3550 page 13
+enum { kRtpCsrcSize = 15 };  // RFC 3550 page 13
 
-enum PayloadFrequencies
-{
-    kFreq8000Hz = 8000,
-    kFreq16000Hz = 16000,
-    kFreq32000Hz = 32000
+enum PayloadFrequencies {
+  kFreq8000Hz = 8000,
+  kFreq16000Hz = 16000,
+  kFreq32000Hz = 32000
 };
 
-enum VadModes                 // degree of bandwidth reduction
-{
-    kVadConventional = 0,      // lowest reduction
-    kVadAggressiveLow,
-    kVadAggressiveMid,
-    kVadAggressiveHigh         // highest reduction
+// Degree of bandwidth reduction.
+enum VadModes {
+  kVadConventional = 0,  // lowest reduction
+  kVadAggressiveLow,
+  kVadAggressiveMid,
+  kVadAggressiveHigh  // highest reduction
 };
 
-struct NetworkStatistics           // NETEQ statistics
-{
-    // current jitter buffer size in ms
-    uint16_t currentBufferSize;
-    // preferred (optimal) buffer size in ms
-    uint16_t preferredBufferSize;
-    // adding extra delay due to "peaky jitter"
-    bool jitterPeaksFound;
-    // Loss rate (network + late); fraction between 0 and 1, scaled to Q14.
-    uint16_t currentPacketLossRate;
-    // Late loss rate; fraction between 0 and 1, scaled to Q14.
-    uint16_t currentDiscardRate;
-    // fraction (of original stream) of synthesized audio inserted through
-    // expansion (in Q14)
-    uint16_t currentExpandRate;
-    // fraction (of original stream) of synthesized speech inserted through
-    // expansion (in Q14)
-    uint16_t currentSpeechExpandRate;
-    // fraction of synthesized speech inserted through pre-emptive expansion
-    // (in Q14)
-    uint16_t currentPreemptiveRate;
-    // fraction of data removed through acceleration (in Q14)
-    uint16_t currentAccelerateRate;
-    // fraction of data coming from secondary decoding (in Q14)
-    uint16_t currentSecondaryDecodedRate;
-    // clock-drift in parts-per-million (negative or positive)
-    int32_t clockDriftPPM;
-    // average packet waiting time in the jitter buffer (ms)
-    int meanWaitingTimeMs;
-    // median packet waiting time in the jitter buffer (ms)
-    int medianWaitingTimeMs;
-    // min packet waiting time in the jitter buffer (ms)
-    int minWaitingTimeMs;
-    // max packet waiting time in the jitter buffer (ms)
-    int maxWaitingTimeMs;
-    // added samples in off mode due to packet loss
-    size_t addedSamples;
+// NETEQ statistics.
+struct NetworkStatistics {
+  // current jitter buffer size in ms
+  uint16_t currentBufferSize;
+  // preferred (optimal) buffer size in ms
+  uint16_t preferredBufferSize;
+  // adding extra delay due to "peaky jitter"
+  bool jitterPeaksFound;
+  // Stats below correspond to similarly-named fields in the WebRTC stats spec.
+  // https://w3c.github.io/webrtc-stats/#dom-rtcmediastreamtrackstats
+  uint64_t totalSamplesReceived;
+  uint64_t concealedSamples;
+  uint64_t concealmentEvents;
+  uint64_t jitterBufferDelayMs;
+  // Stats below DO NOT correspond directly to anything in the WebRTC stats
+  // Loss rate (network + late); fraction between 0 and 1, scaled to Q14.
+  uint16_t currentPacketLossRate;
+  // Late loss rate; fraction between 0 and 1, scaled to Q14.
+  union {
+    RTC_DEPRECATED uint16_t currentDiscardRate;
+  };
+  // fraction (of original stream) of synthesized audio inserted through
+  // expansion (in Q14)
+  uint16_t currentExpandRate;
+  // fraction (of original stream) of synthesized speech inserted through
+  // expansion (in Q14)
+  uint16_t currentSpeechExpandRate;
+  // fraction of synthesized speech inserted through pre-emptive expansion
+  // (in Q14)
+  uint16_t currentPreemptiveRate;
+  // fraction of data removed through acceleration (in Q14)
+  uint16_t currentAccelerateRate;
+  // fraction of data coming from secondary decoding (in Q14)
+  uint16_t currentSecondaryDecodedRate;
+  // Fraction of secondary data, including FEC and RED, that is discarded (in
+  // Q14). Discarding of secondary data can be caused by the reception of the
+  // primary data, obsoleting the secondary data. It can also be caused by early
+  // or late arrival of secondary data.
+  uint16_t currentSecondaryDiscardedRate;
+  // clock-drift in parts-per-million (negative or positive)
+  int32_t clockDriftPPM;
+  // average packet waiting time in the jitter buffer (ms)
+  int meanWaitingTimeMs;
+  // median packet waiting time in the jitter buffer (ms)
+  int medianWaitingTimeMs;
+  // min packet waiting time in the jitter buffer (ms)
+  int minWaitingTimeMs;
+  // max packet waiting time in the jitter buffer (ms)
+  int maxWaitingTimeMs;
+  // added samples in off mode due to packet loss
+  size_t addedSamples;
 };
 
 // Statistics for calls to AudioCodingModule::PlayoutData10Ms().
@@ -395,189 +361,55 @@ struct AudioDecodingCallStats {
         decoded_normal(0),
         decoded_plc(0),
         decoded_cng(0),
-        decoded_plc_cng(0) {}
+        decoded_plc_cng(0),
+        decoded_muted_output(0) {}
 
   int calls_to_silence_generator;  // Number of calls where silence generated,
                                    // and NetEq was disengaged from decoding.
-  int calls_to_neteq;  // Number of calls to NetEq.
+  int calls_to_neteq;              // Number of calls to NetEq.
   int decoded_normal;  // Number of calls where audio RTP packet decoded.
-  int decoded_plc;  // Number of calls resulted in PLC.
+  int decoded_plc;     // Number of calls resulted in PLC.
   int decoded_cng;  // Number of calls where comfort noise generated due to DTX.
   int decoded_plc_cng;  // Number of calls resulted where PLC faded to CNG.
-};
-
-typedef struct
-{
-    int min;              // minumum
-    int max;              // maximum
-    int average;          // average
-} StatVal;
-
-typedef struct           // All levels are reported in dBm0
-{
-    StatVal speech_rx;   // long-term speech levels on receiving side
-    StatVal speech_tx;   // long-term speech levels on transmitting side
-    StatVal noise_rx;    // long-term noise/silence levels on receiving side
-    StatVal noise_tx;    // long-term noise/silence levels on transmitting side
-} LevelStatistics;
-
-typedef struct        // All levels are reported in dB
-{
-    StatVal erl;      // Echo Return Loss
-    StatVal erle;     // Echo Return Loss Enhancement
-    StatVal rerl;     // RERL = ERL + ERLE
-    // Echo suppression inside EC at the point just before its NLP
-    StatVal a_nlp;
-} EchoStatistics;
-
-enum NsModes    // type of Noise Suppression
-{
-    kNsUnchanged = 0,   // previously set mode
-    kNsDefault,         // platform default
-    kNsConference,      // conferencing default
-    kNsLowSuppression,  // lowest suppression
-    kNsModerateSuppression,
-    kNsHighSuppression,
-    kNsVeryHighSuppression,     // highest suppression
-};
-
-enum AgcModes                  // type of Automatic Gain Control
-{
-    kAgcUnchanged = 0,        // previously set mode
-    kAgcDefault,              // platform default
-    // adaptive mode for use when analog volume control exists (e.g. for
-    // PC softphone)
-    kAgcAdaptiveAnalog,
-    // scaling takes place in the digital domain (e.g. for conference servers
-    // and embedded devices)
-    kAgcAdaptiveDigital,
-    // can be used on embedded devices where the capture signal level
-    // is predictable
-    kAgcFixedDigital
-};
-
-// EC modes
-enum EcModes                   // type of Echo Control
-{
-    kEcUnchanged = 0,          // previously set mode
-    kEcDefault,                // platform default
-    kEcConference,             // conferencing default (aggressive AEC)
-    kEcAec,                    // Acoustic Echo Cancellation
-    kEcAecm,                   // AEC mobile
-};
-
-// AECM modes
-enum AecmModes                 // mode of AECM
-{
-    kAecmQuietEarpieceOrHeadset = 0,
-                               // Quiet earpiece or headset use
-    kAecmEarpiece,             // most earpiece use
-    kAecmLoudEarpiece,         // Loud earpiece or quiet speakerphone use
-    kAecmSpeakerphone,         // most speakerphone use (default)
-    kAecmLoudSpeakerphone      // Loud speakerphone
-};
-
-// AGC configuration
-typedef struct
-{
-    unsigned short targetLeveldBOv;
-    unsigned short digitalCompressionGaindB;
-    bool           limiterEnable;
-} AgcConfig;                  // AGC configuration parameters
-
-enum StereoChannel
-{
-    kStereoLeft = 0,
-    kStereoRight,
-    kStereoBoth
-};
-
-// Audio device layers
-enum AudioLayers
-{
-    kAudioPlatformDefault = 0,
-    kAudioWindowsWave = 1,
-    kAudioWindowsCore = 2,
-    kAudioLinuxAlsa = 3,
-    kAudioLinuxPulse = 4
-};
-
-// TODO(henrika): to be removed.
-enum NetEqModes             // NetEQ playout configurations
-{
-    // Optimized trade-off between low delay and jitter robustness for two-way
-    // communication.
-    kNetEqDefault = 0,
-    // Improved jitter robustness at the cost of increased delay. Can be
-    // used in one-way communication.
-    kNetEqStreaming = 1,
-    // Optimzed for decodability of fax signals rather than for perceived audio
-    // quality.
-    kNetEqFax = 2,
-    // Minimal buffer management. Inserts zeros for lost packets and during
-    // buffer increases.
-    kNetEqOff = 3,
-};
-
-// TODO(henrika): to be removed.
-enum OnHoldModes            // On Hold direction
-{
-    kHoldSendAndPlay = 0,    // Put both sending and playing in on-hold state.
-    kHoldSendOnly,           // Put only sending in on-hold state.
-    kHoldPlayOnly            // Put only playing in on-hold state.
-};
-
-// TODO(henrika): to be removed.
-enum AmrMode
-{
-    kRfc3267BwEfficient = 0,
-    kRfc3267OctetAligned = 1,
-    kRfc3267FileStorage = 2,
+  int decoded_muted_output;  // Number of calls returning a muted state output.
 };
 
 // ==================================================================
 // Video specific types
 // ==================================================================
 
-// Raw video types
-enum RawVideoType
-{
-    kVideoI420     = 0,
-    kVideoYV12     = 1,
-    kVideoYUY2     = 2,
-    kVideoUYVY     = 3,
-    kVideoIYUV     = 4,
-    kVideoARGB     = 5,
-    kVideoRGB24    = 6,
-    kVideoRGB565   = 7,
-    kVideoARGB4444 = 8,
-    kVideoARGB1555 = 9,
-    kVideoMJPEG    = 10,
-    kVideoNV12     = 11,
-    kVideoNV21     = 12,
-    kVideoBGRA     = 13,
-    kVideoUnknown  = 99
+// TODO(nisse): Delete, and switch to fourcc values everywhere?
+// Supported video types.
+enum class VideoType {
+  kUnknown,
+  kI420,
+  kIYUV,
+  kRGB24,
+  kABGR,
+  kARGB,
+  kARGB4444,
+  kRGB565,
+  kARGB1555,
+  kYUY2,
+  kYV12,
+  kUYVY,
+  kMJPEG,
+  kNV21,
+  kNV12,
+  kBGRA,
 };
 
 // Video codec
-enum { kConfigParameterSize = 128};
-enum { kPayloadNameSize = 32};
-enum { kMaxSimulcastStreams = 4};
+enum { kPayloadNameSize = 32 };
+enum { kMaxSimulcastStreams = 4 };
 enum { kMaxSpatialLayers = 5 };
-enum { kMaxTemporalStreams = 4};
+enum { kMaxTemporalStreams = 4 };
 
-enum VideoCodecComplexity
-{
-    kComplexityNormal = 0,
-    kComplexityHigh    = 1,
-    kComplexityHigher  = 2,
-    kComplexityMax     = 3
-};
-
-enum VideoCodecProfile
-{
-    kProfileBase = 0x00,
-    kProfileMain = 0x01
+enum VideoCodecComplexity {
+  kComplexityNormal = 0,
+  kComplexityHigh = 1,
+  kComplexityHigher = 2,
+  kComplexityMax = 3
 };
 
 enum VP8ResilienceMode {
@@ -594,43 +426,56 @@ enum VP8ResilienceMode {
 class TemporalLayersFactory;
 // VP8 specific
 struct VideoCodecVP8 {
-  bool                 pictureLossIndicationOn;
-  bool                 feedbackModeOn;
+  // TODO(nisse): Unused, delete?
+  bool pictureLossIndicationOn;
   VideoCodecComplexity complexity;
-  VP8ResilienceMode    resilience;
-  unsigned char        numberOfTemporalLayers;
-  bool                 denoisingOn;
-  bool                 errorConcealmentOn;
-  bool                 automaticResizeOn;
-  bool                 frameDroppingOn;
-  int                  keyFrameInterval;
-  const TemporalLayersFactory* tl_factory;
+  VP8ResilienceMode resilience;
+  unsigned char numberOfTemporalLayers;
+  bool denoisingOn;
+  bool errorConcealmentOn;
+  bool automaticResizeOn;
+  bool frameDroppingOn;
+  int keyFrameInterval;
+  TemporalLayersFactory* tl_factory;
 };
 
 // VP9 specific.
 struct VideoCodecVP9 {
   VideoCodecComplexity complexity;
-  int                  resilience;
-  unsigned char        numberOfTemporalLayers;
-  bool                 denoisingOn;
-  bool                 frameDroppingOn;
-  int                  keyFrameInterval;
-  bool                 adaptiveQpMode;
-  bool                 automaticResizeOn;
-  unsigned char        numberOfSpatialLayers;
-  bool                 flexibleMode;
+  bool resilienceOn;
+  unsigned char numberOfTemporalLayers;
+  bool denoisingOn;
+  bool frameDroppingOn;
+  int keyFrameInterval;
+  bool adaptiveQpMode;
+  bool automaticResizeOn;
+  unsigned char numberOfSpatialLayers;
+  bool flexibleMode;
 };
+
+// TODO(magjed): Move this and other H264 related classes out to their own file.
+namespace H264 {
+
+enum Profile {
+  kProfileConstrainedBaseline,
+  kProfileBaseline,
+  kProfileMain,
+  kProfileConstrainedHigh,
+  kProfileHigh,
+};
+
+}  // namespace H264
 
 // H264 specific.
 struct VideoCodecH264 {
-  VideoCodecProfile profile;
-  bool           frameDroppingOn;
-  int            keyFrameInterval;
+  bool frameDroppingOn;
+  int keyFrameInterval;
   // These are NULL/0 if not externally negotiated.
   const uint8_t* spsData;
-  size_t         spsLen;
+  size_t spsLen;
   const uint8_t* ppsData;
-  size_t         ppsLen;
+  size_t ppsLen;
+  H264::Profile profile;
 };
 
 // Video codec types
@@ -641,27 +486,32 @@ enum VideoCodecType {
   kVideoCodecI420,
   kVideoCodecRED,
   kVideoCodecULPFEC,
+  kVideoCodecFlexfec,
   kVideoCodecGeneric,
+  kVideoCodecStereo,
   kVideoCodecUnknown
 };
 
-union VideoCodecUnion {
-  VideoCodecVP8       VP8;
-  VideoCodecVP9       VP9;
-  VideoCodecH264      H264;
-};
+// Translates from name of codec to codec type and vice versa.
+const char* CodecTypeToPayloadString(VideoCodecType type);
+VideoCodecType PayloadStringToCodecType(const std::string& name);
 
+union VideoCodecUnion {
+  VideoCodecVP8 VP8;
+  VideoCodecVP9 VP9;
+  VideoCodecH264 H264;
+};
 
 // Simulcast is when the same stream is encoded multiple times with different
 // settings such as resolution.
 struct SimulcastStream {
-  unsigned short      width;
-  unsigned short      height;
-  unsigned char       numberOfTemporalLayers;
-  unsigned int        maxBitrate;  // kilobits/sec.
-  unsigned int        targetBitrate;  // kilobits/sec.
-  unsigned int        minBitrate;  // kilobits/sec.
-  unsigned int        qpMax; // minimum quality
+  unsigned short width;
+  unsigned short height;
+  unsigned char numberOfTemporalLayers;
+  unsigned int maxBitrate;     // kilobits/sec.
+  unsigned int targetBitrate;  // kilobits/sec.
+  unsigned int minBitrate;     // kilobits/sec.
+  unsigned int qpMax;          // minimum quality
 };
 
 struct SpatialLayer {
@@ -671,47 +521,118 @@ struct SpatialLayer {
   // TODO(ivica): Add max_quantizer and min_quantizer?
 };
 
-enum VideoCodecMode {
-  kRealtimeVideo,
-  kScreensharing
-};
+enum VideoCodecMode { kRealtimeVideo, kScreensharing };
 
 // Common video codec properties
-struct VideoCodec {
-  VideoCodecType      codecType;
-  char                plName[kPayloadNameSize];
-  unsigned char       plType;
+class VideoCodec {
+ public:
+  VideoCodec();
 
-  unsigned short      width;
-  unsigned short      height;
+  // Public variables. TODO(hta): Make them private with accessors.
+  VideoCodecType codecType;
+  char plName[kPayloadNameSize];
+  unsigned char plType;
 
-  unsigned int        startBitrate;  // kilobits/sec.
-  unsigned int        maxBitrate;  // kilobits/sec.
-  unsigned int        minBitrate;  // kilobits/sec.
-  unsigned int        targetBitrate;  // kilobits/sec.
+  unsigned short width;
+  unsigned short height;
 
-  unsigned char       maxFramerate;
+  unsigned int startBitrate;   // kilobits/sec.
+  unsigned int maxBitrate;     // kilobits/sec.
+  unsigned int minBitrate;     // kilobits/sec.
+  unsigned int targetBitrate;  // kilobits/sec.
 
-  VideoCodecUnion     codecSpecific;
+  uint32_t maxFramerate;
 
-  unsigned int        qpMax;
-  unsigned char       numberOfSimulcastStreams;
-  SimulcastStream     simulcastStream[kMaxSimulcastStreams];
+  unsigned int qpMax;
+  unsigned char numberOfSimulcastStreams;
+  SimulcastStream simulcastStream[kMaxSimulcastStreams];
   SpatialLayer spatialLayers[kMaxSpatialLayers];
 
-  VideoCodecMode      mode;
-  bool                expect_encode_from_texture;
+  VideoCodecMode mode;
+  bool expect_encode_from_texture;
+
+  // Timing frames configuration. There is delay of delay_ms between two
+  // consequent timing frames, excluding outliers. Frame is always made a
+  // timing frame if it's at least outlier_ratio in percent of "ideal" average
+  // frame given bitrate and framerate, i.e. if it's bigger than
+  // |outlier_ratio / 100.0 * bitrate_bps / fps| in bits. This way, timing
+  // frames will not be sent too often usually. Yet large frames will always
+  // have timing information for debug purposes because they are more likely to
+  // cause extra delays.
+  struct TimingFrameTriggerThresholds {
+    int64_t delay_ms;
+    uint16_t outlier_ratio_percent;
+  } timing_frame_thresholds;
 
   bool operator==(const VideoCodec& other) const = delete;
   bool operator!=(const VideoCodec& other) const = delete;
+
+  // Accessors for codec specific information.
+  // There is a const version of each that returns a reference,
+  // and a non-const version that returns a pointer, in order
+  // to allow modification of the parameters.
+  VideoCodecVP8* VP8();
+  const VideoCodecVP8& VP8() const;
+  VideoCodecVP9* VP9();
+  const VideoCodecVP9& VP9() const;
+  VideoCodecH264* H264();
+  const VideoCodecH264& H264() const;
+
+ private:
+  // TODO(hta): Consider replacing the union with a pointer type.
+  // This will allow removing the VideoCodec* types from this file.
+  VideoCodecUnion codec_specific_;
+};
+
+class BitrateAllocation {
+ public:
+  static const uint32_t kMaxBitrateBps;
+  BitrateAllocation();
+
+  bool SetBitrate(size_t spatial_index,
+                  size_t temporal_index,
+                  uint32_t bitrate_bps);
+
+  bool HasBitrate(size_t spatial_index, size_t temporal_index) const;
+
+  uint32_t GetBitrate(size_t spatial_index, size_t temporal_index) const;
+
+  // Whether the specific spatial layers has the bitrate set in any of its
+  // temporal layers.
+  bool IsSpatialLayerUsed(size_t spatial_index) const;
+
+  // Get the sum of all the temporal layer for a specific spatial layer.
+  uint32_t GetSpatialLayerSum(size_t spatial_index) const;
+
+  uint32_t get_sum_bps() const { return sum_; }  // Sum of all bitrates.
+  uint32_t get_sum_kbps() const { return (sum_ + 500) / 1000; }
+
+  inline bool operator==(const BitrateAllocation& other) const {
+    return memcmp(bitrates_, other.bitrates_, sizeof(bitrates_)) == 0;
+  }
+  inline bool operator!=(const BitrateAllocation& other) const {
+    return !(*this == other);
+  }
+
+  // Expensive, please use only in tests.
+  std::string ToString() const;
+  std::ostream& operator<<(std::ostream& os) const;
+
+ private:
+  uint32_t sum_;
+  uint32_t bitrates_[kMaxSpatialLayers][kMaxTemporalStreams];
+  bool has_bitrate_[kMaxSpatialLayers][kMaxTemporalStreams];
 };
 
 // Bandwidth over-use detector options.  These are used to drive
 // experimentation with bandwidth estimation parameters.
 // See modules/remote_bitrate_estimator/overuse_detector.h
+// TODO(terelius): This is only used in overuse_estimator.cc, and only in the
+// default constructed state. Can we move the relevant variables into that
+// class and delete this? See also disabled warning at line 27
 struct OverUseDetectorOptions {
   OverUseDetectorOptions()
-      : initial_slope(8.0/512.0),
+      : initial_slope(8.0 / 512.0),
         initial_offset(0),
         initial_e(),
         initial_process_noise(),
@@ -736,8 +657,7 @@ struct OverUseDetectorOptions {
 struct PacketTime {
   PacketTime() : timestamp(-1), not_before(-1) {}
   PacketTime(int64_t timestamp, int64_t not_before)
-      : timestamp(timestamp), not_before(not_before) {
-  }
+      : timestamp(timestamp), not_before(not_before) {}
 
   int64_t timestamp;   // Receive time after socket delivers the data.
   int64_t not_before;  // Earliest possible time the data could have arrived,
@@ -765,8 +685,59 @@ struct PlayoutDelay {
   int max_ms;
 };
 
+// Class to represent the value of RTP header extensions that are
+// variable-length strings (e.g., RtpStreamId and RtpMid).
+// Unlike std::string, it can be copied with memcpy and cleared with memset.
+//
+// Empty value represents unset header extension (use empty() to query).
+class StringRtpHeaderExtension {
+ public:
+  // String RTP header extensions are limited to 16 bytes because it is the
+  // maximum length that can be encoded with one-byte header extensions.
+  static constexpr size_t kMaxSize = 16;
+
+  static bool IsLegalName(rtc::ArrayView<const char> name);
+
+  StringRtpHeaderExtension() { value_[0] = 0; }
+  explicit StringRtpHeaderExtension(rtc::ArrayView<const char> value) {
+    Set(value.data(), value.size());
+  }
+  StringRtpHeaderExtension(const StringRtpHeaderExtension&) = default;
+  StringRtpHeaderExtension& operator=(const StringRtpHeaderExtension&) =
+      default;
+
+  bool empty() const { return value_[0] == 0; }
+  const char* data() const { return value_; }
+  size_t size() const { return strnlen(value_, kMaxSize); }
+
+  void Set(rtc::ArrayView<const uint8_t> value) {
+    Set(reinterpret_cast<const char*>(value.data()), value.size());
+  }
+  void Set(const char* data, size_t size);
+
+  friend bool operator==(const StringRtpHeaderExtension& lhs,
+                         const StringRtpHeaderExtension& rhs) {
+    return strncmp(lhs.value_, rhs.value_, kMaxSize) == 0;
+  }
+  friend bool operator!=(const StringRtpHeaderExtension& lhs,
+                         const StringRtpHeaderExtension& rhs) {
+    return !(lhs == rhs);
+  }
+
+ private:
+  char value_[kMaxSize];
+};
+
+// StreamId represents RtpStreamId which is a string.
+typedef StringRtpHeaderExtension StreamId;
+
+// Mid represents RtpMid which is a string.
+typedef StringRtpHeaderExtension Mid;
+
 struct RTPHeaderExtension {
   RTPHeaderExtension();
+  RTPHeaderExtension(const RTPHeaderExtension& other);
+  RTPHeaderExtension& operator=(const RTPHeaderExtension& other);
 
   bool hasTransmissionTimeOffset;
   int32_t transmissionTimeOffset;
@@ -785,13 +756,33 @@ struct RTPHeaderExtension {
   // http://www.etsi.org/deliver/etsi_ts/126100_126199/126114/12.07.00_60/
   // ts_126114v120700p.pdf
   bool hasVideoRotation;
-  uint8_t videoRotation;
+  VideoRotation videoRotation;
+
+  // TODO(ilnik): Refactor this and one above to be rtc::Optional() and remove
+  // a corresponding bool flag.
+  bool hasVideoContentType;
+  VideoContentType videoContentType;
+
+  bool has_video_timing;
+  VideoSendTiming video_timing;
 
   PlayoutDelay playout_delay = {-1, -1};
+
+  // For identification of a stream when ssrc is not signaled. See
+  // https://tools.ietf.org/html/draft-ietf-avtext-rid-09
+  // TODO(danilchap): Update url from draft to release version.
+  StreamId stream_id;
+  StreamId repaired_stream_id;
+
+  // For identifying the media section used to interpret this RTP packet. See
+  // https://tools.ietf.org/html/draft-ietf-mmusic-sdp-bundle-negotiation-38
+  Mid mid;
 };
 
 struct RTPHeader {
   RTPHeader();
+  RTPHeader(const RTPHeader& other);
+  RTPHeader& operator=(const RTPHeader& other);
 
   bool markerBit;
   uint8_t payloadType;
@@ -808,10 +799,7 @@ struct RTPHeader {
 
 struct RtpPacketCounter {
   RtpPacketCounter()
-    : header_bytes(0),
-      payload_bytes(0),
-      padding_bytes(0),
-      packets(0) {}
+      : header_bytes(0), payload_bytes(0), padding_bytes(0), packets(0) {}
 
   void Add(const RtpPacketCounter& other) {
     header_bytes += other.header_bytes;
@@ -821,13 +809,13 @@ struct RtpPacketCounter {
   }
 
   void Subtract(const RtpPacketCounter& other) {
-    assert(header_bytes >= other.header_bytes);
+    RTC_DCHECK_GE(header_bytes, other.header_bytes);
     header_bytes -= other.header_bytes;
-    assert(payload_bytes >= other.payload_bytes);
+    RTC_DCHECK_GE(payload_bytes, other.payload_bytes);
     payload_bytes -= other.payload_bytes;
-    assert(padding_bytes >= other.padding_bytes);
+    RTC_DCHECK_GE(padding_bytes, other.padding_bytes);
     padding_bytes -= other.padding_bytes;
-    assert(packets >= other.packets);
+    RTC_DCHECK_GE(packets, other.packets);
     packets -= other.packets;
   }
 
@@ -858,8 +846,8 @@ struct StreamDataCounters {
     retransmitted.Add(other.retransmitted);
     fec.Add(other.fec);
     if (other.first_packet_time_ms != -1 &&
-       (other.first_packet_time_ms < first_packet_time_ms ||
-        first_packet_time_ms == -1)) {
+        (other.first_packet_time_ms < first_packet_time_ms ||
+         first_packet_time_ms == -1)) {
       // Use oldest time.
       first_packet_time_ms = other.first_packet_time_ms;
     }
@@ -889,10 +877,10 @@ struct StreamDataCounters {
            fec.payload_bytes;
   }
 
-  int64_t first_packet_time_ms;  // Time when first packet is sent/received.
-  RtpPacketCounter transmitted;  // Number of transmitted packets/bytes.
+  int64_t first_packet_time_ms;    // Time when first packet is sent/received.
+  RtpPacketCounter transmitted;    // Number of transmitted packets/bytes.
   RtpPacketCounter retransmitted;  // Number of retransmitted packets/bytes.
-  RtpPacketCounter fec;  // Number of redundancy packets/bytes.
+  RtpPacketCounter fec;            // Number of redundancy packets/bytes.
 };
 
 // Callback, called whenever byte/packet counts have been updated.
@@ -913,6 +901,28 @@ enum NetworkState {
   kNetworkDown,
 };
 
+struct RtpKeepAliveConfig final {
+  // If no packet has been sent for |timeout_interval_ms|, send a keep-alive
+  // packet. The keep-alive packet is an empty (no payload) RTP packet with a
+  // payload type of 20 as long as the other end has not negotiated the use of
+  // this value. If this value has already been negotiated, then some other
+  // unused static payload type from table 5 of RFC 3551 shall be used and set
+  // in |payload_type|.
+  int64_t timeout_interval_ms = -1;
+  uint8_t payload_type = 20;
+
+  bool operator==(const RtpKeepAliveConfig& o) const {
+    return timeout_interval_ms == o.timeout_interval_ms &&
+           payload_type == o.payload_type;
+  }
+  bool operator!=(const RtpKeepAliveConfig& o) const { return !(*this == o); }
+};
+
+// Currently only VP8/VP9 specific.
+struct RtpPayloadState {
+  int16_t picture_id = -1;
+};
+
 }  // namespace webrtc
 
-#endif  // WEBRTC_COMMON_TYPES_H_
+#endif  // COMMON_TYPES_H_

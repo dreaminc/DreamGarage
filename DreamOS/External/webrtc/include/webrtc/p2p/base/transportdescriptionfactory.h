@@ -8,11 +8,11 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_
-#define WEBRTC_P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_
+#ifndef P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_
+#define P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_
 
-#include "webrtc/base/rtccertificate.h"
-#include "webrtc/p2p/base/transportdescription.h"
+#include "p2p/base/transportdescription.h"
+#include "rtc_base/rtccertificate.h"
 
 namespace rtc {
 class SSLIdentity;
@@ -21,9 +21,11 @@ class SSLIdentity;
 namespace cricket {
 
 struct TransportOptions {
-  TransportOptions() : ice_restart(false), prefer_passive_role(false) {}
-  bool ice_restart;
-  bool prefer_passive_role;
+  bool ice_restart = false;
+  bool prefer_passive_role = false;
+  // If true, ICE renomination is supported and will be used if it is also
+  // supported by the remote side.
+  bool enable_ice_renomination = false;
 };
 
 // Creates transport descriptions according to the supplied configuration.
@@ -33,6 +35,8 @@ class TransportDescriptionFactory {
  public:
   // Default ctor; use methods below to set configuration.
   TransportDescriptionFactory();
+  ~TransportDescriptionFactory();
+
   SecurePolicy secure() const { return secure_; }
   // The certificate to use when setting up DTLS.
   const rtc::scoped_refptr<rtc::RTCCertificate>& certificate() const {
@@ -51,9 +55,16 @@ class TransportDescriptionFactory {
   TransportDescription* CreateOffer(const TransportOptions& options,
       const TransportDescription* current_description) const;
   // Create a transport description that is a response to an offer.
+  //
+  // If |require_transport_attributes| is true, then TRANSPORT category
+  // attributes are expected to be present in |offer|, as defined by
+  // sdp-mux-attributes, and null will be returned otherwise. It's expected
+  // that this will be set to false for an m= section that's in a BUNDLE group
+  // but isn't the first m= section in the group.
   TransportDescription* CreateAnswer(
       const TransportDescription* offer,
       const TransportOptions& options,
+      bool require_transport_attributes,
       const TransportDescription* current_description) const;
 
  private:
@@ -66,4 +77,4 @@ class TransportDescriptionFactory {
 
 }  // namespace cricket
 
-#endif  // WEBRTC_P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_
+#endif  // P2P_BASE_TRANSPORTDESCRIPTIONFACTORY_H_

@@ -8,18 +8,21 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_
+#ifndef MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_
+#define MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_
 
-#include "webrtc/modules/audio_processing/test/audio_processing_simulator.h"
+#include "modules/audio_processing/test/audio_processing_simulator.h"
 
-#include "webrtc/base/constructormagic.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/ignore_wundef.h"
 
+RTC_PUSH_IGNORING_WUNDEF()
 #ifdef WEBRTC_ANDROID_PLATFORM_BUILD
 #include "external/webrtc/webrtc/modules/audio_processing/debug.pb.h"
 #else
-#include "webrtc/modules/audio_processing/debug.pb.h"
+#include "modules/audio_processing/debug.pb.h"
 #endif
+RTC_POP_IGNORING_WUNDEF()
 
 namespace webrtc {
 namespace test {
@@ -27,9 +30,8 @@ namespace test {
 // Used to perform an audio processing simulation from an aec dump.
 class AecDumpBasedSimulator final : public AudioProcessingSimulator {
  public:
-  explicit AecDumpBasedSimulator(const SimulationSettings& settings)
-      : AudioProcessingSimulator(settings) {}
-  virtual ~AecDumpBasedSimulator() {}
+  explicit AecDumpBasedSimulator(const SimulationSettings& settings);
+  ~AecDumpBasedSimulator() override;
 
   // Processes the messages in the aecdump file.
   void Process() override;
@@ -51,6 +53,9 @@ class AecDumpBasedSimulator final : public AudioProcessingSimulator {
   };
 
   FILE* dump_input_file_;
+  std::unique_ptr<ChannelBuffer<float>> artificial_nearend_buf_;
+  std::unique_ptr<ChannelBufferWavReader> artificial_nearend_buffer_reader_;
+  bool artificial_nearend_eof_reported_ = false;
   InterfaceType interface_used_ = InterfaceType::kNotSpecified;
 
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(AecDumpBasedSimulator);
@@ -59,4 +64,4 @@ class AecDumpBasedSimulator final : public AudioProcessingSimulator {
 }  // namespace test
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_
+#endif  // MODULES_AUDIO_PROCESSING_TEST_AEC_DUMP_BASED_SIMULATOR_H_

@@ -4,9 +4,10 @@
 //#include <pthread.h>
 //#include <sys/time.h>
 
-#include "webrtc/common_video/libyuv/include/webrtc_libyuv.h"
-#include "webrtc/media/base/videocapturer.h"
-#include "webrtc/media/base/videoframe.h"
+#include "common_video/libyuv/include/webrtc_libyuv.h"
+//
+#include "media/base/videocapturer.h"
+#include "api/video/video_frame.h"
 
 #include <memory>
 
@@ -56,9 +57,11 @@ Error:
 	return;
 }
 
+// TODO: This is all kinds of fucked now
 RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
+	/*
 	size_t frameSize = sizeof(uint8_t) * pxHeight * pxWidth * channels;
 	cricket::CapturedFrame capturedVideoframe;
 
@@ -110,17 +113,19 @@ RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFram
 		
 	std::shared_ptr<cricket::CapturedFrame> capturedVideoFrame(new cricket::CapturedFrame(webRTCVideoFrame, &captureBufferVector[0], length));
 
-	
 	*/
 
+	CR(r);
 
 Error:
 	return r;
 }
 
+/*
 void WebRTCCustomVideoCapturer::SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame) {
 	SignalFrameCaptured(this, frame);
 }
+*/
 
 bool WebRTCCustomVideoCapturer::IsRunning() {
 	return capture_state() == cricket::CS_RUNNING;

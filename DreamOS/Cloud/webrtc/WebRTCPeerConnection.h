@@ -9,12 +9,12 @@
 
 #include <memory>
 
-#include "webrtc/base/common.h"
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+//#include "rtc_base/common.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
 
-#include "webrtc/media/base/videocommon.h"
-#include "webrtc/media/base/videoframe.h"
+#include "media/base/videocommon.h"
+#include "api/video/video_frame.h"
 
 #include "WebRTCICECandidate.h"
 #include "WebRTCIceConnection.h"
@@ -23,7 +23,7 @@
 
 #include "Primitives/color.h"
 
-#include "webrtc/api/localaudiosource.h"
+#include "pc/localaudiosource.h"
 
 class WebRTConductor;
 class WebRTCLocalAudioSource;
@@ -42,7 +42,7 @@ class WebRTCPeerConnection :
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
 	public webrtc::AudioTrackSinkInterface,
-	public rtc::VideoSinkInterface<cricket::VideoFrame>,
+	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
 	public WebRTCPeerConnectionProxy
 {
 public:
@@ -131,7 +131,7 @@ protected:
 	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
-	virtual void OnFrame(const cricket::VideoFrame& cricketVideoFrame) override;
+	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
@@ -159,11 +159,11 @@ protected:
 
 
 public:
-	// Video (TODO eventually)
-	cricket::VideoCapturer* OpenVideoCaptureDevice();
+	// Video
+	std::unique_ptr<cricket::VideoCapturer> OpenVideoCaptureDevice();
 
 	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
-	cricket::VideoCapturer* m_pCricketVideoCapturer = nullptr;
+	std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
 
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }

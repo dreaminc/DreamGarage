@@ -8,14 +8,15 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_
-#define WEBRTC_MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_
+#ifndef MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_
+#define MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/thread_annotations.h"
-#include "webrtc/modules/include/module_common_types.h"
-#include "webrtc/modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include <stdint.h>
+
+#include "modules/include/module_common_types.h"
+#include "modules/rtp_rtcp/include/rtp_rtcp_defines.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/thread_annotations.h"
 
 namespace webrtc {
 
@@ -42,16 +43,10 @@ class PlayoutDelayOracle {
     return send_playout_delay_;
   }
 
-  // Returns current minimum playout delay in milliseconds.
-  int min_playout_delay_ms() const {
+  // Returns current playout delay.
+  PlayoutDelay playout_delay() const {
     rtc::CritScope lock(&crit_sect_);
-    return min_playout_delay_ms_;
-  }
-
-  // Returns current maximum playout delay in milliseconds.
-  int max_playout_delay_ms() const {
-    rtc::CritScope lock(&crit_sect_);
-    return max_playout_delay_ms_;
+    return playout_delay_;
   }
 
   // Updates the application requested playout delay, current ssrc
@@ -68,21 +63,19 @@ class PlayoutDelayOracle {
   // Guards access to data across multiple threads.
   rtc::CriticalSection crit_sect_;
   // The current highest sequence number on which playout delay has been sent.
-  int64_t high_sequence_number_ GUARDED_BY(crit_sect_);
+  int64_t high_sequence_number_ RTC_GUARDED_BY(crit_sect_);
   // Indicates whether the playout delay should go on the next frame.
-  bool send_playout_delay_ GUARDED_BY(crit_sect_);
+  bool send_playout_delay_ RTC_GUARDED_BY(crit_sect_);
   // Sender ssrc.
-  uint32_t ssrc_ GUARDED_BY(crit_sect_);
+  uint32_t ssrc_ RTC_GUARDED_BY(crit_sect_);
   // Sequence number unwrapper.
-  SequenceNumberUnwrapper unwrapper_ GUARDED_BY(crit_sect_);
-  // Min playout delay value on the next frame if |send_playout_delay_| is set.
-  int min_playout_delay_ms_ GUARDED_BY(crit_sect_);
-  // Max playout delay value on the next frame if |send_playout_delay_| is set.
-  int max_playout_delay_ms_ GUARDED_BY(crit_sect_);
+  SequenceNumberUnwrapper unwrapper_ RTC_GUARDED_BY(crit_sect_);
+  // Playout delay values on the next frame if |send_playout_delay_| is set.
+  PlayoutDelay playout_delay_ RTC_GUARDED_BY(crit_sect_);
 
   RTC_DISALLOW_COPY_AND_ASSIGN(PlayoutDelayOracle);
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_
+#endif  // MODULES_RTP_RTCP_SOURCE_PLAYOUT_DELAY_ORACLE_H_

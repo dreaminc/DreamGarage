@@ -8,14 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_
+#ifndef MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_
+#define MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_
 
 #include <cstring>
 #include <memory>
 #include <vector>
 
-#include "webrtc/modules/audio_processing/three_band_filter_bank.h"
+#include "modules/audio_processing/three_band_filter_bank.h"
 
 namespace webrtc {
 
@@ -46,6 +46,7 @@ struct TwoBandsStates {
 class SplittingFilter {
  public:
   SplittingFilter(size_t num_channels, size_t num_bands, size_t num_frames);
+  ~SplittingFilter();
 
   void Analysis(const IFChannelBuffer* data, IFChannelBuffer* bands);
   void Synthesis(const IFChannelBuffer* bands, IFChannelBuffer* data);
@@ -65,4 +66,4 @@ class SplittingFilter {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_
+#endif  // MODULES_AUDIO_PROCESSING_SPLITTING_FILTER_H_

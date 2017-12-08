@@ -1,5 +1,9 @@
 #include "ImageFactory.h"
 
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include "FreeImageObj.h"
 #include "MemoryImageObj.h"
 

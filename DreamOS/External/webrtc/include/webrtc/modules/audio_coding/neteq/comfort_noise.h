@@ -8,12 +8,12 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_
-#define WEBRTC_MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_
+#ifndef MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_
+#define MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/modules/audio_coding/neteq/audio_multi_vector.h"
-#include "webrtc/typedefs.h"
+#include "modules/audio_coding/neteq/audio_multi_vector.h"
+#include "rtc_base/constructormagic.h"
+#include "typedefs.h"  // NOLINT(build/include)
 
 namespace webrtc {
 
@@ -45,8 +45,7 @@ class ComfortNoise {
   void Reset();
 
   // Update the comfort noise generator with the parameters in |packet|.
-  // Will delete the packet.
-  int UpdateParameters(Packet* packet);
+  int UpdateParameters(const Packet& packet);
 
   // Generates |requested_length| samples of comfort noise and writes to
   // |output|. If this is the first in call after Reset (or first after creating
@@ -69,4 +68,4 @@ class ComfortNoise {
 };
 
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_
+#endif  // MODULES_AUDIO_CODING_NETEQ_COMFORT_NOISE_H_

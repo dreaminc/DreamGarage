@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "WebRTCCommon.h"
-#include "webrtc/base/win32socketserver.h"
+#include "rtc_base/win32socketserver.h"
 
 #include "WebRTCConductor.h"
 
@@ -24,7 +24,7 @@
 
 #include "Primitives/Proxy.h"
 
-class WebRTCClient;
+//class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
 
@@ -65,7 +65,7 @@ public:
 	WebRTCImp(CloudController *pParentCloudController);
 	~WebRTCImp();
 
-	friend class WebRTCClient;
+	//friend class WebRTCClient;
 	friend class WebRTCConductor;
 
 	RESULT Shutdown();
@@ -143,7 +143,8 @@ protected:
 
 private:
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	rtc::Win32Thread* m_pWin32thread;
+	rtc::Win32Thread* m_pWin32thread = nullptr;
+	rtc::Win32SocketServer* m_pWin32SocketServer = nullptr;
 
 	DWORD m_UIThreadID;
 	std::string m_strServer;

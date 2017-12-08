@@ -9,11 +9,11 @@
  *
  */
 
-#ifndef WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_
-#define WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_
+#ifndef MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_
+#define MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/modules/rtp_rtcp/source/rtcp_packet.h"
+#include "modules/rtp_rtcp/source/rtcp_packet.h"
+#include "rtc_base/basictypes.h"
 
 namespace webrtc {
 namespace rtcp {
@@ -27,8 +27,8 @@ class Psfb : public RtcpPacket {
   Psfb() : sender_ssrc_(0), media_ssrc_(0) {}
   ~Psfb() override {}
 
-  void From(uint32_t ssrc) { sender_ssrc_ = ssrc; }
-  void To(uint32_t ssrc) { media_ssrc_ = ssrc; }
+  void SetSenderSsrc(uint32_t ssrc) { sender_ssrc_ = ssrc; }
+  void SetMediaSsrc(uint32_t ssrc) { media_ssrc_ = ssrc; }
 
   uint32_t sender_ssrc() const { return sender_ssrc_; }
   uint32_t media_ssrc() const { return media_ssrc_; }
@@ -45,4 +45,4 @@ class Psfb : public RtcpPacket {
 
 }  // namespace rtcp
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_
+#endif  // MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_PSFB_H_

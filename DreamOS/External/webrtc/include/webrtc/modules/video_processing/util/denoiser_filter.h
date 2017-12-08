@@ -8,14 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_
-#define WEBRTC_MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_
+#ifndef MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_
+#define MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_
 
 #include <climits>
 #include <memory>
 
-#include "webrtc/modules/include/module_common_types.h"
-#include "webrtc/modules/video_processing/include/video_processing_defines.h"
+#include "modules/include/module_common_types.h"
 
 namespace webrtc {
 
@@ -42,7 +41,7 @@ class DenoiserFilter {
                                 const uint8_t* b,
                                 int b_stride,
                                 unsigned int* sse) = 0;
-  virtual DenoiserDecision MbDenoise(uint8_t* mc_running_avg_y,
+  virtual DenoiserDecision MbDenoise(const uint8_t* mc_running_avg_y,
                                      int mc_avg_y_stride,
                                      uint8_t* running_avg_y,
                                      int avg_y_stride,
@@ -54,4 +53,4 @@ class DenoiserFilter {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_
+#endif  // MODULES_VIDEO_PROCESSING_UTIL_DENOISER_FILTER_H_

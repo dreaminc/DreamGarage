@@ -7,11 +7,11 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifndef WEBRTC_MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_
-#define WEBRTC_MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_
+#ifndef MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_
+#define MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_
 
-#include "webrtc/base/checks.h"
-#include "webrtc/common_video/rotation.h"
+#include "api/video/video_rotation.h"
+#include "rtc_base/checks.h"
 
 namespace webrtc {
 
@@ -34,8 +34,10 @@ inline uint8_t ConvertVideoRotationToCVOByte(VideoRotation rotation) {
   return 0;
 }
 
-inline VideoRotation ConvertCVOByteToVideoRotation(uint8_t rotation) {
-  switch (rotation) {
+inline VideoRotation ConvertCVOByteToVideoRotation(uint8_t cvo_byte) {
+  // CVO byte: |0 0 0 0 C F R R|.
+  const uint8_t rotation_bits = cvo_byte & 0x3;
+  switch (rotation_bits) {
     case 0:
       return kVideoRotation_0;
     case 1:
@@ -51,4 +53,4 @@ inline VideoRotation ConvertCVOByteToVideoRotation(uint8_t rotation) {
 }
 
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_
+#endif  // MODULES_RTP_RTCP_INCLUDE_RTP_CVO_H_

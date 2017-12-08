@@ -8,16 +8,18 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_
+#ifndef MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_
+#define MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/thread_checker.h"
-#include "webrtc/modules/audio_processing/agc/agc_manager_direct.h"
-#include "webrtc/modules/audio_processing/include/audio_processing.h"
+#include "modules/audio_processing/agc/agc_manager_direct.h"
+#include "modules/audio_processing/include/audio_processing.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/thread_checker.h"
 
 namespace webrtc {
+
+class ApmDataDumper;
 
 // This class has two main purposes:
 //
@@ -33,8 +35,9 @@ namespace webrtc {
 class GainControlForExperimentalAgc : public GainControl,
                                       public VolumeCallbacks {
  public:
-  explicit GainControlForExperimentalAgc(GainControl* gain_control,
-                                         rtc::CriticalSection* crit_capture);
+  GainControlForExperimentalAgc(GainControl* gain_control,
+                                rtc::CriticalSection* crit_capture);
+  ~GainControlForExperimentalAgc() override;
 
   // GainControl implementation.
   int Enable(bool enable) override;
@@ -58,13 +61,17 @@ class GainControlForExperimentalAgc : public GainControl,
   void SetMicVolume(int volume) override;
   int GetMicVolume() override;
 
+  void Initialize();
+
  private:
+  std::unique_ptr<ApmDataDumper> data_dumper_;
   GainControl* real_gain_control_;
   int volume_;
   rtc::CriticalSection* crit_capture_;
-  RTC_DISALLOW_COPY_AND_ASSIGN(GainControlForExperimentalAgc);
+  static int instance_counter_;
+  RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(GainControlForExperimentalAgc);
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_
+#endif  // MODULES_AUDIO_PROCESSING_GAIN_CONTROL_FOR_EXPERIMENTAL_AGC_H_

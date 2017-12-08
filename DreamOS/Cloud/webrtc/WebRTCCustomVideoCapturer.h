@@ -7,11 +7,14 @@
 // DreamOS/Cloud/webrtc/WebRTCCustomVideoCapturer.h
 // Custom Video Capturer Class for Web RTC based video streaming
 
-#include "webrtc/media/base/videocommon.h"
-#include "webrtc/media/base/videocapturer.h"
-#include "webrtc/media/engine/webrtcvideocapturerfactory.h"
+#include "media/base/videocommon.h"
 
-#include "webrtc/base/thread.h"
+#include "media/base/videocapturer.h"
+
+#include "media/engine/webrtcvideocapturerfactory.h"
+#include "modules/video_capture/video_capture_factory.h"
+
+#include "rtc_base/thread.h"
 
 class WebRTCCustomVideoCapturer : public cricket::VideoCapturer {
 public:
@@ -30,7 +33,7 @@ public:
 
 private:
 	// To call the SignalFrameCaptured call on the main thread
-	void SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame);
+	//void SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame);
 
 	// RTC Video capture thread
 	rtc::Thread* m_startThread; 
@@ -43,8 +46,9 @@ public:
 	virtual ~WebRTCCustomVideoCapturerFactory() {}
 
 	// WebRTC uses device name to instantiate the capture, which is always 0.
-	virtual cricket::VideoCapturer* Create(const cricket::Device& device) {
-		return new WebRTCCustomVideoCapturer(atoi(device.id.c_str()));
+	//virtual cricket::VideoCapturer* Create(const cricket::Device& device) {
+	std::unique_ptr<cricket::VideoCapturer> Create(const cricket::Device& device) {
+		return std::unique_ptr<cricket::VideoCapturer>(new WebRTCCustomVideoCapturer(atoi(device.id.c_str())));
 	}
 };
 

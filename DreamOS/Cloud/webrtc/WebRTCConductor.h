@@ -14,8 +14,8 @@
 #include <set>
 #include <string>
 
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
 
 #define DTLS_ON  true
 #define DTLS_OFF false
@@ -29,8 +29,8 @@ class AudioPacket;
 
 #include "WebRTCPeerConnection.h"
 
-#include "webrtc/modules/audio_device/include/audio_device.h"
-#include "webrtc/modules/audio_device/dummy/audio_device_dummy.h"
+#include "modules/audio_device/include/audio_device.h"
+#include "modules/audio_device/dummy/audio_device_dummy.h"
 
 #include "WebRTCAudioDeviceModule.h"
 

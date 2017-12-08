@@ -1,5 +1,9 @@
 #include "WebRTCConductor.h"
 
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCImp.h"
@@ -8,13 +12,13 @@
 #include <utility>
 #include <vector>
 
-#include "webrtc/base/common.h"
-#include "webrtc/base/json.h"
-#include "webrtc/base/logging.h"
-#include "webrtc/examples/peerconnection/client/defaults.h"
+//#include "base/common.h"
+#include "rtc_base/json.h"
+#include "base/logging.h"
+#include "examples/peerconnection/client/defaults.h"
 
-#include "webrtc/api/test/fakertccertificategenerator.h"
-#include "webrtc/p2p/base/fakeportallocator.h"
+#include "pc/test/fakertccertificategenerator.h"
+#include "p2p/base/fakeportallocator.h"
 
 #include "WebRTCPeerConnection.h"
 #include "WebRTCICECandidate.h"
@@ -26,7 +30,7 @@
 #include "Sound/AudioPacket.h"
 
 #define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
-#include "webrtc/modules/audio_device/audio_device_impl.h"
+#include "modules/audio_device/audio_device_impl.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -365,10 +369,12 @@ RESULT WebRTCConductor::Initialize() {
 											m_workerThread.get(),	// worker thread
 											//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
 											m_signalingThread.get(),
-											m_pAudioDeviceModule,	// TODO: Default ADM
+											m_pAudioDeviceModule.get(),	// TODO: Default ADM
 											//m_pAudioDeviceDummyModule,		// Dummy ADM
+											nullptr,	// Audio Encoder Factory
+											nullptr,	// Audio Decoder Factory
 											nullptr,	// Video Encoder Factory
-											nullptr		// Audio Encoder Factory
+											nullptr		// Video Decoder Factory
 		);
 
 	m_pWebRTCPeerConnectionFactory->AddRef();
@@ -378,8 +384,8 @@ RESULT WebRTCConductor::Initialize() {
 
 	int32_t res;
 
-	res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
-	res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
+	//res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
+	//res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
 	res = m_pAudioDeviceModule->SetStereoRecording(true);
 	res = m_pAudioDeviceModule->SetStereoPlayout(true);
 

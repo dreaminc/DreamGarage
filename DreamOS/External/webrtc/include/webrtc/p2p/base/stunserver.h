@@ -8,13 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_P2P_BASE_STUNSERVER_H_
-#define WEBRTC_P2P_BASE_STUNSERVER_H_
+#ifndef P2P_BASE_STUNSERVER_H_
+#define P2P_BASE_STUNSERVER_H_
 
 #include <memory>
 
-#include "webrtc/p2p/base/stun.h"
-#include "webrtc/base/asyncudpsocket.h"
+#include "p2p/base/stun.h"
+#include "rtc_base/asyncudpsocket.h"
 
 namespace cricket {
 
@@ -25,7 +25,7 @@ class StunServer : public sigslot::has_slots<> {
   // Creates a STUN server, which will listen on the given socket.
   explicit StunServer(rtc::AsyncUDPSocket* socket);
   // Removes the STUN server from the socket and deletes the socket.
-  ~StunServer();
+  ~StunServer() override;
 
  protected:
   // Slot for AsyncSocket.PacketRead:
@@ -64,4 +64,4 @@ class StunServer : public sigslot::has_slots<> {
 
 }  // namespace cricket
 
-#endif  // WEBRTC_P2P_BASE_STUNSERVER_H_
+#endif  // P2P_BASE_STUNSERVER_H_

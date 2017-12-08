@@ -8,21 +8,23 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_VOICE_ENGINE_CHANNEL_MANAGER_H
-#define WEBRTC_VOICE_ENGINE_CHANNEL_MANAGER_H
+#ifndef VOICE_ENGINE_CHANNEL_MANAGER_H_
+#define VOICE_ENGINE_CHANNEL_MANAGER_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/scoped_ref_ptr.h"
-#include "webrtc/system_wrappers/include/atomic32.h"
-#include "webrtc/typedefs.h"
+#include "api/refcountedbase.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/random.h"
+#include "rtc_base/scoped_ref_ptr.h"
+#include "system_wrappers/include/atomic32.h"
+#include "typedefs.h"  // NOLINT(build/include)
+#include "voice_engine/include/voe_base.h"
 
 namespace webrtc {
 
-class Config;
 class AudioDecoderFactory;
 
 namespace voe {
@@ -48,31 +50,29 @@ class Channel;
 class ChannelOwner {
  public:
   explicit ChannelOwner(Channel* channel);
-  ChannelOwner(const ChannelOwner& channel_owner);
+  ChannelOwner(const ChannelOwner& channel_owner) = default;
 
-  ~ChannelOwner();
+  ~ChannelOwner() = default;
 
-  ChannelOwner& operator=(const ChannelOwner& other);
+  ChannelOwner& operator=(const ChannelOwner& other) = default;
 
   Channel* channel() const { return channel_ref_->channel.get(); }
   bool IsValid() { return channel_ref_->channel.get() != NULL; }
-  int use_count() const { return channel_ref_->ref_count.Value(); }
  private:
   // Shared instance of a Channel. Copying ChannelOwners increase the reference
   // count and destroying ChannelOwners decrease references. Channels are
   // deleted when no references to them are held.
-  struct ChannelRef {
+  struct ChannelRef : public rtc::RefCountedBase {
     ChannelRef(Channel* channel);
     const std::unique_ptr<Channel> channel;
-    Atomic32 ref_count;
   };
 
-  ChannelRef* channel_ref_;
+  rtc::scoped_refptr<ChannelRef> channel_ref_;
 };
 
 class ChannelManager {
  public:
-  ChannelManager(uint32_t instance_id, const Config& config);
+  ChannelManager(uint32_t instance_id);
 
   // Upon construction of an Iterator it will grab a copy of the channel list of
   // the ChannelManager. The iteration will then occur over this state, not the
@@ -95,18 +95,8 @@ class ChannelManager {
     RTC_DISALLOW_COPY_AND_ASSIGN(Iterator);
   };
 
-  // CreateChannel will always return a valid ChannelOwner instance. The channel
-  // is created either based on internal configuration, i.e. |config_|, by
-  // calling CreateChannel(), or using and external configuration
-  // |external_config| if the overloaded method
-  // CreateChannel(const Config& external_config) is called.
-  ChannelOwner CreateChannel();
-  ChannelOwner CreateChannel(const Config& external_config);
-  ChannelOwner CreateChannel(
-      const rtc::scoped_refptr<AudioDecoderFactory>& decoder_factory);
-  ChannelOwner CreateChannel(
-      const Config& external_config,
-      const rtc::scoped_refptr<AudioDecoderFactory>& decoder_factory);
+  // CreateChannel will always return a valid ChannelOwner instance.
+  ChannelOwner CreateChannel(const VoEBase::ChannelConfig& config);
 
   // ChannelOwner.channel() will be NULL if channel_id is invalid or no longer
   // exists. This should be checked with ChannelOwner::IsValid().
@@ -119,11 +109,6 @@ class ChannelManager {
   size_t NumOfChannels() const;
 
  private:
-  // Create a channel given a configuration, |config|.
-  ChannelOwner CreateChannelInternal(
-      const Config& config,
-      const rtc::scoped_refptr<AudioDecoderFactory>& decoder_factory);
-
   uint32_t instance_id_;
 
   Atomic32 last_channel_id_;
@@ -131,11 +116,12 @@ class ChannelManager {
   rtc::CriticalSection lock_;
   std::vector<ChannelOwner> channels_;
 
-  const Config& config_;
+  // For generation of random ssrc:s.
+  webrtc::Random random_;
 
   RTC_DISALLOW_COPY_AND_ASSIGN(ChannelManager);
 };
 }  // namespace voe
 }  // namespace webrtc
 
-#endif  // WEBRTC_VOICE_ENGINE_CHANNEL_MANAGER_H
+#endif  // VOICE_ENGINE_CHANNEL_MANAGER_H_

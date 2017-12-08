@@ -8,17 +8,18 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_API_NOTIFIER_H_
-#define WEBRTC_API_NOTIFIER_H_
+#ifndef API_NOTIFIER_H_
+#define API_NOTIFIER_H_
 
 #include <list>
 
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/base/common.h"
+#include "api/mediastreaminterface.h"
+#include "rtc_base/checks.h"
 
 namespace webrtc {
 
-// Implement a template version of a notifier.
+// Implements a template version of a notifier.
+// TODO(deadbeef): This is an implementation detail; move out of api/.
 template <class T>
 class Notifier : public T {
  public:
@@ -26,7 +27,7 @@ class Notifier : public T {
   }
 
   virtual void RegisterObserver(ObserverInterface* observer) {
-    ASSERT(observer != NULL);
+    RTC_DCHECK(observer != nullptr);
     observers_.push_back(observer);
   }
 
@@ -57,4 +58,4 @@ class Notifier : public T {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_API_NOTIFIER_H_
+#endif  // API_NOTIFIER_H_

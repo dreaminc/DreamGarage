@@ -8,139 +8,90 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_
-#define WEBRTC_MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_
+#ifndef MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_
+#define MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_
 
-#include <list>
-#include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
-#include "webrtc/base/checks.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/rate_statistics.h"
-#include "webrtc/base/thread_checker.h"
-#include "webrtc/modules/remote_bitrate_estimator/aimd_rate_control.h"
-#include "webrtc/modules/remote_bitrate_estimator/include/remote_bitrate_estimator.h"
-#include "webrtc/modules/remote_bitrate_estimator/inter_arrival.h"
-#include "webrtc/modules/remote_bitrate_estimator/overuse_detector.h"
-#include "webrtc/modules/remote_bitrate_estimator/overuse_estimator.h"
-#include "webrtc/system_wrappers/include/critical_section_wrapper.h"
+#include "modules/congestion_controller/median_slope_estimator.h"
+#include "modules/congestion_controller/probe_bitrate_estimator.h"
+#include "modules/congestion_controller/trendline_estimator.h"
+#include "modules/remote_bitrate_estimator/aimd_rate_control.h"
+#include "modules/remote_bitrate_estimator/include/remote_bitrate_estimator.h"
+#include "modules/remote_bitrate_estimator/inter_arrival.h"
+#include "modules/remote_bitrate_estimator/overuse_detector.h"
+#include "modules/remote_bitrate_estimator/overuse_estimator.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/race_checker.h"
 
 namespace webrtc {
 
-class DelayBasedBwe : public RemoteBitrateEstimator {
+class RtcEventLog;
+
+class DelayBasedBwe {
  public:
-  DelayBasedBwe(RemoteBitrateObserver* observer, Clock* clock);
-  virtual ~DelayBasedBwe() {}
+  static const int64_t kStreamTimeOutMs = 2000;
 
-  void IncomingPacketFeedbackVector(
-      const std::vector<PacketInfo>& packet_feedback_vector) override;
+  struct Result {
+    Result();
+    Result(bool probe, uint32_t target_bitrate_bps);
+    ~Result();
+    bool updated;
+    bool probe;
+    uint32_t target_bitrate_bps;
+    bool recovered_from_overuse;
+  };
 
-  void IncomingPacket(int64_t arrival_time_ms,
-                      size_t payload_size,
-                      const RTPHeader& header) override {
-    RTC_NOTREACHED();
-  }
+  DelayBasedBwe(RtcEventLog* event_log, const Clock* clock);
+  virtual ~DelayBasedBwe();
 
-  // This class relies on Process() being called periodically (at least once
-  // every other second) for streams to be timed out properly. Therefore it
-  // shouldn't be detached from the ProcessThread except if it's about to be
-  // deleted.
-  void Process() override;
-  int64_t TimeUntilNextProcess() override;
-  void OnRttUpdate(int64_t avg_rtt_ms, int64_t max_rtt_ms) override;
-  void RemoveStream(uint32_t ssrc) override;
+  Result IncomingPacketFeedbackVector(
+      const std::vector<PacketFeedback>& packet_feedback_vector,
+      rtc::Optional<uint32_t> acked_bitrate_bps);
+  void OnRttUpdate(int64_t avg_rtt_ms, int64_t max_rtt_ms);
   bool LatestEstimate(std::vector<uint32_t>* ssrcs,
-                      uint32_t* bitrate_bps) const override;
-  void SetMinBitrate(int min_bitrate_bps) override;
+                      uint32_t* bitrate_bps) const;
+  void SetStartBitrate(int start_bitrate_bps);
+  void SetMinBitrate(int min_bitrate_bps);
+  int64_t GetExpectedBwePeriodMs() const;
 
  private:
-  struct Probe {
-    Probe(int64_t send_time_ms,
-          int64_t recv_time_ms,
-          size_t payload_size,
-          int cluster_id)
-        : send_time_ms(send_time_ms),
-          recv_time_ms(recv_time_ms),
-          payload_size(payload_size),
-          cluster_id(cluster_id) {}
-    int64_t send_time_ms;
-    int64_t recv_time_ms;
-    size_t payload_size;
-    int cluster_id;
-  };
+  void IncomingPacketFeedback(const PacketFeedback& packet_feedback);
+  Result OnLongFeedbackDelay(int64_t arrival_time_ms);
+  Result MaybeUpdateEstimate(bool overusing,
+                             rtc::Optional<uint32_t> acked_bitrate_bps,
+                             bool request_probe);
+  // Updates the current remote rate estimate and returns true if a valid
+  // estimate exists.
+  bool UpdateEstimate(int64_t now_ms,
+                      rtc::Optional<uint32_t> acked_bitrate_bps,
+                      bool overusing,
+                      uint32_t* target_bitrate_bps);
 
-  struct Cluster {
-    Cluster()
-        : send_mean_ms(0.0f),
-          recv_mean_ms(0.0f),
-          mean_size(0),
-          count(0),
-          num_above_min_delta(0) {}
-
-    int GetSendBitrateBps() const {
-      RTC_CHECK_GT(send_mean_ms, 0.0f);
-      return mean_size * 8 * 1000 / send_mean_ms;
-    }
-
-    int GetRecvBitrateBps() const {
-      RTC_CHECK_GT(recv_mean_ms, 0.0f);
-      return mean_size * 8 * 1000 / recv_mean_ms;
-    }
-
-    float send_mean_ms;
-    float recv_mean_ms;
-    // TODO(holmer): Add some variance metric as well?
-    size_t mean_size;
-    int count;
-    int num_above_min_delta;
-  };
-
-  typedef std::map<uint32_t, int64_t> Ssrcs;
-  enum class ProbeResult { kBitrateUpdated, kNoUpdate };
-
-  static void AddCluster(std::list<Cluster>* clusters, Cluster* cluster);
-
-  void IncomingPacketInfo(int64_t arrival_time_ms,
-                          uint32_t send_time_24bits,
-                          size_t payload_size,
-                          uint32_t ssrc,
-                          int probe_cluster_id);
-
-  void ComputeClusters(std::list<Cluster>* clusters) const;
-
-  std::list<Cluster>::const_iterator FindBestProbe(
-      const std::list<Cluster>& clusters) const;
-
-  // Returns true if a probe which changed the estimate was detected.
-  ProbeResult ProcessClusters(int64_t now_ms) EXCLUSIVE_LOCKS_REQUIRED(&crit_);
-
-  bool IsBitrateImproving(int probe_bitrate_bps) const
-      EXCLUSIVE_LOCKS_REQUIRED(&crit_);
-
-  void TimeoutStreams(int64_t now_ms) EXCLUSIVE_LOCKS_REQUIRED(&crit_);
-
-  rtc::ThreadChecker network_thread_;
-  Clock* const clock_;
-  RemoteBitrateObserver* const observer_;
+  rtc::RaceChecker network_race_;
+  RtcEventLog* const event_log_;
+  const Clock* const clock_;
   std::unique_ptr<InterArrival> inter_arrival_;
-  std::unique_ptr<OveruseEstimator> estimator_;
+  std::unique_ptr<TrendlineEstimator> trendline_estimator_;
   OveruseDetector detector_;
-  RateStatistics incoming_bitrate_;
-  std::list<Probe> probes_;
-  size_t total_probes_received_;
-  int64_t first_packet_time_ms_;
-  int64_t last_update_ms_;
-
-  rtc::CriticalSection crit_;
-  Ssrcs ssrcs_ GUARDED_BY(&crit_);
-  AimdRateControl remote_rate_ GUARDED_BY(&crit_);
+  int64_t last_seen_packet_ms_;
+  bool uma_recorded_;
+  AimdRateControl rate_control_;
+  ProbeBitrateEstimator probe_bitrate_estimator_;
+  size_t trendline_window_size_;
+  double trendline_smoothing_coeff_;
+  double trendline_threshold_gain_;
+  int consecutive_delayed_feedbacks_;
+  uint32_t prev_bitrate_;
+  BandwidthUsage prev_state_;
+  bool in_sparse_update_experiment_;
 
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(DelayBasedBwe);
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_
+#endif  // MODULES_CONGESTION_CONTROLLER_DELAY_BASED_BWE_H_

@@ -8,14 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_P2P_BASE_SESSIONDESCRIPTION_H_
-#define WEBRTC_P2P_BASE_SESSIONDESCRIPTION_H_
+#ifndef P2P_BASE_SESSIONDESCRIPTION_H_
+#define P2P_BASE_SESSIONDESCRIPTION_H_
 
 #include <string>
 #include <vector>
 
-#include "webrtc/p2p/base/transportinfo.h"
-#include "webrtc/base/constructormagic.h"
+#include "p2p/base/transportinfo.h"
+#include "rtc_base/constructormagic.h"
 
 namespace cricket {
 
@@ -32,20 +32,31 @@ class ContentDescription {
 // name = name of <content name="...">
 // type = xmlns of <content>
 struct ContentInfo {
-  ContentInfo() : description(NULL) {}
+  ContentInfo() {}
   ContentInfo(const std::string& name,
               const std::string& type,
-              ContentDescription* description) :
-      name(name), type(type), rejected(false), description(description) {}
+              ContentDescription* description)
+      : name(name), type(type), description(description) {}
   ContentInfo(const std::string& name,
               const std::string& type,
               bool rejected,
               ContentDescription* description) :
       name(name), type(type), rejected(rejected), description(description) {}
+  ContentInfo(const std::string& name,
+              const std::string& type,
+              bool rejected,
+              bool bundle_only,
+              ContentDescription* description)
+      : name(name),
+        type(type),
+        rejected(rejected),
+        bundle_only(bundle_only),
+        description(description) {}
   std::string name;
   std::string type;
-  bool rejected;
-  ContentDescription* description;
+  bool rejected = false;
+  bool bundle_only = false;
+  ContentDescription* description = nullptr;
 };
 
 typedef std::vector<std::string> ContentNames;
@@ -56,8 +67,12 @@ typedef std::vector<std::string> ContentNames;
 // MediaDescription.
 class ContentGroup {
  public:
-  explicit ContentGroup(const std::string& semantics) :
-      semantics_(semantics) {}
+  explicit ContentGroup(const std::string& semantics);
+  ContentGroup(const ContentGroup&);
+  ContentGroup(ContentGroup&&);
+  ContentGroup& operator=(const ContentGroup&);
+  ContentGroup& operator=(ContentGroup&&);
+  ~ContentGroup();
 
   const std::string& semantics() const { return semantics_; }
   const ContentNames& content_names() const { return content_names_; }
@@ -85,25 +100,13 @@ const ContentInfo* FindContentInfoByType(
 // contents are unique be name, but doesn't enforce that.
 class SessionDescription {
  public:
-  SessionDescription() {}
-  explicit SessionDescription(const ContentInfos& contents) :
-      contents_(contents) {}
-  SessionDescription(const ContentInfos& contents,
-                     const ContentGroups& groups) :
-      contents_(contents),
-      content_groups_(groups) {}
+  SessionDescription();
+  explicit SessionDescription(const ContentInfos& contents);
+  SessionDescription(const ContentInfos& contents, const ContentGroups& groups);
   SessionDescription(const ContentInfos& contents,
                      const TransportInfos& transports,
-                     const ContentGroups& groups) :
-      contents_(contents),
-      transport_infos_(transports),
-      content_groups_(groups) {}
-  ~SessionDescription() {
-    for (ContentInfos::iterator content = contents_.begin();
-         content != contents_.end(); ++content) {
-      delete content->description;
-    }
-  }
+                     const ContentGroups& groups);
+  ~SessionDescription();
 
   SessionDescription* Copy() const;
 
@@ -126,6 +129,11 @@ class SessionDescription {
   void AddContent(const std::string& name,
                   const std::string& type,
                   bool rejected,
+                  ContentDescription* description);
+  void AddContent(const std::string& name,
+                  const std::string& type,
+                  bool rejected,
+                  bool bundle_only,
                   ContentDescription* description);
   bool RemoveContentByName(const std::string& name);
 
@@ -165,18 +173,12 @@ class SessionDescription {
   bool msid_supported() const { return msid_supported_; }
 
  private:
+  SessionDescription(const SessionDescription&);
+
   ContentInfos contents_;
   TransportInfos transport_infos_;
   ContentGroups content_groups_;
   bool msid_supported_ = true;
-};
-
-// Indicates whether a ContentDescription was an offer or an answer, as
-// described in http://www.ietf.org/rfc/rfc3264.txt. CA_UPDATE
-// indicates a jingle update message which contains a subset of a full
-// session description
-enum ContentAction {
-  CA_OFFER, CA_PRANSWER, CA_ANSWER, CA_UPDATE
 };
 
 // Indicates whether a ContentDescription was sent by the local client
@@ -187,4 +189,4 @@ enum ContentSource {
 
 }  // namespace cricket
 
-#endif  // WEBRTC_P2P_BASE_SESSIONDESCRIPTION_H_
+#endif  // P2P_BASE_SESSIONDESCRIPTION_H_
