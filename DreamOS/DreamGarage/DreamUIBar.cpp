@@ -142,18 +142,21 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	std::shared_ptr<quad> pSurface = nullptr;
 	vector vSurface;
 	vector vRotation;
+	quaternion qRotation;
+	quaternion qSurface;
+
 	CNR(pButtonContext, R_SKIPPED);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	pSurface = pSelected->GetSurface();
 
 	//vector for captured object movement
-	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
+	qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
 	//vector for captured object collisions
-	quaternion qRotation = pSurface->GetOrientation(true);
+	qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 	CBR(m_pScrollView->IsVisible(), R_SKIPPED);

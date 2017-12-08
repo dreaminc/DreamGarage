@@ -5,8 +5,6 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
-#include "DreamConsole/DreamConsole.h"
-
 // DREAM OS
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
@@ -56,8 +54,7 @@ public:
 class CloudController : public Controller, 
 						public CloudControllerProxy,
 						public std::enable_shared_from_this<CloudController>, 
-						public EnvironmentController::EnvironmentControllerObserver,
-						public Subscriber<CmdPromptEvent> 
+						public EnvironmentController::EnvironmentControllerObserver
 {
 protected:
 	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
@@ -175,9 +172,6 @@ public:
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 	
 	// Proxy Objects

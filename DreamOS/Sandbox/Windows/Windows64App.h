@@ -4,9 +4,6 @@
 #include "RESULT/EHM.h"
 #include "Sandbox/SandboxApp.h"
 
-#include "TimeManager/TimeManager.h"
-#include "DreamConsole/Console.h"
-
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
 // Dream OS Windows 64 Sandbox
@@ -98,9 +95,6 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	//TimeManager	*m_pTimeManager;
-	DreamConsole	m_profiler;
-
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 
 public:

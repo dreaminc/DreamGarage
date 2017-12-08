@@ -32,8 +32,6 @@ RESULT DreamTestApp::LoadScene() {
 	// IO
 	RegisterSubscriber((SenseVirtualKey)('N'), this);
 
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
-
 	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
@@ -157,15 +155,6 @@ RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 		pDimObj->SetVertexColor(color(COLOR_PINK));
 	}
-
-//Error:
-	return r;
-}
-
-RESULT DreamTestApp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	//HUD_OUT("DreamAPP command");
 
 //Error:
 	return r;

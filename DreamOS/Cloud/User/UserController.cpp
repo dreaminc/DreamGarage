@@ -15,8 +15,6 @@
 
 #include <future>
 
-#include "DreamConsole/DreamConsole.h"
-
 #include "Cloud/CloudController.h"
 
 UserController::UserController(Controller* pParentController) :

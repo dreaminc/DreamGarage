@@ -16,7 +16,6 @@
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
-#include "DreamConsole/DreamConsole.h"
 
 #include "Primitives/valid.h"
 
@@ -43,7 +42,12 @@ typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_LEAPMOTION_EVENT;
 
-class SenseLeapMotion : public SenseDevice, public Publisher<int, SenseLeapMotionEvent>, public Subscriber<CmdPromptEvent>, public Leap::Listener, public valid {
+class SenseLeapMotion : 
+	public SenseDevice, 
+	public Publisher<int, SenseLeapMotionEvent>, 
+	public Leap::Listener, 
+	public valid 
+{
 public:
 	SenseLeapMotion();
 	~SenseLeapMotion();
@@ -116,7 +120,6 @@ public:
 
 private:
 	RESULT SetPause(bool fPauseState);
-	RESULT Notify(CmdPromptEvent *event);
 
 public:
 	RESULT Pause();

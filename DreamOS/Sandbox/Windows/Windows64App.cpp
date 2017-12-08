@@ -14,8 +14,6 @@
 
 #include <string>
 
-#include "DreamConsole/DreamConsole.h"
-
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
@@ -95,29 +93,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		this												// lpParam
 	);
 
-	// TODO: Move into Sandbox virtual function
-	// Create the Keyboard and Mouse
-	/*
-	m_pWin64Keyboard = new Win64Keyboard(this);
-	m_pWin64Mouse = new Win64Mouse(this);
-
-	// Initialize Mouse 
-	m_pWin64Mouse->CaptureMouse();
-	m_pWin64Mouse->CenterMousePosition();
-	*/
-
-	// Sense Leap Motion Device (TODO: temporarily here!)
-	//m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
-	//CN(m_pSenseLeapMotion);
-
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
-	/*
-	// Initialize Time Manager
-	m_pTimeManager = new TimeManager();
-	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CVM(m_pTimeManager, "Failed to validate Time Manager");
-	*/
 //TODO: use this label
 //Success:
 	Validate();

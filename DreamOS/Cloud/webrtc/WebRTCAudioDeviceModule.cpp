@@ -298,7 +298,7 @@ int32_t WebRTCAudioDeviceModule::RecordedDataIsAvailable(const void* audioSample
 	float ratio = 1.00f;
 
 	if (msBrowserPending > total_delay_ms) {
-		ratio += msBrowserPending / (1000.0f);
+		ratio += msBrowserPending / (5000.0f);
 
 		// Max 20% speed up
 		if (ratio > 1.20f)

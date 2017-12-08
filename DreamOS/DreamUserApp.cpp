@@ -232,6 +232,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	RotationMatrix qOffset; // mallet positioning
+	quaternion qOrientation;
 
 	// update user interaction ray
 	auto pCameraNode = GetDOS()->GetCameraNode();
@@ -239,7 +240,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 	GetComposite()->SetPosition(pCameraNode->GetPosition());
 
-	quaternion qOrientation = (pCameraNode->GetOrientation());
+	qOrientation = (pCameraNode->GetOrientation());
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
 

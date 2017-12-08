@@ -35,9 +35,6 @@
 
 #include "OGLViewportDisplay.h"
 
-#include "DreamConsole/DreamConsole.h"
-#include "OGLDreamConsole.h"
-
 #include "Core/Utilities.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
@@ -57,7 +54,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 }
 
 OpenGLImp::~OpenGLImp() {
-	m_pOGLDreamConsole.release();
+	// empty
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {

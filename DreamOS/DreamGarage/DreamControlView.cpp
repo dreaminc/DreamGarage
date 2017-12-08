@@ -4,7 +4,6 @@
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
-#include "DreamConsole/DreamConsole.h"
 
 #include "UI/UIMallet.h"
 #include "UI/UIView.h"
@@ -470,52 +469,54 @@ RESULT DreamControlView::Show() {
 	GetComposite()->SetPosition(ptAppBasisPosition);
 	GetComposite()->SetOrientation(qAppBasisOrientation);
 
-	auto fnStartCallback = [&](void *pContext) {
-		GetViewQuad()->SetVisible(true);
-		SetViewState(DreamControlView::state::SHOW);
-		return R_PASS;
-	};
+	{
+		auto fnStartCallback = [&](void *pContext) {
+			GetViewQuad()->SetVisible(true);
+			SetViewState(DreamControlView::state::SHOW);
+			return R_PASS;
+		};
 
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		
-		if (m_pUserHandle == nullptr) {
-			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-			CB(userUIDs.size() == 1);
-			m_userUID = userUIDs[0];
+		auto fnEndCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
 
-			//Capture user app
-			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-			CN(m_pUserHandle);
-		}
+			if (m_pUserHandle == nullptr) {
+				auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+				CB(userUIDs.size() == 1);
+				m_userUID = userUIDs[0];
 
-		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
-		CNR(pLMallet, R_SKIPPED);
-		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
-		CNR(pRMallet, R_SKIPPED);
+				//Capture user app
+				m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+				CN(m_pUserHandle);
+			}
 
-		pLMallet->SetDirty();
-		pRMallet->SetDirty();
-		m_fMouseDown = false;
+			UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+			CNR(pLMallet, R_SKIPPED);
+			UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+			CNR(pRMallet, R_SKIPPED);
 
-		SetViewState(DreamControlView::state::VISIBLE);
-		
-	Error:
-		return r;
-	};
+			pLMallet->SetDirty();
+			pRMallet->SetDirty();
+			m_fMouseDown = false;
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pViewQuad.get(),
-		m_ptVisiblePosition,
-		m_qViewQuadOrientation,
-		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		0.1f,
-		AnimationCurveType::EASE_OUT_QUAD,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
+			SetViewState(DreamControlView::state::VISIBLE);
+
+		Error:
+			return r;
+		};
+
+		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+			m_pViewQuad.get(),
+			m_ptVisiblePosition,
+			m_qViewQuadOrientation,
+			vector(m_visibleScale, m_visibleScale, m_visibleScale),
+			0.1f,
+			AnimationCurveType::EASE_OUT_QUAD,
+			AnimationFlags(),
+			fnStartCallback,
+			fnEndCallback,
+			this
+		));
+	}
 
 Error:
 	return r;
@@ -614,27 +615,31 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
 	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
 
-	auto fnStartCallback = [&](void *pContext) {
-		return R_PASS;
-	};
+	{
 
-	auto fnEndCallback = [&](void *pContext) {
-		SetViewState(DreamControlView::state::VISIBLE);
-		return R_PASS;
-	};
+		auto fnStartCallback = [&](void *pContext) {
+			return R_PASS;
+		};
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pViewQuad.get(),
-		m_ptVisiblePosition,	
-		m_qViewQuadOrientation,
-		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		m_keyboardAnimationDuration,
-		AnimationCurveType::EASE_OUT_QUAD,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
+		auto fnEndCallback = [&](void *pContext) {
+			SetViewState(DreamControlView::state::VISIBLE);
+			return R_PASS;
+		};
+
+		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+			m_pViewQuad.get(),
+			m_ptVisiblePosition,
+			m_qViewQuadOrientation,
+			vector(m_visibleScale, m_visibleScale, m_visibleScale),
+			m_keyboardAnimationDuration,
+			AnimationCurveType::EASE_OUT_QUAD,
+			AnimationFlags(),
+			fnStartCallback,
+			fnEndCallback,
+			this
+		));
+
+	}
 	
 Error:
 	return r;
@@ -672,29 +677,31 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		m_pKeyboardHandle = nullptr;
 	}
 
-	auto fnStartCallback = [&](void *pContext) {
-		SetViewState(DreamControlView::state::SHOW);	// might want to just make an "ANIMATING" state
+	{
+		auto fnStartCallback = [&](void *pContext) {
+			SetViewState(DreamControlView::state::SHOW);	// might want to just make an "ANIMATING" state
 
-		return R_PASS;
-	};
+			return R_PASS;
+		};
 
-	auto fnEndCallback = [&](void *pContext) {
-		SetViewState(DreamControlView::state::TYPING);
-		return R_PASS;
-	};
-	
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pViewQuad.get(),
-		ptTypingPosition,
-		quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f),
-		vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		m_keyboardAnimationDuration,
-		AnimationCurveType::EASE_OUT_QUAD,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
+		auto fnEndCallback = [&](void *pContext) {
+			SetViewState(DreamControlView::state::TYPING);
+			return R_PASS;
+		};
+
+		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+			m_pViewQuad.get(),
+			ptTypingPosition,
+			quaternion::MakeQuaternionWithEuler((float)TYPING_ROTATION, 0.0f, 0.0f),
+			vector(m_visibleScale, m_visibleScale, m_visibleScale),
+			m_keyboardAnimationDuration,
+			AnimationCurveType::EASE_OUT_QUAD,
+			AnimationFlags(),
+			fnStartCallback,
+			fnEndCallback,
+			this
+		));
+	}
 
 Error:
 	return r;

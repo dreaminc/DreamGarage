@@ -1,7 +1,6 @@
 #include "AnimationQueue.h"
 #include "AnimationItem.h"
 #include "Primitives/DimObj.h"
-#include "DreamConsole/DreamConsole.h"
 
 AnimationQueue::AnimationQueue() {
 	m_objectQueue = {};

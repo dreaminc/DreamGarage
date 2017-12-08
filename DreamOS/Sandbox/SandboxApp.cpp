@@ -78,51 +78,8 @@ bool SandboxApp::IsMouseIntersectObjects() {
 	return m_fMouseIntersectObjects;
 }
 
-RESULT SandboxApp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("intersect") == 0) {
-		m_pHALImp->SetRenderReferenceGeometry(true);
-		SetMouseIntersectObjects(!IsMouseIntersectObjects());
-	}
-
-	return r;
-}
-
 RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
-	RESULT r = R_PASS;
-
-	if (kbEvent->m_pSenseKeyboard) {
-		SenseVirtualKey keyCode = kbEvent->KeyCode;
-
-		if (kbEvent->KeyState) {
-			if (m_pHALImp->IsRenderProfiler() == false) {
-				if (keyCode == SVK_TAB) {
-					// quick hack to enable dream console in production but only using several tab hits
-#ifdef PRODUCTION_BUILD
-					static int hits = 0;
-					hits++;
-					if (hits > 7) {
-						m_pHALImp->SetRenderProfiler(true);
-						DreamConsole::GetConsole()->SetInForeground(true);
-					}
-#else
-					m_pHALImp->SetRenderProfiler(true);
-					DreamConsole::GetConsole()->SetInForeground(true);
-#endif // PRODUCTION_BUILD
-				}
-			}
-			else {
-				if (keyCode == SVK_TAB) {
-					m_pHALImp->SetRenderProfiler(false);
-					DreamConsole::GetConsole()->SetInForeground(false);
-				}
-			}
-		}
-	}
-
-	//Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
@@ -240,10 +197,6 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 
 RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
-
-	// Register Dream Console to keyboard events
-	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
-	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
 
 	CR(RegisterSubscriber(SVK_TAB, this));
 
@@ -467,7 +420,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
+		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
 	}
@@ -582,10 +535,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	//	// auto login
 	//	m_pCloudController->Start();
 	//}
-
-	// Register with command prompt
-	// TODO: This should be changed to a command pattern
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Sandbox, this);
 
 Error:
 	return r;

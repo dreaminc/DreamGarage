@@ -14,8 +14,6 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/Types/guid.h"
 
-#include "DreamConsole/DreamConsole.h"
-
 #include "Cloud/CloudMessage.h"
 
 #include "Core/Utilities.h"
