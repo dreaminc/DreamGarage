@@ -165,7 +165,7 @@ public:
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
-	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
