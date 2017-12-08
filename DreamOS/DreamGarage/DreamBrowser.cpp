@@ -98,6 +98,22 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendBackEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleBackEvent();
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SendForwardEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleForwardEvent();
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -515,6 +531,29 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 #endif
 
 	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleBackEvent() {
+	RESULT r = R_PASS;
+
+	CBR(m_pageDepth > 0, R_SKIPPED);
+	CBR(m_pWebBrowserController->CanGoBack(), R_SKIPPED);
+	CR(m_pWebBrowserController->GoBack());
+	m_pageDepth -= 1;
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleForwardEvent() {
+	RESULT r = R_PASS;
+
+	CBR(m_pWebBrowserController->CanGoForward(), R_SKIPPED);
+	CR(m_pWebBrowserController->GoForward());
+	m_pageDepth += 1;
 
 Error:
 	return r;

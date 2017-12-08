@@ -56,6 +56,9 @@ public:
 	RESULT SendMalletMoveEvent(WebBrowserPoint mousePoint);
 	RESULT SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown);
 
+	RESULT SendBackEvent();
+	RESULT SendForwardEvent();
+
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	virtual RESULT SendURL (std::string strURL) = 0;
 
@@ -86,6 +89,9 @@ private:
 	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) = 0;
 
 	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) = 0;
+
+	virtual RESULT HandleBackEvent() = 0;
+	virtual RESULT HandleForwardEvent() = 0;
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) = 0;
 
@@ -170,6 +176,9 @@ public:
 	virtual RESULT OnLoadEnd(int httpStatusCode) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
+	virtual RESULT HandleBackEvent() override;
+	virtual RESULT HandleForwardEvent() override;
+
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);
@@ -252,6 +261,8 @@ private:
 	int m_pxYPosition = 0;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
+
+	int m_pageDepth = 0; // hack to avoid the loading page on back
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;

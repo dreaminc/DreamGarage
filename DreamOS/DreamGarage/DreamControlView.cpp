@@ -930,9 +930,21 @@ Error:
 }
 
 RESULT DreamControlView::HandleBack(UIButton* pButtonContext, void* pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CBR(CanPressButton(pButtonContext), R_SKIPPED);
+	CR(m_pBrowserHandle->SendBackEvent());
+
+Error:
+	return r;
 }
 
 RESULT DreamControlView::HandleForward(UIButton* pButtonContext, void* pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CBR(CanPressButton(pButtonContext), R_SKIPPED);
+	CR(m_pBrowserHandle->SendForwardEvent());
+
+Error:
+	return r;
 }
