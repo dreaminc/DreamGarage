@@ -485,21 +485,13 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 		
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -655,14 +647,6 @@ RESULT HALTestSuite::TestNestedOBB() {
 
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
@@ -1235,21 +1219,13 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1411,18 +1387,10 @@ RESULT HALTestSuite::AddTestQuadObject() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1567,14 +1535,6 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// UI shader stage 
 		
 		ProgramNode* pUIStageProgram = pHAL->MakeProgramNode("uistage");
@@ -1584,7 +1544,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		CR(pUIStageProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Connect output as pass-thru to internal blend program
-		CR(pUIStageProgram->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pUIStageProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -1719,21 +1679,12 @@ RESULT HALTestSuite::AddTestText() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
