@@ -30,8 +30,8 @@ RESULT UIControlBar::Initialize() {
 	m_pDreamOS->AddObjectToInteractionGraph(this);
 
 	// create textures 
-	m_pBackTexture = m_pDreamOS->MakeTexture(L"control-view-back.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pForwardTexture = m_pDreamOS->MakeTexture(L"control-view-forward.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackTexture = m_pDreamOS->MakeTexture(k_wszBack, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pForwardTexture = m_pDreamOS->MakeTexture(k_wszForward, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pHideTexture = m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pStopTexture = m_pDreamOS->MakeTexture(L"control-view-stop-sharing.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pShowTexture = m_pDreamOS->MakeTexture(L"control-view-maximize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);

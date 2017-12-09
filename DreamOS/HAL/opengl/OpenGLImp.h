@@ -73,7 +73,7 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	
-	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) override;
 	virtual texture* MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(const texture &srcTexture) override;

@@ -892,7 +892,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));

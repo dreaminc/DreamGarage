@@ -22,6 +22,23 @@ Error:
 	return;
 }
 
+UIView::UIView(HALImp *pHALImp, DreamOS	*pDreamOS, float width, float height) :
+composite(pHALImp),
+m_pDreamOS(pDreamOS),
+m_width(width),
+m_height(height)
+{
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 UIView::~UIView() {
 
 }

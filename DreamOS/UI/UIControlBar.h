@@ -15,7 +15,7 @@ class text;
 #define URL_WIDTH 0.6875f
 #define ITEM_SPACING 0.015625f
 
-#define ITEM_ACTUATION_DEPTH 0.02f;
+#define ITEM_ACTUATION_DEPTH 0.02f
 
 class UIControlBar : public UIView {
 public:
@@ -43,6 +43,14 @@ public:
 // common behavior
 public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
+
+public:
+	const wchar_t *k_wszBack = L"control-view-back.png";
+	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszHide = L"control-view-minimize.png";
+	const wchar_t *k_wszStop = L"control-view-stop-sharing.png";
+	const wchar_t *k_wszShow = L"control-view-maximize.png";
+	const wchar_t *k_wszURL = L"control-view-url.png";
 
 private:
 	std::shared_ptr<UIButton> m_pBackButton;

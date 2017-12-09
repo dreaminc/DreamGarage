@@ -866,7 +866,7 @@ text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, 
 	return m_pSandbox->AddText(pFont, content, width, height, fBillboard);
 }
 
-texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* DreamOS::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pSandbox->MakeTexture(pszFilename, type);
 }
 

@@ -20,6 +20,7 @@ class DreamOS;
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
 	UIView(HALImp *pHALImp, DreamOS *pDreamOS);
+	UIView(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height);
 	~UIView();
 
 	RESULT Initialize();
@@ -48,6 +49,9 @@ public:
 
 protected:
 	DreamOS *m_pDreamOS = nullptr;
+
+	float m_width;
+	float m_height;
 };
 
 #endif // !UI_VIEW_H_ 
