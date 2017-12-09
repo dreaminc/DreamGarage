@@ -1347,7 +1347,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		std::string strUserToken = pUserControllerProxy->GetUserToken();
 		std::wstring wstrUserToken = util::StringToWideString(strUserToken);
-		CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+		//CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
 
 		LoadRequest(webRequest);
 	}
