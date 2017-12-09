@@ -27,6 +27,9 @@
 #include "Cloud/User/User.h"
 #include "Cloud//User/TwilioNTSInformation.h"
 
+#include "api/audio_codecs/builtin_audio_decoder_factory.h"
+#include "api/audio_codecs/builtin_audio_encoder_factory.h"
+
 #include "Sound/AudioPacket.h"
 
 #define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
@@ -317,16 +320,19 @@ RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
 	// User Peer Connection Factory
-	/* Standard way
+	///* Standard way
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
-	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+		webrtc::CreateBuiltinAudioEncoderFactory(),
+		webrtc::CreateBuiltinAudioDecoderFactory());
+
 	m_pWebRTCPeerConnectionFactory->AddRef();
 	
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 	//*/
 
-	///*
+	/*
 	// Chrome Peer Connection Factory (testing)
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
@@ -380,7 +386,6 @@ RESULT WebRTCConductor::Initialize() {
 	m_pWebRTCPeerConnectionFactory->AddRef();
 
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
-	//*/
 
 	int32_t res;
 
@@ -399,6 +404,7 @@ RESULT WebRTCConductor::Initialize() {
 		m_pAudioDeviceModule->RecordingDeviceName(i, name, guid);
 		DEBUG_LINEOUT("ADM Recording Device %d: %s %s", i, name, guid);
 	}
+	//*/
 
 //Success:
 	return r;
