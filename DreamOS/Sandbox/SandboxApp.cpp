@@ -1280,7 +1280,7 @@ texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int heig
 	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
-texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* SandboxApp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }
 

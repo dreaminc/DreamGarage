@@ -1,8 +1,8 @@
 #include "UIButton.h"
 #include "DreamOS.h"
 
-UIButton::UIButton(HALImp *pHALImp, DreamOS *pDreamOS) :
-UIView(pHALImp, pDreamOS)
+UIButton::UIButton(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height) :
+UIView(pHALImp, pDreamOS, width, height)
 {
 	RESULT r = R_PASS;
 
@@ -28,7 +28,8 @@ RESULT UIButton::Initialize() {
 
 	m_pContextComposite = AddComposite();
 	m_pSurfaceComposite = AddComposite();
-	m_pSurface = AddQuad(0.25f, 0.25f * (9.0f / 16.0f), 1, 1, nullptr, vector::kVector());
+	m_pSurface = AddQuad(m_width, m_height, 1, 1, nullptr, vector::kVector());
+	//m_pSurface = AddQuad(0.25f, 0.25f * (9.0f / 16.0f), 1, 1, nullptr, vector::kVector());
 	//m_pSurface = m_pSurfaceComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
 
 	CN(m_pSurface);

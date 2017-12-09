@@ -98,6 +98,22 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendBackEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleBackEvent();
+Error:
+	return r;
+}
+
+RESULT DreamBrowserHandle::SendForwardEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleForwardEvent();
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -402,7 +418,20 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading) {
-		CR(r);	// URL in here is good
+		m_strCurrentURL = strCurrentURL;
+		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+		CBR(vControlViewUID.size() == 1, R_SKIPPED);
+
+		UID controlViewUID = vControlViewUID[0];
+		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+		CN(pDreamControlViewHandle);
+
+		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+		if (m_strCurrentURL != "") {
+			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
+		}
+
+		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
 
 Error:
@@ -515,6 +544,26 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 #endif
 
 	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleBackEvent() {
+	RESULT r = R_PASS;
+
+	CBR(m_pWebBrowserController->CanGoBack(), R_SKIPPED);
+	CR(m_pWebBrowserController->GoBack());
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleForwardEvent() {
+	RESULT r = R_PASS;
+
+	CBR(m_pWebBrowserController->CanGoForward(), R_SKIPPED);
+	CR(m_pWebBrowserController->GoForward());
 
 Error:
 	return r;

@@ -863,6 +863,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
     <ClCompile Include="..\..\..\UI\UIButton.cpp" />
+    <ClCompile Include="..\..\..\UI\UIControlBar.cpp" />
     <ClCompile Include="..\..\..\UI\UIEvent.cpp" />
     <ClCompile Include="..\..\..\UI\UIKey.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboard.cpp" />
@@ -1230,6 +1231,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="..\..\..\UI\UIButton.h" />
+    <ClInclude Include="..\..\..\UI\UIControlBar.h" />
     <ClInclude Include="..\..\..\UI\UIEvent.h" />
     <ClInclude Include="..\..\..\UI\UIKey.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboard.h" />

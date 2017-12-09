@@ -49,6 +49,7 @@ public:
 	RESULT SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
 	bool IsVisible();
 	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
+	RESULT ShowTitleView();
 	RESULT PopulateTextBox(std::string strText);
 
 private:
@@ -58,6 +59,7 @@ private:
 	virtual RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) = 0;
 	virtual bool IsKeyboardVisible() = 0;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
+	virtual RESULT ShowKeyboardTitleView() = 0;
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) = 0;
 };
 
@@ -142,6 +144,7 @@ public:
 	RESULT UpdateTextBox(int chkey);
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
+	virtual RESULT ShowKeyboardTitleView() override;
 	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
 	RESULT UpdateComposite(float depth); // update position/orientation
 

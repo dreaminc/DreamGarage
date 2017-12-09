@@ -905,6 +905,9 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIControlBar.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2017,6 +2020,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIControlBar.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

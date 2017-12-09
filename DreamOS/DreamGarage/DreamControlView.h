@@ -16,12 +16,13 @@
 
 #define BROWSER_SCROLL_CONSTANT 10.0f
 
-#define CONTROL_VIEWQUAD_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
-#define CONTROL_VIEWQUAD_HEIGHT 0.3375f
-#define CONTROL_VIEWQUAD_ANGLE 32.0f
-#define CONTROL_VIEW_DEPTH 0.1f	
-#define CONTROL_VIEW_HEIGHT -0.2f
-#define TYPING_ROTATION (M_PI / 2.0f)
+#define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
+#define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
+#define VIEW_ANGLE 32.0f
+#define VIEW_POS_DEPTH 0.1f	
+#define VIEW_POS_HEIGHT -0.2f
+
+#define TYPING_ANGLE (M_PI / 2.0f)
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
@@ -29,7 +30,8 @@ class quad;
 class sphere;
 class UIView;
 class UIMallet;
-class UIScrollView;
+class UIControlBar;
+class UIButton;
 class texture;
 class DreamBrowserHandle;
 
@@ -41,6 +43,7 @@ public:
 	RESULT DismissApp();
 	RESULT SendURLtoBrowser();
 	bool IsAppVisible();
+	RESULT SendURLText(std::string strURL);
 
 public:
 	//User Observer
@@ -56,6 +59,7 @@ private:
 	virtual RESULT Dismiss() = 0;
 	virtual RESULT SendURL() = 0;
 	virtual bool IsVisible() = 0;
+	virtual RESULT SetURLText(std::string strURL) = 0;
 };
 
 class DreamControlView : public DreamApp<DreamControlView>, 
@@ -108,6 +112,17 @@ private:
 
 	virtual bool IsVisible() override;
 
+// ControlBar events
+private:
+	bool CanPressButton(UIButton* pButtonContext);
+	RESULT HandleStopSharing(UIButton* pButtonContext, void* pContext);
+	RESULT HandleToggleControlBar(UIButton* pButtonContext, void* pContext);
+	RESULT HandleBack(UIButton* pButtonContext, void* pContext);
+	RESULT HandleForward(UIButton* pButtonContext, void* pContext);
+
+	RESULT HandleEnterURL(UIButton* pButtonContext, void* pContext);
+	virtual RESULT SetURLText(std::string strURL) override;
+
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
@@ -120,6 +135,8 @@ private:
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIView> m_pView = nullptr;
+
+	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
 
@@ -135,7 +152,9 @@ private:
 
 	DreamControlView::state m_viewState;
 
-	bool m_fMouseDown;
+	bool m_fMouseDown[2];
+	point m_ptClick;
+	bool m_fIsShareURL = false;
 
 	float m_hiddenScale; 
 	float m_visibleScale;
@@ -146,6 +165,7 @@ private:
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
+	std::string m_strText;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

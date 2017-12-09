@@ -307,7 +307,7 @@ public:
 	text* AddText(std::shared_ptr<font> pFont, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	text* AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 
-	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
