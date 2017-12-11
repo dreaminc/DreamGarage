@@ -31,15 +31,15 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWebRTCMultiPeer());
-
 	CR(AddTestChromeMultiBrowser());
 
-	CR(AddTestWebRTCAudio());
+	CR(AddTestWebRTCMultiPeer());
 
 	CR(AddTestWebRTCAudio());
 
 	CR(AddTestWebRTCVideoStream());
+
+	// TODO: Need a data channel test
 
 Error:
 	return r;
