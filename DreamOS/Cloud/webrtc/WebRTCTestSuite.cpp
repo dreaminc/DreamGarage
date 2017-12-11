@@ -31,9 +31,9 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestChromeMultiBrowser());
-
 	CR(AddTestWebRTCMultiPeer());
+
+	CR(AddTestChromeMultiBrowser());
 
 	CR(AddTestWebRTCAudio());
 

@@ -143,6 +143,7 @@ protected:
 
 private:
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
+	
 	rtc::Win32Thread* m_pWin32thread = nullptr;
 	rtc::Win32SocketServer* m_pWin32SocketServer = nullptr;
 

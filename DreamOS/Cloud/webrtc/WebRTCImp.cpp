@@ -30,7 +30,8 @@ WebRTCImp::~WebRTCImp() {
 
 	//m_pWin32thread->Stop();
 	//m_pWin32thread->Quit();
-	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
+
+	rtc::ThreadManager::Instance()->SetCurrentThread(nullptr);
 	rtc::CleanupSSL();
 }
 
