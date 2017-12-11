@@ -131,10 +131,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 		std::bind(&DreamControlView::HandleEnterURL, this, std::placeholders::_1, std::placeholders::_2)));
 
 	// Texture needs to be upside down, and flipped on y-axis
-	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pLoadingScreenTexture = GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
 
-	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
 	m_viewState = DreamControlView::state::HIDDEN;
 
 	{
@@ -151,12 +151,12 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	if (GetDOS()->GetHMD() != nullptr) {
 		switch (GetDOS()->GetHMD()->GetDeviceType()) {
 		case HMDDeviceType::OCULUS: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(k_wszOculusOverlayLeft, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(k_wszOculusOverlayRight, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		} break;
 		case HMDDeviceType::VIVE: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(k_wszViveOverlayLeft, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(k_wszViveOverlayRight, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		} break;
 		}
 
@@ -356,41 +356,34 @@ Error:
 
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
-	if (IsVisible()) {
-		switch (pEvent->type) {
-		case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-			int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
-			int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
+	CBR(IsVisible(), R_SKIPPED);
+	switch (pEvent->type) {
+	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
+		int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
+		int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
 
-			CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
-			if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT)
-			{
-				if (m_ptLMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptLMalletPointing.x > 0 &&
-					m_ptLMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptLMalletPointing.y > 0) {
-					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptLMalletPointing));
-				}
-				else {
-					WebBrowserPoint middleOfBrowser;
-					middleOfBrowser.x = m_pBrowserHandle->GetWidthOfBrowser() / 2;
-					middleOfBrowser.y = m_pBrowserHandle->GetHeightOfBrowser() / 2;
-					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
-				}
-			}
-			else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT)
-			{
-				if (m_ptRMalletPointing.x < m_pBrowserHandle->GetWidthOfBrowser() && m_ptRMalletPointing.x > 0 &&
-					m_ptRMalletPointing.y < m_pBrowserHandle->GetHeightOfBrowser() && m_ptRMalletPointing.y > 0) {
-					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, m_ptRMalletPointing));
-				}
-				else {
-					WebBrowserPoint middleOfBrowser;
-					middleOfBrowser.x = m_pBrowserHandle->GetWidthOfBrowser() / 2;
-					middleOfBrowser.y = m_pBrowserHandle->GetHeightOfBrowser() / 2;
-					CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
-				}
-			}
-		} break;
-		}	
+		WebBrowserPoint ptScroll;
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+			ptScroll = m_ptLMalletPointing;
+		}
+		else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+			ptScroll = m_ptRMalletPointing;
+		}
+
+		CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
+
+		if (ptScroll.x < m_pBrowserHandle->GetWidthOfBrowser() && ptScroll.x > 0 &&
+			ptScroll.y < m_pBrowserHandle->GetHeightOfBrowser() && ptScroll.y > 0) {
+			CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, ptScroll));
+		}
+		else {
+			WebBrowserPoint middleOfBrowser;
+			middleOfBrowser.x = m_pBrowserHandle->GetWidthOfBrowser() / 2;
+			middleOfBrowser.y = m_pBrowserHandle->GetHeightOfBrowser() / 2;
+			CR(m_pBrowserHandle->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
+		}
+
+	} break;
 	}
 Error:
 	return r;
@@ -489,7 +482,7 @@ RESULT DreamControlView::SendURL() {
 	}
 
 	if (m_strURL != "") {
-		m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
 		CR(m_pBrowserHandle->SendURL(m_strURL));
 		m_strURL = "";
 	}
@@ -682,14 +675,12 @@ bool DreamControlView::IsVisible() {
 RESULT DreamControlView::SetURLText(std::string strURL) {
 	RESULT r = R_PASS;
 
-//	CBR(strURL != "", R_SKIPPED);
 	CNR(m_pControlBar, R_SKIPPED);
 	{
 		auto pText = m_pControlBar->GetURLText();
 		CNR(pText, R_SKIPPED);
 		pText->SetDirty();
 		m_strText = strURL;
-	//	pText->SetText(strURL);
 	}
 
 Error:
@@ -734,7 +725,6 @@ RESULT DreamControlView::HandleKeyboardDown() {
 			m_pView.get(),
 			m_ptVisiblePosition,	
 			m_qViewQuadOrientation,
-			//vector(m_visibleScale, m_visibleScale, m_visibleScale),
 			m_pView->GetScale(),
 			m_keyboardAnimationDuration,
 			AnimationCurveType::EASE_OUT_QUAD,
@@ -873,11 +863,11 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	CBR(!pLMallet->IsDirty() && !pRMallet->IsDirty(), R_SKIPPED);
 
-	CR(pLMallet->SetDirty());
-	CR(pRMallet->SetDirty());
-
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
+
+	CR(pLMallet->SetDirty());
+	CR(pRMallet->SetDirty());
 
 	CBR(m_viewState != state::TYPING, R_SKIPPED);
 

@@ -130,12 +130,20 @@ public:
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
+public:
+	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
+
+	//TODO: potentially move these into user app or dream app
+	const wchar_t *k_wszOculusOverlayLeft = L"left-controller-overlay-active.png";
+	const wchar_t *k_wszOculusOverlayRight = L"right-controller-overlay-active.png";
+	const wchar_t *k_wszViveOverlayLeft = L"vive-controller-overlay-left-active.png";
+	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
+
 private:
+	std::shared_ptr<UIView> m_pView = nullptr;
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
-	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
-	std::shared_ptr<UIView> m_pView = nullptr;
-
+	texture* m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
