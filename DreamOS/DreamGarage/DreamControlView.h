@@ -71,14 +71,6 @@ class DreamControlView : public DreamApp<DreamControlView>,
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class state {
-		HIDDEN,
-		HIDE,
-		VISIBLE,
-		SHOW,
-		TYPING
-	};
-
 // DreamApp
 public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
@@ -100,6 +92,10 @@ public:
 	virtual RESULT HandleKeyboardDown();
 	virtual RESULT SendURL() override;
 
+private:
+	RESULT ShowKeyboard();
+	RESULT HideKeyboard();
+
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -108,9 +104,15 @@ private:
 
 	virtual RESULT Show() override;
 	virtual RESULT Hide() override;
+	RESULT ShowView();
+	RESULT HideView();
 	virtual RESULT Dismiss() override;
 
 	virtual bool IsVisible() override;
+
+	//	manually checks the objects that could be animating,
+	//	to avoid problems with animations and updates
+	bool IsAnimating();
 
 // ControlBar events
 private:
@@ -126,7 +128,6 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
-	RESULT SetViewState(DreamControlView::state viewState);
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
@@ -158,10 +159,10 @@ private:
 	UID m_browserUID;
 	UID m_userUID;	
 
-	DreamControlView::state m_viewState;
-
 	bool m_fMouseDown[2];
 	point m_ptClick;
+
+	// true while the keyboard is shown for sharing a new URL
 	bool m_fIsShareURL = false;
 
 	float m_hiddenScale; 

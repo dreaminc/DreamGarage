@@ -155,7 +155,6 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
-
 	//vector for captured object collisions
 	qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
@@ -490,7 +489,12 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
 				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
-				m_pKeyboardHandle->Show();
+				CN(m_pKeyboardHandle);
+				CR(m_pKeyboardHandle->Show());
+
+				//Release keyboard is called when Hide would be called
+				//CR(m_pUserHandle->SendReleaseKeyboard());
+				//m_pKeyboardHandle = nullptr;
 
 				//TODO: why does this need to happen
 				{
