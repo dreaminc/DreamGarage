@@ -629,7 +629,8 @@ RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pClou
 
 	if (jsonEnvironmentAsset.size() != 0) {
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
-		CN(pEnvironmentAsset);-
+		CN(pEnvironmentAsset);
+		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
 	}
 
 Error:

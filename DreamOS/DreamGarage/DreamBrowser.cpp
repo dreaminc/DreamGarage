@@ -1337,17 +1337,22 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		WebRequest webRequest;
 
 		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
-
 		std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		CR(webRequest.SetURL(wstrAssetURI));
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-	
+
 		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		CN(pUserControllerProxy);
 
 		std::string strUserToken = pUserControllerProxy->GetUserToken();
 		std::wstring wstrUserToken = util::StringToWideString(strUserToken);
-		//CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+
+		if (strEnvironmentAssetURI.substr(0, 31) == "https://api.develop.dreamos.com") {
+			CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+		}
+		else {
+			CR(webRequest.ClearRequestHeaders());
+		}
 
 		LoadRequest(webRequest);
 	}
