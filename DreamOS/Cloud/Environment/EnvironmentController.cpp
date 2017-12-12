@@ -55,6 +55,9 @@ RESULT EnvironmentController::Initialize() {
 
 	// Register Methods
 	CR(RegisterMethod("share", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("send", std::bind(&EnvironmentController::OnSendAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
+
 
 Error:
 	return r;
@@ -589,8 +592,45 @@ RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloud
 		//CR(pEnvironmentAsset->PrintEnvironmentAsset());
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
+			// Moving to Send/Receive paradigm
 			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
+
+	if (jsonEnvironmentAsset.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
 	}
 
 Error:

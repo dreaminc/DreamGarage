@@ -118,6 +118,8 @@ public:
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
 	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	long GetUserID();

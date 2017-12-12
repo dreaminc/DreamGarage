@@ -146,6 +146,7 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	quaternion qSurface;
 
 	CNR(pButtonContext, R_SKIPPED);
+	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	pSurface = pSelected->GetSurface();
@@ -266,6 +267,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 	switch (type) {
 		case UserObserverEventType::BACK: {
+			CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(m_pKeyboardHandle->Hide());
 				CR(m_pUserHandle->SendReleaseKeyboard());
@@ -438,7 +440,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
 
 	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
-
+	// should check if website
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			const std::string& strScope = pSubMenuNode->GetScope();
