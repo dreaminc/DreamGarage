@@ -625,7 +625,7 @@ RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pClou
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
-	int peerID = jsonPayload["/user"_json_pointer].get<int>();
+	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
 
 	if (jsonEnvironmentAsset.size() != 0) {
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);

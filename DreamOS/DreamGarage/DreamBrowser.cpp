@@ -1349,8 +1349,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
 		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
 		
-		//for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
-		std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); {
+		for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
 
 			std::string strKey = itr->first;
 			std::wstring wstrKey = util::StringToWideString(strKey);
