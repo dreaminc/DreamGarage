@@ -176,6 +176,7 @@ private:
 
 	WebBrowserPoint m_ptLMalletPointing;
 	WebBrowserPoint m_ptRMalletPointing;
+	WebBrowserPoint m_lastPoint;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;

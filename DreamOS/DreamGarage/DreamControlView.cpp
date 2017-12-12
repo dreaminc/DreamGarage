@@ -174,6 +174,8 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_fMalletDirty[0] = new dirty();
 	m_fMalletDirty[1] = new dirty();
+	m_lastPoint.x = -1;
+	m_lastPoint.y = -1;
 
 Error:
 	return r;
@@ -189,7 +191,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	auto pText = m_pControlBar->GetURLText();
 	if (pText->CheckAndCleanDirty()) {
 		//auto strText = pText->GetText();
-		pText->SetText("");
+		//pText->SetText("");
 		pText->SetText(m_strText);
 	}
 
@@ -210,20 +212,34 @@ RESULT DreamControlView::Update(void *pContext) {
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
 	// skip mallet update while keyboard is active
-	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
+	//*
+	if (IsAnimating()) {
+		m_fMouseDown[0] = false;
+		m_fMouseDown[1] = false;
+	}
+	//*/
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(IsVisible(), R_SKIPPED);
 
-	int i = 0;
-	
-	for (auto &pMallet : { pLMallet, pRMallet })
+	for (int i = 0; i < 2; i++)
 	{
+		UIMallet *pMallet;
+		if (i == 0) {
+			pMallet = pLMallet;
+		}
+		else {
+			pMallet = pRMallet;
+		}
+
 		point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
 		point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
 		// if keyboard is up, touching the view quad is always a dismiss
 		if (m_pKeyboardHandle != nullptr) {
+			if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+				m_fMalletDirty[i]->CheckAndCleanDirty();
+			}
 			if (ptSphereOrigin.y() < pMallet->GetRadius() && !m_fMalletDirty[i]->IsDirty()) {
 				CR(HandleKeyboardDown());
 				m_fMalletDirty[i]->SetDirty();
@@ -233,7 +249,6 @@ RESULT DreamControlView::Update(void *pContext) {
 
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
-//			pMallet->CheckAndCleanDirty();
 			m_fMalletDirty[i]->CheckAndCleanDirty();
 
 			if (m_fMouseDown[i]) {
@@ -242,7 +257,7 @@ RESULT DreamControlView::Update(void *pContext) {
 				CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown[i]));
 			}
 
-			if (pMallet == pLMallet) {
+			if (i == 0) {
 				m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 			}
 			else {
@@ -267,7 +282,7 @@ RESULT DreamControlView::Update(void *pContext) {
 			m_ptClick = ptSphereOrigin;
 			m_fMouseDown[i] = true;
 
-			if (pMallet == pLMallet) {
+			if (i == 0) {
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 			}
 			else {
@@ -275,9 +290,8 @@ RESULT DreamControlView::Update(void *pContext) {
 			}
 
 			CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown[i]));
+			m_lastPoint = ptContact;
 		}
-
-		i++;
 	}
 		
 
@@ -500,7 +514,7 @@ RESULT DreamControlView::ShowView() {
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
-		m_pControlBar->GetURLText()->SetText(m_strURL);
+		//m_pControlBar->GetURLText()->SetText(m_strURL);
 		m_pControlBar->SetVisible(true);
 		return R_PASS;
 	};
@@ -716,8 +730,10 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
 	unFocusText.x = -1;				// to go back into the same textbox
 	unFocusText.y = -1;
-	//CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
-	//CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
+	m_lastPoint = unFocusText;
+	//CR(m_pBrowserHandle->SendKeyCharacter(SVK_ESCAPE, true));	// ensures browser gets a return key before controlview changes state
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
@@ -745,11 +761,13 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
+	CBR(m_lastPoint.x != -1 || m_lastPoint.y != -1, R_SKIPPED);
 
 	// TODO: get textbox location from node, for now just defaulting to the middle
 	if (ptTextBox.y() == -1) {
 		ptTextBox.y() = m_pBrowserHandle->GetHeightOfBrowser() / 2.0f;
 	}
+	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
 	textBoxYOffset = ptTextBox.y() / (m_pBrowserHandle->GetHeightOfBrowser() / VIEW_HEIGHT);	// scaled with ControlViewQuad dimensions
 	ptTypingOffset = point(0.0f, -VIEW_HEIGHT / 2.0f, -0.05f);	// so that it'll appear past the keyboard quad
