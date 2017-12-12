@@ -27,12 +27,16 @@ public:
 	const std::string& GetTitle();
 
 	std::string GetURI();
+	const std::string& GetURL();
+	std::multimap<std::string, std::string> GetHeaders();
 
 private:
 	long m_assetID;
 	std::string m_strPath;
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;
+	std::string m_strURL;
+	std::multimap<std::string, std::string> m_headers;
 	//MenuNode::MimeType m_mimeType;
 };
 

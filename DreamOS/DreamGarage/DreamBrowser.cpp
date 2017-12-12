@@ -1261,11 +1261,11 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	m_aspectRatio = aspectRatio;
 	m_vNormal = vNormal.Normal();
 
-	if (m_pBrowserQuad != nullptr) {
-		return UpdateViewQuad();
-	}
+if (m_pBrowserQuad != nullptr) {
+	return UpdateViewQuad();
+}
 
-	return R_PASS;
+return R_PASS;
 }
 
 float DreamBrowser::GetAspectRatio() {
@@ -1292,7 +1292,7 @@ RESULT DreamBrowser::UpdateViewQuad() {
 	RESULT r = R_PASS;
 
 	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
-	
+
 	// Flip UV vertically
 	///*
 	if (r != R_SKIPPED) {
@@ -1336,24 +1336,34 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
 
-		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
-		std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
-		CR(webRequest.SetURL(wstrAssetURI));
+		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
+		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
+		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
+		CR(webRequest.SetURL(wstrAssetURL));
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
 
 		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		CN(pUserControllerProxy);
 
-		std::string strUserToken = pUserControllerProxy->GetUserToken();
-		std::wstring wstrUserToken = util::StringToWideString(strUserToken);
+		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
+		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
+		
+		//for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
+		std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); {
 
-		if (strEnvironmentAssetURI.substr(0, 31) == "https://api.develop.dreamos.com") {
-			CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+			std::string strKey = itr->first;
+			std::wstring wstrKey = util::StringToWideString(strKey);
+			std::string strValue = itr->second;
+			std::wstring wstrValue = util::StringToWideString(strValue);
+			
+			wstrRequestHeaders.insert(std::multimap<std::wstring, std::wstring>::value_type(wstrKey, wstrValue));
 		}
-		else {
-			CR(webRequest.ClearRequestHeaders());
-		}
+		
+		webRequest.SetRequestHeaders(wstrRequestHeaders);
 
+		//CR(webRequest.ClearRequestHeaders());
+		
 		LoadRequest(webRequest);
 	}
 
