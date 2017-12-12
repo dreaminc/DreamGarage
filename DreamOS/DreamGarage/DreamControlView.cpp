@@ -172,6 +172,9 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_fMouseDown[0] = false;
 	m_fMouseDown[1] = false;
 
+	m_fMalletDirty[0] = new dirty();
+	m_fMalletDirty[1] = new dirty();
+
 Error:
 	return r;
 }
@@ -207,7 +210,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	CNR(m_pBrowserHandle, R_OBJECT_NOT_FOUND);
 
 	// skip mallet update while keyboard is active
-	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
+	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(IsVisible(), R_SKIPPED);
 
@@ -219,9 +222,19 @@ RESULT DreamControlView::Update(void *pContext) {
 		point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
+		// if keyboard is up, touching the view quad is always a dismiss
+		if (m_pKeyboardHandle != nullptr) {
+			if (ptSphereOrigin.y() < pMallet->GetRadius() && !m_fMalletDirty[i]->IsDirty()) {
+				CR(HandleKeyboardDown());
+				m_fMalletDirty[i]->SetDirty();
+			}
+			continue;
+		}
+
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
-			pMallet->CheckAndCleanDirty();
+//			pMallet->CheckAndCleanDirty();
+			m_fMalletDirty[i]->CheckAndCleanDirty();
 
 			if (m_fMouseDown[i]) {
 				m_fMouseDown[i] = false;
@@ -243,11 +256,14 @@ RESULT DreamControlView::Update(void *pContext) {
 		}
 
 		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && !pMallet->IsDirty()) {
+		if (ptSphereOrigin.y() < pMallet->GetRadius() && !m_fMalletDirty[i]->IsDirty()) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
-			CR(pMallet->SetDirty());
+
+			//CR(pMallet->SetDirty());
+			m_fMalletDirty[i]->SetDirty();
+
 			m_ptClick = ptSphereOrigin;
 			m_fMouseDown[i] = true;
 
@@ -260,6 +276,7 @@ RESULT DreamControlView::Update(void *pContext) {
 
 			CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown[i]));
 		}
+
 		i++;
 	}
 		
@@ -699,8 +716,8 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
 	unFocusText.x = -1;				// to go back into the same textbox
 	unFocusText.y = -1;
-	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
-	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
+	//CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
+	//CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
@@ -726,6 +743,8 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	CN(m_pBrowserHandle);
 	CBR(IsVisible(), R_SKIPPED);
+	CBR(!IsAnimating(), R_SKIPPED);
+	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 
 	// TODO: get textbox location from node, for now just defaulting to the middle
 	if (ptTextBox.y() == -1) {

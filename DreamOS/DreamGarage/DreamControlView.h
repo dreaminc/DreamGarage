@@ -165,6 +165,11 @@ private:
 	// true while the keyboard is shown for sharing a new URL
 	bool m_fIsShareURL = false;
 
+	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 
+	//		should be registered.  This doesn't work correctly when there are multiple surfaces
+	//		being used at the same time
+	dirty *m_fMalletDirty[2];
+
 	float m_hiddenScale; 
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
