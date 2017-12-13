@@ -61,8 +61,10 @@ Error:
 RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	/*
 	size_t frameSize = sizeof(uint8_t) * pxHeight * pxWidth * channels;
+	webrtc::VideoFrame videoFrame;
+
+	/*
 	cricket::CapturedFrame capturedVideoframe;
 
 	CB(IsRunning());
