@@ -172,10 +172,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_fMouseDown[0] = false;
 	m_fMouseDown[1] = false;
 
-	m_fMalletDirty[0] = new dirty();
-	m_fMalletDirty[1] = new dirty();
-	m_lastPoint.x = -1;
-	m_lastPoint.y = -1;
+	m_fMalletDirty[0] = dirty();
+	m_fMalletDirty[1] = dirty();
+	m_ptLastEvent.x = -1;
+	m_ptLastEvent.y = -1;
 
 Error:
 	return r;
@@ -220,44 +220,66 @@ RESULT DreamControlView::Update(void *pContext) {
 	//*/
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(IsVisible(), R_SKIPPED);
+	// if a url is being shared through the keyboard don't update the control view surface
+	CBR(!m_fIsShareURL, R_SKIPPED);
 
 	for (int i = 0; i < 2; i++)
 	{
 		UIMallet *pMallet;
+		HAND_TYPE type;
 		if (i == 0) {
 			pMallet = pLMallet;
+			type = HAND_TYPE::HAND_LEFT;
 		}
 		else {
 			pMallet = pRMallet;
+			type = HAND_TYPE::HAND_RIGHT;
 		}
 
-		point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
-		point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
-		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
-
-		// if keyboard is up, touching the view quad is always a dismiss
-		if (m_pKeyboardHandle != nullptr) {
-			if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-				m_fMalletDirty[i]->CheckAndCleanDirty();
-			}
-			if (ptSphereOrigin.y() < pMallet->GetRadius() && !m_fMalletDirty[i]->IsDirty()) {
-				CR(HandleKeyboardDown());
-				m_fMalletDirty[i]->SetDirty();
-			}
-			continue;
+		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
+		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		if (fMalletDirty) {
+			m_fMalletDirty[i].SetDirty();
+		} 
+		else {
+			m_fMalletDirty[i].CheckAndCleanDirty();
 		}
+	}
 
+Error:
+	return r;
+}
+
+RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
+	RESULT r = R_PASS;
+
+	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
+	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
+
+	// if keyboard is up, touching the view quad is always a dismiss
+	if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
+		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+			fMalletDirty = false;
+		}
+		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
+			CR(HandleKeyboardDown());
+			fMalletDirty = true;
+		}
+	}
+
+	else {
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
-			m_fMalletDirty[i]->CheckAndCleanDirty();
+			fMalletDirty = false;
 
-			if (m_fMouseDown[i]) {
-				m_fMouseDown[i] = false;
+			if (fMouseDown) {
+				fMouseDown = false;
 				WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
-				CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown[i]));
+				CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, fMouseDown));
 			}
 
-			if (i == 0) {
+			if (handType == HAND_TYPE::HAND_LEFT) {
 				m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 			}
 			else {
@@ -265,35 +287,34 @@ RESULT DreamControlView::Update(void *pContext) {
 			}
 		}
 
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && m_fMouseDown[i]) {
+		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			CR(m_pBrowserHandle->SendMalletMoveEvent(ptContact));
 		}
 
 		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && !m_fMalletDirty[i]->IsDirty()) {
+		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
-			if (ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
-				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0) continue;
+			bool fInBrowserQuad = ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
+				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0;
+			CBR(!fInBrowserQuad, R_SKIPPED);
 
-			//CR(pMallet->SetDirty());
-			m_fMalletDirty[i]->SetDirty();
+			fMalletDirty = true;
 
 			m_ptClick = ptSphereOrigin;
-			m_fMouseDown[i] = true;
+			fMouseDown = true;
 
-			if (i == 0) {
+			if (handType == HAND_TYPE::HAND_LEFT) {
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 			}
 			else {
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 			}
 
-			CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, m_fMouseDown[i]));
-			m_lastPoint = ptContact;
+			CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, fMouseDown));
+			m_ptLastEvent = ptContact;
 		}
 	}
-		
 
 Error:
 	return r;
@@ -307,7 +328,7 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 
 		CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
 
-		if (m_pKeyboardHandle != nullptr) {
+		if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
 			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
 			CBR(chkey != 0, R_SKIPPED);
 			CBR(chkey != SVK_CONTROL, R_SKIPPED);
@@ -396,14 +417,13 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		}
 
 		else if (IsVisible()) {
-			bool fStreaming;
+			bool fStreaming = false;
 
 			CR(Hide());
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
 
 			// if the user is streaming show the menu
-			fStreaming = false;
 			CR(m_pUserHandle->RequestStreamingState(fStreaming));
 
 			if (fStreaming) {
@@ -512,10 +532,14 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::ShowView() {
 	RESULT r = R_PASS;
 
+
+	//TODO: animation for m_pControlBar
+	m_pControlBar->SetVisible(true);
+	
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
 		//m_pControlBar->GetURLText()->SetText(m_strURL);
-		m_pControlBar->SetVisible(true);
+		//m_pControlBar->SetVisible(true);
 		return R_PASS;
 	};
 
@@ -546,6 +570,7 @@ RESULT DreamControlView::ShowView() {
 		return r;
 	};
 
+	CBR(!m_fIsMinimized, R_SKIPPED);
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
 		m_pViewQuad->GetPosition(),
@@ -727,12 +752,12 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	CR(HideKeyboard());
 
 	CN(m_pBrowserHandle);			// This unfocuses the text box so that node change event
-	WebBrowserPoint unFocusText;	// will fire if user closes keyboard and then wants
-	unFocusText.x = -1;				// to go back into the same textbox
-	unFocusText.y = -1;
-	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, false));
-	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(unFocusText, true));
-	m_lastPoint = unFocusText;
+	WebBrowserPoint ptUnFocusText;	// will fire if user closes keyboard and then wants
+	ptUnFocusText.x = -1;				// to go back into the same textbox
+	ptUnFocusText.y = -1;
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptUnFocusText, false));
+	CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptUnFocusText, true));
+	m_ptLastEvent = ptUnFocusText;
 	//CR(m_pBrowserHandle->SendKeyCharacter(SVK_ESCAPE, true));	// ensures browser gets a return key before controlview changes state
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -761,7 +786,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-	CBR(m_lastPoint.x != -1 || m_lastPoint.y != -1, R_SKIPPED);
+	CBR(m_ptLastEvent.x != -1 || m_ptLastEvent.y != -1, R_SKIPPED);
 
 	// TODO: get textbox location from node, for now just defaulting to the middle
 	if (ptTextBox.y() == -1) {
@@ -829,18 +854,13 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	auto pDreamOS = GetDOS();
 
-	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
-	CNR(pLMallet, R_OBJECT_NOT_FOUND);
-	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_OBJECT_NOT_FOUND);
-
-	CBR(!pLMallet->IsDirty() && !pRMallet->IsDirty(), R_SKIPPED);
+	CBR(!m_fMalletDirty[0].IsDirty() && !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
 
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
 
-	CR(pLMallet->SetDirty());
-	CR(pRMallet->SetDirty());
+	CR(m_fMalletDirty[0].SetDirty());
+	CR(m_fMalletDirty[1].SetDirty());
 
 	//only allow button presses while keyboard isn't active
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
@@ -870,6 +890,7 @@ RESULT DreamControlView::HandleToggleControlBar(UIButton* pButtonContext, void* 
 		auto fnEndCallback = [&](void *pContext) {
 			GetViewQuad()->SetVisible(false);
 			m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetShowTexture());
+			m_fIsMinimized = true;
 			m_strURL = "";
 			return R_PASS;
 		};
@@ -892,6 +913,7 @@ RESULT DreamControlView::HandleToggleControlBar(UIButton* pButtonContext, void* 
 	else {
 		auto fnStartCallback = [&](void *pContext) {
 			GetViewQuad()->SetVisible(true);
+			m_fIsMinimized = false;
 			return R_PASS;
 		};
 
