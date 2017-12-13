@@ -75,11 +75,11 @@ CefRefPtr<CefLifeSpanHandler> CEFHandler::GetLifeSpanHandler() {
 CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
-/*
+
 CefRefPtr<CefRequestHandler> CEFHandler::GetRequestHandler() {
 	return this;
 }
-
+/*
 CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) {
 	return this;
 }
@@ -351,7 +351,7 @@ void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int chan
 Error:
 	return;
 }
-/*
+
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	CefResponse::HeaderMap responseHeaders;
 	response->GetHeaderMap(responseHeaders);
@@ -362,14 +362,24 @@ bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<Cef
 			itr->second = "inline";
 		}
 	}
-
+	
 	response->SetHeaderMap(responseHeaders);
 	return true;
 }
+/*
+CefRefPtr<CefResponseFilter> CEFHandler::GetResourceResponseFilter(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
+	CefRefPtr<CefResponseFilter> pContentDispositionFilter;
 
+	response->GetHeader("content-disposition");
+
+
+	return pContentDispositionFilter;
+}
+*/
+/*
 void CEFHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) {
 	CefResponse::HeaderMap responseHeaders;
-
+	
 	response->GetHeaderMap(responseHeaders);
 	std::string contentDisposition = response->GetHeader("content-disposition");
 	for (CefResponse::HeaderMap::iterator itr = responseHeaders.begin(); itr != responseHeaders.end(); ++itr) {

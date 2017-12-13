@@ -40,8 +40,7 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefLoadHandler,
 	public CefRenderHandler,
 	public CefAudioHandler,
-	public CefRequestHandler,
-	public CefResourceHandler
+	public CefRequestHandler
 	//public CefDownloadHandler
 {
 public:
@@ -73,7 +72,6 @@ public:
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
 	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() override;
-	virtual CefRefPtr<CefResourceHandler> GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) override;
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
@@ -124,9 +122,10 @@ public:
 
 	// CefRequestHandler
 	virtual bool OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) override;
-
+	virtual CefRefPtr<CefResponseFilter> GetResourceResponseFilter(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) override;
+	
 	// CefResourceHandler
-	virtual void GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) override;
+	//virtual void GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) override;
 
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
