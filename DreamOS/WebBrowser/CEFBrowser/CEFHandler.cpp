@@ -75,7 +75,15 @@ CefRefPtr<CefLifeSpanHandler> CEFHandler::GetLifeSpanHandler() {
 CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
+/*
+CefRefPtr<CefRequestHandler> CEFHandler::GetRequestHandler() {
+	return this;
+}
 
+CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) {
+	return this;
+}
+*/
 bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, CefProcessId sourceCEFProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
 	RESULT r = R_PASS;
 
@@ -220,7 +228,7 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 	}
 }
 
-bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
+bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
 	// false to allow pop up, true to cancel creation
 	frame->LoadURL(target_url);	// push URL to current frame
 	return true;
@@ -343,3 +351,34 @@ void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int chan
 Error:
 	return;
 }
+/*
+bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
+	CefResponse::HeaderMap responseHeaders;
+	response->GetHeaderMap(responseHeaders);
+	std::string contentDisposition = response->GetHeader("content-disposition");
+	for (CefResponse::HeaderMap::iterator itr = responseHeaders.begin(); itr != responseHeaders.end(); ++itr) {
+		CefString strKey = itr->first;
+		if (strKey == "content-disposition") {
+			itr->second = "inline";
+		}
+	}
+
+	response->SetHeaderMap(responseHeaders);
+	return true;
+}
+
+void CEFHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) {
+	CefResponse::HeaderMap responseHeaders;
+
+	response->GetHeaderMap(responseHeaders);
+	std::string contentDisposition = response->GetHeader("content-disposition");
+	for (CefResponse::HeaderMap::iterator itr = responseHeaders.begin(); itr != responseHeaders.end(); ++itr) {
+		CefString strKey = itr->first;
+		if (strKey == "content-disposition") {
+			itr->second = "inline";
+		}
+	}
+
+	response->SetHeaderMap(responseHeaders);
+}
+*/

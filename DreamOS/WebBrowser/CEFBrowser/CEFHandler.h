@@ -39,7 +39,9 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRenderHandler,
-	public CefAudioHandler
+	public CefAudioHandler,
+	public CefRequestHandler,
+	public CefResourceHandler
 	//public CefDownloadHandler
 {
 public:
@@ -70,6 +72,8 @@ public:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
+	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() override;
+	virtual CefRefPtr<CefResourceHandler> GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) override;
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
@@ -93,7 +97,7 @@ public:
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 	virtual bool DoClose(CefRefPtr<CefBrowser> browser) override;
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
-	virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access);
+	virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access);
 
 	// CefLoadHandler
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
@@ -117,6 +121,12 @@ public:
 	virtual void OnAudioData(CefRefPtr<CefBrowser> browser,
 		int frames, int channels, int bits_per_sample,
 		const void* data_buffer) override;
+
+	// CefRequestHandler
+	virtual bool OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) override;
+
+	// CefResourceHandler
+	virtual void GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) override;
 
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;

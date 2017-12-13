@@ -908,6 +908,9 @@
     <ClCompile Include="..\..\..\UI\UIControlBar.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="CEFResourceHandler.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2023,6 +2026,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIControlBar.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="CEFResourceHandler.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
