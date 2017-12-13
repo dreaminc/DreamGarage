@@ -71,14 +71,6 @@ class DreamControlView : public DreamApp<DreamControlView>,
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class state {
-		HIDDEN,
-		HIDE,
-		VISIBLE,
-		SHOW,
-		TYPING
-	};
-
 // DreamApp
 public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
@@ -100,6 +92,12 @@ public:
 	virtual RESULT HandleKeyboardDown();
 	virtual RESULT SendURL() override;
 
+private:
+	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fMouseDown, HAND_TYPE handType);
+
+	RESULT ShowKeyboard();
+	RESULT HideKeyboard();
+
 protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -108,9 +106,15 @@ private:
 
 	virtual RESULT Show() override;
 	virtual RESULT Hide() override;
+	RESULT ShowView();
+	RESULT HideView();
 	virtual RESULT Dismiss() override;
 
 	virtual bool IsVisible() override;
+
+	//	manually checks the objects that could be animating,
+	//	to avoid problems with animations and updates
+	bool IsAnimating();
 
 // ControlBar events
 private:
@@ -126,16 +130,23 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
-	RESULT SetViewState(DreamControlView::state viewState);
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
+public:
+	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
+
+	//TODO: potentially move these into user app or dream app
+	const wchar_t *k_wszOculusOverlayLeft = L"left-controller-overlay-active.png";
+	const wchar_t *k_wszOculusOverlayRight = L"right-controller-overlay-active.png";
+	const wchar_t *k_wszViveOverlayLeft = L"vive-controller-overlay-left-active.png";
+	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
+
 private:
+	std::shared_ptr<UIView> m_pView = nullptr;
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
-	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
-	std::shared_ptr<UIView> m_pView = nullptr;
-
+	texture* m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
@@ -150,11 +161,17 @@ private:
 	UID m_browserUID;
 	UID m_userUID;	
 
-	DreamControlView::state m_viewState;
-
 	bool m_fMouseDown[2];
 	point m_ptClick;
+
+	// true while the keyboard is shown for sharing a new URL
 	bool m_fIsShareURL = false;
+	bool m_fIsMinimized = false;
+
+	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 
+	//		should be registered.  This doesn't work correctly when there are multiple surfaces
+	//		being used at the same time
+	dirty m_fMalletDirty[2];
 
 	float m_hiddenScale; 
 	float m_visibleScale;
@@ -162,6 +179,7 @@ private:
 
 	WebBrowserPoint m_ptLMalletPointing;
 	WebBrowserPoint m_ptRMalletPointing;
+	WebBrowserPoint m_ptLastEvent;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
