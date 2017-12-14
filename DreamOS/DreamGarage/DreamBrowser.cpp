@@ -114,6 +114,14 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendStopEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleStopEvent();
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -376,11 +384,11 @@ RESULT DreamBrowser::SendURL(std::string strURL) {
 
 	std::string strScope = m_strScope;
 	std::string strTitle = "website";
-	std::string strPath = strURL;
+	SetBrowserPath(strURL);
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
 
 Error:
 	return r;
@@ -569,6 +577,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::HandleStopEvent() {
+	RESULT r = R_PASS;
+
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
+
+Error:
+	return r;
+}
+
 // DreamApp Interface
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
@@ -596,6 +616,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CN(pCommandLineManager);
 	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
 	strURL = strAPIURL + "/client/loading/";
+	SetBrowserPath(strURL);
 
 	// Initialize new browser
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
@@ -1364,8 +1385,25 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		//CR(webRequest.ClearRequestHeaders());
 		
 		LoadRequest(webRequest);
+		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::StopSending() {
+	RESULT r = R_PASS;
+	CR(SetStreamingState(false));
+	CR(m_pBrowserQuad->SetVisible(false));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::StopReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = false;
+	CR(m_pBrowserQuad->SetVisible(false));
 Error:
 	return r;
 }

@@ -29,6 +29,7 @@ public:
 	std::string GetURI();
 	const std::string& GetURL();
 	std::multimap<std::string, std::string> GetHeaders();
+	long GetAssetID();
 
 private:
 	long m_assetID;

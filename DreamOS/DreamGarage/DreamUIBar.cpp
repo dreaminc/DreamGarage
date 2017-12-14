@@ -472,7 +472,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 
-				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
+				//m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
 				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 				CN(m_pKeyboardHandle);

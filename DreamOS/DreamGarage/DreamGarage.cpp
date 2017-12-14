@@ -936,6 +936,20 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 	return r;
 }
 
+RESULT DreamGarage::OnStopSending() {
+	RESULT r = R_PASS;
+	CR(m_pDreamBrowser->StopSending());
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnStopReceiving() {
+	RESULT r = R_PASS;
+	CR(m_pDreamBrowser->StopReceiving());
+Error:
+	return r;
+}
+
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 

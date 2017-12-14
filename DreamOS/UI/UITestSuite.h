@@ -67,6 +67,13 @@ public:
 
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnStopSending() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceiving() override {
+		return R_NOT_IMPLEMENTED;
+	}
 
 public:
 	virtual RESULT Notify(SenseControllerEvent *event) override;

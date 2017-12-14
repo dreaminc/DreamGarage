@@ -85,6 +85,10 @@ std::multimap<std::string, std::string> EnvironmentAsset::GetHeaders() {
 	return m_headers;
 }
 
+long EnvironmentAsset::GetAssetID() {
+	return m_assetID;
+}
+
 std::string EnvironmentAsset::GetURI() {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";

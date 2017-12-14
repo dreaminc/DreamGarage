@@ -873,7 +873,15 @@ Error:
 }
 
 RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CBR(CanPressButton(pButtonContext), R_SKIPPED);
+	CBR(!IsAnimating(), R_SKIPPED);
+
+	CR(m_pBrowserHandle->SendStopEvent());
+
+Error:
+	return r;
 }
 
 RESULT DreamControlView::HandleToggleControlBar(UIButton* pButtonContext, void* pContext) {

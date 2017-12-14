@@ -351,6 +351,28 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnStopSending() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopSending());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopReceiving() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopReceiving());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnDataChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
