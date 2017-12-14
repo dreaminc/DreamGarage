@@ -23,6 +23,7 @@
 #include "Core/Utilities.h"
 #include "CEFDOMNode.h"
 
+#include "CEFResourceHandler.h"
 
 #pragma warning(default : 4067)
 
@@ -353,19 +354,45 @@ Error:
 }
 
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
-	CefResponse::HeaderMap responseHeaders;
-	response->GetHeaderMap(responseHeaders);
-	std::string contentDisposition = response->GetHeader("content-disposition");
-	for (CefResponse::HeaderMap::iterator itr = responseHeaders.begin(); itr != responseHeaders.end(); ++itr) {
-		CefString strKey = itr->first;
-		if (strKey == "content-disposition") {
-			itr->second = "inline";
-		}
-	}
 	
-	response->SetHeaderMap(responseHeaders);
-	return true;
+	/*
+	// This is a gut check to see that the right headers are in the right place
+	// TODO: comment out if not in testing
+	CefRequest::HeaderMap cefHeaders;
+	response->GetHeaderMap(cefHeaders);
+
+	CefResponse::HeaderMap::iterator headeritem;
+	DEBUG_LINEOUT("OnResourceResponse::Response headers size = %i", (int)cefHeaders.size());
+
+	int i = 0;
+	for (headeritem = cefHeaders.begin(); headeritem != cefHeaders.end(); headeritem++) {
+		DEBUG_LINEOUT("[%i]: ['%s','%s']", i++, headeritem->first.ToString().c_str(), headeritem->second.ToString().c_str());
+	}
+	//*/
+
+	return false;
 }
+
+CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefFrame> pCefFrame, CefRefPtr<CefRequest> pCefRequest) {
+	RESULT r = R_PASS;
+	
+	// Uncomment to skip all custom resource handling code
+	//return nullptr;
+
+	// Currently only supporting resource handler for basic GET requests
+	// otherwise, let CEF provide the valid handler
+	if (pCefRequest->GetMethod() == "GET") {
+
+		CefRefPtr<CefResourceHandler> pCefResourceHandler = CefRefPtr<CefResourceHandler>(new CEFResourceHandler(pCefBrowser, pCefFrame, pCefRequest));
+		CN(pCefResourceHandler);
+
+		return pCefResourceHandler;
+	}
+
+Error:
+	return nullptr;
+}
+
 /*
 CefRefPtr<CefResponseFilter> CEFHandler::GetResourceResponseFilter(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	CefRefPtr<CefResponseFilter> pContentDispositionFilter;
