@@ -57,12 +57,32 @@ Error:
 	return;
 }
 
+#include "common_video/libyuv/include/webrtc_libyuv.h"
+#include "third_party/libyuv/include/libyuv.h"  // NOLINT
+#include "api/video/i420_buffer.h"
+#include "api/video/video_frame.h"
+
 // TODO: This is all kinds of fucked now
 RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	size_t frameSize = sizeof(uint8_t) * pxHeight * pxWidth * channels;
-	webrtc::VideoFrame videoFrame;
+	
+	auto pWebRTCI420Buffer = webrtc::I420Buffer::Create(pxWidth, pxHeight);
+	CN(pWebRTCI420Buffer);
+	
+	// Convert RGBA to YUV420
+	libyuv::ConvertToI420(src_frame, sample_size, dst_buffer->MutableDataY(), ...);
+	
+	// Send to transport
+	OnFrame(webrtc::VideoFrame(pWebRTCI420Buffer, 0, rtc::TimeMillis(), webrtc::kVideoRotation_0), pxWidth, pxHeight);
+
+	
+	//webrtc::VideoFrame videoFrame;
+
+	//webrtc::VideoFrameBuffer
+
+	//webrtc::I420ABufferInterface::
 
 	/*
 	cricket::CapturedFrame capturedVideoframe;
