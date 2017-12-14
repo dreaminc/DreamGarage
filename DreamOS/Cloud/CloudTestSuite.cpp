@@ -27,7 +27,7 @@ RESULT CloudTestSuite::AddTests() {
 	//CR(AddTestDownloadFile());	// requires logged in
 
 	CR(AddTestConnectLogin());
-	//CR(AddTestMenuAPI());
+	CR(AddTestMenuAPI());
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests

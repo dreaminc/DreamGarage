@@ -114,6 +114,14 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendStopEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return HandleStopEvent();
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendContactToBrowserAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -372,15 +380,15 @@ Error:
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
-	SetVisible(true);
+//	SetVisible(true);
 
 	std::string strScope = m_strScope;
 	std::string strTitle = "website";
-	std::string strPath = strURL;
+	SetBrowserPath(strURL);
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
 
 Error:
 	return r;
@@ -569,6 +577,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::HandleStopEvent() {
+	RESULT r = R_PASS;
+
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
+
+Error:
+	return r;
+}
+
 // DreamApp Interface
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
@@ -596,6 +616,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CN(pCommandLineManager);
 	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
 	strURL = strAPIURL + "/client/loading/";
+	SetBrowserPath(strURL);
 
 	// Initialize new browser
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
@@ -885,6 +906,10 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
+
+	//currently, only store the most recent message received
+	m_currentMessageType = pDreamBrowserMessage->GetMessageType();
+	m_currentAckType = pDreamBrowserMessage->GetAckType();
 
 	switch (pDreamBrowserMessage->GetMessageType()) {
 		case DreamBrowserMessage::type::PING: {
@@ -1314,8 +1339,13 @@ bool DreamBrowser::IsVisible() {
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
-	CR(m_pBrowserQuad->SetVisible(fVisible));
-	//CR(m_pPointerCursor->SetVisible(fVisible));
+	if (!m_fShouldDisplay) {
+		m_fShouldDisplay = true;
+	}
+	else {
+		CR(m_pBrowserQuad->SetVisible(fVisible));
+		//CR(m_pPointerCursor->SetVisible(fVisible));
+	}
 Error:
 	return r;
 }
@@ -1364,8 +1394,46 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		//CR(webRequest.ClearRequestHeaders());
 		
 		LoadRequest(webRequest);
+		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::StopSending() {
+	RESULT r = R_PASS;
+	std::string strAPIURL;
+	std::string strURL;
+	CommandLineManager *pCommandLineManager = nullptr;
+
+	CR(SetStreamingState(false));
+	CR(SetVisible(false));
+	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+
+	//*
+	// TODO: hack to stop getting audio 
+	// Get loading screen URL
+	pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
+	strURL = strAPIURL + "/client/loading/";
+	m_strScope = "WebsiteProviderScope.WebsiteProvider";
+	CR(SetBrowserPath(strURL));
+	m_fShouldDisplay = false;
+	//*/
+	CR(SendURL(strURL));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::StopReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = false;
+	CR(SetVisible(false));
+	CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
+									 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }

@@ -453,6 +453,18 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
+				{
+					auto browserUIDs = GetDOS()->GetAppUID("DreamBrowser");	// moving this here for better isolation
+					DreamBrowserHandle* pBrowserHandle = nullptr;
+					CB(browserUIDs.size() == 1);
+					m_browserUID = browserUIDs[0];
+					pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+					CN(pBrowserHandle);
+					pBrowserHandle->SetScope(strScope);
+					pBrowserHandle->SetPath(strPath);
+					CR(GetDOS()->ReleaseApp(pBrowserHandle, m_browserUID, this));
+				}
+
 				//TODO: this feels questionable, the focus stack will contain an invalid handle.
 				//		DreamUserObserver::HandleEvent is pure virtual at the handle level, so 
 				//		the code still executes correctly.
@@ -472,7 +484,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 
-				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
+				//m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
 				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 				CN(m_pKeyboardHandle);

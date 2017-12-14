@@ -58,6 +58,7 @@ public:
 
 	RESULT SendBackEvent();
 	RESULT SendForwardEvent();
+	RESULT SendStopEvent();
 
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	virtual RESULT SendURL (std::string strURL) = 0;
@@ -92,6 +93,7 @@ private:
 
 	virtual RESULT HandleBackEvent() = 0;
 	virtual RESULT HandleForwardEvent() = 0;
+	virtual RESULT HandleStopEvent() = 0;
 
 	virtual RESULT ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) = 0;
 
@@ -178,6 +180,7 @@ public:
 
 	virtual RESULT HandleBackEvent() override;
 	virtual RESULT HandleForwardEvent() override;
+	virtual RESULT HandleStopEvent() override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
@@ -204,6 +207,8 @@ public:
 	virtual RESULT SetBrowserPath(std::string strPath) override;
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	RESULT StopSending();
+	RESULT StopReceiving();
 	RESULT SetURI(std::string strURI);
 	RESULT LoadRequest(const WebRequest &webRequest);
 
@@ -267,11 +272,16 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	bool m_fShouldDisplay = true;
 
 	TextEntryString m_strEntered;
 	
 	std::string m_strScope;
 	std::string m_strPath;
+	long m_currentEnvironmentAssetID = 0;
+
+	DreamBrowserMessage::type m_currentMessageType;
+	DreamBrowserMessage::type m_currentAckType;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
