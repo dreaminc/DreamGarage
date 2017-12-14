@@ -907,6 +907,10 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
 
+	//currently, only store the most recent message received
+	m_currentMessageType = pDreamBrowserMessage->GetMessageType();
+	m_currentAckType = pDreamBrowserMessage->GetAckType();
+
 	switch (pDreamBrowserMessage->GetMessageType()) {
 		case DreamBrowserMessage::type::PING: {
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::PING));
@@ -1396,6 +1400,7 @@ RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
 	CR(SetStreamingState(false));
 	CR(m_pBrowserQuad->SetVisible(false));
+	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }
@@ -1404,6 +1409,8 @@ RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = false;
 	CR(m_pBrowserQuad->SetVisible(false));
+	CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
+									 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }
