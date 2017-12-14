@@ -879,6 +879,9 @@ RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pCont
 	CBR(!IsAnimating(), R_SKIPPED);
 
 	CR(m_pBrowserHandle->SendStopEvent());
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->SendClearFocusStack());
+	CR(Hide());
 
 Error:
 	return r;
