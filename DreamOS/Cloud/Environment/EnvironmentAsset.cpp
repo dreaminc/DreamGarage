@@ -13,17 +13,19 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/path"_json_pointer].is_string())
 		m_strPath = jsonMenuNode["/path"_json_pointer].get<std::string>();
 
-	if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
-		m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
+	if (jsonMenuNode.find("external_request") != jsonMenuNode.end()) {
+		if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
+			m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
 
-	if (jsonMenuNode["/external_request/headers"_json_pointer].is_object()) {
-		auto j = jsonMenuNode["/external_request/headers"_json_pointer].get<std::multimap<std::string, nlohmann::json>>();
-		for (const auto it : j) {
-			if (it.second.is_string()) {
-				std::string strsecond = it.second.get<std::string>();
-				m_headers.insert(std::pair<std::string, std::string>(it.first, strsecond));
+		if (jsonMenuNode["/external_request/headers"_json_pointer].is_object()) {
+			auto j = jsonMenuNode["/external_request/headers"_json_pointer].get<std::multimap<std::string, nlohmann::json>>();
+			for (const auto it : j) {
+				if (it.second.is_string()) {
+					std::string strsecond = it.second.get<std::string>();
+					m_headers.insert(std::pair<std::string, std::string>(it.first, strsecond));
+				}
+
 			}
-				
 		}
 	}
 

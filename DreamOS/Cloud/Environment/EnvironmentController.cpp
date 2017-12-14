@@ -59,6 +59,7 @@ RESULT EnvironmentController::Initialize() {
 	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_receiving", std::bind(&EnvironmentController::OnStopReceiving, this, std::placeholders::_1)));
+	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
 
 Error:
 	return r;
@@ -652,15 +653,18 @@ RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pClou
 	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
 	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
 
-	/*
+	//*
 	if (jsonEnvironmentAsset.size() != 0) {
 		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
 		CN(pEnvironmentAsset);
 		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+		}
 	}
 	//*/
 
-//Error:
+Error:
 	return r;
 }
 
