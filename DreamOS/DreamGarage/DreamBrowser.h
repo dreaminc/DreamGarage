@@ -272,6 +272,7 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	bool m_fShouldDisplay = true;
 
 	TextEntryString m_strEntered;
 	

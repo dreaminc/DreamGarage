@@ -380,7 +380,7 @@ Error:
 RESULT DreamBrowser::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
-	SetVisible(true);
+//	SetVisible(true);
 
 	std::string strScope = m_strScope;
 	std::string strTitle = "website";
@@ -1339,8 +1339,13 @@ bool DreamBrowser::IsVisible() {
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
-	CR(m_pBrowserQuad->SetVisible(fVisible));
-	//CR(m_pPointerCursor->SetVisible(fVisible));
+	if (!m_fShouldDisplay) {
+		m_fShouldDisplay = true;
+	}
+	else {
+		CR(m_pBrowserQuad->SetVisible(fVisible));
+		//CR(m_pPointerCursor->SetVisible(fVisible));
+	}
 Error:
 	return r;
 }
@@ -1398,9 +1403,27 @@ Error:
 
 RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
+	std::string strAPIURL;
+	std::string strURL;
+	CommandLineManager *pCommandLineManager = nullptr;
+
 	CR(SetStreamingState(false));
-	CR(m_pBrowserQuad->SetVisible(false));
+	CR(SetVisible(false));
 	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+
+	//*
+	// TODO: hack to stop getting audio 
+	// Get loading screen URL
+	pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
+	strURL = strAPIURL + "/client/loading/";
+	m_strScope = "WebsiteProviderScope.WebsiteProvider";
+	CR(SetBrowserPath(strURL));
+	m_fShouldDisplay = false;
+	//*/
+	CR(SendURL(strURL));
+
 Error:
 	return r;
 }
@@ -1408,7 +1431,7 @@ Error:
 RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = false;
-	CR(m_pBrowserQuad->SetVisible(false));
+	CR(SetVisible(false));
 	CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
 									 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
