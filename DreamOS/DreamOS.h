@@ -349,6 +349,8 @@ protected:
 
 protected:
 	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+
+public:
 	const SandboxApp::configuration& GetSandboxConfiguration();
 
 private:

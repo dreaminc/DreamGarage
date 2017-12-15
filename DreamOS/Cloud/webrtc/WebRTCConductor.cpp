@@ -320,7 +320,7 @@ RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
 	// User Peer Connection Factory
-	///* Standard way
+	/* Standard way
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory(
@@ -332,7 +332,7 @@ RESULT WebRTCConductor::Initialize() {
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 	//*/
 
-	/*
+	///*
 	// Chrome Peer Connection Factory (testing)
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
@@ -347,7 +347,8 @@ RESULT WebRTCConductor::Initialize() {
 	m_workerThread->Start();
 
 	// Signaling Thread
-	m_signalingThread = rtc::Thread::Create();
+	//m_signalingThread = rtc::Thread::Create();
+	m_signalingThread = std::unique_ptr<rtc::Thread>(rtc::ThreadManager::Instance()->WrapCurrentThread());
 	CN(m_signalingThread);
 	m_signalingThread->Start();
 
@@ -367,35 +368,43 @@ RESULT WebRTCConductor::Initialize() {
 	while (m_pAudioDeviceModule == nullptr) {
 		// wait;
 	}
+	//*/
 
 	CN(m_pAudioDeviceModule);
 
 	m_pWebRTCPeerConnectionFactory =
-		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
-											m_workerThread.get(),	// worker thread
-											//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
-											m_signalingThread.get(),
-											m_pAudioDeviceModule.get(),	// TODO: Default ADM
-											//m_pAudioDeviceDummyModule,		// Dummy ADM
-											nullptr,	// Audio Encoder Factory
-											nullptr,	// Audio Decoder Factory
-											nullptr,	// Video Encoder Factory
-											nullptr		// Video Decoder Factory
+		m_signalingThread->Invoke<rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>>(RTC_FROM_HERE, [&]()
+	{
+		return webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+			m_workerThread.get(),	// worker thread
+			//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+			m_signalingThread.get(),
+			m_pAudioDeviceModule.get(),	// TODO: Default ADM
+			//m_pAudioDeviceDummyModule,		// Dummy ADM
+			webrtc::CreateBuiltinAudioEncoderFactory(),	// Audio Encoder Factory
+			webrtc::CreateBuiltinAudioDecoderFactory(),	// Audio Decoder Factory
+			nullptr,	// Video Encoder Factory
+			nullptr		// Video Decoder Factory
 		);
+	});
+
+	while (m_pWebRTCPeerConnectionFactory == nullptr) {
+		// wait
+	}
 
 	m_pWebRTCPeerConnectionFactory->AddRef();
 
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
-	int32_t res;
-
+	//int32_t res;
 	//res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
 	//res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
-	res = m_pAudioDeviceModule->SetStereoRecording(true);
-	res = m_pAudioDeviceModule->SetStereoPlayout(true);
+	//res = m_pAudioDeviceModule->SetStereoRecording(true);
+	//res = m_pAudioDeviceModule->SetStereoPlayout(true);
 
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);
 
+	/*
 	auto numRecordingDevices = m_pAudioDeviceModule->RecordingDevices();
 	for (int i = 0; i < numRecordingDevices; i++) {
 		char name[webrtc::kAdmMaxDeviceNameSize];

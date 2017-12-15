@@ -743,8 +743,11 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		// Cloud Controller
 		CN(pTestContext->pCloudController);
 
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
+		// Initialize Cloud controller if not already initialized 
+		if (m_pDreamOS->GetSandboxConfiguration().fInitCloud == false) {
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
+		}
 
 		// Log in 
 		{
