@@ -72,7 +72,21 @@ RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFram
 	CN(pWebRTCI420Buffer);
 	
 	// Convert RGBA to YUV420
-	libyuv::ConvertToI420(src_frame, sample_size, dst_buffer->MutableDataY(), ...);
+	//libyuv::ConvertToI420(src_frame, sample_size, dst_buffer->MutableDataY(), ...);
+
+	int conversionResult = libyuv::ConvertToI420(
+		(const uint8*)pVideoBufferFrame, frameSize,
+		(uint8*)pWebRTCI420Buffer->DataY(), pWebRTCI420Buffer->StrideY(),	// I420 Buffer from above
+		(uint8*)pWebRTCI420Buffer->DataU(), pWebRTCI420Buffer->StrideU(),
+		(uint8*)pWebRTCI420Buffer->DataV(), pWebRTCI420Buffer->StrideV(),
+		0, 0,					// crop offset
+		pxWidth, pxHeight,		// source dimensions
+		pxWidth, pxHeight,		// Crop dimensions
+		libyuv::kRotate0,		// No rotation
+		libyuv::FOURCC_ARGB		// ARGB source
+	);
+
+	CBM((conversionResult == 0), "Conversion Failed");
 	
 	// Send to transport
 	OnFrame(webrtc::VideoFrame(pWebRTCI420Buffer, 0, rtc::TimeMillis(), webrtc::kVideoRotation_0), pxWidth, pxHeight);
