@@ -1339,13 +1339,8 @@ bool DreamBrowser::IsVisible() {
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
-	if (!m_fShouldDisplay) {
-		m_fShouldDisplay = true;
-	}
-	else {
-		CR(m_pBrowserQuad->SetVisible(fVisible));
-		//CR(m_pPointerCursor->SetVisible(fVisible));
-	}
+	CR(m_pBrowserQuad->SetVisible(fVisible));
+	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
 	return r;
 }
@@ -1420,9 +1415,8 @@ RESULT DreamBrowser::StopSending() {
 	strURL = strAPIURL + "/client/loading/";
 	m_strScope = "WebsiteProviderScope.WebsiteProvider";
 	CR(SetBrowserPath(strURL));
-	m_fShouldDisplay = false;
+	CR(SetURI(strURL));
 	//*/
-	CR(SendURL(strURL));
 
 Error:
 	return r;
