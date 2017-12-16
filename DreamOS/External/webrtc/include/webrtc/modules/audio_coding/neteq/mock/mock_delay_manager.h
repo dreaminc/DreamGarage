@@ -8,12 +8,12 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_
-#define WEBRTC_MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_
+#ifndef MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_
+#define MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_
 
-#include "webrtc/modules/audio_coding/neteq/delay_manager.h"
+#include "modules/audio_coding/neteq/delay_manager.h"
 
-#include "testing/gmock/include/gmock/gmock.h"
+#include "test/gmock.h"
 
 namespace webrtc {
 
@@ -35,8 +35,6 @@ class MockDelayManager : public DelayManager {
       int(int length_ms));
   MOCK_METHOD0(Reset,
       void());
-  MOCK_CONST_METHOD0(AverageIAT,
-      int());
   MOCK_CONST_METHOD0(PeakFound,
       bool());
   MOCK_METHOD1(UpdateCounters,
@@ -47,8 +45,7 @@ class MockDelayManager : public DelayManager {
       void(int* lower_limit, int* higher_limit));
   MOCK_CONST_METHOD0(TargetLevel,
       int());
-  MOCK_METHOD1(LastDecoderType,
-      void(NetEqDecoder decoder_type));
+  MOCK_METHOD0(RegisterEmptyPacket, void());
   MOCK_METHOD1(set_extra_delay_ms,
       void(int16_t delay));
   MOCK_CONST_METHOD0(base_target_level,
@@ -62,4 +59,4 @@ class MockDelayManager : public DelayManager {
 };
 
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_
+#endif  // MODULES_AUDIO_CODING_NETEQ_MOCK_MOCK_DELAY_MANAGER_H_

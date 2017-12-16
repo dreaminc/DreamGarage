@@ -8,36 +8,27 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_
-#define WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_
+#ifndef MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_
+#define MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_
 
 #include <map>
 #include <set>
 #include <vector>
+#include <string>
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/gunit.h"
-#include "webrtc/base/stringutils.h"
-#include "webrtc/base/thread_annotations.h"
-#include "webrtc/media/base/codec.h"
-#include "webrtc/media/engine/webrtcvideodecoderfactory.h"
-#include "webrtc/media/engine/webrtcvideoencoderfactory.h"
-#include "webrtc/modules/video_coding/include/video_error_codes.h"
-#include "webrtc/video_decoder.h"
-#include "webrtc/video_encoder.h"
+#include "api/video_codecs/video_decoder.h"
+#include "api/video_codecs/video_encoder.h"
+#include "media/base/codec.h"
+#include "media/engine/webrtcvideodecoderfactory.h"
+#include "media/engine/webrtcvideoencoderfactory.h"
+#include "modules/video_coding/include/video_error_codes.h"
+#include "rtc_base/basictypes.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/gunit.h"
+#include "rtc_base/stringutils.h"
+#include "rtc_base/thread_annotations.h"
 
 namespace cricket {
-
-static const int kMinVideoBitrate = 100;
-static const int kStartVideoBitrate = 300;
-static const int kMaxVideoBitrate = 1000;
-
-// WebRtc channel id and capture id share the same number space.
-// This is how AddRenderer(renderId, ...) is able to tell if it is adding a
-// renderer for a channel or it is adding a renderer for a capturer.
-static const int kViEChannelIdBase = 0;
-static const int kViEChannelIdMax = 1000;
 static const int kEventTimeoutMs = 10000;
 
 // Fake class for mocking out webrtc::VideoDecoder
@@ -132,9 +123,9 @@ class FakeWebRtcVideoEncoder : public webrtc::VideoEncoder {
   FakeWebRtcVideoEncoder()
       : init_encode_event_(false, false), num_frames_encoded_(0) {}
 
-  virtual int32_t InitEncode(const webrtc::VideoCodec* codecSettings,
-                             int32_t numberOfCores,
-                             size_t maxPayloadSize) {
+  int32_t InitEncode(const webrtc::VideoCodec* codecSettings,
+                     int32_t numberOfCores,
+                     size_t maxPayloadSize) override {
     rtc::CritScope lock(&crit_);
     codec_settings_ = *codecSettings;
     init_encode_event_.Set();
@@ -148,27 +139,28 @@ class FakeWebRtcVideoEncoder : public webrtc::VideoEncoder {
     return codec_settings_;
   }
 
-  virtual int32_t Encode(const webrtc::VideoFrame& inputImage,
-                         const webrtc::CodecSpecificInfo* codecSpecificInfo,
-                         const std::vector<webrtc::FrameType>* frame_types) {
+  int32_t Encode(const webrtc::VideoFrame& inputImage,
+                 const webrtc::CodecSpecificInfo* codecSpecificInfo,
+                 const std::vector<webrtc::FrameType>* frame_types) override {
     rtc::CritScope lock(&crit_);
     ++num_frames_encoded_;
     init_encode_event_.Set();
     return WEBRTC_VIDEO_CODEC_OK;
   }
 
-  virtual int32_t RegisterEncodeCompleteCallback(
-      webrtc::EncodedImageCallback* callback) {
+  int32_t RegisterEncodeCompleteCallback(
+      webrtc::EncodedImageCallback* callback) override {
     return WEBRTC_VIDEO_CODEC_OK;
   }
 
-  virtual int32_t Release() { return WEBRTC_VIDEO_CODEC_OK; }
+  int32_t Release() override { return WEBRTC_VIDEO_CODEC_OK; }
 
-  virtual int32_t SetChannelParameters(uint32_t packetLoss, int64_t rtt) {
+  int32_t SetChannelParameters(uint32_t packetLoss, int64_t rtt) override {
     return WEBRTC_VIDEO_CODEC_OK;
   }
 
-  virtual int32_t SetRates(uint32_t newBitRate, uint32_t frameRate) {
+  int32_t SetRateAllocation(const webrtc::BitrateAllocation& allocation,
+                            uint32_t framerate) override {
     return WEBRTC_VIDEO_CODEC_OK;
   }
 
@@ -180,8 +172,8 @@ class FakeWebRtcVideoEncoder : public webrtc::VideoEncoder {
  private:
   rtc::CriticalSection crit_;
   rtc::Event init_encode_event_;
-  int num_frames_encoded_ GUARDED_BY(crit_);
-  webrtc::VideoCodec codec_settings_ GUARDED_BY(crit_);
+  int num_frames_encoded_ RTC_GUARDED_BY(crit_);
+  webrtc::VideoCodec codec_settings_ RTC_GUARDED_BY(crit_);
 };
 
 // Fake class for mocking out WebRtcVideoEncoderFactory.
@@ -193,11 +185,10 @@ class FakeWebRtcVideoEncoderFactory : public WebRtcVideoEncoderFactory {
         encoders_have_internal_sources_(false) {}
 
   webrtc::VideoEncoder* CreateVideoEncoder(
-      webrtc::VideoCodecType type) override {
+      const cricket::VideoCodec& codec) override {
     rtc::CritScope lock(&crit_);
-    if (supported_codec_types_.count(type) == 0) {
-      return NULL;
-    }
+    if (!FindMatchingCodec(codecs_, codec))
+      return nullptr;
     FakeWebRtcVideoEncoder* encoder = new FakeWebRtcVideoEncoder();
     encoders_.push_back(encoder);
     num_created_encoders_++;
@@ -206,10 +197,13 @@ class FakeWebRtcVideoEncoderFactory : public WebRtcVideoEncoderFactory {
   }
 
   bool WaitForCreatedVideoEncoders(int num_encoders) {
-    while (created_video_encoder_event_.Wait(kEventTimeoutMs)) {
+    int64_t start_offset_ms = rtc::TimeMillis();
+    int64_t wait_time = kEventTimeoutMs;
+    do {
       if (GetNumCreatedEncoders() >= num_encoders)
         return true;
-    }
+      wait_time = kEventTimeoutMs - (rtc::TimeMillis() - start_offset_ms);
+    } while (wait_time > 0 && created_video_encoder_event_.Wait(wait_time));
     return false;
   }
 
@@ -221,8 +215,7 @@ class FakeWebRtcVideoEncoderFactory : public WebRtcVideoEncoderFactory {
     delete encoder;
   }
 
-  const std::vector<WebRtcVideoEncoderFactory::VideoCodec>& codecs()
-      const override {
+  const std::vector<cricket::VideoCodec>& supported_codecs() const override {
     return codecs_;
   }
 
@@ -235,11 +228,12 @@ class FakeWebRtcVideoEncoderFactory : public WebRtcVideoEncoderFactory {
     encoders_have_internal_sources_ = internal_source;
   }
 
-  void AddSupportedVideoCodecType(webrtc::VideoCodecType type,
-                                  const std::string& name) {
-    supported_codec_types_.insert(type);
-    codecs_.push_back(
-        WebRtcVideoEncoderFactory::VideoCodec(type, name, 1280, 720, 30));
+  void AddSupportedVideoCodec(const cricket::VideoCodec& codec) {
+    codecs_.push_back(codec);
+  }
+
+  void AddSupportedVideoCodecType(const std::string& name) {
+    codecs_.push_back(cricket::VideoCodec(name));
   }
 
   int GetNumCreatedEncoders() {
@@ -255,13 +249,12 @@ class FakeWebRtcVideoEncoderFactory : public WebRtcVideoEncoderFactory {
  private:
   rtc::CriticalSection crit_;
   rtc::Event created_video_encoder_event_;
-  std::set<webrtc::VideoCodecType> supported_codec_types_;
-  std::vector<WebRtcVideoEncoderFactory::VideoCodec> codecs_;
-  std::vector<FakeWebRtcVideoEncoder*> encoders_ GUARDED_BY(crit_);
-  int num_created_encoders_ GUARDED_BY(crit_);
+  std::vector<cricket::VideoCodec> codecs_;
+  std::vector<FakeWebRtcVideoEncoder*> encoders_ RTC_GUARDED_BY(crit_);
+  int num_created_encoders_ RTC_GUARDED_BY(crit_);
   bool encoders_have_internal_sources_;
 };
 
 }  // namespace cricket
 
-#endif  // WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_
+#endif  // MEDIA_ENGINE_FAKEWEBRTCVIDEOENGINE_H_

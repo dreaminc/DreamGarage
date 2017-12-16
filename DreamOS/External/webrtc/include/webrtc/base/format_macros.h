@@ -1,43 +1,50 @@
-/*
- *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. An additional intellectual property rights grant can be found
- *  in the file PATENTS.  All contributing project authors may
- *  be found in the AUTHORS file in the root of the source tree.
- */
+// Copyright (c) 2009 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-#ifndef WEBRTC_BASE_FORMAT_MACROS_H_
-#define WEBRTC_BASE_FORMAT_MACROS_H_
+#ifndef BASE_FORMAT_MACROS_H_
+#define BASE_FORMAT_MACROS_H_
 
-// This file defines the format macros for some integer types and is derived
-// from Chromium's base/format_macros.h.
+// This file defines the format macros for some integer types.
 
 // To print a 64-bit value in a portable way:
 //   int64_t value;
 //   printf("xyz:%" PRId64, value);
 // The "d" in the macro corresponds to %d; you can also use PRIu64 etc.
 //
+// For wide strings, prepend "Wide" to the macro:
+//   int64_t value;
+//   StringPrintf(L"xyz: %" WidePRId64, value);
+//
 // To print a size_t value in a portable way:
 //   size_t size;
 //   printf("xyz: %" PRIuS, size);
 // The "u" in the macro corresponds to %u, and S is for "size".
 
-#include "webrtc/typedefs.h"
+#include <stddef.h>
+#include <stdint.h>
 
-#if defined(WEBRTC_POSIX)
+#include "build/build_config.h"
 
-#if (defined(_INTTYPES_H) || defined(_INTTYPES_H_)) && !defined(PRId64)
+#if defined(OS_POSIX) && (defined(_INTTYPES_H) || defined(_INTTYPES_H_)) && \
+    !defined(PRId64)
 #error "inttypes.h has already been included before this header file, but "
 #error "without __STDC_FORMAT_MACROS defined."
 #endif
 
-#if !defined(__STDC_FORMAT_MACROS)
+#if defined(OS_POSIX) && !defined(__STDC_FORMAT_MACROS)
 #define __STDC_FORMAT_MACROS
 #endif
 
 #include <inttypes.h>
+
+#if defined(OS_POSIX)
+
+// GCC will concatenate wide and narrow strings correctly, so nothing needs to
+// be done here.
+#define WidePRId64 PRId64
+#define WidePRIu64 PRIu64
+#define WidePRIx64 PRIx64
 
 #if !defined(PRIuS)
 #define PRIuS "zu"
@@ -47,8 +54,8 @@
 // architectures and Apple does not provides standard format macros and
 // recommends casting. This has many drawbacks, so instead define macros
 // for formatting those types.
-#if defined(WEBRTC_MAC)
-#if defined(WEBRTC_ARCH_64_BITS)
+#if defined(OS_MACOSX)
+#if defined(ARCH_CPU_64_BITS)
 #if !defined(PRIdNS)
 #define PRIdNS "ld"
 #endif
@@ -58,7 +65,7 @@
 #if !defined(PRIxNS)
 #define PRIxNS "lx"
 #endif
-#else  // defined(WEBRTC_ARCH_64_BITS)
+#else  // defined(ARCH_CPU_64_BITS)
 #if !defined(PRIdNS)
 #define PRIdNS "d"
 #endif
@@ -69,23 +76,17 @@
 #define PRIxNS "x"
 #endif
 #endif
-#endif  // defined(WEBRTC_MAC)
+#endif  // defined(OS_MACOSX)
 
-#else  // WEBRTC_WIN
+#else  // OS_WIN
 
-#include <inttypes.h>
-
-#if !defined(PRId64)
-#define PRId64 "I64d"
+#if !defined(PRId64) || !defined(PRIu64) || !defined(PRIx64)
+#error "inttypes.h provided by win toolchain should define these."
 #endif
 
-#if !defined(PRIu64)
-#define PRIu64 "I64u"
-#endif
-
-#if !defined(PRIx64)
-#define PRIx64 "I64x"
-#endif
+#define WidePRId64 L"I64d"
+#define WidePRIu64 L"I64u"
+#define WidePRIx64 L"I64x"
 
 #if !defined(PRIuS)
 #define PRIuS "Iu"
@@ -93,4 +94,4 @@
 
 #endif
 
-#endif  // WEBRTC_BASE_FORMAT_MACROS_H_
+#endif  // BASE_FORMAT_MACROS_H_

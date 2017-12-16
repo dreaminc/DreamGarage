@@ -8,13 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_
-#define WEBRTC_TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_
+#ifndef TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_
+#define TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/video_encoder.h"
+#include "api/video_codecs/video_encoder.h"
 
 namespace webrtc {
 namespace test {
@@ -39,7 +39,8 @@ class ConfigurableFrameSizeEncoder : public VideoEncoder {
 
   int32_t SetChannelParameters(uint32_t packet_loss, int64_t rtt) override;
 
-  int32_t SetRates(uint32_t new_bit_rate, uint32_t frame_rate) override;
+  int32_t SetRateAllocation(const BitrateAllocation& allocation,
+                            uint32_t framerate) override;
 
   int32_t SetPeriodicKeyFrames(bool enable) override;
 
@@ -55,4 +56,4 @@ class ConfigurableFrameSizeEncoder : public VideoEncoder {
 }  // namespace test
 }  // namespace webrtc
 
-#endif  // WEBRTC_TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_
+#endif  // TEST_CONFIGURABLE_FRAME_SIZE_ENCODER_H_

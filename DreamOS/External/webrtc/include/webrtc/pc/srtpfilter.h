@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_PC_SRTPFILTER_H_
-#define WEBRTC_PC_SRTPFILTER_H_
+#ifndef PC_SRTPFILTER_H_
+#define PC_SRTPFILTER_H_
 
 #include <list>
 #include <map>
@@ -17,40 +17,24 @@
 #include <string>
 #include <vector>
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/sigslotrepeater.h"
-#include "webrtc/base/sslstreamadapter.h"
-#include "webrtc/base/thread_checker.h"
-#include "webrtc/media/base/cryptoparams.h"
-#include "webrtc/p2p/base/sessiondescription.h"
+#include "api/cryptoparams.h"
+#include "api/optional.h"
+#include "p2p/base/sessiondescription.h"
+#include "rtc_base/basictypes.h"
+#include "rtc_base/buffer.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/sslstreamadapter.h"
+#include "rtc_base/thread_checker.h"
 
 // Forward declaration to avoid pulling in libsrtp headers here
 struct srtp_event_data_t;
-struct srtp_ctx_t;
-struct srtp_policy_t;
+struct srtp_ctx_t_;
 
 namespace cricket {
 
-// Key is 128 bits and salt is 112 bits == 30 bytes. B64 bloat => 40 bytes.
-extern const int SRTP_MASTER_KEY_BASE64_LEN;
-
-// Needed for DTLS-SRTP
-extern const int SRTP_MASTER_KEY_KEY_LEN;
-extern const int SRTP_MASTER_KEY_SALT_LEN;
-
-class SrtpSession;
-class SrtpStat;
-
-void EnableSrtpDebugging();
-void ShutdownSrtp();
-
-// Class to transform SRTP to/from RTP.
-// Initialize by calling SetSend with the local security params, then call
-// SetRecv once the remote security params are received. At that point
-// Protect/UnprotectRt(c)p can be called to encrypt/decrypt data.
-// TODO: Figure out concurrency policy for SrtpFilter.
+// A helper class used to negotiate SDES crypto params.
+// TODO(zhihuang): Find a better name for this class, like "SdesNegotiator".
 class SrtpFilter {
  public:
   enum Mode {
@@ -87,62 +71,38 @@ class SrtpFilter {
   bool SetAnswer(const std::vector<CryptoParams>& answer_params,
                  ContentSource source);
 
-  // Just set up both sets of keys directly.
-  // Used with DTLS-SRTP.
-  bool SetRtpParams(int send_cs,
-                    const uint8_t* send_key,
-                    int send_key_len,
-                    int recv_cs,
-                    const uint8_t* recv_key,
-                    int recv_key_len);
-  bool SetRtcpParams(int send_cs,
-                     const uint8_t* send_key,
-                     int send_key_len,
-                     int recv_cs,
-                     const uint8_t* recv_key,
-                     int recv_key_len);
-
-  // Encrypts/signs an individual RTP/RTCP packet, in-place.
-  // If an HMAC is used, this will increase the packet size.
-  bool ProtectRtp(void* data, int in_len, int max_len, int* out_len);
-  // Overloaded version, outputs packet index.
-  bool ProtectRtp(void* data,
-                  int in_len,
-                  int max_len,
-                  int* out_len,
-                  int64_t* index);
-  bool ProtectRtcp(void* data, int in_len, int max_len, int* out_len);
-  // Decrypts/verifies an invidiual RTP/RTCP packet.
-  // If an HMAC is used, this will decrease the packet size.
-  bool UnprotectRtp(void* data, int in_len, int* out_len);
-  bool UnprotectRtcp(void* data, int in_len, int* out_len);
-
-  // Returns rtp auth params from srtp context.
-  bool GetRtpAuthParams(uint8_t** key, int* key_len, int* tag_len);
-
-  // Update the silent threshold (in ms) for signaling errors.
-  void set_signal_silent_time(int signal_silent_time_in_ms);
-
   bool ResetParams();
 
-  sigslot::repeater3<uint32_t, Mode, Error> SignalSrtpError;
+  rtc::Optional<int> send_cipher_suite() { return send_cipher_suite_; }
+  rtc::Optional<int> recv_cipher_suite() { return recv_cipher_suite_; }
+
+  const rtc::Buffer& send_key() { return send_key_; }
+  const rtc::Buffer& recv_key() { return recv_key_; }
 
  protected:
   bool ExpectOffer(ContentSource source);
+
   bool StoreParams(const std::vector<CryptoParams>& params,
                    ContentSource source);
+
   bool ExpectAnswer(ContentSource source);
+
   bool DoSetAnswer(const std::vector<CryptoParams>& answer_params,
-                     ContentSource source,
-                     bool final);
-  void CreateSrtpSessions();
+                   ContentSource source,
+                   bool final);
+
   bool NegotiateParams(const std::vector<CryptoParams>& answer_params,
                        CryptoParams* selected_params);
-  bool ApplyParams(const CryptoParams& send_params,
-                   const CryptoParams& recv_params);
-  static bool ParseKeyParams(const std::string& params, uint8_t* key, int len);
 
  private:
+  bool ApplySendParams(const CryptoParams& send_params);
+
+  bool ApplyRecvParams(const CryptoParams& recv_params);
+
+  static bool ParseKeyParams(const std::string& params,
+                             uint8_t* key,
+                             size_t len);
+
   enum State {
     ST_INIT,           // SRTP filter unused.
     ST_SENTOFFER,      // Offer with SRTP parameters sent.
@@ -166,149 +126,16 @@ class SrtpFilter {
     // ST_INIT.
     ST_RECEIVEDPRANSWER
   };
-  State state_;
-  int signal_silent_time_in_ms_;
+  State state_ = ST_INIT;
   std::vector<CryptoParams> offer_params_;
-  std::unique_ptr<SrtpSession> send_session_;
-  std::unique_ptr<SrtpSession> recv_session_;
-  std::unique_ptr<SrtpSession> send_rtcp_session_;
-  std::unique_ptr<SrtpSession> recv_rtcp_session_;
   CryptoParams applied_send_params_;
   CryptoParams applied_recv_params_;
-};
-
-// Class that wraps a libSRTP session.
-class SrtpSession {
- public:
-  SrtpSession();
-  ~SrtpSession();
-
-  // Configures the session for sending data using the specified
-  // cipher-suite and key. Receiving must be done by a separate session.
-  bool SetSend(int cs, const uint8_t* key, int len);
-  // Configures the session for receiving data using the specified
-  // cipher-suite and key. Sending must be done by a separate session.
-  bool SetRecv(int cs, const uint8_t* key, int len);
-
-  // Encrypts/signs an individual RTP/RTCP packet, in-place.
-  // If an HMAC is used, this will increase the packet size.
-  bool ProtectRtp(void* data, int in_len, int max_len, int* out_len);
-  // Overloaded version, outputs packet index.
-  bool ProtectRtp(void* data,
-                  int in_len,
-                  int max_len,
-                  int* out_len,
-                  int64_t* index);
-  bool ProtectRtcp(void* data, int in_len, int max_len, int* out_len);
-  // Decrypts/verifies an invidiual RTP/RTCP packet.
-  // If an HMAC is used, this will decrease the packet size.
-  bool UnprotectRtp(void* data, int in_len, int* out_len);
-  bool UnprotectRtcp(void* data, int in_len, int* out_len);
-
-  // Helper method to get authentication params.
-  bool GetRtpAuthParams(uint8_t** key, int* key_len, int* tag_len);
-
-  // Update the silent threshold (in ms) for signaling errors.
-  void set_signal_silent_time(int signal_silent_time_in_ms);
-
-  // Calls srtp_shutdown if it's initialized.
-  static void Terminate();
-
-  sigslot::repeater3<uint32_t, SrtpFilter::Mode, SrtpFilter::Error>
-      SignalSrtpError;
-
- private:
-  bool SetKey(int type, int cs, const uint8_t* key, int len);
-    // Returns send stream current packet index from srtp db.
-  bool GetSendStreamPacketIndex(void* data, int in_len, int64_t* index);
-
-  static bool Init();
-  void HandleEvent(const srtp_event_data_t* ev);
-  static void HandleEventThunk(srtp_event_data_t* ev);
-
-  rtc::ThreadChecker thread_checker_;
-  srtp_ctx_t* session_;
-  int rtp_auth_tag_len_;
-  int rtcp_auth_tag_len_;
-  std::unique_ptr<SrtpStat> srtp_stat_;
-  static bool inited_;
-  static rtc::GlobalLockPod lock_;
-  int last_send_seq_num_;
-  RTC_DISALLOW_COPY_AND_ASSIGN(SrtpSession);
-};
-
-// Class that collects failures of SRTP.
-class SrtpStat {
- public:
-  SrtpStat();
-
-  // Report RTP protection results to the handler.
-  void AddProtectRtpResult(uint32_t ssrc, int result);
-  // Report RTP unprotection results to the handler.
-  void AddUnprotectRtpResult(uint32_t ssrc, int result);
-  // Report RTCP protection results to the handler.
-  void AddProtectRtcpResult(int result);
-  // Report RTCP unprotection results to the handler.
-  void AddUnprotectRtcpResult(int result);
-
-  // Get silent time (in ms) for SRTP statistics handler.
-  int signal_silent_time() const { return signal_silent_time_; }
-  // Set silent time (in ms) for SRTP statistics handler.
-  void set_signal_silent_time(int signal_silent_time) {
-    signal_silent_time_ = signal_silent_time;
-  }
-
-  // Sigslot for reporting errors.
-  sigslot::signal3<uint32_t, SrtpFilter::Mode, SrtpFilter::Error>
-      SignalSrtpError;
-
- private:
-  // For each different ssrc and error, we collect statistics separately.
-  struct FailureKey {
-    FailureKey()
-        : ssrc(0),
-          mode(SrtpFilter::PROTECT),
-          error(SrtpFilter::ERROR_NONE) {
-    }
-    FailureKey(uint32_t in_ssrc,
-               SrtpFilter::Mode in_mode,
-               SrtpFilter::Error in_error)
-        : ssrc(in_ssrc), mode(in_mode), error(in_error) {}
-    bool operator <(const FailureKey& key) const {
-      return
-          (ssrc < key.ssrc) ||
-          (ssrc == key.ssrc && mode < key.mode) ||
-          (ssrc == key.ssrc && mode == key.mode && error < key.error);
-    }
-    uint32_t ssrc;
-    SrtpFilter::Mode mode;
-    SrtpFilter::Error error;
-  };
-  // For tracing conditions for signaling, currently we only use
-  // last_signal_time.  Wrap this as a struct so that later on, if we need any
-  // other improvements, it will be easier.
-  struct FailureStat {
-    FailureStat()
-        : last_signal_time(0) {
-    }
-    explicit FailureStat(uint32_t in_last_signal_time)
-        : last_signal_time(in_last_signal_time) {}
-    void Reset() {
-      last_signal_time = 0;
-    }
-    int64_t last_signal_time;
-  };
-
-  // Inspect SRTP result and signal error if needed.
-  void HandleSrtpResult(const FailureKey& key);
-
-  std::map<FailureKey, FailureStat> failures_;
-  // Threshold in ms to silent the signaling errors.
-  int signal_silent_time_;
-
-  RTC_DISALLOW_COPY_AND_ASSIGN(SrtpStat);
+  rtc::Optional<int> send_cipher_suite_;
+  rtc::Optional<int> recv_cipher_suite_;
+  rtc::Buffer send_key_;
+  rtc::Buffer recv_key_;
 };
 
 }  // namespace cricket
 
-#endif  // WEBRTC_PC_SRTPFILTER_H_
+#endif  // PC_SRTPFILTER_H_

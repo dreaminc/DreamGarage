@@ -1,5 +1,9 @@
 #include "WebRTCConductor.h"
 
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCImp.h"
@@ -8,13 +12,13 @@
 #include <utility>
 #include <vector>
 
-#include "webrtc/base/common.h"
-#include "webrtc/base/json.h"
-#include "webrtc/base/logging.h"
-#include "webrtc/examples/peerconnection/client/defaults.h"
+//#include "base/common.h"
+#include "rtc_base/json.h"
+#include "base/logging.h"
+#include "examples/peerconnection/client/defaults.h"
 
-#include "webrtc/api/test/fakertccertificategenerator.h"
-#include "webrtc/p2p/base/fakeportallocator.h"
+#include "pc/test/fakertccertificategenerator.h"
+#include "p2p/base/fakeportallocator.h"
 
 #include "WebRTCPeerConnection.h"
 #include "WebRTCICECandidate.h"
@@ -23,10 +27,13 @@
 #include "Cloud/User/User.h"
 #include "Cloud//User/TwilioNTSInformation.h"
 
+#include "api/audio_codecs/builtin_audio_decoder_factory.h"
+#include "api/audio_codecs/builtin_audio_encoder_factory.h"
+
 #include "Sound/AudioPacket.h"
 
 #define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
-#include "webrtc/modules/audio_device/audio_device_impl.h"
+#include "modules/audio_device/audio_device_impl.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -316,7 +323,10 @@ RESULT WebRTCConductor::Initialize() {
 	/* Standard way
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 
-	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+		webrtc::CreateBuiltinAudioEncoderFactory(),
+		webrtc::CreateBuiltinAudioDecoderFactory());
+
 	m_pWebRTCPeerConnectionFactory->AddRef();
 	
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
@@ -337,7 +347,8 @@ RESULT WebRTCConductor::Initialize() {
 	m_workerThread->Start();
 
 	// Signaling Thread
-	m_signalingThread = rtc::Thread::Create();
+	//m_signalingThread = rtc::Thread::Create();
+	m_signalingThread = std::unique_ptr<rtc::Thread>(rtc::ThreadManager::Instance()->WrapCurrentThread());
 	CN(m_signalingThread);
 	m_signalingThread->Start();
 
@@ -357,34 +368,43 @@ RESULT WebRTCConductor::Initialize() {
 	while (m_pAudioDeviceModule == nullptr) {
 		// wait;
 	}
+	//*/
 
 	CN(m_pAudioDeviceModule);
 
 	m_pWebRTCPeerConnectionFactory =
-		webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
-											m_workerThread.get(),	// worker thread
-											//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
-											m_signalingThread.get(),
-											m_pAudioDeviceModule,	// TODO: Default ADM
-											//m_pAudioDeviceDummyModule,		// Dummy ADM
-											nullptr,	// Video Encoder Factory
-											nullptr		// Audio Encoder Factory
+		m_signalingThread->Invoke<rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>>(RTC_FROM_HERE, [&]()
+	{
+		return webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+			m_workerThread.get(),	// worker thread
+			//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
+			m_signalingThread.get(),
+			m_pAudioDeviceModule.get(),	// TODO: Default ADM
+			//m_pAudioDeviceDummyModule,		// Dummy ADM
+			webrtc::CreateBuiltinAudioEncoderFactory(),	// Audio Encoder Factory
+			webrtc::CreateBuiltinAudioDecoderFactory(),	// Audio Decoder Factory
+			nullptr,	// Video Encoder Factory
+			nullptr		// Video Decoder Factory
 		);
+	});
+
+	while (m_pWebRTCPeerConnectionFactory == nullptr) {
+		// wait
+	}
 
 	m_pWebRTCPeerConnectionFactory->AddRef();
 
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
-	//*/
 
-	int32_t res;
-
-	res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
-	res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
-	res = m_pAudioDeviceModule->SetStereoRecording(true);
-	res = m_pAudioDeviceModule->SetStereoPlayout(true);
+	//int32_t res;
+	//res = m_pAudioDeviceModule->SetPlayoutSampleRate(44100);
+	//res = m_pAudioDeviceModule->SetRecordingSampleRate(44100);
+	//res = m_pAudioDeviceModule->SetStereoRecording(true);
+	//res = m_pAudioDeviceModule->SetStereoPlayout(true);
 
 	//m_pAudioDeviceModule->RegisterAudioCallback(this);
 
+	/*
 	auto numRecordingDevices = m_pAudioDeviceModule->RecordingDevices();
 	for (int i = 0; i < numRecordingDevices; i++) {
 		char name[webrtc::kAdmMaxDeviceNameSize];
@@ -393,6 +413,7 @@ RESULT WebRTCConductor::Initialize() {
 		m_pAudioDeviceModule->RecordingDeviceName(i, name, guid);
 		DEBUG_LINEOUT("ADM Recording Device %d: %s %s", i, name, guid);
 	}
+	//*/
 
 //Success:
 	return r;

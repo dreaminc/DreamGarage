@@ -4,9 +4,10 @@
 //#include <pthread.h>
 //#include <sys/time.h>
 
-#include "webrtc/common_video/libyuv/include/webrtc_libyuv.h"
-#include "webrtc/media/base/videocapturer.h"
-#include "webrtc/media/base/videoframe.h"
+#include "common_video/libyuv/include/webrtc_libyuv.h"
+//
+#include "media/base/videocapturer.h"
+#include "api/video/video_frame.h"
 
 #include <memory>
 
@@ -56,10 +57,48 @@ Error:
 	return;
 }
 
+#include "common_video/libyuv/include/webrtc_libyuv.h"
+#include "third_party/libyuv/include/libyuv.h"  // NOLINT
+#include "api/video/i420_buffer.h"
+#include "api/video/video_frame.h"
+
+// TODO: This is all kinds of fucked now
 RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFrame, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	size_t frameSize = sizeof(uint8_t) * pxHeight * pxWidth * channels;
+	
+	auto pWebRTCI420Buffer = webrtc::I420Buffer::Create(pxWidth, pxHeight);
+	CN(pWebRTCI420Buffer);
+	
+	// Convert RGBA to YUV420
+	//libyuv::ConvertToI420(src_frame, sample_size, dst_buffer->MutableDataY(), ...);
+
+	int conversionResult = libyuv::ConvertToI420(
+		(const uint8*)pVideoBufferFrame, frameSize,
+		(uint8*)pWebRTCI420Buffer->DataY(), pWebRTCI420Buffer->StrideY(),	// I420 Buffer from above
+		(uint8*)pWebRTCI420Buffer->DataU(), pWebRTCI420Buffer->StrideU(),
+		(uint8*)pWebRTCI420Buffer->DataV(), pWebRTCI420Buffer->StrideV(),
+		0, 0,					// crop offset
+		pxWidth, pxHeight,		// source dimensions
+		pxWidth, pxHeight,		// Crop dimensions
+		libyuv::kRotate0,		// No rotation
+		libyuv::FOURCC_ARGB		// ARGB source
+	);
+
+	CBM((conversionResult == 0), "Conversion Failed");
+	
+	// Send to transport
+	OnFrame(webrtc::VideoFrame(pWebRTCI420Buffer, 0, rtc::TimeMillis(), webrtc::kVideoRotation_0), pxWidth, pxHeight);
+
+	
+	//webrtc::VideoFrame videoFrame;
+
+	//webrtc::VideoFrameBuffer
+
+	//webrtc::I420ABufferInterface::
+
+	/*
 	cricket::CapturedFrame capturedVideoframe;
 
 	CB(IsRunning());
@@ -110,17 +149,19 @@ RESULT WebRTCCustomVideoCapturer::SubmitNewFrameBuffer(uint8_t *pVideoBufferFram
 		
 	std::shared_ptr<cricket::CapturedFrame> capturedVideoFrame(new cricket::CapturedFrame(webRTCVideoFrame, &captureBufferVector[0], length));
 
-	
 	*/
 
+	CR(r);
 
 Error:
 	return r;
 }
 
+/*
 void WebRTCCustomVideoCapturer::SignalFrameCapturedOnStartThread(const cricket::CapturedFrame* frame) {
 	SignalFrameCaptured(this, frame);
 }
+*/
 
 bool WebRTCCustomVideoCapturer::IsRunning() {
 	return capture_state() == cricket::CS_RUNNING;

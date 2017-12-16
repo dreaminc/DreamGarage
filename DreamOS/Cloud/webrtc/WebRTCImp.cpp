@@ -2,13 +2,13 @@
 
 #include "DreamLogger/DreamLogger.h"
 
-#include "webrtc/base/ssladapter.h"
-#include "webrtc/base/win32socketinit.h"
+#include "rtc_base/ssladapter.h"
+#include "rtc_base/win32socketinit.h"
 
 #include "WebRTCClient.h"
 #include "WebRTCConductor.h"
 
-#include "webrtc/base/arraysize.h"
+#include "rtc_base/arraysize.h"
 #include "Cloud/CloudController.h"
 #include "Cloud/Environment/PeerConnection.h"
 
@@ -30,7 +30,8 @@ WebRTCImp::~WebRTCImp() {
 
 	//m_pWin32thread->Stop();
 	//m_pWin32thread->Quit();
-	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
+
+	rtc::ThreadManager::Instance()->SetCurrentThread(nullptr);
 	rtc::CleanupSSL();
 }
 
@@ -49,8 +50,11 @@ RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;
 
 	rtc::EnsureWinsockInit();
-	
-	m_pWin32thread = new rtc::Win32Thread();
+
+	m_pWin32SocketServer = new rtc::Win32SocketServer();
+	CN(m_pWin32SocketServer);
+
+	m_pWin32thread = new rtc::Win32Thread(m_pWin32SocketServer);
 	CN(m_pWin32thread);
 
 	rtc::ThreadManager::Instance()->SetCurrentThread(m_pWin32thread);

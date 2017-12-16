@@ -2,6 +2,11 @@
 #define FREE_IMAGE_OBJ_H_
 
 #include "RESULT/EHM.h"
+
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include <FreeImagePlus.h>
 
 // DREAM OS

@@ -8,34 +8,33 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MEDIA_BASE_VIDEOSOURCEBASE_H_
-#define WEBRTC_MEDIA_BASE_VIDEOSOURCEBASE_H_
+#ifndef MEDIA_BASE_VIDEOSOURCEBASE_H_
+#define MEDIA_BASE_VIDEOSOURCEBASE_H_
 
 #include <vector>
 
-#include "webrtc/base/thread_checker.h"
-#include "webrtc/media/base/videoframe.h"
-#include "webrtc/media/base/videosourceinterface.h"
+#include "api/video/video_frame.h"
+#include "media/base/videosourceinterface.h"
+#include "rtc_base/thread_checker.h"
 
 namespace rtc {
 
 // VideoSourceBase is not thread safe.
-class VideoSourceBase : public VideoSourceInterface<cricket::VideoFrame> {
+class VideoSourceBase : public VideoSourceInterface<webrtc::VideoFrame> {
  public:
   VideoSourceBase();
-  void AddOrUpdateSink(VideoSinkInterface<cricket::VideoFrame>* sink,
+  void AddOrUpdateSink(VideoSinkInterface<webrtc::VideoFrame>* sink,
                        const VideoSinkWants& wants) override;
-  void RemoveSink(VideoSinkInterface<cricket::VideoFrame>* sink) override;
+  void RemoveSink(VideoSinkInterface<webrtc::VideoFrame>* sink) override;
 
  protected:
   struct SinkPair {
-    SinkPair(VideoSinkInterface<cricket::VideoFrame>* sink,
-             VideoSinkWants wants)
+    SinkPair(VideoSinkInterface<webrtc::VideoFrame>* sink, VideoSinkWants wants)
         : sink(sink), wants(wants) {}
-    VideoSinkInterface<cricket::VideoFrame>* sink;
+    VideoSinkInterface<webrtc::VideoFrame>* sink;
     VideoSinkWants wants;
   };
-  SinkPair* FindSinkPair(const VideoSinkInterface<cricket::VideoFrame>* sink);
+  SinkPair* FindSinkPair(const VideoSinkInterface<webrtc::VideoFrame>* sink);
 
   const std::vector<SinkPair>& sink_pairs() const { return sinks_; }
   ThreadChecker thread_checker_;
@@ -46,4 +45,4 @@ class VideoSourceBase : public VideoSourceInterface<cricket::VideoFrame> {
 
 }  // namespace rtc
 
-#endif  // WEBRTC_MEDIA_BASE_VIDEOSOURCEBASE_H_
+#endif  // MEDIA_BASE_VIDEOSOURCEBASE_H_

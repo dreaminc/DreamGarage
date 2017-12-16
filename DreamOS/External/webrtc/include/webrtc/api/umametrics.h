@@ -10,8 +10,10 @@
 
 // This file contains enums related to IPv4/IPv6 metrics.
 
-#ifndef WEBRTC_API_UMAMETRICS_H_
-#define WEBRTC_API_UMAMETRICS_H_
+#ifndef API_UMAMETRICS_H_
+#define API_UMAMETRICS_H_
+
+#include "rtc_base/refcount.h"
 
 namespace webrtc {
 
@@ -32,6 +34,9 @@ enum PeerConnectionEnumCounterType {
   kEnumCounterVideoSslCipher,
   kEnumCounterDataSrtpCipher,
   kEnumCounterDataSslCipher,
+  kEnumCounterDtlsHandshakeError,
+  kEnumCounterIceRegathering,
+  kEnumCounterIceRestart,
   kPeerConnectionEnumCounterMax
 };
 
@@ -106,6 +111,27 @@ enum IceCandidatePairType {
   kIceCandidatePairMax
 };
 
+class MetricsObserverInterface : public rtc::RefCountInterface {
+ public:
+  // |type| is the type of the enum counter to be incremented. |counter|
+  // is the particular counter in that type. |counter_max| is the next sequence
+  // number after the highest counter.
+  virtual void IncrementEnumCounter(PeerConnectionEnumCounterType type,
+                                    int counter,
+                                    int counter_max) {}
+
+  // This is used to handle sparse counters like SSL cipher suites.
+  // TODO(guoweis): Remove the implementation once the dependency's interface
+  // definition is updated.
+  virtual void IncrementSparseEnumCounter(PeerConnectionEnumCounterType type,
+                                          int counter);
+
+  virtual void AddHistogramSample(PeerConnectionMetricsName type,
+                                  int value) = 0;
+};
+
+typedef MetricsObserverInterface UMAObserver;
+
 }  // namespace webrtc
 
-#endif  // WEBRTC_API_UMAMETRICS_H_
+#endif  // API_UMAMETRICS_H_

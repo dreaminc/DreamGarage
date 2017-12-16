@@ -8,8 +8,8 @@
 // DreamOS/Cloud/webrtc/WebRTC.h
 // A customer WebRTC Audio Capture Device
 
-#include "webrtc/api/localaudiosource.h"
-#include "webrtc/api/mediaconstraintsinterface.h"
+#include "pc/localaudiosource.h"
+#include "api/mediaconstraintsinterface.h"
 
 class AudioPacket;
 

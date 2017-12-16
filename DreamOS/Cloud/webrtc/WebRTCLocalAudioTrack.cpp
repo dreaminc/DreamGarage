@@ -2,6 +2,8 @@
 
 #include "Sound/AudioPacket.h"
 
+#include "rtc_base/refcountedobject.h"
+
 rtc::scoped_refptr<WebRTCLocalAudioTrack> WebRTCLocalAudioTrack::Create(
 	const std::string& id,
 	const rtc::scoped_refptr<webrtc::AudioSourceInterface>& source) 

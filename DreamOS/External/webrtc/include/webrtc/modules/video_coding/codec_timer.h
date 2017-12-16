@@ -8,14 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_VIDEO_CODING_CODEC_TIMER_H_
-#define WEBRTC_MODULES_VIDEO_CODING_CODEC_TIMER_H_
+#ifndef MODULES_VIDEO_CODING_CODEC_TIMER_H_
+#define MODULES_VIDEO_CODING_CODEC_TIMER_H_
 
 #include <queue>
 
-#include "webrtc/modules/include/module_common_types.h"
-#include "webrtc/modules/video_coding/percentile_filter.h"
-#include "webrtc/typedefs.h"
+#include "modules/include/module_common_types.h"
+#include "rtc_base/numerics/percentile_filter.h"
+#include "typedefs.h"  // NOLINT(build/include)
 
 namespace webrtc {
 
@@ -43,9 +43,9 @@ class VCMCodecTimer {
   std::queue<Sample> history_;
   // |filter_| contains the same values as |history_|, but in a data structure
   // that allows efficient retrieval of the percentile value.
-  PercentileFilter filter_;
+  PercentileFilter<int64_t> filter_;
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_VIDEO_CODING_CODEC_TIMER_H_
+#endif  // MODULES_VIDEO_CODING_CODEC_TIMER_H_

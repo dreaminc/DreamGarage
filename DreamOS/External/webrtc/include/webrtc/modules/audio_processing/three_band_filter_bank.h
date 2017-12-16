@@ -8,14 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_
+#ifndef MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_
+#define MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_
 
 #include <cstring>
 #include <memory>
 #include <vector>
 
-#include "webrtc/common_audio/sparse_fir_filter.h"
+#include "common_audio/sparse_fir_filter.h"
 
 namespace webrtc {
 
@@ -35,6 +35,7 @@ namespace webrtc {
 class ThreeBandFilterBank final {
  public:
   explicit ThreeBandFilterBank(size_t length);
+  ~ThreeBandFilterBank();
 
   // Splits |in| into 3 downsampled frequency bands in |out|.
   // |length| is the |in| length. Each of the 3 bands of |out| has to have a
@@ -65,4 +66,4 @@ class ThreeBandFilterBank final {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_
+#endif  // MODULES_AUDIO_PROCESSING_THREE_BAND_FILTER_BANK_H_

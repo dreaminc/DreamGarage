@@ -8,16 +8,17 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_
+#ifndef MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_
+#define MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/array_view.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/modules/audio_processing/level_controller/down_sampler.h"
-#include "webrtc/modules/audio_processing/level_controller/noise_spectrum_estimator.h"
+#include "api/array_view.h"
+#include "modules/audio_processing/level_controller/down_sampler.h"
+#include "modules/audio_processing/level_controller/noise_spectrum_estimator.h"
+#include "modules/audio_processing/utility/ooura_fft.h"
+#include "rtc_base/constructormagic.h"
 
 namespace webrtc {
 
@@ -37,8 +38,8 @@ class SignalClassifier {
  private:
   class FrameExtender {
    public:
-    FrameExtender(size_t frame_size, size_t extended_frame_size)
-        : x_old_(extended_frame_size - frame_size, 0.f) {}
+    FrameExtender(size_t frame_size, size_t extended_frame_size);
+    ~FrameExtender();
 
     void ExtendFrame(rtc::ArrayView<const float> x,
                      rtc::ArrayView<float> x_extended);
@@ -57,9 +58,10 @@ class SignalClassifier {
   int initialization_frames_left_;
   int consistent_classification_counter_;
   SignalType last_signal_type_;
+  const OouraFft ooura_fft_;
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(SignalClassifier);
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_
+#endif  // MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_SIGNAL_CLASSIFIER_H_

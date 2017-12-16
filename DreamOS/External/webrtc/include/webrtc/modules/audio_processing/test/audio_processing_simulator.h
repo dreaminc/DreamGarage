@@ -8,26 +8,32 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_
+#ifndef MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_
+#define MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_
 
 #include <algorithm>
+#include <fstream>
 #include <limits>
 #include <memory>
 #include <string>
 
-#include "webrtc/base/timeutils.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/optional.h"
-#include "webrtc/common_audio/channel_buffer.h"
-#include "webrtc/modules/audio_processing/include/audio_processing.h"
-#include "webrtc/modules/audio_processing/test/test_utils.h"
+#include "api/optional.h"
+#include "common_audio/channel_buffer.h"
+#include "modules/audio_processing/include/audio_processing.h"
+#include "modules/audio_processing/test/fake_recording_device.h"
+#include "modules/audio_processing/test/test_utils.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/task_queue.h"
+#include "rtc_base/timeutils.h"
 
 namespace webrtc {
 namespace test {
 
 // Holds all the parameters available for controlling the simulation.
 struct SimulationSettings {
+  SimulationSettings();
+  SimulationSettings(const SimulationSettings&);
+  ~SimulationSettings();
   rtc::Optional<int> stream_delay;
   rtc::Optional<int> stream_drift_samples;
   rtc::Optional<int> output_sample_rate_hz;
@@ -40,9 +46,13 @@ struct SimulationSettings {
   rtc::Optional<std::string> reverse_output_filename;
   rtc::Optional<std::string> input_filename;
   rtc::Optional<std::string> reverse_input_filename;
+  rtc::Optional<std::string> artificial_nearend_filename;
   rtc::Optional<bool> use_aec;
   rtc::Optional<bool> use_aecm;
+  rtc::Optional<bool> use_ed;  // Residual Echo Detector.
+  rtc::Optional<std::string> ed_graph_output_filename;
   rtc::Optional<bool> use_agc;
+  rtc::Optional<bool> use_agc2;
   rtc::Optional<bool> use_hpf;
   rtc::Optional<bool> use_ns;
   rtc::Optional<bool> use_ts;
@@ -57,15 +67,20 @@ struct SimulationSettings {
   rtc::Optional<bool> use_drift_compensation;
   rtc::Optional<bool> use_aec3;
   rtc::Optional<bool> use_lc;
+  rtc::Optional<bool> use_experimental_agc;
   rtc::Optional<int> aecm_routing_mode;
   rtc::Optional<bool> use_aecm_comfort_noise;
   rtc::Optional<int> agc_mode;
   rtc::Optional<int> agc_target_level;
   rtc::Optional<bool> use_agc_limiter;
   rtc::Optional<int> agc_compression_gain;
+  float agc2_fixed_gain_db;
   rtc::Optional<int> vad_likelihood;
   rtc::Optional<int> ns_level;
   rtc::Optional<bool> use_refined_adaptive_filter;
+  int initial_mic_level;
+  bool simulate_mic_gain = false;
+  rtc::Optional<int> simulated_mic_kind;
   bool report_performance = false;
   bool report_bitexactness = false;
   bool use_verbose_logging = false;
@@ -74,6 +89,7 @@ struct SimulationSettings {
   rtc::Optional<std::string> aec_dump_output_filename;
   bool fixed_interface = false;
   bool store_intermediate_output = false;
+  rtc::Optional<std::string> custom_call_order_filename;
 };
 
 // Holds a few statistics about a series of TickIntervals.
@@ -92,9 +108,8 @@ class AudioProcessingSimulator {
  public:
   static const int kChunksPerSecond = 1000 / AudioProcessing::kChunkSizeMs;
 
-  explicit AudioProcessingSimulator(const SimulationSettings& settings)
-      : settings_(settings) {}
-  virtual ~AudioProcessingSimulator() {}
+  explicit AudioProcessingSimulator(const SimulationSettings& settings);
+  virtual ~AudioProcessingSimulator();
 
   // Processes the data in the input.
   virtual void Process() = 0;
@@ -156,6 +171,7 @@ class AudioProcessingSimulator {
   AudioFrame rev_frame_;
   AudioFrame fwd_frame_;
   bool bitexact_output_ = true;
+  int aec_dump_mic_level_ = 0;
 
  private:
   void SetupOutput();
@@ -166,6 +182,11 @@ class AudioProcessingSimulator {
   std::unique_ptr<ChannelBufferWavWriter> buffer_writer_;
   std::unique_ptr<ChannelBufferWavWriter> reverse_buffer_writer_;
   TickIntervalStats proc_time_;
+  std::ofstream residual_echo_likelihood_graph_writer_;
+  int analog_mic_level_;
+  FakeRecordingDevice fake_recording_device_;
+
+  rtc::TaskQueue worker_queue_;
 
   RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(AudioProcessingSimulator);
 };
@@ -173,4 +194,4 @@ class AudioProcessingSimulator {
 }  // namespace test
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_
+#endif  // MODULES_AUDIO_PROCESSING_TEST_AUDIO_PROCESSING_SIMULATOR_H_

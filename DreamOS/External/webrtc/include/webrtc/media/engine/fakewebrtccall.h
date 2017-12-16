@@ -17,32 +17,38 @@
 //   webrtc::VideoSendStream
 //   webrtc::VideoReceiveStream
 
-#ifndef WEBRTC_MEDIA_ENGINE_FAKEWEBRTCCALL_H_
-#define WEBRTC_MEDIA_ENGINE_FAKEWEBRTCCALL_H_
+#ifndef MEDIA_ENGINE_FAKEWEBRTCCALL_H_
+#define MEDIA_ENGINE_FAKEWEBRTCCALL_H_
 
 #include <memory>
+#include <string>
 #include <vector>
 
-#include "webrtc/audio_receive_stream.h"
-#include "webrtc/audio_send_stream.h"
-#include "webrtc/base/buffer.h"
-#include "webrtc/call.h"
-#include "webrtc/video_frame.h"
-#include "webrtc/video_receive_stream.h"
-#include "webrtc/video_send_stream.h"
+#include "api/video/video_frame.h"
+#include "call/audio_receive_stream.h"
+#include "call/audio_send_stream.h"
+#include "call/call.h"
+#include "call/flexfec_receive_stream.h"
+#include "modules/rtp_rtcp/source/rtp_packet_received.h"
+#include "rtc_base/buffer.h"
+#include "call/video_receive_stream.h"
+#include "call/video_send_stream.h"
 
 namespace cricket {
 class FakeAudioSendStream final : public webrtc::AudioSendStream {
  public:
   struct TelephoneEvent {
     int payload_type = -1;
+    int payload_frequency = -1;
     int event_code = 0;
     int duration_ms = 0;
   };
 
-  explicit FakeAudioSendStream(const webrtc::AudioSendStream::Config& config);
+  explicit FakeAudioSendStream(
+      int id, const webrtc::AudioSendStream::Config& config);
 
-  const webrtc::AudioSendStream::Config& GetConfig() const;
+  int id() const { return id_; }
+  const webrtc::AudioSendStream::Config& GetConfig() const override;
   void SetStats(const webrtc::AudioSendStream::Stats& stats);
   TelephoneEvent GetLatestTelephoneEvent() const;
   bool IsSending() const { return sending_; }
@@ -50,14 +56,19 @@ class FakeAudioSendStream final : public webrtc::AudioSendStream {
 
  private:
   // webrtc::AudioSendStream implementation.
+  void Reconfigure(const webrtc::AudioSendStream::Config& config) override;
+
   void Start() override { sending_ = true; }
   void Stop() override { sending_ = false; }
 
-  bool SendTelephoneEvent(int payload_type, int event,
+  bool SendTelephoneEvent(int payload_type, int payload_frequency, int event,
                           int duration_ms) override;
   void SetMuted(bool muted) override;
   webrtc::AudioSendStream::Stats GetStats() const override;
+  webrtc::AudioSendStream::Stats GetStats(
+      bool has_remote_tracks) const override;
 
+  int id_ = -1;
   TelephoneEvent latest_telephone_event_;
   webrtc::AudioSendStream::Config config_;
   webrtc::AudioSendStream::Stats stats_;
@@ -68,8 +79,9 @@ class FakeAudioSendStream final : public webrtc::AudioSendStream {
 class FakeAudioReceiveStream final : public webrtc::AudioReceiveStream {
  public:
   explicit FakeAudioReceiveStream(
-      const webrtc::AudioReceiveStream::Config& config);
+      int id, const webrtc::AudioReceiveStream::Config& config);
 
+  int id() const { return id_; }
   const webrtc::AudioReceiveStream::Config& GetConfig() const;
   void SetStats(const webrtc::AudioReceiveStream::Stats& stats);
   int received_packets() const { return received_packets_; }
@@ -79,32 +91,41 @@ class FakeAudioReceiveStream final : public webrtc::AudioReceiveStream {
   bool DeliverRtp(const uint8_t* packet,
                   size_t length,
                   const webrtc::PacketTime& packet_time);
+  bool started() const { return started_; }
 
  private:
   // webrtc::AudioReceiveStream implementation.
-  void Start() override {}
-  void Stop() override {}
+  void Start() override { started_ = true; }
+  void Stop() override { started_ = false; }
 
   webrtc::AudioReceiveStream::Stats GetStats() const override;
+  int GetOutputLevel() const override { return 0; }
   void SetSink(std::unique_ptr<webrtc::AudioSinkInterface> sink) override;
   void SetGain(float gain) override;
+  std::vector<webrtc::RtpSource> GetSources() const override {
+    return std::vector<webrtc::RtpSource>();
+  }
 
+  int id_ = -1;
   webrtc::AudioReceiveStream::Config config_;
   webrtc::AudioReceiveStream::Stats stats_;
   int received_packets_ = 0;
   std::unique_ptr<webrtc::AudioSinkInterface> sink_;
   float gain_ = 1.0f;
   rtc::Buffer last_packet_;
+  bool started_ = false;
 };
 
-class FakeVideoSendStream final : public webrtc::VideoSendStream,
-                                  public webrtc::VideoCaptureInput {
+class FakeVideoSendStream final
+    : public webrtc::VideoSendStream,
+      public rtc::VideoSinkInterface<webrtc::VideoFrame> {
  public:
-  FakeVideoSendStream(const webrtc::VideoSendStream::Config& config,
-                      const webrtc::VideoEncoderConfig& encoder_config);
-  webrtc::VideoSendStream::Config GetConfig() const;
-  webrtc::VideoEncoderConfig GetEncoderConfig() const;
-  std::vector<webrtc::VideoStream> GetVideoStreams();
+  FakeVideoSendStream(webrtc::VideoSendStream::Config config,
+                      webrtc::VideoEncoderConfig encoder_config);
+  ~FakeVideoSendStream() override;
+  const webrtc::VideoSendStream::Config& GetConfig() const;
+  const webrtc::VideoEncoderConfig& GetEncoderConfig() const;
+  const std::vector<webrtc::VideoStream>& GetVideoStreams() const;
 
   bool IsSending() const;
   bool GetVp8Settings(webrtc::VideoCodecVP8* settings) const;
@@ -119,27 +140,48 @@ class FakeVideoSendStream final : public webrtc::VideoSendStream,
     return num_encoder_reconfigurations_;
   }
 
+  void EnableEncodedFrameRecording(const std::vector<rtc::PlatformFile>& files,
+                                   size_t byte_limit) override;
+
+  bool resolution_scaling_enabled() const {
+    return resolution_scaling_enabled_;
+  }
+  bool framerate_scaling_enabled() const { return framerate_scaling_enabled_; }
+  void InjectVideoSinkWants(const rtc::VideoSinkWants& wants);
+
+  rtc::VideoSourceInterface<webrtc::VideoFrame>* source() const {
+    return source_;
+  }
+
  private:
-  void IncomingCapturedFrame(const webrtc::VideoFrame& frame) override;
+  // rtc::VideoSinkInterface<VideoFrame> implementation.
+  void OnFrame(const webrtc::VideoFrame& frame) override;
 
   // webrtc::VideoSendStream implementation.
   void Start() override;
   void Stop() override;
+  void SetSource(rtc::VideoSourceInterface<webrtc::VideoFrame>* source,
+                 const webrtc::VideoSendStream::DegradationPreference&
+                     degradation_preference) override;
   webrtc::VideoSendStream::Stats GetStats() override;
-  void ReconfigureVideoEncoder(
-      const webrtc::VideoEncoderConfig& config) override;
-  webrtc::VideoCaptureInput* Input() override;
+  void ReconfigureVideoEncoder(webrtc::VideoEncoderConfig config) override;
 
   bool sending_;
   webrtc::VideoSendStream::Config config_;
   webrtc::VideoEncoderConfig encoder_config_;
+  std::vector<webrtc::VideoStream> video_streams_;
+  rtc::VideoSinkWants sink_wants_;
+
   bool codec_settings_set_;
   union VpxSettings {
     webrtc::VideoCodecVP8 vp8;
     webrtc::VideoCodecVP9 vp9;
   } vpx_settings_;
+  bool resolution_scaling_enabled_;
+  bool framerate_scaling_enabled_;
+  rtc::VideoSourceInterface<webrtc::VideoFrame>* source_;
   int num_swapped_frames_;
-  webrtc::VideoFrame last_frame_;
+  rtc::Optional<webrtc::VideoFrame> last_frame_;
   webrtc::VideoSendStream::Stats stats_;
   int num_encoder_reconfigurations_ = 0;
 };
@@ -148,13 +190,19 @@ class FakeVideoReceiveStream final : public webrtc::VideoReceiveStream {
  public:
   explicit FakeVideoReceiveStream(webrtc::VideoReceiveStream::Config config);
 
-  const webrtc::VideoReceiveStream::Config& GetConfig();
+  const webrtc::VideoReceiveStream::Config& GetConfig() const;
 
   bool IsReceiving() const;
 
   void InjectFrame(const webrtc::VideoFrame& frame);
 
   void SetStats(const webrtc::VideoReceiveStream::Stats& stats);
+
+  void EnableEncodedFrameRecording(rtc::PlatformFile file,
+                                   size_t byte_limit) override;
+
+  void AddSecondarySink(webrtc::RtpPacketSinkInterface* sink) override;
+  void RemoveSecondarySink(const webrtc::RtpPacketSinkInterface* sink) override;
 
  private:
   // webrtc::VideoReceiveStream implementation.
@@ -166,6 +214,21 @@ class FakeVideoReceiveStream final : public webrtc::VideoReceiveStream {
   webrtc::VideoReceiveStream::Config config_;
   bool receiving_;
   webrtc::VideoReceiveStream::Stats stats_;
+};
+
+class FakeFlexfecReceiveStream final : public webrtc::FlexfecReceiveStream {
+ public:
+  explicit FakeFlexfecReceiveStream(
+      const webrtc::FlexfecReceiveStream::Config& config);
+
+  const webrtc::FlexfecReceiveStream::Config& GetConfig() const override;
+
+ private:
+  webrtc::FlexfecReceiveStream::Stats GetStats() const override;
+
+  void OnRtpPacket(const webrtc::RtpPacketReceived& packet) override;
+
+  webrtc::FlexfecReceiveStream::Config config_;
 };
 
 class FakeCall final : public webrtc::Call, public webrtc::PacketReceiver {
@@ -181,6 +244,8 @@ class FakeCall final : public webrtc::Call, public webrtc::PacketReceiver {
   const FakeAudioSendStream* GetAudioSendStream(uint32_t ssrc);
   const std::vector<FakeAudioReceiveStream*>& GetAudioReceiveStreams();
   const FakeAudioReceiveStream* GetAudioReceiveStream(uint32_t ssrc);
+
+  const std::vector<FakeFlexfecReceiveStream*>& GetFlexfecReceiveStreams();
 
   rtc::SentPacket last_sent_packet() const { return last_sent_packet_; }
 
@@ -206,49 +271,62 @@ class FakeCall final : public webrtc::Call, public webrtc::PacketReceiver {
       webrtc::AudioReceiveStream* receive_stream) override;
 
   webrtc::VideoSendStream* CreateVideoSendStream(
-      const webrtc::VideoSendStream::Config& config,
-      const webrtc::VideoEncoderConfig& encoder_config) override;
+      webrtc::VideoSendStream::Config config,
+      webrtc::VideoEncoderConfig encoder_config) override;
   void DestroyVideoSendStream(webrtc::VideoSendStream* send_stream) override;
 
   webrtc::VideoReceiveStream* CreateVideoReceiveStream(
       webrtc::VideoReceiveStream::Config config) override;
   void DestroyVideoReceiveStream(
       webrtc::VideoReceiveStream* receive_stream) override;
+
+  webrtc::FlexfecReceiveStream* CreateFlexfecReceiveStream(
+      const webrtc::FlexfecReceiveStream::Config& config) override;
+  void DestroyFlexfecReceiveStream(
+      webrtc::FlexfecReceiveStream* receive_stream) override;
+
   webrtc::PacketReceiver* Receiver() override;
 
   DeliveryStatus DeliverPacket(webrtc::MediaType media_type,
-                               const uint8_t* packet,
-                               size_t length,
+                               rtc::CopyOnWriteBuffer packet,
                                const webrtc::PacketTime& packet_time) override;
 
   webrtc::Call::Stats GetStats() const override;
 
   void SetBitrateConfig(
       const webrtc::Call::Config::BitrateConfig& bitrate_config) override;
+  void SetBitrateConfigMask(
+      const webrtc::Call::Config::BitrateConfigMask& mask) override;
+  void SetBitrateAllocationStrategy(
+      std::unique_ptr<rtc::BitrateAllocationStrategy>
+          bitrate_allocation_strategy) override;
   void OnNetworkRouteChanged(const std::string& transport_name,
                              const rtc::NetworkRoute& network_route) override {}
   void SignalChannelNetworkState(webrtc::MediaType media,
                                  webrtc::NetworkState state) override;
+  void OnTransportOverheadChanged(webrtc::MediaType media,
+                                  int transport_overhead_per_packet) override;
   void OnSentPacket(const rtc::SentPacket& sent_packet) override;
-
-  bool StartEventLog(rtc::PlatformFile log_file,
-                     int64_t max_size_bytes) override;
-  void StopEventLog() override;
 
   webrtc::Call::Config config_;
   webrtc::NetworkState audio_network_state_;
   webrtc::NetworkState video_network_state_;
   rtc::SentPacket last_sent_packet_;
   int last_sent_nonnegative_packet_id_ = -1;
+  int next_stream_id_ = 665;
   webrtc::Call::Stats stats_;
   std::vector<FakeVideoSendStream*> video_send_streams_;
   std::vector<FakeAudioSendStream*> audio_send_streams_;
   std::vector<FakeVideoReceiveStream*> video_receive_streams_;
   std::vector<FakeAudioReceiveStream*> audio_receive_streams_;
+  std::vector<FakeFlexfecReceiveStream*> flexfec_receive_streams_;
 
   int num_created_send_streams_;
   int num_created_receive_streams_;
+
+  int audio_transport_overhead_;
+  int video_transport_overhead_;
 };
 
 }  // namespace cricket
-#endif  // TALK_MEDIA_WEBRTC_WEBRTCVIDEOENGINE2_UNITTEST_H_
+#endif  // MEDIA_ENGINE_FAKEWEBRTCCALL_H_

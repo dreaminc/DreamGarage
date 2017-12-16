@@ -8,12 +8,16 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_
-#define WEBRTC_MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_
+#ifndef MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_
+#define MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_
 
 #include <stddef.h>
 
+#include "rtc_base/ignore_wundef.h"
+
+RTC_PUSH_IGNORING_WUNDEF()
 #include "opus.h"
+RTC_POP_IGNORING_WUNDEF()
 
 struct WebRtcOpusEncInst {
   OpusEncoder* encoder;
@@ -29,4 +33,4 @@ struct WebRtcOpusDecInst {
 };
 
 
-#endif  // WEBRTC_MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_
+#endif  // MODULES_AUDIO_CODING_CODECS_OPUS_OPUS_INST_H_

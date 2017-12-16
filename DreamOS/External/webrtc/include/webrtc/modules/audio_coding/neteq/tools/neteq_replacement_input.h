@@ -8,12 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_
-#define WEBRTC_MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_
+#ifndef MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_
+#define MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_
 
+#include <memory>
 #include <set>
 
-#include "webrtc/modules/audio_coding/neteq/tools/neteq_input.h"
+#include "modules/audio_coding/neteq/tools/neteq_input.h"
 
 namespace webrtc {
 namespace test {
@@ -42,8 +43,9 @@ class NetEqReplacementInput : public NetEqInput {
   const std::set<uint8_t> comfort_noise_types_;
   const std::set<uint8_t> forbidden_types_;
   std::unique_ptr<PacketData> packet_;  // The next packet to deliver.
+  uint32_t last_frame_size_timestamps_ = 960;  // Initial guess: 20 ms @ 48 kHz.
 };
 
 }  // namespace test
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_
+#endif  // MODULES_AUDIO_CODING_NETEQ_TOOLS_NETEQ_REPLACEMENT_INPUT_H_

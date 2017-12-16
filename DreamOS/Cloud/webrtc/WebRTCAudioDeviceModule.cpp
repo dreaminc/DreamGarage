@@ -1,10 +1,11 @@
 #include "WebRTCAudioDeviceModule.h"
 
-#include "webrtc/base/refcount.h"
-#include "webrtc/base/checks.h"
+#include "rtc_base/refcount.h"
+#include "rtc_base/refcountedobject.h"
+#include "rtc_base/checks.h"
 
 #define WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
-#include "webrtc/modules/audio_device/audio_device_impl.h"
+#include "modules/audio_device/audio_device_impl.h"
 
 RESULT AudioDeviceDataCapturer::Initialize() {
 	//m_pendingAudioPackets = std::queue<AudioPacket>();
@@ -92,6 +93,8 @@ bool WebRTCAudioDeviceModule::IsValid() {
 	return m_fValid;
 }
 
+// TODO: do it right
+/*
 // RefCountedModule methods overrides.
 int64_t WebRTCAudioDeviceModule::TimeUntilNextProcess()  {
 	return m_pAudioDeviceModuleImp->TimeUntilNextProcess();
@@ -101,8 +104,6 @@ int64_t WebRTCAudioDeviceModule::TimeUntilNextProcess()  {
 void WebRTCAudioDeviceModule::Process()  {
 	m_pAudioDeviceModuleImp->Process();
 
-	// TODO: Update WebRTC and do it right
-	/*
 	size_t nSamples = 441;
 	size_t nBytesPerSample = 2;
 	size_t nChannels = 2;
@@ -125,8 +126,8 @@ void WebRTCAudioDeviceModule::Process()  {
 		&elapsed_time_ms,
 		&ntp_time_ms
 	);
-	*/
 }
+*/
 
 float WebRTCAudioDeviceModule::GetRunTimeMicAverage() {
 	return m_runTimeAvgMicValue;
@@ -476,9 +477,11 @@ int32_t WebRTCAudioDeviceModule::ActiveAudioLayer(AudioLayer* audio_layer) const
 	return m_pAudioDeviceModuleImp->ActiveAudioLayer(audio_layer);
 }
 
+/*
 int32_t WebRTCAudioDeviceModule::RegisterEventObserver(webrtc::AudioDeviceObserver* event_callback)  {
 	return m_pAudioDeviceModuleImp->RegisterEventObserver(event_callback);
 }
+*/
 
 int32_t WebRTCAudioDeviceModule::Init()  {
 	return m_pAudioDeviceModuleImp->Init();
@@ -580,6 +583,7 @@ bool WebRTCAudioDeviceModule::AGC() const  {
 	return m_pAudioDeviceModuleImp->AGC();
 }
 
+/*
 int32_t WebRTCAudioDeviceModule::SetWaveOutVolume(uint16_t volume_left, uint16_t volume_right)  {
 	return m_pAudioDeviceModuleImp->SetWaveOutVolume(volume_left, volume_right);
 }
@@ -587,6 +591,7 @@ int32_t WebRTCAudioDeviceModule::SetWaveOutVolume(uint16_t volume_left, uint16_t
 int32_t WebRTCAudioDeviceModule::WaveOutVolume(uint16_t* volume_left, uint16_t* volume_right) const  {
 	return m_pAudioDeviceModuleImp->WaveOutVolume(volume_left, volume_right);
 }
+*/
 
 int32_t WebRTCAudioDeviceModule::InitSpeaker()  {
 	return m_pAudioDeviceModuleImp->InitSpeaker();
@@ -624,9 +629,11 @@ int32_t WebRTCAudioDeviceModule::MinSpeakerVolume(uint32_t* min_volume) const  {
 	return m_pAudioDeviceModuleImp->MinSpeakerVolume(min_volume);
 }
 
+/*
 int32_t WebRTCAudioDeviceModule::SpeakerVolumeStepSize(uint16_t* step_size) const  {
 	return m_pAudioDeviceModuleImp->SpeakerVolumeStepSize(step_size);
 }
+*/
 
 int32_t WebRTCAudioDeviceModule::MicrophoneVolumeIsAvailable(bool* available)  {
 	return m_pAudioDeviceModuleImp->MicrophoneVolumeIsAvailable(available);
@@ -648,9 +655,11 @@ int32_t WebRTCAudioDeviceModule::MinMicrophoneVolume(uint32_t* min_volume) const
 	return m_pAudioDeviceModuleImp->MinMicrophoneVolume(min_volume);
 }
 
+/*
 int32_t WebRTCAudioDeviceModule::MicrophoneVolumeStepSize(uint16_t* step_size) const  {
 	return m_pAudioDeviceModuleImp->MicrophoneVolumeStepSize(step_size);
 }
+*/
 
 int32_t WebRTCAudioDeviceModule::SpeakerMuteIsAvailable(bool* available)  {
 	return m_pAudioDeviceModuleImp->SpeakerMuteIsAvailable(available);
@@ -676,6 +685,7 @@ int32_t WebRTCAudioDeviceModule::MicrophoneMute(bool* enabled) const  {
 	return m_pAudioDeviceModuleImp->MicrophoneMute(enabled);
 }
 
+/*
 int32_t WebRTCAudioDeviceModule::MicrophoneBoostIsAvailable(bool* available)  {
 	return m_pAudioDeviceModuleImp->MicrophoneBoostIsAvailable(available);
 }
@@ -687,6 +697,7 @@ int32_t WebRTCAudioDeviceModule::SetMicrophoneBoost(bool enable)  {
 int32_t WebRTCAudioDeviceModule::MicrophoneBoost(bool* enabled) const  {
 	return m_pAudioDeviceModuleImp->MicrophoneBoost(enabled);
 }
+*/
 
 int32_t WebRTCAudioDeviceModule::StereoPlayoutIsAvailable(bool* available) const  {
 	return m_pAudioDeviceModuleImp->StereoPlayoutIsAvailable(available);
@@ -712,6 +723,11 @@ int32_t WebRTCAudioDeviceModule::StereoRecording(bool* enabled) const  {
 	return m_pAudioDeviceModuleImp->StereoRecording(enabled);
 }
 
+int32_t WebRTCAudioDeviceModule::PlayoutDelay(uint16_t* delay_ms) const  {
+	return m_pAudioDeviceModuleImp->PlayoutDelay(delay_ms);
+}
+
+/*
 int32_t WebRTCAudioDeviceModule::SetRecordingChannel(const ChannelType channel)  {
 	return m_pAudioDeviceModuleImp->SetRecordingChannel(channel);
 }
@@ -726,10 +742,6 @@ int32_t WebRTCAudioDeviceModule::SetPlayoutBuffer(const BufferType type, uint16_
 
 int32_t WebRTCAudioDeviceModule::PlayoutBuffer(BufferType* type, uint16_t* size_ms) const  {
 	return m_pAudioDeviceModuleImp->PlayoutBuffer(type, size_ms);
-}
-
-int32_t WebRTCAudioDeviceModule::PlayoutDelay(uint16_t* delay_ms) const  {
-	return m_pAudioDeviceModuleImp->PlayoutDelay(delay_ms);
 }
 
 int32_t WebRTCAudioDeviceModule::RecordingDelay(uint16_t* delay_ms) const  {
@@ -783,6 +795,7 @@ int32_t WebRTCAudioDeviceModule::SetLoudspeakerStatus(bool enable)  {
 int32_t WebRTCAudioDeviceModule::GetLoudspeakerStatus(bool* enabled) const  {
 	return m_pAudioDeviceModuleImp->GetLoudspeakerStatus(enabled);
 }
+*/
 
 bool WebRTCAudioDeviceModule::BuiltInAECIsAvailable() const  {
 	return m_pAudioDeviceModuleImp->BuiltInAECIsAvailable();

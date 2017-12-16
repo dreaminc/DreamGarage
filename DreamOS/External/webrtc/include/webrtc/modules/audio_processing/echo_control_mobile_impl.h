@@ -8,17 +8,17 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_
+#ifndef MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_
+#define MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/swap_queue.h"
-#include "webrtc/modules/audio_processing/include/audio_processing.h"
-#include "webrtc/modules/audio_processing/render_queue_item_verifier.h"
+#include "modules/audio_processing/include/audio_processing.h"
+#include "modules/audio_processing/render_queue_item_verifier.h"
+#include "rtc_base/constructormagic.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/swap_queue.h"
 
 namespace webrtc {
 
@@ -29,9 +29,9 @@ class EchoControlMobileImpl : public EchoControlMobile {
   EchoControlMobileImpl(rtc::CriticalSection* crit_render,
                         rtc::CriticalSection* crit_capture);
 
-  virtual ~EchoControlMobileImpl();
+  ~EchoControlMobileImpl() override;
 
-  int ProcessRenderAudio(const AudioBuffer* audio);
+  void ProcessRenderAudio(rtc::ArrayView<const int16_t> packed_render_audio);
   int ProcessCaptureAudio(AudioBuffer* audio, int stream_delay_ms);
 
   // EchoControlMobile implementation.
@@ -43,13 +43,13 @@ class EchoControlMobileImpl : public EchoControlMobile {
                   size_t num_reverse_channels,
                   size_t num_output_channels);
 
-  // Checks whether the module is enabled. Must only be
-  // called from the render side of APM as otherwise
-  // deadlocks may occur.
-  bool is_enabled_render_side_query() const;
+  static void PackRenderAudioBuffer(const AudioBuffer* audio,
+                                    size_t num_output_channels,
+                                    size_t num_channels,
+                                    std::vector<int16_t>* packed_buffer);
 
-  // Reads render side data that has been queued on the render call.
-  void ReadQueuedRenderData();
+  static size_t NumCancellersRequired(size_t num_output_channels,
+                                      size_t num_reverse_channels);
 
  private:
   class Canceller;
@@ -62,31 +62,17 @@ class EchoControlMobileImpl : public EchoControlMobile {
   int SetEchoPath(const void* echo_path, size_t size_bytes) override;
   int GetEchoPath(void* echo_path, size_t size_bytes) const override;
 
-  size_t num_handles_required() const;
-
-  void AllocateRenderQueue();
   int Configure();
 
-  rtc::CriticalSection* const crit_render_ ACQUIRED_BEFORE(crit_capture_);
+  rtc::CriticalSection* const crit_render_ RTC_ACQUIRED_BEFORE(crit_capture_);
   rtc::CriticalSection* const crit_capture_;
 
   bool enabled_ = false;
 
-  RoutingMode routing_mode_ GUARDED_BY(crit_capture_);
-  bool comfort_noise_enabled_ GUARDED_BY(crit_capture_);
-  unsigned char* external_echo_path_ GUARDED_BY(crit_render_)
-      GUARDED_BY(crit_capture_);
-
-  size_t render_queue_element_max_size_ GUARDED_BY(crit_render_)
-      GUARDED_BY(crit_capture_);
-
-  std::vector<int16_t> render_queue_buffer_ GUARDED_BY(crit_render_);
-  std::vector<int16_t> capture_queue_buffer_ GUARDED_BY(crit_capture_);
-
-  // Lock protection not needed.
-  std::unique_ptr<
-      SwapQueue<std::vector<int16_t>, RenderQueueItemVerifier<int16_t>>>
-      render_signal_queue_;
+  RoutingMode routing_mode_ RTC_GUARDED_BY(crit_capture_);
+  bool comfort_noise_enabled_ RTC_GUARDED_BY(crit_capture_);
+  unsigned char* external_echo_path_ RTC_GUARDED_BY(crit_render_)
+      RTC_GUARDED_BY(crit_capture_);
 
   std::vector<std::unique_ptr<Canceller>> cancellers_;
   std::unique_ptr<StreamProperties> stream_properties_;
@@ -95,4 +81,4 @@ class EchoControlMobileImpl : public EchoControlMobile {
 };
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_
+#endif  // MODULES_AUDIO_PROCESSING_ECHO_CONTROL_MOBILE_IMPL_H_

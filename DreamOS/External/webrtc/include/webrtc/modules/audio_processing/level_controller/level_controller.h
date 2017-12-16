@@ -8,21 +8,21 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_
+#ifndef MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_
+#define MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/base/optional.h"
-#include "webrtc/modules/audio_processing/include/audio_processing.h"
-#include "webrtc/modules/audio_processing/level_controller/gain_applier.h"
-#include "webrtc/modules/audio_processing/level_controller/gain_selector.h"
-#include "webrtc/modules/audio_processing/level_controller/noise_level_estimator.h"
-#include "webrtc/modules/audio_processing/level_controller/peak_level_estimator.h"
-#include "webrtc/modules/audio_processing/level_controller/saturating_gain_estimator.h"
-#include "webrtc/modules/audio_processing/level_controller/signal_classifier.h"
+#include "api/optional.h"
+#include "modules/audio_processing/include/audio_processing.h"
+#include "modules/audio_processing/level_controller/gain_applier.h"
+#include "modules/audio_processing/level_controller/gain_selector.h"
+#include "modules/audio_processing/level_controller/noise_level_estimator.h"
+#include "modules/audio_processing/level_controller/peak_level_estimator.h"
+#include "modules/audio_processing/level_controller/saturating_gain_estimator.h"
+#include "modules/audio_processing/level_controller/signal_classifier.h"
+#include "rtc_base/constructormagic.h"
 
 namespace webrtc {
 
@@ -38,12 +38,25 @@ class LevelController {
   void Process(AudioBuffer* audio);
   float GetLastGain() { return last_gain_; }
 
+  // TODO(peah): This method is a temporary solution as the the aim is to
+  // instead apply the config inside the constructor. Therefore this is likely
+  // to change.
+  void ApplyConfig(const AudioProcessing::Config::LevelController& config);
+  // Validates a config.
+  static bool Validate(const AudioProcessing::Config::LevelController& config);
+  // Dumps a config to a string.
+  static std::string ToString(
+      const AudioProcessing::Config::LevelController& config);
+
  private:
   class Metrics {
    public:
     Metrics() { Initialize(AudioProcessing::kSampleRate48kHz); }
     void Initialize(int sample_rate_hz);
-    void Update(float peak_level, float noise_level, float gain);
+    void Update(float long_term_peak_level,
+                float noise_level,
+                float gain,
+                float frame_peak_level);
 
    private:
     void Reset();
@@ -71,10 +84,12 @@ class LevelController {
   float dc_level_[2];
   float dc_forgetting_factor_;
   float last_gain_;
+  bool gain_jumpstart_ = false;
+  AudioProcessing::Config::LevelController config_;
 
   RTC_DISALLOW_COPY_AND_ASSIGN(LevelController);
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_
+#endif  // MODULES_AUDIO_PROCESSING_LEVEL_CONTROLLER_LEVEL_CONTROLLER_H_

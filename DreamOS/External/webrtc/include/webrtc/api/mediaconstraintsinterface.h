@@ -17,20 +17,23 @@
 // from WebRTC too.
 // https://bugs.chromium.org/p/webrtc/issues/detail?id=5617
 
-#ifndef WEBRTC_API_MEDIACONSTRAINTSINTERFACE_H_
-#define WEBRTC_API_MEDIACONSTRAINTSINTERFACE_H_
+#ifndef API_MEDIACONSTRAINTSINTERFACE_H_
+#define API_MEDIACONSTRAINTSINTERFACE_H_
 
 #include <string>
 #include <vector>
 
-#include "webrtc/base/optional.h"
-#include "webrtc/api/peerconnectioninterface.h"
+#include "api/optional.h"
+#include "api/peerconnectioninterface.h"
 
 namespace webrtc {
 
-// MediaConstraintsInterface
 // Interface used for passing arguments about media constraints
 // to the MediaStream and PeerConnection implementation.
+//
+// Constraints may be either "mandatory", which means that unless satisfied,
+// the method taking the constraints should fail, or "optional", which means
+// they may not be satisfied..
 class MediaConstraintsInterface {
  public:
   struct Constraint {
@@ -46,9 +49,6 @@ class MediaConstraintsInterface {
    public:
     bool FindFirst(const std::string& key, std::string* value) const;
   };
-
-  virtual const Constraints& GetMandatory() const = 0;
-  virtual const Constraints& GetOptional() const = 0;
 
   // Constraint keys used by a local video source.
   // Specified by draft-alvestrand-constraints-resolution-00b
@@ -75,9 +75,13 @@ class MediaConstraintsInterface {
   static const char kExperimentalNoiseSuppression[];  // googNoiseSuppression2
   static const char kIntelligibilityEnhancer[];  // intelligibilityEnhancer
   static const char kLevelControl[];             // levelControl
+  static const char
+      kLevelControlInitialPeakLevelDBFS[];  // levelControlInitialPeakLevelDBFS
   static const char kHighpassFilter[];  // googHighpassFilter
   static const char kTypingNoiseDetection[];  // googTypingNoiseDetection
   static const char kAudioMirroring[];  // googAudioMirroring
+  static const char
+      kAudioNetworkAdaptorConfig[];  // goodAudioNetworkAdaptorConfig
 
   // Google-specific constraint keys for a local video source
   static const char kNoiseReduction[];  // googNoiseReduction
@@ -118,9 +122,10 @@ class MediaConstraintsInterface {
   // stripped by Chrome before passed down to Libjingle.
   static const char kInternalConstraintPrefix[];
 
- protected:
-  // Dtor protected as objects shouldn't be deleted via this interface
-  virtual ~MediaConstraintsInterface() {}
+  virtual ~MediaConstraintsInterface() = default;
+
+  virtual const Constraints& GetMandatory() const = 0;
+  virtual const Constraints& GetOptional() const = 0;
 };
 
 bool FindConstraint(const MediaConstraintsInterface* constraints,
@@ -137,6 +142,11 @@ void CopyConstraintsIntoRtcConfiguration(
     const MediaConstraintsInterface* constraints,
     PeerConnectionInterface::RTCConfiguration* configuration);
 
+// Copy all relevant constraints into an AudioOptions object.
+void CopyConstraintsIntoAudioOptions(
+    const MediaConstraintsInterface* constraints,
+    cricket::AudioOptions* options);
+
 }  // namespace webrtc
 
-#endif  // WEBRTC_API_MEDIACONSTRAINTSINTERFACE_H_
+#endif  // API_MEDIACONSTRAINTSINTERFACE_H_

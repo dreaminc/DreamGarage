@@ -1,5 +1,9 @@
 #include "WebRTCPeerConnection.h"
 
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCConductor.h"
@@ -10,17 +14,19 @@
 #include <utility>
 #include <vector>
 
-#include "webrtc/api/test/fakeconstraints.h"
+#include "api/test/fakeconstraints.h"
 
-#include "webrtc/base/common.h"
-#include "webrtc/base/json.h"
-#include "webrtc/base/logging.h"
-#include "webrtc/examples/peerconnection/client/defaults.h"
-#include "webrtc/media/engine/webrtcvideocapturerfactory.h"
-#include "webrtc/modules/video_capture/video_capture_factory.h"
+//#include "base/common.h"
+#include "rtc_base/json.h"
+#include "base/logging.h"
+#include "examples/peerconnection/client/defaults.h"
+#include "media/engine/webrtcvideocapturerfactory.h"
 
-#include "webrtc/api/test/fakertccertificategenerator.h"
-#include "webrtc/p2p/base/fakeportallocator.h"
+#include "modules/video_capture/video_capture_factory.h"
+
+#include "pc/test/fakertccertificategenerator.h"
+
+#include "p2p/base/fakeportallocator.h"
 
 #include "Cloud/User/TwilioNTSInformation.h"
 
@@ -31,6 +37,8 @@
 #include "WebRTCLocalAudioTrack.h"
 
 #include "Primitives/texture.h"
+
+#include "common_video/libyuv/include/webrtc_libyuv.h"
 
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
@@ -132,6 +140,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kUserAudioLabel));
 
 	// Chrome Video
+	// TODO: Put back
 	CR(AddVideoStream(pMediaStreamInterface));
 
 	// Chrome Audio Source
@@ -150,7 +159,6 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	//*/
 
 	// Data Channel
-	// TODO: Do this moar bettar
 	// This is not in the media streaming interface
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
@@ -161,11 +169,11 @@ Error:
 }
 
 // Video
-cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
+std::unique_ptr<cricket::VideoCapturer> WebRTCPeerConnection::OpenVideoCaptureDevice() {
 	std::vector<std::string> deviceNames;
 
 	{
-		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> videoCaptureModuleDeviceInfo(webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
+		std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> videoCaptureModuleDeviceInfo(webrtc::VideoCaptureFactory::CreateDeviceInfo());
 		if (!videoCaptureModuleDeviceInfo) {
 			return nullptr;
 		}
@@ -185,7 +193,7 @@ cricket::VideoCapturer* WebRTCPeerConnection::OpenVideoCaptureDevice() {
 
 	cricket::WebRtcVideoDeviceCapturerFactory webRTCVideoDeviceCapturerFactory;
 
-	cricket::VideoCapturer* pCricketVideoCapturer = nullptr;
+	std::unique_ptr<cricket::VideoCapturer> pCricketVideoCapturer = nullptr;
 
 	for (const auto& strDeviceName : deviceNames) {
 		pCricketVideoCapturer = webRTCVideoDeviceCapturerFactory.Create(cricket::Device(strDeviceName, 0));
@@ -227,7 +235,7 @@ RESULT WebRTCPeerConnection::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStre
 	//CN(pVideoCapturer);
 
 	CR(InitializeVideoCaptureDevice("default_capture"));
-	pVideoCapturer = m_pCricketVideoCapturer;
+	pVideoCapturer = m_pCricketVideoCapturer.get();
 	CN(pVideoCapturer);
 
 	pVideoTrackSource = m_pWebRTCPeerConnectionFactory->CreateVideoSource(pVideoCapturer, &videoSourceConstraints);
@@ -285,8 +293,8 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(rtc::scoped_refptr<webrtc::Medi
 		//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 		//*/
 
-		fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
-		fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
+		//fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
+		//fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
 
 		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
 		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
@@ -599,15 +607,13 @@ void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, i
 	}
 }
 
-#include "webrtc/common_video/libyuv/include/webrtc_libyuv.h"
-
 // TODO: Update WebRTC version and move to webrtc::video_frame since 
 // I'm not sure what the hell cricket is all about
 
 // TODO: Need to be wary of memory stuff
 // Might want to give observer the handle for the memory and 
 // they will deallocate it
-void WebRTCPeerConnection::OnFrame(const cricket::VideoFrame& cricketVideoFrame) {
+void WebRTCPeerConnection::OnFrame(const webrtc::VideoFrame& cricketVideoFrame) {
 	RESULT r = R_PASS;
 
 	int videoFrameWidth = cricketVideoFrame.width();
@@ -1008,9 +1014,9 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	}
 
 	if (dtls) {
-		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
-			pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
-		}
+		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		//}
 
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
@@ -1177,7 +1183,7 @@ RESULT WebRTCPeerConnection::SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWi
 
 	CN(m_pCricketVideoCapturer);
 
-	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer);
+	WebRTCCustomVideoCapturer* pWebRTCCustomVideoCapturer = (WebRTCCustomVideoCapturer*)(m_pCricketVideoCapturer.get());
 
 	CR(pWebRTCCustomVideoCapturer->SubmitNewFrameBuffer(pVideoFrameBuffer, pxWidth, pxHeight, channels));
 
