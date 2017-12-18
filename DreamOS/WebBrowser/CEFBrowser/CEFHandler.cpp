@@ -388,30 +388,3 @@ CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowse
 Error:
 	return nullptr;
 }
-
-/*
-CefRefPtr<CefResponseFilter> CEFHandler::GetResourceResponseFilter(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
-	CefRefPtr<CefResponseFilter> pContentDispositionFilter;
-
-	response->GetHeader("content-disposition");
-
-
-	return pContentDispositionFilter;
-}
-*/
-/*
-void CEFHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl) {
-	CefResponse::HeaderMap responseHeaders;
-	
-	response->GetHeaderMap(responseHeaders);
-	std::string contentDisposition = response->GetHeader("content-disposition");
-	for (CefResponse::HeaderMap::iterator itr = responseHeaders.begin(); itr != responseHeaders.end(); ++itr) {
-		CefString strKey = itr->first;
-		if (strKey == "content-disposition") {
-			itr->second = "inline";
-		}
-	}
-
-	response->SetHeaderMap(responseHeaders);
-}
-*/
