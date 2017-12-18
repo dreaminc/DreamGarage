@@ -82,7 +82,7 @@ void CEFResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> pCefResponse,
 	
 	CefRefPtr<CefResponse> pLocalResponse = m_pCefURLRequest->GetResponse();
 
-	CefRequest::HeaderMap cefHeaders;
+	CefResponse::HeaderMap cefHeaders;
 	pLocalResponse->GetHeaderMap(cefHeaders);
 
 	/*
@@ -99,6 +99,14 @@ void CEFResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> pCefResponse,
 
 	// Copy the headers over (this is where we'd manipulate them)
 	// TODO: Adjust content-disposition as needed
+	std::string strContentDisposition = pLocalResponse->GetHeader("content-disposition");
+	for (CefResponse::HeaderMap::iterator itr = cefHeaders.begin(); itr != cefHeaders.end(); ++itr) {
+		CefString strKey = itr->first;
+		if (strKey == "content-disposition") {
+			itr->second = "inline";		// for now, we always want content-disposition to be inline
+		}
+	}
+
 	pCefResponse->SetHeaderMap(cefHeaders);
 
 	// Copy over response settings 

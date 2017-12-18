@@ -80,11 +80,7 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 CefRefPtr<CefRequestHandler> CEFHandler::GetRequestHandler() {
 	return this;
 }
-/*
-CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) {
-	return this;
-}
-*/
+
 bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, CefProcessId sourceCEFProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
 	RESULT r = R_PASS;
 
