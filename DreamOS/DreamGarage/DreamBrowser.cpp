@@ -540,6 +540,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 			CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
 		}
 		bool useAsterisk = pDOMNode->IsPassword();
+		pDreamControlViewHandle->SendPasswordFlag(useAsterisk);
 
 	}
 

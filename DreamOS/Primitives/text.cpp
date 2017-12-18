@@ -326,6 +326,24 @@ bool text::IsRenderToQuad() {
 	return ((m_flags & text::flags::RENDER_QUAD) != text::flags::NONE);
 }
 
+bool text::CheckFlag(text::flags checkFlag) {
+	return ((m_flags & checkFlag) != text::flags::NONE);
+}
+
+bool text::CheckFlagAgainstFlags(text::flags checkFlag, text::flags allFlags) {
+	return ((allFlags & checkFlag) != text::flags::NONE);
+}
+
+RESULT text::AddFlags(text::flags newFlags) {
+	m_flags = m_flags | newFlags;
+	return R_PASS;
+}
+
+RESULT text::RemoveFlags(text::flags removeFlags) {
+	m_flags = m_flags & (~(removeFlags));
+	return R_PASS;
+}
+
 // Notes all values are in dots
 std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float posY) {
 	RESULT r = R_PASS;
