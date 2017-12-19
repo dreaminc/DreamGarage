@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Image Source="DreamLogo.png" Height="65" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0, 50, 0, 0"></Image>
-        <TextBlock Text="Updating ..." VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"></TextBlock>
-        <ProgressBar Foreground="#3d6db5" Maximum="100" Value="24" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,50" Width="450" Height="50"></ProgressBar>
+        <TextBlock x:Name="m_textBlockStatus" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30" ><Run Text="Loading"/><LineBreak/><Run/></TextBlock>
+        <ProgressBar Name="m_progressBarDownload" Foreground="#3d6db5" Maximum="100" Value="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,50" Width="450" Height="50"></ProgressBar>
     </Grid>
 </Window>
