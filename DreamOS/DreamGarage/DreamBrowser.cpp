@@ -959,15 +959,18 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			//auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-			//UID controlViewUID = vControlViewUID[0];
-			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			//CN(pDreamControlViewHandle);
+			//*
+			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+			UID controlViewUID = vControlViewUID[0];
+			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+			CN(pDreamControlViewHandle);
+			//*/
 
-			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 			if (pDreamControlViewHandle != nullptr) {
 				CR(pDreamControlViewHandle->DismissApp());
-				CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+				//CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+				CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 			}
 
 		} break;
