@@ -940,6 +940,7 @@ RESULT DreamGarage::OnReceiveAsset() {
 	RESULT r = R_PASS;
 	if (m_pDreamBrowser != nullptr) {
 		m_pDreamBrowser->SetVisible(true);
+		m_pDreamBrowser->StartReceiving();
 	}
 	return r;
 }

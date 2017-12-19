@@ -208,6 +208,7 @@ public:
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT StopSending();
+	RESULT StartReceiving();
 	RESULT StopReceiving();
 	RESULT SetURI(std::string strURI);
 	RESULT LoadRequest(const WebRequest &webRequest);

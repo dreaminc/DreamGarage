@@ -952,7 +952,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
 				CR(GetDOS()->GetCloudController()->StopVideoStreaming());
 			}
-			*/
+			//*/
 
 			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 			m_fReceivingStream = true;
@@ -1407,9 +1407,9 @@ RESULT DreamBrowser::StopSending() {
 
 	CR(SetStreamingState(false));
 	CR(SetVisible(false));
-	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 
-	//*
+	/*
 	// TODO: hack to stop getting audio 
 	// Get loading screen URL
 	pCommandLineManager = CommandLineManager::instance();
@@ -1425,12 +1425,21 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::StartReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = true;
+	CR(SetVisible(true));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = false;
 	CR(SetVisible(false));
-	CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
-									 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+	//CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
+	//								 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }
