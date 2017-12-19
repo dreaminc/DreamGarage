@@ -103,7 +103,14 @@ void CEFResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> pCefResponse,
 	for (CefResponse::HeaderMap::iterator itr = cefHeaders.begin(); itr != cefHeaders.end(); ++itr) {
 		CefString strKey = itr->first;
 		if (strKey == "content-disposition") {
-			itr->second = "inline";		// for now, we always want content-disposition to be inline
+			if (strContentDisposition.substr(0, 10) == "attachment") {		// for now, we always want content-disposition to be inline
+				strContentDisposition.replace(0, 10, "inline");
+				itr->second = strContentDisposition;
+			}
+		}
+		if (strKey == "content-security-policy") {
+			itr->second = "";	// using x-xss-protection instead of a csp for now - sandboxing breaks pdfs from dropbox
+			cefHeaders.insert(std::multimap<CefString, CefString>::value_type("x-xss-protection", "1; mode=block"));
 		}
 	}
 
