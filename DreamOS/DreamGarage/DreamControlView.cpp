@@ -424,8 +424,8 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			CR(m_pUserHandle->SendClearFocusStack());
 
 			// if the user is streaming show the menu
-			CR(m_pUserHandle->RequestStreamingState(fStreaming));
-
+			//CR(m_pUserHandle->RequestStreamingState(fStreaming));
+/*
 			if (fStreaming) {
 				auto pDreamOS = GetDOS();
 
@@ -439,6 +439,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 				}
 				pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 			}
+//*/
 		}
 
 

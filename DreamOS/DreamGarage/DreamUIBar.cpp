@@ -266,7 +266,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 	switch (type) {
 		case UserObserverEventType::BACK: {
-			CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(m_pKeyboardHandle->Hide());
 				CR(m_pUserHandle->SendReleaseKeyboard());
@@ -281,8 +281,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 				// if the stack is empty after popping from the path, hide the app
 				CBR(m_pathStack.empty(), R_SKIPPED);
-				CR(HideApp());
 				CR(m_pUserHandle->SendPopFocusStack());
+				CR(HideApp());
+				//*
 				{
 					// if the user is currently streaming, show the control view
 					bool fStreaming = false;
@@ -291,6 +292,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 						CR(ShowControlView(false));
 					}
 				}
+				//*/
 				//break;
 			}
 
