@@ -659,7 +659,7 @@ RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pClou
 		CN(pEnvironmentAsset);
 		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
 		if (m_pEnvironmentControllerObserver != nullptr) {
-			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+			CR(m_pEnvironmentControllerObserver->OnReceiveAsset());
 		}
 	}
 	//*/

@@ -351,6 +351,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnReceiveAsset() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnReceiveAsset());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnStopSending() {
 	RESULT r = R_PASS;
 

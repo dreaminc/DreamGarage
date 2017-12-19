@@ -71,6 +71,7 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnReceiveAsset() override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 

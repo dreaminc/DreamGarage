@@ -936,6 +936,14 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 	return r;
 }
 
+RESULT DreamGarage::OnReceiveAsset() {
+	RESULT r = R_PASS;
+	if (m_pDreamBrowser != nullptr) {
+		m_pDreamBrowser->SetVisible(true);
+	}
+	return r;
+}
+
 RESULT DreamGarage::OnStopSending() {
 	RESULT r = R_PASS;
 	CR(m_pDreamBrowser->StopSending());
