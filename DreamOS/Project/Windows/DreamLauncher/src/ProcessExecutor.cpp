@@ -2,102 +2,102 @@
 
 #include "windows.h"
 
-bool ProcessExecutor::Init()
-{
+// Instantiate the static singleton instance
+ProcessExecutor* ProcessExecutor::s_pProcessExecutor = nullptr;
+
+bool ProcessExecutor::Initialize() {
 	TCHAR path[MAX_PATH];
 
 	int bytes = GetModuleFileName(NULL, path, MAX_PATH);
 
-	if (bytes == 0)
-	{
+	if (bytes == 0) {
 		LOG(ERROR) << "failed to GetModuleFileName";
 		return false;
 	}
 
-	m_currentProcessDir = std::wstring(path);
+	m_strCurrentProcessDir = std::wstring(path);
+
+	m_strCurrentProcessDir = m_strCurrentProcessDir.substr(0, m_strCurrentProcessDir.find_last_of(L"\\/"));
 	
-	m_currentProcessDir = m_currentProcessDir.substr(0, m_currentProcessDir.find_last_of(L"\\/"));
+	m_parentDir = m_strCurrentProcessDir.substr(0, m_strCurrentProcessDir.find_last_of(L"\\/"));
 	
-	m_parentDir = m_currentProcessDir.substr(0, m_currentProcessDir.find_last_of(L"\\/"));
-	
-	m_currentProcessDir += L"\\";
+	m_strCurrentProcessDir += L"\\";
 	m_parentDir += L"\\";
 
-	LOG(INFO) << "current dir = " << m_currentProcessDir;
+	LOG(INFO) << "current dir = " << m_strCurrentProcessDir;
 	LOG(INFO) << "parent dir (update.exe) = " << m_parentDir;
 
 	return true;
 }
 
-bool ProcessExecutor::ExecuteProcess(const std::wstring& processFullPath, const std::wstring& args, bool runAsAdmin, bool wait)
-{
-	LOG(INFO) << "Executing " << processFullPath << " " << args << " ...";
+bool ProcessExecutor::ExecuteProcess(const std::wstring& wstrProcessFullPath, const std::wstring& wstrArgs, bool fRunAsAdmin, bool fWait) {
+	LOG(INFO) << "Executing " << wstrProcessFullPath << " " << wstrArgs << " ...";
 
-	if (!wait)
-	{
-		HINSTANCE hInst = ShellExecute(NULL, (!runAsAdmin) ? NULL : L"runas", processFullPath.c_str(), args.c_str(), 0, SW_SHOWNORMAL);
+	if (!fWait) {
+		HINSTANCE hInst = ShellExecute(NULL, (!fRunAsAdmin) ? NULL : L"runas", wstrProcessFullPath.c_str(), wstrArgs.c_str(), 0, SW_SHOWNORMAL);
 		return (hInst != NULL);
 	}
-	else
-	{
+	else {
 		SHELLEXECUTEINFO ShExecInfo = { 0 };
+		
 		ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
 		ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-		ShExecInfo.hwnd = NULL;
-		ShExecInfo.lpVerb = (!runAsAdmin) ? NULL : L"runas";
-		ShExecInfo.lpFile = processFullPath.c_str();
-		ShExecInfo.lpParameters = args.c_str();
-		ShExecInfo.lpDirectory = NULL;
+		ShExecInfo.hwnd = nullptr;
+		ShExecInfo.lpVerb = (!fRunAsAdmin) ? NULL : L"runas";
+		ShExecInfo.lpFile = wstrProcessFullPath.c_str();
+		ShExecInfo.lpParameters = wstrArgs.c_str();
+		ShExecInfo.lpDirectory = nullptr;
 		ShExecInfo.nShow = SW_SHOWNORMAL;
-		ShExecInfo.hInstApp = NULL;
-		if (ShellExecuteEx(&ShExecInfo) == TRUE)
-		{	
+		ShExecInfo.hInstApp = nullptr;
+
+		if (ShellExecuteEx(&ShExecInfo) == true) {	
+
 			DWORD res = WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 
-			switch (res)
-			{
-			case WAIT_ABANDONED:
-			case WAIT_FAILED:
-			case WAIT_TIMEOUT: {
-				LOG(INFO) << "create process failed = " << res;
-				return false;
-			}break;
-			case WAIT_OBJECT_0: {
-				LOG(INFO) << "create process ok";
-				return true;
-			}break;
+			switch (res) {
+				case WAIT_ABANDONED:
+				case WAIT_FAILED:
+				case WAIT_TIMEOUT: {
+					LOG(INFO) << "create process failed = " << res;
+					return false;
+				}break;
+
+				case WAIT_OBJECT_0: {
+					LOG(INFO) << "create process ok";
+					return true;
+				}break;
 			}
 
 			return false;
 		}
-		else
+		else {
 			return false;
+		}
 	}
 }
 
-bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstring& args, ProcessDir processDir, bool runAsAdmin, bool wait, const std::function<bool(const std::string&)> callback)
-{
+bool ProcessExecutor::Execute(const std::wstring& wstrProcessPath, const std::wstring& wstrArgs, PROCESS_DIRECTORY_TYPE processDir, bool runAsAdmin, bool wait, const std::function<bool(const std::string&)> callback) {
 	std::wstring fullPath;
 
-	switch (processDir)
-	{
-		case ProcessDir::FullPath: break;
-		case ProcessDir::CurrentDir: {
-			fullPath = m_currentProcessDir + processPath;
+	switch (processDir) {
+		case PROCESS_DIRECTORY_TYPE::FULL: break;
+
+		case PROCESS_DIRECTORY_TYPE::CURRENT: {
+			fullPath = m_strCurrentProcessDir + wstrProcessPath;
 		} break;
-		case ProcessDir::ParentDir: {
-			fullPath = m_parentDir + processPath;
+
+		case PROCESS_DIRECTORY_TYPE::PARENT: {
+			fullPath = m_parentDir + wstrProcessPath;
 		} break;
 	}
 
-	LOG(INFO) << "Executing " << fullPath << " " << args << " ...";
+	LOG(INFO) << "Executing " << fullPath << " " << wstrArgs << " ...";
 
-	bool	success = true;
-	bool	exeSuccess = false;
+	bool fSuccess = true;
+	bool fExecutedSuccessfully  = false;
 
-	if (!callback)
-	{
-		exeSuccess = ExecuteProcess(fullPath, args, runAsAdmin, wait);
+	if (!callback) {
+		fExecutedSuccessfully  = ExecuteProcess(fullPath, wstrArgs, runAsAdmin, wait);
 	}
 	else
 	{		
@@ -105,7 +105,7 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 	
 		// TODO: this should be written cleanly to run a process with stream out
 		{
-			std::wstring wcmd(fullPath + L" " + args + L" >> callback.0");
+			std::wstring wcmd(fullPath + L" " + wstrArgs + L" >> callback.0");
 
 			LOG(INFO) << "run " << wcmd;
 
@@ -141,7 +141,7 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 			{
 				DWORD res = WaitForSingleObject(pi.hProcess, INFINITE);
 
-				exeSuccess = false;
+				fExecutedSuccessfully  = false;
 
 				switch (res)
 				{
@@ -149,16 +149,16 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 				case WAIT_FAILED:
 				case WAIT_TIMEOUT: {
 					LOG(INFO) << "create process failed = " << res;
-					exeSuccess = false;
+					fExecutedSuccessfully  = false;
 				}break;
 				case WAIT_OBJECT_0: {
 					LOG(INFO) << "create process ok";
-					exeSuccess = true;
+					fExecutedSuccessfully  = true;
 				}break;
 				}
 			}
 			else
-				exeSuccess = false;
+				fExecutedSuccessfully  = false;
 
 			CloseHandle(pi.hProcess);
 			CloseHandle(pi.hThread);
@@ -177,12 +177,11 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 		std::ifstream cbFile("callback.0", std::ios::binary);
 		std::string line;
 
-		while (std::getline(cbFile, line))
-		{
+		while (std::getline(cbFile, line)) {
 			LOG(INFO) << "callback " << line;
-			if (callback(line))
-			{
-				success = false;
+
+			if (callback(line)) {
+				fSuccess = false;
 				break;
 			}
 		}
@@ -191,19 +190,21 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 		remove("callback.0");
 	}
 
-	if (exeSuccess)
-		LOG(INFO) << "Executed OK " << fullPath << " " << args;
-	else
-		LOG(ERROR) << "Executed failed " << fullPath << " " << args;
+	if (fExecutedSuccessfully ) {
+		LOG(INFO) << "Executed OK " << fullPath << " " << wstrArgs;
+	}
+	else {
+		LOG(ERROR) << "Executed failed " << fullPath << " " << wstrArgs;
+	}
 
-	if (!success)
+	if (!fSuccess) {
 		LOG(INFO) << "Executed callback failed";
+	}
 
-	return (success && exeSuccess);
+	return (fSuccess && fExecutedSuccessfully );
 }
 
-bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstring& args, ProcessDir processDir, bool runAsAdmin, bool wait, const std::function<bool(const SquirrelEvent&)> squirrelCallback)
-{
+bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstring& args, PROCESS_DIRECTORY_TYPE processDir, bool runAsAdmin, bool wait, const std::function<bool(const SquirrelEvent&)> squirrelCallback) {
 	SquirrelEvent event;
 
 	return Execute(processPath,
@@ -219,12 +220,10 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 	});
 }
 
-const std::wstring& ProcessExecutor::GetCurrentProcessDir() const
-{
-	return m_currentProcessDir;
+const std::wstring& ProcessExecutor::GetCurrentProcessDir() const {
+	return m_strCurrentProcessDir;
 }
 
-const std::wstring& ProcessExecutor::GetParentDir() const
-{
+const std::wstring& ProcessExecutor::GetParentDir() const {
 	return m_parentDir;
 }

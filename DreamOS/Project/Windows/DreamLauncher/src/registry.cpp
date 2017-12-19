@@ -44,7 +44,7 @@ std::multimap<std::wstring, registryData> registry
 
 bool InitRegistry()
 {
-	std::wstring squirrelUpdateProcess(ProcessExecutor::GetProcessExecutor()->GetParentDir());
+	std::wstring squirrelUpdateProcess(ProcessExecutor::instance()->GetParentDir());
 	//std::replace(squirrelUpdateProcess.begin(), squirrelUpdateProcess.end(), '\\', '/');
 
 	for (auto& reg : registry)

@@ -5,33 +5,25 @@
 
 #include <string>
 
-class ProcessExecutor
-{
+class ProcessExecutor {
 public:
-	enum class ProcessDir
-	{
-		FullPath,
-		CurrentDir,
-		ParentDir
+	enum class PROCESS_DIRECTORY_TYPE {
+		FULL,
+		CURRENT,
+		PARENT
 	};
 
-	static ProcessExecutor* GetProcessExecutor()
-	{
-		static ProcessExecutor pe;
-		return &pe;
-	}
-
 	// initialize working path, returns bool when failed
-	bool Init();
+	bool Initialize();
 
-	bool Execute(const std::wstring& processPath, const std::wstring& args, ProcessDir processDir, bool runAsAdmin, bool wait, const std::function<bool(const std::string&)> callback = nullptr);
-	bool Execute(const std::wstring& processPath, const std::wstring& args, ProcessDir processDir, bool runAsAdmin, bool wait, const std::function<bool(const SquirrelEvent&)> callback);
+	bool Execute(const std::wstring& wstrProccessPath, const std::wstring& wstrArgs, PROCESS_DIRECTORY_TYPE processDir, bool runAsAdmin, bool wait, const std::function<bool(const std::string&)> callback = nullptr);
+	bool Execute(const std::wstring& wstrProccessPath, const std::wstring& wstrArgs, PROCESS_DIRECTORY_TYPE processDir, bool runAsAdmin, bool wait, const std::function<bool(const SquirrelEvent&)> callback);
 
 	const std::wstring& GetCurrentProcessDir() const;
 	const std::wstring& GetParentDir() const;
 
 private:
-	bool ExecuteProcess(const std::wstring& processFullPath, const std::wstring& args, bool runAsAdmin, bool wait);
+	bool ExecuteProcess(const std::wstring& wstrProcessFullPath, const std::wstring& strArgs, bool fRunAsAdmin, bool fWait);
 
 private:
 
@@ -42,6 +34,22 @@ private:
 	//		DreamOS.exe
 	//		DreamLauncher.exe
 
-	std::wstring m_currentProcessDir;
+	std::wstring m_strCurrentProcessDir;
 	std::wstring m_parentDir;
+
+	// Singleton
+
+public:
+	static ProcessExecutor* instance() {
+		if (s_pProcessExecutor == nullptr) {
+			s_pProcessExecutor = new ProcessExecutor();
+			
+			//s_pProcessExecutor->Initialize();
+		}
+
+		return s_pProcessExecutor;
+	}
+
+private:
+	static ProcessExecutor *s_pProcessExecutor;
 };

@@ -32,23 +32,22 @@ INITIALIZE_EASYLOGGINGPP
 bool CheckForUpdate(bool& updated) {
 	SquirrelEvent res;
 
-	std::wstring loadingGif;
+	std::wstring wstrLoadingGif;
 	//loadingGif += L"--loadingGif=\"";
 	//loadingGif += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
 	//loadingGif += L"loading.gif\"";
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--checkForUpdate=\"" + updatesUrl + L"\" " + loadingGif,
-		ProcessExecutor::ProcessDir::ParentDir,
+	if (!ProcessExecutor::instance()->Execute(L"Update.exe", L"--checkForUpdate=\"" + updatesUrl + L"\" " + wstrLoadingGif,
+		ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 		false,
 		false,
-		[&](const SquirrelEvent& event) -> bool
-	{
-		LOG(INFO) << "event " << event;
+		[&](const SquirrelEvent& event) -> bool {
+			LOG(INFO) << "event " << event;
 
-		res = event;
-		return false;
-	}
-	))
+			res = event;
+			return false;
+		})
+		)
 	{
 		LOG(ERROR) << "process execute failed";
 		return false;
@@ -78,8 +77,8 @@ bool Update()
 	//loadingGif += L"loading.gif\"";
 
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--update=\"" + updatesUrl + L"\" " + loadingGif,
-		ProcessExecutor::ProcessDir::ParentDir,
+	if (!ProcessExecutor::instance()->Execute(L"Update.exe", L"--update=\"" + updatesUrl + L"\" " + loadingGif,
+		ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 		false,
 		true,
 		[&](const SquirrelEvent& event) -> bool
@@ -106,8 +105,8 @@ bool ExecuteUpdate(int argc, char *argv[])
 
 	if (argc <= 1)
 	{
-		if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--processStart \"DreamLauncher.exe\"",
-			ProcessExecutor::ProcessDir::ParentDir,
+		if (!ProcessExecutor::instance()->Execute(L"Update.exe", L"--processStart \"DreamLauncher.exe\"",
+			ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 			false,
 			false))
 		{
@@ -131,9 +130,9 @@ bool ExecuteUpdate(int argc, char *argv[])
 		args += wcmdlnArgs;
 		args += L"\"";
 
-		if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+		if (!ProcessExecutor::instance()->Execute(exe.c_str(),
 			args.c_str(),
-			ProcessExecutor::ProcessDir::ParentDir,
+			ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 			false,
 			false))
 		{
@@ -218,12 +217,12 @@ bool InstallShortcuts()
 #ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--createShortcut=\"Dream.html\" --icon=\"");
-	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
+	args += ProcessExecutor::instance()->GetCurrentProcessDir();
 	args += L"Dream.ico\"";
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+	if (!ProcessExecutor::instance()->Execute(exe.c_str(),
 		args.c_str(),
-		ProcessExecutor::ProcessDir::ParentDir,
+		ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 		false,
 		false))
 	{
@@ -240,12 +239,12 @@ bool RemoveShortcuts()
 #ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--removeShortcut=\"Dream.html\" --icon=\"");
-	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
+	args += ProcessExecutor::instance()->GetCurrentProcessDir();
 	args += L"Dream.ico\"";
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+	if (!ProcessExecutor::instance()->Execute(exe.c_str(),
 		args.c_str(),
-		ProcessExecutor::ProcessDir::ParentDir,
+		ProcessExecutor::PROCESS_DIRECTORY_TYPE::PARENT,
 		false,
 		false))
 	{
@@ -277,9 +276,9 @@ bool InstallRegistry()
 			std::wstring exe(L"DreamLauncher.exe");
 			std::wstring args(L"--registry");
 
-			if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+			if (!ProcessExecutor::instance()->Execute(exe.c_str(),
 				args.c_str(),
-				ProcessExecutor::ProcessDir::CurrentDir,
+				ProcessExecutor::PROCESS_DIRECTORY_TYPE::CURRENT,
 				true,
 				true))
 			{
@@ -318,9 +317,9 @@ bool RunDream(int argc, char *argv[])
 		wcmdlnArgs = std::wstring(cmdlnArgs.begin(), cmdlnArgs.end() - 1);
 	}
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"DreamOS.exe",
+	if (!ProcessExecutor::instance()->Execute(L"DreamOS.exe",
 		wcmdlnArgs.c_str(),
-		ProcessExecutor::ProcessDir::CurrentDir,
+		ProcessExecutor::PROCESS_DIRECTORY_TYPE::CURRENT,
 		false,
 		false))
 	{
@@ -335,7 +334,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 {
 	Logger::InitializeLogger();
 
-	if (!ProcessExecutor::GetProcessExecutor()->Init())
+	if (!ProcessExecutor::instance()->Initialize())
 	{
 		LOG(ERROR) << "process executor init failed";
 		return -1;
@@ -372,9 +371,9 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 #ifdef DEV_ENVIRONMENT
 			// open in external browser (for now used as an indication updated completed)
 			//ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
-			if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Dream.html",
+			if (!ProcessExecutor::instance()->Execute(L"Dream.html",
 				L"",
-				ProcessExecutor::ProcessDir::CurrentDir,
+				ProcessExecutor::PROCESS_DIRECTORY_TYPE::CURRENT,
 				false,
 				false))
 			{

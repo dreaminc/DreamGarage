@@ -5,19 +5,16 @@
 #include <string>
 #include <windows.h>
 
-std::string getexepath()
-{
+std::string getexepath() {
 	char result[MAX_PATH];
 	return std::string(result, GetModuleFileNameA(NULL, result, MAX_PATH));
 }
 
-std::string getcommandline()
-{
+std::string getcommandline() {
 	return std::string(GetCommandLineA());
 }
 
-uint32_t getprocessid()
-{
+uint32_t getprocessid() {
 	return GetCurrentProcessId();
 }
 
@@ -50,8 +47,7 @@ uint32_t getprocessid()
 #endif
 
 
-bool	Logger::InitializeLogger()
-{
+bool Logger::InitializeLogger() {
 	// TODO: garbage-collect older logs
 
 	std::time_t now = std::time(NULL);
