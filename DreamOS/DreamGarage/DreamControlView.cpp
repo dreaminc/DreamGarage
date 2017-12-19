@@ -669,6 +669,7 @@ RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
 	CR(HideView());
+	CNR(m_pBrowserHandle, R_SKIPPED);
 	CR(GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this)); // release browser
 
 Error:
