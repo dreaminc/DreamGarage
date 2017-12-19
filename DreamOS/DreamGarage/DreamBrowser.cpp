@@ -589,6 +589,7 @@ RESULT DreamBrowser::HandleStopEvent() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
+	CR(SetStreamingState(false));
 
 Error:
 	return r;
@@ -1414,7 +1415,7 @@ RESULT DreamBrowser::StopSending() {
 	std::string strURL;
 	CommandLineManager *pCommandLineManager = nullptr;
 
-	CR(SetStreamingState(false));
+//	CR(SetStreamingState(false));
 	CR(SetVisible(false));
 	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 

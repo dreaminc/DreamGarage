@@ -367,8 +367,8 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 		if (m_appStack.empty()) {
 
+			ResetAppComposite();
 			if (m_pMenuHandle != nullptr) {
-				ResetAppComposite();
 				m_pMenuHandle->SendShowRootMenu();
 			}
 
@@ -486,6 +486,7 @@ Error:
 RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 	RESULT r = R_PASS;
 
+	ResetAppComposite();
 	if (!m_fStreaming) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
