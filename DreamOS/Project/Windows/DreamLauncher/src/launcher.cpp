@@ -334,6 +334,8 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 {
 	Logger::InitializeLogger();
 
+	MessageBox(nullptr, L"main", L"Dream Message", MB_OK);
+
 	if (!ProcessExecutor::instance()->Initialize())
 	{
 		LOG(ERROR) << "process executor init failed";
@@ -507,13 +509,13 @@ int run(WindowController* pSplashWindow)
 	return main(argc, argv, pSplashWindow);
 }
 
-void launcher::EntryPoint(WindowController* pSplashWindow)
-{
+void launcher::EntryPoint(WindowController* pSplashWindow) {
 	int ret = run(pSplashWindow);
 
-	if (ret != 0)
-	{
-		MessageBox(NULL, L"Dream failed to load :( Please try to reinstall Dream client.\n", L"Dream Message", MB_OK);
+	MessageBox(nullptr, L"EntryPoint", L"Dream Message", MB_OK);
+
+	if (ret != 0) {
+		MessageBox(nullptr, L"Dream failed to load :( Please try to reinstall Dream client.\n", L"Dream Message", MB_OK);
 	}
 
 	exit(ret);
