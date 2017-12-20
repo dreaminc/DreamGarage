@@ -297,6 +297,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			bool fInBrowserQuad = ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0;
+			fInBrowserQuad = fInBrowserQuad || m_fIsMinimized;
 			CBR(!fInBrowserQuad, R_SKIPPED);
 
 			fMalletDirty = true;
@@ -884,6 +885,7 @@ RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pCont
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
+	m_fIsMinimized = false;
 
 	CR(m_pBrowserHandle->SendStopEvent());
 	CN(m_pUserHandle);

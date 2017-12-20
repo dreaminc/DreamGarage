@@ -977,15 +977,18 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			//*
+			/*
 			pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
 			CN(pDreamControlViewHandle);
-			//*/
 
 			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 			if (pDreamControlViewHandle != nullptr) {
 				CR(pDreamControlViewHandle->DismissApp());
 				//CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+			}
+			//*/
+			if (m_pDreamUserHandle != nullptr) {
+				m_pDreamUserHandle->SendUserObserverEvent(UserObserverEventType::DISMISS);
 			}
 
 		} break;
