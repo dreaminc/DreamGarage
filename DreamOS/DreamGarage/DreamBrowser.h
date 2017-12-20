@@ -62,6 +62,7 @@ public:
 
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	virtual RESULT SendURL (std::string strURL) = 0;
+	RESULT SendURI(std::string strURI);
 
 	int GetScrollPixelsX();
 	int GetScrollPixelsY();
@@ -108,6 +109,8 @@ private:
 	virtual float GetAspectRatio() = 0;
 
 	virtual RESULT BeginStream() = 0;
+
+	virtual RESULT SetURI(std::string strURI) = 0;
 };
 
 class DreamBrowser : 
@@ -210,7 +213,7 @@ public:
 	RESULT StopSending();
 	RESULT StartReceiving();
 	RESULT StopReceiving();
-	RESULT SetURI(std::string strURI);
+	virtual RESULT SetURI(std::string strURI) override;
 	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);

@@ -626,6 +626,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		vCameraToMenu = ptMid - ptCameraOrigin;	
 
 		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
+		vCameraToBrowser.y() = 0;
 
 		float menuDepth = vCameraToMenu.magnitude();
 		

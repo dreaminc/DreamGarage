@@ -451,6 +451,10 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::KB_ENTER): {
 
+		if (m_pBrowserHandle != nullptr) {
+			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
+		}
+
 		if (m_fIsShareURL) {
 			CR(ShowView());
 
@@ -460,16 +464,17 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 			m_fIsShareURL = false;
 			CR(SendURL());
+
+			//TODO: bypass making a request to help smooth the loading
+			//CR(SendURI());
 		}
 		else {
 			CR(HandleKeyboardDown());
 
-			if (m_pBrowserHandle != nullptr) {
-				CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
-			}
 		}	
 
-	} break;
+
+		} break;
 
 	} 
 	

@@ -90,6 +90,14 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendURI(std::string strURI) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetURI(strURI));
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
