@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 
 using Squirrel;
+using NuGet;
 
 namespace DreamLaunch {
 
@@ -18,13 +19,30 @@ namespace DreamLaunch {
         private void HandleOnFirstRun() {
             // do nothing
             //m_fShowTheWelcomeWizard = true;
-            if (m_mainWindow != null)
-                m_mainWindow.SetStatusText("First run");
+
+            //if (m_mainWindow != null) {
+            //    m_mainWindow.SetStatusText("Dream Installed!");
+            //}
+
+            m_fFirstRun = true;
+        }
+
+        public bool IsFirstRun() {
+            return m_fFirstRun;
+        }
+
+        public bool IsInitialInstall() {
+            return m_fInitialInstall;
         }
 
         private void HandleOnInitialInstall(Version ver) {
-            if (m_squirrelUpdateManager != null)
+            //MessageBox.Show("OnInitialInstall", "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            if (m_squirrelUpdateManager != null) {
                 m_squirrelUpdateManager.CreateShortcutForThisExe();
+            }
+
+            m_fInitialInstall = true;
         }
 
         private void HandleOnAppUpdate(Version ver) {
@@ -71,8 +89,8 @@ namespace DreamLaunch {
                 if (m_mainWindow != null) {
                     // Getting fancy
                     string strDownload = string.Format("Downloading {0}% ", value);
-                    for (int i = 0; i < s_downloadCounter; i++)
-                        strDownload += ".";
+                    //for (int i = 0; i < s_downloadCounter; i++)
+                    //    strDownload += ".";
 
                     m_mainWindow.SetStatusText(strDownload);
                     m_mainWindow.SetDownloadProgressBarPercentage(value);
@@ -90,7 +108,6 @@ namespace DreamLaunch {
                 if((updateInfo.CurrentlyInstalledVersion == null) ||
                    (updateInfo.FutureReleaseEntry != null && updateInfo.FutureReleaseEntry.Version > updateInfo.CurrentlyInstalledVersion.Version)) 
                 {
-
                     if (m_mainWindow != null)
                         m_mainWindow.SetStatusText(string.Format("Downloading New Version: {0}", updateInfo.FutureReleaseEntry.Version));
 
@@ -114,11 +131,15 @@ namespace DreamLaunch {
             }
             catch (Exception ex) {
 
-                if (m_mainWindow != null)
-                    m_mainWindow.SetStatusText("Error");
+                if (m_mainWindow != null) {
+                    m_mainWindow.SetStatusText("Update Error");
+                }
 
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                throw new ApplicationException(string.Format("Failed to call UpdatEManager::UpdateApp"), ex);
+                MessageBox.Show(ex.Message, "Update Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                //throw new ApplicationException(string.Format("Failed to call UpdatEManager::UpdateApp"), ex);
+
+                // Don't kill application here, let launcher 
+                // attempt to launch app otherwise
             }
 
             return 0;
@@ -131,13 +152,11 @@ namespace DreamLaunch {
 
         public int InitializeSquirrel() {
             // Figure out where to look for RELEASES
-#if (_TEST_LOCAL_LAUNCHER)
-            //m_strReleasesURI = "C:\\dev\\DreamGarage\\DreamOS\\Project\\Windows\\DreamOS\\DevReleases";
-            m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/DevReleases/";
-#elif (_DEV_RELEASE)
-            m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/DevReleases/";
-#elif (_PROD_RELEASE)
+
+#if (_PROD_RELEASE)
             m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/Releases/";
+#else
+            m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/DevReleases/";
 #endif
 
             if (m_squirrelUpdateManager == null) {
@@ -145,6 +164,7 @@ namespace DreamLaunch {
                     if (m_mainWindow != null)
                         m_mainWindow.SetStatusText("Initializing");
 
+                    //MessageBox.Show("updatemanager", "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
                     m_squirrelUpdateManager = new UpdateManager(m_strReleasesURI);
                 }
                 catch (Exception ex) {
@@ -177,5 +197,7 @@ namespace DreamLaunch {
         private MainWindow m_mainWindow = null;
         private UpdateManager m_squirrelUpdateManager = null;
         private string m_strReleasesURI = null;
+        private bool m_fFirstRun = false;
+        private bool m_fInitialInstall = false;
     }
 }

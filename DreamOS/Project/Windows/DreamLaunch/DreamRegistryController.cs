@@ -144,10 +144,10 @@ namespace DreamLaunch {
                     m_mainwindow.SetStatusText("Admin Privileges Required");
 
                     // If we're not admin we need to restart as admin
-                    ProcessStartInfo proc = new ProcessStartInfo();
-                    proc.UseShellExecute = true;
-                    proc.WorkingDirectory = Environment.CurrentDirectory;
-                    proc.FileName = Assembly.GetEntryAssembly().CodeBase;
+                    ProcessStartInfo dreamLaunchProcessStartInfo = new ProcessStartInfo();
+                    dreamLaunchProcessStartInfo.UseShellExecute = true;
+                    dreamLaunchProcessStartInfo.WorkingDirectory = Environment.CurrentDirectory;
+                    dreamLaunchProcessStartInfo.FileName = Assembly.GetEntryAssembly().CodeBase;
 
                     string[] commandLineArguments = Environment.GetCommandLineArgs();
 
@@ -156,13 +156,13 @@ namespace DreamLaunch {
 
                     // Arguments
                     foreach (string arg in commandLineArguments) {
-                        proc.Arguments += String.Format("\"{0}\" ", arg);
+                        dreamLaunchProcessStartInfo.Arguments += String.Format("\"{0}\" ", arg);
                     }
 
-                    proc.Verb = "runas";
+                    dreamLaunchProcessStartInfo.Verb = "runas";
 
                     try {
-                        Process.Start(proc);
+                        Process.Start(dreamLaunchProcessStartInfo);
                     }
                     catch {
                         // The user refused the elevation.
@@ -244,6 +244,8 @@ namespace DreamLaunch {
             foreach (RegistryEntry entry in m_dreamRegistryEntries)
                 entry.UpdateDataInRegistry();
 
+            m_fRegistryUpdated = true;
+
             return 0;
         }
 
@@ -278,16 +280,18 @@ namespace DreamLaunch {
 
         const string s_classesRoot = "HKEY_CLASSES_ROOT";
 
-        
 
-#if (_DEV_RELEASE)
-        const string s_strDreamKeyName = "dreamosdev";
+#if (_PROD_RELEASE)
+    const string s_strDreamKeyName = "dreamos";
 #else
-        const string s_strDreamKeyName = "dreamos";
+    const string s_strDreamKeyName = "dreamosdev";
 #endif
 
         const string s_dreamRootKey = s_classesRoot + "\\" + s_strDreamKeyName;
 
         private string m_dreamRootAppDirectory = null;
+        private bool m_fRegistryUpdated = false;
+
+        public bool DidRegistryUpdate() { return m_fRegistryUpdated; }
     }
 }
