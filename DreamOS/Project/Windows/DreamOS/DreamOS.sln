@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamOS", "DreamOS.vcxproj", "{E8896328-06EB-43A0-902C-59C3D2F3A3B5}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DreamSetup", "..\DreamSetup\DreamSetup.vdproj", "{03832278-B839-46F6-880D-3BA6148FDF1F}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamCef", "..\DreamCef\DreamCef.vcxproj", "{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLaunch", "..\DreamLaunch\DreamLaunch.csproj", "{72DE702F-CC98-4A96-B158-D6C718C4853F}"
@@ -75,34 +73,6 @@ Global
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.TestingRelease|x64.Build.0 = TestingRelease|x64
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.TestingRelease|x86.ActiveCfg = Release|Win32
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.TestingRelease|x86.Build.0 = Release|Win32
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|Any CPU.ActiveCfg = Debug
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|ARM.ActiveCfg = Debug
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|x64.ActiveCfg = Debug
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|x86.ActiveCfg = Debug
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.DevProduction|Any CPU.ActiveCfg = DevProduction
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.DevProduction|ARM.ActiveCfg = DevProduction
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.DevProduction|x64.ActiveCfg = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.DevProduction|x86.ActiveCfg = DevProduction
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.DevProduction|x86.Build.0 = DevProduction
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Production|Any CPU.ActiveCfg = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Production|ARM.ActiveCfg = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Production|x64.ActiveCfg = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Production|x86.ActiveCfg = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Production|x86.Build.0 = Production
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|Any CPU.ActiveCfg = Release
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|ARM.ActiveCfg = Release
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|x64.ActiveCfg = Release
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|x86.ActiveCfg = Release
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Testing|Any CPU.ActiveCfg = Testing
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Testing|ARM.ActiveCfg = Testing
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Testing|x64.ActiveCfg = Testing
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Testing|x86.ActiveCfg = Testing
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.Testing|x86.Build.0 = Testing
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.TestingRelease|Any CPU.ActiveCfg = TestingRelease
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.TestingRelease|ARM.ActiveCfg = TestingRelease
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.TestingRelease|x64.ActiveCfg = TestingRelease
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.TestingRelease|x86.ActiveCfg = TestingRelease
-		{03832278-B839-46F6-880D-3BA6148FDF1F}.TestingRelease|x86.Build.0 = TestingRelease
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Debug|ARM.ActiveCfg = Debug|Win32
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Debug|x64.ActiveCfg = Debug|x64
