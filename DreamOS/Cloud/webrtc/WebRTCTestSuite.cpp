@@ -757,6 +757,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 			if (pCommandLineManager->GetParameterValue("testval") != "1") {
 				strURL = "https://www.youtube.com/watch?v=5vZ4lCKv1ik";
+				//strURL = "https://www.google.com";
 			}
 
 			std::string strPassword = "nightmare";

@@ -1373,6 +1373,21 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		
+		// parsing the info we get back from server during a dropbox request
+		// it returns a whole function call instead of just the URL
+		// TODO: the response from server should be cleaned and then this can go.
+		if (strEnvironmentAssetURL.find(',') != std::string::npos) {
+			std::vector<std::string> tokens;
+			std::string token;
+			std::istringstream tokenStream(strEnvironmentAssetURL);
+			while (std::getline(tokenStream, token, ',')) {
+				tokens.push_back(token);
+			}
+			std::string link = tokens[tokens.size()-1];
+			strEnvironmentAssetURL = link.substr(7, link.size());
+		}
+
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
 		CR(webRequest.SetURL(wstrAssetURL));
