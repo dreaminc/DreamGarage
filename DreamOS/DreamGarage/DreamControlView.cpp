@@ -424,23 +424,6 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
 
-			// if the user is streaming show the menu
-			//CR(m_pUserHandle->RequestStreamingState(fStreaming));
-/*
-			if (fStreaming) {
-				auto pDreamOS = GetDOS();
-
-				auto menuUIDs = pDreamOS->GetAppUID("DreamUIBar");
-				CB(menuUIDs.size() == 1);
-				auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
-				if (pMenuHandle != nullptr) {
-					CR(m_pUserHandle->RequestResetAppComposite());
-					CR(pMenuHandle->SendShowRootMenu());
-					CR(m_pUserHandle->SendPushFocusStack(pMenuHandle));
-				}
-				pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
-			}
-//*/
 		}
 
 
@@ -595,11 +578,25 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::Show() {
+RESULT DreamControlView::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
+
+	CN(m_pUserHandle);
+
+	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
+
+	GetComposite()->SetPosition(ptAppBasisPosition);
+	GetComposite()->SetOrientation(qAppBasisOrientation);
+Error:
+	return r;
+}
+
+RESULT DreamControlView::Show() {
+	RESULT r = R_PASS;
 
 	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
 	CB(uids.size() == 1);
@@ -610,14 +607,7 @@ RESULT DreamControlView::Show() {
 
 	CR(m_pBrowserHandle->RequestBeginStream());
 
-	//SetSharedViewContext();
-
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
-
-	GetComposite()->SetPosition(ptAppBasisPosition);
-	GetComposite()->SetOrientation(qAppBasisOrientation);
+	CR(ResetAppComposite());
 
 	CR(ShowView());
 

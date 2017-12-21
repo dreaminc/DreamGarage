@@ -221,6 +221,34 @@ Error:
 	return r;
 }
 
+RESULT DreamUIBar::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	point ptOrigin;
+	quaternion qOrigin;
+	vector vCameraToMenu;
+
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	
+	GetComposite()->SetPosition(ptOrigin);
+	GetComposite()->SetOrientation(qOrigin);
+
+	vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+	vCameraToMenu.y() = 0.0f;
+	vCameraToMenu.Normalize();
+
+	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
+	// TODO: This offset doesn't behave quite as expected, 
+	// will probably need corrections whenever we change menu position
+	ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
+
+	m_pUIStageProgram->SetOriginPoint(ptOrigin);
+
+Error:
+	return r;
+}
+
 RESULT DreamUIBar::ShowRootMenu() {
 	RESULT r = R_PASS;
 
@@ -236,26 +264,8 @@ RESULT DreamUIBar::ShowRootMenu() {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
-	{
-		point ptOrigin;
-		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-		quaternion qOrigin;
-		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
-		
-		GetComposite()->SetPosition(ptOrigin);
-		GetComposite()->SetOrientation(qOrigin);
 
-		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
-		vCameraToMenu.y() = 0.0f;
-		vCameraToMenu.Normalize();
-
-		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
-		// TODO: This offset doesn't behave quite as expected, 
-		// will probably need corrections whenever we change menu position
-		ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
-
-		m_pUIStageProgram->SetOriginPoint(ptOrigin);
-	}
+	CR(ResetAppComposite());
 
 Error:
 	return r;

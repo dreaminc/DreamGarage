@@ -7,6 +7,7 @@ UID::UID() :
 	TypeObj(TYPE_OBJ_UID)
 {
 	this->m_uiID = UID::GetNewUID();
+	m_fValid = true;
 }
 
 UID::UID(UID::type uidType) :

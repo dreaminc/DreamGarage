@@ -115,6 +115,8 @@ private:
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
 
+	bool m_fShouldUpdateAppComposites = false;
+
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;

@@ -92,6 +92,8 @@ public:
 	virtual RESULT HandleKeyboardDown();
 	virtual RESULT SendURL() override;
 
+	RESULT ResetAppComposite();
+
 private:
 	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fMouseDown, HAND_TYPE handType);
 
