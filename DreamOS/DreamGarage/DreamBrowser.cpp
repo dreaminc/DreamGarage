@@ -90,6 +90,14 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowserHandle::SendURI(std::string strURI) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetURI(strURI));
+Error:
+	return r;
+}
+
 RESULT DreamBrowserHandle::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -425,13 +433,12 @@ Error:
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
-		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-		CBR(vControlViewUID.size() == 1, R_SKIPPED);
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
-		UID controlViewUID = vControlViewUID[0];
-		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
 		CN(pDreamControlViewHandle);
 
 		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
@@ -439,10 +446,12 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
 		}
 
-		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
 
 Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -477,30 +486,32 @@ RESULT DreamBrowser::OnLoadStart() {
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		
-		{
-			auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-			CBR(vControlViewUID.size() == 1, R_SKIPPED);
+		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
-			UID controlViewUID = vControlViewUID[0];
-			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			CN(pDreamControlViewHandle);
+		m_strCurrentURL = strCurrentURL;
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+		CN(pDreamControlViewHandle);
 
-			pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-
-			CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
+		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+		if (m_strCurrentURL != "") {
+			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
 		}
+		
+		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
 
 #ifndef _USE_TEST_APP
 		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 #endif
 
 	Error:
+		if (pDreamControlViewHandle != nullptr) {
+			GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+		}
 		return r;
 	};
 
@@ -522,12 +533,10 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-		CBR(vControlViewUID.size() == 1, R_SKIPPED);
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
-		UID controlViewUID = vControlViewUID[0];
-		auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 
 		if (pDreamControlViewHandle->IsAppVisible()) {
@@ -537,7 +546,6 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		}
 		bool useAsterisk = pDOMNode->IsPassword();
 
-		CR(GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this));
 	}
 
 #ifdef _USE_TEST_APP
@@ -551,9 +559,10 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	}
 #endif
 
-	CR(r);
-
 Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -584,6 +593,7 @@ RESULT DreamBrowser::HandleStopEvent() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
+	CR(SetStreamingState(false));
 
 Error:
 	return r;
@@ -904,6 +914,10 @@ Error:
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
+	UID controlViewUID = vControlViewUID[0];
+
 	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
 
@@ -952,28 +966,24 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 			if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
 				CR(GetDOS()->GetCloudController()->StopVideoStreaming());
 			}
-			*/
+			//*/
 
 			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 			m_fReceivingStream = true;
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			//auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-			//UID controlViewUID = vControlViewUID[0];
-			//auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			//CN(pDreamControlViewHandle);
-
-			auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-			if (pDreamControlViewHandle != nullptr) {
-				CR(pDreamControlViewHandle->DismissApp());
-				CR(GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this));
+			if (m_pDreamUserHandle != nullptr) {
+				m_pDreamUserHandle->SendUserObserverEvent(UserObserverEventType::DISMISS);
 			}
 
 		} break;
 	}
 
 Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this);
+	}
 	return r;
 }
 
@@ -1402,9 +1412,9 @@ RESULT DreamBrowser::StopSending() {
 	std::string strURL;
 	CommandLineManager *pCommandLineManager = nullptr;
 
-	CR(SetStreamingState(false));
+//	CR(SetStreamingState(false));
 	CR(SetVisible(false));
-	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 
 	//*
 	// TODO: hack to stop getting audio 
@@ -1422,12 +1432,21 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::StartReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = true;
+	CR(SetVisible(true));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = false;
 	CR(SetVisible(false));
-	CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
-									 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+	//CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
+	//								 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
 	return r;
 }

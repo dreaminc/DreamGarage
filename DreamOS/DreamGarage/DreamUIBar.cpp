@@ -221,6 +221,34 @@ Error:
 	return r;
 }
 
+RESULT DreamUIBar::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	point ptOrigin;
+	quaternion qOrigin;
+	vector vCameraToMenu;
+
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	
+	GetComposite()->SetPosition(ptOrigin);
+	GetComposite()->SetOrientation(qOrigin);
+
+	vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+	vCameraToMenu.y() = 0.0f;
+	vCameraToMenu.Normalize();
+
+	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
+	// TODO: This offset doesn't behave quite as expected, 
+	// will probably need corrections whenever we change menu position
+	ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
+
+	m_pUIStageProgram->SetOriginPoint(ptOrigin);
+
+Error:
+	return r;
+}
+
 RESULT DreamUIBar::ShowRootMenu() {
 	RESULT r = R_PASS;
 
@@ -236,26 +264,8 @@ RESULT DreamUIBar::ShowRootMenu() {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
-	{
-		point ptOrigin;
-		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-		quaternion qOrigin;
-		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
-		
-		GetComposite()->SetPosition(ptOrigin);
-		GetComposite()->SetOrientation(qOrigin);
 
-		vector vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
-		vCameraToMenu.y() = 0.0f;
-		vCameraToMenu.Normalize();
-
-		m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
-		// TODO: This offset doesn't behave quite as expected, 
-		// will probably need corrections whenever we change menu position
-		ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
-
-		m_pUIStageProgram->SetOriginPoint(ptOrigin);
-	}
+	CR(ResetAppComposite());
 
 Error:
 	return r;
@@ -266,7 +276,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 	switch (type) {
 		case UserObserverEventType::BACK: {
-			CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(m_pKeyboardHandle->Hide());
 				CR(m_pUserHandle->SendReleaseKeyboard());
@@ -281,8 +291,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 				// if the stack is empty after popping from the path, hide the app
 				CBR(m_pathStack.empty(), R_SKIPPED);
+				CR(m_pUserHandle->SendClearFocusStack());
 				CR(HideApp());
-				CR(m_pUserHandle->SendPopFocusStack());
+				//*
 				{
 					// if the user is currently streaming, show the control view
 					bool fStreaming = false;
@@ -291,6 +302,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 						CR(ShowControlView(false));
 					}
 				}
+				//*/
 				//break;
 			}
 
@@ -306,6 +318,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
+			CR(m_pUserHandle->SendClearFocusStack());
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 				
@@ -330,7 +343,7 @@ RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 	RESULT r = R_PASS;
 
 	auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
-	CB(controlUIDs.size() == 1);
+	//CB(controlUIDs.size() == 1);
 	auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
 	CN(pControlHandle);
 	CN(m_pUserHandle);
@@ -340,10 +353,12 @@ RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 		if (fSendURL) {
 			(pControlHandle->SendURLtoBrowser());
 		}	
-		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
 	}
 
 Error:
+	if (pControlHandle != nullptr) {
+		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+	}
 	return r;
 }
 
@@ -468,6 +483,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				//TODO: this feels questionable, the focus stack will contain an invalid handle.
 				//		DreamUserObserver::HandleEvent is pure virtual at the handle level, so 
 				//		the code still executes correctly.
+
+				CR(ShowControlView(false));
+				/*
 				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
 				CB(controlUIDs.size() == 1);
 				auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
@@ -476,7 +494,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CR(pControlHandle->ShowApp());
 				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
 				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-
+				//*/
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {

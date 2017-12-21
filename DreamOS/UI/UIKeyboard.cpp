@@ -696,7 +696,8 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		// DreamUIBar in some way in the future
 
 		//HideKeyboard();
-		m_pUserHandle->SendKBEnterEvent();
+		//m_pUserHandle->SendKBEnterEvent();
+		m_pUserHandle->SendUserObserverEvent(UserObserverEventType::KB_ENTER);
 	}
 
 	else if (chkey == 0x01) {

@@ -297,6 +297,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			bool fInBrowserQuad = ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0;
+			fInBrowserQuad = fInBrowserQuad || m_fIsMinimized;
 			CBR(!fInBrowserQuad, R_SKIPPED);
 
 			fMalletDirty = true;
@@ -423,22 +424,6 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			CN(m_pUserHandle);
 			CR(m_pUserHandle->SendClearFocusStack());
 
-			// if the user is streaming show the menu
-			CR(m_pUserHandle->RequestStreamingState(fStreaming));
-
-			if (fStreaming) {
-				auto pDreamOS = GetDOS();
-
-				auto menuUIDs = pDreamOS->GetAppUID("DreamUIBar");
-				CB(menuUIDs.size() == 1);
-				auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
-				if (pMenuHandle != nullptr) {
-					CR(m_pUserHandle->RequestResetAppComposite());
-					CR(pMenuHandle->SendShowRootMenu());
-					CR(m_pUserHandle->SendPushFocusStack(pMenuHandle));
-				}
-				pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
-			}
 		}
 
 
@@ -450,6 +435,10 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::KB_ENTER): {
 
+		if (m_pBrowserHandle != nullptr) {
+			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
+		}
+
 		if (m_fIsShareURL) {
 			CR(ShowView());
 
@@ -459,16 +448,17 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 			m_fIsShareURL = false;
 			CR(SendURL());
+
+			//TODO: bypass making a request to help smooth the loading
+			//CR(SendURI());
 		}
 		else {
 			CR(HandleKeyboardDown());
 
-			if (m_pBrowserHandle != nullptr) {
-				CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
-			}
 		}	
 
-	} break;
+
+		} break;
 
 	} 
 	
@@ -588,11 +578,25 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::Show() {
+RESULT DreamControlView::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
+
+	CN(m_pUserHandle);
+
+	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
+
+	GetComposite()->SetPosition(ptAppBasisPosition);
+	GetComposite()->SetOrientation(qAppBasisOrientation);
+Error:
+	return r;
+}
+
+RESULT DreamControlView::Show() {
+	RESULT r = R_PASS;
 
 	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
 	CB(uids.size() == 1);
@@ -603,14 +607,7 @@ RESULT DreamControlView::Show() {
 
 	CR(m_pBrowserHandle->RequestBeginStream());
 
-	//SetSharedViewContext();
-
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
-
-	GetComposite()->SetPosition(ptAppBasisPosition);
-	GetComposite()->SetOrientation(qAppBasisOrientation);
+	CR(ResetAppComposite());
 
 	CR(ShowView());
 
@@ -668,6 +665,7 @@ RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
 	CR(HideView());
+	CNR(m_pBrowserHandle, R_SKIPPED);
 	CR(GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this)); // release browser
 
 Error:
@@ -877,6 +875,7 @@ RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pCont
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
+	m_fIsMinimized = false;
 
 	CR(m_pBrowserHandle->SendStopEvent());
 	CN(m_pUserHandle);

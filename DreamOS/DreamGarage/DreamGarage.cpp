@@ -576,6 +576,14 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
+	if (m_fShouldUpdateAppComposites) {
+		m_pDreamUser->ResetAppComposite();
+		m_pDreamUIBar->ResetAppComposite();
+		m_pDreamControlView->ResetAppComposite();
+
+		m_fShouldUpdateAppComposites = false;
+	}
+
 Error:
 	return r;
 }
@@ -681,10 +689,10 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	if (!m_fSeated) {
 		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
-		CR(m_pDreamUser->HandleUserObserverEvent(UserObserverEventType::DISMISS));
-		CR(m_pDreamUser->ClearFocusStack());
 		CR(SetRoundtablePosition(localSeatingPosition));
+
 		m_fSeated = true;
+		m_fShouldUpdateAppComposites = true;
 	}
 	//*/
 
@@ -932,6 +940,15 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 		m_pDreamBrowser->SetVisible(true);
 		//m_pDreamBrowser->FadeQuadToBlack();
 		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	}
+	return r;
+}
+
+RESULT DreamGarage::OnReceiveAsset() {
+	RESULT r = R_PASS;
+	if (m_pDreamBrowser != nullptr) {
+		m_pDreamBrowser->SetVisible(true);
+		m_pDreamBrowser->StartReceiving();
 	}
 	return r;
 }

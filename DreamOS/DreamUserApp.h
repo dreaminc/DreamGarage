@@ -28,6 +28,7 @@ class DimRay;
 class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
+class DreamUIBarHandle;
 class DimObj;
 
 #define MENU_HEIGHT -0.16f
@@ -132,7 +133,7 @@ public:
 	virtual RESULT PopFocusStack() override;
 	virtual RESULT PushFocusStack(DreamUserObserver* pObserver) override;
 	virtual RESULT ClearFocusStack() override;
-	RESULT OnFocusStackEmpty();
+	RESULT OnFocusStackEmpty(DreamUserObserver *pLastApp);
 
 	virtual RESULT HandleKBEnterEvent() override;
 	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) override;
@@ -168,6 +169,7 @@ private:
 	VirtualObj *m_pAppBasis = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+	DreamUIBarHandle *m_pMenuHandle = nullptr;
 
 	// reflection of the member 
 	bool m_fStreaming = false;

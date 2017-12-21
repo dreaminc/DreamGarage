@@ -62,6 +62,7 @@ public:
 
 	RESULT SendKeyCharacter(char chKey, bool fkeyDown);
 	virtual RESULT SendURL (std::string strURL) = 0;
+	RESULT SendURI(std::string strURI);
 
 	int GetScrollPixelsX();
 	int GetScrollPixelsY();
@@ -108,6 +109,8 @@ private:
 	virtual float GetAspectRatio() = 0;
 
 	virtual RESULT BeginStream() = 0;
+
+	virtual RESULT SetURI(std::string strURI) = 0;
 };
 
 class DreamBrowser : 
@@ -175,7 +178,7 @@ public:
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
-	virtual RESULT OnLoadEnd(int httpStatusCode) override;
+	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
 	virtual RESULT HandleBackEvent() override;
@@ -208,8 +211,9 @@ public:
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT StopSending();
+	RESULT StartReceiving();
 	RESULT StopReceiving();
-	RESULT SetURI(std::string strURI);
+	virtual RESULT SetURI(std::string strURI) override;
 	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);

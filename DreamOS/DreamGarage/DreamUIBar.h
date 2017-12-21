@@ -107,6 +107,7 @@ public:
 
 	RESULT PopPath();
 	RESULT RequestMenu();
+	RESULT ResetAppComposite();
 	virtual RESULT ShowRootMenu() override;
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type) override;

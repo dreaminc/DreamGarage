@@ -81,6 +81,7 @@ public:
 	class EnvironmentObserver {
 	public:
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnReceiveAsset() = 0;
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;
 	};
@@ -166,6 +167,7 @@ public:
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
+	virtual RESULT OnReceiveAsset() override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;

@@ -316,6 +316,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 
+	if (m_pMenuHandle == nullptr) {
+		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
+		CB(menuUIDs.size() == 1);
+		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
+	}
+
 	CR(UpdateHands());
 
 Error:
@@ -355,28 +361,15 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		// get app ids
 		auto pDreamOS = GetDOS();
 
-		auto menuUIDs = pDreamOS->GetAppUID("DreamUIBar");
-		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
-		//auto browserUIDs = pDreamOS->GetAppUID("DreamBrowser");
-		auto controlUIDs = pDreamOS->GetAppUID("DreamControlView");
-
 		//TODO: requesting the handles may need to be moved into the switch statements,
 		//		depending on how other applications handle capturing each other
-
+		
 
 		if (m_appStack.empty()) {
-			CB(menuUIDs.size() == 1);
-			auto pMenuHandle = dynamic_cast<DreamUIBarHandle*>(pDreamOS->CaptureApp(menuUIDs[0], this));
 
-			CB(controlUIDs.size() == 1);
-			auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(pDreamOS->CaptureApp(controlUIDs[0], this));
-
-			CN(pMenuHandle);
-			CN(pControlHandle);
-
-			if (pMenuHandle != nullptr) {
-				ResetAppComposite();
-				pMenuHandle->SendShowRootMenu();
+			ResetAppComposite();
+			if (m_pMenuHandle != nullptr) {
+				m_pMenuHandle->SendShowRootMenu();
 			}
 
 			m_pLeftMallet->Show();
@@ -385,9 +378,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
 			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 
-			m_appStack.push(pMenuHandle);
-			GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-			GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
+			m_appStack.push(m_pMenuHandle);
+
+			//currently, the user app always has the menu handle
+			//GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 		}
 		else {
 			m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
@@ -439,7 +433,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	} break;
 	}
-Error:
+//Error:
 	return r;
 }
 
@@ -456,9 +450,12 @@ RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
 RESULT DreamUserApp::PopFocusStack() {
 	RESULT r = R_PASS;
 
+	CBR(m_appStack.empty(), R_SKIPPED);
+
+	auto pLastApp = m_appStack.top();
 	m_appStack.pop();
-	if (m_appStack.empty()) {
-		CR(OnFocusStackEmpty());
+	if (m_appStack.size() == 0) {
+		CR(OnFocusStackEmpty(pLastApp));
 	}
 
 Error:
@@ -478,17 +475,18 @@ RESULT DreamUserApp::ClearFocusStack() {
 	RESULT r = R_PASS;
 
 	CBR(!m_appStack.empty(), R_SKIPPED);
+	auto pLastApp = m_appStack.top();
 	m_appStack = std::stack<DreamUserObserver*>();
-
-	CR(OnFocusStackEmpty());
+	CR(OnFocusStackEmpty(pLastApp));
 
 Error:
 	return r;
 }
 
-RESULT DreamUserApp::OnFocusStackEmpty() {
+RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 	RESULT r = R_PASS;
 
+	ResetAppComposite();
 	if (!m_fStreaming) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
@@ -498,8 +496,28 @@ RESULT DreamUserApp::OnFocusStackEmpty() {
 			CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
 		}
 	}
-	else {
-		// show app that wasn't dismissed...
+	// when the user is streaming, alternate between the control view and the menu
+	if (m_fStreaming) {
+	//	auto pApp = m_appStack.top();
+		auto pApp = pLastApp;
+
+		if (pApp == m_pMenuHandle) {
+			/*
+			auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
+			CB(controlUIDs.size() == 1);
+			auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
+			CN(pControlHandle);
+			pControlHandle->ShowApp();
+			CR(PushFocusStack(pControlHandle));
+			GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+			//*/
+		}
+		else {
+			CR(ResetAppComposite());
+			CR(m_pMenuHandle->SendShowRootMenu());
+			CR(PushFocusStack(m_pMenuHandle));
+			//pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
+		}
 	}
 
 Error:
@@ -608,6 +626,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		vCameraToMenu = ptMid - ptCameraOrigin;	
 
 		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
+		vCameraToBrowser.y() = 0;
 
 		float menuDepth = vCameraToMenu.magnitude();
 		

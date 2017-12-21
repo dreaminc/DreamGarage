@@ -90,6 +90,7 @@ public:
 		
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
+		virtual RESULT OnReceiveAsset() = 0;
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;;
 	};

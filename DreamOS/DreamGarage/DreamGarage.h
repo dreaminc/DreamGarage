@@ -71,6 +71,7 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnReceiveAsset() override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 
@@ -113,6 +114,8 @@ private:
 	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
+
+	bool m_fShouldUpdateAppComposites = false;
 
 	// UI
 	//ViewMatrix *m_pClippingView;
