@@ -178,7 +178,7 @@ public:
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
-	virtual RESULT OnLoadEnd(int httpStatusCode) override;
+	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
 	virtual RESULT HandleBackEvent() override;

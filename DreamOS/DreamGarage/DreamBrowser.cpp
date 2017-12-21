@@ -488,7 +488,7 @@ RESULT DreamBrowser::OnLoadStart() {
 	return r;
 }
 
-RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -498,13 +498,16 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 
 		UID controlViewUID = vControlViewUID[0];
 		
-		{
-			pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
-			CN(pDreamControlViewHandle);
+		m_strCurrentURL = strCurrentURL;
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlViewUID, this));
+		CN(pDreamControlViewHandle);
 
-			pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-
+		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+		if (m_strCurrentURL != "") {
+			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
 		}
+		
+		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
 
 #ifndef _USE_TEST_APP
 		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());

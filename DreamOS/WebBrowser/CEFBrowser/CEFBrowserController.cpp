@@ -474,8 +474,10 @@ RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpSt
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
 	
+	std::string strCurrentURL = pCEFFrame->GetURL();
+
 	CN(m_pWebBrowserControllerObserver);
-	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode));
+	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode, strCurrentURL));
 
 Error:
 	return r;
