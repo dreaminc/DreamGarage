@@ -8,8 +8,10 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 
-class OGLVolume;
-
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLRay : public DimRay, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
@@ -19,8 +21,8 @@ protected:
 public:
 	OGLRay(OpenGLImp *pParentImp, point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	virtual RESULT Render() override;
-
 };
+#pragma warning(pop)
 
 
 #endif // ! OGL_RAY_H_

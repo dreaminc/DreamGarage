@@ -10,6 +10,10 @@
 #include "OGLObj.h"
 #include "Primitives/quad.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLQuad : public quad, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
@@ -76,7 +80,7 @@ public:
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad) {
 		RESULT r = R_PASS;
 
-		quad *pQuad = (quad*)(GetDimObj());
+		quad *pQuad = reinterpret_cast<quad*>(GetDimObj());
 		CR(pQuad->UpdateFromBoundingQuad(pBoundingQuad));
 		CR(UpdateOGLBuffers());
 
@@ -84,5 +88,6 @@ public:
 		return r;
 	}
 };
+#pragma warning(pop)
 
 #endif // ! OGL_QUAD_H_

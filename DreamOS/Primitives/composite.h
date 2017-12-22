@@ -32,7 +32,7 @@ class stereocamera;
 
 class DreamOS;
 
-class composite : public DimObj {
+class composite : public virtual DimObj {
 public:
 	composite(HALImp *pHALImp);
 

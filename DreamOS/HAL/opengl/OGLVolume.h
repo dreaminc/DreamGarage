@@ -10,12 +10,11 @@
 #include "OGLObj.h"
 #include "Primitives/volume.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLVolume : public volume, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLVolume(OpenGLImp *pParentImp) :
 		volume(1.0f),
@@ -52,8 +51,7 @@ public:
 	RESULT UpdateFromBoundingBox(BoundingBox* pBoundingBox) {
 		RESULT r = R_PASS;
 
-		volume *pVolume = (volume*)(GetDimObj());
-		CR(pVolume->UpdateFromBoundingBox(pBoundingBox));
+		CR(volume::UpdateFromBoundingBox(pBoundingBox));
 		CR(UpdateOGLBuffers());
 
 	Error:
@@ -63,9 +61,9 @@ public:
 	RESULT UpdateFromVertices(DimObj *pDimObj) {
 		RESULT r = R_PASS;
 
-		// TODO: Update the bounding box from verts
+		// TODO: Update the bounding box from vertices
 
-		volume *pVolume = (volume*)(GetDimObj());
+		//volume *pVolume = reinterpret_cast<volume*>(GetDimObj());
 		//CR(pVolume->UpdateFromVertices(pDimObj));
 
 		CR(UpdateOGLBuffers());
@@ -87,14 +85,14 @@ public:
 		RESULT r = R_PASS;
 
 		// TODO: Rethink this since it's in the critical path
-		volume *pVolume = (volume*)(GetDimObj());
+		//volume *pVolume = reinterpret_cast<volume*>(GetDimObj());
 
 		m_pParentImp->glBindVertexArray(m_hVAO);
 		m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO);
 		m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO);
 
 		// TODO: This should be made more uniform (functions / caps struct etc)
-		if (pVolume->IsWireframe()) {
+		if (IsWireframe()) {
 			GLint previousPolygonMode[2]{ 0 };
 			GLboolean previousCullFaceEnabled;
 			glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
@@ -105,8 +103,8 @@ public:
 				glDisable(GL_CULL_FACE);
 			}
 
-			if (pVolume->IsTriangleBased()) {
-				glDrawElements(GL_TRIANGLES, pVolume->NumberIndices(), GL_UNSIGNED_INT, NULL);
+			if (IsTriangleBased()) {
+				glDrawElements(GL_TRIANGLES, NumberIndices(), GL_UNSIGNED_INT, NULL);
 			}
 			else {
 				for (int i = 0; i < NUM_VOLUME_QUADS; i++) {
@@ -129,12 +127,14 @@ public:
 			}
 		}
 		else {
-			glDrawElements(GL_TRIANGLES, pVolume->NumberIndices(), GL_UNSIGNED_INT, NULL);
+			glDrawElements(GL_TRIANGLES, NumberIndices(), GL_UNSIGNED_INT, NULL);
 		}
 
 	//Error:
 		return r;
 	}
 };
+
+#pragma warning(pop)
 
 #endif // ! OGL_QUAD_H_

@@ -17,7 +17,7 @@
 
 #define MIN_SPHERE_DIVISIONS 3
 
-class sphere : public DimObj {
+class sphere : public virtual DimObj {
 public:
 	int m_numAngularDivisions;
 	int m_numVerticalDivisions;

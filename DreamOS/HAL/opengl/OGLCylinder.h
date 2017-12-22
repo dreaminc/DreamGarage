@@ -10,12 +10,11 @@
 #include "OGLObj.h"
 #include "Primitives/cylinder.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLCylinder : public cylinder, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLCylinder(OpenGLImp *pParentImp, double radius = 1.0f, double height = 1.0f, int numAngularDivisions = MIN_CYLINDER_DIVISIONS, int numVerticalDivisions = MIN_CYLINDER_DIVISIONS) :
 		cylinder(radius, height, numAngularDivisions, numVerticalDivisions),
@@ -30,9 +29,6 @@ public:
 	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
-		// TODO: Rethink this since it's in the critical path
-		DimObj *pDimObj = GetDimObj();
-
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
@@ -43,7 +39,7 @@ public:
 		GLint previousPolygonMode[2]{ 0 };
 		glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
 
-		if (pDimObj->IsWireframe()) {
+		if (IsWireframe()) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 
@@ -59,7 +55,7 @@ public:
 			indexCount += numTriangleStripVerts;
 		}
 
-		if (pDimObj->IsWireframe()) {
+		if (IsWireframe()) {
 			if (previousPolygonMode[1] != 0) {
 				glPolygonMode(GL_FRONT, previousPolygonMode[0]);
 				glPolygonMode(GL_BACK, previousPolygonMode[1]);
@@ -73,5 +69,6 @@ public:
 		return r;
 	}
 };
+#pragma warning(pop)
 
 #endif // ! OGL_CYLINDER_H_

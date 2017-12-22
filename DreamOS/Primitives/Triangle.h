@@ -15,7 +15,7 @@
 #include "point.h"
 #include "color.h"
 
-class triangle : public DimObj {
+class triangle : public virtual DimObj {
 
 //protected:
 //	vertex m_vertices[NUM_TRI_POINTS];

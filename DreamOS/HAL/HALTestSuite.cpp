@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(TestNestedOBB());
+
 	CR(AddTestText());
 
 	CR(AddTestUserModel());
@@ -43,8 +45,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestSkybox());
-
-	CR(TestNestedOBB());
 
 	CR(AddTestRenderToTextureQuad());
 

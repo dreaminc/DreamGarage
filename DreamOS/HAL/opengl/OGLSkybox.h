@@ -6,11 +6,16 @@
 // DREAM OS
 // DreamOS/HAL/OpenGL/OGLSkybox.h
 // OGL Skybox
+// TODO: Remove this potentially 
 
 #include "OGLObj.h"
 #include "OGLTexture.h"
 #include "Primitives/skybox.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLSkybox : public skybox, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
@@ -63,5 +68,6 @@ public:
 	}
 	//*/
 };
+#pragma warning(pop)
 
 #endif	// ! OGL_SKYBOX_H_

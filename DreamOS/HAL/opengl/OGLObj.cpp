@@ -59,7 +59,6 @@ inline GLushort OGLObj::GetOGLPrecision() {
 RESULT OGLObj::OGLInitialize() {
 	RESULT r = R_PASS;
 
-	DimObj *pDimObj = GetDimObj();
 	CR(m_pParentImp->MakeCurrentContext());
 
 	// Set up the Vertex Array Object (VAO)
@@ -74,8 +73,8 @@ RESULT OGLObj::OGLInitialize() {
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
 	// TODO: Remove convenience vars 
-	vertex *pVertex = pDimObj->VertexData();
-	GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+	vertex *pVertex = VertexData();
+	GLsizeiptr pVertex_n = VertexDataSize();
 	CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
 	// Index Element Buffer
@@ -83,8 +82,8 @@ RESULT OGLObj::OGLInitialize() {
 	CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
 	// TODO: Remove convenience vars 
-	dimindex *pIndex = pDimObj->IndexData();
-	int pIndex_s = pDimObj->IndexDataSize();
+	dimindex *pIndex = IndexData();
+	int pIndex_s = IndexDataSize();
 	CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
 
 	// Enable the vertex attribute arrays
@@ -132,16 +131,13 @@ Error:
 RESULT OGLObj::UpdateOGLBuffers() {
 	RESULT r = R_PASS;
 
-	DimObj *pDimObj = GetDimObj();
-	CNM(pDimObj, "Failed to acquire Dimension Object");
-
 	//CR(m_pParentImp->MakeCurrentContext());
 
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
-	vertex *pVertex = pDimObj->VertexData();
-	GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+	vertex *pVertex = VertexData();
+	GLsizeiptr pVertex_n = VertexDataSize();
 	CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
 	// Usually we prefer to release the context so that it won't get mistakenly used by next OGL calls.
@@ -165,7 +161,6 @@ RESULT OGLObj::Render() {
 	RESULT r = R_PASS;
 
 	// TODO: Rethink this since it's in the critical path
-	DimObj *pDimObj = GetDimObj();
 
 	//if (g_fVAOInit == false) {
 		m_pParentImp->glBindVertexArray(m_hVAO);	// TODO: VAO might not be needed every object every frame
@@ -182,7 +177,7 @@ RESULT OGLObj::Render() {
 	previousCullFaceEnabled = glIsEnabled(GL_CULL_FACE);
 
 	// TODO: This should be made more uniform (functions / caps struct etc)
-	if (pDimObj->IsWireframe()) {
+	if (IsWireframe()) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		if (previousCullFaceEnabled) {
 			glDisable(GL_CULL_FACE);
@@ -190,10 +185,10 @@ RESULT OGLObj::Render() {
 	}
 #endif
 
-	glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+	glDrawElements(GL_TRIANGLES, NumberIndices(), GL_UNSIGNED_INT, NULL);
 
 #ifdef _DEBUG
-	if (pDimObj->IsWireframe()) {
+	if (IsWireframe()) {
 		if (previousPolygonMode[1] != 0) {
 			glPolygonMode(GL_FRONT, previousPolygonMode[0]);
 			glPolygonMode(GL_BACK, previousPolygonMode[1]);
@@ -216,31 +211,29 @@ RESULT OGLObj::Render() {
 	return r;
 }
 
-RESULT OGLObj::UpdateBoundingVolume() {
+RESULT OGLObj::UpdateOGLBoundingVolume() {
 	RESULT r = R_PASS;
-
-	DimObj *pDimObj = GetDimObj();
 
 	// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
 	BoundingBox *pBoundingBox = nullptr;
 	BoundingSphere *pBoundingSphere = nullptr;
 	BoundingQuad *pBoundingQuad = nullptr;
 
-	if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+	if ((pBoundingBox = dynamic_cast<BoundingBox*>(GetBoundingVolume().get())) != nullptr) {
 		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
 		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
 			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
 		}
 	}
-	else if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+	else if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(GetBoundingVolume().get())) != nullptr) {
 		OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
 
 		if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
 			CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
 		}
 	}
-	else if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+	else if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(GetBoundingVolume().get())) != nullptr) {
 		OGLQuad *pOGLBoundingQuad = dynamic_cast<OGLQuad*>(m_pOGLBoundingVolume);
 
 		if (pBoundingQuad->CheckAndCleanDirty() && pOGLBoundingQuad != nullptr) {
@@ -259,12 +252,11 @@ Error:
 	return r;
 }
 
-RESULT OGLObj::RenderBoundingVolume() {
+RESULT OGLObj::RenderOGLBoundingVolume() {
 	RESULT r = R_PASS;
 
 	if (m_pOGLBoundingVolume == nullptr) {
-		DimObj *pDimObj = GetDimObj();
-		BoundingVolume* pBoundingVolume = pDimObj->GetBoundingVolume().get();
+		BoundingVolume* pBoundingVolume = GetBoundingVolume().get();
 
 		if (pBoundingVolume == nullptr) {
 			return R_SKIPPED;
@@ -290,10 +282,10 @@ RESULT OGLObj::RenderBoundingVolume() {
 		}
 
 		CN(m_pOGLBoundingVolume);
-		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
+		m_pOGLBoundingVolume->SetWireframe(true);
 
-		if (pDimObj->GetParent() != nullptr) {
-			m_pOGLBoundingVolume->GetDimObj()->SetParent(pDimObj->GetParent());
+		if (GetParent() != nullptr) {
+			m_pOGLBoundingVolume->SetParent(GetParent());
 		}
 	}
 	
@@ -303,27 +295,23 @@ Error:
 	return r;
 }
 
-OGLTexture* OGLObj::GetTextureBump() {
-	DimObj *pDimObj = GetDimObj();
-	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetBumpTexture());
+OGLTexture* OGLObj::GetOGLTextureBump() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(DimObj::GetBumpTexture());
 	return pTexture;
 }
 
-OGLTexture* OGLObj::GetTextureAmbient() {
-	DimObj *pDimObj = GetDimObj();
-	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureAmbient());
+OGLTexture* OGLObj::GetOGLTextureAmbient() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(DimObj::GetTextureAmbient());
 	return pTexture;
 }
 
-OGLTexture* OGLObj::GetTextureDiffuse() {
-	DimObj *pDimObj = GetDimObj();
-	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureDiffuse());
+OGLTexture* OGLObj::GetOGLTextureDiffuse() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(GetTextureDiffuse());
 	return pTexture;
 }
 
-OGLTexture* OGLObj::GetTextureSpecular() {
-	DimObj *pDimObj = GetDimObj();
-	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureSpecular());
+OGLTexture* OGLObj::GetOGLTextureSpecular() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(GetTextureSpecular());
 	return pTexture;
 }
 

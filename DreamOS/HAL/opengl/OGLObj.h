@@ -14,16 +14,10 @@
 
 #define NUM_VBO 2
 
-class OGLObj {
+class OGLObj : public virtual DimObj {
 public:
 	OGLObj(OpenGLImp *pParentImp);
 	~OGLObj();
-
-	//virtual inline vertex *VertexData() = 0;
-	//virtual inline int VertexDataSize() = 0;
-
-	//virtual RESULT Render() = 0;
-	virtual DimObj *GetDimObj() = 0;
 
 	RESULT ReleaseOGLBuffers();
 	GLushort GetOGLPrecision();
@@ -38,13 +32,13 @@ public:
 	//virtual RESULT Render() {
 	virtual RESULT Render();
 
-	virtual RESULT RenderBoundingVolume();
-	virtual RESULT UpdateBoundingVolume();
+	virtual RESULT RenderOGLBoundingVolume();
+	virtual RESULT UpdateOGLBoundingVolume();
 
-	OGLTexture *GetTextureBump();
-	OGLTexture *GetTextureAmbient();
-	OGLTexture *GetTextureDiffuse();
-	OGLTexture *GetTextureSpecular();
+	OGLTexture *GetOGLTextureBump();
+	OGLTexture *GetOGLTextureAmbient();
+	OGLTexture *GetOGLTextureDiffuse();
+	OGLTexture *GetOGLTextureSpecular();
 	
 	OGLObj *GetOGLBoundingVolume();
 

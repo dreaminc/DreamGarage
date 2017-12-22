@@ -12,6 +12,10 @@
 #include "OGLObj.h"
 #include "Primitives/user.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLUser : public user, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
@@ -19,6 +23,11 @@ protected:
 	}
 
 public:
+	// Need to resolve ambiguity 
+	virtual inline RESULT UpdateBoundingVolume() override {
+		return OGLObj::UpdateBoundingVolume();
+	}
+
 	OGLUser(OpenGLImp *pParentImp) :
 		user(pParentImp),
 		OGLObj(pParentImp)
@@ -27,5 +36,6 @@ public:
 		RESULT r = OGLInitialize();
 	}
 };
+#pragma warning(pop)
 
 #endif // ! OGL_USER_H_

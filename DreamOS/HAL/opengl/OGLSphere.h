@@ -10,12 +10,11 @@
 #include "OGLObj.h"
 #include "Primitives/sphere.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLSphere : public sphere, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) :
 		sphere(radius, numAngularDivisions, numVerticalDivisions, c),
@@ -39,7 +38,6 @@ public:
 	RESULT OGLInitialize() {
 		RESULT r = R_PASS;
 
-		DimObj *pDimObj = GetDimObj();
 		CR(m_pParentImp->MakeCurrentContext());
 
 		// Set up the Vertex Array Object (VAO)
@@ -52,8 +50,8 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
 		// TODO: Remove convenience vars 
-		vertex *pVertex = pDimObj->VertexData();
-		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+		vertex *pVertex = VertexData();
+		GLsizeiptr pVertex_n = VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
 		// Index Element Buffer
@@ -62,8 +60,8 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
 		// TODO: Remove convenience vars 
-		dimindex *pIndex = pDimObj->IndexData();
-		int pIndex_s = pDimObj->IndexDataSize();
+		dimindex *pIndex = IndexData();
+		int pIndex_s = IndexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
 		//*/
 
@@ -112,8 +110,7 @@ public:
 	RESULT UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere) {
 		RESULT r = R_PASS;
 
-		sphere *pSphere = (sphere*)(GetDimObj());
-		CR(pSphere->UpdateFromBoundingSphere(pBoundingSphere));
+		CR(sphere::UpdateFromBoundingSphere(pBoundingSphere));
 		CR(UpdateOGLBuffers());
 
 	Error:
@@ -125,9 +122,6 @@ public:
 	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
-		// TODO: Rethink this since it's in the critical path
-		DimObj *pDimObj = GetDimObj();
-
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
@@ -135,7 +129,7 @@ public:
 		GLint previousPolygonMode[2]{ 0 };
 		glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
 
-		if (pDimObj->IsWireframe()) {
+		if (IsWireframe()) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 		
@@ -151,7 +145,7 @@ public:
 			indexCount += numTriangleStripVerts;
 		}
 		
-		if (pDimObj->IsWireframe()) {
+		if (IsWireframe()) {
 			if (previousPolygonMode[1] != 0) {
 				glPolygonMode(GL_FRONT, previousPolygonMode[0]);
 				glPolygonMode(GL_BACK, previousPolygonMode[1]);
@@ -166,5 +160,6 @@ public:
 		return r;
 	}
 };
+#pragma warning(pop)
 
 #endif // ! OGL_SPHERE_H_

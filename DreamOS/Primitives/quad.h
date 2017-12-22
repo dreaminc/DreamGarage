@@ -20,7 +20,7 @@
 
 class BoundingQuad;
 
-class quad : public DimObj {
+class quad : public virtual DimObj {
 public:
 	enum class type {
 		SQUARE,

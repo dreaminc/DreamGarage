@@ -885,18 +885,19 @@ RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
 		return R_PASS;
 
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	//OGLObj *pOGLObj = reinterpret_cast<OGLObj*>(pDimObj);
 
 	if (pOGLObj != nullptr) {
 		// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
 		// which might not be the right flow
 		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
 			// Update bounding volume:
-			pOGLObj->UpdateBoundingVolume();
-			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+			pOGLObj->UpdateOGLBoundingVolume();
+			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume());
 		}
 
-		// This is called even when bounding volume is null since it'll create the refgeo
-		CR(pOGLObj->RenderBoundingVolume());
+		// This is called even when bounding volume is null since it'll create the reference geometry
+		CR(pOGLObj->RenderOGLBoundingVolume());
 	}
 
 	if (pDimObj->HasChildren()) {
@@ -912,6 +913,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	//OGLObj *pOGLObj = reinterpret_cast<OGLObj*>(pDimObj);
 	//CNR(pOGLObj, R_SKIPPED);
 
 	// Update buffers if marked as dirty

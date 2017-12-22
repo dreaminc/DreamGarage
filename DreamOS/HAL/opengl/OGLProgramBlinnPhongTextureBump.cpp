@@ -125,7 +125,7 @@ RESULT OGLProgramBlinnPhongTextureBump::SetObjectTextures(OGLObj *pOGLObj) {
 
 	OGLTexture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
+	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
@@ -136,7 +136,7 @@ RESULT OGLProgramBlinnPhongTextureBump::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pUniformUseColorTexture->SetUniform(false);
 	}
 
-	if ((pTexture = pOGLObj->GetTextureBump()) != nullptr) {
+	if ((pTexture = pOGLObj->GetOGLTextureBump()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE1);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureBump->SetUniform(1);
