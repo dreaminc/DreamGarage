@@ -84,9 +84,6 @@ public:
 	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
-		// TODO: Rethink this since it's in the critical path
-		//volume *pVolume = reinterpret_cast<volume*>(GetDimObj());
-
 		m_pParentImp->glBindVertexArray(m_hVAO);
 		m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO);
 		m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO);

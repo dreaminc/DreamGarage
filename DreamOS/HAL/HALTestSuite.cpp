@@ -24,13 +24,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(TestNestedOBB());
-
-	CR(AddTestText());
+	CR(AddTestModel());
 
 	CR(AddTestUserModel());
 
-	CR(AddTestModel());
+	CR(TestNestedOBB());
+
+	CR(AddTestText());
 
 	CR(AddTestModelInstancing());
 	

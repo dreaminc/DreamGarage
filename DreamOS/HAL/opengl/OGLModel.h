@@ -17,12 +17,6 @@
 #pragma warning(disable : 4250)
 class OGLModel : public model, public OGLObj {
 public:
-
-	// Need to resolve ambiguity 
-	virtual inline RESULT UpdateBoundingVolume() override {
-		return OGLObj::UpdateBoundingVolume();
-	}
-
 	OGLModel(OpenGLImp *pParentImp) :
 		model(pParentImp),
 		OGLObj(pParentImp)
