@@ -26,6 +26,8 @@
 
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 
+#define SQUARED_DRAG_THRESHOLD 0.001f;
+
 class quad; 
 class sphere;
 class UIView;
@@ -174,6 +176,8 @@ private:
 	//		should be registered.  This doesn't work correctly when there are multiple surfaces
 	//		being used at the same time
 	dirty m_fMalletDirty[2];
+
+	float m_dragThresholdSquared = SQUARED_DRAG_THRESHOLD;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

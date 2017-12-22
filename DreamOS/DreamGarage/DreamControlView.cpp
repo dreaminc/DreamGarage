@@ -275,7 +275,8 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 
 			if (fMouseDown) {
 				fMouseDown = false;
-				WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
+				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
+				//WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
 				CR(m_pBrowserHandle->SendContactToBrowserAtPoint(ptContact, fMouseDown));
 			}
 
@@ -285,11 +286,17 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			else {
 				m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
 			}
+
 		}
 
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown) {
+		float xDistance = ptSphereOrigin.x() - m_ptClick.x();
+		float zDistance = ptSphereOrigin.z() - m_ptClick.z();
+		float squaredDistance = xDistance * xDistance + zDistance * zDistance;
+
+		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			CR(m_pBrowserHandle->SendMalletMoveEvent(ptContact));
+			//m_ptClick = ptSphereOrigin;
 		}
 
 		// if the sphere is lower than its own radius, there must be an interaction
