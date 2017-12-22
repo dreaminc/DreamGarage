@@ -113,7 +113,12 @@ public:
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
 	// EnvironmentObserver
+	// TODO: This should be encapsulated in it's own object
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnReceiveAsset() override {
 		return R_NOT_IMPLEMENTED;
 	}
 
