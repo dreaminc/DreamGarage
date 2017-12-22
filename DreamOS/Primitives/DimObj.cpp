@@ -21,9 +21,9 @@ DimObj::DimObj() :
 	/* stub */
 }
 
-DimObj::~DimObj() {
-	Destroy();
-}
+//DimObj::~DimObj() {
+//	Destroy();
+//}
 
 OBJECT_TYPE DimObj::GetType() {
 	return OBJECT_DIMENSION;

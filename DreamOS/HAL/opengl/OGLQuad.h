@@ -15,11 +15,6 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLQuad : public quad, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLQuad(OpenGLImp *pParentImp) :
 		quad(1.0f),
@@ -80,8 +75,7 @@ public:
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad) {
 		RESULT r = R_PASS;
 
-		quad *pQuad = reinterpret_cast<quad*>(GetDimObj());
-		CR(pQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		CR(quad::UpdateFromBoundingQuad(pBoundingQuad));
 		CR(UpdateOGLBuffers());
 
 	Error:

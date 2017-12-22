@@ -17,16 +17,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLUser : public user, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
-	// Need to resolve ambiguity 
-	virtual inline RESULT UpdateBoundingVolume() override {
-		return OGLObj::UpdateBoundingVolume();
-	}
 
 	OGLUser(OpenGLImp *pParentImp) :
 		user(pParentImp),

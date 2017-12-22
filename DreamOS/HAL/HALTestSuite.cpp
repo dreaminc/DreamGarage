@@ -24,13 +24,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestText());
+
 	CR(AddTestModel());
 
 	CR(AddTestUserModel());
 
 	CR(TestNestedOBB());
-
-	CR(AddTestText());
 
 	CR(AddTestModelInstancing());
 	
@@ -1719,6 +1719,7 @@ RESULT HALTestSuite::AddTestText() {
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
 			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
 
+			/*
 			pFlatContext->ClearChildren();
 			
 			pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hello", 1.0f, true);
@@ -1728,6 +1729,7 @@ RESULT HALTestSuite::AddTestText() {
 			CN(pQuad);
 			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
 			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+			*/
 
 			
 		}

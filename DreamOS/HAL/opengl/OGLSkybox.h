@@ -17,11 +17,6 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLSkybox : public skybox, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLSkybox(OpenGLImp *pParentImp) :
 		skybox(),

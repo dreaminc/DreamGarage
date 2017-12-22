@@ -64,7 +64,10 @@ private:
 public:
 
 	DimObj();
-	~DimObj();
+
+	~DimObj() {
+		Destroy();
+	}
 
 	// TODO: rename
 	enum class MaterialTexture { 

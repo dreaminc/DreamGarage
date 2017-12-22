@@ -13,11 +13,6 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLRay : public DimRay, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this; // nullptr
-	}
-
 public:
 	OGLRay(OpenGLImp *pParentImp, point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	virtual RESULT Render() override;

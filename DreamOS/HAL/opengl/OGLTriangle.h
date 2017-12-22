@@ -15,11 +15,6 @@
 #pragma warning(push)
 #pragma warning(disable : 4250)
 class OGLTriangle : public triangle, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
 	OGLTriangle(OpenGLImp *pParentImp) :
 		triangle(1.0f),

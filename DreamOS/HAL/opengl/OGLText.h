@@ -22,10 +22,6 @@ class font;
 class OGLText : public text, public virtual OGLObj {
 
 public:
-	// Need to resolve ambiguity 
-	virtual inline RESULT UpdateBoundingVolume() override {
-		return OGLObj::UpdateBoundingVolume();
-	}
 
 	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags textFlags);
 	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 1.0f, bool fBillboard = false);
