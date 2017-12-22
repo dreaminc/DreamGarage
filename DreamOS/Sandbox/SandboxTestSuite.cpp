@@ -154,6 +154,19 @@ RESULT SandboxTestSuite::AddTestObjectPipeline() {
 
 		// TODO: Add some objects
 
+		// Objects 
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// TODO: Why does shit explode with no objects in scene
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+		pSphere->MoveTo(point(-1.0f, 0.0f, 0.0f));
+
+		auto pCube = m_pDreamOS->AddVolume(0.5f);
+		pCube->MoveTo(point(0.0f, 0.0f, 0.0f));
+
+		auto pCylinder = m_pDreamOS->AddCylinder(0.25f, 0.5f, 20, 20);
+		pCylinder->MoveTo(point(1.0f, -0.25f, 0.0f));
+
 	Error:
 		return r;
 	};
