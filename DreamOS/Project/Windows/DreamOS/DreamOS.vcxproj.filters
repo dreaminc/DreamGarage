@@ -911,6 +911,9 @@
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2029,6 +2032,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h">
+      <Filter>Sandbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
