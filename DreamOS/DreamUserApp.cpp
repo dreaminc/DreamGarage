@@ -497,26 +497,14 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 		}
 	}
 	// when the user is streaming, alternate between the control view and the menu
+
 	if (m_fStreaming) {
-	//	auto pApp = m_appStack.top();
 		auto pApp = pLastApp;
 
-		if (pApp == m_pMenuHandle) {
-			/*
-			auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
-			CB(controlUIDs.size() == 1);
-			auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
-			CN(pControlHandle);
-			pControlHandle->ShowApp();
-			CR(PushFocusStack(pControlHandle));
-			GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-			//*/
-		}
-		else {
+		if (pApp != m_pMenuHandle) {
 			CR(ResetAppComposite());
 			CR(m_pMenuHandle->SendShowRootMenu());
 			CR(PushFocusStack(m_pMenuHandle));
-			//pDreamOS->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 		}
 	}
 
