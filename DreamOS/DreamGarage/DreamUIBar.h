@@ -93,6 +93,8 @@ public:
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
+	RESULT UpdateBrowser(std::string strScope, std::string strPath);
+
 	// Animations
 	RESULT HideApp();
 	RESULT ShowApp();

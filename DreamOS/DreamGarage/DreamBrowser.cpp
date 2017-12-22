@@ -497,11 +497,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 
-		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-		if (m_strCurrentURL != "") {
-			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
-		}
-		
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
 
 #ifndef _USE_TEST_APP
@@ -915,8 +910,6 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	auto vControlViewUID = GetDOS()->GetAppUID("DreamControlView");
-	UID controlViewUID = vControlViewUID[0];
 
 	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
@@ -973,8 +966,9 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-			if (m_pDreamUserHandle != nullptr) {
-				m_pDreamUserHandle->SendUserObserverEvent(UserObserverEventType::DISMISS);
+			pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+			if (pDreamControlViewHandle != nullptr) {
+				pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
 			}
 
 		} break;
@@ -982,7 +976,7 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 
 Error:
 	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->ReleaseApp(pDreamControlViewHandle, controlViewUID, this);
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
 	return r;
 }

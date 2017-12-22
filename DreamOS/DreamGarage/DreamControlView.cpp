@@ -666,9 +666,9 @@ RESULT DreamControlView::Hide() {
 
 	CR(HideView());
 	CNR(m_pBrowserHandle, R_SKIPPED);
-	CR(GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this)); // release browser
 
 Error:
+	GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this);
 	return r;
 }
 
@@ -737,10 +737,9 @@ RESULT DreamControlView::HideKeyboard() {
 	CR(m_pKeyboardHandle->Hide());
 	CR(m_pUserHandle->SendReleaseKeyboard());
 
-	//TODO: move this when possible
-	m_pKeyboardHandle = nullptr;
-
 Error:
+	m_pKeyboardHandle = nullptr;
+	
 	return r;
 }
 

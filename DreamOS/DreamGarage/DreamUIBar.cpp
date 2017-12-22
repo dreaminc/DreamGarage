@@ -342,22 +342,20 @@ Error:
 RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 	RESULT r = R_PASS;
 
-	auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
-	//CB(controlUIDs.size() == 1);
-	auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
-	CN(pControlHandle);
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
 	CN(m_pUserHandle);
-	if (!pControlHandle->IsAppVisible()) {
-		CR(pControlHandle->ShowApp());
-		CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
+	if (!pDreamControlViewHandle->IsAppVisible()) {
+		CR(pDreamControlViewHandle->ShowApp());
+		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		if (fSendURL) {
-			(pControlHandle->SendURLtoBrowser());
+			(pDreamControlViewHandle->SendURLtoBrowser());
 		}	
 	}
 
 Error:
-	if (pControlHandle != nullptr) {
-		GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
 	return r;
 }
@@ -468,33 +466,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
-				{
-					auto browserUIDs = GetDOS()->GetAppUID("DreamBrowser");	// moving this here for better isolation
-					DreamBrowserHandle* pBrowserHandle = nullptr;
-					CB(browserUIDs.size() == 1);
-					m_browserUID = browserUIDs[0];
-					pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
-					CN(pBrowserHandle);
-					pBrowserHandle->SetScope(strScope);
-					pBrowserHandle->SetPath(strPath);
-					CR(GetDOS()->ReleaseApp(pBrowserHandle, m_browserUID, this));
-				}
-
-				//TODO: this feels questionable, the focus stack will contain an invalid handle.
-				//		DreamUserObserver::HandleEvent is pure virtual at the handle level, so 
-				//		the code still executes correctly.
+				CR(UpdateBrowser(strScope, strPath));
 
 				CR(ShowControlView(false));
-				/*
-				auto controlUIDs = GetDOS()->GetAppUID("DreamControlView");
-				CB(controlUIDs.size() == 1);
-				auto pControlHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->CaptureApp(controlUIDs[0], this));
-				CN(pControlHandle);
-				CN(m_pUserHandle);
-				CR(pControlHandle->ShowApp());
-				CR(m_pUserHandle->SendPushFocusStack(pControlHandle));
-				GetDOS()->ReleaseApp(pControlHandle, controlUIDs[0], this);
-				//*/
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -513,23 +487,28 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				//m_pKeyboardHandle = nullptr;
 
 				//TODO: why does this need to happen
-				{
-					auto browserUIDs = GetDOS()->GetAppUID("DreamBrowser");	// moving this here for better isolation
-					DreamBrowserHandle* pBrowserHandle = nullptr;
-					CB(browserUIDs.size() == 1);
-					m_browserUID = browserUIDs[0];
-					pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
-					CN(pBrowserHandle);
-					pBrowserHandle->SetScope(strScope);
-					pBrowserHandle->SetPath(strPath);
-					CR(GetDOS()->ReleaseApp(pBrowserHandle, m_browserUID, this));
-				}
+				CR(UpdateBrowser(strScope, strPath));
 			}
 //*/
 		}
 	}
 
 Error:
+	return r;
+}
+
+RESULT DreamUIBar::UpdateBrowser(std::string strScope, std::string strPath) {
+	RESULT r = R_PASS;
+
+	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
+	CN(pBrowserHandle);
+	pBrowserHandle->SetScope(strScope);
+	pBrowserHandle->SetPath(strPath);
+
+Error:
+	if (pBrowserHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pBrowserHandle, this);
+	}
 	return r;
 }
 
