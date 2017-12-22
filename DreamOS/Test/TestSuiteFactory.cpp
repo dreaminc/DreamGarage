@@ -11,7 +11,7 @@
 #include "HAL/HALTestSuite.h"
 #include "DreamOSTestSuite.h"
 #include "Sound/SoundTestSuite.h"
-#include "Sandbox/SanboxTestSuite.h"
+#include "Sandbox/SandboxTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
