@@ -732,6 +732,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp" />

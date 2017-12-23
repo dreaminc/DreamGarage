@@ -21,9 +21,9 @@ DimObj::DimObj() :
 	/* stub */
 }
 
-//DimObj::~DimObj() {
-//	Destroy();
-//}
+DimObj::~DimObj() {
+	Destroy();
+}
 
 OBJECT_TYPE DimObj::GetType() {
 	return OBJECT_DIMENSION;
@@ -39,6 +39,15 @@ RESULT DimObj::Destroy() {
 		delete[] m_pVertices;
 		m_pVertices = nullptr;
 	}
+
+	/*
+	if (m_pObjects != nullptr) {
+		ClearChildren();
+
+		delete m_pObjects;
+		m_pObjects = nullptr;
+	}
+	*/
 
 	return R_PASS;
 }
@@ -413,6 +422,7 @@ Error:
 RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront) {
 	if (m_pObjects == nullptr) {
 		m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
+		//m_pObjects = new std::vector<std::shared_ptr<VirtualObj>>();
 	}
 
 	if (fFront) {
@@ -474,7 +484,7 @@ bool DimObj::HasChildren() {
 }
 
 std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
-	return *(m_pObjects.get());
+	return *(m_pObjects);
 }
 
 // Intersections and Collision

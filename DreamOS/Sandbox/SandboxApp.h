@@ -174,11 +174,14 @@ public:
 	RESULT SetGravityState(bool fEnabled);
 
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);

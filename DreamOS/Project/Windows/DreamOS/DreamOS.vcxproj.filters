@@ -914,6 +914,9 @@
     <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp">
       <Filter>Sandbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

@@ -49,6 +49,11 @@ public:
 		m_fValid = false;
 	}
 
+	void ValidateOverride() {
+		m_fValidated = true;
+		m_fValid = true;
+	}
+
 public:
 	bool IsValid() {
 		return m_fValid;

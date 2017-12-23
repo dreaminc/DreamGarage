@@ -25,6 +25,7 @@ public:
 
 	// Tests
 	RESULT AddTestObjectPipeline();
+	RESULT AddTestCompositeObject();
 	
 
 private:

@@ -23,6 +23,8 @@ SandboxTestSuite::~SandboxTestSuite() {
 RESULT SandboxTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCompositeObject());
+
 	CR(AddTestObjectPipeline());
 
 Error:
@@ -166,6 +168,72 @@ RESULT SandboxTestSuite::AddTestObjectPipeline() {
 
 		auto pCylinder = m_pDreamOS->AddCylinder(0.25f, 0.5f, 20, 20);
 		pCylinder->MoveTo(point(1.0f, -0.25f, 0.0f));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Object Pipeline Test");
+	pUITest->SetTestDescription("This is a test for the basic object pipeline arch");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT SandboxTestSuite::AddTestCompositeObject() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupDreamAppPipeline());
+
+		// TODO: Add some objects
+
+		// Objects 
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// TODO: Why does shit explode with no objects in scene
+		auto pComposite = m_pDreamOS->AddComposite();
+		
+		pComposite->AddSphere(0.25f, 10, 10);
+
+		//pComposite->ClearChildren();
+		pComposite->ClearObjects();
+
+		pComposite->AddVolume(0.5f);
 
 	Error:
 		return r;

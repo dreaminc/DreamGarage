@@ -867,8 +867,9 @@ RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
 	VirtualObj *pVirtualObj = nullptr;
 
 	pObjectStore->Reset();
+
 	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
-		if (pVirtualObj->IsVisible() == true) {
+		if (pVirtualObj != nullptr && pVirtualObj->IsVisible() == true) {
 			RenderObject((DimObj*)pVirtualObj);
 		}
 	}

@@ -17,7 +17,7 @@
 class OGLObj : public virtual DimObj {
 public:
 	OGLObj(OpenGLImp *pParentImp);
-	~OGLObj();
+	virtual ~OGLObj();
 
 	RESULT ReleaseOGLBuffers();
 	GLushort GetOGLPrecision();

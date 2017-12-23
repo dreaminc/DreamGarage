@@ -59,10 +59,25 @@ Error:
 	return r;
 }
 
+RESULT ObjectStore::LockStore() {
+	m_objectStoreLock.lock();
+	return R_PASS;
+}
+
+bool ObjectStore::TryLockStore() {
+	return m_objectStoreLock.try_lock();
+}
+
+RESULT ObjectStore::UnlockStore() {
+	m_objectStoreLock.unlock();
+	return R_PASS;
+}
+
 RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	CN(m_pSceneGraphStore);
+	
 	CR(m_pSceneGraphStore->RemoveObject(pObject));
 
 Error:
@@ -74,9 +89,8 @@ VirtualObj* ObjectStore::FindObject(VirtualObj *pObject) {
 }
 
 RESULT ObjectStore::RemoveAllObjects() {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_NOT_IMPLEMENTED;	
 
-	CN(m_pSceneGraphStore);
 	CR(m_pSceneGraphStore->RemoveAllObjects());
 
 Error:
@@ -87,6 +101,7 @@ RESULT ObjectStore::RemoveObjectByUID(UID uid) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	CN(m_pSceneGraphStore);
+
 	CR(m_pSceneGraphStore->RemoveObjectByUID(uid));
 
 Error:

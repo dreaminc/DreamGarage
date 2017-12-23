@@ -39,6 +39,7 @@ public:
 	RESULT SetSkybox(skybox *pSkybox);
 	RESULT GetSkybox(skybox*& pSkybox);
 
+	virtual std::list<VirtualObj*> GetList() override;
 	virtual std::vector<VirtualObj*> GetObjects() override;
 	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) override;
 	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) override;

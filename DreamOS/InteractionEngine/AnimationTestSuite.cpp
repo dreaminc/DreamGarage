@@ -20,11 +20,13 @@ AnimationTestSuite::~AnimationTestSuite() {
 
 RESULT AnimationTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
 	CR(AddTestUIColor());
 	CR(AddTestRotate());
 	CR(AddTestCurves());
 	CR(AddTestAnimationBasic());
 	CR(AddTestCancel());
+
 Error:
 	return r;
 }
