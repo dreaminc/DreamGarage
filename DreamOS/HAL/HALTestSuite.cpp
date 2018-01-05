@@ -24,13 +24,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(TestNestedOBB());
+
 	CR(AddTestText());
 
 	CR(AddTestModel());
 
 	CR(AddTestUserModel());
-
-	CR(TestNestedOBB());
 
 	CR(AddTestModelInstancing());
 	
@@ -600,14 +600,14 @@ RESULT HALTestSuite::TestNestedOBB() {
 
 	struct TestContext {
 		composite *pComposite = nullptr;
-		std::shared_ptr<volume> pVolume[8] = { nullptr };
 	} *pTestContext = new TestContext();
 
 	float width = 0.5f;
 	float height = width;
 	float length = width;
+	float padding = 0.75f;
 
-	float padding = 0.5f;
+	int numDimension = 5;
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -615,55 +615,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 		m_pDreamOS->SetGravityState(false);
 
 		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		CR(pHAL->MakeCurrentContext());
-
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		/*
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		//*/
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Connect Program to Display
-
-		// Connected in parallel (order matters)
-		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-
-		CR(pHAL->ReleaseCurrentContext());
+		CR(SetupSkyboxPipeline("environment"));
 
 		// Objects 
 
@@ -671,18 +623,39 @@ RESULT HALTestSuite::TestNestedOBB() {
 		CN(pTestContext);
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
 			pTestContext->pComposite = m_pDreamOS->AddComposite();
 			CN(pTestContext->pComposite);
+
 			pTestContext->pComposite->InitializeOBB();
 			pTestContext->pComposite->SetPosition(0.0f, 0.0f, -5.0f);
-		pTestContext->pComposite->Scale(0.5f);
+			pTestContext->pComposite->Scale(0.5f);
 
+			for (int i = 0; i < numDimension; i++) {
+
+				float xPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * i);
+
+				for (int j = 0; j < numDimension; j++) {
+
+					float yPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * j);
+
+					for (int k = 0; k < numDimension; k++) {
+
+						float zPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * k);
+
+						auto pVolume = pTestContext->pComposite->AddVolume(width);
+						CN(pVolume);
+
+						pVolume->SetPosition(point(xPos, yPos, zPos));
+					}
+				}
+			}
+
+			/*
 			pTestContext->pVolume[0] = pTestContext->pComposite->AddVolume(width);
 			CN(pTestContext->pVolume[0]);
-			pTestContext->pVolume[0]->SetPosition(point(-1.0f, -1.0f, -1.0f));
+			
 
 			pTestContext->pVolume[1] = pTestContext->pComposite->AddVolume(width);
 			CN(pTestContext->pVolume[1]);
@@ -711,6 +684,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 			pTestContext->pVolume[7] = pTestContext->pComposite->AddVolume(width);
 			CN(pTestContext->pVolume[7]);
 			pTestContext->pVolume[7]->SetPosition(point(-1.0f, -1.0f, 1.0f));
+			*/
 		}
 
 
@@ -731,7 +705,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 		CN(pTestContext);
 
 		pTestContext->pComposite->RotateYByDeg(0.035f);
-		pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+		//pTestContext->pVolume[2]->RotateYByDeg(0.035f);
 
 	Error:
 		return r;

@@ -18,13 +18,7 @@
 #pragma warning(disable : 4250)
 class OGLHand : public hand, public OGLObj {
 public:
-	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type) :
-		hand(pParentImp, type),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type);
 };
 #pragma warning(pop)
 

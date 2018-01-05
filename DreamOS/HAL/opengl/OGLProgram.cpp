@@ -914,15 +914,15 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	//OGLObj *pOGLObj = reinterpret_cast<OGLObj*>(pDimObj);
-	//CNR(pOGLObj, R_SKIPPED);
 
-	// Update buffers if marked as dirty
-	if (pDimObj->CheckAndCleanDirty()) {
-		pOGLObj->UpdateOGLBuffers();
-	}
-	
+	// IsVisible will return false for Virtual Objects
 	if (pOGLObj != nullptr) {
+
+		// Update buffers if marked as dirty
+		if (pDimObj->CheckAndCleanDirty()) {
+			pOGLObj->UpdateOGLBuffers();
+		}
+
 		// TODO: This should be replaced with a materials store or OGLMaterial that 
 		// preallocates and swaps binding points (Wait for textures)
 		SetObjectUniforms(pDimObj);

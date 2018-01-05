@@ -18,49 +18,19 @@
 #pragma warning(disable : 4250)
 class OGLSkybox : public skybox, public OGLObj {
 public:
-	OGLSkybox(OpenGLImp *pParentImp) :
-		skybox(),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLSkybox(OpenGLImp *pParentImp);
 
+
+public:
 	/*
-	RESULT OGLActivateCubeMapTexture() {
-		RESULT r = R_PASS;
-
-		OGLTexture *pCubeMapTexture = reinterpret_cast<OGLTexture*>(m_pCubeMapTexture);
-
-		CN(pCubeMapTexture);
-		CR(pCubeMapTexture->OGLActivateTexture());
-
-	Error:
-		return r;
-	}
+	RESULT OGLActivateCubeMapTexture();
 	*/
 
 	// Face culling
 	
 	///*
 	//RESULT Render() {
-	RESULT Render() {
-		RESULT r = R_PASS;
-		bool fCullingEnabled = glIsEnabled(GL_CULL_FACE)!=0;
-
-		glDisable(GL_CULL_FACE);
-		glDepthMask(GL_FALSE);
-
-		CR(OGLObj::Render());
-
-	Error:
-		glDepthMask(GL_TRUE);
-
-		if(fCullingEnabled)
-			glEnable(GL_CULL_FACE);
-
-		return r;
-	}
+	virtual RESULT Render() override;
 	//*/
 };
 #pragma warning(pop)

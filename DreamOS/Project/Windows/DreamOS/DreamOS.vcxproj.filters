@@ -260,9 +260,6 @@
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
       <Filter>HMD</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
@@ -915,6 +912,36 @@
       <Filter>Sandbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLComposite.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLCylinder.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLHand.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMesh.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLModel.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLSkybox.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUser.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTriangle.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVolume.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>

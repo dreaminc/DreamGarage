@@ -17,18 +17,11 @@
 #pragma warning(disable : 4250)
 class OGLModel : public model, public OGLObj {
 public:
-	OGLModel(OpenGLImp *pParentImp) :
-		model(pParentImp),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLModel(OpenGLImp *pParentImp);
 
+public:
 	// TODO: Need to make this better
-	RESULT UpdateBuffers() override {
-		return UpdateOGLBuffers();
-	}
+	RESULT UpdateBuffers() override;
 };
 #pragma warning(pop)
 

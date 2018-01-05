@@ -16,18 +16,11 @@
 #pragma warning(disable : 4250)
 class OGLComposite : public composite, public OGLObj {
 public:
-	OGLComposite(OpenGLImp *pParentImp) :
-		composite(pParentImp),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLComposite(OpenGLImp *pParentImp);
 
+public:
 	// TODO: Need to make this better
-	RESULT UpdateBuffers() override {
-		return UpdateOGLBuffers();
-	}
+	virtual RESULT UpdateBuffers() override;
 };
 #pragma warning(pop)
 
