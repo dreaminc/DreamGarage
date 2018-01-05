@@ -3,6 +3,8 @@
 
 #include "RESULT/EHM.h"
 
+#include <mutex>
+
 // DREAM OS
 // DreamOS/Dimension/Scene/ObjectStore.h
 // The Scene Graph contains all of the objects in a given
@@ -54,11 +56,19 @@ public:
 
 	RESULT CommitObjects();
 
+	RESULT LockStore();
+	RESULT UnlockStore();
+	bool TryLockStore();
+
 
 protected:
 	ObjectStoreImp *m_pSceneGraphStore;
+
 private:
 	UID m_uid;
+
+	//std::mutex m_objectStoreLock;
+	std::recursive_mutex m_objectStoreLock;
 };
 
 #endif // ! SCENE_GRAPH_H_

@@ -11,25 +11,18 @@
 #include "OGLObj.h"
 #include "Primitives/model/model.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLModel : public model, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
+public:
+	OGLModel(OpenGLImp *pParentImp);
 
 public:
-	OGLModel(OpenGLImp *pParentImp) :
-		model(pParentImp),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
-
 	// TODO: Need to make this better
-	RESULT UpdateBuffers() override {
-		return UpdateOGLBuffers();
-	}
+	RESULT UpdateBuffers() override;
 };
+#pragma warning(pop)
 
 #endif // ! OGL_MODEL_H_

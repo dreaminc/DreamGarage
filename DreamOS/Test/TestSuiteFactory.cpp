@@ -11,6 +11,7 @@
 #include "HAL/HALTestSuite.h"
 #include "DreamOSTestSuite.h"
 #include "Sound/SoundTestSuite.h"
+#include "Sandbox/SandboxTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
@@ -70,6 +71,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 		case TEST_SUITE_TYPE::HAL: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<HALTestSuite>((DreamOS*)pContext);
+		} break;
+
+		case TEST_SUITE_TYPE::SANDBOX: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<SandboxTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::MATH: {

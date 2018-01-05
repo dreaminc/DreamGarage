@@ -64,7 +64,7 @@ private:
 public:
 
 	DimObj();
-	~DimObj();
+	virtual ~DimObj();
 
 	// TODO: rename
 	enum class MaterialTexture { 
@@ -189,6 +189,7 @@ public:
 protected:
 	DimObj* m_pParent = nullptr;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
+	//std::vector<std::shared_ptr<VirtualObj>> *m_pObjects = nullptr;
 
 	// Bounding Volume
 public:

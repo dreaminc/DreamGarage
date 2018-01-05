@@ -16,7 +16,7 @@
 
 #define MIN_CYLINDER_DIVISIONS 3
 
-class cylinder : public DimObj {
+class cylinder : public virtual DimObj {
 public:
 	int m_numAngularDivisions;
 	int m_numVerticalDivisions;

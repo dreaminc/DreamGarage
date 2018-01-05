@@ -867,8 +867,9 @@ RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
 	VirtualObj *pVirtualObj = nullptr;
 
 	pObjectStore->Reset();
+
 	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
-		if (pVirtualObj->IsVisible() == true) {
+		if (pVirtualObj != nullptr && pVirtualObj->IsVisible() == true) {
 			RenderObject((DimObj*)pVirtualObj);
 		}
 	}
@@ -885,18 +886,19 @@ RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
 		return R_PASS;
 
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	//OGLObj *pOGLObj = reinterpret_cast<OGLObj*>(pDimObj);
 
 	if (pOGLObj != nullptr) {
 		// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
 		// which might not be the right flow
 		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
 			// Update bounding volume:
-			pOGLObj->UpdateBoundingVolume();
-			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+			pOGLObj->UpdateOGLBoundingVolume();
+			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume());
 		}
 
-		// This is called even when bounding volume is null since it'll create the refgeo
-		CR(pOGLObj->RenderBoundingVolume());
+		// This is called even when bounding volume is null since it'll create the reference geometry
+		CR(pOGLObj->RenderOGLBoundingVolume());
 	}
 
 	if (pDimObj->HasChildren()) {
@@ -912,14 +914,15 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	//CNR(pOGLObj, R_SKIPPED);
 
-	// Update buffers if marked as dirty
-	if (pDimObj->CheckAndCleanDirty()) {
-		pOGLObj->UpdateOGLBuffers();
-	}
-	
+	// IsVisible will return false for Virtual Objects
 	if (pOGLObj != nullptr) {
+
+		// Update buffers if marked as dirty
+		if (pDimObj->CheckAndCleanDirty()) {
+			pOGLObj->UpdateOGLBuffers();
+		}
+
 		// TODO: This should be replaced with a materials store or OGLMaterial that 
 		// preallocates and swaps binding points (Wait for textures)
 		SetObjectUniforms(pDimObj);

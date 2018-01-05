@@ -22,6 +22,7 @@ public:
 		ANIMATION,
 		OS,
 		SOUND,
+		SANDBOX,
 		INVALID
 	} ;
 

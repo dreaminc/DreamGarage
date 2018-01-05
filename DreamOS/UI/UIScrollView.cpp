@@ -238,20 +238,35 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 	if (m_pMenuButtonsContainer->HasChildren()) {
 		for (auto& pObj : m_pMenuButtonsContainer->GetChildren()) {
-			UIButton* pButton = reinterpret_cast<UIButton*>(pObj.get());
+			
+			UIButton* pButton = dynamic_cast<UIButton*>(pObj.get());
 
-			//TODO: this works for now, but it may be necessary to have some of the individual
-			// RemoveObject functions properly cascade the call for future situations
-			CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
-			CR(m_pDreamOS->RemoveObject(pButton));
-			CR(m_pDreamOS->UnregisterInteractionObject(pButton));
+			if (pButton != nullptr) {
 
-			UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
-			if (pMenuItem) {
-				CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurfaceComposite().get()));
+				//TODO: this works for now, but it may be necessary to have some of the individual
+				// RemoveObject functions properly cascade the call for future situations
+
+				//CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
+				//CR(m_pDreamOS->RemoveObject(pButton));
+
+				m_pDreamOS->UnregisterInteractionObject(pButton);
+				m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
+
+				m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
+
+				//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton->GetSurface().get());
+				//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton->GetSurfaceComposite().get());
+
+				//m_pMenuButtonsContainer->RemoveChild(pButton);
+
+				//UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
+				//if (pMenuItem) {
+				//	CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurfaceComposite().get()));
+				//}
 			}
 		}
 	}
+
 	CR(m_pMenuButtonsContainer->ClearChildren());
 
 	int i = 0;
@@ -259,6 +274,10 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+
+		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
+		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
+		m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
@@ -280,10 +299,12 @@ RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 	m_fScrollButtonVisible = false;
 
 	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
-		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
-		//if (pObj != pPushButton) {
+		auto pObj = dynamic_cast<UIButton*>(pButton.get());
+		
+		if (pObj != nullptr) {
 			CR(HideObject(pObj));
-		//}
+		}
+
 		//else {
 		//	CR(HideAndPushButton(pObj));
 		//}

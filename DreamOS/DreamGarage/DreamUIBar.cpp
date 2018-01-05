@@ -625,14 +625,15 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
-			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
-			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 			pButtons.emplace_back(pButton);
 		}
 
 		if (m_pMenuNode->GetNodeType() != MenuNode::type::ACTION) {
+
 			m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
+			
 			CR(m_pScrollView->UpdateMenuButtons(pButtons));
+			
 			if (m_pPendingIconTexture != nullptr) {
 				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
 				m_pPendingIconTexture = nullptr;

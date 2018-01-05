@@ -15,11 +15,14 @@
 
 class font;
 
-class OGLText : public text, public OGLObj {
-protected:
-	virtual DimObj *GetDimObj() override;
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
+class OGLText : public text, public virtual OGLObj {
 
 public:
+
 	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags textFlags);
 	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 1.0f, bool fBillboard = false);
 	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText = "", double width = 1.0f, double height = 1.0f, bool fBillboard = false);
@@ -28,5 +31,6 @@ public:
 	
 	virtual RESULT SetText(const std::string& text) override;
 };
+#pragma warning(pop)
 
 #endif // ! OGL_TEXT_H_

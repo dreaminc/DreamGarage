@@ -981,6 +981,10 @@ RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->UnregisterInteractionObject(pObject);
 }
 
+RESULT DreamOS::RemoveObjectFromInteractionGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromInteractionGraph(pObject);
+}
+
 RESULT DreamOS::AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
@@ -998,6 +1002,14 @@ RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 
 RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
+}
+
+RESULT DreamOS::RemoveObjectFromUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromUIGraph(pObject);
+}
+
+RESULT DreamOS::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObjectFromUIClippingGraph(pObject);
 }
 
 // Cloud Controller

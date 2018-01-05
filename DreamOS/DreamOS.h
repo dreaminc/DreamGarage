@@ -75,6 +75,7 @@ class DreamOS :
 	friend class CollisionTestSuite;
 	friend class WebRTCTestSuite;
 	friend class SoundTestSuite;
+	friend class SandboxTestSuite;
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
@@ -213,11 +214,14 @@ public:
 	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();

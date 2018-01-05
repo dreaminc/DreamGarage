@@ -780,6 +780,10 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RemoveObjectFromInteractionGraph(VirtualObj *pObject) {
+	return m_pInteractionGraph->RemoveObject(pObject);
+}
+
 RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
@@ -807,6 +811,14 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
+	return m_pUISceneGraph->RemoveObject(pObject);
+}	   
+	   
+RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
+	return m_pUIClippingSceneGraph->RemoveObject(pObject);
+}
+
 /*
 RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
@@ -822,8 +834,10 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
-	if (pObj != nullptr)
+
+	if (pObj != nullptr) {
 		CR(m_pInteractionEngine->RemoveAnimationObject(pObj));
+	}
 
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
@@ -834,6 +848,11 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
+	//if (pObject != nullptr) {
+	//	delete pObject;
+	//	pObject = nullptr;
+	//}
+
 	return r;
 }
 
