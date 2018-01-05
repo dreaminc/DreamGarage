@@ -651,40 +651,6 @@ RESULT HALTestSuite::TestNestedOBB() {
 					}
 				}
 			}
-
-			/*
-			pTestContext->pVolume[0] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[0]);
-			
-
-			pTestContext->pVolume[1] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[1]);
-			pTestContext->pVolume[1]->SetPosition(point(1.0f, 1.0f, 1.0f));
-
-			pTestContext->pVolume[2] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[2]);
-			pTestContext->pVolume[2]->SetPosition(point(1.0f, 1.0f, -1.0f));
-
-			pTestContext->pVolume[3] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[3]);
-			pTestContext->pVolume[3]->SetPosition(point(1.0f, -1.0f, -1.0f));
-
-			pTestContext->pVolume[4] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[4]);
-			pTestContext->pVolume[4]->SetPosition(point(1.0f, -1.0f, 1.0f));
-
-			pTestContext->pVolume[5] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[5]);
-			pTestContext->pVolume[5]->SetPosition(point(-1.0f, 1.0f, 1.0f));
-
-			pTestContext->pVolume[6] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[6]);
-			pTestContext->pVolume[6]->SetPosition(point(-1.0f, 1.0f, -1.0f));
-
-			pTestContext->pVolume[7] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[7]);
-			pTestContext->pVolume[7]->SetPosition(point(-1.0f, -1.0f, 1.0f));
-			*/
 		}
 
 
