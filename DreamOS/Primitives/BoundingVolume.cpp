@@ -44,6 +44,7 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	return false;
 }
 
+// TODO: Uh - not this way
 CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	// Sphere
 	BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pRHS);
@@ -61,6 +62,12 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pRHS);
 	if (pBoundingQuad != nullptr) {
 		return Collide(*pBoundingQuad);
+	}
+
+	// Plane
+	BoundingPlane *pBoundingPlane = dynamic_cast<BoundingPlane*>(pRHS);
+	if (pBoundingPlane != nullptr) {
+		return Collide(*pBoundingPlane);
 	}
 
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());

@@ -57,6 +57,14 @@ CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
 	return manifold;
 }
 
+CollisionManifold BoundingQuad::Collide(const BoundingPlane& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
+
+	return manifold;
+}
+
 CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 

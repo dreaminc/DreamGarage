@@ -79,6 +79,35 @@ CollisionManifold BoundingPlane::Collide(const BoundingBox& rhs) {
 }
 
 CollisionManifold BoundingPlane::Collide(const BoundingSphere& rhs) {
+	// First calculate rotation per normal and re-orient
+
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
+	double distance = ptSphereOrigin.y();
+
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	float absDistance = std::abs(distance);
+
+	if (absDistance < static_cast<BoundingSphere>(rhs).GetRadius()) {
+
+		point ptClosestPoint = point(ptSphereOrigin.x(), 0.0f, ptSphereOrigin.z());
+		ptClosestPoint = (rotMat * ptClosestPoint) + GetAbsoluteOrigin();
+
+		vector vNormal = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - ptClosestPoint;
+		vNormal.Normalize();
+
+		point ptContact = ptClosestPoint;
+		float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - absDistance;
+
+		manifold.AddContactPoint(ptContact, vNormal, -penetration, 1);
+	}
+
+	return manifold;
+}
+
+CollisionManifold BoundingPlane::Collide(const BoundingQuad& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// TODO:
@@ -86,7 +115,7 @@ CollisionManifold BoundingPlane::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
-CollisionManifold BoundingPlane::Collide(const BoundingQuad& rhs) {
+CollisionManifold BoundingPlane::Collide(const BoundingPlane& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// TODO:

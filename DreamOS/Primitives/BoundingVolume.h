@@ -52,6 +52,7 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingPlane& rhs) = 0;
 
 	virtual CollisionManifold Collide(const ray &rCast) = 0;
 

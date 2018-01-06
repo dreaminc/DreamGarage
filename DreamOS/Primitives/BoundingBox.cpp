@@ -655,6 +655,10 @@ CollisionManifold BoundingBox::Collide(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Collide(*this);
 }
 
+CollisionManifold BoundingBox::Collide(const BoundingPlane& rhs) {
+	return static_cast<BoundingPlane>(rhs).Collide(*this);
+}
+
 RESULT BoundingBox::SetHalfVector(vector vHalfVector) {
 	m_vHalfSize = vHalfVector;
 	return R_PASS;

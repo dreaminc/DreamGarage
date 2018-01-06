@@ -33,6 +33,7 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
+	virtual CollisionManifold Collide(const BoundingPlane& rhs) override;
 
 	virtual CollisionManifold Collide(const ray &rCast) override;
 

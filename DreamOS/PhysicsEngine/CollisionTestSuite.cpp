@@ -151,14 +151,15 @@ RESULT CollisionTestSuite::AddTestSpherePlane() {
 
 		pTestContext->pSphere->translateY(-0.0001f);
 
-		for (int i = 0; i < 4; i++)
-			pTestContext->pCollidePoint[i]->SetVisible(false);
+		//for (int i = 0; i < 4; i++)
+		//	pTestContext->pCollidePoint[i]->SetVisible(false);
 
 		// Check for collisions 
 		if (pTestContext->pPlane->Intersect(pTestContext->pSphere)) {
-			
-			/*
-			CollisionManifold manifold = pTestContext->pComposite->Collide(pTestContext->pRay->GetRay());
+
+			pTestContext->pSphere->SetMaterialColors(COLOR_RED);
+
+			CollisionManifold manifold = pTestContext->pPlane->Collide(pTestContext->pSphere);
 
 			if (manifold.NumContacts() > 0) {
 				for (int i = 0; i < manifold.NumContacts(); i++) {
@@ -166,8 +167,7 @@ RESULT CollisionTestSuite::AddTestSpherePlane() {
 					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
 				}
 			}
-			*/
-			pTestContext->pSphere->SetMaterialColors(COLOR_RED);
+			
 		}
 		else {
 			pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);

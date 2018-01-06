@@ -146,6 +146,10 @@ CollisionManifold BoundingSphere::Collide(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Collide(*this);
 }
 
+CollisionManifold BoundingSphere::Collide(const BoundingPlane& rhs) {
+	return static_cast<BoundingPlane>(rhs).Collide(*this);
+}
+
 bool BoundingSphere::Intersect(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Intersect(*this);
 }
