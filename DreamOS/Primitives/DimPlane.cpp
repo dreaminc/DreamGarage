@@ -67,8 +67,14 @@ RESULT DimPlane::SetPlaneVertices(float scale) {
 	// Orient the points accordingly 
 	{
 		vector vNormal = m_vNormal.Normal();
+		
 		quaternion qOrientation = quaternion(vector::jVector(1.0f), vNormal);
 		RotationMatrix rotMat(qOrientation);
+
+		if (vNormal.y() == -1.0f) {
+			rotMat = RotationMatrix(0.0f, 0.0f, (float)M_PI);
+		}
+
 
 		for (unsigned int i = 0; i < NumberVertices(); i++) {
 			m_pVertices[i].m_point = rotMat * m_pVertices[i].m_point;

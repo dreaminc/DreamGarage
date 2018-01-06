@@ -27,6 +27,7 @@ public:
 	RESULT AddTestRayInComposite();
 
 	// Plane
+	RESULT AddTestPlanePlane();
 	RESULT AddTestPlaneSphere();
 	RESULT AddTestPlaneRay();
 

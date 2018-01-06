@@ -35,7 +35,7 @@ public:
 
 	virtual CollisionManifold Collide(const ray &rCast) override;
 
-	vector GetNormal();
+	vector GetNormal() const;
 
 	virtual BoundingVolume::Type GetType() override {
 		return BoundingVolume::Type::PLANE;

@@ -5,6 +5,8 @@
 #include "BoundingQuad.h"
 #include <algorithm>
 
+#include "plane.h"
+
 #include "VirtualObj.h"
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -53,15 +55,24 @@ bool BoundingPlane::Intersect(const BoundingQuad& rhs) {
 }
 
 bool BoundingPlane::Intersect(const BoundingPlane& rhs) {
-	// TODO:
+	vector vCross = rhs.GetNormal().cross(m_vNormal);
 
-	return false;
+	if (vCross.magnitude() == 0.0f) {
+		return Intersect(static_cast<BoundingPlane>(rhs).GetOrigin());
+	}
+	
+	return true;
 }
 
 bool BoundingPlane::Intersect(point& pt) {
-	// TODO:
+	float distance = plane(GetOrigin(), GetNormal()).Distance(pt);
 
-	return false;
+	if (distance > 0) {
+		return false;
+	}
+	else {
+		return true;
+	}
 }
 
 bool BoundingPlane::Intersect(const ray& r) {
@@ -135,7 +146,7 @@ CollisionManifold BoundingPlane::Collide(const BoundingQuad& rhs) {
 CollisionManifold BoundingPlane::Collide(const BoundingPlane& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
-	// TODO:
+	// TODO:  This will return a line so return two points
 
 	return manifold;
 }
@@ -166,6 +177,6 @@ CollisionManifold BoundingPlane::Collide(const ray &rCast) {
 	return manifold;
 }
 
-vector BoundingPlane::GetNormal() {
+vector BoundingPlane::GetNormal() const {
 	return m_vNormal;
 }
