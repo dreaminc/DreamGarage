@@ -65,7 +65,24 @@ bool BoundingPlane::Intersect(point& pt) {
 }
 
 bool BoundingPlane::Intersect(const ray& r) {
-	// TODO:
+	double t = -1.0f;
+
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
+
+	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
+	double denom = r.GetVector().Normal().dot(vNormal);
+
+	if (denom != 0) {
+		t /= denom;
+
+		if (t >= 0) {
+			return true;
+		}
+	}
+	else {
+		// parallel 
+	}
 
 	return false;
 }
@@ -126,7 +143,25 @@ CollisionManifold BoundingPlane::Collide(const BoundingPlane& rhs) {
 CollisionManifold BoundingPlane::Collide(const ray &rCast) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
 
-	// TODO:
+	double t = -1.0f;
+
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
+
+	t = ((vector)(GetAbsoluteOrigin() - rCast.GetOrigin())).dot(vNormal);
+	double denom = rCast.GetVector().Normal().dot(vNormal);
+
+	if (denom != 0) {
+		t /= denom;
+
+		if (t >= 0) {
+			point ptContact = rCast.GetOrigin() + rCast.GetVector() * t;
+			manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+		}
+	}
+	else {
+		// parallel 
+	}
 
 	return manifold;
 }
