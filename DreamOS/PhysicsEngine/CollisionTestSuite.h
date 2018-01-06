@@ -26,6 +26,9 @@ public:
 
 	RESULT AddTestRayInComposite();
 
+	// Sphere Plane
+	RESULT AddTestSpherePlane();
+
 	// TODO: OBB - OBB
 
 	// TODO: OBB - Sphere

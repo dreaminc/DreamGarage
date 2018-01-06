@@ -894,6 +894,7 @@ RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
 		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
 			// Update bounding volume:
 			pOGLObj->UpdateOGLBoundingVolume();
+			SetMaterial(&material()); // refgeo material
 			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume());
 		}
 

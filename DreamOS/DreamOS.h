@@ -28,6 +28,7 @@
 #include "Primitives/sphere.h"
 #include "Primitives/cylinder.h"
 #include "Primitives/DimRay.h"
+#include "Primitives/DimPlane.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
@@ -281,6 +282,7 @@ public:
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
 
 	texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);

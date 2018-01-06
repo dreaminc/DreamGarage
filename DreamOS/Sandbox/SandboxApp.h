@@ -42,6 +42,7 @@ class FlatContext;
 class sphere; 
 class cylinder;
 class DimRay;
+class DimPlane;
 class volume; 
 class texture; 
 class skybox;
@@ -293,6 +294,9 @@ public:
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+
+	DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
+	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
 
 	text *AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);

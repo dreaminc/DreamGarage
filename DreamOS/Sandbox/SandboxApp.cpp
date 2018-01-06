@@ -1012,7 +1012,27 @@ Error:
 	return nullptr;
 }
 
+DimPlane* SandboxApp::MakePlane(point ptOrigin, vector vNormal) {
+	return m_pHALImp->MakePlane(ptOrigin, vNormal);
+}
 
+DimPlane* SandboxApp::AddPlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+	DimPlane* pPlane = MakePlane(ptOrigin, vNormal);
+	CN(pPlane);
+
+	CR(AddObject(pPlane));
+
+	//Success:
+	return pPlane;
+
+Error:
+	if (pPlane != nullptr) {
+		delete pPlane;
+		pPlane = nullptr;
+	}
+	return nullptr;
+}
 
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);

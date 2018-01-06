@@ -758,6 +758,10 @@ DimRay* DreamOS::AddRay(point ptOrigin, vector vDirection, float step, bool fDir
 	return m_pSandbox->AddRay(ptOrigin, vDirection, step, fDirectional);
 }
 
+DimPlane* DreamOS::AddPlane(point ptOrigin, vector vNormal) {
+	return m_pSandbox->AddPlane(ptOrigin, vNormal);
+}
+
 volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
 }

@@ -240,6 +240,7 @@ RESULT OGLObj::UpdateOGLBoundingVolume() {
 			CR(pOGLBoundingQuad->UpdateFromBoundingQuad(pBoundingQuad));
 		}
 	}
+	// TODO: Plane
 
 	// If this is a child, we should let the parent know
 	/*
@@ -278,6 +279,12 @@ RESULT OGLObj::RenderOGLBoundingVolume() {
 			case BoundingVolume::Type::QUAD: {
 				BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pBoundingVolume);
 				m_pOGLBoundingVolume = new OGLQuad(m_pParentImp, pBoundingQuad, false);
+			} break;
+
+			case BoundingVolume::Type::PLANE: {
+				// TODO:
+
+				return R_SKIPPED;
 			} break;
 		}
 
