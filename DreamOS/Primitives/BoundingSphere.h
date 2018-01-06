@@ -24,6 +24,7 @@ public:
 	virtual bool Intersect(const BoundingSphere& rhs) override;
 	virtual bool Intersect(const BoundingBox& rhs) override;
 	virtual bool Intersect(const BoundingQuad& rhs) override;
+	virtual bool Intersect(const BoundingPlane& rhs) override;
 
 	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray &r) override;

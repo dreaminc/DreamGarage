@@ -1,6 +1,7 @@
 #include "BoundingQuad.h"
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingPlane.h"
 #include <algorithm>
 
 #include "VirtualObj.h"
@@ -32,6 +33,12 @@ bool BoundingQuad::Intersect(const BoundingBox& rhs) {
 
 bool BoundingQuad::Intersect(const BoundingQuad& rhs) {
 	// TODO:
+
+	return false;
+}
+
+bool BoundingQuad::Intersect(const BoundingPlane& rhs) {
+	// TODO: 
 
 	return false;
 }

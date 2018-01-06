@@ -23,9 +23,21 @@ BoundingPlane::BoundingPlane(VirtualObj *pParentObject, point ptOrigin, vector v
 }
 
 bool BoundingPlane::Intersect(const BoundingSphere& rhs) {
-	// TODO:
+	// First calculate rotation per normal and re-orient
 
-	return false;
+	//quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix matRotation = RotationMatrix(qOrientation);
+
+	point ptSphereOrigin = inverse(matRotation) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
+	double distance = ptSphereOrigin.y();
+
+	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool BoundingPlane::Intersect(const BoundingBox& rhs) {
@@ -35,6 +47,12 @@ bool BoundingPlane::Intersect(const BoundingBox& rhs) {
 }
 
 bool BoundingPlane::Intersect(const BoundingQuad& rhs) {
+	// TODO:
+
+	return false;
+}
+
+bool BoundingPlane::Intersect(const BoundingPlane& rhs) {
 	// TODO:
 
 	return false;

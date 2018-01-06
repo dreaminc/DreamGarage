@@ -114,12 +114,12 @@ RESULT CollisionTestSuite::AddTestSpherePlane() {
 		CN(pTestContext);
 
 		// Objects
-		pTestContext->pPlane = m_pDreamOS->AddPlane();
+		pTestContext->pPlane = m_pDreamOS->AddPlane(point(1.0f, 0.5f, -1.0f), vector(1.0f, 1.0f, 0.0f).Normal());
 		CN(pTestContext->pPlane);
 		pTestContext->pPlane->SetMaterialColors(COLOR_BLUE);
-		pTestContext->pPlane->SetPosition(0.0f, -1.0f, 0.0f);
+		pTestContext->pPlane->SetPosition(0.0f, -0.001f, 0.0f);
 
-		pTestContext->pSphere = m_pDreamOS->AddSphere(1.25f, 20, 20);
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
 		pTestContext->pSphere->SetPosition(0.0f, 1.0f, 0.0f);
@@ -146,18 +146,18 @@ RESULT CollisionTestSuite::AddTestSpherePlane() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		//CN(pTestContext->pPlane);
-		//CN(pTestContext->pSphere);
+		CN(pTestContext->pPlane);
+		CN(pTestContext->pSphere);
 
+		pTestContext->pSphere->translateY(-0.0001f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 
 		// Check for collisions 
-
-		/*
-		if (pTestContext->pComposite->Intersect(pTestContext->pRay->GetRay())) {
-			//CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pComposite);
+		if (pTestContext->pPlane->Intersect(pTestContext->pSphere)) {
+			
+			/*
 			CollisionManifold manifold = pTestContext->pComposite->Collide(pTestContext->pRay->GetRay());
 
 			if (manifold.NumContacts() > 0) {
@@ -166,8 +166,12 @@ RESULT CollisionTestSuite::AddTestSpherePlane() {
 					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
 				}
 			}
+			*/
+			pTestContext->pSphere->SetMaterialColors(COLOR_RED);
 		}
-		*/
+		else {
+			pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
+		}
 
 	Error:
 		return r;

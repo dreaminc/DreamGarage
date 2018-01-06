@@ -1,6 +1,7 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 #include "BoundingQuad.h"
+#include "BoundingPlane.h"
 #include <algorithm>
 
 #include "VirtualObj.h"
@@ -631,6 +632,10 @@ vector BoundingBox::GetBoxFaceNormal(BoxFace faceType) {
 
 bool BoundingBox::Intersect(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Intersect(*this);
+}
+
+bool BoundingBox::Intersect(const BoundingPlane& rhs) {
+	return static_cast<BoundingPlane>(rhs).Intersect(*this);
 }
 
 //bool Intersect(const point& pt) {
