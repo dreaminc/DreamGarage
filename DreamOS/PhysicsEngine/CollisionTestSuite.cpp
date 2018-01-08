@@ -343,7 +343,7 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 		pTestContext->pPlaneB = m_pDreamOS->AddPlane(point(), vector::jVector(-1.0f));
 		CN(pTestContext->pPlaneB);
 		pTestContext->pPlaneB->SetMaterialColors(COLOR_RED);
-		pTestContext->pPlaneB->SetPosition(0.0f, -2.0f, 0.0f);
+		pTestContext->pPlaneB->SetPosition(0.0f, 2.0f, 0.0f);
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
@@ -387,6 +387,10 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 				}
 			}
 
+			pTestContext->pPlaneA->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pPlaneA->SetMaterialColors(COLOR_BLUE);
 		}
 
 	Error:

@@ -67,12 +67,11 @@ bool BoundingPlane::Intersect(const BoundingPlane& rhs) {
 bool BoundingPlane::Intersect(point& pt) {
 	float distance = plane(GetOrigin(), GetNormal()).Distance(pt);
 
-	if (distance > 0) {
-		return false;
-	}
-	else {
+	if (distance == 0) {
 		return true;
 	}
+	
+	return false;
 }
 
 bool BoundingPlane::Intersect(const ray& r) {
