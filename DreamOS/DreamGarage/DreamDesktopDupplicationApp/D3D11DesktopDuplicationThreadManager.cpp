@@ -5,7 +5,7 @@
 //
 // Copyright (c) Microsoft Corporation. All rights reserved
 
-#include "ThreadManager.h"
+#include "D3D11DesktopDuplicationThreadManager.h"
 
 DWORD WINAPI DDProc(_In_ void* Param);
 
