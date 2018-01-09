@@ -1,6 +1,7 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
 #include "BoundingQuad.h"
+#include "BoundingPlane.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -145,8 +146,16 @@ CollisionManifold BoundingSphere::Collide(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Collide(*this);
 }
 
+CollisionManifold BoundingSphere::Collide(const BoundingPlane& rhs) {
+	return static_cast<BoundingPlane>(rhs).Collide(*this);
+}
+
 bool BoundingSphere::Intersect(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Intersect(*this);
+}
+
+bool BoundingSphere::Intersect(const BoundingPlane& rhs) {
+	return static_cast<BoundingPlane>(rhs).Intersect(*this);
 }
 
 CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {

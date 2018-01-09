@@ -3,6 +3,7 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
 #include "BoundingQuad.h"
+#include "BoundingPlane.h"
 
 #include "VirtualObj.h"
 
@@ -22,6 +23,7 @@ BoundingVolume::BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
 	// Empty
 }
 
+// TODO: Uhhh - not this
 bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
 	if (pBoundingBox != nullptr)
@@ -35,9 +37,14 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	if (pBoundingQuad != nullptr)
 		return Intersect(*pBoundingQuad);
 
+	BoundingPlane *pBoundingPlane = dynamic_cast<BoundingPlane*>(pRHS);
+	if (pBoundingPlane != nullptr)
+		return Intersect(*pBoundingPlane);
+
 	return false;
 }
 
+// TODO: Uh - not this way
 CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	// Sphere
 	BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pRHS);
@@ -55,6 +62,12 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pRHS);
 	if (pBoundingQuad != nullptr) {
 		return Collide(*pBoundingQuad);
+	}
+
+	// Plane
+	BoundingPlane *pBoundingPlane = dynamic_cast<BoundingPlane*>(pRHS);
+	if (pBoundingPlane != nullptr) {
+		return Collide(*pBoundingPlane);
 	}
 
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());

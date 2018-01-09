@@ -194,11 +194,14 @@ protected:
 	// Bounding Volume
 public:
 	virtual RESULT UpdateBoundingVolume();
+
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
 	RESULT InitializeBoundingQuad();
 	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
+	RESULT InitializeBoundingPlane(point ptOrigin, vector vNormal);
+
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
 	// OnManipulation is called by VirtualObj every time a manipulation occurs - this is a chance for

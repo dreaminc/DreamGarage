@@ -470,9 +470,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
     </ClCompile>
@@ -943,6 +940,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLVolume.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimPlane.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLPlane.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingPlane.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2065,6 +2074,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h">
       <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimPlane.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLPlane.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingPlane.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

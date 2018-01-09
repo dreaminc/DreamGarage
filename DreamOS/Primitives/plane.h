@@ -31,11 +31,16 @@ public:
 		return m_vNormal.Normal().dot(m_ptPosition - pt);
 	}
 
-	vector GetNormal() {
+	vector GetNormal() const {
 		return m_vNormal;
 	}
 
-	point GetPosition() {
+	RESULT SetNormal(vector vNormal) {
+		m_vNormal = vNormal.Normal();
+		return R_PASS;
+	}
+
+	point GetPosition() const {
 		return m_ptPosition;
 	}
 

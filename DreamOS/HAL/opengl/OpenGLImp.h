@@ -62,6 +62,7 @@ public:
 
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) override;
+	virtual DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f)) override;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;

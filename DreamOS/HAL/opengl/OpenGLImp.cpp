@@ -31,6 +31,7 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
+#include "OGLPlane.h"
 #include "OGLAttachment.h"
 
 #include "OGLViewportDisplay.h"
@@ -540,6 +541,23 @@ Error:
 			delete pRay;
 			pRay = nullptr;
 		}
+	return nullptr;
+}
+
+DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+
+	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
+	CN(pPlane);
+
+	//Success:
+	return pPlane;
+
+Error:
+	if (pPlane != nullptr) {
+		delete pPlane;
+		pPlane = nullptr;
+	}
 	return nullptr;
 }
 

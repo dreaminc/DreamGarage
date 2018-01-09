@@ -8,6 +8,7 @@ RotationMatrix::RotationMatrix() :
 	identity();
 }
 
+// TODO: This is broken
 RotationMatrix::RotationMatrix(vector rotationAxis, rotation_precision theta) :
 	m_type(ARBITRARY_AXIS)
 {

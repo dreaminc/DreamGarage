@@ -1,6 +1,7 @@
 #include "BoundingQuad.h"
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingPlane.h"
 #include <algorithm>
 
 #include "VirtualObj.h"
@@ -36,6 +37,12 @@ bool BoundingQuad::Intersect(const BoundingQuad& rhs) {
 	return false;
 }
 
+bool BoundingQuad::Intersect(const BoundingPlane& rhs) {
+	// TODO: 
+
+	return false;
+}
+
 bool BoundingQuad::Intersect(point& pt) {
 	// TODO:
 
@@ -43,6 +50,14 @@ bool BoundingQuad::Intersect(point& pt) {
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
+
+	return manifold;
+}
+
+CollisionManifold BoundingQuad::Collide(const BoundingPlane& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// TODO:

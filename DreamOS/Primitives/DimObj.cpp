@@ -3,6 +3,7 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 #include "BoundingQuad.h"
+#include "BoundingPlane.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -1035,6 +1036,20 @@ RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height,
 	RESULT r = R_PASS;
 
 	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this, ptOrigin, vNormal, width, height));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
+
+	//CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingPlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingPlane>(new BoundingPlane(this, ptOrigin, vNormal));
 	CN(m_pBoundingVolume);
 
 	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);

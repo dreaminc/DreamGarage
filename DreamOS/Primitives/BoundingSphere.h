@@ -24,6 +24,7 @@ public:
 	virtual bool Intersect(const BoundingSphere& rhs) override;
 	virtual bool Intersect(const BoundingBox& rhs) override;
 	virtual bool Intersect(const BoundingQuad& rhs) override;
+	virtual bool Intersect(const BoundingPlane& rhs) override;
 
 	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray &r) override;
@@ -32,6 +33,7 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
+	virtual CollisionManifold Collide(const BoundingPlane& rhs) override;
 
 	virtual CollisionManifold Collide(const ray &rCast) override;
 
