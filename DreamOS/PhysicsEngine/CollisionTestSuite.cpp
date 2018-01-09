@@ -22,6 +22,8 @@ CollisionTestSuite::~CollisionTestSuite() {
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestSphereQuad());
+
 	CR(AddTestSphereSphere());
 
 	CR(AddTestPlaneQuad());
@@ -775,10 +777,116 @@ Error:
 	return r;
 }
 
-//RESULT CollisionTestSuite::AddTestSphereQuad() {
-//
-//}
-//
+RESULT CollisionTestSuite::AddTestSphereQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 55.0f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		quad *pQuad = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.3f, 10, 10);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphere->SetPosition(0.1f, 0.0f, 0.1f);
+
+		pTestContext->pQuad = m_pDreamOS->AddQuad(1.5f, 1.5f, 1, 1, nullptr, vector::jVector(1.0f));
+		CN(pTestContext->pQuad);
+		pTestContext->pQuad->SetMaterialColors(COLOR_RED);
+		pTestContext->pQuad->SetPosition(0.0f, -1.0f, 0.0f);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pSphere);
+		CN(pTestContext->pQuad);
+
+		pTestContext->pSphere->translateY(-0.0005f);
+
+		//for (int i = 0; i < 4; i++)
+		//	pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pSphere->Intersect(pTestContext->pQuad)) {
+
+			//CollisionManifold manifold = pTestContext->pQuad->Collide(pTestContext->pSphere);
+			CollisionManifold manifold = pTestContext->pSphere->Collide(pTestContext->pQuad);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Quad Test");
+	pNewTest->SetTestDescription("Sphere vs Quad Test");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
 //RESULT CollisionTestSuite::AddTestSphereOBB() {
 //
 //}

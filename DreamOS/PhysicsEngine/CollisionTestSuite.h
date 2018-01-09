@@ -35,7 +35,7 @@ public:
 
 	// Sphere
 	RESULT AddTestSphereSphere();
-	//RESULT AddTestSphereQuad();
+	RESULT AddTestSphereQuad();
 	//RESULT AddTestSphereOBB();
 	
 	// OBB
