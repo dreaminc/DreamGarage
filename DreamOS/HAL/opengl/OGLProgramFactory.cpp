@@ -19,6 +19,7 @@
 #include "OGLProgramBlendQuad.h"
 #include "OGLProgramBlurQuad.h"
 #include "OGLProgramUIStage.h"
+#include "OGLProgramDebugOverlay.h"
 
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
@@ -41,6 +42,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
 	{ "blur", OGLPROGRAM_BLUR_QUAD },
 	{ "uistage", OGLPROGRAM_UI_STAGE },
+	{ "debug_overlay", OGLPROGRAM_DEBUG_OVERLAY },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -184,6 +186,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blurquad.vert", L"blurquad.frag", versionOGL),
 				"Failed to initialize OGL blur quad Program");
+		} break;
+
+		case OGLPROGRAM_DEBUG_OVERLAY: {
+			pOGLProgram = new OGLProgramDebugOverlay(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL),
+				"Failed to initialize OGL minimal Program");
 		} break;
 
 		case OGLPROGRAM_CUSTOM:

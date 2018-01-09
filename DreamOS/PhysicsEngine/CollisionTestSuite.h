@@ -12,6 +12,8 @@
 #include <functional>
 #include <memory>
 
+#include "Scene/ObjectStoreNode.h"
+
 class DreamOS;
 
 class CollisionTestSuite : public TestSuite {
@@ -64,7 +66,7 @@ private:
 
 private:
 	DreamOS *m_pDreamOS;
-
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 };
 
 #endif // ! COLLISION_TEST_SUITE_H_

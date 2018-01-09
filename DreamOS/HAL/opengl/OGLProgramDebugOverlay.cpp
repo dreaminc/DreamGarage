@@ -1,4 +1,4 @@
-#include "OGLProgramMinimal.h"
+#include "OGLProgramDebugOverlay.h"
 
 #include "Scene/ObjectStoreImp.h"
 #include "Scene/ObjectStore.h"
@@ -9,19 +9,13 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglminimal")
+OGLProgramDebugOverlay::OGLProgramDebugOverlay(OpenGLImp *pParentImp) :
+	OGLProgramMinimal(pParentImp, "ogldebugoverlay")
 {
 	// empty
 }
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
-{
-	// empty
-}
-
-RESULT OGLProgramMinimal::OGLInitialize() {
+RESULT OGLProgramDebugOverlay::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -42,7 +36,7 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	// Custom framebuffer output settings
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT24, GL_INT));
 
-	///*
+	/*
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -66,22 +60,22 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimal::SetupConnections() {
+RESULT OGLProgramDebugOverlay::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	//TODO: CR(MakeInput("lights"));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramMinimal::ProcessNode(long frameID) {
+RESULT OGLProgramDebugOverlay::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -90,17 +84,17 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT24, GL_INT);
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
 
-	glEnable(GL_DEPTH_TEST);
-	//glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();
 	}
-
+	
 	glEnable(GL_BLEND);
 
 	SetLights(pLights);
@@ -110,54 +104,10 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
+	glEnable(GL_DEPTH_TEST);
+
 	UnbindFramebuffer();
 
 //Error:
 	return r;
-}
-
-RESULT OGLProgramMinimal::SetObjectTextures(OGLObj *pOGLObj) {
-	return R_NOT_IMPLEMENTED;
-}
-
-RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
-	if (m_pUniformModelMatrix != nullptr) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
-	}
-
-	return R_PASS;
-}
-
-RESULT OGLProgramMinimal::SetMaterial(material *pMaterial) {
-	RESULT r = R_PASS;
-
-	if (m_pMaterialsBlock != nullptr) {
-		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
-		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
-	}
-
-Error:
-	return r;
-}
-
-RESULT OGLProgramMinimal::SetCameraUniforms(camera *pCamera) {
-	if (m_pUniformViewProjectionMatrix != nullptr) {
-		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		//auto matVP = pCamera->GetProjectionMatrix();
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-	}
-
-	return R_PASS;
-}
-
-RESULT OGLProgramMinimal::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-
-	if (m_pUniformViewProjectionMatrix != nullptr) {
-		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-		//auto matVP = pStereoCamera->GetProjectionMatrix(eye);
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-	}
-
-	return R_PASS;
 }

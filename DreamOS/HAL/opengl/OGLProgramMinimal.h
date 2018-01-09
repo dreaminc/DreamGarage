@@ -16,6 +16,7 @@ class stereocamera;
 class OGLProgramMinimal : public OGLProgram {
 public:
 	OGLProgramMinimal(OpenGLImp *pParentImp);
+	OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName);
 
 	RESULT OGLInitialize();
 
