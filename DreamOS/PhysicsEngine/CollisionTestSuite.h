@@ -33,6 +33,15 @@ public:
 	RESULT AddTestPlaneQuad();
 	RESULT AddTestPlaneOBB();
 
+	// Sphere
+	RESULT AddTestSphereSphere();
+	//RESULT AddTestSphereQuad();
+	//RESULT AddTestSphereOBB();
+	
+	// OBB
+	//RESULT AddTestOBBOBB();
+
+
 	// TODO: OBB - OBB
 
 	// TODO: OBB - Sphere

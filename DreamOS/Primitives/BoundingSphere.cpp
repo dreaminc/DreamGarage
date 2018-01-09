@@ -37,7 +37,7 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	if (abs(distance) <= (rhs.GetRadius() + GetRadius())) {
 		// Find the contact point and normal
 		vector vNormal = vMidLine.Normal();
-		point ptContact = const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() + (vMidLine * 0.5f);
+		point ptContact = const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - (vMidLine * 0.5f);
 		double penetration = (rhs.GetRadius() + GetRadius()) - abs(distance);
 
 		manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
