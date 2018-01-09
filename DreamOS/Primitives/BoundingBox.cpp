@@ -62,6 +62,14 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	}
 }
 
+CollisionManifold BoundingBox::Collide(const BoundingPlane& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	
+	// TODO: 
+
+	return manifold;
+}
+
 CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin();
 	point ptBoxOrigin = GetAbsoluteOrigin();
@@ -69,12 +77,8 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	point ptMin = GetMinPoint();
 
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-	//CollisionManifold manifold = CollisionManifold(rhs.GetParentObject(), this->m_pParent);
 
 	if (m_type == Type::OBB) {
-		//point ptRelativeOrigin = GetOrigin() - ptSphereOrigin;
-		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
-		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (ptSphereOrigin - GetAbsoluteOrigin()));
 		ptMax = GetHalfVector();
 		ptMin = GetHalfVector() * -1.0f;
@@ -94,7 +98,6 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 		if (m_type == Type::OBB) {
 			ptClosestPoint = (RotationMatrix(GetAbsoluteOrientation()) * ptClosestPoint) + GetAbsoluteOrigin();
 		}
-		//ptClosestPoint = (this->m_pParent->GetModelMatrix() * ptClosestPoint);
 
 		vector vNormal = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - ptClosestPoint;
 		vNormal.Normalize();
@@ -653,10 +656,6 @@ bool BoundingBox::Intersect(point& pt) {
 
 CollisionManifold BoundingBox::Collide(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Collide(*this);
-}
-
-CollisionManifold BoundingBox::Collide(const BoundingPlane& rhs) {
-	return static_cast<BoundingPlane>(rhs).Collide(*this);
 }
 
 RESULT BoundingBox::SetHalfVector(vector vHalfVector) {

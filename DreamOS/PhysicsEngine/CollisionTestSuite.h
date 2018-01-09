@@ -30,6 +30,8 @@ public:
 	RESULT AddTestPlanePlane();
 	RESULT AddTestPlaneSphere();
 	RESULT AddTestPlaneRay();
+	RESULT AddTestPlaneQuad();
+	RESULT AddTestPlaneOBB();
 
 	// TODO: OBB - OBB
 

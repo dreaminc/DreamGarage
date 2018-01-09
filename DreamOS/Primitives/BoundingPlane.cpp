@@ -43,13 +43,43 @@ bool BoundingPlane::Intersect(const BoundingSphere& rhs) {
 }
 
 bool BoundingPlane::Intersect(const BoundingBox& rhs) {
-	// TODO:
+	
+	vector vBoxHalfVector = RotationMatrix(static_cast<BoundingBox>(rhs).GetAbsoluteOrientation()) * static_cast<BoundingBox>(rhs).GetHalfVector(true);
+
+	vector vPlaneNormal = GetNormal();
+
+	vector vProjectHVOnPlaneNormal = (vBoxHalfVector.dot(vPlaneNormal)) * vPlaneNormal;
+
+	point ptBoxOrigin = static_cast<BoundingBox>(rhs).GetOrigin();
+	point ptPlaneOrigin = GetOrigin();
+
+	float distanceFromPlane = plane(ptPlaneOrigin, vPlaneNormal).Distance(ptBoxOrigin);
+	float projectionMagnitude = vProjectHVOnPlaneNormal.magnitude();
+
+	if (std::abs(distanceFromPlane) <= projectionMagnitude) {
+		return true;
+	}
 
 	return false;
 }
 
 bool BoundingPlane::Intersect(const BoundingQuad& rhs) {
-	// TODO:
+	//vector vQuadHalfVector = RotationMatrix(static_cast<BoundingQuad>(rhs).GetAbsoluteOrientation()) * static_cast<BoundingQuad>(rhs).GetHalfVector(true);
+	vector vQuadHalfVector = static_cast<BoundingQuad>(rhs).GetHalfVector(true);
+
+	vector vPlaneNormal = GetNormal();
+
+	vector vProjectHVOnPlaneNormal = (vQuadHalfVector.dot(vPlaneNormal)) * vPlaneNormal;
+
+	point ptQuadOrigin = static_cast<BoundingQuad>(rhs).GetOrigin();
+	point ptPlaneOrigin = GetOrigin();
+
+	float distanceFromPlane = plane(ptPlaneOrigin, vPlaneNormal).Distance(ptQuadOrigin);
+	float projectionMagnitude = vProjectHVOnPlaneNormal.magnitude();
+
+	if (std::abs(distanceFromPlane) <= projectionMagnitude) {
+		return true;
+	}
 
 	return false;
 }
@@ -98,11 +128,7 @@ bool BoundingPlane::Intersect(const ray& r) {
 }
 
 CollisionManifold BoundingPlane::Collide(const BoundingBox& rhs) {
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-
-	// TODO:
-
-	return manifold;
+	return static_cast<BoundingBox>(rhs).Collide(*this);
 }
 
 CollisionManifold BoundingPlane::Collide(const BoundingSphere& rhs) {
