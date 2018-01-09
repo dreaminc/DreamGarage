@@ -22,6 +22,12 @@ CollisionTestSuite::~CollisionTestSuite() {
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestSphereOBB());
+
+	CR(AddTestSphereQuad());
+
+	CR(AddTestSphereSphere());
+
 	CR(AddTestPlaneQuad());
 
 	CR(AddTestPlaneOBB());
@@ -52,6 +58,9 @@ RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) 
 	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
+
 	CR(pHAL->MakeCurrentContext());
 
 	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
@@ -66,12 +75,19 @@ RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) 
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
+	// Debug Overlay
+	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+	CN(pDebugOverlay);
+	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
@@ -92,6 +108,9 @@ RESULT CollisionTestSuite::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Will reset the sandbox as needed between tests
+
+	CR(m_pSceneGraph->RemoveAllObjects());
+
 	CN(m_pDreamOS);
 	CR(m_pDreamOS->RemoveAllObjects());
 
@@ -136,8 +155,11 @@ RESULT CollisionTestSuite::AddTestPlaneOBB() {
 		pTestContext->pVolume->RotateByDeg(15.0f, 35.0f, 45.0f);
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -250,8 +272,11 @@ RESULT CollisionTestSuite::AddTestPlaneQuad() {
 		pTestContext->pQuad->RotateByDeg(45.0f, 0.0f, 32.0f);
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -361,8 +386,11 @@ RESULT CollisionTestSuite::AddTestPlaneSphere() {
 		pTestContext->pSphere->SetPosition(0.0f, 1.0f, 0.0f);
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -471,8 +499,11 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 		pTestContext->pRay->SetPosition(-3.0f, 1.0f, 0.0f);
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -578,8 +609,11 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 		pTestContext->pPlaneB->SetPosition(0.0f, 2.0f, 0.0f);
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -649,6 +683,355 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
 	//pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+// Sphere
+RESULT CollisionTestSuite::AddTestSphereSphere() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 55.0f;
+
+	struct TestContext {
+		sphere *pSphereA = nullptr;
+		sphere *pSphereB = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pSphereA = m_pDreamOS->AddSphere(0.3f, 10, 10);
+		CN(pTestContext->pSphereA);
+		pTestContext->pSphereA->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphereA->SetPosition(0.0f, 0.3f, 0.0f);
+
+		pTestContext->pSphereB = m_pDreamOS->AddSphere(0.3f, 10, 10);
+		CN(pTestContext->pSphereB);
+		pTestContext->pSphereB->SetMaterialColors(COLOR_RED);
+		pTestContext->pSphereB->SetPosition(0.0f, 1.0f, 0.0f);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pSphereA);
+		CN(pTestContext->pSphereB);
+
+		//pTestContext->pSphereA->translateY(0.0005f);
+		pTestContext->pSphereB->translateY(-0.0005f);
+
+		//for (int i = 0; i < 4; i++)
+		//	pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pSphereA->Intersect(pTestContext->pSphereB)) {
+
+			//CollisionManifold manifold = pTestContext->pSphereA->Collide(pTestContext->pSphereB);
+			CollisionManifold manifold = pTestContext->pSphereB->Collide(pTestContext->pSphereA);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pSphereA->SetMaterialColors(COLOR_GREEN);
+
+			pTestContext->pSphereA->SetVisible(false);
+			pTestContext->pSphereB->SetVisible(false);
+		}
+		else {
+
+			pTestContext->pSphereA->SetVisible(true);
+			pTestContext->pSphereB->SetVisible(true);
+
+			pTestContext->pSphereA->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Sphere Test");
+	pNewTest->SetTestDescription("Sphere vs Sphere Test");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
+RESULT CollisionTestSuite::AddTestSphereQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 55.0f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		quad *pQuad = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.3f, 10, 10);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphere->SetPosition(0.1f, 0.0f, 0.1f);
+
+		pTestContext->pQuad = m_pDreamOS->AddQuad(1.5f, 1.5f, 1, 1, nullptr, vector::jVector(1.0f));
+		CN(pTestContext->pQuad);
+		pTestContext->pQuad->SetMaterialColors(COLOR_RED);
+		pTestContext->pQuad->SetPosition(0.0f, -1.0f, 0.0f);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pSphere);
+		CN(pTestContext->pQuad);
+
+		pTestContext->pSphere->translateY(-0.00025f);
+
+		//for (int i = 0; i < 4; i++)
+		//	pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pSphere->Intersect(pTestContext->pQuad)) {
+
+			//CollisionManifold manifold = pTestContext->pQuad->Collide(pTestContext->pSphere);
+			CollisionManifold manifold = pTestContext->pSphere->Collide(pTestContext->pQuad);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Quad Test");
+	pNewTest->SetTestDescription("Sphere vs Quad Test");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
+RESULT CollisionTestSuite::AddTestSphereOBB() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 55.0f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		volume *pVolume = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.3f, 10, 10);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphere->SetPosition(0.1f, 1.5f, -0.1f);
+
+		pTestContext->pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pTestContext->pVolume);
+		pTestContext->pVolume->SetMaterialColors(COLOR_RED);
+		pTestContext->pVolume->SetPosition(0.0f, 0.6f, 0.0f);
+		pTestContext->pVolume->RotateByDeg(-24.0f, 0.0f, 15.0f);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pSphere);
+		CN(pTestContext->pVolume);
+
+		pTestContext->pSphere->translateY(-0.0005f);
+
+		//for (int i = 0; i < 4; i++)
+		//	pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pSphere->Intersect(pTestContext->pVolume)) {
+
+			//CollisionManifold manifold = pTestContext->pQuad->Collide(pTestContext->pSphere);
+			CollisionManifold manifold = pTestContext->pSphere->Collide(pTestContext->pVolume);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pSphere->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs OBB Test");
+	pNewTest->SetTestDescription("Sphere vs OBB Test");
+	pNewTest->SetTestDuration(sTestTime);
 
 Error:
 	return r;
@@ -746,8 +1129,11 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 		pTestContext->pModel->SetPosition(point(2.0f, -0.0f, 0.0f));
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -910,8 +1296,11 @@ RESULT CollisionTestSuite::AddTestScaledCompositeRay() {
 		pTestContext->pQuad->SetVertexColor(color(COLOR_BLUE));
 
 		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
+
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
@@ -1058,10 +1447,11 @@ RESULT CollisionTestSuite::AddTestRayModel() {
 			pTestContext->pComposite->SetScale(0.1f);
 
 			for (int i = 0; i < 4; i++) {
-				pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+				pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 				CN(pTestContext->pCollidePoint[i]);
+
+				m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
 				pTestContext->pCollidePoint[i]->SetMaterialDiffuseColor(color(COLOR_BLUE));
-				//pTestContext->pCollidePoint[i]->SetColor(color(COLOR_BLUE));
 				pTestContext->pCollidePoint[i]->SetVisible(false);
 			}
 
