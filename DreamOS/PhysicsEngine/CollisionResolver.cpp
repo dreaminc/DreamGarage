@@ -168,7 +168,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.7f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
 		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
