@@ -9,6 +9,7 @@
 
 #include "point.h"
 #include "vector.h"
+#include "ray.h"
 
 class line {
 	friend class BoundingVolume;
@@ -24,6 +25,9 @@ public:
 	point ProjectedPoint(point ptP);
 
 	vector GetVector();
+	ray GetRay();
+
+	float length();
 
 	RESULT Translate(vector vTranslate);
 	RESULT ApplyMatrix(matrix<point_precision, 4, 4> mat);

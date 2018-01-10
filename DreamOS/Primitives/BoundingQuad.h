@@ -24,6 +24,14 @@ public:
 		INVALID
 	};
 
+	enum class QuadEdge {
+		RIGHT,
+		LEFT,
+		TOP,
+		BOTTOM,
+		INVALID
+	};
+
 public:
 	BoundingQuad(VirtualObj *pParentObject);
 	BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNormal, double width, double height);
@@ -35,6 +43,7 @@ public:
 
 	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray& r) override;
+	bool Intersect(const line& l, point *pptCollision = nullptr);
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
@@ -61,6 +70,7 @@ public:
 	double GetBottom(bool fAbsolute = true);
 
 	vector GetNormal();
+	vector GetAbsoluteNormal();
 
 	vector GetHalfVector(bool fAbsolute = false);
 	virtual RESULT SetHalfVector(vector vHalfVector) override;
@@ -69,6 +79,9 @@ public:
 	virtual point GetMaxPoint(bool fAbsolute = false) override;
 	
 	point GetQuadPoint(QuadPoint ptType);
+	point GetAbsoluteQuadPoint(QuadPoint ptType);
+
+	line GetAbsoluteQuadEdge(QuadEdge edgeType);
 
 protected:
 	double m_width;

@@ -40,8 +40,9 @@ public:
 	RESULT AddTestSphereQuad();
 	RESULT AddTestSphereOBB();
 	
-	// OBB
-	//RESULT AddTestOBBOBB();
+	// Quad
+	RESULT AddTestQuadQuad();
+	//RESULT AddTestQuadOBB();
 
 
 	// TODO: OBB - OBB
@@ -70,3 +71,4 @@ private:
 };
 
 #endif // ! COLLISION_TEST_SUITE_H_
+
