@@ -611,6 +611,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	SetAppName(DREAM_BROWSER_APP_NAME);
 	SetAppDescription("A Shared Content View");
 
+	GetDOS()->AddObjectToUIGraph(GetComposite());	
+
 	// Set up browser manager
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
