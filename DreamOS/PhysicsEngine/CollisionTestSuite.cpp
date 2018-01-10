@@ -590,15 +590,18 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		POINT_EDGE,
 		FACE_FACE,
 		EDGE_FACE
-	};
+	} testOrientation;
 
-	//TestOrientation testOrientation = TestOrientation::EDGE_EDGE;
-	TestOrientation testOrientation = TestOrientation::POINT_FACE;
+	testOrientation = TestOrientation::EDGE_EDGE;
+	//testOrientation = TestOrientation::POINT_FACE;
+	//testOrientation = TestOrientation::EDGE_FACE;
+	//testOrientation = TestOrientation::FACE_FACE;
 
 	struct TestContext {
 		volume *pOBBA = nullptr;
 		volume *pOBBB = nullptr;
 		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
 	} *pTestContext = new TestContext();
 
 	// Initialize Code 
@@ -632,11 +635,29 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
 		} break;
 
+		case TestOrientation::FACE_FACE: {
+			pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
+			pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+			pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
+
+			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+			pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 53.0f);
+		} break;
+
 		case TestOrientation::POINT_FACE: {
 			pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
 
 			pTestContext->pOBBB->SetPosition(0.0f, -0.25f, 0.0f);
 			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
+		} break;
+
+		case TestOrientation::EDGE_FACE: {
+			pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+
+			pTestContext->pOBBB->SetPosition(0.0f, -0.35f, 0.0f);
+			pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+			pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
 		} break;
 		}
 
@@ -645,6 +666,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			CN(pTestContext->pCollidePoint[i]);
 			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
 			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
 		}
 
 	Error:
@@ -667,7 +693,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		//pTestContext->pOBBB->RotateZByDeg(0.04f);
+		pTestContext->pOBBB->RotateZByDeg(0.04f);
+		//pTestContext->pOBBB->RotateYByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -679,8 +706,19 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 			if (manifold.NumContacts() > 0) {
 				for (int i = 0; i < manifold.NumContacts(); i++) {
-					pTestContext->pCollidePoint[i]->SetVisible(true);
-					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+
+						ray rPoint = ray(manifold.GetContactPoint(i).GetPoint(), manifold.GetContactPoint(i).GetNormal());
+						pTestContext->pCollidePointRay[i]->SetVisible(true);
+						pTestContext->pCollidePointRay[i]->UpdateFromRay(rPoint);
+						pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+						pTestContext->pCollidePointRay[i]->UpdateBuffers();
+					}
+
+					//pTestContext->pCollidePoint[0]->SetVisible(true);
+					//pTestContext->pCollidePoint[0]->SetOrigin(manifold.GetContactPoint());
 				}
 			}
 

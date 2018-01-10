@@ -128,6 +128,10 @@ Error:
 	return r;
 }
 
+RESULT OGLObj::UpdateBuffers() {
+	return UpdateOGLBuffers();
+}
+
 RESULT OGLObj::UpdateOGLBuffers() {
 	RESULT r = R_PASS;
 

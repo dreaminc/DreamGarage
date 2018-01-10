@@ -754,6 +754,10 @@ cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivis
 	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
+DimRay* DreamOS::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pSandbox->MakeRay(ptOrigin, vDirection, step, fDirectional);
+}
+
 DimRay* DreamOS::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	return m_pSandbox->AddRay(ptOrigin, vDirection, step, fDirectional);
 }

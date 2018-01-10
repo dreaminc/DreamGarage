@@ -141,19 +141,23 @@ point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bb
 }
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
-	vector vDirection = vector::iVector(1.0f);
-	
-	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	//vector vDirection = vector::iVector(1.0f);
+	//
+	//point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	//
+	//return false;
 
-	return false;
+	return IntersectSAT(rhs);
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	//CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	//
+	//// TODO:
+	//
+	//return manifold;
 
-	// TODO:
-
-	return manifold;
+	return CollideSAT(rhs);
 }
 
 bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
@@ -205,6 +209,9 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	double temp;
 	double minAxisDistance = std::numeric_limits<double>::infinity();
 	vector vAxis, vAxisTemp;
+	//point ptFarthestLocal;
+	float penetration = 0.0f;
+
 	for (int i = 0; i < 3; i++) {
 		// Self Box Axes
 		if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = GetAxis(BoundingBox::BoxAxis(i)))) {
@@ -212,7 +219,6 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				minAxisDistance = temp;
 				vAxis = vAxisTemp;
 			}
-			//break;
 		}
 
 		// The other box Axes (todo: test if it's an OBB)
@@ -221,7 +227,6 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				minAxisDistance = temp;
 				vAxis = vAxisTemp;
 			}
-			//break;
 		}
 
 		// Go through the cross product of each of the axes
@@ -231,7 +236,6 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 					minAxisDistance = temp;
 					vAxis = vAxisTemp;
 				}
-				break;
 			}
 		}
 	}
@@ -424,6 +428,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				if (std::abs(vRay(i)) < DREAM_EPSILON) {
 					if (ptMin(i) - lineBoxEdgeB.a()(i) > 0 || ptMax(i) - lineBoxEdgeB.a()(i) < 0) {
 						fMiss = true;
+						continue;
 					}
 				}
 				else {
@@ -439,8 +444,10 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 					if (tMax < tFar)
 						tFar = tMax;
 
-					if (tNear > tFar || tFar < 0)
+					if (tNear > tFar || tFar < 0) {
 						fMiss = true;
+						continue;
+					}
 				}
 			}
 
@@ -555,13 +562,18 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 					penetration *= -1.0f;
 				//}
 
+				// This is a bit of a hack, but will ensure normal facing out
+				if (vNormalOriented.dot(ptContact - ptBoxAOrigin) < 0) {
+					vNormalOriented = vNormalOriented * -1.0f;
+				}
+
 				//manifold.Clear();
 				if (weight == 2) {
 					point ptContactPointA = (RotationMatrix(qBoxAOrientation) * ptEdgeMin) + ptBoxAOrigin;
 					point ptContactPointB = (RotationMatrix(qBoxAOrientation) * ptEdgeMax) + ptBoxAOrigin;
 
 					// TODO: THIS IS NOT GENERAL
-					vNormalOriented = vNormalTemp;
+					//vNormalOriented = vNormalTemp;
 
 					manifold.AddContactPoint(ptContactPointA, vNormalOriented, penetration, 1);
 					manifold.AddContactPoint(ptContactPointB, vNormalOriented, penetration, 1);
@@ -569,7 +581,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				else {
 
 					// TODO: THIS IS NOT GENERAL
-					vNormalOriented = vNormalTemp;
+					//vNormalOriented = vNormalTemp;
 
 					manifold.AddContactPoint(ptContact, vNormalOriented, penetration, 1);
 				}

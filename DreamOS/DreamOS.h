@@ -281,6 +281,7 @@ public:
 
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
 
+	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
 
