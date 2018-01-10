@@ -740,6 +740,17 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
 		}
 	}
+	else if (strTokens[0] == "socket_connection") {
+		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
+		strMethod = strTokens[1];
+		
+		if (strType == "response") {
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage RESPONSE %v, %v", strMethod ,jsonPayload);
+			
+			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
+		}
+
+	}
 	else {
 		DOSLOG(ERR, "[EnvironmentController] websocket msg method unknown");
 	}
@@ -1007,6 +1018,17 @@ RESULT EnvironmentController::OnNewPeerConnection(long userID, long peerUserID, 
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		CR(m_pEnvironmentControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnNewSocketConnection(int position) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnNewSocketConnection(position));
 	}
 
 Error:

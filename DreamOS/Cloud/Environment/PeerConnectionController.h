@@ -36,6 +36,7 @@ public:
 
 		// TODO: Switch to Peer User ID
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnNewSocketConnection(int position) = 0;
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -137,6 +138,7 @@ public:
 
 private:
 	RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection);
+	RESULT OnNewSocketConnection(int position);
 	RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection);
 
 private:

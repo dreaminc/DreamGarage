@@ -253,6 +253,17 @@ Error:
 	return r;
 }
 
+RESULT PeerConnectionController::OnNewSocketConnection(int position) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnNewSocketConnection(position));
+	}
+
+Error:
+	return r;
+}
+
 RESULT PeerConnectionController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 	RESULT rObserver = R_PASS;
@@ -504,7 +515,16 @@ RESULT PeerConnectionController::HandleEnvironmentSocketResponse(std::string str
 
 	// TODO: Validate state?
 
-//Error:
+	// once we have the socket_connection.connect response, the user can be seated
+	if (strMethod == "connect") {
+		long peerConnectionID = jsonPayload["/id"_json_pointer].get<long>();
+		int position = jsonPayload["/position"_json_pointer].get<int>();
+
+		// set position
+		CR(OnNewSocketConnection(position));
+	}
+
+Error:
 	return r;
 }
 

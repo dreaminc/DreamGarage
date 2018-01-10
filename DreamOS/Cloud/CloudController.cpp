@@ -284,6 +284,19 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnNewSocketConnection(int position) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnNewSocketConnection(position));
+	}
+
+Error:
+	return r;
+}
+
+//RESULT 
+
 RESULT CloudController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 

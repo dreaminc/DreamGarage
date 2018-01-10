@@ -114,6 +114,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnNewSocketConnection(int position) {
+			DEVENV_LINEOUT("OnNewSocketConnection");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 			DEVENV_LINEOUT("OnPeerConnectionClosed");
 
@@ -285,6 +291,10 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 
 		// PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnNewSocketConnection(int position) {
 			return R_NOT_HANDLED;
 		}
 
