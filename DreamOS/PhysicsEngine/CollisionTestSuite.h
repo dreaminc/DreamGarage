@@ -44,8 +44,8 @@ public:
 	RESULT AddTestQuadQuad();
 	//RESULT AddTestQuadOBB();
 
-
-	// TODO: OBB - OBB
+	// OBB - OBB
+	RESULT AddTestOBBOBB();
 
 	// TODO: OBB - Sphere
 

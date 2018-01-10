@@ -22,6 +22,8 @@ CollisionTestSuite::~CollisionTestSuite() {
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestOBBOBB());
+
 	CR(AddTestQuadQuad());
 
 	CR(AddTestSphereOBB());
@@ -570,6 +572,146 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 
 	pNewTest->SetTestName("Plane vs Ray Test");
 	pNewTest->SetTestDescription("Plane vs Ray Test");
+	pNewTest->SetTestDuration(sTestTime);
+	//pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT CollisionTestSuite::AddTestOBBOBB() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 500.0f;
+
+	enum class TestOrientation {
+		EDGE_EDGE,
+		POINT_FACE,
+		POINT_EDGE,
+		FACE_FACE,
+		EDGE_FACE
+	};
+
+	TestOrientation testOrientation = TestOrientation::EDGE_EDGE;
+	//TestOrientation testOrientation = TestOrientation::POINT_FACE;
+
+	struct TestContext {
+		volume *pOBBA = nullptr;
+		volume *pOBBB = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+		CN(pTestContext->pOBBB);
+		pTestContext->pOBBB->SetMaterialColors(COLOR_RED);
+
+		pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+		CN(pTestContext->pOBBA);
+		pTestContext->pOBBA->SetMaterialColors(COLOR_BLUE);
+
+
+		switch (testOrientation) {
+		case TestOrientation::EDGE_EDGE: {
+			pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
+			pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+			pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
+
+			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+		} break;
+
+		case TestOrientation::POINT_FACE: {
+			pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+
+			pTestContext->pOBBB->SetPosition(0.0f, -0.25f, 0.0f);
+			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
+		} break;
+		}
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pOBBA);
+		CN(pTestContext->pOBBB);
+
+		//pTestContext->pOBBB->translateY(-0.0001f);
+		pTestContext->pOBBB->RotateZByDeg(0.04f);
+
+		for (int i = 0; i < 4; i++)
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pOBBA->Intersect(pTestContext->pOBBB)) {
+
+			CollisionManifold manifold = pTestContext->pOBBA->Collide(pTestContext->pOBBB);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pOBBA->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pOBBA->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Plane vs Plane Test");
+	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
 	//pNewTest->SetTestRepeats(nRepeats);
 
