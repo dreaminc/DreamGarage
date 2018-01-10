@@ -592,9 +592,9 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		EDGE_FACE
 	} testOrientation;
 
-	testOrientation = TestOrientation::EDGE_EDGE;
+	//testOrientation = TestOrientation::EDGE_EDGE;
 	//testOrientation = TestOrientation::POINT_FACE;
-	//testOrientation = TestOrientation::EDGE_FACE;
+	testOrientation = TestOrientation::EDGE_FACE;
 	//testOrientation = TestOrientation::FACE_FACE;
 
 	struct TestContext {
@@ -657,7 +657,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 			pTestContext->pOBBB->SetPosition(0.0f, -0.35f, 0.0f);
 			pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
-			pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
+			//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
 		} break;
 		}
 
@@ -693,8 +693,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		pTestContext->pOBBB->RotateZByDeg(0.04f);
-		//pTestContext->pOBBB->RotateYByDeg(0.04f);
+		//pTestContext->pOBBB->RotateZByDeg(0.04f);
+		pTestContext->pOBBB->RotateYByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
