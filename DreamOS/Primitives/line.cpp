@@ -77,6 +77,14 @@ vector line::GetVector() {
 	return v;
 }
 
+ray line::GetRay() {
+	return ray(m_ptA, (m_ptB - m_ptA).Normal());
+}
+
+float line::length() {
+	return (float)((m_ptB - m_ptA).magnitude());
+}
+
 RESULT line::Translate(vector vTranslate) {
 	m_ptA += vTranslate;
 	m_ptB += vTranslate;

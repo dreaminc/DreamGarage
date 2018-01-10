@@ -22,6 +22,8 @@ CollisionTestSuite::~CollisionTestSuite() {
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestQuadQuad());
+
 	CR(AddTestSphereOBB());
 
 	CR(AddTestSphereQuad());
@@ -568,6 +570,118 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 
 	pNewTest->SetTestName("Plane vs Ray Test");
 	pNewTest->SetTestDescription("Plane vs Ray Test");
+	pNewTest->SetTestDuration(sTestTime);
+	//pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT CollisionTestSuite::AddTestQuadQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 55.0f;
+
+	struct TestContext {
+		quad *pQuadA = nullptr;
+		quad *pQuadB = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+		pTestContext->pQuadA = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		CN(pTestContext->pQuadA);
+		pTestContext->pQuadA->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pQuadA->SetPosition(0.0f, -1.0f, 0.0f);
+
+		pTestContext->pQuadB = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		CN(pTestContext->pQuadB);
+		pTestContext->pQuadB->SetMaterialColors(COLOR_RED);
+		pTestContext->pQuadB->SetPosition(0.0f, 0.0f, 0.0f);
+		pTestContext->pQuadB->RotateByDeg(90.0f, 0.0f, 45.0f);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pQuadA);
+		CN(pTestContext->pQuadB);
+
+		pTestContext->pQuadB->translateY(-0.0001f);
+
+		for (int i = 0; i < 4; i++)
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pQuadA->Intersect(pTestContext->pQuadB)) {
+
+			CollisionManifold manifold = pTestContext->pQuadA->Collide(pTestContext->pQuadB);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pQuadA->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			pTestContext->pQuadA->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Plane vs Plane Test");
+	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
 	//pNewTest->SetTestRepeats(nRepeats);
 
