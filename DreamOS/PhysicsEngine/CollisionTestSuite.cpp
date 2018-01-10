@@ -592,8 +592,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		EDGE_FACE
 	};
 
-	TestOrientation testOrientation = TestOrientation::EDGE_EDGE;
-	//TestOrientation testOrientation = TestOrientation::POINT_FACE;
+	//TestOrientation testOrientation = TestOrientation::EDGE_EDGE;
+	TestOrientation testOrientation = TestOrientation::POINT_FACE;
 
 	struct TestContext {
 		volume *pOBBA = nullptr;
@@ -667,7 +667,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		pTestContext->pOBBB->RotateZByDeg(0.04f);
+		//pTestContext->pOBBB->RotateZByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);

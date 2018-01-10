@@ -82,11 +82,15 @@ public:
 	virtual bool Intersect(const BoundingQuad& rhs) override;
 	virtual bool Intersect(const BoundingPlane& rhs) override;
 
+	bool IntersectSAT(const BoundingBox& rhs);
+
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
 	virtual bool Intersect(const ray& r) override;
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
+	CollisionManifold CollideSAT(const BoundingBox& rhs);
+
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
 	virtual CollisionManifold Collide(const BoundingPlane& rhs) override;
@@ -124,6 +128,9 @@ public:
 	virtual point GetMaxPoint(bool fAbsolute = false) override;
 	virtual point GetMinPointOriented(bool fAbsolute = false) override;
 	virtual point GetMaxPointOriented(bool fAbsolute = false) override;
+
+	point GetFarthestPointInDirection(vector vDirection);
+	static point GetSupportPoint(const BoundingBox& rhs, const BoundingBox& lhs, vector vDirection);
 
 	BoundingBox GetBoundingAABB();
 

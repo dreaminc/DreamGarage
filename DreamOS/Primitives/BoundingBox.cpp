@@ -111,7 +111,52 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
+point BoundingBox::GetFarthestPointInDirection(vector vDirection) {
+	
+	// First orient vDirection to box (easier if AABB)
+
+	RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());
+
+	vector vDirectionAdjust = inverse(matRotation) * vDirection;
+
+	point ptReturn;
+
+	point ptMax = GetMaxPoint();
+	point ptMin = GetMinPoint();
+
+	ptReturn.x() = vDirectionAdjust.x() >= 0 ? ptMax.x() : ptMin.x();
+	ptReturn.y() = vDirectionAdjust.y() >= 0 ? ptMax.y() : ptMin.y();
+	ptReturn.z() = vDirectionAdjust.z() >= 0 ? ptMax.z() : ptMin.z();
+
+	ptReturn = matRotation * ptReturn;
+
+	return ptReturn;
+}
+
+point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bbB, vector vDirection) {
+	point ptBBA = static_cast<BoundingBox>(bbA).GetFarthestPointInDirection(vDirection);
+	point ptBBB = static_cast<BoundingBox>(bbB).GetFarthestPointInDirection(-1.0f * vDirection);
+
+	return (point)(ptBBA - ptBBB);
+}
+
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
+	vector vDirection = vector::iVector(1.0f);
+	
+	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+
+	return false;
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
+
+	return manifold;
+}
+
+bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
 	if (m_type == Type::AABB) {
 		point ptMaxA = GetAbsoluteOrigin() + GetHalfVector();
 		point ptMinA = GetAbsoluteOrigin() - GetHalfVector();
@@ -152,7 +197,7 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	return false;
 }
 
-CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
+CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// SAT to get contact normal 
