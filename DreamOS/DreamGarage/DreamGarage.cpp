@@ -302,7 +302,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CRM(InitializeDreamUser(), "Failed to initialize User App");
 
 #ifndef _DEBUG
-	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
+	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this, false);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
 
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
