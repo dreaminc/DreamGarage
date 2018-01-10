@@ -7,7 +7,7 @@
 
 #include "UI/UIMallet.h"
 //#include "UI/UIView.h"
-#include "UI/UIControlBar.h"
+//#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
 
 RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
@@ -15,6 +15,16 @@ RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pB
 	CB(GetAppState());
 
 	return SetViewQuadTexture(pBrowserTexture);
+
+Error:
+	return r;
+}
+
+RESULT DreamControlViewHandle::SendContentType(std::string strContentType) {
+	RESULT r = R_PASS;	
+	CB(GetAppState());
+
+	return SetContentType(strContentType);
 
 Error:
 	return r;
@@ -114,21 +124,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pControlBar = m_pView->AddUIControlBar();
 	m_pControlBar->SetVisible(false);
 	CN(m_pControlBar);
-
-	CR(m_pControlBar->GetStopButton()->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-		std::bind(&DreamControlView::HandleStopSharing, this, std::placeholders::_1, std::placeholders::_2)));
-
-	CR(m_pControlBar->GetToggleButton()->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-		std::bind(&DreamControlView::HandleToggleControlBar, this, std::placeholders::_1, std::placeholders::_2)));
-
-	CR(m_pControlBar->GetBackButton()->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-		std::bind(&DreamControlView::HandleBack, this, std::placeholders::_1, std::placeholders::_2)));
-
-	CR(m_pControlBar->GetForwardButton()->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-		std::bind(&DreamControlView::HandleForward, this, std::placeholders::_1, std::placeholders::_2)));
-
-	CR(m_pControlBar->GetURLButton()->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-		std::bind(&DreamControlView::HandleEnterURL, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(m_pControlBar->SetObserver(this));
 
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -182,7 +178,11 @@ Error:
 }
 
 RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+
+//Error:
+	return r;
 }
 
 RESULT DreamControlView::Update(void *pContext) {
@@ -518,6 +518,17 @@ DreamAppHandle* DreamControlView::GetAppHandle() {
 
 RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
 	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
+	return R_PASS;
+}
+
+RESULT DreamControlView::SetContentType(std::string strContentType) {
+
+
+	m_currentControlBarType = UIControlBar::ControlBarTypeFromString(strContentType);
+
+	//TODO: don't need to do this until different types of control bars are defined
+	//m_pControlBar = UIControlBar::MakeControlBarWithType(m_currentControlBarType,m_pView);
+
 	return R_PASS;
 }
 
@@ -878,7 +889,7 @@ Error:
 	return false;
 }
 
-RESULT DreamControlView::HandleStopSharing(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleStopPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
@@ -894,7 +905,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleToggleControlBar(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
@@ -965,7 +976,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleEnterURL(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -987,7 +998,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleBack(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
@@ -997,7 +1008,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleForward(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);

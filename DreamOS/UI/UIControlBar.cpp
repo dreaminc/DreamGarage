@@ -61,41 +61,50 @@ RESULT UIControlBar::Initialize() {
 			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 	}
 
-	{
-		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
-		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
-
-		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
-			"", 
-			m_urlWidth - m_itemSpacing, 
-			m_itemSide - (2.0f*m_itemSpacing), 
-			textFlags));
-
-		m_pURLText->RotateXByDeg(90.0f);
-		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-		m_pURLButton->AddObject(m_pURLText);
-
-
-		// set buttons positions based on spec
-		point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
-
-		point ptBack = point(m_itemSide / 2.0f, 0.0f, 0.0f);
-		m_pBackButton->SetPosition(ptStart + ptBack);
-
-		point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-		m_pForwardButton->SetPosition(ptStart + ptForward);
-
-		// URL button is centered at 0
-
-		point ptHide = point(m_urlWidth / 2.0f + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
-		m_pToggleButton->SetPosition(ptHide);
-
-		point ptStop = ptHide + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-		m_pStopButton->SetPosition(ptStop);
-	}
+	CR(UpdateButtonsWithType(m_barType));
 
 Error:
+	return r;
+}
+
+RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
+	RESULT r = R_PASS;
+
+	m_barType = type;
+
+	auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
+	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+
+	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
+		"", 
+		m_urlWidth - m_itemSpacing, 
+		m_itemSide - (2.0f*m_itemSpacing), 
+		textFlags));
+
+	m_pURLText->RotateXByDeg(90.0f);
+	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+	m_pURLButton->AddObject(m_pURLText);
+
+
+	// set buttons positions based on spec
+	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
+
+	point ptBack = point(m_itemSide / 2.0f, 0.0f, 0.0f);
+	m_pBackButton->SetPosition(ptStart + ptBack);
+
+	point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	m_pForwardButton->SetPosition(ptStart + ptForward);
+
+	// URL button is centered at 0
+
+	point ptHide = point(m_urlWidth / 2.0f + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
+	m_pToggleButton->SetPosition(ptHide);
+
+	point ptStop = ptHide + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	m_pStopButton->SetPosition(ptStop);
+
+//Error:
 	return r;
 }
 
@@ -175,4 +184,70 @@ texture *UIControlBar::GetShowTexture() {
 
 std::shared_ptr<text> UIControlBar::GetURLText() {
 	return m_pURLText;
+}
+
+RESULT UIControlBar::SetObserver(ControlBarObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	m_pObserver = pObserver;
+	{
+		auto fnStopCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return m_pObserver->HandleStopPressed(pButtonContext, pContext);
+		};
+		auto fnToggleCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return m_pObserver->HandleTogglePressed(pButtonContext, pContext);
+		};
+		auto fnBackCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return m_pObserver->HandleBackPressed(pButtonContext, pContext);
+		};
+		auto fnForwardCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return m_pObserver->HandleForwardPressed(pButtonContext, pContext);
+		};
+		auto fnURLCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return m_pObserver->HandleURLPressed(pButtonContext, pContext);
+		};
+
+		// update button trigger events to match the observer
+		CR(m_pStopButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
+		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
+		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
+		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
+	}
+
+Error:
+	return r;
+}
+
+BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType) {
+
+	//TODO: use static map
+	if (strContentType == "ContentControlType.Website") {
+		return BarType::BROWSER;
+	}
+	else if (strContentType == "") {
+		return BarType::DEFAULT;
+	}
+	else {
+		return BarType::INVALID;
+	}
+}
+
+std::shared_ptr<UIControlBar> UIControlBar::MakeControlBarWithType(BarType type, std::shared_ptr<UIView> pViewContext) {
+
+	switch (type) {
+
+	case BarType::BROWSER:
+	case BarType::DEFAULT: {
+		return pViewContext->MakeUIControlBar();
+	}
+
+	case BarType::INVALID: {
+		return nullptr;
+	}
+
+	}
+
+	return nullptr;
 }

@@ -1362,11 +1362,20 @@ RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		m_strContentType = pEnvironmentAsset->GetContentType();
+
+
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+		CN(pDreamControlViewHandle);
+
+		pDreamControlViewHandle->SendContentType(m_strContentType);
 		
 		// parsing the info we get back from server during a dropbox request
 		// it returns a whole function call instead of just the URL
@@ -1412,6 +1421,9 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	}
 
 Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 

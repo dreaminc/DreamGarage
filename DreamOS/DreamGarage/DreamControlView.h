@@ -9,6 +9,7 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "WebBrowser/WebBrowserController.h"
 #include "DreamUserApp.h"
+#include "UI/UIControlBar.h"
 
 #include "Primitives/Subscriber.h"
 #include <functional>
@@ -32,7 +33,6 @@ class quad;
 class sphere;
 class UIView;
 class UIMallet;
-class UIControlBar;
 class UIButton;
 class texture;
 class DreamBrowserHandle;
@@ -40,6 +40,7 @@ class DreamBrowserHandle;
 class DreamControlViewHandle : public DreamAppHandle, public DreamUserObserver {
 public:
 	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
+	RESULT SendContentType(std::string strContentType);
 	RESULT ShowApp();
 	RESULT HideApp();
 	RESULT DismissApp();
@@ -56,6 +57,7 @@ public:
 
 private:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
+	virtual RESULT SetContentType(std::string strContentType) = 0;
 	virtual RESULT Show() = 0;
 	virtual RESULT Hide() = 0;
 	virtual RESULT Dismiss() = 0;
@@ -67,7 +69,8 @@ private:
 class DreamControlView : public DreamApp<DreamControlView>, 
 						 public DreamControlViewHandle,
 						 public Subscriber<InteractionObjectEvent>,
-						 public Subscriber<SenseControllerEvent> {
+						 public Subscriber<SenseControllerEvent>, 
+						 public ControlBarObserver {
 	friend class DreamAppManager;
 
 public:
@@ -82,6 +85,8 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
+	virtual RESULT SetContentType(std::string strContentType) override;
+
 	virtual DreamAppHandle* GetAppHandle() override;
 
 	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
@@ -120,15 +125,16 @@ private:
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
 
-// ControlBar events
+// ControlBarObserver 
 private:
 	bool CanPressButton(UIButton* pButtonContext);
-	RESULT HandleStopSharing(UIButton* pButtonContext, void* pContext);
-	RESULT HandleToggleControlBar(UIButton* pButtonContext, void* pContext);
-	RESULT HandleBack(UIButton* pButtonContext, void* pContext);
-	RESULT HandleForward(UIButton* pButtonContext, void* pContext);
 
-	RESULT HandleEnterURL(UIButton* pButtonContext, void* pContext);
+	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
+
 	virtual RESULT SetURLText(std::string strURL) override;
 
 // View Context
@@ -190,6 +196,8 @@ private:
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
 	std::string m_strText;
+
+	BarType m_currentControlBarType;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

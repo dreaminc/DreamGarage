@@ -29,6 +29,10 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 		}
 	}
 
+	if (jsonMenuNode["/content_control_type"_json_pointer].is_string()) {
+		m_strContentType = jsonMenuNode["/content_control_type"_json_pointer].get<std::string>();
+	}
+
 	if (jsonMenuNode["/storage_provider_scope"_json_pointer].is_string())
 		m_strStorageProviderScope = jsonMenuNode["/storage_provider_scope"_json_pointer].get<std::string>();
 	else if (jsonMenuNode["/scope"_json_pointer].is_string())
@@ -81,6 +85,10 @@ const std::string& EnvironmentAsset::GetTitle() {
 
 const std::string& EnvironmentAsset::GetURL() {
 	return m_strURL;
+}
+
+const std::string& EnvironmentAsset::GetContentType() {
+	return m_strContentType;
 }
 
 std::multimap<std::string, std::string> EnvironmentAsset::GetHeaders() {
