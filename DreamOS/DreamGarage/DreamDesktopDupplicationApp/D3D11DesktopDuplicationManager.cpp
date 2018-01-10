@@ -1,5 +1,6 @@
 #include "D3D11DesktopDuplicationManager.h"
 
+
 //
 // Constructor sets up references / variables
 //
@@ -110,6 +111,20 @@ DUPL_RETURN D3D11DesktopDuplicationManager::InitDupl(_In_ ID3D11Device* Device, 
 
 	return DUPL_RETURN_SUCCESS;
 }
+
+/*
+RESULT D3D11DesktopDuplicationManager::RegisterDesktopAppObserver(D3D11DesktopDuplicationManager* pDesktopControllerObserver) {
+	RESULT r = R_PASS;
+
+	CBM((m_pWebBrowserControllerObserver == nullptr), "CEFBrowserControllerObserver already registered");
+	CN(pCEFBrowserControllerObserver);
+
+	m_pWebBrowserControllerObserver = pCEFBrowserControllerObserver;
+
+Error:
+	return r;
+}
+*/
 
 //
 // Retrieves mouse info and write it into PtrInfo

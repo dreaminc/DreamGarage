@@ -2,12 +2,16 @@
 #define _DUPLICATIONMANAGER_H_
 
 #include "CommonTypes.h"
+#include "RESULT/EHM.h"
+
+#include "D3D11DesktopController.h"
 
 //
 // Handles the task of duplicating an output.
 //
-class D3D11DesktopDuplicationManager
+class D3D11DesktopDuplicationManager : public D3D11DesktopController
 {
+	RESULT RegisterDesktopAppObserver(D3D11DesktopDuplicationManager::observer* pDesktopControllerObserver);
 public:
 	D3D11DesktopDuplicationManager();
 	~D3D11DesktopDuplicationManager();
@@ -16,6 +20,8 @@ public:
 	DUPL_RETURN InitDupl(_In_ ID3D11Device* Device, UINT Output);
 	DUPL_RETURN GetMouse(_Inout_ PTR_INFO* PtrInfo, _In_ DXGI_OUTDUPL_FRAME_INFO* FrameInfo, INT OffsetX, INT OffsetY);
 	void GetOutputDesc(_Out_ DXGI_OUTPUT_DESC* DescPtr);
+
+	RESULT SendTextureBuffer();
 
 private:
 

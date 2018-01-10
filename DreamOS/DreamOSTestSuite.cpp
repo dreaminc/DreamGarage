@@ -30,7 +30,7 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	
+	CR(AddTestDreamDesktop());
 
 	CR(AddTestDreamOS());
 
@@ -796,26 +796,9 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-	
+
+		SetupDreamAppPipeline();
 		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
-		CR(SetupDreamAppPipeline());
-		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
-			DEBUG_LINEOUT("Initializing Cloud Controller");
-			quad *pQuad = nullptr;
-			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-			{
-				std::string strUsername = pCommandLineManager->GetParameterValue("username");
-				std::string strPassword = pCommandLineManager->GetParameterValue("password");
-				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-				long environmentID = 168;
-
-				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-				CRM(pCloudController->Start(false), "Failed to Start Cloud Controller");
-
-			}
-		}
 
 		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 		CNM(pDreamDesktop, "Failed to create dream desktop");

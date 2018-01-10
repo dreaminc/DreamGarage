@@ -380,26 +380,20 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
+	SetAppName("DreamDesktopApp");
 	SetAppDescription("A Shared Desktop View");
 
 	// Set up the quad
-	m_pDesktopQuad = GetComposite()->AddQuad(5, 4, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+	m_pDesktopQuad = GetComposite()->AddQuad(6, 4, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 	m_pDesktopQuad->SetPosition(0.0f, 2.0f, -2.0f);
-	
-	m_pDesktopTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	//m_pDesktopTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
+	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
-	int monitorToOutput;
+	GetComposite()->SetVisible(true);
+
 	monitorToOutput = 1;	// assuming we want to duplicate the main desktop for now
-	
-	// Synchronization
-	HANDLE UnexpectedErrorEvent = nullptr;
-	HANDLE ExpectedErrorEvent = nullptr;
-	HANDLE TerminateThreadsEvent = nullptr;
-
-	// TODO: Make this a quad instead
-	// Window
-	HWND WindowHandle = nullptr;
 
 	// Event used by the threads to signal an unexpected error and we want to quit the app
 	UnexpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
@@ -426,7 +420,6 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	}
 
 	// Load simple cursor
-	HCURSOR Cursor = nullptr;
 	Cursor = LoadCursor(nullptr, IDC_ARROW);
 	if (!Cursor)
 	{
@@ -476,17 +469,20 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	//ShowWindow(WindowHandle, nCmdShow);	// replace these
 	//UpdateWindow(WindowHandle);
 
-	D3D11DesktopDuplicationThreadManager ThreadMgr;
-	RECT DeskBounds;	
-	UINT OutputCount;
+	
 
-	// Message loop (attempts to update screen when no other messages to process)
-	MSG msg = { 0 };
-	bool FirstTime = true;
-	bool Occluded = true;
+	return r;
+}
+
+RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::Update(void *pContext) {
+	RESULT r = R_PASS;
+	
 	DYNAMIC_WAIT DynamicWait;
-
-	while (WM_QUIT != msg.message)
+	//while (WM_QUIT != msg.message)
 	{
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -506,7 +502,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 		else if (WaitForSingleObjectEx(UnexpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0)
 		{
 			// Unexpected error occurred so exit the application
-			break;
+			// break;
 		}
 		else if (FirstTime || WaitForSingleObjectEx(ExpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0)
 		{
@@ -539,12 +535,12 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 				HANDLE SharedHandle = OutMgr.GetSharedHandle();
 				if (SharedHandle)
 				{
-					Ret = ThreadMgr.Initialize(monitorToOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
+				Ret = ThreadMgr.Initialize(monitorToOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
 				}
 				else
 				{
-					DisplayMsg(L"Failed to get handle of shared surface", L"Error", S_OK);
-					Ret = DUPL_RETURN_ERROR_UNEXPECTED;
+				DisplayMsg(L"Failed to get handle of shared surface", L"Error", S_OK);
+				Ret = DUPL_RETURN_ERROR_UNEXPECTED;
 				}
 			}
 
@@ -556,7 +552,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 			// Nothing else to do, so try to present to write out to window if not occluded
 			if (!Occluded)
 			{
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded);
+				//Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded);
 			}
 		}
 
@@ -571,7 +567,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 			else
 			{
 				// Unexpected error so exit
-				break;
+				// break;
 			}
 		}
 	}
@@ -583,20 +579,10 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	}
 
 	// Clean up
-	CloseHandle(UnexpectedErrorEvent);
-	CloseHandle(ExpectedErrorEvent);
-	CloseHandle(TerminateThreadsEvent);
+	//CloseHandle(UnexpectedErrorEvent);
+	//CloseHandle(ExpectedErrorEvent);
+	//CloseHandle(TerminateThreadsEvent);
 
-	return r;
-}
-
-RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
-	return R_PASS;
-}
-
-RESULT DreamDesktopApp::Update(void *pContext) {
-	RESULT r = R_PASS;
-	
 	return r;
 }
 
@@ -685,7 +671,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 	{
 		// Tell output manager that window size has changed
-		OutMgr.WindowResize();
+		//OutMgr.WindowResize();
 		break;
 	}
 	default:
