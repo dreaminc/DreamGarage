@@ -34,6 +34,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamDesktop());
+
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());

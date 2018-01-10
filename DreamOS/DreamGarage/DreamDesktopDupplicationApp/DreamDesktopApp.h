@@ -24,18 +24,25 @@
 
 #include "DreamVideoStreamSubscriber.h"
 
+#include "D3D11DesktopController.h"
+
+#include <limits.h>
+#include "D3D11DesktopDuplicationDisplayManager.h"
+#include "D3D11DesktopDuplicationManager.h"
+#include "D3D11DesktopDuplicationThreadManager.h"
+#include "D3D11DesktopDuplicationOutputManager.h"
+
 class quad;
 class sphere;
 class texture;
 
-class D3D11DesktopController;
 class EnvironmentAsset;
 class DreamUserHandle;
 class AudioPacket;
 
 class DreamDesktopApp :
-	public DreamApp<DreamDesktopApp>
-	//public D3D11DesktopController::observer,
+	public DreamApp<DreamDesktopApp>,
+	public D3D11DesktopController::observer
 {
 	friend class DreamAppManager;
 
@@ -58,7 +65,7 @@ public:
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
-	RESULT OnPaint(const void *pBuffer, int width, int height);
+	virtual RESULT OnPaint(const void *pBuffer, int width, int height) override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
@@ -111,6 +118,14 @@ private:
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
+	// Synchronization
+	HANDLE UnexpectedErrorEvent = nullptr;
+	HANDLE ExpectedErrorEvent = nullptr;
+	HANDLE TerminateThreadsEvent = nullptr;
+
+	// Load simple cursor
+	HCURSOR Cursor = nullptr;
+
 	int m_DesktopWidth = 1366;
 	int m_DesktopHeight = 768;
 	float m_aspectRatio = 1.0f;
@@ -119,6 +134,20 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	D3D11DesktopDuplicationThreadManager ThreadMgr;
+	RECT DeskBounds;
+	UINT OutputCount;
+
+	// Message loop (attempts to update screen when no other messages to process)
+	MSG msg = { 0 };
+	bool FirstTime = true;
+	bool Occluded = true;
+
+	// Window
+	HWND WindowHandle = nullptr;
+
+	int monitorToOutput;
+	
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
