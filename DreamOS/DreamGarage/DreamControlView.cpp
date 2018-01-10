@@ -869,6 +869,8 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 	//only allow button presses while keyboard isn't active
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 
+	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
+
 	CR(m_pUserHandle->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
 
 	return true;
