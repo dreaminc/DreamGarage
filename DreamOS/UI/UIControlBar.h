@@ -53,6 +53,13 @@ public:
 	std::shared_ptr<UIButton> GetURLButton();
 	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
 
+	// Wrappers for executing the observer methods
+	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
+	RESULT ForwardPressed(UIButton* pButtonContext, void* pContext);
+	RESULT TogglePressed(UIButton* pButtonContext, void* pContext);
+	RESULT StopPressed(UIButton* pButtonContext, void* pContext);
+	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
+
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();

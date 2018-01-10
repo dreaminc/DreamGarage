@@ -63,6 +63,72 @@ RESULT UIControlBar::Initialize() {
 
 	CR(UpdateButtonsWithType(m_barType));
 
+	// Register wrapper functions to button events
+	{
+		auto fnStopCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return StopPressed(pButtonContext, pContext);
+		};
+		auto fnToggleCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return TogglePressed(pButtonContext, pContext);
+		};
+		auto fnBackCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return BackPressed(pButtonContext, pContext);
+		};
+		auto fnForwardCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return ForwardPressed(pButtonContext, pContext);
+		};
+		auto fnURLCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return URLPressed(pButtonContext, pContext);
+		};
+
+		// update button trigger events to match the observer
+		CR(m_pStopButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
+		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
+		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
+		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
+	}
+
+Error:
+	return r;
+}
+
+RESULT UIControlBar::BackPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleBackPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::ForwardPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleForwardPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::TogglePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleTogglePressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::StopPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleStopPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::URLPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleURLPressed(pButtonContext, pContext));
 Error:
 	return r;
 }
@@ -187,37 +253,8 @@ std::shared_ptr<text> UIControlBar::GetURLText() {
 }
 
 RESULT UIControlBar::SetObserver(ControlBarObserver *pObserver) {
-	RESULT r = R_PASS;
-
-	CN(pObserver);
 	m_pObserver = pObserver;
-	{
-		auto fnStopCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return m_pObserver->HandleStopPressed(pButtonContext, pContext);
-		};
-		auto fnToggleCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return m_pObserver->HandleTogglePressed(pButtonContext, pContext);
-		};
-		auto fnBackCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return m_pObserver->HandleBackPressed(pButtonContext, pContext);
-		};
-		auto fnForwardCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return m_pObserver->HandleForwardPressed(pButtonContext, pContext);
-		};
-		auto fnURLCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return m_pObserver->HandleURLPressed(pButtonContext, pContext);
-		};
-
-		// update button trigger events to match the observer
-		CR(m_pStopButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
-		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
-		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
-		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
-		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
-	}
-
-Error:
-	return r;
+	return R_PASS;
 }
 
 BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType) {
