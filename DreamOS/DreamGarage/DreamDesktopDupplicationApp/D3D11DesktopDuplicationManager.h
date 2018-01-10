@@ -6,11 +6,11 @@
 //
 // Handles the task of duplicating an output.
 //
-class DUPLICATIONMANAGER
+class D3D11DesktopDuplicationManager
 {
 public:
-	DUPLICATIONMANAGER();
-	~DUPLICATIONMANAGER();
+	D3D11DesktopDuplicationManager();
+	~D3D11DesktopDuplicationManager();
 	_Success_(*Timeout == false && return == DUPL_RETURN_SUCCESS) DUPL_RETURN GetFrame(_Out_ FRAME_DATA* Data, _Out_ bool* Timeout);
 	DUPL_RETURN DoneWithFrame();
 	DUPL_RETURN InitDupl(_In_ ID3D11Device* Device, UINT Output);

@@ -11,7 +11,8 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
-#include "DreamControlView\DreamControlView.h"
+#include "DreamGarage\DreamControlView.h"
+#include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
@@ -29,6 +30,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	
+
 	CR(AddTestDreamOS());
 
 	CR(AddTestUserApp());	
@@ -779,4 +782,82 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 Error:
 	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestDreamDesktop() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	struct TestContext {
+		std::shared_ptr<DreamUserApp> pUser = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+	
+		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
+		CR(SetupDreamAppPipeline());
+		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			quad *pQuad = nullptr;
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+				long environmentID = 168;
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+				CRM(pCloudController->Start(false), "Failed to Start Cloud Controller");
+
+			}
+		}
+
+		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
+		CNM(pDreamDesktop, "Failed to create dream desktop");
+		
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Dream Desktop Test");
+	pUITest->SetTestDescription("Dream Desktop working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+
 }

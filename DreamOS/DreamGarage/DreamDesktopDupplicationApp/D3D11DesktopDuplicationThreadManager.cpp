@@ -9,14 +9,14 @@
 
 DWORD WINAPI DDProc(_In_ void* Param);
 
-THREADMANAGER::THREADMANAGER() : m_ThreadCount(0),
+D3D11DesktopDuplicationThreadManager::D3D11DesktopDuplicationThreadManager() : m_ThreadCount(0),
 m_ThreadHandles(nullptr),
 m_ThreadData(nullptr)
 {
 	RtlZeroMemory(&m_PtrInfo, sizeof(m_PtrInfo));
 }
 
-THREADMANAGER::~THREADMANAGER()
+D3D11DesktopDuplicationThreadManager::~D3D11DesktopDuplicationThreadManager()
 {
 	Clean();
 }
@@ -24,7 +24,7 @@ THREADMANAGER::~THREADMANAGER()
 //
 // Clean up resources
 //
-void THREADMANAGER::Clean()
+void D3D11DesktopDuplicationThreadManager::Clean()
 {
 	if (m_PtrInfo.PtrShapeBuffer)
 	{
@@ -62,7 +62,7 @@ void THREADMANAGER::Clean()
 //
 // Clean up DX_RESOURCES
 //
-void THREADMANAGER::CleanDx(_Inout_ DX_RESOURCES* Data)
+void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* Data)
 {
 	if (Data->Device)
 	{
@@ -104,7 +104,7 @@ void THREADMANAGER::CleanDx(_Inout_ DX_RESOURCES* Data)
 //
 // Start up threads for DDA
 //
-DUPL_RETURN THREADMANAGER::Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* DesktopDim)
+DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* DesktopDim)
 {
 	m_ThreadCount = OutputCount;
 	m_ThreadHandles = new (std::nothrow) HANDLE[m_ThreadCount];
@@ -148,7 +148,7 @@ DUPL_RETURN THREADMANAGER::Initialize(INT SingleOutput, UINT OutputCount, HANDLE
 //
 // Get DX_RESOURCES
 //
-DUPL_RETURN THREADMANAGER::InitializeDx(_Out_ DX_RESOURCES* Data)
+DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCES* Data)
 {
 	HRESULT hr = S_OK;
 
@@ -241,7 +241,7 @@ DUPL_RETURN THREADMANAGER::InitializeDx(_Out_ DX_RESOURCES* Data)
 //
 // Getter for the PTR_INFO structure
 //
-PTR_INFO* THREADMANAGER::GetPointerInfo()
+PTR_INFO* D3D11DesktopDuplicationThreadManager::GetPointerInfo()
 {
 	return &m_PtrInfo;
 }
@@ -249,7 +249,7 @@ PTR_INFO* THREADMANAGER::GetPointerInfo()
 //
 // Waits infinitely for all spawned threads to terminate
 //
-void THREADMANAGER::WaitForThreadTermination()
+void D3D11DesktopDuplicationThreadManager::WaitForThreadTermination()
 {
 	if (m_ThreadCount != 0)
 	{

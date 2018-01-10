@@ -1294,6 +1294,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserFactory.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h" />
+    <ClInclude Include="D3D11DesktopController.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
