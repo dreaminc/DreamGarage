@@ -281,10 +281,12 @@ private:
 	
 	std::string m_strScope;
 	std::string m_strPath;
+	std::string m_strContentType;
 	long m_currentEnvironmentAssetID = 0;
 
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;
+
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

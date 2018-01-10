@@ -1,7 +1,7 @@
 #ifndef UI_CONTROL_BAR_H_
 #define UI_CONTROL_BAR_H_
 
-#include "UIView.h"
+#include "UI/UIView.h"
 #include <memory>
 
 class UIButton;
@@ -17,12 +17,31 @@ class text;
 
 #define ITEM_ACTUATION_DEPTH 0.02f
 
+enum class BarType {
+	DEFAULT,
+	BROWSER,
+	INVALID
+};
+
+// Default Observer
+class ControlBarObserver {
+public:
+	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) = 0;
+};
+
 class UIControlBar : public UIView {
 public:
 	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIControlBar();
 
 	RESULT Initialize();
+
+	//TODO: currently different control bar layouts are not used
+	RESULT UpdateButtonsWithType(BarType type);
 
 	float GetSpacingOffset();
 
@@ -34,11 +53,24 @@ public:
 	std::shared_ptr<UIButton> GetURLButton();
 	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
 
+	// Wrappers for executing the observer methods
+	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
+	RESULT ForwardPressed(UIButton* pButtonContext, void* pContext);
+	RESULT TogglePressed(UIButton* pButtonContext, void* pContext);
+	RESULT StopPressed(UIButton* pButtonContext, void* pContext);
+	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
+
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();
 
 	std::shared_ptr<text> GetURLText();
+
+	RESULT SetObserver(ControlBarObserver *pObserver);
+
+	static BarType ControlBarTypeFromString(const std::string& strContentType);
+
+	static std::shared_ptr<UIControlBar> MakeControlBarWithType(BarType type, std::shared_ptr<UIView> pViewContext);
 
 // common behavior
 public:
@@ -73,6 +105,10 @@ private:
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;
 	float m_urlWidth = m_totalWidth * URL_WIDTH;
 	float m_actuationDepth = ITEM_ACTUATION_DEPTH;
+
+	BarType m_barType = BarType::DEFAULT;
+
+	ControlBarObserver *m_pObserver = nullptr;
 
 };
 

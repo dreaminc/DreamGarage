@@ -12,7 +12,7 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
-#include "DreamControlView.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "DreamBrowser.h"
 

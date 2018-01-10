@@ -25,6 +25,7 @@ public:
 	const std::string& GetStorageProviderScope();
 	//const MenuNode::MimeType & GetMIMEType();
 	const std::string& GetTitle();
+	const std::string& GetContentType();
 
 	std::string GetURI();
 	const std::string& GetURL();
@@ -37,6 +38,8 @@ private:
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;
 	std::string m_strURL;
+	std::string m_strContentType;
+
 	std::multimap<std::string, std::string> m_headers;
 	//MenuNode::MimeType m_mimeType;
 };
