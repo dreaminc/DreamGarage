@@ -3,7 +3,7 @@
 #include "UIButton.h"
 #include "UIMenuItem.h"
 #include "UIScrollView.h"
-#include "UIControlBar.h"
+#include "DreamControlView/UIControlBar.h"
 
 #include "DreamOS.h"
 

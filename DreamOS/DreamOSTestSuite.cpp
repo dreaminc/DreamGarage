@@ -11,7 +11,7 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
-#include "DreamGarage/DreamControlView.h"
+#include "DreamControlView\DreamControlView.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"

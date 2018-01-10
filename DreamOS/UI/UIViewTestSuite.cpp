@@ -3,7 +3,7 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamControlView.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"

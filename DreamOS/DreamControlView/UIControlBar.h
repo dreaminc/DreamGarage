@@ -1,7 +1,7 @@
 #ifndef UI_CONTROL_BAR_H_
 #define UI_CONTROL_BAR_H_
 
-#include "UIView.h"
+#include "UI/UIView.h"
 #include <memory>
 
 class UIButton;
