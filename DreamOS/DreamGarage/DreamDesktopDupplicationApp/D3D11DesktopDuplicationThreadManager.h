@@ -10,11 +10,11 @@
 
 #include "CommonTypes.h"
 
-class THREADMANAGER
+class D3D11DesktopDuplicationThreadManager
 {
 public:
-	THREADMANAGER();
-	~THREADMANAGER();
+	D3D11DesktopDuplicationThreadManager();
+	~D3D11DesktopDuplicationThreadManager();
 	void Clean();
 	DUPL_RETURN Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* DesktopDim);
 	PTR_INFO* GetPointerInfo();

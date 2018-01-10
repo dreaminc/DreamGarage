@@ -1,5 +1,7 @@
 #include "DreamDesktopApp.h"
+#include "DreamOS.h"
 #include <limits.h>
+#include "Core/Utilities.h"
 
 #include "D3D11DesktopDuplicationDisplayManager.h"
 #include "D3D11DesktopDuplicationManager.h"
@@ -9,7 +11,8 @@
 //
 // Globals
 //
-OUTPUTMANAGER OutMgr;
+// TODO: can maybe simplify this
+D3D11DesktopDuplicationOutputManager OutMgr;
 
 // Below are lists of errors expect from Dxgi API calls when a transition event like mode change, PnpStop, PnpStart
 // desktop switch, TDR or session disconnect/reconnect. In all these cases we want the application to clean up the threads that process
@@ -52,7 +55,7 @@ HRESULT EnumOutputsExpectedErrors[] = {
 //
 DWORD WINAPI DDProc(_In_ void* Param);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-bool ProcessCmdline(_Out_ INT* Output);
+//bool ProcessCmdline(_Out_ INT* Output);
 
 
 //
@@ -233,7 +236,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	ShowWindow(WindowHandle, nCmdShow);
 	UpdateWindow(WindowHandle);
 
-	THREADMANAGER ThreadMgr;
+	D3D11DesktopDuplicationThreadManager ThreadMgr;
 	RECT DeskBounds;
 	UINT OutputCount;
 
@@ -353,25 +356,50 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	return 0;
 }
 /*/
+DreamDesktopApp::DreamDesktopApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamDesktopApp>(pDreamOS, pContext)
+{
+	// Empty - initialization by factory
+}
+
+DreamDesktopApp::~DreamDesktopApp() {
+	RESULT r = R_PASS;
+
+	CR(Shutdown());
+
+Error:
+	return;
+}
 
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	INT SingleOutput;
+	int pxWidth = m_DesktopWidth;
+	int pxHeight = m_DesktopHeight;
+	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 
+	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+
+	SetAppDescription("A Shared Desktop View");
+
+	// Set up the quad
+	m_pDesktopQuad = GetComposite()->AddQuad(5, 4, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+	m_pDesktopQuad->SetPosition(0.0f, 2.0f, -2.0f);
+	
+	m_pDesktopTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+
+
+	int monitorToOutput;
+	monitorToOutput = 1;	// assuming we want to duplicate the main desktop for now
+	
 	// Synchronization
 	HANDLE UnexpectedErrorEvent = nullptr;
 	HANDLE ExpectedErrorEvent = nullptr;
 	HANDLE TerminateThreadsEvent = nullptr;
 
+	// TODO: Make this a quad instead
 	// Window
 	HWND WindowHandle = nullptr;
-
-	bool CmdResult = ProcessCmdline(&SingleOutput);
-	if (!CmdResult)
-	{
-		return r;
-	}
 
 	// Event used by the threads to signal an unexpected error and we want to quit the app
 	UnexpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
@@ -413,7 +441,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	Wc.lpfnWndProc = WndProc;
 	Wc.cbClsExtra = 0;
 	Wc.cbWndExtra = 0;
-	//Wc.hInstance = hInstance;
+	//Wc.hInstance = hInstance;		// TODO: will probably need to pull from DOS
 	Wc.hIcon = nullptr;
 	Wc.hCursor = Cursor;
 	Wc.hbrBackground = nullptr;
@@ -441,13 +469,15 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	}
 	*/
 
+	// TODO: make the quad here, dimensions, aspect ration, etc...
+
 	DestroyCursor(Cursor);
 
-	//ShowWindow(WindowHandle, nCmdShow);
+	//ShowWindow(WindowHandle, nCmdShow);	// replace these
 	//UpdateWindow(WindowHandle);
 
-	THREADMANAGER ThreadMgr;
-	RECT DeskBounds;
+	D3D11DesktopDuplicationThreadManager ThreadMgr;
+	RECT DeskBounds;	
 	UINT OutputCount;
 
 	// Message loop (attempts to update screen when no other messages to process)
@@ -503,13 +533,13 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 			}
 
 			// Re-initialize
-			Ret = OutMgr.InitOutput(WindowHandle, SingleOutput, &OutputCount, &DeskBounds);
+			Ret = OutMgr.InitOutput(WindowHandle, monitorToOutput, &OutputCount, &DeskBounds);
 			if (Ret == DUPL_RETURN_SUCCESS)
 			{
 				HANDLE SharedHandle = OutMgr.GetSharedHandle();
 				if (SharedHandle)
 				{
-					Ret = ThreadMgr.Initialize(SingleOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
+					Ret = ThreadMgr.Initialize(monitorToOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
 				}
 				else
 				{
@@ -557,11 +587,53 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	CloseHandle(ExpectedErrorEvent);
 	CloseHandle(TerminateThreadsEvent);
 
-//Error:
 	return r;
 }
 
-//
+RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::Update(void *pContext) {
+	RESULT r = R_PASS;
+	
+	return r;
+}
+
+RESULT DreamDesktopApp::Shutdown(void *pContext) {
+	// TODO: clean up in here
+	
+	return R_PASS;
+}
+
+DreamDesktopApp* DreamDesktopApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamDesktopApp *pDreamApp = new DreamDesktopApp(pDreamOS, pContext);
+	return pDreamApp;
+}
+
+RESULT DreamDesktopApp::OnPaint(const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+
+	if (m_fReceivingStream == false) {
+		CN(m_pDesktopTexture);
+
+		// Update texture dimensions if needed
+		CR(m_pDesktopTexture->UpdateDimensions(width, height));
+		if (r != R_NOT_HANDLED) {
+			DEBUG_LINEOUT("Changed chrome texture dimensions");
+		}
+
+		(m_pDesktopTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+
+		(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+		
+	}
+
+Error:
+	return r;
+}
+
+/*
 // Process command line parameters
 //
 bool ProcessCmdline(_Out_ INT* Output)
@@ -596,6 +668,7 @@ bool ProcessCmdline(_Out_ INT* Output)
 	}
 	return true;
 }
+/*/
 
 //
 // Window message processor
@@ -629,7 +702,7 @@ DWORD WINAPI DDProc(_In_ void* Param)
 {
 	// Classes
 	DISPLAYMANAGER DispMgr;
-	DUPLICATIONMANAGER DuplMgr;
+	D3D11DesktopDuplicationManager DuplMgr;
 
 	// D3D objects
 	ID3D11Texture2D* SharedSurf = nullptr;
