@@ -287,31 +287,10 @@ RESULT DreamUserApp::Update(void *pContext) {
 			m_pLeftHand->SetOverlayVisible(true);
 			m_pRightHand->SetOverlayVisible(true);
 
-
+			UpdateOverlay();
 			if (m_appStack.empty()) {
-				m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-				m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
 				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
 				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-			}
-			else {
-				//*
-				auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
-				if (pTexture == nullptr) {
-					m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-				}
-				else {
-					m_pRightHand->SetOverlayTexture(pTexture);
-				}
-
-				pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
-				if (pTexture == nullptr) {
-					m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-				}
-				else {
-					m_pLeftHand->SetOverlayTexture(pTexture);
-				}
-				//*/
 			}
 		}
 	}
@@ -351,6 +330,35 @@ Error:
 	return r;
 }
 
+RESULT DreamUserApp::UpdateOverlay() {
+	RESULT r = R_PASS;
+
+	if (!m_appStack.empty()) {
+		auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
+		if (pTexture == nullptr) {
+			CR(m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight));
+		}
+		else {
+			CR(m_pRightHand->SetOverlayTexture(pTexture));
+		}
+
+		pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
+		if (pTexture == nullptr) {
+			CR(m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft));
+		}
+		else {
+			CR(m_pLeftHand->SetOverlayTexture(pTexture));
+		}
+	}
+	else {
+		CR(m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft));
+		CR(m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
@@ -380,21 +388,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 			m_appStack.push(m_pMenuHandle);
 
-			auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
-			if (pTexture == nullptr) {
-				m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-			}
-			else {
-				m_pRightHand->SetOverlayTexture(pTexture);
-			}
-
-			pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
-			if (pTexture == nullptr) {
-				m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-			}
-			else {
-				m_pLeftHand->SetOverlayTexture(pTexture);
-			}
+			UpdateOverlay();
 			//currently, the user app always has the menu handle
 			//GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 		}
@@ -506,9 +500,7 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
 
-		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-
+		UpdateOverlay();
 		//stay with controller models if the user is currently looking at them
 		if (!(m_fCollisionLeft || m_fCollisionRight)) {
 			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));

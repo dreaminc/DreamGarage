@@ -148,6 +148,7 @@ public:
 protected:
 
 	RESULT UpdateHands();
+	RESULT UpdateOverlay();
 
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
