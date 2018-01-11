@@ -24,6 +24,16 @@ bool CEFResourceHandler::ProcessRequest(CefRefPtr<CefRequest> pCefRequest, CefRe
 	RESULT r = R_PASS;
 
 	/*
+	// Here for testing purposes, insert a header
+	CefRequest::HeaderMap requestHeaders;
+	pCefRequest->GetHeaderMap(requestHeaders);
+
+	CefString cstrKey = "testKey";
+	CefString cstrValue = "testValue";
+	requestHeaders.insert(std::multimap<CefString, CefString>::value_type(cstrKey, cstrValue));
+
+	pCefRequest->SetHeaderMap(requestHeaders);
+	
 	// Here for testing purposes (this will output the request headers)
 	CefRequest::HeaderMap cefHeaders;
 	pCefRequest->GetHeaderMap(cefHeaders);

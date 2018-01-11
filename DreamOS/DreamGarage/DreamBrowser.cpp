@@ -493,6 +493,8 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		RESULT r = R_PASS;
 		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
+		m_pBrowserQuad->SetVisible(true);
+
 		m_strCurrentURL = strCurrentURL;
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
@@ -620,7 +622,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
-
+/*
 	// Get loading screen URL
 	pCommandLineManager = CommandLineManager::instance();
 	CN(pCommandLineManager);
@@ -632,7 +634,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-
+*/
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
@@ -1318,6 +1320,7 @@ bool DreamBrowser::IsVisible() {
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
+		
 	CR(m_pBrowserQuad->SetVisible(fVisible));
 	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
@@ -1338,12 +1341,22 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	
+	if (m_fClosed) {
+		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
+		CN(m_pWebBrowserController);
+		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		
+		m_fClosed = false;
+	}
 
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
 
@@ -1351,20 +1364,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		CN(pDreamControlViewHandle);
 
 		pDreamControlViewHandle->SendContentType(m_strContentType);
-		
-		// parsing the info we get back from server during a dropbox request
-		// it returns a whole function call instead of just the URL
-		// TODO: the response from server should be cleaned and then this can go.
-		if (strEnvironmentAssetURL.find(',') != std::string::npos) {
-			std::vector<std::string> tokens;
-			std::string token;
-			std::istringstream tokenStream(strEnvironmentAssetURL);
-			while (std::getline(tokenStream, token, ',')) {
-				tokens.push_back(token);
-			}
-			std::string link = tokens[tokens.size()-1];
-			strEnvironmentAssetURL = link.substr(7, link.size());
-		}
 
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
@@ -1404,11 +1403,17 @@ Error:
 
 RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
+
+	//CR(SetStreamingState(false));
+	CR(m_pWebBrowserController->StopSending());
+	CR(SetVisible(false));
+	m_fClosed = true;
+
+	/*
 	std::string strAPIURL;
 	std::string strURL;
 	CommandLineManager *pCommandLineManager = nullptr;
-
-//	CR(SetStreamingState(false));
+	//CR(SetStreamingState(false));
 	CR(SetVisible(false));
 	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 

@@ -957,7 +957,7 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 	//*/
 	if (m_pDreamBrowser != nullptr) {
-		m_pDreamBrowser->SetVisible(true);
+		//m_pDreamBrowser->SetVisible(true);
 		//m_pDreamBrowser->FadeQuadToBlack();
 		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
