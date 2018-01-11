@@ -1,4 +1,3 @@
-<<<<<<< HEAD:DreamOS/DreamControlView/DreamControlView.cpp
 #include "DreamControlView.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamUIBar.h"

@@ -1342,13 +1342,12 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	
-	if (m_fClosed) {
+	if (!m_pBrowserQuad->IsVisible()) {
 		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
 		CN(m_pWebBrowserController);
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 		
-		m_fClosed = false;
 	}
 
 	if (pEnvironmentAsset != nullptr) {
@@ -1407,7 +1406,6 @@ RESULT DreamBrowser::StopSending() {
 	//CR(SetStreamingState(false));
 	CR(m_pWebBrowserController->StopSending());
 	CR(SetVisible(false));
-	m_fClosed = true;
 
 	/*
 	std::string strAPIURL;

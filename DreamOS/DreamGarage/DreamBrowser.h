@@ -278,8 +278,6 @@ private:
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
 
-	bool m_fClosed = true;
-
 	TextEntryString m_strEntered;
 	
 	std::string m_strScope;
