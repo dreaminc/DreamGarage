@@ -1024,11 +1024,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnNewSocketConnection(int position) {
+RESULT EnvironmentController::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnNewSocketConnection(position));
+		CR(m_pEnvironmentControllerObserver->OnNewSocketConnection(seatPosition));
 	}
 
 Error:

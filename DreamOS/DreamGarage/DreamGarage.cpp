@@ -667,12 +667,12 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnNewSocketConnection(int position) {
+RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
-		CB(position < m_seatLookup.size());
-		CR(SetRoundtablePosition(position));
+		CB(seatPosition < m_seatLookup.size());
+		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
 		m_fShouldUpdateAppComposites = true;
 	}

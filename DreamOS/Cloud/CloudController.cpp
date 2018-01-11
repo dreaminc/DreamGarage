@@ -284,11 +284,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnNewSocketConnection(int position) {
+RESULT CloudController::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnNewSocketConnection(position));
+		CR(m_pPeerConnectionObserver->OnNewSocketConnection(seatPosition));
 	}
 
 Error:

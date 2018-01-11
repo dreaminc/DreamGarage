@@ -253,11 +253,11 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnNewSocketConnection(int position) {
+RESULT PeerConnectionController::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnNewSocketConnection(position));
+		CR(m_pPeerConnectionControllerObserver->OnNewSocketConnection(seatPosition));
 	}
 
 Error:
@@ -517,11 +517,10 @@ RESULT PeerConnectionController::HandleEnvironmentSocketResponse(std::string str
 
 	// once we have the socket_connection.connect response, the user can be seated
 	if (strMethod == "connect") {
-		long peerConnectionID = jsonPayload["/id"_json_pointer].get<long>();
-		int position = jsonPayload["/position"_json_pointer].get<int>();
+		int seatPosition = jsonPayload["/position"_json_pointer].get<int>();
 
 		// set position
-		CR(OnNewSocketConnection(position));
+		CR(OnNewSocketConnection(seatPosition));
 	}
 
 Error:

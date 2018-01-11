@@ -106,7 +106,7 @@ public:
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
-	virtual RESULT OnNewSocketConnection(int position) = 0;
+	virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;

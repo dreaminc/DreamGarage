@@ -61,7 +61,7 @@ public:
 	//virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	//virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	//
-	virtual RESULT OnNewSocketConnection(int position) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;

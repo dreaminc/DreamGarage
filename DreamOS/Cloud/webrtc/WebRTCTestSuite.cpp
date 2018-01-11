@@ -114,7 +114,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnNewSocketConnection(int position) {
+		virtual RESULT OnNewSocketConnection(int seatPosition) {
 			DEVENV_LINEOUT("OnNewSocketConnection");
 
 			return R_NOT_HANDLED;
@@ -294,7 +294,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 			return R_NOT_HANDLED;
 		}
 
-		virtual RESULT OnNewSocketConnection(int position) {
+		virtual RESULT OnNewSocketConnection(int seatPosition) {
 			return R_NOT_HANDLED;
 		}
 
