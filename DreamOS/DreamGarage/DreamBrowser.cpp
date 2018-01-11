@@ -417,6 +417,7 @@ Error:
 RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
+	CNR(m_pWebBrowserController, R_SKIPPED);
 	WebBrowserMouseEvent mouseEvent;
 
 	mouseEvent.pt = ptContact;
@@ -1404,7 +1405,7 @@ RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
 
 	//CR(SetStreamingState(false));
-	CR(m_pWebBrowserController->StopSending());
+	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
 
 	/*
@@ -1478,6 +1479,8 @@ Error:
 RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+
 	CR(SetVisible(true));
 
 Error:

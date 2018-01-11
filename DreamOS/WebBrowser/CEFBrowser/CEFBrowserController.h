@@ -98,8 +98,6 @@ public:
 	virtual RESULT GoBack() override;
 	virtual RESULT GoForward() override;
 
-	virtual RESULT StopSending() override;
-
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
 

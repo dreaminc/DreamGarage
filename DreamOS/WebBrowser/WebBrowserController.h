@@ -86,9 +86,7 @@ public:
 	virtual RESULT GoBack() = 0;
 	virtual RESULT GoForward() = 0;
 	virtual bool CanGoBack() = 0;
-	virtual bool CanGoForward() = 0;
-
-	virtual RESULT StopSending() = 0;
+	virtual bool CanGoForward() = 0;	
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.

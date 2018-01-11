@@ -341,14 +341,6 @@ Error:
 	return r;
 }
 
-RESULT  CEFBrowserController::StopSending() {
-	RESULT r = R_PASS;
-
-	m_pCEFBrowser->GetHost()->CloseBrowser(false);
-
-	return r;
-}
-
 // TODO: Mouse wheel
 /*--cef()--
 virtual void SendMouseWheelEvent(const CefMouseEvent& event,
