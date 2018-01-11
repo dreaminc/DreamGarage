@@ -667,6 +667,20 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
+	RESULT r = R_PASS;
+
+	if (!m_fSeated) {
+		CB(seatPosition < m_seatLookup.size());
+		CR(SetRoundtablePosition(seatPosition));
+		m_fSeated = true;
+		m_fShouldUpdateAppComposites = true;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
