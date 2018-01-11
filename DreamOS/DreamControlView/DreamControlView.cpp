@@ -170,6 +170,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_fMalletDirty[0] = dirty();
 	m_fMalletDirty[1] = dirty();
+
+	m_fCanPressButton[0] = dirty();
+	m_fCanPressButton[1] = dirty();
+
 	m_ptLastEvent.x = -1;
 	m_ptLastEvent.y = -1;
 
@@ -250,7 +254,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
+RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fControlBarDirty, bool &fMouseDown, HAND_TYPE handType) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
@@ -272,6 +276,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
 			fMalletDirty = false;
+			fControlBarDirty = false;
 
 			if (fMouseDown) {
 				fMouseDown = false;
@@ -302,12 +307,27 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		// if the sphere is lower than its own radius, there must be an interaction
 		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
-			bool fInBrowserQuad = ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
-				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0;
-			fInBrowserQuad = fInBrowserQuad || m_fIsMinimized;
 
-			fMalletDirty = true;
-			CBR(!fInBrowserQuad, R_SKIPPED);
+			float browserWidth = m_pBrowserHandle->GetWidthOfBrowser();
+			float browserHeight = m_pBrowserHandle->GetHeightOfBrowser();
+
+			bool fNotInBrowserQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
+				ptContact.y > browserHeight || ptContact.y < 0;
+
+			float viewHeight = m_pViewQuad->GetHeight();
+			float controlBarHeight = m_pControlBar->GetItemHeight() / viewHeight;
+
+			// dependent on bar width being the same as the browser width and 
+			// on the control bar being below the view quad
+			bool fNotInControlBarQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
+				ptContact.y > (browserHeight * (1.0f+controlBarHeight)) || ptContact.y < browserHeight;
+
+			// mallet dirty is used with the control bar buttons, and gets set to dirty when a button is pressed
+			// set mallet dirty here if there is an intersection outside of the control bar area
+			fMalletDirty = fNotInControlBarQuad;
+
+			fNotInBrowserQuad = fNotInBrowserQuad || m_fIsMinimized;
+			CBR(!fNotInBrowserQuad, R_SKIPPED);
 
 			m_ptClick = ptSphereOrigin;
 			fMouseDown = true;
@@ -869,7 +889,7 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	auto pDreamOS = GetDOS();
 
-	CBR(!m_fMalletDirty[0].IsDirty() && !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
+	CBR(!m_fMalletDirty[0].IsDirty() || !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
 
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
@@ -879,6 +899,8 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	//only allow button presses while keyboard isn't active
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
+
+	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
 
 	CR(m_pUserHandle->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
 

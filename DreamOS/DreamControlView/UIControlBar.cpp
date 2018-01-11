@@ -216,6 +216,10 @@ float UIControlBar::GetSpacingOffset() {
 	return -(m_itemSpacing + m_itemSide / 2.0f);
 }
 
+float UIControlBar::GetItemHeight() {
+	return m_itemSide;
+}
+
 std::shared_ptr<UIButton> UIControlBar::GetBackButton() {
 	return m_pBackButton;
 }

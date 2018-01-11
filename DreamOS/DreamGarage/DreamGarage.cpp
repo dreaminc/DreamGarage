@@ -301,6 +301,10 @@ RESULT DreamGarage::DidFinishLoading() {
 	CRM(InitializeKeyboard(), "Failed to initialize Keyboard");
 	CRM(InitializeDreamUser(), "Failed to initialize User App");
 
+	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
+	CN(m_pDreamUIBar);
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
+
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this, false);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
@@ -313,9 +317,6 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 
 	//*
-	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
 //*/
 	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
 

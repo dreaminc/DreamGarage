@@ -44,6 +44,7 @@ public:
 	RESULT UpdateButtonsWithType(BarType type);
 
 	float GetSpacingOffset();
+	float GetItemHeight();
 
 	// Getters used for registering event behavior
 	std::shared_ptr<UIButton> GetBackButton();
