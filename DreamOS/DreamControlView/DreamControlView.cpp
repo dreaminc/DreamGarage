@@ -305,9 +305,9 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			bool fInBrowserQuad = ptContact.x > m_pBrowserHandle->GetWidthOfBrowser() || ptContact.x < 0 ||
 				ptContact.y > m_pBrowserHandle->GetHeightOfBrowser() || ptContact.y < 0;
 			fInBrowserQuad = fInBrowserQuad || m_fIsMinimized;
-			CBR(!fInBrowserQuad, R_SKIPPED);
 
 			fMalletDirty = true;
+			CBR(!fInBrowserQuad, R_SKIPPED);
 
 			m_ptClick = ptSphereOrigin;
 			fMouseDown = true;
