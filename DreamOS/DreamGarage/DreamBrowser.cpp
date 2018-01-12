@@ -484,6 +484,17 @@ Error:
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
 
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+
+	//pDreamControlViewHandle->ShowApp();
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -1365,10 +1376,11 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
-
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 
+		CR(pDreamControlViewHandle->ShowApp());
+		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		pDreamControlViewHandle->SendContentType(m_strContentType);
 
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
@@ -1417,7 +1429,7 @@ RESULT DreamBrowser::StopSending() {
 		pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
 	}
 
-	//CR(SetStreamingState(false));
+	CR(SetStreamingState(false));
 	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
 

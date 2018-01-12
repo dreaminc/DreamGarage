@@ -346,10 +346,10 @@ RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 	CN(pDreamControlViewHandle);
 	CN(m_pUserHandle);
 	if (!pDreamControlViewHandle->IsAppVisible()) {
-		CR(pDreamControlViewHandle->ShowApp());
-		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+		//CR(pDreamControlViewHandle->ShowApp());
+		//CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		if (fSendURL) {
-			(pDreamControlViewHandle->SendURLtoBrowser());
+			CR(pDreamControlViewHandle->SendURLtoBrowser());
 		}	
 	}
 
