@@ -643,7 +643,7 @@ RESULT DreamControlView::Show() {
 	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
 	CN(m_pBrowserHandle);
 
-	CR(m_pBrowserHandle->RequestBeginStream());
+	//CR(m_pBrowserHandle->RequestBeginStream());
 
 	CR(ResetAppComposite());
 

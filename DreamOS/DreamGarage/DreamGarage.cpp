@@ -967,7 +967,6 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
 	if (m_pDreamBrowser != nullptr) {
-		m_pDreamBrowser->SetVisible(true);
 
 		m_pDreamBrowser->PendReceiving();
 

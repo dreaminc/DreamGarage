@@ -495,6 +495,10 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
 		m_pBrowserQuad->SetVisible(true);
+		
+		if (!m_fStreaming) {
+			BeginStream();
+		}
 
 		m_strCurrentURL = strCurrentURL;
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
@@ -857,6 +861,10 @@ RESULT DreamBrowser::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVid
 		}
 
 		CRM(r, "Failed for other reason");
+
+		if (!IsVisible()) {
+			SetVisible(true);
+		}
 	}
 
 Error:
@@ -944,7 +952,6 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 						// For non-changing stuff we need to send the current frame
 						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
 					}
-
 
 				} break;
 			}
@@ -1479,9 +1486,9 @@ Error:
 RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	CR(m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get()));
 
-	CR(SetVisible(true));
+	//CR(SetVisible(true));
 
 Error:
 	return r;
