@@ -102,7 +102,7 @@ public:
 	RESULT ResetAppComposite();
 
 private:
-	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fMouseDown, HAND_TYPE handType);
+	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fControlBarDirty, bool &fMouseDown, HAND_TYPE handType);
 
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
@@ -182,6 +182,7 @@ private:
 	//		should be registered.  This doesn't work correctly when there are multiple surfaces
 	//		being used at the same time
 	dirty m_fMalletDirty[2];
+	dirty m_fCanPressButton[2];
 
 	float m_dragThresholdSquared = SQUARED_DRAG_THRESHOLD;
 

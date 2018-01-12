@@ -539,6 +539,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 		CR(m_pLeftHand->InitializeWithContext(pDreamOS));
 		CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);	
+		m_pLeftHand->SetOverlayVisible(false);
 	}
 	else {
 		m_pRightHand = pHand;
@@ -546,6 +547,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 		CR(m_pRightHand->InitializeWithContext(pDreamOS));
 		CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
 		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
+		m_pRightHand->SetOverlayVisible(false);
 	}
 
 	auto pVolume = pHand->GetPhantomVolume().get();
