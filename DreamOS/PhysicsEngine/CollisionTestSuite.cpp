@@ -589,13 +589,15 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		POINT_FACE,
 		POINT_EDGE,
 		FACE_FACE,
+		AABB_AABB,
 		EDGE_FACE
 	} testOrientation;
 
 	//testOrientation = TestOrientation::EDGE_EDGE;
-	//testOrientation = TestOrientation::POINT_FACE;
-	testOrientation = TestOrientation::EDGE_FACE;
+	testOrientation = TestOrientation::POINT_FACE;
+	//testOrientation = TestOrientation::EDGE_FACE;
 	//testOrientation = TestOrientation::FACE_FACE;
+	//testOrientation = TestOrientation::AABB_AABB;
 
 	struct TestContext {
 		volume *pOBBA = nullptr;
@@ -626,39 +628,45 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 
 		switch (testOrientation) {
-		case TestOrientation::EDGE_EDGE: {
-			pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
-			pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+			case TestOrientation::EDGE_EDGE: {
+				pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
 
-			pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
+				pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
 
-			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
-		} break;
+				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+			} break;
 
-		case TestOrientation::FACE_FACE: {
-			pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
-			pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+			case TestOrientation::FACE_FACE: {
+				pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
 
-			pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
+				pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
 
-			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
-			pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 53.0f);
-		} break;
+				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 53.0f);
+			} break;
 
-		case TestOrientation::POINT_FACE: {
-			pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+			case TestOrientation::POINT_FACE: {
+				pTestContext->pOBBA->SetPosition(0.0f, -0.5f, 0.0f);
 
-			pTestContext->pOBBB->SetPosition(0.0f, -0.25f, 0.0f);
-			pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
-		} break;
+				pTestContext->pOBBB->SetPosition(0.0f, 0.75f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
+			} break;
 
-		case TestOrientation::EDGE_FACE: {
-			pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+			case TestOrientation::EDGE_FACE: {
+				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
 
-			pTestContext->pOBBB->SetPosition(0.0f, -0.35f, 0.0f);
-			pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
-			//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
-		} break;
+				pTestContext->pOBBB->SetPosition(0.0f, -0.35f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+				//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
+			} break;
+
+			case TestOrientation::AABB_AABB: {
+				pTestContext->pOBBA->SetPosition(0.5f, -1.5f, 0.0f);
+
+				pTestContext->pOBBB->SetPosition(0.0f, -0.05f, 0.0f);
+			} break;
 		}
 
 		for (int i = 0; i < 4; i++) {
@@ -693,8 +701,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		//pTestContext->pOBBB->RotateZByDeg(0.04f);
-		pTestContext->pOBBB->RotateYByDeg(0.04f);
+		pTestContext->pOBBB->RotateZByDeg(0.04f);
+		pTestContext->pOBBB->RotateYByDeg(0.024f);
+		pTestContext->pOBBA->RotateZByDeg(-0.02f);
+		pTestContext->pOBBA->RotateXByDeg(-0.01f);
+		//pTestContext->pOBBB->RotateYByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);

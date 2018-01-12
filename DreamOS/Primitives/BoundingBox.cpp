@@ -6,6 +6,7 @@
 
 #include "VirtualObj.h"
 #include "PhysicsEngine/CollisionManifold.h"
+#include "PhysicsEngine/Simplex.h"
 
 BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
 	BoundingVolume(pParentObject),
@@ -115,22 +116,54 @@ point BoundingBox::GetFarthestPointInDirection(vector vDirection) {
 	
 	// First orient vDirection to box (easier if AABB)
 
-	RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());
+	if (m_type == Type::AABB) {
+		point ptReturn;
+	
+		point ptMax = GetMaxPoint();
+		point ptMin = GetMinPoint();
+	
+		ptReturn.x() = vDirection.x() >= 0 ? ptMax.x() : ptMin.x();
+		ptReturn.y() = vDirection.y() >= 0 ? ptMax.y() : ptMin.y();
+		ptReturn.z() = vDirection.z() >= 0 ? ptMax.z() : ptMin.z();
+	
+		return ptReturn;
+	}
+	else {
+		RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());
+		vector vDirectionAdjust = inverse(matRotation) * vDirection;
 
-	vector vDirectionAdjust = inverse(matRotation) * vDirection;
+		point ptReturn;
 
-	point ptReturn;
+		point ptMax = GetHalfVector();
 
-	point ptMax = GetMaxPoint();
-	point ptMin = GetMinPoint();
+		ptReturn.x() = vDirectionAdjust.x() >= 0 ? ptMax.x() : -ptMax.x();
+		ptReturn.y() = vDirectionAdjust.y() >= 0 ? ptMax.y() : -ptMax.y();
+		ptReturn.z() = vDirectionAdjust.z() >= 0 ? ptMax.z() : -ptMax.z();
 
-	ptReturn.x() = vDirectionAdjust.x() >= 0 ? ptMax.x() : ptMin.x();
-	ptReturn.y() = vDirectionAdjust.y() >= 0 ? ptMax.y() : ptMin.y();
-	ptReturn.z() = vDirectionAdjust.z() >= 0 ? ptMax.z() : ptMin.z();
+		ptReturn = GetOrigin() + (vector)(matRotation * ptReturn);
 
-	ptReturn = matRotation * ptReturn;
+		return ptReturn;
+	}
 
-	return ptReturn;
+	// Keeping this since it's pretty useful code for a point cloud 
+	//BoundingBox::BoxPoint bestBoxPoint;
+	//float bestDotProd = -INFINITY;
+	//point ptBestPoint;
+	//
+	//for (int i = 0; i < (int)BoundingBox::BoxPoint::INVALID; i++) {
+	//	point ptBox = GetBoxPoint((BoundingBox::BoxPoint)(i), true);
+	//
+	//	float d = ((vector)(ptBox)).dot(vDirection);
+	//
+	//	if (d > bestDotProd) {
+	//		bestBoxPoint = (BoundingBox::BoxPoint)(i);
+	//		bestDotProd = d;
+	//		ptBestPoint = ptBox;
+	//	}
+	//
+	//}
+	//
+	//return ptBestPoint;	
 }
 
 point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bbB, vector vDirection) {
@@ -141,23 +174,41 @@ point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bb
 }
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
-	//vector vDirection = vector::iVector(1.0f);
-	//
-	//point ptSupport = GetSupportPoint(*this, rhs, vDirection);
-	//
-	//return false;
 
-	return IntersectSAT(rhs);
+	//return IntersectSAT(rhs);
+
+	Simplex intersectionSimplex = Simplex();
+	
+	vector vDirection = vector::iVector(1.0f);
+	
+	// First point
+	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	intersectionSimplex.UpdateSimplex(ptSupport, &vDirection);
+
+	do {
+		ptSupport = GetSupportPoint(*this, rhs, vDirection);
+
+		if (vDirection.dot(ptSupport) < 0.0f) {
+			return false;
+		}
+
+		if (intersectionSimplex.UpdateSimplex(ptSupport, &vDirection)) {
+			return true;
+		}
+		
+	} while (1);
+	
+	return false;
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
-	//CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-	//
-	//// TODO:
-	//
-	//return manifold;
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	
+	// TODO:
+	
+	return manifold;
 
-	return CollideSAT(rhs);
+	//return CollideSAT(rhs);
 }
 
 bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
