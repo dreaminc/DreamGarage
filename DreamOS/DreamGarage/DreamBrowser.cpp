@@ -757,6 +757,7 @@ Error:
 
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
@@ -777,7 +778,20 @@ RESULT DreamBrowser::Update(void *pContext) {
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
 
+	if (m_fShowControlView) {
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+		CN(pDreamControlViewHandle);
+
+		CR(pDreamControlViewHandle->ShowApp());
+		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+		pDreamControlViewHandle->SendContentType(m_strContentType);
+		m_fShowControlView = false;
+	}
+
 Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -1368,6 +1382,16 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		
 	}
 
+	m_fShowControlView = true;
+	/*
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+
+	CR(pDreamControlViewHandle->ShowApp());
+	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+	pDreamControlViewHandle->SendContentType(m_strContentType);
+	//*/
+
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
 
@@ -1376,12 +1400,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-
-		CR(pDreamControlViewHandle->ShowApp());
-		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		pDreamControlViewHandle->SendContentType(m_strContentType);
 
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);

@@ -99,7 +99,8 @@ public:
 	RESULT HideApp();
 	RESULT ShowApp();
 
-	RESULT ShowControlView(bool fSendURL);
+	RESULT ShowControlView();
+	RESULT SendURLToBrowser();
 
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 

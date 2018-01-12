@@ -288,6 +288,8 @@ private:
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;
 
+	bool m_fShowControlView = false;
+
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

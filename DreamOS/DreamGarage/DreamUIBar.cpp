@@ -299,7 +299,8 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 					bool fStreaming = false;
 					CR(m_pUserHandle->RequestStreamingState(fStreaming));
 					if (fStreaming) {
-						CR(ShowControlView(false));
+					//	CR(ShowControlView(false));
+						CR(ShowControlView());
 					}
 				}
 				//*/
@@ -330,7 +331,8 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			CR(ShowControlView(true));
+			//CR(ShowControlView(true));
+			CR(SendURLToBrowser());
 		} break;
 	}
 
@@ -339,18 +341,30 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowControlView(bool fSendURL) {
+RESULT DreamUIBar::SendURLToBrowser() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendURLtoBrowser());
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+	return r;
+}
+
+RESULT DreamUIBar::ShowControlView() {
+
 	RESULT r = R_PASS;
 
 	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	CN(pDreamControlViewHandle);
 	CN(m_pUserHandle);
 	if (!pDreamControlViewHandle->IsAppVisible()) {
-		//CR(pDreamControlViewHandle->ShowApp());
-		//CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		if (fSendURL) {
-			CR(pDreamControlViewHandle->SendURLtoBrowser());
-		}	
+		CR(pDreamControlViewHandle->ShowApp());
+		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 	}
 
 Error:
@@ -359,6 +373,7 @@ Error:
 	}
 	return r;
 }
+
 
 texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
@@ -468,7 +483,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				CR(UpdateBrowser(strScope, strPath));
 
-				CR(ShowControlView(false));
+//				CR(ShowControlView(false));
+				CR(ShowControlView());
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {

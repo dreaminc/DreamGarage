@@ -636,14 +636,13 @@ Error:
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
-	CB(uids.size() == 1);
-	m_browserUID = uids[0];
+	if (m_pBrowserHandle == nullptr) {
 
-	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
-	CN(m_pBrowserHandle);
+		m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
+		CN(m_pBrowserHandle);
 
-	//CR(m_pBrowserHandle->RequestBeginStream());
+		//CR(m_pBrowserHandle->RequestBeginStream());
+	}
 
 	CR(ResetAppComposite());
 
