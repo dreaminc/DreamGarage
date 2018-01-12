@@ -70,6 +70,7 @@ public:
 	struct face {
 		BoxFace m_type;
 		point m_points[4];
+		vector m_vNormal;
 	};
 
 public:
@@ -90,6 +91,7 @@ public:
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	CollisionManifold CollideSAT(const BoundingBox& rhs);
+	CollisionManifold CollideBruteForce(const BoundingBox& rhs);	// This is old and normals are broken
 
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
@@ -109,7 +111,7 @@ public:
 
 	// Separating Axis Theorem (SAT) early test
 	double TransformToAxis(const vector &vAxis);
-	vector GetAxis(BoxAxis boxAxis);
+	vector GetAxis(BoxAxis boxAxis, bool fOriented = true);
 	bool OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis);
 	double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis);
 
@@ -135,8 +137,8 @@ public:
 	BoundingBox GetBoundingAABB();
 
 	point GetBoxPoint(BoxPoint ptType, bool fOriented = true);
-	BoundingBox::face GetFace(BoxFace faceType);
-	vector GetBoxFaceNormal(BoxFace faceType);
+	BoundingBox::face GetFace(BoxFace faceType, bool fOriented = true);
+	vector GetBoxFaceNormal(BoxFace faceType, bool fOriented = true);
 	line GetBoxEdge(BoxEdge edgeType);
 
 protected:
