@@ -226,13 +226,13 @@ RESULT DreamGarage::LoadScene() {
 	
 	AddSkybox();
 
-	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight->EnableShadows();
 
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
@@ -306,7 +306,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
 
 #ifndef _DEBUG
-	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this, false);
+	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
 
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));

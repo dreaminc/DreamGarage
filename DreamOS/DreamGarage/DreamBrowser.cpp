@@ -611,7 +611,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	SetAppName(DREAM_BROWSER_APP_NAME);
 	SetAppDescription("A Shared Content View");
 
-	GetDOS()->AddObjectToUIGraph(GetComposite());	
+	// TODO: may want browser to have its own shader at some point, but 
+	// after testing with the UI graph, the browser clashed with the menu
+	//
+//	GetDOS()->AddObjectToUIGraph(GetComposite());	
 
 	// Set up browser manager
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
@@ -641,7 +644,12 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad->FlipUVVertical();
 	//*/
 
-	m_pBrowserQuad->SetMaterialAmbient(0.8f);
+	// attempt to give the browser a matte appearance
+	m_pBrowserQuad->SetMaterialAmbient(0.9f);
+
+	GetComposite()->SetMaterialShininess(0.0f, true);
+	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
+
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	

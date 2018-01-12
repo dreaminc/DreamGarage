@@ -241,12 +241,22 @@ RESULT DreamControlView::Update(void *pContext) {
 		}
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
-		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		bool fControlBarDirty = m_fCanPressButton[i].IsDirty();
+
+		UpdateWithMallet(pMallet, fMalletDirty, fControlBarDirty, m_fMouseDown[i], type);
+
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
 		} 
 		else {
 			m_fMalletDirty[i].CheckAndCleanDirty();
+		}
+
+		if (fControlBarDirty) {
+			m_fCanPressButton[i].SetDirty();
+		}
+		else {
+			m_fCanPressButton[i].CheckAndCleanDirty();
 		}
 	}
 
@@ -314,17 +324,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			bool fNotInBrowserQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
 				ptContact.y > browserHeight || ptContact.y < 0;
 
-			float viewHeight = m_pViewQuad->GetHeight();
-			float controlBarHeight = m_pControlBar->GetItemHeight() / viewHeight;
-
-			// dependent on bar width being the same as the browser width and 
-			// on the control bar being below the view quad
-			bool fNotInControlBarQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
-				ptContact.y > (browserHeight * (1.0f+controlBarHeight)) || ptContact.y < browserHeight;
-
-			// mallet dirty is used with the control bar buttons, and gets set to dirty when a button is pressed
-			// set mallet dirty here if there is an intersection outside of the control bar area
-			fMalletDirty = fNotInControlBarQuad;
+			fMalletDirty = true;
 
 			fNotInBrowserQuad = fNotInBrowserQuad || m_fIsMinimized;
 			CBR(!fNotInBrowserQuad, R_SKIPPED);
@@ -889,13 +889,16 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	auto pDreamOS = GetDOS();
 
-	CBR(!m_fMalletDirty[0].IsDirty() || !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
+	//CBR(!m_fMalletDirty[0].IsDirty() || !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
+	CBR(!m_fCanPressButton[0].IsDirty() && !m_fCanPressButton[1].IsDirty(), R_SKIPPED);
 
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
 
-	CR(m_fMalletDirty[0].SetDirty());
-	CR(m_fMalletDirty[1].SetDirty());
+	//CR(m_fMalletDirty[0].SetDirty());
+	//CR(m_fMalletDirty[1].SetDirty());
+	CR(m_fCanPressButton[0].SetDirty());
+	CR(m_fCanPressButton[1].SetDirty());
 
 	//only allow button presses while keyboard isn't active
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
