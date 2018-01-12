@@ -1350,7 +1350,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	
-	if (!m_pBrowserQuad->IsVisible()) {
+	if (m_pWebBrowserController == nullptr) {
 		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
 		CN(m_pWebBrowserController);
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
