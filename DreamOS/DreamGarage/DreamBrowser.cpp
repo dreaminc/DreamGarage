@@ -777,7 +777,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
-
+	//*
 	if (m_fShowControlView) {
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
@@ -787,7 +787,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		pDreamControlViewHandle->SendContentType(m_strContentType);
 		m_fShowControlView = false;
 	}
-
+	//*/
 Error:
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
@@ -1378,11 +1378,11 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
 		CN(m_pWebBrowserController);
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+		m_fShowControlView = true;
+
 		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-		
 	}
 
-	m_fShowControlView = true;
 	/*
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	CN(pDreamControlViewHandle);
@@ -1390,7 +1390,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	CR(pDreamControlViewHandle->ShowApp());
 	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 	pDreamControlViewHandle->SendContentType(m_strContentType);
-	//*/
+	//*/	
 
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;

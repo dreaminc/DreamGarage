@@ -560,6 +560,9 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::ShowView() {
 	RESULT r = R_PASS;
 
+	if (GetDOS()->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get())) {
+		GetDOS()->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
+	}
 
 	//TODO: animation for m_pControlBar
 	m_pControlBar->SetVisible(true);
@@ -574,6 +577,7 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
+
 		if (m_pUserHandle == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 			CB(userUIDs.size() == 1);
@@ -705,7 +709,7 @@ RESULT DreamControlView::Hide() {
 	CNR(m_pBrowserHandle, R_SKIPPED);
 
 Error:
-	GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this);
+	//GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this);
 	return r;
 }
 
