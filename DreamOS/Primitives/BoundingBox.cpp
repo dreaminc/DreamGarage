@@ -461,12 +461,13 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	point ptBoxAOrigin = GetAbsoluteOrigin();
 	vector vBoxAHV = GetHalfVector();
 	quaternion qBoxAOrientation = GetAbsoluteOrientation();
-	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
-	auto matInverseRotation = inverse(matRotation);
+	RotationMatrix matRotationA = RotationMatrix(qBoxAOrientation);
+	auto matInverseRotationA = inverse(matRotationA);
 
 	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
 	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
 	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
+	RotationMatrix matRotationB = RotationMatrix(qBoxBOrientation);
 
 	vector vAxesA[3], vAxesB[3];
 
@@ -476,9 +477,11 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 	// Get Box B axes in A space
 	for (int i = 0; i < 3; i++) {
-		vAxesB[i] = matInverseRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+		vAxesB[i] = matInverseRotationA * (matRotationB * vAxesA[i]);// static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+		vAxesB[i].Normalize();
 	}
-	ptBoxBOrigin = matInverseRotation * (ptBoxBOrigin - ptBoxAOrigin);
+
+	ptBoxBOrigin = matInverseRotationA * (ptBoxBOrigin - ptBoxAOrigin);
 
 	for (int i = 0; i < 3; i++) {
 		vector vAxisA = vAxesA[i];
@@ -518,13 +521,151 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		}
 	}
 
-	
-	// Points vs Face
-	// Find the incident vector
-
-
+	vector vNormal = matRotationA * vAxis;
+	manifold.AddContactPoint(ptBoxAOrigin, vNormal, penetration, 1);
 
 	return manifold;
+
+	// Points vs Face
+
+	// Find the incident vector
+	// Find most negative dot prod
+	vector vFaceVector;
+	float bestDotProd = 0.0f;
+	int bestAxis = 0;
+	bool fNegative = false;
+	float d;
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 2; j++) {
+			vector vTemp = vAxesB[i];
+
+			if(j == 1) {
+				vTemp = -1.0f * vTemp;
+			}
+
+			d = vAxis.dot(vTemp);
+
+			if (d < bestDotProd) {
+
+				bestDotProd = d;
+				bestAxis = i;
+				fNegative = (bool)(j);
+
+				vFaceVector = vTemp;
+			}
+		}
+	}
+
+	// Get the incident face given the axis
+	BoundingBox::face boxBFace = BoundingBox::face(bestAxis, fNegative, vBoxBHV);
+
+	// TODO: formalize this
+	// Apply rotation of B
+	boxBFace.ApplyMatrix(matRotationB);
+	boxBFace.Translate(ptBoxBOrigin);
+	
+	// Apply A
+	boxBFace.ApplyMatrix(matInverseRotationA);
+
+
+	// Now that we have the face, clip it against our planes
+	for (int i = 0; i < 4; i++) {
+		float xAbsVal = std::abs(boxBFace.m_points[i].x());
+		float yAbsVal = std::abs(boxBFace.m_points[i].y());
+		float zAbsVal = std::abs(boxBFace.m_points[i].z());
+
+		if (xAbsVal < vBoxAHV.x() &&
+			yAbsVal < vBoxAHV.y() &&
+			zAbsVal < vBoxAHV.z()) 
+		{
+			// point is in there, re-orient
+			point ptContact = (matRotationA * boxBFace.m_points[i]) + ptBoxAOrigin;
+			//point ptContact = (boxBFace.m_points[i]) + ptBoxAOrigin;
+			penetration = -minAxisDistance;
+			vector vNormal = matRotationA * vAxis;
+
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
+	}
+
+	return manifold;
+}
+
+BoundingBox::face::face() {
+	// empty
+}
+
+BoundingBox::face::face(int axis, bool fNegative, vector vHalfVector) {
+	switch (axis) {
+		// x axis
+		case 0: {
+			float xVal = vHalfVector.x();
+			if (fNegative)
+				xVal *= -1.0f;
+
+			m_points[0] = point(xVal, vHalfVector.y(), vHalfVector.z());
+			m_points[1] = point(xVal, -vHalfVector.y(), vHalfVector.z());
+			m_points[2] = point(xVal, vHalfVector.y(), -vHalfVector.z());
+			m_points[3] = point(xVal, -vHalfVector.y(), -vHalfVector.z());
+
+			if(fNegative)
+				m_vNormal = vector::iVector(-1.0f);
+			else
+				m_vNormal = vector::iVector(1.0f);
+		} break;
+
+		// y axis
+		case 1: {
+			float yVal = vHalfVector.y();
+			if (fNegative)
+				yVal *= -1.0f;
+
+			m_points[0] = point(-vHalfVector.x(), yVal, vHalfVector.z());
+			m_points[1] = point(vHalfVector.x(), yVal, vHalfVector.z());
+			m_points[2] = point(-vHalfVector.x(), yVal, -vHalfVector.z());
+			m_points[3] = point(vHalfVector.x(), yVal, -vHalfVector.z());
+
+			if (fNegative)
+				m_vNormal = vector::jVector(-1.0f);
+			else
+				m_vNormal = vector::jVector(1.0f);
+		} break;
+
+		// z axis
+		case 2: {
+			float zVal = vHalfVector.z();
+			if (fNegative)
+				zVal *= -1.0f;
+
+			m_points[0] = point(-vHalfVector.x(), vHalfVector.y(), zVal);
+			m_points[1] = point(vHalfVector.x(), vHalfVector.y(), zVal);
+			m_points[2] = point(-vHalfVector.x(), -vHalfVector.y(), zVal);
+			m_points[3] = point(vHalfVector.x(), -vHalfVector.y(), zVal);
+
+			if (fNegative)
+				m_vNormal = vector::kVector(-1.0f);
+			else
+				m_vNormal = vector::kVector(1.0f);
+		} break;
+	}
+}
+
+RESULT BoundingBox::face::ApplyMatrix(matrix<float, 4, 4> mat) {
+	for (int i = 0; i < 4; i++) {
+		m_points[i] = mat * m_points[i];
+	}
+
+	m_vNormal = mat * m_vNormal;
+
+	return R_PASS;
+}
+
+RESULT BoundingBox::face::Translate(vector vTranslation) {
+	for (int i = 0; i < 4; i++) 
+		m_points[i].translate(vTranslation);
+
+	return R_PASS;
 }
 
 CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {

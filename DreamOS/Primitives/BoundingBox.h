@@ -67,7 +67,15 @@ public:
 		INVALID
 	};
 
-	struct face {
+	class face {
+	public:
+		face();
+		face(int axis, bool fNegative, vector vHalfVector);
+
+		RESULT ApplyMatrix(matrix<float, 4, 4> mat);
+		RESULT Translate(vector vTranslation);
+
+	public:
 		BoxFace m_type;
 		point m_points[4];
 		vector m_vNormal;

@@ -648,9 +648,10 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			} break;
 
 			case TestOrientation::POINT_FACE: {
-				pTestContext->pOBBA->SetPosition(0.0f, -0.5f, 0.0f);
+				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 180.0f);
 
-				pTestContext->pOBBB->SetPosition(0.0f, 0.75f, 0.0f);
+				pTestContext->pOBBB->SetPosition(0.0f, -0.25f, 0.0f);
 				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
 			} break;
 
@@ -701,18 +702,19 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		pTestContext->pOBBB->RotateZByDeg(0.04f);
+		//pTestContext->pOBBA->RotateZByDeg(0.04f);
+		//pTestContext->pOBBB->RotateZByDeg(0.04f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
 		//pTestContext->pOBBA->RotateXByDeg(-0.01f);
-		pTestContext->pOBBB->RotateYByDeg(0.04f);
+		//pTestContext->pOBBB->RotateYByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 
 		// Check for collisions 
-		if (pTestContext->pOBBA->Intersect(pTestContext->pOBBB)) {
-
+		if (pTestContext->pOBBA->Intersect(pTestContext->pOBBB)) 
+		{
 			CollisionManifold manifold = pTestContext->pOBBA->Collide(pTestContext->pOBBB);
 			//CollisionManifold manifold = pTestContext->pOBBB->Collide(pTestContext->pOBBA);
 
