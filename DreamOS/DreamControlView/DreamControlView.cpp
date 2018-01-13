@@ -460,7 +460,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		CR(Dismiss());
 	}
 
-	case (UserObserverEventType::KB_ENTER): {
+	case (UserObserverEventType::KB_ENTER): {	
 
 		if (m_pBrowserHandle != nullptr) {
 			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state

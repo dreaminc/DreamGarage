@@ -1444,7 +1444,7 @@ RESULT DreamBrowser::StopSending() {
 
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
+		pDreamControlViewHandle->HideApp();
 	}
 
 	CR(SetStreamingState(false));
