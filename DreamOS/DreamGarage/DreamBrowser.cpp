@@ -1526,7 +1526,7 @@ RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
 	CR(m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get()));
-
+	m_pDreamUserHandle->SendClearFocusStack();
 	//CR(SetVisible(true));
 
 Error:
