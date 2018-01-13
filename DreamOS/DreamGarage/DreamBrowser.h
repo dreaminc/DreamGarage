@@ -211,7 +211,8 @@ public:
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT StopSending();
-	RESULT StartReceiving();
+	RESULT StartReceiving(PeerConnection *pPeerConnection);
+	RESULT PendReceiving();
 	RESULT StopReceiving();
 	virtual RESULT SetURI(std::string strURI) override;
 	RESULT LoadRequest(const WebRequest &webRequest);

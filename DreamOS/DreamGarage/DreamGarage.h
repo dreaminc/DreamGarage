@@ -72,7 +72,7 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnReceiveAsset() override;
+	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 
@@ -117,6 +117,8 @@ private:
 	float m_keepOutAngle = 5.0f;
 
 	bool m_fShouldUpdateAppComposites = false;
+
+	long m_pendingUserID = -1;
 
 	// UI
 	//ViewMatrix *m_pClippingView;

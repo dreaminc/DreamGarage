@@ -724,6 +724,10 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
 	}
 
+	if (pPeerConnection->GetPeerUserID() == m_pendingUserID) {
+		m_pDreamBrowser->StartReceiving(pPeerConnection);
+	}
+
 Error:
 	return r;
 }
@@ -959,11 +963,14 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 	return r;
 }
 
-RESULT DreamGarage::OnReceiveAsset() {
+RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
 	if (m_pDreamBrowser != nullptr) {
 		m_pDreamBrowser->SetVisible(true);
-		m_pDreamBrowser->StartReceiving();
+		m_pDreamBrowser->PendReceiving();
+		//m_pDreamBrowser->StartReceiving();
+
+		m_pendingUserID = userID;
 	}
 	return r;
 }
@@ -978,6 +985,9 @@ Error:
 RESULT DreamGarage::OnStopReceiving() {
 	RESULT r = R_PASS;
 	CR(m_pDreamBrowser->StopReceiving());
+
+	m_pendingUserID = -1;
+
 Error:
 	return r;
 }

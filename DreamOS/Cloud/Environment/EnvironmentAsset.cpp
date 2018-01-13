@@ -6,6 +6,9 @@
 EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/id"_json_pointer].is_number_integer())
 		m_assetID = jsonMenuNode["/id"_json_pointer].get<long>();
+
+	if (jsonMenuNode["/user"_json_pointer].is_number_integer())
+		m_userID = jsonMenuNode["/user"_json_pointer].get<long>();
 	
 	if (jsonMenuNode["/title"_json_pointer].is_string())
 		m_strTitle = jsonMenuNode["/title"_json_pointer].get<std::string>();
@@ -97,6 +100,10 @@ std::multimap<std::string, std::string> EnvironmentAsset::GetHeaders() {
 
 long EnvironmentAsset::GetAssetID() {
 	return m_assetID;
+}
+
+long EnvironmentAsset::GetUserID() {
+	return m_userID;
 }
 
 std::string EnvironmentAsset::GetURI() {

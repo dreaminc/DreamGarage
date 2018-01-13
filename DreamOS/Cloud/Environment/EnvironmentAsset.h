@@ -31,9 +31,11 @@ public:
 	const std::string& GetURL();
 	std::multimap<std::string, std::string> GetHeaders();
 	long GetAssetID();
+	long GetUserID();
 
 private:
 	long m_assetID;
+	long m_userID = -1; // sharing user id used with on receive asset
 	std::string m_strPath;
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;

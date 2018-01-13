@@ -121,7 +121,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnReceiveAsset() override {
+	virtual RESULT OnReceiveAsset(long userID) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

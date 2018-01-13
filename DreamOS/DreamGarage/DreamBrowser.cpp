@@ -919,7 +919,6 @@ Error:
 RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
 	DreamBrowserMessage *pDreamBrowserMessage = (DreamBrowserMessage*)(pDreamAppMessage);
 	CN(pDreamBrowserMessage);
@@ -949,45 +948,11 @@ RESULT DreamBrowser::HandleDreamAppMessage(PeerConnection* pPeerConnection, Drea
 		} break;
 
 		case DreamBrowserMessage::type::REQUEST_STREAMING_START: {
-			// Switch to input
-			if (IsStreaming()) {
-				SetStreamingState(false);
-
-				// TODO: Turn off streamer etc
-			}
-
-			// Register for Video for the requester peer connection
-			// (this buffers against multi-casts that are incorrect)
-			if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
-				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-			}
-
-			/*
-			// TODO: May not be needed, if not streaming no video is actually being transmitted
-			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-			// Stop video streaming if we're streaming
-			if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
-				CR(GetDOS()->GetCloudController()->StopVideoStreaming());
-			}
-			//*/
-
-			CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
-			m_fReceivingStream = true;
-
-			CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
-
-			pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-			if (pDreamControlViewHandle != nullptr) {
-				pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
-			}
-
+			CR(StartReceiving(pPeerConnection));
 		} break;
 	}
 
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
@@ -1463,7 +1428,51 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::StartReceiving() {
+RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+
+	// Switch to input
+	if (IsStreaming()) {
+		SetStreamingState(false);
+
+		// TODO: Turn off streamer etc
+	}
+
+	// Register for Video for the requester peer connection
+	// (this buffers against multi-casts that are incorrect)
+	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	}
+
+	/*
+	// TODO: May not be needed, if not streaming no video is actually being transmitted
+	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+	// Stop video streaming if we're streaming
+	if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
+		CR(GetDOS()->GetCloudController()->StopVideoStreaming());
+	}
+	//*/
+
+	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+	m_fReceivingStream = true;
+
+	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
+
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	if (pDreamControlViewHandle != nullptr) {
+		pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
+	}
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+	return r;
+}
+
+RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
 	CR(SetVisible(true));

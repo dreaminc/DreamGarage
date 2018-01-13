@@ -68,7 +68,7 @@ public:
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
-	virtual RESULT OnReceiveAsset() override {
+	virtual RESULT OnReceiveAsset(long userID) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
