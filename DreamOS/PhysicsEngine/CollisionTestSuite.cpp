@@ -658,7 +658,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			case TestOrientation::EDGE_FACE: {
 				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
 
-				pTestContext->pOBBB->SetPosition(0.0f, -0.0f, 0.0f);
+				pTestContext->pOBBB->SetPosition(0.0f, -0.6f, 0.0f);
 				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
 				//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
 			} break;
@@ -703,7 +703,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
 		//pTestContext->pOBBA->RotateZByDeg(0.04f);
-		//pTestContext->pOBBB->RotateZByDeg(0.04f);
+		pTestContext->pOBBB->RotateZByDeg(0.04f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
 		//pTestContext->pOBBA->RotateXByDeg(-0.01f);

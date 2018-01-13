@@ -1991,7 +1991,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 				// case 3
 				pVolume = m_pDreamOS->AddVolume(0.5f);
 				CN(pVolume);
-				pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+				pVolume->SetPosition(point(4.0f, 0.0f, 0.0f));
 				pVolume->RotateYByDeg(45.0f);
 				pVolume->SetMass(1.0f);
 				pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);

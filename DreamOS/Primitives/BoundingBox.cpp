@@ -355,6 +355,7 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	//return CollideSAT(rhs);
+	return CollideBruteForce(rhs);
 
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
