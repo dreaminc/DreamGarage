@@ -310,15 +310,11 @@ bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
 	return false;
 }
 
-bool BoundingBox::Intersect(const BoundingBox& rhs) {
-
-	return IntersectSATAABB(*this, rhs);
-	//return IntersectSAT(rhs);
-
+bool BoundingBox::IntersectGJK(const BoundingBox& rhs) {
 	Simplex intersectionSimplex = Simplex();
-	
+
 	vector vDirection = vector::iVector(1.0f);
-	
+
 	// First point
 	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
 	intersectionSimplex.UpdateSimplex(ptSupport, &vDirection);
@@ -333,10 +329,18 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 		if (intersectionSimplex.UpdateSimplex(ptSupport, &vDirection)) {
 			return true;
 		}
-		
+
 	} while (1);
-	
+
 	return false;
+}
+
+bool BoundingBox::Intersect(const BoundingBox& rhs) {
+
+	return IntersectSATAABB(*this, rhs);
+	//return IntersectSAT(rhs);
+	//return IntersectGJK(rhs);
+	
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {

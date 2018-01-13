@@ -84,6 +84,7 @@ public:
 	virtual bool Intersect(const BoundingPlane& rhs) override;
 
 	bool IntersectSAT(const BoundingBox& rhs);
+	bool IntersectGJK(const BoundingBox& rhs);
 
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
