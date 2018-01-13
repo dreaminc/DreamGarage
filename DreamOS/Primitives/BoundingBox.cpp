@@ -252,6 +252,130 @@ bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
 	return false;
 }
 
+// http://www.willperone.net/Code/coderr.php
+vector BoundingBox::GetHalfVector(bool fAbsolute) {
+	vector vScale = GetScale(fAbsolute);
+
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+
+		double width = 0.0f;
+		double height = 0.0f;
+		double length = 0.0f;
+
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+
+			if (pt.x() > width)
+				width = pt.x();
+
+			if (pt.y() > height)
+				height = pt.y();
+
+			if (pt.z() > length)
+				length = pt.z();
+		}
+
+		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
+	}
+
+	// Otherwise it's OBB
+	//return m_vHalfSize;
+	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
+}
+
+double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	double selfProject = TransformToAxis(vAxis);
+	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
+
+	return (selfProject + rhsProject) - std::abs(vToCenter.dot(vAxis));
+}
+
+bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	//double selfProject = TransformToAxis(vAxis);
+	//double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	//return (OverlapOnAxisDistance(rhs, vAxis) <= (selfProject + rhsProject));
+	return (OverlapOnAxisDistance(rhs, vAxis) >= 0.0f);
+}
+
+// Project half size onto vector axis
+double BoundingBox::TransformToAxis(const vector &vAxis) {
+	double retVal = 0.0f;
+
+	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
+	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
+	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
+
+	return retVal;
+}
+
+
+
+//double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
+//	// Project the half-size of one onto axis
+//	double selfProject = TransformToAxis(vAxis);
+//	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+//
+//	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
+//	return (selfProject + rhsProject) - std::abs(vToCenter.dot(vAxis));
+//}
+
+vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
+	vector retVector = vector(0.0f, 0.0f, 0.0f);
+
+	switch (boxAxis) {
+	case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
+	case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
+	case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+	}
+
+	// Rotate by OBB if so
+	//if (m_type == Type::OBB) {
+	if (fOriented && m_type == Type::OBB) {
+		retVector = RotationMatrix(GetAbsoluteOrientation()) * retVector;
+		retVector.Normalize();
+	}
+
+	return retVector;
+}
+
+double TransformToAxis(const vector &vAxis, vector vHalfVector, const vector vAxes[3]) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.dot(vAxes[0]));
+	retVal += vHalfVector.y() * std::abs(vAxis.dot(vAxes[1]));
+	retVal += vHalfVector.z() * std::abs(vAxis.dot(vAxes[2]));
+
+	return retVal;
+}
+
+double TransformToAxisAABB(vector vAxis, vector vHalfVector) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.x());
+	retVal += vHalfVector.y() * std::abs(vAxis.y());
+	retVal += vHalfVector.z() * std::abs(vAxis.z());
+
+	return retVal;
+}
+
+// This treats box A as AABB and box B as OBB
+double OverlapAxisDistanceAABBOBBB(const vector &vAxis, 
+								   vector vHalfVectorA,  
+								   vector vHalfVectorB, point ptOriginB, vector vAxesB[3]) 
+{
+
+	double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
+	double projectB = TransformToAxis(vAxis, vHalfVectorB, vAxesB);
+
+	return (projectA + projectB) - std::abs(((vector)ptOriginB).dot(vAxis));
+}
+
 CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
@@ -266,6 +390,27 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	double minAxisDistance = std::numeric_limits<double>::infinity();
 	vector vAxis, vAxisTemp;
 	float penetration = 0.0f;
+
+	// Move test into space of this bounding box
+	point ptBoxAOrigin = GetAbsoluteOrigin();
+	quaternion qBoxAOrientation = GetAbsoluteOrientation();
+	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
+	auto matInverseRotation = inverse(matRotation);
+
+	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
+	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
+	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
+
+	vector vAxesA[3], vAxesB[3];
+
+	vAxesA[0] = vector::iVector(1.0f);
+	vAxesA[1] = vector::jVector(1.0f);
+	vAxesA[2] = vector::kVector(1.0f);
+
+	// Get Box B axes in A space
+	for (int i = 0; i < 3; i++) {
+		vAxesB[i] = matInverseRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+	}
 
 	for (int i = 0; i < 3; i++) {
 		vector vAxisA;
@@ -780,87 +925,6 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 	m_vHalfSize = (ptMax - GetOrigin());
 	//m_vHalfSize = ptMax;
 	return R_PASS;
-}
-
-// http://www.willperone.net/Code/coderr.php
-vector BoundingBox::GetHalfVector(bool fAbsolute) {
-	vector vScale = GetScale(fAbsolute);
-
-	if (m_type == Type::AABB) {
-		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
-
-		double width = 0.0f;
-		double height = 0.0f;
-		double length = 0.0f;
-
-		for (int i = 0; i < 8; i++) {
-			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-
-			if (pt.x() > width)
-				width = pt.x();
-
-			if (pt.y() > height)
-				height = pt.y();
-
-			if (pt.z() > length)
-				length = pt.z();
-		}
-
-		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
-	}
-	
-	// Otherwise it's OBB
-	//return m_vHalfSize;
-	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
-}
-
-double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
-	// Project the half-size of one onto axis
-	double selfProject = TransformToAxis(vAxis);
-	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
-
-	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
-
-	return (selfProject + rhsProject) - std::abs(vToCenter.dot(vAxis));
-}
-
-bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
-	// Project the half-size of one onto axis
-	//double selfProject = TransformToAxis(vAxis);
-	//double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
-
-	//return (OverlapOnAxisDistance(rhs, vAxis) <= (selfProject + rhsProject));
-	return (OverlapOnAxisDistance(rhs, vAxis) >= 0.0f);
-}
-
-// Project half size onto vector axis
-double BoundingBox::TransformToAxis(const vector &vAxis) {
-	double retVal = 0.0f;
-
-	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
-	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
-	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
-
-	return retVal;
-}
-
-vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
-	vector retVector = vector(0.0f, 0.0f, 0.0f);
-
-	switch (boxAxis) {
-		case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
-		case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
-		case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
-	}
-
-	// Rotate by OBB if so
-	//if (m_type == Type::OBB) {
-	if(fOriented && m_type == Type::OBB) {
-		retVector = RotationMatrix(GetAbsoluteOrientation()) * retVector;
-		retVector.Normalize();
-	}
-
-	return retVector;
 }
 
 // TODO: Replace with Transform to AABB function - in volume as well
