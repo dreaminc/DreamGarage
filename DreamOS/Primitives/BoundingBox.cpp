@@ -194,14 +194,24 @@ double TransformToAxis(const vector &vAxis, vector vHalfVector, const vector vAx
 	return retVal;
 }
 
+double TransformToAxisAABB(vector vAxis, vector vHalfVector) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.x());
+	retVal += vHalfVector.y() * std::abs(vAxis.y());
+	retVal += vHalfVector.z() * std::abs(vAxis.z());
+
+	return retVal;
+}
+
 // This treats box A as AABB and box B as OBB
 double OverlapAxisDistanceAABBOBB(const vector &vAxis,
 	vector vHalfVectorA, vector vAxesA[3],
 	vector vHalfVectorB, point ptOriginB, vector vAxesB[3])
 {
 
-	//double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
-	double projectA = TransformToAxis(vAxis, vHalfVectorA, vAxesA);
+	double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
+	//double projectA = TransformToAxis(vAxis, vHalfVectorA, vAxesA);
 	double projectB = TransformToAxis(vAxis, vHalfVectorB, vAxesB);
 
 	return (projectA + projectB) - std::abs(((vector)ptOriginB).dot(vAxis));
