@@ -173,46 +173,104 @@ point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bb
 	return (point)(ptBBA - ptBBB);
 }
 
-bool BoundingBox::Intersect(const BoundingBox& rhs) {
+// Project half size onto vector axis
+double BoundingBox::TransformToAxis(const vector &vAxis) {
+	double retVal = 0.0f;
 
-	//return IntersectSAT(rhs);
+	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
+	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
+	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
 
-	Simplex intersectionSimplex = Simplex();
+	return retVal;
+}
+
+double TransformToAxis(const vector &vAxis, vector vHalfVector, const vector vAxes[3]) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.dot(vAxes[0]));
+	retVal += vHalfVector.y() * std::abs(vAxis.dot(vAxes[1]));
+	retVal += vHalfVector.z() * std::abs(vAxis.dot(vAxes[2]));
+
+	return retVal;
+}
+
+// This treats box A as AABB and box B as OBB
+double OverlapAxisDistanceAABBOBB(const vector &vAxis,
+	vector vHalfVectorA, vector vAxesA[3],
+	vector vHalfVectorB, point ptOriginB, vector vAxesB[3])
+{
+
+	//double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
+	double projectA = TransformToAxis(vAxis, vHalfVectorA, vAxesA);
+	double projectB = TransformToAxis(vAxis, vHalfVectorB, vAxesB);
+
+	return (projectA + projectB) - std::abs(((vector)ptOriginB).dot(vAxis));
+}
+
+bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 	
-	vector vDirection = vector::iVector(1.0f);
-	
-	// First point
-	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
-	intersectionSimplex.UpdateSimplex(ptSupport, &vDirection);
+	double temp;
+	double minAxisDistance = std::numeric_limits<double>::infinity();
+	vector vAxis, vAxisTemp;
+	float penetration = 0.0f;
 
-	do {
-		ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	// Move test into space of this bounding box
+	point ptBoxAOrigin = static_cast<BoundingBox>(lhs).GetAbsoluteOrigin();
+	vector vBoxAHV = static_cast<BoundingBox>(lhs).GetHalfVector();
+	quaternion qBoxAOrientation = static_cast<BoundingBox>(lhs).GetAbsoluteOrientation();
 
-		if (vDirection.dot(ptSupport) < 0.0f) {
+	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
+	auto matInverseRotation = inverse(matRotation);
+
+	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
+	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
+	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
+
+	vector vAxesA[3], vAxesB[3];
+
+	// Probably can replace this
+	vAxesA[0] = vector::iVector(1.0f);
+	vAxesA[1] = vector::jVector(1.0f);
+	vAxesA[2] = vector::kVector(1.0f);
+
+	// Get Box B axes in A space
+	for (int i = 0; i < 3; i++) {
+		vAxesB[i] = matInverseRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+	}
+	ptBoxBOrigin = matInverseRotation * (ptBoxBOrigin - ptBoxAOrigin);
+
+	for (int i = 0; i < 3; i++) {
+		vector vAxisA = vAxesA[i];
+
+		// Self Box Axes
+		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
 			return false;
 		}
 
-		if (intersectionSimplex.UpdateSimplex(ptSupport, &vDirection)) {
-			return true;
+		// The other box Axes (todo: test if it's an OBB)
+		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+			return false;
 		}
-		
-	} while (1);
-	
-	return false;
-}
 
-CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
-	//CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-	//
-	//// TODO:
-	//
-	//return manifold;
+		// Go through the cross product of each of the axes
+		for (int j = 0; j < 3; j++) {
+			vector vAxisB = vAxesB[j];
 
-	return CollideSAT(rhs);
+			// Ensure not same
+			if (vAxisA != vAxisB) {
+				if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 }
 
 bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
 	if (m_type == Type::AABB) {
+		// TODO: Doesn't think about other box as AABB or not
 		point ptMaxA = GetAbsoluteOrigin() + GetHalfVector();
 		point ptMinA = GetAbsoluteOrigin() - GetHalfVector();
 
@@ -250,6 +308,45 @@ bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
 	}
 
 	return false;
+}
+
+bool BoundingBox::Intersect(const BoundingBox& rhs) {
+
+	return IntersectSATAABB(*this, rhs);
+	//return IntersectSAT(rhs);
+
+	Simplex intersectionSimplex = Simplex();
+	
+	vector vDirection = vector::iVector(1.0f);
+	
+	// First point
+	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	intersectionSimplex.UpdateSimplex(ptSupport, &vDirection);
+
+	do {
+		ptSupport = GetSupportPoint(*this, rhs, vDirection);
+
+		if (vDirection.dot(ptSupport) < 0.0f) {
+			return false;
+		}
+
+		if (intersectionSimplex.UpdateSimplex(ptSupport, &vDirection)) {
+			return true;
+		}
+		
+	} while (1);
+	
+	return false;
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
+	//return CollideSAT(rhs);
+
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
+
+	return manifold;
 }
 
 // http://www.willperone.net/Code/coderr.php
@@ -303,19 +400,6 @@ bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
 	return (OverlapOnAxisDistance(rhs, vAxis) >= 0.0f);
 }
 
-// Project half size onto vector axis
-double BoundingBox::TransformToAxis(const vector &vAxis) {
-	double retVal = 0.0f;
-
-	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
-	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
-	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
-
-	return retVal;
-}
-
-
-
 //double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
 //	// Project the half-size of one onto axis
 //	double selfProject = TransformToAxis(vAxis);
@@ -344,38 +428,6 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
 	return retVector;
 }
 
-double TransformToAxis(const vector &vAxis, vector vHalfVector, const vector vAxes[3]) {
-	double retVal = 0.0f;
-
-	retVal += vHalfVector.x() * std::abs(vAxis.dot(vAxes[0]));
-	retVal += vHalfVector.y() * std::abs(vAxis.dot(vAxes[1]));
-	retVal += vHalfVector.z() * std::abs(vAxis.dot(vAxes[2]));
-
-	return retVal;
-}
-
-double TransformToAxisAABB(vector vAxis, vector vHalfVector) {
-	double retVal = 0.0f;
-
-	retVal += vHalfVector.x() * std::abs(vAxis.x());
-	retVal += vHalfVector.y() * std::abs(vAxis.y());
-	retVal += vHalfVector.z() * std::abs(vAxis.z());
-
-	return retVal;
-}
-
-// This treats box A as AABB and box B as OBB
-double OverlapAxisDistanceAABBOBBB(const vector &vAxis, 
-								   vector vHalfVectorA,  
-								   vector vHalfVectorB, point ptOriginB, vector vAxesB[3]) 
-{
-
-	double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
-	double projectB = TransformToAxis(vAxis, vHalfVectorB, vAxesB);
-
-	return (projectA + projectB) - std::abs(((vector)ptOriginB).dot(vAxis));
-}
-
 CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
@@ -393,6 +445,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 	// Move test into space of this bounding box
 	point ptBoxAOrigin = GetAbsoluteOrigin();
+	vector vBoxAHV = GetHalfVector();
 	quaternion qBoxAOrientation = GetAbsoluteOrientation();
 	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
 	auto matInverseRotation = inverse(matRotation);
@@ -411,19 +464,22 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	for (int i = 0; i < 3; i++) {
 		vAxesB[i] = matInverseRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
 	}
+	ptBoxBOrigin = matInverseRotation * (ptBoxBOrigin - ptBoxAOrigin);
 
 	for (int i = 0; i < 3; i++) {
-		vector vAxisA;
+		vector vAxisA = vAxesA[i];
 
 		// Self Box Axes
-		temp = OverlapOnAxisDistance(rhs, vAxisA = GetAxis(BoundingBox::BoxAxis(i)));
+		//temp = OverlapOnAxisDistance(rhs, vAxisA = GetAxis(BoundingBox::BoxAxis(i)));
+		temp = OverlapAxisDistanceAABBOBB(vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB);
 		if (temp < minAxisDistance) {
 			minAxisDistance = temp;
 			vAxis = vAxisA;
 		}
 
 		// The other box Axes (todo: test if it's an OBB)
-		temp = OverlapOnAxisDistance(rhs, vAxisTemp = static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i)));
+		//temp = OverlapOnAxisDistance(rhs, vAxisTemp = static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i)));
+		temp = OverlapAxisDistanceAABBOBB(vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB);
 		if (temp < minAxisDistance) {
 			minAxisDistance = temp;
 			vAxis = vAxisTemp;
@@ -431,13 +487,14 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 		// Go through the cross product of each of the axes
 		for (int j = 0; j < 3; j++) {
-			vector vAxisB = static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(j));
+			vector vAxisB = vAxesB[j];
 
 			// Ensure not same
 			if (vAxisA != vAxisB) {
 
 				//temp = OverlapOnAxisDistance(rhs, vAxisTemp = vAxisA.cross(vAxisB));
-				temp = OverlapOnAxisDistance(rhs, vAxisTemp = vAxisB.cross(vAxisA));
+				//temp = OverlapOnAxisDistance(rhs, vAxisTemp = vAxisB.cross(vAxisA));
+				temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB);
 
 				if (temp < minAxisDistance) {
 					minAxisDistance = temp;

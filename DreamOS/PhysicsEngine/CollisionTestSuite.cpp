@@ -701,11 +701,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBB->translateY(-0.0001f);
-		//pTestContext->pOBBB->RotateZByDeg(0.04f);
+		pTestContext->pOBBB->RotateZByDeg(0.04f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
 		//pTestContext->pOBBA->RotateXByDeg(-0.01f);
-		//pTestContext->pOBBB->RotateYByDeg(0.04f);
+		pTestContext->pOBBB->RotateYByDeg(0.04f);
 
 		for (int i = 0; i < 4; i++)
 			pTestContext->pCollidePoint[i]->SetVisible(false);
