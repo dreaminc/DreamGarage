@@ -1533,7 +1533,6 @@ Error:
 RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
-	CR(m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get()));
 	//CR(SetVisible(true));
 
 Error:
@@ -1544,6 +1543,8 @@ RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = false;
 	CR(SetVisible(false));
+	CR(m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get()));
+
 	//CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
 	//								 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
 Error:
