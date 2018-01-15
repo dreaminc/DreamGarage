@@ -484,6 +484,10 @@ Error:
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
 
+	if (!m_fStreaming) {
+		BeginStream();
+	}
+
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
@@ -505,17 +509,13 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		RESULT r = R_PASS;
 		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
-		m_pBrowserQuad->SetVisible(true);	
+		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());	
 
 		m_strCurrentURL = strCurrentURL;
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-
-		if (!m_fStreaming) {
-			BeginStream();
-		}
 
 #ifndef _USE_TEST_APP
 		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
@@ -786,6 +786,10 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		pDreamControlViewHandle->SendContentType(m_strContentType);
 		m_fShowControlView = false;
+
+		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		m_pBrowserQuad->SetVisible(true);
+
 	}
 	//*/
 Error:
@@ -1061,6 +1065,9 @@ RESULT DreamBrowser::BeginStream() {
 
 	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
 	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+	
+	// This is probably redundant!!!
+	CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
 
 	SetStreamingState(true);
 
