@@ -1441,13 +1441,14 @@ RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	CR(SetStreamingState(false));
 
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+
 	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->HideApp();
+		pDreamControlViewHandle->DismissApp();
 	}
 
-	CR(SetStreamingState(false));
 	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
 
@@ -1526,7 +1527,6 @@ RESULT DreamBrowser::PendReceiving() {
 	RESULT r = R_PASS;
 	m_fReceivingStream = true;
 	CR(m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get()));
-	m_pDreamUserHandle->SendClearFocusStack();
 	//CR(SetVisible(true));
 
 Error:
