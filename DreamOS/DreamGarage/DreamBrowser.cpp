@@ -1455,7 +1455,8 @@ RESULT DreamBrowser::StopSending() {
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
 	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->DismissApp();
+		pDreamControlViewHandle->HideApp();
+		m_pDreamUserHandle->SendStopSharing();
 	}
 
 	m_pWebBrowserController->CloseBrowser();
@@ -1493,7 +1494,7 @@ RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 	// Switch to input
 	if (IsStreaming()) {
 		SetStreamingState(false);

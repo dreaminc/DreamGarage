@@ -76,6 +76,8 @@ public:
 	RESULT SendStreamingState(bool fStreaming);
 	RESULT SendSharingAgain(bool fSharingAgain);
 
+	RESULT SendStopSharing();
+
 	RESULT RequestResetAppComposite();
 
 private:
@@ -97,6 +99,8 @@ private:
 	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
 	virtual RESULT SetStreamingState(bool fStreaming) = 0;
 	virtual RESULT SetSharingAgain(bool fSharingAgain) = 0;
+
+	virtual RESULT StopSharing() = 0;
 
 	virtual RESULT ResetAppComposite() = 0;
 

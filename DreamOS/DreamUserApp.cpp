@@ -71,6 +71,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendStopSharing() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(StopSharing());
+Error:
+	return r;
+}
+
 RESULT DreamUserHandle::SendKBEnterEvent() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -492,6 +500,23 @@ RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 	m_appStack.push(pObserver);
 
 //Error:
+	return r;
+}
+
+RESULT DreamUserApp::StopSharing() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CBR(!m_appStack.empty(), R_SKIPPED);
+
+	if (m_appStack.top == pDreamControlViewHandle) {
+		CR(PopFocusStack());
+	}
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
