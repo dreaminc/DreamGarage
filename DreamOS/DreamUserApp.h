@@ -150,6 +150,8 @@ public:
 	virtual RESULT SetStreamingState(bool fStreaming) override;
 	virtual RESULT SetSharingAgain(bool fSharingAgain) override;
 
+	virtual RESULT StopSharing() override;
+
 	virtual RESULT ResetAppComposite() override;
 
 protected:

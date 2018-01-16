@@ -509,7 +509,7 @@ RESULT DreamUserApp::StopSharing() {
 	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	CBR(!m_appStack.empty(), R_SKIPPED);
 
-	if (m_appStack.top == pDreamControlViewHandle) {
+	if (m_appStack.top() == pDreamControlViewHandle) {
 		CR(PopFocusStack());
 	}
 
