@@ -112,6 +112,11 @@ public:
 	bool IsPassword();
 	bool IsUsingCursor();
 	bool IsRenderToQuad();
+
+	bool CheckFlag(text::flags checkFlag);
+	bool CheckFlagAgainstFlags(text::flags checkFlag, text::flags allFlags);
+	RESULT AddFlags(text::flags newFlags);
+	RESULT RemoveFlags(text::flags newFlags);
 	
 	RESULT SetBackgroundColor(color backgroundColor);
 	RESULT SetBackgroundColorTexture(texture *pColorTexture);
@@ -167,6 +172,11 @@ inline constexpr text::flags operator & (const text::flags &lhs, const text::fla
 	return static_cast<text::flags>(
 		static_cast<std::underlying_type<text::flags>::type>(lhs) & static_cast<std::underlying_type<text::flags>::type>(rhs)
 		);
+}
+
+inline constexpr text::flags operator ~ (const text::flags &lhs) {
+	return static_cast<text::flags>(
+		~(static_cast<std::underlying_type<text::flags>::type>(lhs)));
 }
 
 #endif // ! TEXT_H_

@@ -76,6 +76,14 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardHandle::SendPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetPasswordFlag(fIsPassword));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -800,6 +808,19 @@ RESULT UIKeyboard::UpdateComposite(float depth) {
 
 Error:
 	return r;
+}
+
+RESULT UIKeyboard::SetPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+
+	if (fIsPassword) {
+		m_pTextBoxText->AddFlags(text::flags::PASSWORD);
+	}
+	else {
+		m_pTextBoxText->RemoveFlags(text::flags::PASSWORD);
+	}
+
+	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {

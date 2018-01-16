@@ -529,7 +529,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-
+	bool fMaskPasswordEnabled = false;
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
@@ -539,9 +539,15 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
 			CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
 		}
-		bool useAsterisk = pDOMNode->IsPassword();
-
+		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
+
+	auto pKeyboardHandle = m_pDreamUserHandle->RequestKeyboard();
+	if (pKeyboardHandle != nullptr) {
+		pKeyboardHandle->SendPasswordFlag(fMaskPasswordEnabled);
+	}
+	m_pDreamUserHandle->SendReleaseKeyboard();
+	pKeyboardHandle = nullptr;
 
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {

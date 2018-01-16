@@ -51,6 +51,7 @@ public:
 	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
 	RESULT ShowTitleView();
 	RESULT PopulateTextBox(std::string strText);
+	RESULT SendPasswordFlag(bool fIsPassword);
 
 private:
 	virtual RESULT ShowKeyboard() = 0;
@@ -61,6 +62,7 @@ private:
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
 	virtual RESULT ShowKeyboardTitleView() = 0;
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) = 0;
+	virtual RESULT SetPasswordFlag(bool fIsPassword) = 0;
 };
 
 class UIKeyboard :	public DreamApp<UIKeyboard>, 
@@ -147,6 +149,8 @@ public:
 	virtual RESULT ShowKeyboardTitleView() override;
 	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
 	RESULT UpdateComposite(float depth); // update position/orientation
+
+	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
 
 private:
 	// layout variables
