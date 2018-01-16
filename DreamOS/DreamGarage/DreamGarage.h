@@ -118,7 +118,7 @@ private:
 
 	bool m_fShouldUpdateAppComposites = false;
 
-	long m_pendingUserID = -1;
+	long m_pendingAssetReceiveUserID = -1;
 
 	// UI
 	//ViewMatrix *m_pClippingView;

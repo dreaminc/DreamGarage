@@ -724,9 +724,9 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
 	}
 
-	if (pPeerConnection->GetPeerUserID() == m_pendingUserID) {
+	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
 		m_pDreamBrowser->StartReceiving(pPeerConnection);
-		m_pendingUserID = -1;
+		m_pendingAssetReceiveUserID = -1;
 	}
 
 Error:
@@ -975,7 +975,7 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 		// OnNewPeerConnection; otherwise this user should receive the dream message
 		// to start receiving
 		if (FindPeer(userID) == nullptr) {
-			m_pendingUserID = userID;
+			m_pendingAssetReceiveUserID = userID;
 		}
 
 		//m_pDreamBrowser->StartReceiving();
@@ -994,7 +994,7 @@ RESULT DreamGarage::OnStopReceiving() {
 	RESULT r = R_PASS;
 	CR(m_pDreamBrowser->StopReceiving());
 
-	m_pendingUserID = -1;
+	m_pendingAssetReceiveUserID = -1;
 
 Error:
 	return r;
