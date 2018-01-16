@@ -1402,6 +1402,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+		m_pDreamUserHandle->SendSharingAgain(false);
 		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	}
 
@@ -1507,6 +1508,7 @@ RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	m_pDreamUserHandle->SendSharingAgain(false);
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 	// Switch to input
 	if (IsStreaming()) {
