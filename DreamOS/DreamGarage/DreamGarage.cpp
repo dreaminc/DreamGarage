@@ -726,6 +726,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	if (pPeerConnection->GetPeerUserID() == m_pendingUserID) {
 		m_pDreamBrowser->StartReceiving(pPeerConnection);
+		m_pendingUserID = -1;
 	}
 
 Error:
@@ -967,10 +968,17 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
 	if (m_pDreamBrowser != nullptr) {
 		m_pDreamBrowser->SetVisible(true);
-		m_pDreamBrowser->PendReceiving();
-		//m_pDreamBrowser->StartReceiving();
 
-		m_pendingUserID = userID;
+		m_pDreamBrowser->PendReceiving();
+
+		// if not connected yet, save the userID and start receiving during
+		// OnNewPeerConnection; otherwise this user should receive the dream message
+		// to start receiving
+		if (FindPeer(userID) == nullptr) {
+			m_pendingUserID = userID;
+		}
+
+		//m_pDreamBrowser->StartReceiving();
 	}
 	return r;
 }
