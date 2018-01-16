@@ -474,6 +474,13 @@ Error:
 RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 	RESULT r = R_PASS;
 
+	if (m_appStack.empty()) {
+		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pLeftMallet->Show();
+		m_pRightMallet->Show();
+	}
+
 	m_appStack.push(pObserver);
 
 //Error:
