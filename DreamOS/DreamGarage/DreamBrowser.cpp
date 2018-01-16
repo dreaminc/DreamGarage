@@ -237,6 +237,8 @@ DreamAppHandle* DreamBrowser::GetAppHandle() {
 RESULT DreamBrowser::ScrollBrowserToPoint(int pxXScroll, int pxYScroll) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = m_lastWebBrowserPoint;
 
@@ -268,6 +270,8 @@ Error:
 RESULT DreamBrowser::ScrollBrowserToX(int pxXScroll) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = m_lastWebBrowserPoint;
 	
@@ -291,6 +295,8 @@ Error:
 RESULT DreamBrowser::ScrollBrowserToY(int pxYScroll) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = m_lastWebBrowserPoint;
 
@@ -314,6 +320,8 @@ Error:
 RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = scrollPoint;
 
@@ -329,6 +337,8 @@ Error:
 RESULT DreamBrowser::ScrollBrowserXByDiff(int pxXDiff) {
 	RESULT r = R_PASS;
 
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = m_lastWebBrowserPoint;
 
@@ -343,6 +353,8 @@ Error:
 RESULT DreamBrowser::ScrollBrowserYByDiff(int pxYDiff) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pWebBrowserController, R_SKIPPED);
+
 	WebBrowserMouseEvent mouseEvent;
 	mouseEvent.pt = m_lastWebBrowserPoint;
 
@@ -380,6 +392,7 @@ int DreamBrowser::GetBrowserWidth() {
 
 RESULT DreamBrowser::SendKeyPressed(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
+	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
 Error:
 	return r;
