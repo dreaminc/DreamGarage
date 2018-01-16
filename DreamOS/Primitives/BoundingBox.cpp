@@ -448,21 +448,42 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
 	return retVector;
 }
 
-inline double GetAABBOBBSeparation(vector vAxis, matrix<float, 4, 4> matRelativeRotation, vector vTranslation,
-	vector vAABBHalfVector, vector vOBBHalfVector)
+inline double GetAABBOBBSeparation(vector vAxis, vector vTranslation,
+	vector vAABBHalfVector, vector vOBBHalfVector, matrix<float, 4, 4> matRelRotation)
 {
-	double separation = std::abs(vTranslation.dot(vAxis));
-	separation -= std::abs(vAABBHalfVector.dot(vAxis)) + std::abs(((vector)(matRelativeRotation * vOBBHalfVector)).dot(vAxis));
+	double translation = std::abs(vTranslation.dot(vAxis));
+
+	//double projAABB = std::abs(vAABBHalfVector.dot(vAxis)); //+ std::abs(vOBBHalfVector.dot(vAxis));
+
+	vector vAxisAX = vector::iVector(1.0f);
+	vector vAxisAY = vector::jVector(1.0f);
+	vector vAxisAZ = vector::kVector(1.0f);
+
+	double projAABB = std::abs(vAABBHalfVector.x() * vAxis.dot(vAxisAX));
+	projAABB += std::abs(vAABBHalfVector.y() * vAxis.dot(vAxisAY));
+	projAABB += std::abs(vAABBHalfVector.z() * vAxis.dot(vAxisAZ));
+	
+	vector vAxisBX = ((vector)(matRelRotation * vector::iVector(1.0f))).Normal();
+	vector vAxisBY = ((vector)(matRelRotation * vector::jVector(1.0f))).Normal();
+	vector vAxisBZ = ((vector)(matRelRotation * vector::kVector(1.0f))).Normal();
+
+	double projOBB = std::abs(vOBBHalfVector.x() * vAxis.dot(vAxisBX));
+	projOBB += std::abs(vOBBHalfVector.y() * vAxis.dot(vAxisBY));
+	projOBB += std::abs(vOBBHalfVector.z() * vAxis.dot(vAxisBZ));
+
+	double separation = translation - (projOBB + projAABB);
 
 	return separation;
 }
 
 // TODO: Before done - clean everything up and create a proper transpose matrix function
 
+#define SAT_EPSILON 1.192092896e-07f
+
 CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
-	double minSeparationDistance = INFINITY;
+	double minSeparationDistance = -INFINITY;
 	vector vAxis, vAxisTemp;
 	double penetration = 0.0f;
 	float separation = 0.0f;
@@ -470,74 +491,81 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	// Move test into space of this bounding box
 	point ptBoxAOrigin = GetAbsoluteOrigin();
 	vector vBoxAHV = GetHalfVector();
-	quaternion qBoxAOrientation = GetAbsoluteOrientation();
-	RotationMatrix matRotationA = RotationMatrix(qBoxAOrientation);
+
+	RotationMatrix matRotationA = RotationMatrix(GetAbsoluteOrientation());
 	auto matTransposeRotationA = transpose(matRotationA);
 
 	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
 	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
-	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
-	RotationMatrix matRotationB = RotationMatrix(qBoxBOrientation);
+
+	RotationMatrix matRotationB = RotationMatrix(static_cast<BoundingBox>(rhs).GetAbsoluteOrientation());
 
 	vector vAxesA[3], vAxesB[3];
 
-	vAxesA[0] = vector::iVector(1.0f); vAxesA[1] = vector::jVector(1.0f); vAxesA[2] = vector::kVector(1.0f);
+	vAxesA[0] = vector::iVector(1.0f); 
+	vAxesA[1] = vector::jVector(1.0f); 
+	vAxesA[2] = vector::kVector(1.0f);
 
 	vector vTranslationAB = matTransposeRotationA * (ptBoxBOrigin - ptBoxAOrigin);
 	auto matRelativeRotation = matTransposeRotationA * matRotationB;
-	auto matRelativeRotationAbs = absolute(matRelativeRotation);
+
+	vector vBHVRelativeToA = matRelativeRotation * vBoxBHV;
+	vBHVRelativeToA = absolute(vBHVRelativeToA);
 
 	// Get Box B axes in A space
 	for (int i = 0; i < 3; i++) {
 		vAxesB[i] = matRelativeRotation * vAxesA[i];
+		vAxesB[i].Normalize();
 	}
 
 	for (int i = 0; i < 3; i++) {
-
 		vAxisTemp = vAxesA[i];
-		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
-		if (std::abs(separation) < minSeparationDistance) {
-			minSeparationDistance = std::abs(separation);
+
+		separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+		if (separation > (minSeparationDistance + SAT_EPSILON)) {
+			minSeparationDistance = separation;
 			penetration = separation;
 			vAxis = vAxisTemp;
 		}
+	}
 
+	for (int i = 0; i < 3; i++) {
 		vAxisTemp = vAxesB[i];
-		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
-		if (std::abs(separation) < minSeparationDistance) {
-			minSeparationDistance = std::abs(separation);
+		separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+		if (separation > (minSeparationDistance + SAT_EPSILON)) {
+			minSeparationDistance = separation;
 			penetration = separation;
 			vAxis = vAxisTemp;
 		}
+	}
 
-		/*
-		// Go through the cross product of each of the axes
+	///*
+	// Go through the cross product of each of the axes
+	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
 
 			// Ensure not same
 			if (vAxesB[j] != vAxesA[i]) {
 
-				vAxisTemp = vAxesA[i].cross(vAxesB[j]);
+				vAxisTemp = vAxesA[i].NormalizedCross(vAxesB[j]);
+				//vAxisTemp = vAxesB[j].cross(vAxesA[i]);
 
-				separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
-				if (std::abs(separation) < minSeparationDistance) {
-					minSeparationDistance = std::abs(separation);
+				separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+				if (separation > minSeparationDistance + SAT_EPSILON) {
+					minSeparationDistance = separation;
 					penetration = separation;
 					vAxis = vAxisTemp;
 				}
 			}
 		}
-		*/
 	}
+	//*/
 
+	// Use translation vector to figure out direction of normal
+	if (vAxis.dot(vTranslationAB) < 0.0f)
+		vAxis *= -1.0f;
+	//
 	vector vNormal = matRotationA * vAxis;
-	//vector vNormal = vAxis;
-
-	manifold.AddContactPoint(ptBoxAOrigin, vNormal, penetration, 1);
-	
-	return manifold;
-
-	// Points vs Face
 
 	// Find the incident vector - Find most negative dot prod
 	vector vFaceVector;
@@ -546,15 +574,19 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	bool fNegative = false;
 	float d;
 
+	// There is definitely a faster way to do this
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 2; j++) {
-			vector vTemp = matRotationA * vAxesB[i];
+			vector vTemp;
 
 			if(j == 1) {
-				vTemp = -1.0f * vTemp;
+				vTemp = matRotationB * (-1.0f * vAxesA[i]);
+			}
+			else {
+				vTemp = matRotationB * vAxesA[i];
 			}
 
-			d = vAxis.dot(vTemp);
+			d = vNormal.dot(vTemp);
 
 			if (d < bestDotProd) {
 
@@ -573,11 +605,10 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	// TODO: formalize this
 	// Apply rotation of B
 	boxBFace.ApplyMatrix(matRotationB);
-
+	boxBFace.Translate(ptBoxBOrigin - ptBoxAOrigin);
+	
 	// Apply A
 	boxBFace.ApplyMatrix(matTransposeRotationA);
-	
-	boxBFace.Translate(ptBoxBOrigin - ptBoxBOrigin);
 
 
 	// Now that we have the face, clip it against our planes
@@ -592,20 +623,13 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		{
 			// point is in there, re-orient
 			point ptContact = (matRotationA * boxBFace.m_points[i]) + ptBoxAOrigin;
-			
-			//point ptContact = (boxBFace.m_points[i]) + ptBoxAOrigin;
-			
 			penetration = -minSeparationDistance;
-			
-			vector vNormal = matRotationA * vAxis;
-
-			// This will reverse the vector if needed
-			if (vBoxAHV.dot(boxBFace.m_points[i]) < 0.0f) {
-				vNormal = -1.0f * vNormal;
-			}
-
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
+	}
+
+	if (manifold.NumContacts() == 0) {
+		int a = 5;
 	}
 
 	return manifold;

@@ -149,7 +149,8 @@ vector vector::cross(vector rhs) {
 
 // Normalized Cross Product
 vector vector::NormalizedCross(vector rhs) {
-	return vector(this->Normal(), rhs.Normal());
+	vector vRet = vector(this->Normal(), rhs.Normal());
+	return vRet.Normal();
 }
 
 // http://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
