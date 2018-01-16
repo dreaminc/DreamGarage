@@ -783,7 +783,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CN(pDreamControlViewHandle);
 
 		CR(pDreamControlViewHandle->ShowApp());
-		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		pDreamControlViewHandle->SendContentType(m_strContentType);
 		m_fShowControlView = false;
 
@@ -1387,6 +1386,9 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 		m_fShowControlView = true;
 
+		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+		CN(pDreamControlViewHandle);
+		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	}
 
@@ -1456,6 +1458,7 @@ RESULT DreamBrowser::StopSending() {
 		pDreamControlViewHandle->DismissApp();
 	}
 
+	m_pWebBrowserController->CloseBrowser();
 	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
 

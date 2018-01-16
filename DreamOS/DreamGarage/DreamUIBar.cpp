@@ -332,6 +332,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 			} 
 			//CR(ShowControlView(true));
+			m_pUserHandle->SendSharingAgain(true);
 			CR(SendURLToBrowser());
 		} break;
 	}

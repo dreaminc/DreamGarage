@@ -465,7 +465,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 		if (m_fIsShareURL) {
 			//CR(ShowView());
-
+			m_pUserHandle->SendSharingAgain(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
@@ -511,7 +511,7 @@ RESULT DreamControlView::SendURL() {
 		CR(m_pBrowserHandle->SendURL(m_strURL));
 		m_strURL = "";
 	}
-	
+
 Error:
 	return r;
 }
