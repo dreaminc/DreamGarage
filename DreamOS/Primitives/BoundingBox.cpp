@@ -448,11 +448,11 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
 	return retVector;
 }
 
-inline double GetAABBOBBSeparation(vector vAxis, matrix<float, 4, 4> matRelativeRotationAbs, vector vTranslation,
+inline double GetAABBOBBSeparation(vector vAxis, matrix<float, 4, 4> matRelativeRotation, vector vTranslation,
 	vector vAABBHalfVector, vector vOBBHalfVector)
 {
 	double separation = std::abs(vTranslation.dot(vAxis));
-	separation -= std::abs(vAABBHalfVector.dot(vAxis)) + std::abs(((vector)(matRelativeRotationAbs * vOBBHalfVector)).dot(vAxis));
+	separation -= std::abs(vAABBHalfVector.dot(vAxis)) + std::abs(((vector)(matRelativeRotation * vOBBHalfVector)).dot(vAxis));
 
 	return separation;
 }
@@ -472,7 +472,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	vector vBoxAHV = GetHalfVector();
 	quaternion qBoxAOrientation = GetAbsoluteOrientation();
 	RotationMatrix matRotationA = RotationMatrix(qBoxAOrientation);
-	auto matInverseRotationA = inverse(matRotationA);
+	auto matTransposeRotationA = transpose(matRotationA);
 
 	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
 	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
@@ -483,8 +483,8 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 	vAxesA[0] = vector::iVector(1.0f); vAxesA[1] = vector::jVector(1.0f); vAxesA[2] = vector::kVector(1.0f);
 
-	vector vTranslationAB = matInverseRotationA * (ptBoxBOrigin - ptBoxAOrigin);
-	auto matRelativeRotation = matInverseRotationA * matRotationB;
+	vector vTranslationAB = matTransposeRotationA * (ptBoxBOrigin - ptBoxAOrigin);
+	auto matRelativeRotation = matTransposeRotationA * matRotationB;
 	auto matRelativeRotationAbs = absolute(matRelativeRotation);
 
 	// Get Box B axes in A space
@@ -495,7 +495,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	for (int i = 0; i < 3; i++) {
 
 		vAxisTemp = vAxesA[i];
-		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotationAbs, vTranslationAB, vBoxAHV, vBoxBHV);
+		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
 		if (std::abs(separation) < minSeparationDistance) {
 			minSeparationDistance = std::abs(separation);
 			penetration = separation;
@@ -503,13 +503,14 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		}
 
 		vAxisTemp = vAxesB[i];
-		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotationAbs, vTranslationAB, vBoxAHV, vBoxBHV);
+		separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
 		if (std::abs(separation) < minSeparationDistance) {
 			minSeparationDistance = std::abs(separation);
 			penetration = separation;
 			vAxis = vAxisTemp;
 		}
 
+		/*
 		// Go through the cross product of each of the axes
 		for (int j = 0; j < 3; j++) {
 
@@ -518,7 +519,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 				vAxisTemp = vAxesA[i].cross(vAxesB[j]);
 
-				separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotationAbs, vTranslationAB, vBoxAHV, vBoxBHV);
+				separation = GetAABBOBBSeparation(vAxisTemp, matRelativeRotation, vTranslationAB, vBoxAHV, vBoxBHV);
 				if (std::abs(separation) < minSeparationDistance) {
 					minSeparationDistance = std::abs(separation);
 					penetration = separation;
@@ -526,6 +527,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				}
 			}
 		}
+		*/
 	}
 
 	vector vNormal = matRotationA * vAxis;
@@ -573,7 +575,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	boxBFace.ApplyMatrix(matRotationB);
 
 	// Apply A
-	boxBFace.ApplyMatrix(matInverseRotationA);
+	boxBFace.ApplyMatrix(matTransposeRotationA);
 	
 	boxBFace.Translate(ptBoxBOrigin - ptBoxBOrigin);
 

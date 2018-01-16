@@ -594,10 +594,10 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	} testOrientation;
 
 	//testOrientation = TestOrientation::EDGE_EDGE;
-	testOrientation = TestOrientation::POINT_FACE;
+	//testOrientation = TestOrientation::POINT_FACE;
 	//testOrientation = TestOrientation::EDGE_FACE;
 	//testOrientation = TestOrientation::FACE_FACE;
-	//testOrientation = TestOrientation::AABB_AABB;
+	testOrientation = TestOrientation::AABB_AABB;
 
 	struct TestContext {
 		volume *pOBBA = nullptr;
@@ -669,7 +669,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			case TestOrientation::AABB_AABB: {
 				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
 
-				pTestContext->pOBBB->SetPosition(0.0f, -0.6f, 0.0f);
+				pTestContext->pOBBB->SetPosition(0.0f, -0.0f, 0.0f);
 			} break;
 		}
 
@@ -704,8 +704,9 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBA);
 		CN(pTestContext->pOBBB);
 
-		//pTestContext->pOBBB->translateY(-0.0001f);
-		pTestContext->pOBBA->RotateZByDeg(0.02f);
+		pTestContext->pOBBB->translateY(-0.0001f);
+
+		//pTestContext->pOBBA->RotateZByDeg(0.02f);
 		//pTestContext->pOBBB->RotateZByDeg(0.02f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
