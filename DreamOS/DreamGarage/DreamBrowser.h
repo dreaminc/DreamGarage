@@ -277,6 +277,7 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	bool m_fReadyForFrame = false;
 
 	TextEntryString m_strEntered;
 	

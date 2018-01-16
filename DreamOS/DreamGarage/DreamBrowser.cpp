@@ -770,6 +770,12 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
+	if (m_fReadyForFrame) {
+		CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pBrowserTexture.get(), 0, PIXEL_FORMAT::BGRA));
+		m_fReadyForFrame = false;
+	}
+		
+
 	if (m_pDreamUserHandle == nullptr) {
 		auto pDreamOS = GetDOS();
 		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
@@ -1535,7 +1541,7 @@ RESULT DreamBrowser::PendReceiving() {
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
 
-Error:
+//Error:
 	return r;
 }
 
