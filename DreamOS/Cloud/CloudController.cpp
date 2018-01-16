@@ -364,11 +364,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnReceiveAsset() {
+RESULT CloudController::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnReceiveAsset());
+		CR(m_pEnvironmentObserver->OnReceiveAsset(userID));
 	}
 
 Error:
