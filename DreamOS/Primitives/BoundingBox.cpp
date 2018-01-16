@@ -235,7 +235,7 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 	quaternion qBoxAOrientation = static_cast<BoundingBox>(lhs).GetAbsoluteOrientation();
 
 	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
-	auto matInverseRotation = inverse(matRotation);
+	auto matTransposeRotation = transpose(matRotation);
 
 	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
 	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
@@ -250,9 +250,9 @@ bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
 
 	// Get Box B axes in A space
 	for (int i = 0; i < 3; i++) {
-		vAxesB[i] = matInverseRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+		vAxesB[i] = matTransposeRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
 	}
-	ptBoxBOrigin = matInverseRotation * (ptBoxBOrigin - ptBoxAOrigin);
+	ptBoxBOrigin = matTransposeRotation * (ptBoxBOrigin - ptBoxAOrigin);
 
 	for (int i = 0; i < 3; i++) {
 		vector vAxisA = vAxesA[i];

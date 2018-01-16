@@ -236,8 +236,6 @@ public:
 
 	TMatrix minor(unsigned i, unsigned j) {
 		matrix<TMatrix, N - 1, M - 1> retMatrix = minormatrix(i, j);
-		retMatrix.clear();
-
 		return determinant(retMatrix);
 	}
 
@@ -264,7 +262,7 @@ public:
 
 	// This is a zero based matrix, so adding one for the power (but -1^0 == 1 so the math should actually work regardless)
 	TMatrix cofactor(unsigned i, unsigned j) {
-		TMatrix signVal = pow(-1, ((i+1) + (j+1)));		
+		TMatrix signVal = pow(-1, ((i + 1) + (j + 1)));		
 		return (signVal * minor(i, j));
 	}
 
