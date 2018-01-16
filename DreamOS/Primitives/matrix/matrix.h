@@ -936,6 +936,24 @@ Error:
 	return retMatrix;
 }
 
+// TODO: Add Transpose
+
+
+// TODO: Generalize for n x m matrix
+template <typename TMat4x4>
+matrix<TMat4x4, 4, 4> absolute(matrix<TMat4x4, 4, 4> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat4x4, 4, 4> retMatrix;
+	retMatrix.clear();
+
+	for (int i = 0; i < 4 * 4; i++) {
+		retMatrix(i) = (TMat4x4)(std::fabs((double)(mat(i))));
+	}
+
+	return retMatrix;
+}
+
 /*
 // TODO: Implement determinant (not critical atm)
 // Only applicable for square matrices
