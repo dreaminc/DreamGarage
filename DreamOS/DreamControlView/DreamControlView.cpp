@@ -460,15 +460,12 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		CR(Dismiss());
 	}
 
-	case (UserObserverEventType::KB_ENTER): {
+	case (UserObserverEventType::KB_ENTER): {	
 
-		if (m_pBrowserHandle != nullptr) {
-			CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
-		}
 
 		if (m_fIsShareURL) {
-			CR(ShowView());
-
+			//CR(ShowView());
+			m_pUserHandle->SendPreserveSharingState(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
@@ -480,6 +477,10 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			//CR(SendURI());
 		}
 		else {
+			if (m_pBrowserHandle != nullptr) {
+				CR(m_pBrowserHandle->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
+			}
+
 			CR(HandleKeyboardDown());
 
 		}	
@@ -510,7 +511,7 @@ RESULT DreamControlView::SendURL() {
 		CR(m_pBrowserHandle->SendURL(m_strURL));
 		m_strURL = "";
 	}
-	
+
 Error:
 	return r;
 }
@@ -560,6 +561,9 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamControlView::ShowView() {
 	RESULT r = R_PASS;
 
+	if (GetDOS()->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get())) {
+		GetDOS()->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
+	}
 
 	//TODO: animation for m_pControlBar
 	m_pControlBar->SetVisible(true);
@@ -574,6 +578,7 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
+
 		if (m_pUserHandle == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 			CB(userUIDs.size() == 1);
@@ -636,14 +641,13 @@ Error:
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
-	CB(uids.size() == 1);
-	m_browserUID = uids[0];
+	if (m_pBrowserHandle == nullptr) {
 
-	m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
-	CN(m_pBrowserHandle);
+		m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
+		CN(m_pBrowserHandle);
 
-	CR(m_pBrowserHandle->RequestBeginStream());
+		//CR(m_pBrowserHandle->RequestBeginStream());
+	}
 
 	CR(ResetAppComposite());
 
@@ -706,7 +710,7 @@ RESULT DreamControlView::Hide() {
 	CNR(m_pBrowserHandle, R_SKIPPED);
 
 Error:
-	GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this);
+	//GetDOS()->ReleaseApp(m_pBrowserHandle, m_browserUID, this);
 	return r;
 }
 

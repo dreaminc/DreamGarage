@@ -71,6 +71,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendStopSharing() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(StopSharing());
+Error:
+	return r;
+}
+
 RESULT DreamUserHandle::SendKBEnterEvent() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -115,6 +123,14 @@ RESULT DreamUserHandle::SendStreamingState(bool fStreaming) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetStreamingState(fStreaming));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::SendPreserveSharingState(bool fIsSharing) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PreserveSharingState(fIsSharing));
 Error:
 	return r;
 }
@@ -474,9 +490,35 @@ Error:
 RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 	RESULT r = R_PASS;
 
+	if (m_appStack.empty()) {
+		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pLeftMallet->Show();
+		m_pRightMallet->Show();
+	}
+
 	m_appStack.push(pObserver);
 
 //Error:
+	return r;
+}
+
+RESULT DreamUserApp::StopSharing() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+
+	CBR(!m_appStack.empty(), R_SKIPPED);
+
+	if (m_appStack.top() == pDreamControlViewHandle) {
+		m_pKeyboardHandle->Hide();
+		CR(ClearFocusStack());
+	}
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -496,7 +538,7 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 	RESULT r = R_PASS;
 
 	ResetAppComposite();
-	if (!m_fStreaming) {
+	if (!m_fStreaming && !m_fIsSharing) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
 
@@ -694,6 +736,11 @@ RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
 
 RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
 	m_fStreaming = fStreaming;
+	return R_PASS;
+}
+
+RESULT DreamUserApp::PreserveSharingState(bool fIsSharing) {
+	m_fIsSharing = fIsSharing;
 	return R_PASS;
 }
 

@@ -277,6 +277,7 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	bool m_fReadyForFrame = false;
 
 	TextEntryString m_strEntered;
 	
@@ -287,6 +288,8 @@ private:
 
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;
+
+	bool m_fShowControlView = false;
 
 };
 

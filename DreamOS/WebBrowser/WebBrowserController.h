@@ -73,6 +73,8 @@ public:
 	// This function can be called by any thread.
 	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
 
+	virtual RESULT CloseBrowser() = 0;
+
 	// Mouse
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) = 0;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) = 0;
@@ -86,7 +88,7 @@ public:
 	virtual RESULT GoBack() = 0;
 	virtual RESULT GoForward() = 0;
 	virtual bool CanGoBack() = 0;
-	virtual bool CanGoForward() = 0;
+	virtual bool CanGoForward() = 0;	
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
