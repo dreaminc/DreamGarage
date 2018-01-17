@@ -74,7 +74,7 @@ public:
 
 	RESULT RequestStreamingState(bool& fStreaming);
 	RESULT SendStreamingState(bool fStreaming);
-	RESULT SendSharingAgain(bool fSharingAgain);
+	RESULT SendPreserveSharingState(bool fIsSharing);
 
 	RESULT SendStopSharing();
 
@@ -98,7 +98,7 @@ private:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
 	virtual RESULT SetStreamingState(bool fStreaming) = 0;
-	virtual RESULT SetSharingAgain(bool fSharingAgain) = 0;
+	virtual RESULT PreserveSharingState(bool fIsSharing) = 0;
 
 	virtual RESULT StopSharing() = 0;
 
@@ -148,7 +148,7 @@ public:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) override;
 	virtual RESULT SetStreamingState(bool fStreaming) override;
-	virtual RESULT SetSharingAgain(bool fSharingAgain) override;
+	virtual RESULT PreserveSharingState(bool fIsSharing) override;
 
 	virtual RESULT StopSharing() override;
 
@@ -193,7 +193,7 @@ private:
 
 	bool m_fCollisionLeft = false;
 	bool m_fCollisionRight = false;
-	bool m_fSharingAgain = false;
+	bool m_fIsSharing = false;
 
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;

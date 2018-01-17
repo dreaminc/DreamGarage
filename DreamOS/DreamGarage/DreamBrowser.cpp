@@ -497,21 +497,7 @@ Error:
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
 
-	if (!m_fStreaming) {
-		BeginStream();
-	}
-
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-
-	//pDreamControlViewHandle->ShowApp();
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
+// Error:
 	return r;
 }
 
@@ -1402,18 +1388,9 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		m_pDreamUserHandle->SendSharingAgain(false);
-		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		m_pDreamUserHandle->SendPreserveSharingState(false);
+		BeginStream();
 	}
-
-	/*
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-
-	CR(pDreamControlViewHandle->ShowApp());
-	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-	pDreamControlViewHandle->SendContentType(m_strContentType);
-	//*/	
 
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
@@ -1422,7 +1399,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
 		
 		m_strContentType = pEnvironmentAsset->GetContentType();
-
 
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
@@ -1446,8 +1422,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		}
 		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
-
-		//CR(webRequest.ClearRequestHeaders());
 		
 		LoadRequest(webRequest);
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
@@ -1479,26 +1453,6 @@ RESULT DreamBrowser::StopSending() {
 	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
 
-	/*
-	std::string strAPIURL;
-	std::string strURL;
-	CommandLineManager *pCommandLineManager = nullptr;
-	//CR(SetStreamingState(false));
-	CR(SetVisible(false));
-	//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REPORT_STREAMING_STOP));
-
-	//*
-	// TODO: hack to stop getting audio 
-	// Get loading screen URL
-	pCommandLineManager = CommandLineManager::instance();
-	CN(pCommandLineManager);
-	strAPIURL = pCommandLineManager->GetParameterValue("www.ip");
-	strURL = strAPIURL + "/client/loading/";
-	m_strScope = "WebsiteProviderScope.WebsiteProvider";
-	CR(SetBrowserPath(strURL));
-	CR(SetURI(strURL));
-	//*/
-
 Error:
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
@@ -1509,7 +1463,7 @@ Error:
 RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	m_pDreamUserHandle->SendSharingAgain(false);
+	m_pDreamUserHandle->SendPreserveSharingState(false);
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 	// Switch to input
 	if (IsStreaming()) {

@@ -127,10 +127,10 @@ Error:
 	return r;
 }
 
-RESULT DreamUserHandle::SendSharingAgain(bool fSharingAgain) {
+RESULT DreamUserHandle::SendPreserveSharingState(bool fIsSharing) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	CR(SetSharingAgain(fSharingAgain));
+	CR(PreserveSharingState(fIsSharing));
 Error:
 	return r;
 }
@@ -538,7 +538,7 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 	RESULT r = R_PASS;
 
 	ResetAppComposite();
-	if (!m_fStreaming && !m_fSharingAgain) {
+	if (!m_fStreaming && !m_fIsSharing) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
 
@@ -739,8 +739,8 @@ RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
 	return R_PASS;
 }
 
-RESULT DreamUserApp::SetSharingAgain(bool fSharingAgain) {
-	m_fSharingAgain = fSharingAgain;
+RESULT DreamUserApp::PreserveSharingState(bool fIsSharing) {
+	m_fIsSharing = fIsSharing;
 	return R_PASS;
 }
 

@@ -465,7 +465,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 		if (m_fIsShareURL) {
 			//CR(ShowView());
-			m_pUserHandle->SendSharingAgain(true);
+			m_pUserHandle->SendPreserveSharingState(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
