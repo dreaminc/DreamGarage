@@ -496,8 +496,10 @@ Error:
 
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
+	
+	CR(BeginStream());
 
-// Error:
+Error:
 	return r;
 }
 
@@ -1388,8 +1390,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		m_pDreamUserHandle->SendPreserveSharingState(false);
-		BeginStream();
+		m_pDreamUserHandle->SendPreserveSharingState(false);	
 	}
 
 	if (pEnvironmentAsset != nullptr) {
