@@ -507,9 +507,11 @@ RESULT DreamUserApp::StopSharing() {
 	RESULT r = R_PASS;
 
 	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+
 	CBR(!m_appStack.empty(), R_SKIPPED);
 
 	if (m_appStack.top() == pDreamControlViewHandle) {
+		m_pKeyboardHandle->Hide();
 		CR(PopFocusStack());
 	}
 
