@@ -511,8 +511,11 @@ RESULT DreamUserApp::StopSharing() {
 	CBR(!m_appStack.empty(), R_SKIPPED);
 
 	if (m_appStack.top() == pDreamControlViewHandle) {
+		CR(ClearFocusStack());
+	}
+
+	else {
 		m_pKeyboardHandle->Hide();
-		CR(PopFocusStack());
 	}
 
 Error:
