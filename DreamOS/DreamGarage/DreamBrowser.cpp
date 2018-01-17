@@ -1470,6 +1470,8 @@ RESULT DreamBrowser::StopSending() {
 
 	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->HideApp();
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+		
 		m_pDreamUserHandle->SendStopSharing();
 	}
 
@@ -1507,7 +1509,6 @@ Error:
 RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	m_pDreamUserHandle->SendSharingAgain(false);
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 	// Switch to input
@@ -1537,15 +1538,7 @@ RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 
 	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->HandleEvent(UserObserverEventType::DISMISS);
-	}
-
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
