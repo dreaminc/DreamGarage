@@ -46,7 +46,7 @@ private:
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;
 	std::string m_strURL;
-	std::string m_strResourceHandlerType;
+	ResourceHandlerType m_resourceHandlerType;
 	std::string m_strContentType;
 
 	std::multimap<std::string, std::string> m_headers;

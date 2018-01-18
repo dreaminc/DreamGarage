@@ -17,8 +17,16 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 		m_strPath = jsonMenuNode["/path"_json_pointer].get<std::string>();
 
 	if (jsonMenuNode.find("external_request") != jsonMenuNode.end()) {
-		if (jsonMenuNode["/external_request/resource_handler"_json_pointer].is_string())
-			m_strResourceHandlerType = jsonMenuNode["/external_request/resource_handler"_json_pointer].get<std::string>();
+		if (jsonMenuNode["/external_request/resource_handler"_json_pointer].is_string()) {
+			std::string strResourceHandlerType = jsonMenuNode["/external_request/resource_handler"_json_pointer].get<std::string>();
+			if (strResourceHandlerType == "ResourceHandler.Dream") {
+				m_resourceHandlerType = ResourceHandlerType::DREAM;
+			}
+
+			else {
+				m_resourceHandlerType = ResourceHandlerType::DEFAULT;
+			}
+		}
 
 		if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
 			m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
@@ -94,13 +102,7 @@ const std::string& EnvironmentAsset::GetURL() {
 }
 
 ResourceHandlerType EnvironmentAsset::GetResourceHandlerType() {
-	if (m_strResourceHandlerType == "ResourceHandler.Dream") {
-		return ResourceHandlerType::DREAM;
-	}
-
-	else {
-		return ResourceHandlerType::DEFAULT;
-	}
+	return m_resourceHandlerType;
 }
 
 const std::string& EnvironmentAsset::GetContentType() {
