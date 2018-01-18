@@ -156,15 +156,15 @@ public:
 
 protected:
 
-	RESULT UpdateHands();
-	RESULT UpdateOverlay();
+	RESULT UpdateHand(HAND_TYPE type);
+	RESULT UpdateOverlayTexture(HAND_TYPE type);
+	RESULT UpdateOverlayTextures();
 
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
 
 private:
 	//user *m_pUserModel = nullptr;
-	std::shared_ptr<volume> m_pVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
 	hand* m_pLeftHand = nullptr;

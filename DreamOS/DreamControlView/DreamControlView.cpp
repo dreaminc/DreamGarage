@@ -893,14 +893,22 @@ bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
 
 	auto pDreamOS = GetDOS();
 
-	//CBR(!m_fMalletDirty[0].IsDirty() || !m_fMalletDirty[1].IsDirty(), R_SKIPPED);
-	CBR(!m_fCanPressButton[0].IsDirty() && !m_fCanPressButton[1].IsDirty(), R_SKIPPED);
+	auto pInteractionObj = pButtonContext->GetInteractionObject();
+	int dirtyIndex = -1;
+	if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
+		dirtyIndex = 0;
+	}
+	else if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
+		dirtyIndex = 1;
+	}
+	CBR(dirtyIndex != -1, R_SKIPPED);
+
+	CBR(!m_fCanPressButton[dirtyIndex].IsDirty(), R_SKIPPED);
 
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
 	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
 
-	//CR(m_fMalletDirty[0].SetDirty());
-	//CR(m_fMalletDirty[1].SetDirty());
+	// avoids pressing two control bar buttons at once
 	CR(m_fCanPressButton[0].SetDirty());
 	CR(m_fCanPressButton[1].SetDirty());
 
