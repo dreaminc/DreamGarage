@@ -6,6 +6,8 @@
 
 #include "CEFApp.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 CEFBrowserManager::CEFBrowserManager() {
 	// empty
 }
@@ -182,13 +184,13 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 	return nullptr;
 }
 
-RESULT CEFBrowserManager::GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL) {
+RESULT CEFBrowserManager::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
 	CN(pCEFBrowserController);
 
-	CR(pCEFBrowserController->GetResourceHandlerType(resourceHandlerType, cefstrURL));
+	CR(pCEFBrowserController->GetResourceHandlerType(resourceHandlerType, strCEFURL));
 
 Error:
 	return r;

@@ -134,7 +134,7 @@ private:
 
 	CefRefPtr<CefURLRequest> m_pCefURLRequest = nullptr;
 	bool m_fRequestReady = false;
-
+	
 	std::vector<uint8_t> m_rxDownloadBuffer;
 
 	IMPLEMENT_REFCOUNTING(CEFResourceHandler);

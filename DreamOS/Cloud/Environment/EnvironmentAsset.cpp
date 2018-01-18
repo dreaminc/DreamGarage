@@ -93,8 +93,14 @@ const std::string& EnvironmentAsset::GetURL() {
 	return m_strURL;
 }
 
-std::string& EnvironmentAsset::GetResourceHandlerType() {
-	return m_strResourceHandlerType;
+ResourceHandlerType EnvironmentAsset::GetResourceHandlerType() {
+	if (m_strResourceHandlerType == "ResourceHandler.Dream") {
+		return ResourceHandlerType::DREAM;
+	}
+
+	else {
+		return ResourceHandlerType::DEFAULT;
+	}
 }
 
 const std::string& EnvironmentAsset::GetContentType() {

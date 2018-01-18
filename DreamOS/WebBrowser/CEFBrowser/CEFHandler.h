@@ -17,7 +17,7 @@
 #include "Primitives/singleton.h"
 
 #include "WebBrowser/WebBrowserController.h"
-
+#include "Cloud/Environment/EnvironmentAsset.h"
 #include "CEFBrowserController.h"
 
 #include "include\cef_client.h"
@@ -61,7 +61,8 @@ public:
 		virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) = 0;
 		virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) = 0;
 		virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) = 0;
-		virtual RESULT GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL) = 0;
+		
+		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) = 0;
 	};
 
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
@@ -122,9 +123,12 @@ public:
 		const void* data_buffer) override;
 
 	// CefRequestHandler
-	RESULT GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL);
+	virtual ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) override;
 	virtual bool OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) override;
 	virtual CefRefPtr<CefResourceHandler> GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) override;
+
+	// Pipe to Browser
+	RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL);
 	
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
@@ -132,6 +136,8 @@ private:
 	bool m_fBrowserRunning = false;
 
 	CEFHandlerObserver* m_pCEFHandlerObserver = nullptr;
+
+	std::map<CefString, std::multimap<CefString, CefString>> m_savedRequestHeaders;
 
 	IMPLEMENT_REFCOUNTING(CEFHandler);
 };

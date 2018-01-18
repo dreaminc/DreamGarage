@@ -586,22 +586,20 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::GetResourceHandlerType(std::string &strResourceHandlerType, std::string strURL) {
+RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) {
 	RESULT r = R_PASS;
 	
-	if (!m_dreamResourceHandlerLinks.empty()) {
-		for (std::multimap<std::string, std::string>::iterator itr = m_dreamResourceHandlerLinks.begin(); itr != m_dreamResourceHandlerLinks.end(); ++itr) {
-			std::string strKey = itr->first;
-			std::string strValue = itr->second;
+	std::map<std::string, ResourceHandlerType>::iterator it;
 
-			if (strKey == strURL) {
-				strResourceHandlerType = strValue;
-			}
+	if (!m_dreamResourceHandlerLinks.empty()) {
+		it = m_dreamResourceHandlerLinks.find(strURL);
+		if (it != m_dreamResourceHandlerLinks.end()) {
+			resourceHandlerType = it->second;
 		}
 	}
 
 	else {
-		strResourceHandlerType = "default";
+		resourceHandlerType = ResourceHandlerType::DEFAULT;
 	}
 
 	return r;
@@ -1425,10 +1423,10 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		std::string strResourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();	
+		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();	
 
-		if (strResourceHandlerType != "ResourceHandler.Default") {	// Keeping it flexible, it's very possible there's only default and dream
-			m_dreamResourceHandlerLinks.insert(std::multimap<std::string, std::string>::value_type(strEnvironmentAssetURL, strResourceHandlerType));
+		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
+			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
 		}
 
 		m_strContentType = pEnvironmentAsset->GetContentType();
@@ -1451,7 +1449,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 			std::string strValue = itr->second;
 			std::wstring wstrValue = util::StringToWideString(strValue);
 			
-			wstrRequestHeaders.insert(std::multimap<std::wstring, std::wstring>::value_type(wstrKey, wstrValue));
+			wstrRequestHeaders.insert(std::pair<std::wstring, std::wstring>(wstrKey, wstrValue));
 		}
 		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
@@ -1482,6 +1480,7 @@ RESULT DreamBrowser::StopSending() {
 		m_pDreamUserHandle->SendStopSharing();
 	}
 
+	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	m_pWebBrowserController->CloseBrowser();
 	m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));

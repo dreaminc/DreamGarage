@@ -509,12 +509,10 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::GetResourceHandlerType(CefString &resourceHandlerType, CefString cefstrURL) {
+RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
-	std::string strResourceHandlerType;
-	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(strResourceHandlerType, cefstrURL));
-	resourceHandlerType = strResourceHandlerType;
+	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
 
 Error:
 	return r;

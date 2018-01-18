@@ -188,11 +188,11 @@ Error:
 	return r;
 }
 
-RESULT CEFApp::GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL) {
+RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
 	if (m_pCEFAppObserver != nullptr) {
-		CR(m_pCEFAppObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, cefstrURL));
+		CR(m_pCEFAppObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL));
 	}
 
 Error:

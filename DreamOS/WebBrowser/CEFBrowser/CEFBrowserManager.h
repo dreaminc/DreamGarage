@@ -23,6 +23,8 @@
 #include <string>
 #include "WebBrowser/WebBrowserManager.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 #include "CEFAppObserver.h"
 
 class CEFApp;
@@ -61,7 +63,7 @@ private:
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) override;
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(int cefBrowserID) override;
 
-	virtual RESULT GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL)  override;
+	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL)  override;
 
 private:
 	RESULT CEFManagerThread();
