@@ -156,8 +156,10 @@ public:
 
 protected:
 
+	RESULT UpdateHand(HAND_TYPE type);
 	RESULT UpdateHands();
-	RESULT UpdateOverlay();
+	RESULT UpdateOverlayTexture(HAND_TYPE type);
+	RESULT UpdateOverlayTextures();
 
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);

@@ -247,7 +247,7 @@ unsigned int DreamUserApp::GetHandleLimit() {
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	RotationMatrix qOffset; // mallet positioning
+//	RotationMatrix qOffset; // mallet positioning
 	quaternion qOrientation;
 
 	// update user interaction ray
@@ -276,23 +276,29 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 
-	CBR(m_pLeftHand, R_SKIPPED);
+	if (m_pMenuHandle == nullptr) {
+		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
+		CB(menuUIDs.size() == 1);
+		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
+	}
 
 	// Update Mallet Positions
+	/*
 	CNR(m_pLeftHand, R_SKIPPED);
-	CNR(m_pRightHand, R_SKIPPED);
 
 	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(m_pLeftHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
-	CBR(m_pRightHand, R_SKIPPED);
+	CNR(m_pRightHand, R_SKIPPED);
+
 	qOffset = RotationMatrix();
 	qOffset.SetQuaternionRotationMatrix(m_pRightHand->GetOrientation());
 
 	if (m_pRightMallet)
 		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
+		//*/
 
 	if (m_fCollisionLeft || m_fCollisionRight) {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -303,7 +309,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 			m_pLeftHand->SetOverlayVisible(true);
 			m_pRightHand->SetOverlayVisible(true);
 
-			UpdateOverlay();
+			UpdateOverlayTextures();
 			if (m_appStack.empty()) {
 				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
 				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
@@ -311,11 +317,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 
-	if (m_pMenuHandle == nullptr) {
-		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
-		CB(menuUIDs.size() == 1);
-		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
-	}
 
 	CR(UpdateHands());
 
@@ -346,7 +347,58 @@ Error:
 	return r;
 }
 
-RESULT DreamUserApp::UpdateOverlay() {
+RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
+	RESULT r = R_PASS;
+
+	hand *pHand = nullptr;
+	UIMallet *pMallet = nullptr;
+	bool fRayHandCollision = false;
+	RotationMatrix qOffset; 
+
+	// define variables based on hand type
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pHand = m_pLeftHand;
+		pMallet = m_pLeftMallet;
+		fRayHandCollision = m_fCollisionLeft;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		pHand = m_pRightHand;
+		pMallet = m_pRightMallet;
+		fRayHandCollision = m_fCollisionRight;
+	}
+
+	CNR(pHand, R_SKIPPED);
+
+	CR(pHand->Update());
+
+	// Update Mallet Position
+	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+	if (pMallet != nullptr) {
+		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetHeadOffset()));
+	}
+
+	// Update Overlay
+	if (fRayHandCollision) {
+		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
+
+			pHand->SetOverlayVisible(true);
+
+			UpdateOverlayTextures();
+			if (m_appStack.empty()) {
+				pHand->SetModelState(hand::ModelState::CONTROLLER);
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::UpdateOverlayTextures() {
 	RESULT r = R_PASS;
 
 	if (!m_appStack.empty()) {
@@ -404,7 +456,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 			m_appStack.push(m_pMenuHandle);
 
-			UpdateOverlay();
+			UpdateOverlayTextures();
 			//currently, the user app always has the menu handle
 			//GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 		}
@@ -542,7 +594,7 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
 
-		UpdateOverlay();
+		UpdateOverlayTextures();
 		//stay with controller models if the user is currently looking at them
 		if (!(m_fCollisionLeft || m_fCollisionRight)) {
 			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
