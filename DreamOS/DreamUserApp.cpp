@@ -247,7 +247,6 @@ unsigned int DreamUserApp::GetHandleLimit() {
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-//	RotationMatrix qOffset; // mallet positioning
 	quaternion qOrientation;
 
 	// update user interaction ray
@@ -260,14 +259,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
 
-	/*
-	if (m_pVolume == nullptr) {
-		m_pVolume = GetComposite()->AddVolume(1.0f);
-		CN(m_pVolume);
-		m_pVolume->SetVisible(false);
-	}
-	//*/
-	
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f);
 		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
@@ -282,66 +273,8 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
 	}
 
-	// Update Mallet Positions
-	/*
-	CNR(m_pLeftHand, R_SKIPPED);
-
-	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(m_pLeftHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	CNR(m_pRightHand, R_SKIPPED);
-
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(m_pRightHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
-		//*/
-
-	if (m_fCollisionLeft || m_fCollisionRight) {
-		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
-		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
-
-			m_pLeftHand->SetOverlayVisible(true);
-			m_pRightHand->SetOverlayVisible(true);
-
-			UpdateOverlayTextures();
-			if (m_appStack.empty()) {
-				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-			}
-		}
-	}
-
-
-	CR(UpdateHands());
-
-Error:
-	return r;
-}
-
-RESULT DreamUserApp::UpdateHands() {
-	RESULT r = R_PASS;
-
-	CR(m_pLeftHand->Update());
-	if (!m_pLeftHand->IsTracked() && m_pLeftMallet->GetMalletHead()->IsVisible()) {
-		m_pLeftMallet->Hide();
-	} 
-	else if (m_pLeftHand->IsTracked() && !m_appStack.empty() && !m_pLeftMallet->GetMalletHead()->IsVisible()) {
-		m_pLeftMallet->Show();
-	}
-
-	CR(m_pRightHand->Update());
-	if (!m_pRightHand->IsTracked() && m_pRightMallet->GetMalletHead()->IsVisible()) {
-		m_pRightMallet->Hide();
-	} 
-	else if (m_pRightHand->IsTracked() && !m_appStack.empty() && !m_pRightMallet->GetMalletHead()->IsVisible()) {
-		m_pRightMallet->Show();
-	}
+	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
+	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
@@ -378,7 +311,15 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetHeadOffset()));
 	}
 
-	// Update Overlay
+	// Update Mallet Visibility
+	if (!pHand->IsTracked() && pMallet->GetMalletHead()->IsVisible()) { // || m_appStack.empty()?
+		pMallet->Hide();
+	} 
+	else if (pHand->IsTracked() && !m_appStack.empty() && !pMallet->GetMalletHead()->IsVisible()) {
+		pMallet->Show();
+	}
+
+	// Update Overlay visibility / texture
 	if (fRayHandCollision) {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
@@ -387,6 +328,7 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 
 			pHand->SetOverlayVisible(true);
 
+			//UpdateOverlayTexture(type);
 			UpdateOverlayTextures();
 			if (m_appStack.empty()) {
 				pHand->SetModelState(hand::ModelState::CONTROLLER);
@@ -398,30 +340,45 @@ Error:
 	return r;
 }
 
+RESULT DreamUserApp::UpdateOverlayTexture(HAND_TYPE type) {
+	RESULT r = R_PASS;
+
+	hand *pHand = nullptr;
+	texture *pDefaultTexture = nullptr;
+	texture *pOverlayTexture = nullptr;
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pHand = m_pLeftHand;
+		pDefaultTexture = m_pTextureDefaultGazeLeft;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		pHand = m_pRightHand;
+		pDefaultTexture = m_pTextureDefaultGazeRight;
+	}
+
+	CNR(pHand, R_SKIPPED);
+	CNR(pDefaultTexture, R_SKIPPED);
+
+	if (!m_appStack.empty()) {
+		pOverlayTexture = m_appStack.top()->GetOverlayTexture(type);
+	}
+
+	if (pOverlayTexture != nullptr) {
+		CR(pHand->SetOverlayTexture(pOverlayTexture));
+	}
+	else {
+		CR(pHand->SetOverlayTexture(pDefaultTexture));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserApp::UpdateOverlayTextures() {
 	RESULT r = R_PASS;
 
-	if (!m_appStack.empty()) {
-		auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
-		if (pTexture == nullptr) {
-			CR(m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight));
-		}
-		else {
-			CR(m_pRightHand->SetOverlayTexture(pTexture));
-		}
-
-		pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
-		if (pTexture == nullptr) {
-			CR(m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft));
-		}
-		else {
-			CR(m_pLeftHand->SetOverlayTexture(pTexture));
-		}
-	}
-	else {
-		CR(m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft));
-		CR(m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight));
-	}
+	CR(UpdateOverlayTexture(HAND_TYPE::HAND_LEFT));
+	CR(UpdateOverlayTexture(HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
@@ -627,22 +584,20 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
+	pDreamOS->AddObject(pHand);
+	CR(pHand->InitializeWithContext(pDreamOS));
+	pHand->SetModelState(hand::ModelState::HAND);
+
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
-		GetDOS()->AddObject(m_pLeftHand);
-		CR(m_pLeftHand->InitializeWithContext(pDreamOS));
-		CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);	
-		m_pLeftHand->SetOverlayVisible(false);
 	}
 	else {
 		m_pRightHand = pHand;
-		GetDOS()->AddObject(m_pRightHand);
-		CR(m_pRightHand->InitializeWithContext(pDreamOS));
-		CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
 		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-		m_pRightHand->SetOverlayVisible(false);
 	}
+
+	pHand->SetOverlayVisible(false);
 
 	auto pVolume = pHand->GetPhantomVolume().get();
 	CNR(pVolume, R_SKIPPED);
@@ -709,9 +664,6 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
 	CN(pCamera);
-	CN(m_pLeftHand);
-	CN(m_pRightHand);
-
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
 		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);

@@ -157,7 +157,6 @@ public:
 protected:
 
 	RESULT UpdateHand(HAND_TYPE type);
-	RESULT UpdateHands();
 	RESULT UpdateOverlayTexture(HAND_TYPE type);
 	RESULT UpdateOverlayTextures();
 
@@ -166,7 +165,6 @@ protected:
 
 private:
 	//user *m_pUserModel = nullptr;
-	std::shared_ptr<volume> m_pVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
 	hand* m_pLeftHand = nullptr;

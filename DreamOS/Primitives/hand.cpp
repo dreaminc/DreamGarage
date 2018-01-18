@@ -175,8 +175,9 @@ RESULT hand::Update() {
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
-		if (!m_pOverlayQuad->IsVisible())
-			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
+//		if (!m_pOverlayQuad->IsVisible())
+//			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
+		m_pOverlayQuad->SetVisible(m_pOverlayQuad->IsVisible() && m_fTracked);
 	} break;
 	}
 
