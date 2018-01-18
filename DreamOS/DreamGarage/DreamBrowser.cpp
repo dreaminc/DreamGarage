@@ -1404,7 +1404,12 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		
+		std::string strResourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();	
+
+		if (strResourceHandlerType != "ResourceHandler.Default") {	// Keeping it flexible, it's very possible there's only default and dream
+			m_dreamResourceHandlerLinks.insert(std::multimap<std::string, std::string>::value_type(strEnvironmentAssetURL, strResourceHandlerType));
+		}
+
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
 		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);

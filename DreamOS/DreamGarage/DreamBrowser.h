@@ -285,6 +285,7 @@ private:
 	std::string m_strPath;
 	std::string m_strContentType;
 	long m_currentEnvironmentAssetID = 0;
+	std::multimap<std::string, std::string> m_dreamResourceHandlerLinks;
 
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;

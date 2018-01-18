@@ -29,6 +29,7 @@ public:
 
 	std::string GetURI();
 	const std::string& GetURL();
+	std::string GetResourceHandlerType();
 	std::multimap<std::string, std::string> GetHeaders();
 	long GetAssetID();
 	long GetUserID();
@@ -40,6 +41,7 @@ private:
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;
 	std::string m_strURL;
+	std::string m_strResourceHandlerType;
 	std::string m_strContentType;
 
 	std::multimap<std::string, std::string> m_headers;

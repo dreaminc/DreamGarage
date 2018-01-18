@@ -17,6 +17,9 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 		m_strPath = jsonMenuNode["/path"_json_pointer].get<std::string>();
 
 	if (jsonMenuNode.find("external_request") != jsonMenuNode.end()) {
+		if (jsonMenuNode["/extrenal_request/resource_handler"_json_pointer].is_string())
+			m_strResourceHandlerType = jsonMenuNode["/external_request/resource_handler"_json_pointer].get<std::string>();
+
 		if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
 			m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
 
@@ -88,6 +91,10 @@ const std::string& EnvironmentAsset::GetTitle() {
 
 const std::string& EnvironmentAsset::GetURL() {
 	return m_strURL;
+}
+
+std::string EnvironmentAsset::GetResourceHandlerType() {
+	return m_strResourceHandlerType;
 }
 
 const std::string& EnvironmentAsset::GetContentType() {

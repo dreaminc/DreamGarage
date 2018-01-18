@@ -377,6 +377,8 @@ CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowse
 
 	// Currently only supporting resource handler for basic GET requests
 	// otherwise, let CEF provide the valid handler
+	
+	
 	if (pCefRequest->GetMethod() == "GET") {
 
 		CefRefPtr<CefResourceHandler> pCefResourceHandler = CefRefPtr<CefResourceHandler>(new CEFResourceHandler(pCefBrowser, pCefFrame, pCefRequest));

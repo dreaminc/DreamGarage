@@ -22,18 +22,40 @@ CEFResourceHandler::~CEFResourceHandler() {
 /*--cef()--*/
 bool CEFResourceHandler::ProcessRequest(CefRefPtr<CefRequest> pCefRequest, CefRefPtr<CefCallback> pCefCallback) {
 	RESULT r = R_PASS;
-
+	
 	/*
-	// Here for testing purposes, insert a header
+	CefString strRequestURL = pCefRequest->GetURL();
 	CefRequest::HeaderMap requestHeaders;
 	pCefRequest->GetHeaderMap(requestHeaders);
+	bool fUsesAuthentication = false;
 
-	CefString cstrKey = "testKey";
-	CefString cstrValue = "testValue";
-	requestHeaders.insert(std::multimap<CefString, CefString>::value_type(cstrKey, cstrValue));
+	for (std::multimap<CefString, CefString>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
+		if (itr->first == "Authentication") {
+			fUsesAuthentication = true;
+		}
+	}
+
+	if (fUsesAuthentication) {
+		for (std::multimap<CefString, std::multimap<CefString, CefString>>::iterator itr = m_savedRequestHeaders.begin(); itr != m_savedRequestHeaders.end(); ++itr) {
+
+			CefString strURL = itr->first;
+			std::multimap<CefString, CefString> savedRequestHeaders = itr->second;
+
+			if (strRequestURL == strURL) {
+				for (std::multimap<CefString, CefString>::iterator headerItr = savedRequestHeaders.begin(); headerItr != savedRequestHeaders.end(); ++itr) {
+					requestHeaders.insert(std::multimap<CefString, CefString>::value_type(headerItr->first, headerItr->second));
+				}
+			}
+
+		}
+	}
+	
+	//requestHeaders.insert(std::multimap<CefString, CefString>::value_type(str, strHeader));
 
 	pCefRequest->SetHeaderMap(requestHeaders);
+	//*/
 	
+	/*
 	// Here for testing purposes (this will output the request headers)
 	CefRequest::HeaderMap cefHeaders;
 	pCefRequest->GetHeaderMap(cefHeaders);
