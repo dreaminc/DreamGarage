@@ -24,13 +24,13 @@ RESULT CollisionTestSuite::AddTests() {
 
 	CR(AddTestOBBOBB());
 
+	CR(AddTestSphereSphere());
+
 	CR(AddTestQuadQuad());
 
 	CR(AddTestSphereOBB());
 
 	CR(AddTestSphereQuad());
-
-	CR(AddTestSphereSphere());
 
 	CR(AddTestPlaneQuad());
 
@@ -79,23 +79,23 @@ RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) 
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Debug Overlay
-	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
-	CN(pDebugOverlay);
-	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	// Debug Overlay
+	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+	CN(pDebugOverlay);
+	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -587,6 +587,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	enum class TestOrientation {
 		EDGE_EDGE,
 		POINT_FACE,
+		POINT_FACE_X,
 		POINT_EDGE,
 		FACE_FACE,
 		AABB_AABB_X,
@@ -596,7 +597,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	} testOrientation;
 
 	//testOrientation = TestOrientation::EDGE_EDGE;
-	testOrientation = TestOrientation::POINT_FACE;
+	//testOrientation = TestOrientation::POINT_FACE;
+	testOrientation = TestOrientation::POINT_FACE_X;
 	//testOrientation = TestOrientation::EDGE_FACE;
 	//testOrientation = TestOrientation::FACE_FACE;
 	//testOrientation = TestOrientation::AABB_AABB_X;
@@ -656,10 +658,20 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 90.0f);
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 180.0f);
 
-				pTestContext->pOBBB->SetPosition(point(0.0f, -0.25f, 0.0f));
+				pTestContext->pOBBB->SetPosition(point(0.0f, -0.05f, 0.0f));
 				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
 				//pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
 				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, -35.0f);
+			} break;
+
+			case TestOrientation::POINT_FACE_X: {
+				
+				pTestContext->pOBBA->SetPosition(point(0.0f, 0.0f, 0.0f));
+				pTestContext->pOBBA->RotateYByDeg(45.0f);
+				pTestContext->pOBBA->RotateZByDeg(45.0f);
+
+				pTestContext->pOBBB->SetPosition(point(-1.25f, 0.0f, 0.0f));
+
 			} break;
 
 			case TestOrientation::EDGE_FACE: {
@@ -720,12 +732,14 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBA);
 		CN(pTestContext->pOBBB);
 
+		//pTestContext->pOBBA->translateX(-0.0002f);
+
 		//pTestContext->pOBBB->translateX(-0.0001f);
-		//pTestContext->pOBBB->translateY(-0.0001f);
+		//pTestContext->pOBBB->translateY(-0.00005f);
 		//pTestContext->pOBBB->translateZ(0.0001f);
 
-		pTestContext->pOBBA->RotateZByDeg(0.01f);
-		pTestContext->pOBBB->RotateZByDeg(0.01f);
+		//pTestContext->pOBBA->RotateZByDeg(0.01f);
+		//pTestContext->pOBBB->RotateZByDeg(0.01f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
 		//pTestContext->pOBBA->RotateXByDeg(-0.01f);
@@ -747,9 +761,10 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
 			
 						ray rPoint = ray(manifold.GetContactPoint(i).GetPoint(), manifold.GetContactPoint(i).GetNormal());
+
 						pTestContext->pCollidePointRay[i]->SetVisible(true);
 						pTestContext->pCollidePointRay[i]->UpdateFromRay(rPoint);
-						pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+						pTestContext->pCollidePointRay[i]->SetRayVertices(manifold.GetContactPoint(i).GetPenetration() * 10.0f);
 						pTestContext->pCollidePointRay[i]->UpdateBuffers();
 					}
 			
@@ -1056,6 +1071,8 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
 
+			pTestContext->pCollidePoint[i]->SetMaterialColors(COLOR_BLACK);
+
 			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
 
 			pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -1081,7 +1098,7 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 		CN(pTestContext->pSphereB);
 
 		//pTestContext->pSphereA->translateY(0.0005f);
-		pTestContext->pSphereB->translateY(-0.0005f);
+		pTestContext->pSphereB->translateY(-0.0002f);
 
 		//for (int i = 0; i < 4; i++)
 		//	pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -1101,13 +1118,13 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 
 			pTestContext->pSphereA->SetMaterialColors(COLOR_GREEN);
 
-			pTestContext->pSphereA->SetVisible(false);
-			pTestContext->pSphereB->SetVisible(false);
+			//pTestContext->pSphereA->SetVisible(false);
+			//pTestContext->pSphereB->SetVisible(false);
 		}
 		else {
 
-			pTestContext->pSphereA->SetVisible(true);
-			pTestContext->pSphereB->SetVisible(true);
+			//pTestContext->pSphereA->SetVisible(true);
+			//pTestContext->pSphereB->SetVisible(true);
 
 			pTestContext->pSphereA->SetMaterialColors(COLOR_BLUE);
 		}

@@ -1,5 +1,7 @@
 #include "line.h"
 
+#include "Core/Utilities.h"
+
 line::line() :
 	m_ptA(),
 	m_ptB()
@@ -26,6 +28,7 @@ point_precision line::Distance(point ptP) {
 }
 
 //point_precision line::Distance(line l) {
+// Not line segments
 point_precision line::Distance(line l, point *pptClosestLineA, point *pptClosestLineB, vector *pvNormal) {
 	vector vCross = GetVector().cross(l.GetVector());
 	
@@ -60,6 +63,44 @@ point_precision line::Distance(line l, point *pptClosestLineA, point *pptClosest
 	}
 
 	return retVal;
+}
+
+point_precision line::SegmentDistance(line l, point *pptClosestLineA, point *pptClosestLineB, vector *pvNormal) {
+	vector vCross = GetVector().cross(l.GetVector());
+
+	if (pvNormal != nullptr) {
+		*pvNormal = GetVector().cross(l.GetVector()).Normal();
+	}
+
+	// Find the closest respective points
+	// https://en.wikipedia.org/wiki/Skew_lines#Distance_between_two_skew_lines
+
+	vector vNormalA = GetVector().cross(*pvNormal);
+	vector vNormalB = l.GetVector().cross(*pvNormal);
+
+	double dotProdDiffNormalA = (l.a() - a()).dot(vNormalB);
+	double dotProdNormalA = GetVector().dot(vNormalB);
+	double tA = dotProdDiffNormalA / dotProdNormalA;
+
+	util::Clamp<double>(tA, 0.0f, 1.0f);
+	point ptA = a() + GetVector() * tA;
+
+	if (pptClosestLineA != nullptr) {
+		*pptClosestLineA = ptA;
+	}
+
+	double dotProdDiffNormalB = (a() - l.a()).dot(vNormalA);
+	double dotProdNormalB = l.GetVector().dot(vNormalA);
+	double tB = dotProdDiffNormalB / dotProdNormalB;
+
+	util::Clamp<double>(tB, 0.0f, 1.0f);
+	point ptB = l.a() + l.GetVector() * tB;
+
+	if (pptClosestLineB != nullptr) {
+		*pptClosestLineB = ptB;
+	}
+
+	return (ptB - ptA).magnitude();
 }
 
 point line::ProjectedPoint(point ptP) {

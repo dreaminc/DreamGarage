@@ -137,7 +137,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		*/
 
 		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.05f;		// Penetration percentage to correct
+			const double percentCorrection = 1.025f;		// Penetration percentage to correct
 			vector vCorrection = vNormal * penetration * (percentCorrection);
 			
 			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);

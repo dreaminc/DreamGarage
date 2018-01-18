@@ -20,8 +20,8 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestVolumeVolumeEdge());
 	CR(AddTestVolumeVolumePointFace());
+	CR(AddTestVolumeVolumeEdge());
 
 	CR(AddTestRayQuadsComposite());
 	CR(AddTestRayQuads());
@@ -1334,7 +1334,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 
 		// Volume vs Volume point - face
 
-		auto pVolume = m_pDreamOS->AddVolume(0.5f);
+		volume *pVolume = nullptr;
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolume);
 		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
@@ -1347,6 +1349,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		CN(pVolume);
 		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(1.0f);
+		//pVolume->SetVelocity(-1.0f / 2, 0.0f, 0.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
@@ -1357,6 +1360,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		pVolume->SetMass(1.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
+		///*
 		pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
@@ -1384,6 +1388,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+		//*/
 	
 	Error:
 		return R_PASS;
