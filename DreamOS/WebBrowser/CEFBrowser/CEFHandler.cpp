@@ -349,6 +349,15 @@ Error:
 	return;
 }
 
+RESULT CEFHandler::GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pCEFHandlerObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, cefstrURL));
+
+Error:
+	return r;
+}
+
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	
 	/*
@@ -377,10 +386,15 @@ CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowse
 
 	// Currently only supporting resource handler for basic GET requests
 	// otherwise, let CEF provide the valid handler
+	CefString handlerType;
+	CefString cefstrURL = pCefRequest->GetURL();
+	GetResourceHandlerType(handlerType, pCefBrowser, cefstrURL);
 	
+	if (handlerType == "default") {
+		return nullptr;
+	}
 	
-	if (pCefRequest->GetMethod() == "GET") {
-
+	else if (handlerType == "ResourceHandler.Dream") {
 		CefRefPtr<CefResourceHandler> pCefResourceHandler = CefRefPtr<CefResourceHandler>(new CEFResourceHandler(pCefBrowser, pCefFrame, pCefRequest));
 		CN(pCefResourceHandler);
 

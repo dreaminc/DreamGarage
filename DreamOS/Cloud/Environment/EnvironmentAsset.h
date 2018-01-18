@@ -29,7 +29,7 @@ public:
 
 	std::string GetURI();
 	const std::string& GetURL();
-	std::string GetResourceHandlerType();
+	std::string& GetResourceHandlerType();
 	std::multimap<std::string, std::string> GetHeaders();
 	long GetAssetID();
 	long GetUserID();

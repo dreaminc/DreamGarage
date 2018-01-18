@@ -55,6 +55,8 @@ public:
 	virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) override;
 	virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) override;
 
+	virtual RESULT GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL)  override;
+
 	// CefApp methods:
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {
 		return this;

@@ -181,6 +181,8 @@ public:
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
+	virtual RESULT GetResourceHandlerType(std::string &strResourceHandlerType,std::string strURL) override;
+
 	virtual RESULT HandleBackEvent() override;
 	virtual RESULT HandleForwardEvent() override;
 	virtual RESULT HandleStopEvent() override;

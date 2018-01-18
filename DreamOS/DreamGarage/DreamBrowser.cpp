@@ -586,6 +586,27 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::GetResourceHandlerType(std::string &strResourceHandlerType, std::string strURL) {
+	RESULT r = R_PASS;
+	
+	if (!m_dreamResourceHandlerLinks.empty()) {
+		for (std::multimap<std::string, std::string>::iterator itr = m_dreamResourceHandlerLinks.begin(); itr != m_dreamResourceHandlerLinks.end(); ++itr) {
+			std::string strKey = itr->first;
+			std::string strValue = itr->second;
+
+			if (strKey == strURL) {
+				strResourceHandlerType = strValue;
+			}
+		}
+	}
+
+	else {
+		strResourceHandlerType = "default";
+	}
+
+	return r;
+}
+
 RESULT DreamBrowser::HandleBackEvent() {
 	RESULT r = R_PASS;
 

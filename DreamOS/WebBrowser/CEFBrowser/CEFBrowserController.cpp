@@ -509,6 +509,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::GetResourceHandlerType(CefString &resourceHandlerType, CefString cefstrURL) {
+	RESULT r = R_PASS;
+
+	std::string strResourceHandlerType;
+	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(strResourceHandlerType, cefstrURL));
+	resourceHandlerType = strResourceHandlerType;
+
+Error:
+	return r;
+}
+
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }

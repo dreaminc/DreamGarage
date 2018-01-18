@@ -182,6 +182,18 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 	return nullptr;
 }
 
+RESULT CEFBrowserManager::GetResourceHandlerType(CefString &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString cefstrURL) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->GetResourceHandlerType(resourceHandlerType, cefstrURL));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 
