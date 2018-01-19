@@ -38,11 +38,15 @@ RESULT UIControlBar::Initialize() {
 	m_pURLTexture = m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
+
+	//temporarily removed
+	/*
 	m_pBackButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
 
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+	//*/
 
 	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
@@ -84,8 +88,8 @@ RESULT UIControlBar::Initialize() {
 		// update button trigger events to match the observer
 		CR(m_pStopButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
 		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
-		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
-		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		//CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
+		//CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
 	}
 
@@ -156,15 +160,18 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
+	/*
 	point ptBack = point(m_itemSide / 2.0f, 0.0f, 0.0f);
 	m_pBackButton->SetPosition(ptStart + ptBack);
 
 	point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pForwardButton->SetPosition(ptStart + ptForward);
+	//*/
 
-	// URL button is centered at 0
+	point ptURL = ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
+	m_pURLButton->SetPosition(ptURL);
 
-	point ptHide = point(m_urlWidth / 2.0f + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
+	point ptHide = ptStart + point(m_urlWidth + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
 	m_pToggleButton->SetPosition(ptHide);
 
 	point ptStop = ptHide + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
@@ -237,7 +244,7 @@ std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
 }
 
 std::vector<std::shared_ptr<UIButton>> UIControlBar::GetControlButtons() {
-	return { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pStopButton, m_pURLButton };
+	return { /*m_pBackButton, m_pForwardButton,*/ m_pToggleButton, m_pStopButton, m_pURLButton };
 }
 
 texture *UIControlBar::GetHideTexture() {
