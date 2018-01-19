@@ -48,6 +48,8 @@ RESULT CollisionTestSuite::AddTests() {
 
 	CR(AddTestRayModel());
 
+	CR(SetupSkyboxPipeline("minimal"));
+
 Error:
 	return r;
 }
@@ -112,7 +114,6 @@ RESULT CollisionTestSuite::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Will reset the sandbox as needed between tests
-
 	CR(m_pSceneGraph->RemoveAllObjects());
 
 	CN(m_pDreamOS);
@@ -583,6 +584,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 500.0f;
+	
 
 	enum class TestOrientation {
 		EDGE_EDGE,
@@ -596,6 +598,9 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		EDGE_FACE
 	} testOrientation;
 
+	//int nRepeats = (int)(TestOrientation::EDGE_FACE);
+	int nRepeats = 1;
+
 	//testOrientation = TestOrientation::EDGE_EDGE;
 	//testOrientation = TestOrientation::POINT_FACE;
 	testOrientation = TestOrientation::POINT_FACE_X;
@@ -604,6 +609,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	//testOrientation = TestOrientation::AABB_AABB_X;
 	//testOrientation = TestOrientation::AABB_AABB_Y;
 	//testOrientation = TestOrientation::AABB_AABB_Z;
+	//testOrientation = (TestOrientation)(nRepeats);
 
 	struct TestContext {
 		volume *pOBBA = nullptr;
@@ -616,8 +622,6 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
-
-		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -658,7 +662,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 90.0f);
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 180.0f);
 
-				pTestContext->pOBBB->SetPosition(point(0.0f, -0.05f, 0.0f));
+				pTestContext->pOBBB->SetPosition(point(0.0f, -0.25f, 0.0f));
 				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
 				//pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
 				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, -35.0f);
@@ -786,7 +790,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-
+		
 		if (pTestContext != nullptr) {
 			delete pTestContext;
 			pTestContext = nullptr;
@@ -799,10 +803,12 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
+	//CR(SetupSkyboxPipeline("minimal"));
+
 	pNewTest->SetTestName("Plane vs Plane Test");
 	pNewTest->SetTestDescription("Plane vs Plane Test");
 	pNewTest->SetTestDuration(sTestTime);
-	//pNewTest->SetTestRepeats(nRepeats);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

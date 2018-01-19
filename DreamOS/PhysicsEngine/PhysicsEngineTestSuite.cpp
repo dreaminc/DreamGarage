@@ -20,7 +20,12 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(SetupSkyboxPipeline("blinnphong"));
+
+	CR(AddTestVolumeToPlaneVolume());
+
 	CR(AddTestVolumeVolumePointFace());
+
 	CR(AddTestVolumeVolumeEdge());
 
 	CR(AddTestRayQuadsComposite());
@@ -48,7 +53,6 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());
-	CR(AddTestVolumeToPlaneVolume());
 	CR(AddTestBallVolume());
 
 Error:
@@ -1330,8 +1334,6 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("blinnphong"));
-
 		// Volume vs Volume point - face
 
 		volume *pVolume = nullptr;
@@ -1434,23 +1436,21 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(true);
 
-		// Volume to "plane"
-		auto pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
-		CN(pVolume);
+		volume *pVolume = nullptr;
 
+		// Volume to "plane"
+		pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
+		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 		pVolume->SetMass(100000.0f);
 		pVolume->SetImmovable(true);
-
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
 		CN(pVolume);
-
 		pVolume->SetPosition(point(0.5f, 1.0f, 0.0f));
 		pVolume->SetMass(1.0f);
 		pVolume->RotateZByDeg(45.0f);
-
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		//pQuad = AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector::jVector(1.0f));

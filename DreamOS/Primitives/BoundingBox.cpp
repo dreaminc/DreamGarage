@@ -661,7 +661,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	}
 
 	// Iterate the reference face points against box B
-
+	///*
 	// Reference Face
 	BoundingBox::face boxAReferenceFace = BoundingBox::face(bestAxisReference, fNegativeReference, vBoxAHV);
 
@@ -696,7 +696,15 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 			penetration = -minSeparationDistance;
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
+
+		// TODO: I don't think this is right,
+		// but we need to not pass back the supporting edge
+		// collisions sometimes (this needs to be more general)
+		//if (manifold.NumContacts() > 0) {
+		//	return manifold;
+		//}
 	}
+	//*/
 
 	// Edges
 	///*
