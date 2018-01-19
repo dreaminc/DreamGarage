@@ -205,6 +205,7 @@ private:
 	std::shared_ptr<texture> m_pSpaceTexture;
 	std::shared_ptr<texture> m_pSymbolsTexture;
 	std::shared_ptr<texture> m_pUnshiftTexture;
+	std::shared_ptr<texture> m_pDefaultIconTexture;
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
