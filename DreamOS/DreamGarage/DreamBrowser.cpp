@@ -1475,6 +1475,7 @@ RESULT DreamBrowser::StopSending() {
 
 	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->HideApp();
+		pDreamControlViewHandle->SetControlViewTexture(m_pLoadingScreenTexture);
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 		
 		m_pDreamUserHandle->SendStopSharing();
