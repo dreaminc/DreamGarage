@@ -326,12 +326,16 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 
 		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
 
-			pHand->SetOverlayVisible(true);
+			//pHand->SetOverlayVisible(true);
+			m_pLeftHand->SetOverlayVisible(true);
+			m_pRightHand->SetOverlayVisible(true);
 
 			//UpdateOverlayTexture(type);
 			UpdateOverlayTextures();
 			if (m_appStack.empty()) {
-				pHand->SetModelState(hand::ModelState::CONTROLLER);
+				//pHand->SetModelState(hand::ModelState::CONTROLLER);
+				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 			}
 		}
 	}

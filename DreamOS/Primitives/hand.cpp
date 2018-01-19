@@ -155,7 +155,8 @@ RESULT hand::SetModelState(ModelState modelState) {
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
-		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
+		m_pOverlayQuad->SetVisible(m_fTracked && m_pOverlayQuad->IsVisible());
+		//m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
 	} break;
 	}
