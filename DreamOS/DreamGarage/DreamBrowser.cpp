@@ -497,7 +497,12 @@ Error:
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
 	
-	CR(BeginStream());
+	if (m_fShouldBeginStream) {
+		CR(BeginStream());
+	} 
+	else {
+		m_fShouldBeginStream = true;
+	}
 
 Error:
 	return r;
@@ -1493,8 +1498,11 @@ RESULT DreamBrowser::StopSending() {
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	//m_pWebBrowserController->CloseBrowser();
 	//m_pWebBrowserController = nullptr;
-	CR(SetVisible(false));
+
+	// don't stream on the next website load
+	m_fShouldBeginStream = false; 
 	CR(m_pWebBrowserController->LoadURL("about:blank"));
+	CR(SetVisible(false));
 
 Error:
 	if (pDreamControlViewHandle != nullptr) {
