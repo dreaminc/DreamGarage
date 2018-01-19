@@ -12,7 +12,7 @@ class text;
 
 //TODO: some of these values / the way they are used are specific to control view
 #define ITEM_SIDE 0.0625f
-#define URL_WIDTH 0.6875f
+#define URL_WIDTH 0.84375f //0.6875f is the width with forward and back
 #define ITEM_SPACING 0.015625f
 
 #define ITEM_ACTUATION_DEPTH 0.02f

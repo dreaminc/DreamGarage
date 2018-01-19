@@ -295,6 +295,8 @@ private:
 
 	bool m_fShowControlView = false;
 
+	bool m_fShouldBeginStream = true;
+
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
