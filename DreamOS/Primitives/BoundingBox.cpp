@@ -693,7 +693,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		{
 			// point is in there, re-orient
 			point ptContact = (matRotationB * boxAReferenceFace.m_points[i]) + ptBoxBOrigin;
-			penetration = -minSeparationDistance;
+			penetration = minSeparationDistance;
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 
