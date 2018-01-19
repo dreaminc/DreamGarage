@@ -31,6 +31,7 @@ public:
 	RESULT AddTestRayQuadsComposite();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
+	RESULT AddTestVolumeToPlaneVolumeDominos();
 	RESULT AddTestVolumeToPlaneVolume();
 	RESULT AddTestSphereVsSphereArray();
 	RESULT AddTestSphereVsSphere();

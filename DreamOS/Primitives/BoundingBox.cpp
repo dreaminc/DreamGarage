@@ -633,19 +633,22 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 	// TODO: formalize this
 	// Apply rotation of B
-	boxBIncidentFace.ApplyMatrix(matRotationB);
-	boxBIncidentFace.Translate(ptBoxBOrigin - ptBoxAOrigin);
+	//boxBIncidentFace.ApplyMatrix(matRotationB);
 	
 	// Apply A
-	boxBIncidentFace.ApplyMatrix(matTransposeRotationA);
+	//boxBIncidentFace.ApplyMatrix(matTransposeRotationA);
+
+	boxBIncidentFace.ApplyMatrix(matRelativeRotation);
+	boxBIncidentFace.Translate(vTranslationAB);
 
 	// Debug: This will add the incident face
 	//for (int i = 0; i < 4; i++) {
 	//	point ptRef = boxBIncidentFace.m_points[i];
-	//	ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	//ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
 	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
 	//}
 
+	///*
 	// Now that we have the face, clip it against our planes
 	for (int i = 0; i < 4; i++) {
 		float xAbsVal = std::abs(boxBIncidentFace.m_points[i].x());
@@ -662,11 +665,19 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 	}
+	//*/
 
 	// Iterate the reference face points against box B
 	///*
 	// Reference Face
 	BoundingBox::face boxAReferenceFace = BoundingBox::face(bestAxisReference, fNegativeReference, vBoxAHV);
+
+	//// Debug: This will add the reference face
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxAReferenceFace.m_points[i];
+	//	ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
 
 	// TODO: formalize this
 	// Apply rotation of B
@@ -680,7 +691,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	//// Debug: This will add the reference face
 	//for (int i = 0; i < 4; i++) {
 	//	point ptRef = boxAReferenceFace.m_points[i];
-	//	ptRef = (matRotationB * ptRef) + ptBoxBOrigin;
+	//	//ptRef = (matRotationB * ptRef) + ptBoxBOrigin;
 	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
 	//}
 
@@ -718,23 +729,26 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
 	//}
 
+	// Incident Face
+
 	for (int j = 0; j < 4; j++) {
-		line lineB; 
+		line edgeLine; 
 		
-		if (j < 3) {
-			lineB = line(boxBIncidentFace.m_points[j + 1], boxBIncidentFace.m_points[j]);
-			//lineB = line(boxBIncidentFace.m_points[j], boxBIncidentFace.m_points[j + 1]);
-		}
-		else {
-			lineB = line(boxBIncidentFace.m_points[0], boxBIncidentFace.m_points[j]);
-			//lineB = line(boxBIncidentFace.m_points[j], boxBIncidentFace.m_points[0]);
+		int a = j + 1;
+		int b = j;
+
+		if (j == 3) {
+			a = 0;
+			b = j;
 		}
 
-		vector vEdgeDirection = lineB.GetVector();
+		edgeLine = line(boxBIncidentFace.m_points[a], boxBIncidentFace.m_points[b]);
+
+		vector vEdgeDirection = edgeLine.GetVector();
 
 		// We can now test intersection as if it's an AABB
-		point ptMax = vBoxAHV;
-		point ptMin = -1.0f * vBoxAHV ;
+		point ptMax = (point)vBoxAHV;
+		point ptMin = (point)(-1.0f * vBoxAHV);
 
 		double tNear = -INFINITY;
 		double tFar = INFINITY;
@@ -743,14 +757,14 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		for (int i = 0; i < 3; i++) {
 
 			if (std::abs(vEdgeDirection(i)) < DREAM_EPSILON) {
-				if (ptMin(i) - lineB.a()(i) > 0 || ptMax(i) - lineB.a()(i) < 0) {
+				if (ptMin(i) - edgeLine.a()(i) > 0 || ptMax(i) - edgeLine.a()(i) < 0) {
 					fMiss = true;
 					continue;
 				}
 			}
 			else {
-				double t1 = (ptMin(i) - lineB.a()(i)) / vEdgeDirection(i);
-				double t2 = (ptMax(i) - lineB.a()(i)) / vEdgeDirection(i);
+				double t1 = (ptMin(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+				double t2 = (ptMax(i) - edgeLine.a()(i)) / vEdgeDirection(i);
 
 				double tMin = std::min(t1, t2);
 				double tMax = std::max(t1, t2);
@@ -773,20 +787,83 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		}
 
 		if ((tNear >= 0 && tNear <= 1) && (tFar >= 0 && tFar <= 1)) {
-			point ptEdgeMin = lineB.a() + (vEdgeDirection * tNear);
-			point ptEdgeMax = lineB.a() + (vEdgeDirection * tFar);
+			point ptEdgeMin = edgeLine.a() + (vEdgeDirection * tNear);
+			point ptEdgeMax = edgeLine.a() + (vEdgeDirection * tFar);
 			point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
-
+		
 			point ptContact = (matRotationA * ptEdgeMid) + ptBoxAOrigin;
 			penetration = -minSeparationDistance;
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 	}	
-	//*/
 
-	if (manifold.NumContacts() == 0) {
-		int a = 5;
+	// Reference Face
+	for (int j = 0; j < 4; j++) {
+		line edgeLine;
+
+		int a = j + 1;
+		int b = j;
+
+		if (j == 3) {
+			a = 0;
+			b = j;
+		}
+
+		edgeLine = line(boxAReferenceFace.m_points[a], boxAReferenceFace.m_points[b]);
+
+		vector vEdgeDirection = edgeLine.GetVector();
+
+		// We can now test intersection as if it's an AABB
+		point ptMax = (point)vBoxBHV;
+		point ptMin = (point)(-1.0f * vBoxBHV);
+
+		double tNear = -INFINITY;
+		double tFar = INFINITY;
+		bool fMiss = false;
+
+		for (int i = 0; i < 3; i++) {
+
+			if (std::abs(vEdgeDirection(i)) < DREAM_EPSILON) {
+				if (ptMin(i) - edgeLine.a()(i) > 0 || ptMax(i) - edgeLine.a()(i) < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+			else {
+				double t1 = (ptMin(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+				double t2 = (ptMax(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+
+				double tMin = std::min(t1, t2);
+				double tMax = std::max(t1, t2);
+
+				if (tMin > tNear)
+					tNear = tMin;
+
+				if (tMax < tFar)
+					tFar = tMax;
+
+				if (tNear > tFar || tFar < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+		}
+
+		if (fMiss) {
+			continue;
+		}
+
+		if ((tNear >= 0 && tNear <= 1) && (tFar >= 0 && tFar <= 1)) {
+			point ptEdgeMin = edgeLine.a() + (vEdgeDirection * tNear);
+			point ptEdgeMax = edgeLine.a() + (vEdgeDirection * tFar);
+			point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
+
+			point ptContact = (matRotationB * ptEdgeMid) + ptBoxBOrigin;
+			penetration = -minSeparationDistance;
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
 	}
+	//*/
 
 	return manifold;
 }

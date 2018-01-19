@@ -22,6 +22,8 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 
 	CR(SetupSkyboxPipeline("blinnphong"));
 
+	CR(AddTestVolumeToPlaneVolumeDominos());
+
 	CR(AddTestVolumeToPlaneVolume());
 
 	CR(AddTestVolumeVolumePointFace());
@@ -1424,6 +1426,188 @@ Error:
 	return r;
 }
 
+RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolumeDominos() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 215.0f;
+	int nRepeats = 1;
+
+
+	class TestContext {
+	public:
+		sphere * pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+
+
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		volume *pVolume = nullptr;
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
+		}
+
+		// Volume to "plane"
+		//pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(10.0, 10.0, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-4.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->AddAngularMomentum(vector(0.0f, 0.0f, -0.1f));
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-0.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(4.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Volume vs Volume Plane");
+	pNewTest->SetTestDescription("Volume colliding with immovable volume");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	RESULT r = R_PASS;

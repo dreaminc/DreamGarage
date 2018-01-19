@@ -644,18 +644,23 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
 				pTestContext->pOBBA->SetPosition(2.0f, -0.2f, 0.0f);
 				pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
+
+				auto pVol = m_pDreamOS->AddVolume(1.0f);
+				pVol->SetMaterialColors(COLOR_AQUA);
 			} break;
 
 			case TestOrientation::EDGE_EDGE_AABB: {
-				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
-				pTestContext->pOBBB->SetPosition(0.9f, -1.1f, 0.0f);
-				pTestContext->pOBBB->RotateByDeg(0.0f, 45.0f, 0.0f);
-				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
-
 				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
-				pTestContext->pOBBA->RotateByDeg(90.0f, 90.0f, 180.0f);
-				pTestContext->pOBBA->SetPosition(0.0f, -2.0f, 0.0f);
+				pTestContext->pOBBA->SetPosition(-1.25f, -0.25f, -0.5f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(-2.0f, -1.0f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(90.0f, 90.0f, 180.0f);
 				//pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
+
+				auto pVol = m_pDreamOS->AddVolume(1.0f);
+				pVol->SetMaterialColors(COLOR_AQUA);
 			} break;
 
 			case TestOrientation::FACE_FACE: {
@@ -673,13 +678,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 			case TestOrientation::POINT_FACE: {
 				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBA);
 				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 90.0f);
 				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 180.0f);
 
 				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBB);
 				pTestContext->pOBBB->SetPosition(point(0.0f, -0.25f, 0.0f));
 				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
 				//pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
@@ -688,14 +691,12 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 			case TestOrientation::POINT_FACE_X: {
 				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBA);
-				pTestContext->pOBBA->SetPosition(point(0.0f, 0.0f, 0.0f));
+				pTestContext->pOBBA->SetPosition(point(0.25f, -1.0f, 0.0f));
 				pTestContext->pOBBA->RotateYByDeg(45.0f);
 				pTestContext->pOBBA->RotateZByDeg(45.0f);
 
 				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBB);
-				pTestContext->pOBBB->SetPosition(point(-1.25f, 0.0f, 0.0f));
+				pTestContext->pOBBB->SetPosition(point(-1.0f, -1.0f, 0.0f));
 
 			} break;
 
@@ -780,12 +781,13 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		CN(pTestContext->pOBBB);
 
 		//pTestContext->pOBBA->translateX(-0.0002f);
+		//pTestContext->pOBBA->translateY(-0.0002f);
 
 		//pTestContext->pOBBB->translateX(-0.0001f);
 		//pTestContext->pOBBB->translateY(-0.00005f);
 		//pTestContext->pOBBB->translateZ(0.0001f);
 
-		//pTestContext->pOBBA->RotateZByDeg(0.05f);
+		pTestContext->pOBBA->RotateZByDeg(0.01f);
 		//pTestContext->pOBBB->RotateZByDeg(0.02f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
