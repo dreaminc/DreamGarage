@@ -14,6 +14,7 @@
 
 #include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
+#include "Cloud/Environment/EnvironmentAsset.h"
 
 #include <map>
 #include <vector>
@@ -181,6 +182,8 @@ public:
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
+	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
+
 	virtual RESULT HandleBackEvent() override;
 	virtual RESULT HandleForwardEvent() override;
 	virtual RESULT HandleStopEvent() override;
@@ -285,6 +288,7 @@ private:
 	std::string m_strPath;
 	std::string m_strContentType;
 	long m_currentEnvironmentAssetID = 0;
+	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
 
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;

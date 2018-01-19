@@ -11,6 +11,8 @@
 
 #include <vector>
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 class DOMNode;
 class DOMDocument;
 class AudioPacket;
@@ -60,6 +62,7 @@ public:
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) = 0;
 		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
+		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 	};
 
 public:
@@ -108,7 +111,6 @@ public:
 	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;
 
 	virtual RESULT Shutdown() = 0;
-
 
 	// frames
 	virtual size_t GetFrameCount() = 0;

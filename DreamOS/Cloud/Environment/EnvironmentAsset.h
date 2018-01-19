@@ -13,6 +13,11 @@
 
 #include "json.hpp"
 
+enum class ResourceHandlerType {
+	DEFAULT,
+	DREAM
+};
+
 class EnvironmentAsset : public dirty {
 public:
 	EnvironmentAsset(nlohmann::json jsonMenuNode);
@@ -29,6 +34,7 @@ public:
 
 	std::string GetURI();
 	const std::string& GetURL();
+	ResourceHandlerType GetResourceHandlerType();
 	std::multimap<std::string, std::string> GetHeaders();
 	long GetAssetID();
 	long GetUserID();
@@ -40,6 +46,7 @@ private:
 	std::string m_strStorageProviderScope;
 	std::string m_strTitle;
 	std::string m_strURL;
+	ResourceHandlerType m_resourceHandlerType;
 	std::string m_strContentType;
 
 	std::multimap<std::string, std::string> m_headers;

@@ -19,6 +19,8 @@
 #include "include/cef_render_handler.h"
 #include "include/cef_load_handler.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 class CEFBrowserController;
 class CEFDOMNode;
 
@@ -33,6 +35,7 @@ public:
 	virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) = 0;
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) = 0;
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(int cefBrowserID) = 0;
+	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) = 0;
 };
 
 #endif	// ! CEF_APP_OBSERVER_H_

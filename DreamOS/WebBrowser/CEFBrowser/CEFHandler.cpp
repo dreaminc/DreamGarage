@@ -349,6 +349,56 @@ Error:
 	return;
 }
 
+RESULT CEFHandler::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pCEFHandlerObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL));
+
+Error:
+	return r;
+}
+
+CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) {
+	
+	CefString strRequestURL = request->GetURL();
+	CefRequest::HeaderMap requestHeaders;
+	request->GetHeaderMap(requestHeaders);
+	bool fUsesAuthentication = false;
+
+	// Check for an authorization token
+	for (std::multimap<CefString, CefString>::iterator it = requestHeaders.begin(); it != requestHeaders.end(); ++it) {
+		if (it->first == "Authorization") {
+			fUsesAuthentication = true;
+		}
+	}
+
+	if (fUsesAuthentication) {	// If the link uses an authorization token we need to save it
+		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
+		it = m_savedRequestHeaders.find(strRequestURL);
+
+		if (it != m_savedRequestHeaders.end()) {	// If the link already exists, update the headers
+			it->second = requestHeaders;
+		}
+
+		else if (it == m_savedRequestHeaders.end()) {	// Otherwise insert it
+			m_savedRequestHeaders.insert(std::pair<CefString, std::multimap<CefString, CefString>>(strRequestURL, requestHeaders));
+		}
+	}
+
+	else {	// If the link doesn't have an auth header we need to check if it's one of the saved links
+		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
+		it = m_savedRequestHeaders.find(strRequestURL);
+
+		if (it != m_savedRequestHeaders.end()) {	// If it is, insert the headers
+			requestHeaders = it->second;
+		}
+	}
+
+	request->SetHeaderMap(requestHeaders);
+	
+	return RV_CONTINUE;
+}
+
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	
 	/*
@@ -375,14 +425,21 @@ CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowse
 	// Uncomment to skip all custom resource handling code
 	//return nullptr;
 
-	// Currently only supporting resource handler for basic GET requests
-	// otherwise, let CEF provide the valid handler
-	if (pCefRequest->GetMethod() == "GET") {
+	ResourceHandlerType resourceHandlerType;
+	CefString strCEFURL = pCefRequest->GetURL();
+	GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL);	
 
+	switch (resourceHandlerType) {
+	case (ResourceHandlerType::DREAM): {
 		CefRefPtr<CefResourceHandler> pCefResourceHandler = CefRefPtr<CefResourceHandler>(new CEFResourceHandler(pCefBrowser, pCefFrame, pCefRequest));
 		CN(pCefResourceHandler);
 
 		return pCefResourceHandler;
+	} break;
+
+	case (ResourceHandlerType::DEFAULT): {
+		return nullptr;
+	} break;
 	}
 
 Error:

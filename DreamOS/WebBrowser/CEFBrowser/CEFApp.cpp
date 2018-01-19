@@ -188,6 +188,17 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL));
+	}
+
+Error:
+	return r;
+}
+
 // This doesn't do much right now
 // but this gives us back a different browser than the browser process (render process)
 void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
