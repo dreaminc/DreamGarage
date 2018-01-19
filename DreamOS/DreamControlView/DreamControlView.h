@@ -45,6 +45,7 @@ public:
 	RESULT HideApp();
 	RESULT DismissApp();
 	RESULT SendURLtoBrowser();
+	RESULT SendBrowserScopeAndPath(std::string strScope, std::string strPath);
 	bool IsAppVisible();
 	RESULT SendURLText(std::string strURL);
 
@@ -62,6 +63,7 @@ private:
 	virtual RESULT Hide() = 0;
 	virtual RESULT Dismiss() = 0;
 	virtual RESULT SendURL() = 0;
+	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) = 0;
 	virtual bool IsVisible() = 0;
 	virtual RESULT SetURLText(std::string strURL) = 0;
 };
@@ -98,6 +100,7 @@ public:
 	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
 	virtual RESULT HandleKeyboardDown();
 	virtual RESULT SendURL() override;
+	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) override;
 
 	RESULT ResetAppComposite();
 

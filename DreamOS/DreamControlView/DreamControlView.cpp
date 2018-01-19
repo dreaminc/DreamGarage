@@ -70,6 +70,16 @@ Error:
 	return r;
 }
 
+RESULT DreamControlViewHandle::SendBrowserScopeAndPath(std::string strScope, std::string strPath) {
+	RESULT r = R_PASS;
+
+	CB(GetAppState());
+	CR(SetBrowserScopeAndPath(strScope, strPath));
+
+Error:
+	return r;
+}
+
 bool DreamControlViewHandle::IsAppVisible() {
 	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
 
@@ -471,6 +481,12 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			}
 
 			m_fIsShareURL = false;
+
+			//TODO: when using the control bar, we know that a website will be shared on enter,
+			// need a way to not have the scope and path hardcoded here
+			m_pBrowserHandle->SetScope("WebsiteProviderScope.WebsiteProvider");
+			m_pBrowserHandle->SetPath("");
+
 			CR(SendURL());
 
 			//TODO: bypass making a request to help smooth the loading
@@ -511,6 +527,25 @@ RESULT DreamControlView::SendURL() {
 		CR(m_pBrowserHandle->SendURL(m_strURL));
 		m_strURL = "";
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamControlView::SetBrowserScopeAndPath(std::string strScope, std::string strPath) {
+	RESULT r = R_PASS;
+
+	if (m_pBrowserHandle == nullptr) {
+		std::vector<UID> uids = GetDOS()->GetAppUID("DreamBrowser");	// capture browser
+		CB(uids.size() == 1);
+		m_browserUID = uids[0];
+
+		m_pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->CaptureApp(m_browserUID, this));
+		CN(m_pBrowserHandle);
+	}
+	
+	CR(m_pBrowserHandle->SetScope(strScope));
+	CR(m_pBrowserHandle->SetPath(strPath));
 
 Error:
 	return r;

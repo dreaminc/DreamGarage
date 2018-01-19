@@ -403,7 +403,6 @@ RESULT DreamBrowser::SendURL(std::string strURL) {
 
 //	SetVisible(true);
 
-	std::string strScope = m_strScope;
 	std::string strTitle = "website";
 	SetBrowserPath(strURL);
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -510,7 +509,9 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		RESULT r = R_PASS;
 		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 
-		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());	
+		if (strCurrentURL != "about:blank") {
+			m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+		}
 
 		m_strCurrentURL = strCurrentURL;
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));

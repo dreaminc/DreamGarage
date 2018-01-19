@@ -517,14 +517,24 @@ Error:
 RESULT DreamUIBar::UpdateBrowser(std::string strScope, std::string strPath) {
 	RESULT r = R_PASS;
 
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendBrowserScopeAndPath(strScope, strPath));
+
+	/*
 	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
 	CN(pBrowserHandle);
 	pBrowserHandle->SetScope(strScope);
 	pBrowserHandle->SetPath(strPath);
-
+	//*/
 Error:
+	/*
 	if (pBrowserHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pBrowserHandle, this);
+	}
+	//*/
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
 	return r;
 }
