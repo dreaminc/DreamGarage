@@ -137,7 +137,8 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		*/
 
 		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.025f;		// Penetration percentage to correct
+			const double percentCorrection = 1.00005f;		// Penetration percentage to correct
+			//const double percentCorrection = 0.95f;		// Penetration percentage to correct
 			vector vCorrection = vNormal * penetration * (percentCorrection);
 			
 			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
@@ -236,7 +237,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		pObjB->ApplyTorqueImpulse(vTorqueB);
 
 		// Friction
-		double uConstant = 0.3f;
+		double uConstant = 0.8f;
 		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
 		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f * uConstant;
 		jFrictionImpulse /= denom;

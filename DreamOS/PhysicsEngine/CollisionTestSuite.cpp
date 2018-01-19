@@ -588,6 +588,7 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 	enum class TestOrientation {
 		EDGE_EDGE,
+		EDGE_EDGE_AABB,
 		POINT_FACE,
 		POINT_FACE_X,
 		POINT_EDGE,
@@ -601,10 +602,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 	//int nRepeats = (int)(TestOrientation::EDGE_FACE);
 	int nRepeats = 1;
 
-	//testOrientation = TestOrientation::EDGE_EDGE;
+	testOrientation = TestOrientation::EDGE_EDGE;
+	//testOrientation = TestOrientation::EDGE_EDGE_AABB;
 	//testOrientation = TestOrientation::POINT_FACE;
 	//testOrientation = TestOrientation::POINT_FACE_X;
-	testOrientation = TestOrientation::EDGE_FACE;
+	//testOrientation = TestOrientation::EDGE_FACE;
 	//testOrientation = TestOrientation::FACE_FACE;
 	//testOrientation = TestOrientation::AABB_AABB_X;
 	//testOrientation = TestOrientation::AABB_AABB_Y;
@@ -616,7 +618,11 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		volume *pOBBB = nullptr;
 		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
 		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+		float translateYA = 0.0f;
+		float translateYB = 0.0f;
 	} *pTestContext = new TestContext();
+
+	
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -631,15 +637,25 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 
 		switch (testOrientation) {
 			case TestOrientation::EDGE_EDGE: {
-				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBA);
-				pTestContext->pOBBA->SetPosition(2.0f, -1.5f, 0.0f);
-				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
-
 				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
-				CN(pTestContext->pOBBB);
-				pTestContext->pOBBB->SetPosition(2.0f, -0.2f, 0.0f);
-				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+				pTestContext->pOBBB->SetPosition(2.0f, -1.5f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->SetPosition(2.0f, -0.2f, 0.0f);
+				pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
+			} break;
+
+			case TestOrientation::EDGE_EDGE_AABB: {
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(0.9f, -1.1f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 45.0f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->RotateByDeg(90.0f, 90.0f, 180.0f);
+				pTestContext->pOBBA->SetPosition(0.0f, -2.0f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
 			} break;
 
 			case TestOrientation::FACE_FACE: {
@@ -684,14 +700,18 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			} break;
 
 			case TestOrientation::EDGE_FACE: {
-				pTestContext->pOBBB = m_pDreamOS->AddVolume(0.25f, 0.25f, 1.0f);				
-				pTestContext->pOBBB->SetPosition(0.0f, 0.5f, 0.0f);
-				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, -45.0f);
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(0.5f, 0.5f, 1.0f);
+				pTestContext->pOBBA->SetPosition(-1.0f, -0.45f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 135.0f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+				//pTestContext->translateYB = -0.001f;
 
-				pTestContext->pOBBA = m_pDreamOS->AddVolume(5.0f, 5.0f, 0.5f);
-				pTestContext->pOBBA->SetPosition(0.0f, -1.0f, 0.0f);
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(5.0f, 5.0f, 0.5f);
+				pTestContext->pOBBB->SetPosition(0.0f, -1.0f, 0.0f);
 				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
 				//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
+				//pTestContext->translateYB = -0.001f;
+
 			} break;
 
 			case TestOrientation::AABB_AABB_X: {
@@ -765,8 +785,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 		//pTestContext->pOBBB->translateY(-0.00005f);
 		//pTestContext->pOBBB->translateZ(0.0001f);
 
-		//pTestContext->pOBBA->RotateZByDeg(0.01f);
-		//pTestContext->pOBBB->RotateZByDeg(0.01f);
+		//pTestContext->pOBBA->RotateZByDeg(0.05f);
+		//pTestContext->pOBBB->RotateZByDeg(0.02f);
 		//pTestContext->pOBBB->RotateYByDeg(0.024f);
 		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
 		//pTestContext->pOBBA->RotateXByDeg(-0.01f);
@@ -792,7 +812,14 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 						pTestContext->pCollidePointRay[i]->SetVisible(true);
 						pTestContext->pCollidePointRay[i]->UpdateFromRay(rPoint);
 						//pTestContext->pCollidePointRay[i]->SetRayVertices(manifold.GetContactPoint(i).GetPenetration() * 10.0f);
+						
 						pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+
+						//if(manifold.GetContactPoint(i).GetPenetration() < 0.0f)
+						//	pTestContext->pCollidePointRay[i]->SetRayVertices(-1.0f);
+						//else
+						//	pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+
 						pTestContext->pCollidePointRay[i]->UpdateBuffers();
 					}
 			
@@ -804,7 +831,8 @@ RESULT CollisionTestSuite::AddTestOBBOBB() {
 			pTestContext->pOBBA->SetMaterialColors(COLOR_GREEN);
 		}
 		else {
-			pTestContext->pOBBB->translateY(-0.001f);
+			//pTestContext->pOBBA->translateY(pTestContext->translateYA);
+			//pTestContext->pOBBB->translateY(pTestContext->translateYB);
 			pTestContext->pOBBA->SetMaterialColors(COLOR_BLUE);
 		}
 

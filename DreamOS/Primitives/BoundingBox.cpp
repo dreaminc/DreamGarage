@@ -561,9 +561,11 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	}
 	//*/
 
+
 	// Use translation vector to figure out direction of normal
-	if (vAxis.dot(vTranslationAB) < 0.0f)
+	if (vAxis.dot(vTranslationAB) < 0.0f) {
 		vAxis *= -1.0f;
+	}
 	//
 	vector vNormal = matRotationA * vAxis;
 
@@ -585,21 +587,22 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 			// Reference Face
 			if (j == 1) {
-				vTemp = -1.0f * vAxesA[i];
+				vTemp = (-1.0f * vAxesA[i]);
 			}
 			else {
-				vTemp = vAxesA[i];
+				vTemp = (vAxesA[i]);
 			}
 
-			d = vNormal.dot(vTemp);
+			// Use axis (not normal)
+			d = vAxis.dot(vTemp);
 
-			if (d > bestDotProdReference) {
+			if (d > bestDotProdReference + SAT_EPSILON) {
 
 				bestDotProdReference = d;
 				bestAxisReference = i;
 				fNegativeReference = (bool)(j);
 
-				vFaceVectorIncident = vTemp;
+				vFaceVectorReference = vTemp;
 			}
 
 			// Incident Face
@@ -612,13 +615,13 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 			d = vNormal.dot(vTemp);
 
-			if (d < bestDotProdIncident) {
+			if (d < (bestDotProdIncident - SAT_EPSILON)) {
 
 				bestDotProdIncident = d;
 				bestAxisIncident = i;
 				fNegativeIncident = (bool)(j);
 
-				vFaceVectorReference = vTemp;
+				vFaceVectorIncident = vTemp;
 			}
 		}
 	}
@@ -677,7 +680,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 	//// Debug: This will add the reference face
 	//for (int i = 0; i < 4; i++) {
 	//	point ptRef = boxAReferenceFace.m_points[i];
-	//	//ptRef = (matRotationB * ptRef) + ptBoxBOrigin;
+	//	ptRef = (matRotationB * ptRef) + ptBoxBOrigin;
 	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
 	//}
 
@@ -693,7 +696,7 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		{
 			// point is in there, re-orient
 			point ptContact = (matRotationB * boxAReferenceFace.m_points[i]) + ptBoxBOrigin;
-			penetration = minSeparationDistance;
+			penetration = -minSeparationDistance;
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 
@@ -708,8 +711,25 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 
 	// Edges
 	///*
+
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxBIncidentFace.m_points[i];
+	//	//ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
+
 	for (int j = 0; j < 4; j++) {
-		line lineB = line(((j < 3) ? boxBIncidentFace.m_points[j + 1] : boxBIncidentFace.m_points[0]), boxBIncidentFace.m_points[j]);
+		line lineB; 
+		
+		if (j < 3) {
+			lineB = line(boxBIncidentFace.m_points[j + 1], boxBIncidentFace.m_points[j]);
+			//lineB = line(boxBIncidentFace.m_points[j], boxBIncidentFace.m_points[j + 1]);
+		}
+		else {
+			lineB = line(boxBIncidentFace.m_points[0], boxBIncidentFace.m_points[j]);
+			//lineB = line(boxBIncidentFace.m_points[j], boxBIncidentFace.m_points[0]);
+		}
+
 		vector vEdgeDirection = lineB.GetVector();
 
 		// We can now test intersection as if it's an AABB
@@ -729,8 +749,8 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 				}
 			}
 			else {
-				double t1 = (ptMin(i) - lineB .a()(i)) / vEdgeDirection(i);
-				double t2 = (ptMax(i) - lineB .a()(i)) / vEdgeDirection(i);
+				double t1 = (ptMin(i) - lineB.a()(i)) / vEdgeDirection(i);
+				double t2 = (ptMax(i) - lineB.a()(i)) / vEdgeDirection(i);
 
 				double tMin = std::min(t1, t2);
 				double tMax = std::max(t1, t2);
@@ -763,6 +783,10 @@ CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
 		}
 	}	
 	//*/
+
+	if (manifold.NumContacts() == 0) {
+		int a = 5;
+	}
 
 	return manifold;
 }

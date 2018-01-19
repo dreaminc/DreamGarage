@@ -1428,17 +1428,43 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 15.0f;
+	double sTestTime = 215.0f;
 	int nRepeats = 1;
 
+	
+	class TestContext {
+	public:
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+		
+
+	} *pTestContext = new TestContext();
+
 	// Initialize Code 
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(true);
 
 		volume *pVolume = nullptr;
 
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
+		}
+
 		// Volume to "plane"
+		//pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
 		pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
 		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
@@ -1446,11 +1472,12 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 		pVolume->SetImmovable(true);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
-		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 0.5f);
 		CN(pVolume);
 		pVolume->SetPosition(point(0.5f, 1.0f, 0.0f));
 		pVolume->SetMass(1.0f);
-		pVolume->RotateZByDeg(45.0f);
+		pVolume->RotateZByDeg(25.0f);
+		//pVolume->RotateZByDeg(-15.01f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		//pQuad = AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector::jVector(1.0f));
@@ -1478,7 +1505,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Volume vs Volume Plane");
@@ -3097,23 +3124,23 @@ RESULT PhysicsEngineTestSuite::SetupSkyboxPipeline(std::string strRenderShaderNa
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Debug Overlay
-	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
-	CN(pDebugOverlay);
-	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	// Debug Overlay
+	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+	CN(pDebugOverlay);
+	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
