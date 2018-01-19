@@ -1410,13 +1410,22 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
 		CN(m_pWebBrowserController);
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+		/*
 		m_fShowControlView = true;
 
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		m_pDreamUserHandle->SendPreserveSharingState(false);	
+		*/
 	}
+
+	m_fShowControlView = true;
+
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+	m_pDreamUserHandle->SendPreserveSharingState(false);
 
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
@@ -1482,9 +1491,10 @@ RESULT DreamBrowser::StopSending() {
 	}
 
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-	m_pWebBrowserController->CloseBrowser();
-	m_pWebBrowserController = nullptr;
+	//m_pWebBrowserController->CloseBrowser();
+	//m_pWebBrowserController = nullptr;
 	CR(SetVisible(false));
+	CR(m_pWebBrowserController->LoadURL("about:blank"));
 
 Error:
 	if (pDreamControlViewHandle != nullptr) {
