@@ -17,7 +17,7 @@
 #include "Primitives/singleton.h"
 
 #include "WebBrowser/WebBrowserController.h"
-
+#include "Cloud/Environment/EnvironmentAsset.h"
 #include "CEFBrowserController.h"
 
 #include "include\cef_client.h"
@@ -38,7 +38,9 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
-	public CefRenderHandler
+	public CefRenderHandler,
+	public CefAudioHandler,
+	public CefRequestHandler
 	//public CefDownloadHandler
 {
 public:
@@ -52,19 +54,27 @@ public:
 		virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) = 0;
 		virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
 		virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) = 0;
+
 
 		virtual RESULT OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
 		virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) = 0;
 		virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) = 0;
+		virtual RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) = 0;
+		
+		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) = 0;
 	};
 
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
 
 	// CefClient
+	virtual CefRefPtr<CefAudioHandler> GetAudioHandler() override;
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
+	virtual CefRefPtr<CefRequestHandler> GetRequestHandler() override;
+	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 
 	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
 	// CefDownloadHandler methods
@@ -87,6 +97,7 @@ public:
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
 	virtual bool DoClose(CefRefPtr<CefBrowser> browser) override;
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
+	virtual bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access);
 
 	// CefLoadHandler
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
@@ -106,12 +117,27 @@ public:
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
 	virtual void OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) override;
 
+	// CefAudioHandler
+	virtual void OnAudioData(CefRefPtr<CefBrowser> browser,
+		int frames, int channels, int bits_per_sample,
+		const void* data_buffer) override;
+
+	// CefRequestHandler
+	virtual ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) override;
+	virtual bool OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) override;
+	virtual CefRefPtr<CefResourceHandler> GetResourceHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request) override;
+
+	// Pipe to Browser
+	RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL);
+	
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
 	bool m_fShuttingdown = false;
 	bool m_fBrowserRunning = false;
 
 	CEFHandlerObserver* m_pCEFHandlerObserver = nullptr;
+
+	std::map<CefString, std::multimap<CefString, CefString>> m_savedRequestHeaders;
 
 	IMPLEMENT_REFCOUNTING(CEFHandler);
 };

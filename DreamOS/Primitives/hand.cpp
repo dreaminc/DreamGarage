@@ -1,177 +1,11 @@
 #include "hand.h"
 #include "Sense/SenseLeapMotionHand.h"
-#include "DreamConsole/DreamConsole.h"
 #include "Primitives/sphere.h"
 #include "Primitives/model/model.h"
-
-thumb::thumb(HALImp* pHALImp) :
-	finger(pHALImp)
-{
-	//Initialize();
-}
-
-RESULT thumb::Initialize() {
-	RESULT r = R_PASS;
-
-	float width = 0.25f;
-	float height = 0.25f;
-	float length = 1.0f;
-	float jointRadius = 0.01f;
-
-	/*
-	m_pMetacarpal = AddVolume(width, height, length);
-	m_pMetacarpal->SetColor(color(COLOR_RED));
-	m_pMetacarpal->UpdateBuffers();
-
-	m_pProximalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-	m_pProximalPhalanx->SetPivotPoint(0, length, 0);
-	m_pProximalPhalanx->SetColor(color(COLOR_BLUE));
-	m_pProximalPhalanx->UpdateBuffers();
-	m_pMetacarpal->AddChild(m_pProximalPhalanx);
-
-	m_pDistalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-	m_pDistalPhalanx->SetPivotPoint(0, length, 0);
-	m_pDistalPhalanx->SetColor(color(COLOR_YELLOW));
-	m_pDistalPhalanx->UpdateBuffers();
-	m_pProximalPhalanx->AddChild(m_pDistalPhalanx);
-	*/
-
-	m_pTip = AddSphere(jointRadius, 10, 10);
-	m_pDIP = AddSphere(jointRadius, 10, 10);
-	m_pPIP = AddSphere(jointRadius, 10, 10);
-	//m_pMCP = AddSphere(jointRadius, 10, 10);
-
-//Error:
-	return r;
-}
-
-thumb::ThumbState thumb::GetThumbState() {
-	ThumbState thumbState = {
-		m_pTip->GetPosition(),
-		m_pDIP->GetPosition(),
-		m_pPIP->GetPosition()
-	};
-
-	return thumbState;
-}
-
-RESULT thumb::SetThumbState(const ThumbState& pThumbState) {
-	RESULT r = R_PASS;
-
-	m_pTip->SetPosition(pThumbState.ptTip);
-	m_pDIP->SetPosition(pThumbState.ptDIP);
-	m_pPIP->SetPosition(pThumbState.ptPIP);
-
-//Error:
-	return r;
-}
-
-
-finger::finger(HALImp* pHALImp) :
-	composite(pHALImp),
-	m_pMCP(nullptr),
-	m_pTip(nullptr),
-	m_pPIP(nullptr),
-	m_pDIP(nullptr)
-{
-	//Initialize();
-}
-
-RESULT finger::Initialize() {
-	RESULT r = R_PASS;
-
-	float width = 0.25f;
-	float height = 0.25f;
-	float length = 1.0f;
-	float jointRadius = 0.01f;
-
-	/*
-	m_pMetacarpal = AddVolume(width, height, length);
-	m_pMetacarpal->SetColor(color(COLOR_RED));
-	m_pMetacarpal->UpdateBuffers();
-
-	m_pProximalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-	m_pProximalPhalanx->SetPivotPoint(0, length, 0);
-	m_pProximalPhalanx->SetColor(color(COLOR_BLUE));
-	m_pProximalPhalanx->UpdateBuffers();
-	m_pMetacarpal->AddChild(m_pProximalPhalanx);
-
-	m_pIntermediatePhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-	m_pIntermediatePhalanx->SetPivotPoint(0, length, 0);
-	m_pIntermediatePhalanx->SetColor(color(COLOR_GREEN));
-	m_pIntermediatePhalanx->UpdateBuffers();
-	m_pProximalPhalanx->AddChild(m_pIntermediatePhalanx);
-
-	m_pDistalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-	m_pDistalPhalanx->SetPivotPoint(0, length, 0);
-	m_pDistalPhalanx->SetColor(color(COLOR_YELLOW));
-	m_pDistalPhalanx->UpdateBuffers();
-	m_pIntermediatePhalanx->AddChild(m_pDistalPhalanx);
-	*/
-
-	m_pTip = AddSphere(jointRadius, 10, 10);
-	m_pMCP = AddSphere(jointRadius, 10, 10);
-	m_pDIP = AddSphere(jointRadius, 10, 10);
-	m_pPIP = AddSphere(jointRadius, 10, 10);
-
-//Error:
-	return r;
-}
-
-finger::FingerState finger::GetFingerState() {
-	FingerState fingerState = {
-		m_pTip->GetPosition(),
-		m_pMCP->GetPosition(),
-		m_pDIP->GetPosition(),
-		m_pPIP->GetPosition()
-	};
-
-	return fingerState;
-}
-
-RESULT finger::SetFingerState(const FingerState& pFingerState) {
-	RESULT r = R_PASS;
-
-	m_pTip->SetPosition(pFingerState.ptTip);
-	m_pMCP->SetPosition(pFingerState.ptMCP);
-	m_pDIP->SetPosition(pFingerState.ptDIP);
-	m_pPIP->SetPosition(pFingerState.ptPIP);
-
-//Error:
-	return r;
-}
-
-RESULT finger::SetJointPosition(point ptJoint, JOINT_TYPE jointType) {
-	switch (jointType) {
-		case JOINT_MCP: {
-			if (m_pMCP != nullptr)
-				m_pMCP->SetPosition(ptJoint);
-		} break;
-
-		case JOINT_DIP: {
-			if (m_pDIP != nullptr)
-				m_pDIP->SetPosition(ptJoint);
-		} break;
-
-		case JOINT_PIP: {
-			if (m_pPIP != nullptr)
-				m_pPIP->SetPosition(ptJoint);
-		} break;
-
-		case JOINT_TIP: {
-			if (m_pTip != nullptr)
-				m_pTip->SetPosition(ptJoint);
-		} break;
-		
-		default: 
-		case JOINT_INVALID: {
-			return R_FAIL;
-		} break;
-	}
-
-	return R_PASS;
-}
-
+#include "Primitives/DimObj.h"
+#include "Primitives/model/mesh.h"
+#include "DreamOS.h"
+#include "InteractionEngine/AnimationItem.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
@@ -187,7 +21,7 @@ RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const ha
 	return R_PASS;
 }
 
-std::shared_ptr<model> hand::GetModel(HAND_TYPE handType) {
+std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
 	return m_pModel;
 }
 
@@ -195,33 +29,12 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	float palmRadius = 0.01f;
+	point ptModel = point(0.0f, 0.0f, 0.08f);
+	float scaleModel = 0.015f;
 
-	m_pPalm = AddSphere(palmRadius, 10, 10);
-
-	m_pIndexFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
-	m_pIndexFinger->Initialize();
-	AddObject(m_pIndexFinger);
-
-	m_pMiddleFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
-	m_pMiddleFinger->Initialize();
-	AddObject(m_pMiddleFinger);
-
-	m_pRingFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
-	m_pRingFinger->Initialize();
-	AddObject(m_pRingFinger);
-
-	m_pPinkyFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
-	m_pPinkyFinger->Initialize();
-	AddObject(m_pPinkyFinger);
-
-	m_pThumb = std::shared_ptr<thumb>(new thumb(m_pHALImp));
-	m_pThumb->Initialize();
-	AddObject(m_pThumb);
+	//m_pPalm = AddSphere(palmRadius, 10, 10);
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
-
-	point ptModel = point(0.0f, 0.0f, 0.0f);
-	float scaleModel = 0.015f;
 
 #ifndef _DEBUG
 	if (type == HAND_TYPE::HAND_LEFT) {
@@ -239,22 +52,181 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
 						
+	m_pPhantomVolume = MakeVolume(0.15, 0.15, 0.01);	// This is the "hitbox" for the controller overlay 
+	CN(m_pPhantomVolume);
+	m_pPhantomVolume->SetVisible(false);
+	AddObject(m_pPhantomVolume);
+
 #else
-	m_pModel = AddComposite();
-	m_pModel->AddVolume(0.02f);
+	//m_pModel = AddComposite();
+	//m_pModel->AddVolume(0.02f);
+	m_pModel = AddModel(L"cube.obj");
+	m_pModel->SetScale(0.02f);
 #endif
 	
 	m_fOriented = false;
-	m_fSkeleton = false;
 
 	m_qRotation = GetOrientation();
 
 	m_fTracked = false;
 	//Start all visibility at false
-	OnLostTrack();
+	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
 
 Error:
 	return r;
+}
+
+RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
+	RESULT r = R_PASS;
+
+	CN(pDreamOS);
+	m_pDreamOS = pDreamOS;
+
+	auto pHMD = m_pDreamOS->GetHMD();
+	CNR(pHMD, R_SKIPPED);
+
+	m_pController = pHMD->GetSenseControllerObject((ControllerType)(m_handType));
+	CN(m_pController);
+	m_pController->SetVisible(false);
+
+	//TODO: several unique positioning variables per device here that aren't used anywhere else
+	switch (pHMD->GetDeviceType()) {
+	case (HMDDeviceType::OCULUS): {
+
+		float scale = OVR_OVERLAY_SCALE;
+		float overlayAspect = OVR_OVERLAY_ASPECT_RATIO;
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(scale * t * OVR_OVERLAY_POSITION_X, 
+										scale * OVR_OVERLAY_POSITION_Y, 
+										scale * OVR_OVERLAY_POSITION_Z));
+		m_pOverlayQuad->SetVisible(false);
+
+	} break;
+	case (HMDDeviceType::VIVE): {
+
+		float scale = VIVE_OVERLAY_SCALE;
+		float overlayAspect = VIVE_ASPECT_RATIO;
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X, 
+										scale * VIVE_OVERLAY_POSITION_Y, 
+										scale * VIVE_OVERLAY_POSITION_Z));
+		m_pOverlayQuad->SetVisible(false);
+
+	} break;
+	}
+
+
+Error:
+	return r;
+}
+
+hand::ModelState hand::GetModelState() {
+	return m_modelState;
+}
+
+RESULT hand::SetModelState(ModelState modelState) {
+	RESULT r = R_PASS;
+
+	CBR(m_modelState != modelState, R_SKIPPED);
+	//CNR(m_modelState)
+	/*
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pModel.get());
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pMesh);
+	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pOverlayQuad.get());
+	//*/
+
+	switch (m_modelState) {
+	case ModelState::HAND: {
+		HideModel();
+	} break;
+	case ModelState::CONTROLLER: {
+		HideController();
+	} break;
+	}
+
+	switch (modelState) {
+	case ModelState::HAND: {
+		ShowModel();
+	} break;
+	case ModelState::CONTROLLER: {
+		ShowController();
+		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
+	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
+	} break;
+	}
+
+	m_modelState = modelState;
+
+Error:
+	return r;
+}
+
+RESULT hand::Update() {
+	RESULT r = R_PASS;
+
+	switch (m_modelState) {
+	case ModelState::HAND: {
+		m_pModel->SetVisible(m_fTracked);
+	} break;
+	case ModelState::CONTROLLER: {
+		m_pController->SetVisible(m_fTracked);
+//		if (!m_pOverlayQuad->IsVisible())
+//			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
+		m_pOverlayQuad->SetVisible(m_pOverlayQuad->IsVisible() && m_fTracked);
+	} break;
+	}
+
+	return r;
+}
+
+RESULT hand::SetVisible(bool fVisible, bool fSetChildren /* = true */) {
+	RESULT r = R_PASS;
+
+	//Ensure hand is not set to visible while not tracked
+	CR(DimObj::SetVisible(fVisible && m_fTracked, fSetChildren));
+	//Ensure phantom volume is not set to visible
+	m_pPhantomVolume->SetVisible(false);
+
+Error:
+	return r;
+}
+
+RESULT hand::SetOverlayVisible(bool fVisible) {
+	RESULT r = R_PASS;
+
+	if (m_fOverlayVisible != fVisible && m_pOverlayQuad != nullptr) {
+		if (fVisible) {
+			ShowOverlay();
+		}
+		else {
+			HideOverlay();
+		}
+	}
+	m_fOverlayVisible = fVisible;
+//	CNR(m_pOverlayQuad, R_SKIPPED);
+//	m_pOverlayQuad->SetVisible(fVisible);
+
+//Error:
+	return r;
+}
+
+RESULT hand::SetOverlayTexture(texture *pOverlayTexture) {
+	RESULT r = R_PASS;
+
+	CN(pOverlayTexture);
+	m_pOverlayQuad->SetDiffuseTexture(pOverlayTexture);
+
+Error:
+	return r;
+}
+
+std::shared_ptr<volume> hand::GetPhantomVolume() {
+	return m_pPhantomVolume;
 }
 
 RESULT hand::SetOriented(bool fOriented) {
@@ -264,15 +236,6 @@ RESULT hand::SetOriented(bool fOriented) {
 
 bool hand::IsOriented() {
 	return m_fOriented;
-}
-
-RESULT hand::SetSkeleton(bool fSkeleton) {
-	m_fSkeleton = fSkeleton;
-	return R_PASS;
-}
-
-bool hand::IsSkeleton() {
-	return m_fSkeleton;
 }
 
 RESULT hand::SetTracked(bool fTracked) {
@@ -289,12 +252,7 @@ RESULT hand::OnLostTrack() {
 	
 	m_pModel->SetVisible(m_fTracked);
 	
-	m_pPalm->SetVisible(m_fTracked);
-	m_pIndexFinger->SetVisible(m_fTracked);
-	m_pMiddleFinger->SetVisible(m_fTracked);
-	m_pRingFinger->SetVisible(m_fTracked);
-	m_pPinkyFinger->SetVisible(m_fTracked);
-	m_pThumb->SetVisible(m_fTracked);
+	//m_pPalm->SetVisible(m_fTracked);
 
 	return R_PASS;
 }
@@ -304,109 +262,21 @@ RESULT hand::SetLocalOrientation(quaternion qRotation) {
 	return R_PASS;
 }
 
-RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
-	RESULT r = R_PASS;
-
-	m_fTracked = true;
-
-	m_handType = (hand.isLeft()) ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
-	//m_leapHandID = hand.id();
-
-	// update skeleton
-	Leap::Vector leapPalmPosition = hand.palmPosition();
-	leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
-	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.z, leapPalmPosition.y);
-
-	SetPosition(ptPalmPosition * -1.0f);
-
-	Leap::Matrix mBasis = hand.basis();
-	Leap::Vector xAxis = mBasis.xBasis;
-	Leap::Vector yAxis = mBasis.yBasis;
-	Leap::Vector zAxis = mBasis.zBasis;
-
-	vector vx = vector(-xAxis.x, -xAxis.z, -xAxis.y);
-	vector vy = vector(-yAxis.x, -yAxis.z, -yAxis.y);
-	vector vz = vector(-zAxis.x, -zAxis.z, -zAxis.y);
-	
-	// the x-axis is positive in the direction from the palm to the pinky,
-	// so it must be reversed for the left hand
-	if (hand.isLeft()) {
-		vx = vector(xAxis.x, xAxis.z, xAxis.y);
-	}
-
-	quaternion qRotation = quaternion();
-	qRotation.SetQuaternion(vx, vy, vz);
-	qRotation.Reverse();
-
-	m_qRotation = qRotation;
-
-	Leap::Matrix handTransform;
-	handTransform.origin = hand.palmPosition();
-	handTransform = handTransform.rigidInverse();
-
-	for (int i = 0; i < hand.fingers().count(); i++) {
-		Leap::Finger leapFinger = hand.fingers()[i];
-	
-		Leap::Vector jointPosition;
-		Leap::Vector transformedJointPosition;
-
-		std::shared_ptr<finger> pFinger = nullptr;
-
-		switch (leapFinger.type()) {
-			case Leap::Finger::TYPE_THUMB: pFinger = m_pThumb; break;
-			case Leap::Finger::TYPE_INDEX: pFinger = m_pIndexFinger; break;
-			case Leap::Finger::TYPE_MIDDLE: pFinger = m_pMiddleFinger; break;
-			case Leap::Finger::TYPE_RING: pFinger = m_pRingFinger; break;
-			case Leap::Finger::TYPE_PINKY: pFinger = m_pPinkyFinger; break;
-		}
-	
-		for (int j = 0; j <= (int)(Leap::Finger::JOINT_TIP); j++) {
-			Leap::Finger::Joint jt = (Leap::Finger::Joint)(j);
-			transformedJointPosition = handTransform.transformPoint(leapFinger.jointPosition(jt));
-			point ptPosition = point(transformedJointPosition.x, transformedJointPosition.z, transformedJointPosition.y);
-			ptPosition *= (-1.0f / 1000.0f);
-			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
-		}
-	}
-
-	// update model
-	HAND_TYPE modelType = (m_fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
-	SetHandModel(modelType);
-
-	m_pModel->SetOrientation(m_qRotation);
-	
-//Error:
-	return r;
-}
 
 RESULT hand::SetHandModel(HAND_TYPE type) {
-	SetVisible();
-	
-	if (type == HAND_TYPE::HAND_SKELETON) {
-		m_pPalm->SetVisible(true);
-		m_pIndexFinger->SetVisible(true);
-		m_pMiddleFinger->SetVisible(true);
-		m_pRingFinger->SetVisible(true);
-		m_pPinkyFinger->SetVisible(true);
-		m_pThumb->SetVisible(true);
-	}
-	else {
-		m_pModel->SetVisible(true);
-	}
+	RESULT r = R_PASS;
 
-	return R_PASS;
+	CBR(type == HAND_TYPE::HAND_SKELETON, R_SKIPPED) 
+
+	SetVisible();
+	m_pModel->SetVisible(true);
+
+Error:
+	return r;
 }
 
 RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
 	m_pModel->SetOrientation(qOrientation);
-	return R_PASS;
-}
-
-RESULT hand::ToggleRenderType() {
-	m_fSkeleton = !m_fSkeleton;
-	HAND_TYPE modelType = (m_fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
-	SetHandModel(modelType);
-
 	return R_PASS;
 }
 
@@ -417,19 +287,12 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	SetPosition(pt);
 
 	m_handType = pHandState.handType;
-	HAND_TYPE modelType = (pHandState.fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
-	SetHandModel(modelType);
+	SetHandModel(pHandState.handType);
 
 	m_fTracked = pHandState.fTracked;
 	if (!m_fTracked)
 		OnLostTrack();
 
-	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
-	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
-	m_pRingFinger->SetFingerState(pHandState.fingerRing);
-	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
-	m_pThumb->SetThumbState(pHandState.thumb);
-	
 	m_pModel->SetOrientation(pHandState.qOrientation);
 
 //Error:
@@ -442,13 +305,7 @@ hand::HandState hand::GetHandState() {
 		GetPosition(true),
 		m_qRotation,
 		m_fOriented,
-		m_fSkeleton,
-		m_fTracked,
-		m_pIndexFinger->GetFingerState(),
-		m_pMiddleFinger->GetFingerState(),
-		m_pRingFinger->GetFingerState(),
-		m_pPinkyFinger->GetFingerState(),
-		m_pThumb->GetThumbState()
+		m_fTracked
 	};
 
 	return handState;
@@ -460,14 +317,172 @@ hand::HandState hand::GetDebugHandState(HAND_TYPE handType) {
 		point(1,2,3),
 		quaternion(),
 		false,
-		false,
-		false,
-		finger::FingerState(),
-		finger::FingerState(),
-		finger::FingerState(),
-		finger::FingerState(),
-		thumb::ThumbState()
+		false
 	};
 
 	return handState;
+}
+
+RESULT hand::HideModel() {
+	RESULT r = R_PASS;
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pModel->SetVisible(false);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+Error:
+	return r;
+}
+
+RESULT hand::ShowModel() {
+	RESULT r = R_PASS;
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pModel->SetVisible(true && m_fTracked);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(),
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags()));
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pModel.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::HideController() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pController->SetVisible(false);
+		return r;
+	};
+
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+//		m_pController, 
+		pMesh,
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::ShowController() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pController->SetVisible(true && m_fTracked);
+		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
+		return r;
+	};
+
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		pMesh,
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags()));
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+//		m_pController, 
+		pMesh,
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		HAND_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::HideOverlay() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pOverlayQuad->SetVisible(false);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pOverlayQuad.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		OVERLAY_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		nullptr,
+		fnVisibleCallback,
+		this));
+
+Error:
+	return r;
+}
+
+RESULT hand::ShowOverlay() {
+	RESULT r = R_PASS;
+	//CNR(m_pDreamOS, R_SKIPPED);
+
+	auto fnVisibleCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pOverlayQuad->SetVisible(true && m_fTracked && m_fOverlayVisible);
+		return r;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pOverlayQuad.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		OVERLAY_ANIMATION_DURATION, 
+		AnimationCurveType::SIGMOID, 
+		AnimationFlags(),
+		fnVisibleCallback,
+		nullptr,
+		this));
+
+Error:
+	return r;
 }

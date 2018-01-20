@@ -18,6 +18,23 @@ std::vector<std::string> util::TokenizeString(std::string str, char cDelim) {
 	return strTokens;
 }
 
+std::vector<std::string> util::TokenizeString(std::string str, std::string strDelim) {
+	size_t str_pos = 0;
+	std::string strToken;
+	std::vector<std::string> strTokens;
+
+	do {
+		str_pos = str.find(strDelim); 
+		
+		strToken = str.substr(0, str_pos);
+		strTokens.push_back(strToken);
+
+		str.erase(0, str_pos + strDelim.length());
+	} while (str_pos != std::string::npos);
+
+	return strTokens;
+}
+
 void util::tolowerstring(std::string& str) {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }

@@ -8,30 +8,28 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_
-#define WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_
+#ifndef MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_
+#define MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_
 
 #include <vector>
 
-#include "webrtc/media/engine/fakewebrtcdeviceinfo.h"
-#include "webrtc/media/engine/fakewebrtcvideocapturemodule.h"
-#include "webrtc/media/engine/webrtcvideocapturer.h"
+#include "media/engine/fakewebrtcdeviceinfo.h"
+#include "media/engine/fakewebrtcvideocapturemodule.h"
+#include "media/engine/webrtcvideocapturer.h"
 
 // Factory class to allow the fakes above to be injected into
 // WebRtcVideoCapturer.
 class FakeWebRtcVcmFactory : public cricket::WebRtcVcmFactoryInterface {
  public:
   virtual rtc::scoped_refptr<webrtc::VideoCaptureModule> Create(
-      int module_id,
       const char* device_id) {
     if (!device_info.GetDeviceById(device_id)) return NULL;
     rtc::scoped_refptr<FakeWebRtcVideoCaptureModule> module(
-        new rtc::RefCountedObject<FakeWebRtcVideoCaptureModule>(this,
-                                                                module_id));
+        new rtc::RefCountedObject<FakeWebRtcVideoCaptureModule>(this));
     modules.push_back(module);
     return module;
   }
-  virtual webrtc::VideoCaptureModule::DeviceInfo* CreateDeviceInfo(int id) {
+  virtual webrtc::VideoCaptureModule::DeviceInfo* CreateDeviceInfo() {
     return &device_info;
   }
   virtual void DestroyDeviceInfo(webrtc::VideoCaptureModule::DeviceInfo* info) {
@@ -48,4 +46,4 @@ FakeWebRtcVideoCaptureModule::~FakeWebRtcVideoCaptureModule() {
     factory_->OnDestroyed(this);
 }
 
-#endif  // WEBRTC_MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_
+#endif  // MEDIA_ENGINE_FAKEWEBRTCVCMFACTORY_H_

@@ -6,12 +6,11 @@
 // Error Handling Macros
 
 #include "RESULT.h"
+
 #include <assert.h>
 
 #include <stdio.h>
 #include <stddef.h>
-
-
 
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
@@ -23,20 +22,26 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #endif
 */
 
+// Logging (needs DreamLogger included)
+//#define _ENABLE_LOGGING
+#ifdef _ENABLE_LOGGING
+	#define DOSLOG(level, strMsg, ...) do { \
+		DreamLogger::instance()->Log(DreamLogger::Level::level, strMsg, ##__VA_ARGS__); \
+	} while (0);
+#else
+	#define DOSLOG(level, strMsg, ...)
+#endif
+// ------------------------------------
+ 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
 	#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
 #elif defined(DEBUG_OUT_TO_WIN_DEBUGGER)
-	#include <windows.h>
-
-	#define DEBUGGER_SIGNATURE "DOS::"
-	#define DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
-	#define	OUTPUT_MAX_SIZE	1024
-
-	static char outstr[OUTPUT_MAX_SIZE] = { DEBUGGER_SIGNATURE };
-	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') OutputDebugStringA(outstr); } while(0);
+	// empty
 #endif
 
+
+// Console Output
 #ifdef _DEBUG
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
     #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
@@ -49,8 +54,26 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 	#define DEBUG_SYSTEM_PAUSE()
 #endif
 
-#define DEBUG_FILE_LINE
 
+// DevEnv output (available in release) but should throw a production error
+#ifdef _WIN32
+	#define DOS_DEBUGGER_SIGNATURE "DOS::"
+	#define DOS_DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
+	#define	DOS_DEBUGGER_OUTPUT_MAX_SIZE	1024
+
+	extern void OutputDebugString(wchar_t*);
+	static char szDebugOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
+
+	//#define DEVENV_LINEOUT(str) do { OutputDebugString(str); } while(0); 
+		
+	#define DEVENV_LINEOUT(str, ...) do {																												\
+		sprintf_s(szDebugOutputString + DOS_DEBUGGER_SIGNATURE_SIZE, DOS_DEBUGGER_OUTPUT_MAX_SIZE - DOS_DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__);	\
+		if (szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\n' && szDebugOutputString[DOS_DEBUGGER_SIGNATURE_SIZE] != '\r')						\
+			OutputDebugStringA(szDebugOutputString);																									\
+		} while(0);
+#endif
+
+#define DEBUG_FILE_LINE
 #ifdef DEBUG_FILE_LINE
     #define CurrentFileLine "%s line#%d\n", __FILE__, __LINE__
 #else

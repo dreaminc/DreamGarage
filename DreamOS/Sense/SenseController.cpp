@@ -1,5 +1,4 @@
 #include "SenseController.h"
-#include "DreamConsole/DreamConsole.h"
 
 SenseController::SenseController()
 {

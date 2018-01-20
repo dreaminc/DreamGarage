@@ -9,12 +9,12 @@
  *
  */
 
-#ifndef WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_
-#define WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_
+#ifndef MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_
+#define MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_
 
 #include <vector>
 
-#include "webrtc/base/basictypes.h"
+#include "rtc_base/basictypes.h"
 
 namespace webrtc {
 namespace rtcp {
@@ -32,13 +32,15 @@ struct ReceiveTimeInfo {
 class Dlrr {
  public:
   static const uint8_t kBlockType = 5;
-  static const size_t kMaxNumberOfDlrrItems = 100;
 
-  Dlrr() {}
-  Dlrr(const Dlrr& other) = default;
-  ~Dlrr() {}
+  Dlrr();
+  Dlrr(const Dlrr& other);
+  ~Dlrr();
 
   Dlrr& operator=(const Dlrr& other) = default;
+
+  // Dlrr without items treated same as no dlrr block.
+  explicit operator bool() const { return !sub_blocks_.empty(); }
 
   // Second parameter is value read from block header,
   // i.e. size of block in 32bits excluding block header itself.
@@ -49,9 +51,10 @@ class Dlrr {
   // Consumes BlockLength() bytes.
   void Create(uint8_t* buffer) const;
 
-  // Max 100 DLRR Items can be added per DLRR report block.
-  bool WithDlrrItem(const ReceiveTimeInfo& time_info);
-  bool WithDlrrItem(uint32_t ssrc, uint32_t last_rr, uint32_t delay_last_rr);
+  void ClearItems() { sub_blocks_.clear(); }
+  void AddDlrrItem(const ReceiveTimeInfo& time_info) {
+    sub_blocks_.push_back(time_info);
+  }
 
   const std::vector<ReceiveTimeInfo>& sub_blocks() const { return sub_blocks_; }
 
@@ -63,4 +66,4 @@ class Dlrr {
 };
 }  // namespace rtcp
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_
+#endif  // MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_DLRR_H_

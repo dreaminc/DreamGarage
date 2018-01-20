@@ -162,10 +162,10 @@ std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::T
 	return nullptr;
 }
 
-std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
+std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n));
+	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n));
 
 	//Success:
 	return pTexture;
@@ -439,6 +439,7 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHo
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
+	CN(pQuad);
 	CR(AddObject(pQuad));
 
 //Success:

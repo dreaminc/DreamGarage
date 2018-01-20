@@ -64,7 +64,8 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
-	virtual VirtualObj *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
+	virtual HMDDeviceType GetDeviceType() override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
@@ -96,12 +97,14 @@ public:
 
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
+
+	composite *m_pLeftController = nullptr;
+	std::shared_ptr<mesh> m_pControllerMeshLeft = nullptr;
+	texture *m_pControllerMeshLeftTexture = nullptr;
 	
-	mesh *m_pControllerMeshLeft;
-	texture *m_pControllerMeshLeftTexture;
-	
-	mesh *m_pControllerMeshRight;
-	texture *m_pControllerMeshRightTexture;
+	composite *m_pRightController = nullptr;
+	std::shared_ptr<mesh> m_pControllerMeshRight = nullptr;
+	texture *m_pControllerMeshRightTexture = nullptr;
 
 	uint32_t m_vrFrameCount;
 

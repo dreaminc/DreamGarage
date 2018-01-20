@@ -2,7 +2,6 @@
 #define DREAM_GARAGE_H_
 
 #include "RESULT/EHM.h"
-#include "DreamConsole/DreamConsole.h"
 
 // DREAM GARAGE
 // DreamGarage.h
@@ -18,6 +17,7 @@ class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
 class UIStageProgram;
+class UpdateMouthMessage;
 
 #define MAX_PEERS 8
 
@@ -37,6 +37,7 @@ public:
 
 	RESULT SendHeadPosition();
 	RESULT SendHandPosition();
+	RESULT SendMouthSize();
 
 	// TODO: this is just a debug test temp
 	//RESULT SendSwitchHeadMessage();
@@ -60,19 +61,25 @@ public:
 	//virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	//virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	//
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
 	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) override;
 	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	//virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+	virtual RESULT OnReceiveAsset(long userID) override;
+	virtual RESULT OnStopSending() override;
+	virtual RESULT OnStopReceiving() override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
+	RESULT HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage);
 	RESULT HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
 
 	// 
@@ -81,6 +88,7 @@ public:
 
 	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+	RESULT BroadcastUpdateMouthMessage(float mouthSize);
 
 	user* ActivateUser(long userId);
 
@@ -107,6 +115,10 @@ private:
 	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
+
+	bool m_fShouldUpdateAppComposites = false;
+
+	long m_pendingAssetReceiveUserID = -1;
 
 	// UI
 	//ViewMatrix *m_pClippingView;

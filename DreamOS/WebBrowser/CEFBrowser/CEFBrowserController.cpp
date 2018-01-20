@@ -1,7 +1,16 @@
 #include "CefBrowserController.h"
 //#include "easylogging++.h"
 
+#include "include/cef_base.h"
 #include "include/cef_browser.h"
+#include "include/wrapper/cef_helpers.h"
+#include "include/base/cef_bind.h"
+
+#include "include/cef_browser.h"
+#include "include/cef_app.h"
+
+#include "include/wrapper/cef_closure_task.h"
+#include "include/wrapper/cef_helpers.h"
 
 #include <sstream>
 #include <string>
@@ -9,6 +18,8 @@
 #include "Cloud/WebRequest.h"
 #include "Cloud/WebRequestPostData.h"
 #include "Cloud/WebRequestPostDataElement.h"
+
+#include "CEFDOMNode.h"
 
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
@@ -80,6 +91,31 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 	}
 
 	m_NewDirtyFrames.clear();
+
+Error:
+	return r;
+}
+
+// Might not be the way to go
+RESULT CEFBrowserController::PollPendingAudioPackets(int &numAudioPacketsProcessed) {
+	RESULT r = R_PASS;
+
+	numAudioPacketsProcessed = 0;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		if(IsAudioPacketPending()) {
+			auto pendingAudioPacket = PopPendingAudioPacket();
+			
+			CR(m_pWebBrowserControllerObserver->OnAudioPacket(pendingAudioPacket));
+			
+			// This is done by the ADM right now
+			//pendingAudioPacket.DeleteBuffer();
+
+			numAudioPacketsProcessed++;
+		}
+	}
+
+	//CR(ClearPendingAudioPacketQueue());
 
 Error:
 	return r;
@@ -268,11 +304,13 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount) {
+RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount) {
 	RESULT r = R_PASS;
 
 	CefMouseEvent cefMouseEvent;
 	CefBrowserHost::MouseButtonType cefMouseButtonType;
+	bool fMouseUp = !fMouseDown;
+
 	CN(m_pCEFBrowser);
 
 	cefMouseEvent.x = webBrowserMouseEvent.pt.x;
@@ -303,6 +341,14 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::CloseBrowser() {
+	RESULT r = R_PASS;
+
+	m_pCEFBrowser->GetHost()->CloseBrowser(true);
+
+	return r;
+}
+
 // TODO: Mouse wheel
 /*--cef()--
 virtual void SendMouseWheelEvent(const CefMouseEvent& event,
@@ -320,9 +366,73 @@ RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){
 	return r;
 }
 
+RESULT CEFBrowserController::ClearPendingAudioPacketQueue() {
+	while (m_pendingAudioPackets.size() > 0)
+		m_pendingAudioPackets.pop();
+
+	return R_PASS;
+}
+
+size_t CEFBrowserController::PendingAudioPacketQueueLength() {
+	return m_pendingAudioPackets.size();
+}
+
+AudioPacket CEFBrowserController::PopPendingAudioPacket() {
+	AudioPacket pendingAudioPacket = m_pendingAudioPackets.front();
+	
+	m_pendingAudioPackets.pop();
+
+	return pendingAudioPacket;
+}
+
+RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, int bitsPerSample, uint8_t *pDataBuffer) {
+	RESULT r = R_PASS;
+
+	///*
+	// Make a copy here
+	size_t pNewDataBuffer_n = (bitsPerSample / 8) * frames * channels;
+	uint8_t *pNewDataBuffer = (uint8_t*)malloc(pNewDataBuffer_n);
+	CN(pNewDataBuffer);
+	memcpy(pNewDataBuffer, pDataBuffer, pNewDataBuffer_n);
+	//*/
+	
+	{
+		AudioPacket newPendingPacket(
+			frames,
+			channels,
+			bitsPerSample,
+			pNewDataBuffer
+			//pDataBuffer
+		);
+
+		m_pendingAudioPackets.push(newPendingPacket);
+
+		// This will push directly into the pending buffer
+		//CR(m_pWebBrowserControllerObserver->OnAudioPacket(newPendingPacket));
+	}
+
+Error:
+	return r;
+}
+
+bool CEFBrowserController::IsAudioPacketPending() {
+	return (m_pendingAudioPackets.size() > 0) ? true : false;
+}
+
+RESULT CEFBrowserController::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+	RESULT r = R_PASS;
+	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
+
+	// Queue up new audio packet 
+	CR(PushPendingAudioPacket(frames, channels, bitsPerSample, (uint8_t*)pDataBuffer));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
@@ -344,12 +454,12 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
-RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
 
 	CN(m_pWebBrowserControllerObserver);
-	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward));
+	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
 
 Error:
 	return r;
@@ -371,9 +481,11 @@ Error:
 RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	
+	std::string strCurrentURL = pCEFFrame->GetURL();
 
 	CN(m_pWebBrowserControllerObserver);
-	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode));
+	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode, strCurrentURL));
 
 Error:
 	return r;
@@ -382,3 +494,104 @@ Error:
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
+
+RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	CN(pCEFDOMNode);
+
+	// Report to browser
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(pCEFDOMNode));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+
+Error:
+	return r;
+}
+
+size_t CEFBrowserController::GetFrameCount() {
+	return m_pCEFBrowser->GetFrameCount();
+}
+
+bool CEFBrowserController::CanGoBack() {
+	return m_pCEFBrowser->CanGoBack();
+}
+
+bool CEFBrowserController::CanGoForward() {
+	return m_pCEFBrowser->CanGoForward();
+}
+
+RESULT CEFBrowserController::GoBack() {
+	m_pCEFBrowser->GoBack();
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::GoForward() {
+	m_pCEFBrowser->GoForward();
+	return R_PASS;
+}
+
+/*
+// TODO: Put this somewhere better
+class CEFDOMVisitor : public CefDOMVisitor {
+public:
+	CEFDOMVisitor(std::shared_ptr<CEFBrowserController> pParentController) :
+		m_pParentCEFBrowserController(pParentController)
+	{
+		// empty
+	}
+
+	virtual void Visit(CefRefPtr<CefDOMDocument> pCefDOMDocument) override {
+		RESULT r = R_PASS;
+
+		CN(pCefDOMDocument);
+		
+		{
+			auto pCefDOMNode = pCefDOMDocument->GetFocusedNode();
+			CN(pCefDOMNode);
+		}
+
+		// catch it
+
+	Error:
+		return;
+	}
+
+	IMPLEMENT_REFCOUNTING(CEFDOMVisitor);
+
+private:
+	std::shared_ptr<CEFBrowserController> m_pParentCEFBrowserController = nullptr;
+};
+
+// TODO: Not sure if we need this
+RESULT CEFBrowserController::GetFocusedNode() {
+	RESULT r = R_PASS;
+
+	// Create the message object.
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("CEFBrowserController::GetFocusedNode");
+
+	// Retrieve the argument list object.
+	CefRefPtr<CefListValue> cefMessageArgs = pCEFProcessMessage->GetArgumentList();
+
+	// Populate the argument values.
+	cefMessageArgs->SetString(0, "TestString");
+	cefMessageArgs->SetInt(0, 55);
+
+	// Send the process message to the render process.
+	// Use PID_BROWSER instead when sending a message to the browser process.
+	CN(m_pCEFBrowser);
+	CBM((m_pCEFBrowser->SendProcessMessage(PID_RENDERER, pCEFProcessMessage)), "Failed to send browser process a message");
+
+Error:
+	return r;
+}
+*/

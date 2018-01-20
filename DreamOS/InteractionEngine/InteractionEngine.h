@@ -147,6 +147,8 @@ public:
 	virtual RESULT ResetObjects(VirtualObj *pInteractionObject) override;
 	virtual RESULT ReleaseObject(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
 	virtual RESULT ReleaseObjects(VirtualObj *pInteractionObject) override;
+	RESULT RemoveObject(VirtualObj *pEventObject, ObjectStore *pObjectStore);
+	RESULT RemoveActiveObjects(std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove, std::pair<ActiveObject::type, ActiveObjectQueue*> activeObjectQueuePair, VirtualObj *pInteractionObject);
 	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) override;
 	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) override;
 	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) override;

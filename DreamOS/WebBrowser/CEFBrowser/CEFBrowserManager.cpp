@@ -6,6 +6,8 @@
 
 #include "CEFApp.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 CEFBrowserManager::CEFBrowserManager() {
 	// empty
 }
@@ -44,9 +46,13 @@ RESULT CEFBrowserManager::Update() {
 	RESULT r = R_PASS;
 
 	for (auto& pWebBrowserController : m_webBrowserControllers) {
+		
 		// TODO: optimize with actual dirty rects copy
+		
 		int numFramesProcessed = 0;
 		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
+
+		CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
 	}
 
 Error:
@@ -66,9 +72,22 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
+	RESULT r = R_PASS;
+	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
 	CN(pCEFBrowserController);
@@ -83,10 +102,12 @@ RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowse
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChanged");
 
+	std::string strCurrentURL = pCEFBrowser->GetFocusedFrame()->GetURL();
+
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
 	CN(pCEFBrowserController);
 
-	CR(pCEFBrowserController->OnLoadingStateChanged(fLoading, fCanGoBack, fCanGoForward));
+	CR(pCEFBrowserController->OnLoadingStateChanged(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
 
 Error:
 	return r;
@@ -107,6 +128,7 @@ Error:
 
 RESULT CEFBrowserManager::OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
@@ -119,17 +141,59 @@ Error:
 	return r;
 }
 
-std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+RESULT CEFBrowserManager::OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEFBrowserManager: OnFocusedNodeChanged");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(cefBrowserID);
+	CN(pCEFBrowserController);
+
+	// TODO: add frame
+	CR(pCEFBrowserController->OnFocusedNodeChanged(cefBrowserID, cefFrameID, pCEFDOMNode));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(int cefBrowserID) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
 		if (pCEFBrowserController != nullptr) {
-			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser)) {
+			if (pCEFBrowserController->GetCEFBrowser()->GetIdentifier() == cefBrowserID) {
 				return pCEFBrowserController;
 			}
 		}
 	}
 
 	return nullptr;
+}
+
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+	for (auto &pWebBrowserController : m_webBrowserControllers) {
+		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+
+		if (pCEFBrowserController != nullptr) {
+			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser))  {
+				return pCEFBrowserController;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+RESULT CEFBrowserManager::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+
+Error:
+	return r;
 }
 
 RESULT CEFBrowserManager::CEFManagerThread() {
@@ -156,6 +220,8 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
+	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
+	
 
 #ifdef _DEBUG
 	cefSettings.single_process = true;

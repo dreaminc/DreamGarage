@@ -1,6 +1,11 @@
 #include "ImageFactory.h"
 
+// Logging is redefining macros due to CEF, Logging++ and WebRTC
+// When we solve logging we need to solve this too
+#pragma warning( disable : 4005)
+
 #include "FreeImageObj.h"
+#include "MemoryImageObj.h"
 
 image* ImageFactory::MakeImageFromPath(IMAGE_TYPE type, std::wstring wstrImageFilename) {
 	RESULT r = R_PASS;
@@ -43,10 +48,40 @@ image* ImageFactory::MakeImageFromMemory(IMAGE_TYPE type, uint8_t *pBuffer, size
 			CN(pImage);
 		} break;
 
-			// Currently no other supported formats 
+		// Currently no other supported formats 
 		default: {
 			pImage = nullptr;
 		} break;
+	}
+
+	CR(pImage->LoadFromMemory());
+
+	return pImage;
+
+Error:
+	if (pImage != nullptr) {
+		delete pImage;
+		pImage = nullptr;
+	}
+
+	return nullptr;
+}
+
+image* ImageFactory::MakeMemoryImage(IMAGE_TYPE type, int width, int height, int channels) {
+	RESULT r = R_PASS;
+
+	image *pImage = nullptr;
+
+	switch (type) {
+	case IMAGE_MEMORY: {
+		pImage = new MemoryImageObj(width, height, channels);
+		CN(pImage);
+	} break;
+
+		// Currently no other supported formats 
+	default: {
+		pImage = nullptr;
+	} break;
 	}
 
 	CR(pImage->LoadFromMemory());

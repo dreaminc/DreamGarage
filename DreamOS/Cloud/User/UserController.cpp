@@ -1,5 +1,5 @@
 #include "UserController.h"
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -14,8 +14,6 @@
 #include <cctype>
 
 #include <future>
-
-#include "DreamConsole/DreamConsole.h"
 
 #include "Cloud/CloudController.h"
 
@@ -61,7 +59,7 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 }
 
 // //https://api.develop.dreamos.com/one-time-key/404d642e34e74d68a401f126f5b327c2
-RESULT UserController::LoginWithOTK(std::string& strOTK) {
+RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("Login using OTK");
@@ -74,6 +72,7 @@ RESULT UserController::LoginWithOTK(std::string& strOTK) {
 
 	CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadTwilioNTSInformation failed to post request");
 	DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+	
 	{
 		std::string strHttpResponse(httpResponse.PullResponse());
 		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
@@ -88,11 +87,12 @@ RESULT UserController::LoginWithOTK(std::string& strOTK) {
 		// Get the token
 		//CBM((jsonResponse["/data/token"_json_pointer].is_null()), "Token is missing from JSON");
 		m_strToken = jsonResponse["/data/token"_json_pointer].get<std::string>();
+		environmentID = jsonResponse["/data/environment"_json_pointer].get<long>();
 
 		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 		m_fLoggedIn = true;
 
-		LOG(INFO) << "(Cloud) user logged in with OTK";
+		DOSLOG(INFO, "[UserController] User logged in with OTK");
 	}
 
 Error:
@@ -126,7 +126,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 	m_fLoggedIn = true;
 
-	LOG(INFO) << "(Cloud) user logged in:user=" << strUsername;
+	DOSLOG(INFO, "[UserController] User %v logged in", strUsername);
 
 Error:
 	return r;
@@ -252,7 +252,8 @@ RESULT UserController::LoadProfile() {
 
 		m_user = User(
 			jsonResponse["/data/id"_json_pointer].get<long>(),
-			jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
+			-1,
 			jsonResponse["/data/email"_json_pointer].get<std::string>(),
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
@@ -265,10 +266,49 @@ RESULT UserController::LoadProfile() {
 		DEBUG_LINEOUT("User Profile Loaded");
 		m_user.PrintUser();
 
-		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
-
-		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
+		//HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
+		//OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
 		//OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
+
+		DOSLOG(INFO, "User %v is connected", m_user.GetUserID());
+	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::GetPeerProfile(long peerUserID) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Loading peer profile");
+	{
+		HTTPResponse httpResponse;
+
+		std::string strAuthorizationToken = "Authorization: Token " + GetUserToken();
+
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+		std::string strPeerID = std::to_string(peerUserID);
+		std::string	strURI = strAPIURL + "/user/" + strPeerID + "/";
+
+		HTTPController *pHTTPController = HTTPController::instance();
+
+		auto headers = HTTPController::ContentAcceptJson();
+		headers.push_back(strAuthorizationToken);
+
+		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
+		
+		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+		
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
+		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
+			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
+		}
+		
+		DEBUG_LINEOUT("User Profile Loaded");
 	}
 
 Error:
@@ -285,6 +325,11 @@ UserControllerProxy* UserController::GetUserControllerProxy() {
 
 std::string UserController::GetUserToken() {
 	return m_strToken;
+}
+
+std::string UserController::GetPeerScreenName(long peerUserID) {
+	GetPeerProfile(peerUserID);
+	return m_strPeerScreenName;
 }
 
 CLOUD_CONTROLLER_TYPE UserController::GetControllerType() {

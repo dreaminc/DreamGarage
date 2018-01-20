@@ -16,7 +16,6 @@
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
-#include "DreamConsole/DreamConsole.h"
 
 #include "Primitives/valid.h"
 
@@ -24,6 +23,7 @@
 #include "Primitives/composite.h"
 
 #include "SenseLeapMotionHand.h"
+#include "Primitives/LeapHand.h"
 
 typedef enum SenseLeapMotionEventType {
 	SENSE_LEAPMOTION_EVENT_HAND_LEFT,
@@ -42,7 +42,12 @@ typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_LEAPMOTION_EVENT;
 
-class SenseLeapMotion : public SenseDevice, public Publisher<int, SenseLeapMotionEvent>, public Subscriber<CmdPromptEvent>, public Leap::Listener, public valid {
+class SenseLeapMotion : 
+	public SenseDevice, 
+	public Publisher<int, SenseLeapMotionEvent>, 
+	public Leap::Listener, 
+	public valid 
+{
 public:
 	SenseLeapMotion();
 	~SenseLeapMotion();
@@ -78,7 +83,7 @@ public:
 	}
 	*/
 
-	RESULT AttachHand(hand *pHand, HAND_TYPE handType) {
+	RESULT AttachHand(LeapHand *pHand, HAND_TYPE handType) {
 		if(handType == HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
 		else if (handType == HAND_TYPE::HAND_RIGHT)
@@ -100,7 +105,7 @@ public:
 		return R_PASS;
 	}
 
-	hand *GetHand(HAND_TYPE handType) {
+	LeapHand *GetHand(HAND_TYPE handType) {
 		if (handType == HAND_TYPE::HAND_LEFT)
 			return m_pLeftHand;
 		else if (handType == HAND_TYPE::HAND_RIGHT)
@@ -115,7 +120,6 @@ public:
 
 private:
 	RESULT SetPause(bool fPauseState);
-	RESULT Notify(CmdPromptEvent *event);
 
 public:
 	RESULT Pause();
@@ -124,8 +128,8 @@ public:
 private:
 	std::unique_ptr<Leap::Controller> m_pLeapController;
 	//VirtualObj *m_pVirtualObj;	// temp
-	hand *m_pLeftHand;
-	hand *m_pRightHand;
+	LeapHand *m_pLeftHand;
+	LeapHand *m_pRightHand;
 
 	composite *m_pLeftModel;
 	composite *m_pRightModel;

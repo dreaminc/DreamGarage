@@ -8,15 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_
-#define WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_
+#ifndef MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_
+#define MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_
 
 #include <string>
 #include <vector>
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/modules/rtp_rtcp/source/rtcp_packet.h"
+#include "modules/rtp_rtcp/source/rtcp_packet.h"
+#include "rtc_base/basictypes.h"
 
 namespace webrtc {
 namespace rtcp {
@@ -28,7 +27,8 @@ class Sdes : public RtcpPacket {
     uint32_t ssrc;
     std::string cname;
   };
-  static const uint8_t kPacketType = 202;
+  static constexpr uint8_t kPacketType = 202;
+  static constexpr size_t kMaxNumberOfChunks = 0x1f;
 
   Sdes();
   ~Sdes() override;
@@ -36,26 +36,21 @@ class Sdes : public RtcpPacket {
   // Parse assumes header is already parsed and validated.
   bool Parse(const CommonHeader& packet);
 
-  bool WithCName(uint32_t ssrc, const std::string& cname);
+  bool AddCName(uint32_t ssrc, std::string cname);
 
   const std::vector<Chunk>& chunks() const { return chunks_; }
 
-  size_t BlockLength() const override { return block_length_; }
+  size_t BlockLength() const override;
 
- protected:
   bool Create(uint8_t* packet,
               size_t* index,
               size_t max_length,
-              RtcpPacket::PacketReadyCallback* callback) const override;
+              PacketReadyCallback callback) const override;
 
  private:
-  static const size_t kMaxNumberOfChunks = 0x1f;
-
   std::vector<Chunk> chunks_;
   size_t block_length_;
-
-  RTC_DISALLOW_COPY_AND_ASSIGN(Sdes);
 };
 }  // namespace rtcp
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_
+#endif  // MODULES_RTP_RTCP_SOURCE_RTCP_PACKET_SDES_H_

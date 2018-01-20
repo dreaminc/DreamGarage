@@ -11,7 +11,7 @@ class volume;
 class CollisionManifold;
 
 //class DimRay : public ray, public DimObj {
-class DimRay : public ray, public DimObj {
+class DimRay : public ray, public virtual DimObj {
 public:
 	DimRay(point ptOrigin, vector vDirection);
 	DimRay(point ptOrigin, vector vDirection, float rayVisualLength);

@@ -15,6 +15,12 @@ OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
 	// empty
 }
 
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName) :
+	OGLProgram(pParentImp, strName)
+{
+	// empty
+}
+
 RESULT OGLProgramMinimal::OGLInitialize() {
 	RESULT r = R_PASS;
 

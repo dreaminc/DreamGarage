@@ -8,13 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_
+#ifndef MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_
+#define MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_
 
 #include <memory>
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/modules/audio_processing/agc/agc.h"
+#include "modules/audio_processing/agc/agc.h"
+#include "rtc_base/constructormagic.h"
 
 namespace webrtc {
 
@@ -46,13 +46,15 @@ class AgcManagerDirect final {
   // outside that range will be clamped.
   AgcManagerDirect(GainControl* gctrl,
                    VolumeCallbacks* volume_callbacks,
-                   int startup_min_level);
+                   int startup_min_level,
+                   int clipped_level_min);
   // Dependency injection for testing. Don't delete |agc| as the memory is owned
   // by the manager.
   AgcManagerDirect(Agc* agc,
                    GainControl* gctrl,
                    VolumeCallbacks* volume_callbacks,
-                   int startup_min_level);
+                   int startup_min_level,
+                   int clipped_level_min);
   ~AgcManagerDirect();
 
   int Initialize();
@@ -98,6 +100,7 @@ class AgcManagerDirect final {
   bool check_volume_on_next_process_;
   bool startup_;
   int startup_min_level_;
+  const int clipped_level_min_;
 
   std::unique_ptr<DebugFile> file_preproc_;
   std::unique_ptr<DebugFile> file_postproc_;
@@ -107,4 +110,4 @@ class AgcManagerDirect final {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_
+#endif  // MODULES_AUDIO_PROCESSING_AGC_AGC_MANAGER_DIRECT_H_

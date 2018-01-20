@@ -20,6 +20,7 @@ public:
 	// Objects
 	virtual RESULT ResetIterator() = 0;
 	virtual VirtualObj *GetNextObject() = 0;
+	
 
 	virtual RESULT PushObject(VirtualObj *pObject) = 0;
 	virtual RESULT RemoveObject(VirtualObj *pObject) = 0;
@@ -37,6 +38,7 @@ public:
 	// Skybox / Sphere
 	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
 
+	virtual std::list<VirtualObj*> GetList() = 0;
 	virtual std::vector<VirtualObj*> GetObjects() = 0;
 	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) = 0;
 	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) = 0;

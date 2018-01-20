@@ -37,6 +37,7 @@ public:
 		SPHERE,
 		CUSTOM,
 		QUAD,
+		PLANE,
 		INVALID
 	};
 

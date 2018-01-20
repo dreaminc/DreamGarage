@@ -8,19 +8,20 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_
+#ifndef MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_
+#define MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_
 
 #include <complex>
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/swap_queue.h"
-#include "webrtc/common_audio/lapped_transform.h"
-#include "webrtc/common_audio/channel_buffer.h"
-#include "webrtc/modules/audio_processing/intelligibility/intelligibility_utils.h"
-#include "webrtc/modules/audio_processing/render_queue_item_verifier.h"
-#include "webrtc/modules/audio_processing/vad/voice_activity_detector.h"
+#include "common_audio/channel_buffer.h"
+#include "common_audio/lapped_transform.h"
+#include "modules/audio_processing/audio_buffer.h"
+#include "modules/audio_processing/intelligibility/intelligibility_utils.h"
+#include "modules/audio_processing/render_queue_item_verifier.h"
+#include "modules/audio_processing/vad/voice_activity_detector.h"
+#include "rtc_base/swap_queue.h"
 
 namespace webrtc {
 
@@ -33,17 +34,16 @@ class IntelligibilityEnhancer : public LappedTransform::Callback {
  public:
   IntelligibilityEnhancer(int sample_rate_hz,
                           size_t num_render_channels,
+                          size_t num_bands,
                           size_t num_noise_bins);
 
-  ~IntelligibilityEnhancer();
+  ~IntelligibilityEnhancer() override;
 
   // Sets the capture noise magnitude spectrum estimate.
   void SetCaptureNoiseEstimate(std::vector<float> noise, float gain);
 
   // Reads chunk of speech in time domain and updates with modified signal.
-  void ProcessRenderAudio(float* const* audio,
-                          int sample_rate_hz,
-                          size_t num_channels);
+  void ProcessRenderAudio(AudioBuffer* audio);
   bool active() const;
 
  protected:
@@ -56,10 +56,13 @@ class IntelligibilityEnhancer : public LappedTransform::Callback {
                          std::complex<float>* const* out_block) override;
 
  private:
+  FRIEND_TEST_ALL_PREFIXES(IntelligibilityEnhancerTest, TestRenderUpdate);
   FRIEND_TEST_ALL_PREFIXES(IntelligibilityEnhancerTest, TestErbCreation);
   FRIEND_TEST_ALL_PREFIXES(IntelligibilityEnhancerTest, TestSolveForGains);
   FRIEND_TEST_ALL_PREFIXES(IntelligibilityEnhancerTest,
                            TestNoiseGainHasExpectedResult);
+  FRIEND_TEST_ALL_PREFIXES(IntelligibilityEnhancerTest,
+                           TestAllBandsHaveSameDelay);
 
   // Updates the SNR estimation and enables or disables this component using a
   // hysteresis.
@@ -83,6 +86,10 @@ class IntelligibilityEnhancer : public LappedTransform::Callback {
 
   // Returns true if the audio is speech.
   bool IsSpeech(const float* audio);
+
+  // Delays the high bands to compensate for the processing delay in the low
+  // band.
+  void DelayHighBands(AudioBuffer* audio);
 
   static const size_t kMaxNumNoiseEstimatesToBuffer = 5;
 
@@ -120,8 +127,11 @@ class IntelligibilityEnhancer : public LappedTransform::Callback {
   std::vector<float> noise_estimation_buffer_;
   SwapQueue<std::vector<float>, RenderQueueItemVerifier<float>>
       noise_estimation_queue_;
+
+  std::vector<std::unique_ptr<intelligibility::DelayBuffer>>
+      high_bands_buffers_;
 };
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_
+#endif  // MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_ENHANCER_H_

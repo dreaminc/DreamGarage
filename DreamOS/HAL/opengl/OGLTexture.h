@@ -71,13 +71,17 @@ public:
 	RESULT AllocateGLTexture(size_t optOffset = 0);
 	RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
-	RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override;
+	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
+	virtual RESULT UpdateDimensions(int width, int height) override;
 
-	static GLenum GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels = 3);
+	static GLenum GetOGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
 
 	GLenum GetOGLTextureTarget() { return m_textureTarget; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
+
+public:
+	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) override;
 
 private:
 	GLenum GetOGLPixelFormat();
@@ -91,7 +95,7 @@ public:
 	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
 	static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
 	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename);
-	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, texture::PixelFormat format, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
 	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, void *pBuffer, size_t pBuffer_n);
 
 private:

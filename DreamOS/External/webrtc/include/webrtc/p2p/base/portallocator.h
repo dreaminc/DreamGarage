@@ -8,20 +8,25 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_P2P_BASE_PORTALLOCATOR_H_
-#define WEBRTC_P2P_BASE_PORTALLOCATOR_H_
+#ifndef P2P_BASE_PORTALLOCATOR_H_
+#define P2P_BASE_PORTALLOCATOR_H_
 
 #include <deque>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "webrtc/p2p/base/port.h"
-#include "webrtc/p2p/base/portinterface.h"
-#include "webrtc/base/helpers.h"
-#include "webrtc/base/proxyinfo.h"
-#include "webrtc/base/sigslot.h"
-#include "webrtc/base/thread.h"
+#include "p2p/base/port.h"
+#include "p2p/base/portinterface.h"
+#include "rtc_base/helpers.h"
+#include "rtc_base/proxyinfo.h"
+#include "rtc_base/sigslot.h"
+#include "rtc_base/thread.h"
+
+namespace webrtc {
+class MetricsObserverInterface;
+class TurnCustomizer;
+}
 
 namespace cricket {
 
@@ -70,6 +75,26 @@ enum {
   // candidates. Doing so ensures that even if a cellular network type was not
   // detected initially, it would not be used if a Wi-Fi network is present.
   PORTALLOCATOR_DISABLE_COSTLY_NETWORKS = 0x2000,
+
+  // When specified, do not collect IPv6 ICE candidates on Wi-Fi.
+  PORTALLOCATOR_ENABLE_IPV6_ON_WIFI = 0x4000,
+
+  // When this flag is set, ports not bound to any specific network interface
+  // will be used, in addition to normal ports bound to the enumerated
+  // interfaces. Without this flag, these "any address" ports would only be
+  // used when network enumeration fails or is disabled. But under certain
+  // conditions, these ports may succeed where others fail, so they may allow
+  // the application to work in a wider variety of environments, at the expense
+  // of having to allocate additional candidates.
+  PORTALLOCATOR_ENABLE_ANY_ADDRESS_PORTS = 0x8000,
+};
+
+// Defines various reasons that have caused ICE regathering.
+enum class IceRegatheringReason {
+  NETWORK_CHANGE,      // Network interfaces on the device changed
+  NETWORK_FAILURE,     // Regather only on networks that have failed
+  OCCASIONAL_REFRESH,  // Periodic regather on all networks
+  MAX_VALUE
 };
 
 const uint32_t kDefaultPortAllocatorFlags = 0;
@@ -79,6 +104,12 @@ const uint32_t kDefaultStepDelay = 1000;  // 1 sec step delay.
 // internal. Less than 20ms is not acceptable. We choose 50ms as our default.
 const uint32_t kMinimumStepDelay = 50;
 
+// Turning on IPv6 could make many IPv6 interfaces available for connectivity
+// check and delay the call setup time. kDefaultMaxIPv6Networks is the default
+// upper limit of IPv6 networks but could be changed by
+// set_max_ipv6_networks().
+constexpr int kDefaultMaxIPv6Networks = 5;
+
 // CF = CANDIDATE FILTER
 enum {
   CF_NONE = 0x0,
@@ -86,6 +117,17 @@ enum {
   CF_REFLEXIVE = 0x2,
   CF_RELAY = 0x4,
   CF_ALL = 0x7,
+};
+
+// TLS certificate policy.
+enum class TlsCertPolicy {
+  // For TLS based protocols, ensure the connection is secure by not
+  // circumventing certificate validation.
+  TLS_CERT_POLICY_SECURE,
+  // For TLS based protocols, disregard security completely by skipping
+  // certificate validation. This is insecure and should never be used unless
+  // security is irrelevant in that particular context.
+  TLS_CERT_POLICY_INSECURE_NO_CHECK,
 };
 
 // TODO(deadbeef): Rename to TurnCredentials (and username to ufrag).
@@ -106,18 +148,25 @@ struct RelayCredentials {
 typedef std::vector<ProtocolAddress> PortList;
 // TODO(deadbeef): Rename to TurnServerConfig.
 struct RelayServerConfig {
-  RelayServerConfig(RelayType type) : type(type) {}
-
+  explicit RelayServerConfig(RelayType type);
+  RelayServerConfig(const rtc::SocketAddress& address,
+                    const std::string& username,
+                    const std::string& password,
+                    ProtocolType proto);
+  RelayServerConfig(const std::string& address,
+                    int port,
+                    const std::string& username,
+                    const std::string& password,
+                    ProtocolType proto);
+  // Legacy constructor where "secure" and PROTO_TCP implies PROTO_TLS.
   RelayServerConfig(const std::string& address,
                     int port,
                     const std::string& username,
                     const std::string& password,
                     ProtocolType proto,
-                    bool secure)
-      : type(RELAY_TURN), credentials(username, password) {
-    ports.push_back(
-        ProtocolAddress(rtc::SocketAddress(address, port), proto, secure));
-  }
+                    bool secure);
+  RelayServerConfig(const RelayServerConfig&);
+  ~RelayServerConfig();
 
   bool operator==(const RelayServerConfig& o) const {
     return type == o.type && ports == o.ports && credentials == o.credentials &&
@@ -129,6 +178,9 @@ struct RelayServerConfig {
   PortList ports;
   RelayCredentials credentials;
   int priority = 0;
+  TlsCertPolicy tls_cert_policy = TlsCertPolicy::TLS_CERT_POLICY_SECURE;
+  std::vector<std::string> tls_alpn_protocols;
+  std::vector<std::string> tls_elliptic_curves;
 };
 
 class PortAllocatorSession : public sigslot::has_slots<> {
@@ -141,7 +193,7 @@ class PortAllocatorSession : public sigslot::has_slots<> {
                        uint32_t flags);
 
   // Subclasses should clean up any ports created.
-  virtual ~PortAllocatorSession() {}
+  ~PortAllocatorSession() override;
 
   uint32_t flags() const { return flags_; }
   void set_flags(uint32_t flags) { flags_ = flags; }
@@ -158,20 +210,28 @@ class PortAllocatorSession : public sigslot::has_slots<> {
   // Default filter should be CF_ALL.
   virtual void SetCandidateFilter(uint32_t filter) = 0;
 
-  // Starts gathering STUN and Relay configurations.
+  // Starts gathering ports and ICE candidates.
   virtual void StartGettingPorts() = 0;
-  // Completely stops the gathering process and will not start new ones.
+  // Completely stops gathering. Will not gather again unless StartGettingPorts
+  // is called again.
   virtual void StopGettingPorts() = 0;
   // Whether the session is actively getting ports.
   virtual bool IsGettingPorts() = 0;
-  // ClearGettingPorts and IsCleared are used by continual gathering.
-  // Only stops the existing gathering process but may start new ones if needed.
+
+  //
+  // NOTE: The group of methods below is only used for continual gathering.
+  //
+
+  // ClearGettingPorts should have the same immediate effect as
+  // StopGettingPorts, but if the implementation supports continual gathering,
+  // ClearGettingPorts allows additional ports/candidates to be gathered if the
+  // network conditions change.
   virtual void ClearGettingPorts() = 0;
   // Whether it is in the state where the existing gathering process is stopped,
   // but new ones may be started (basically after calling ClearGettingPorts).
-  virtual bool IsCleared() const { return false; }
+  virtual bool IsCleared() const;
   // Whether the session has completely stopped.
-  virtual bool IsStopped() const { return false; }
+  virtual bool IsStopped() const;
   // Re-gathers candidates on networks that do not have any connections. More
   // precisely, a network interface may have more than one IP addresses (e.g.,
   // IPv4 and IPv6 addresses). Each address subnet will be used to create a
@@ -179,7 +239,6 @@ class PortAllocatorSession : public sigslot::has_slots<> {
   // implementation should start re-gathering on all networks of that interface.
   virtual void RegatherOnFailedNetworks() {}
   // Re-gathers candidates on all networks.
-  // TODO(honghaiz): Implement this in BasicPortAllocator.
   virtual void RegatherOnAllNetworks() {}
 
   // Another way of getting the information provided by the signals below.
@@ -189,13 +248,17 @@ class PortAllocatorSession : public sigslot::has_slots<> {
   virtual std::vector<PortInterface*> ReadyPorts() const = 0;
   virtual std::vector<Candidate> ReadyCandidates() const = 0;
   virtual bool CandidatesAllocationDone() const = 0;
+  // Marks all ports in the current session as "pruned" so that they may be
+  // destroyed if no connection is using them.
+  virtual void PruneAllPorts() {}
 
   sigslot::signal2<PortAllocatorSession*, PortInterface*> SignalPortReady;
-  // Ports should be signaled to be removed when the networks of the ports
-  // failed (either because the interface is down, or because there is no
-  // connection on the interface).
+  // Fires this signal when the network of the ports failed (either because the
+  // interface is down, or because there is no connection on the interface),
+  // or when TURN ports are pruned because a higher-priority TURN port becomes
+  // ready(pairable).
   sigslot::signal2<PortAllocatorSession*, const std::vector<PortInterface*>&>
-      SignalPortsRemoved;
+      SignalPortsPruned;
   sigslot::signal2<PortAllocatorSession*,
                    const std::vector<Candidate>&> SignalCandidatesReady;
   // Candidates should be signaled to be removed when the port that generated
@@ -203,14 +266,12 @@ class PortAllocatorSession : public sigslot::has_slots<> {
   sigslot::signal2<PortAllocatorSession*, const std::vector<Candidate>&>
       SignalCandidatesRemoved;
   sigslot::signal1<PortAllocatorSession*> SignalCandidatesAllocationDone;
-  // A TURN port is pruned if a higher-priority TURN port becomes ready
-  // (pairable). When it is pruned, it will not be used for creating
-  // connections and its candidates will not be sent to the remote side
-  // if they have not been sent.
-  sigslot::signal2<PortAllocatorSession*, PortInterface*> SignalPortPruned;
 
-  virtual uint32_t generation() { return generation_; }
-  virtual void set_generation(uint32_t generation) { generation_ = generation; }
+  sigslot::signal2<PortAllocatorSession*, IceRegatheringReason>
+      SignalIceRegathering;
+
+  virtual uint32_t generation();
+  virtual void set_generation(uint32_t generation);
   sigslot::signal1<PortAllocatorSession*> SignalDestroyed;
 
  protected:
@@ -259,15 +320,8 @@ class PortAllocatorSession : public sigslot::has_slots<> {
 // passing it into an object that uses it on a different thread.
 class PortAllocator : public sigslot::has_slots<> {
  public:
-  PortAllocator() :
-      flags_(kDefaultPortAllocatorFlags),
-      min_port_(0),
-      max_port_(0),
-      step_delay_(kDefaultStepDelay),
-      allow_tcp_listen_(true),
-      candidate_filter_(CF_ALL) {
-  }
-  virtual ~PortAllocator() {}
+  PortAllocator();
+  ~PortAllocator() override;
 
   // This should be called on the PortAllocator's thread before the
   // PortAllocator is used. Subclasses may override this if necessary.
@@ -276,15 +330,20 @@ class PortAllocator : public sigslot::has_slots<> {
   // Set STUN and TURN servers to be used in future sessions, and set
   // candidate pool size, as described in JSEP.
   //
-  // If the servers are changing and the candidate pool size is nonzero,
-  // existing pooled sessions will be destroyed and new ones created.
+  // If the servers are changing, and the candidate pool size is nonzero, and
+  // FreezeCandidatePool hasn't been called, existing pooled sessions will be
+  // destroyed and new ones created.
   //
-  // If the servers are not changing but the candidate pool size is,
-  // pooled sessions will be either created or destroyed as necessary.
-  void SetConfiguration(const ServerAddresses& stun_servers,
+  // If the servers are not changing but the candidate pool size is, and
+  // FreezeCandidatePool hasn't been called, pooled sessions will be either
+  // created or destroyed as necessary.
+  //
+  // Returns true if the configuration could successfully be changed.
+  bool SetConfiguration(const ServerAddresses& stun_servers,
                         const std::vector<RelayServerConfig>& turn_servers,
                         int candidate_pool_size,
-                        bool prune_turn_ports);
+                        bool prune_turn_ports,
+                        webrtc::TurnCustomizer* turn_customizer = nullptr);
 
   const ServerAddresses& stun_servers() const { return stun_servers_; }
 
@@ -292,7 +351,7 @@ class PortAllocator : public sigslot::has_slots<> {
     return turn_servers_;
   }
 
-  int candidate_pool_size() const { return target_pooled_session_count_; }
+  int candidate_pool_size() const { return candidate_pool_size_; }
 
   // Sets the network types to ignore.
   // Values are defined by the AdapterType enum.
@@ -302,7 +361,6 @@ class PortAllocator : public sigslot::has_slots<> {
   virtual void SetNetworkIgnoreMask(int network_ignore_mask) = 0;
 
   std::unique_ptr<PortAllocatorSession> CreateSession(
-      const std::string& sid,
       const std::string& content_name,
       int component,
       const std::string& ice_ufrag,
@@ -322,9 +380,24 @@ class PortAllocator : public sigslot::has_slots<> {
   // Returns the next session that would be returned by TakePooledSession.
   const PortAllocatorSession* GetPooledSession() const;
 
+  // After FreezeCandidatePool is called, changing the candidate pool size will
+  // no longer be allowed, and changing ICE servers will not cause pooled
+  // sessions to be recreated.
+  //
+  // Expected to be called when SetLocalDescription is called on a
+  // PeerConnection. Can be called safely on any thread as long as not
+  // simultaneously with SetConfiguration.
+  void FreezeCandidatePool();
+
+  // Discard any remaining pooled sessions.
+  void DiscardCandidatePool();
+
   uint32_t flags() const { return flags_; }
   void set_flags(uint32_t flags) { flags_ = flags; }
 
+  // These three methods are deprecated. If connections need to go through a
+  // proxy, the application should create a BasicPortAllocator given a custom
+  // PacketSocketFactory that creates proxy sockets.
   const std::string& user_agent() const { return agent_; }
   const rtc::ProxyInfo& proxy() const { return proxy_; }
   void set_proxy(const std::string& agent, const rtc::ProxyInfo& proxy) {
@@ -345,6 +418,23 @@ class PortAllocator : public sigslot::has_slots<> {
     return true;
   }
 
+  // Can be used to change the default numer of IPv6 network interfaces used
+  // (5). Can set to INT_MAX to effectively disable the limit.
+  //
+  // TODO(deadbeef): Applications shouldn't have to arbitrarily limit the
+  // number of available IPv6 network interfaces just because they could slow
+  // ICE down. We should work on making our ICE logic smarter (for example,
+  // prioritizing pinging connections that are most likely to work) so that
+  // every network interface can be used without impacting ICE's speed.
+  void set_max_ipv6_networks(int networks) { max_ipv6_networks_ = networks; }
+  int max_ipv6_networks() { return max_ipv6_networks_; }
+
+  // Delay between different candidate gathering phases (UDP, TURN, TCP).
+  // Defaults to 1 second, but PeerConnection sets it to 50ms.
+  // TODO(deadbeef): Get rid of this. Its purpose is to avoid sending too many
+  // STUN transactions at once, but that's already happening if you configure
+  // multiple STUN servers or have multiple network interfaces. We should
+  // implement some global pacing logic instead if that's our goal.
   uint32_t step_delay() const { return step_delay_; }
   void set_step_delay(uint32_t delay) { step_delay_ = delay; }
 
@@ -364,6 +454,14 @@ class PortAllocator : public sigslot::has_slots<> {
   const std::string& origin() const { return origin_; }
   void set_origin(const std::string& origin) { origin_ = origin; }
 
+  void SetMetricsObserver(webrtc::MetricsObserverInterface* observer) {
+    metrics_observer_ = observer;
+  }
+
+  webrtc::TurnCustomizer* turn_customizer() {
+    return turn_customizer_;
+  }
+
  protected:
   virtual PortAllocatorSession* CreateSessionInternal(
       const std::string& content_name,
@@ -371,11 +469,20 @@ class PortAllocator : public sigslot::has_slots<> {
       const std::string& ice_ufrag,
       const std::string& ice_pwd) = 0;
 
+  webrtc::MetricsObserverInterface* metrics_observer() {
+    return metrics_observer_;
+  }
+
+  const std::deque<std::unique_ptr<PortAllocatorSession>>& pooled_sessions() {
+    return pooled_sessions_;
+  }
+
   uint32_t flags_;
   std::string agent_;
   rtc::ProxyInfo proxy_;
   int min_port_;
   int max_port_;
+  int max_ipv6_networks_;
   uint32_t step_delay_;
   bool allow_tcp_listen_;
   uint32_t candidate_filter_;
@@ -384,15 +491,19 @@ class PortAllocator : public sigslot::has_slots<> {
  private:
   ServerAddresses stun_servers_;
   std::vector<RelayServerConfig> turn_servers_;
-  // The last size passed into SetConfiguration.
-  int target_pooled_session_count_ = 0;
-  // This variable represents the total number of pooled sessions
-  // both owned by this class and taken by TakePooledSession.
-  int allocated_pooled_session_count_ = 0;
+  int candidate_pool_size_ = 0;  // Last value passed into SetConfiguration.
   std::deque<std::unique_ptr<PortAllocatorSession>> pooled_sessions_;
+  bool candidate_pool_frozen_ = false;
   bool prune_turn_ports_ = false;
+
+  webrtc::MetricsObserverInterface* metrics_observer_ = nullptr;
+
+  // Customizer for TURN messages.
+  // The instance is owned by application and will be shared among
+  // all TurnPort(s) created.
+  webrtc::TurnCustomizer* turn_customizer_ = nullptr;
 };
 
 }  // namespace cricket
 
-#endif  // WEBRTC_P2P_BASE_PORTALLOCATOR_H_
+#endif  // P2P_BASE_PORTALLOCATOR_H_

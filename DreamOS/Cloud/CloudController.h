@@ -5,8 +5,6 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
-#include "DreamConsole/DreamConsole.h"
-
 // DREAM OS
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
@@ -56,8 +54,7 @@ public:
 class CloudController : public Controller, 
 						public CloudControllerProxy,
 						public std::enable_shared_from_this<CloudController>, 
-						public EnvironmentController::EnvironmentControllerObserver,
-						public Subscriber<CmdPromptEvent> 
+						public EnvironmentController::EnvironmentControllerObserver
 {
 protected:
 	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
@@ -72,10 +69,12 @@ public:
 	class PeerConnectionObserver {
 	public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 	};
@@ -83,6 +82,9 @@ public:
 	class EnvironmentObserver {
 	public:
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
+		virtual RESULT OnStopSending() = 0;
+		virtual RESULT OnStopReceiving() = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
@@ -96,6 +98,21 @@ public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
+	// Video
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat);
+
+	// Audio 
+	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
+
+	// TODO: Generalize channels
+
+	// TODO: Allow creation / deletion of channels ad-hoc
+
 public:
 	CloudController();
 	~CloudController();
@@ -106,7 +123,8 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-	RESULT Start();
+	RESULT Start(bool fLogin = true);
+	RESULT Start(std::string strUsername, std::string strPassword, long environmentID);
 	RESULT Stop();
 
 	RESULT Initialize();
@@ -114,7 +132,7 @@ public:
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	//RESULT LoginUser();
-	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK = "INVALIDONETIMEKEY");
 	RESULT Update();
 	RESULT Login();
 
@@ -143,11 +161,17 @@ public:
 
 	// EnvironmentControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
+
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
+	virtual RESULT OnReceiveAsset(long userID) override;
+	virtual RESULT OnStopSending() override;
+	virtual RESULT OnStopReceiving() override;
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
@@ -156,9 +180,6 @@ public:
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 	
 	// Proxy Objects
@@ -186,7 +207,10 @@ private:
 
 	std::thread	m_cloudThread;
 	bool m_fRunning;
-	RESULT ProcessingThread();
+	bool m_fLoginOnStart = true;
+
+	RESULT CloudThreadProcess();
+	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);
 };
 
 #endif

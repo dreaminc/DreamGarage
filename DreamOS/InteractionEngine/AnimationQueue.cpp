@@ -1,7 +1,6 @@
 #include "AnimationQueue.h"
 #include "AnimationItem.h"
 #include "Primitives/DimObj.h"
-#include "DreamConsole/DreamConsole.h"
 
 AnimationQueue::AnimationQueue() {
 	m_objectQueue = {};
@@ -24,6 +23,7 @@ RESULT AnimationQueue::Update(double sNow) {
 		AnimationState state;
 		state.vScale = vector(1.0f, 1.0f, 1.0f);
 		bool fShouldAnimateColor = (*pItem)->ShouldAnimateColor();
+		bool fShouldAnimationObject = (*pItem)->ShouldAnimateObject();
 
 		do {
 			(*pItem)->Update(pObj, state, sNow);
@@ -42,7 +42,9 @@ RESULT AnimationQueue::Update(double sNow) {
 
 		//TODO: hack to avoid color issues
 		//state.Apply(pObj);
-		state.ApplyTransform(pObj);
+		if (fShouldAnimationObject) {
+			state.ApplyTransform(pObj);
+		}
 		if (fShouldAnimateColor) {
 			state.ApplyColor(pObj);
 		}

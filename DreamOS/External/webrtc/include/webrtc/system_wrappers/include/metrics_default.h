@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_
-#define WEBRTC_SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_
+#ifndef SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_
+#define SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_
 
 #include <map>
 #include <memory>
@@ -17,6 +17,10 @@
 
 namespace webrtc {
 namespace metrics {
+
+// This class does not actually exist. It is casted to an implementation defined
+// pointer inside the functions.
+class Histogram;
 
 struct SampleInfo {
   SampleInfo(const std::string& name, int min, int max, size_t bucket_count);
@@ -54,4 +58,4 @@ int MinSample(const std::string& name);
 }  // namespace metrics
 }  // namespace webrtc
 
-#endif  // WEBRTC_SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_
+#endif  // SYSTEM_WRAPPERS_INCLUDE_METRICS_DEFAULT_H_

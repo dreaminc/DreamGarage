@@ -24,7 +24,7 @@ RESULT CloudTestSuite::AddTests() {
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
 	//CR(AddTestMultiConnectTest());
-	CR(AddTestDownloadFile());	// requires logged in
+	//CR(AddTestDownloadFile());	// requires logged in
 
 	CR(AddTestConnectLogin());
 	CR(AddTestMenuAPI());
@@ -177,7 +177,7 @@ Error:
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 2.0f;
+	double sTestTime = 30.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {

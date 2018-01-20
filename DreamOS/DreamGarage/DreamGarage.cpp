@@ -1,7 +1,6 @@
 #include "DreamGarage.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include <string>
 #include <array>
@@ -16,7 +15,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamControlView.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -35,6 +34,7 @@ light *g_pLight = nullptr;
 #include "DreamGarageMessage.h"
 #include "UpdateHeadMessage.h"
 #include "UpdateHandMessage.h"
+#include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
 
 // TODO: Should this go into the DreamOS side?
@@ -55,7 +55,6 @@ Error:
 }
 */
 
-
 RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
@@ -63,6 +62,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fInitCloud = true;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
@@ -115,34 +115,26 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 	//TODO: Matrix node
-//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
+	//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
 	// Connect output as pass-thru to internal blend program
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	// save interface for UI apps
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-/*
+	
+	/*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-//*/
-	// Debug Console
-	ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-	CN(pDreamConsoleProgram);
-	CR(pDreamConsoleProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-
-	// Connect output as pass-thru to internal blend program
-	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-//	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//*/
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 	// Connect Program to Display
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -234,13 +226,13 @@ RESULT DreamGarage::LoadScene() {
 	
 	AddSkybox();
 
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 2.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight->EnableShadows();
 
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
@@ -301,9 +293,17 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	// ControlView App
+	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
+	CN(m_pDreamControlView);
+
+	// UIKeyboard App
+	CRM(InitializeKeyboard(), "Failed to initialize Keyboard");
+	CRM(InitializeDreamUser(), "Failed to initialize User App");
+
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -316,9 +316,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamBrowser->SetVisible(false);
 #endif
 
-	//m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
-	//CN(m_pDreamControlView);
-
+	//*
+//*/
 	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
 
 	//TODO: collisions doesn't follow properly
@@ -337,9 +336,6 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	//CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 
-	// UIKeyboard App
-	CR(InitializeKeyboard());
-	CR(InitializeDreamUser());
 
 	{
 		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
@@ -402,12 +398,27 @@ Error:
 
 RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
 	RESULT r = R_PASS;
+
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
 	// Create the message
 	UpdateHandMessage updateHandMessage(GetUserID(), -1, handState);
 	CR(BroadcastDataMessage(&updateHandMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::BroadcastUpdateMouthMessage(float mouthSize) {
+	RESULT r = R_PASS;
+
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// Create the message
+	UpdateMouthMessage updateMouthMessage(GetUserID(), -1, mouthSize);
+	CR(BroadcastDataMessage(&updateMouthMessage));
 
 Error:
 	return r;
@@ -438,6 +449,18 @@ RESULT DreamGarage::SendHandPosition() {
 	if (pRightHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::SendMouthSize() {
+	RESULT r = R_PASS;
+
+	// TODO: get actual mouth size from audio (or create observer pathway - prefer former)
+	float mouthSize = GetCloudController()->GetRunTimeMicAverage();
+
+	CR(BroadcastUpdateMouthMessage(mouthSize));
 
 Error:
 	return r;
@@ -478,6 +501,15 @@ std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
+// Mouth update time
+#define UPDATE_MOUTH_COUNT_THROTTLE 90	
+#define UPDATE_MOUTH_COUNT_MS ((1000.0f) / UPDATE_MOUTH_COUNT_THROTTLE)
+std::chrono::system_clock::time_point g_lastMouthUpdateTime = std::chrono::system_clock::now();
+
+// Hands update time	
+#define CHECK_PEER_APP_STATE_INTERVAL_MS (3000.0f) 
+std::chrono::system_clock::time_point g_lastPeerStateCheckTime = std::chrono::system_clock::now();
+
 // For testing
 std::chrono::system_clock::time_point g_lastDebugUpdate = std::chrono::system_clock::now();
 
@@ -512,6 +544,13 @@ RESULT DreamGarage::Update(void) {
 		SendHandPosition();
 		g_lastHandUpdateTime = timeNow;
 	}
+
+	// Mouth update
+	// TODO: this should go up into DreamOS or even sandbox
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastMouthUpdateTime).count() > UPDATE_MOUTH_COUNT_MS) {
+		SendMouthSize();
+		g_lastMouthUpdateTime = timeNow;
+	}
 	//*/
 	
 	/*
@@ -532,7 +571,21 @@ RESULT DreamGarage::Update(void) {
 	}
 	//*/
 
-//Error:
+	// Periodically check peer app states
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
+		CR(CheckDreamPeerAppStates());
+		g_lastPeerStateCheckTime = timeNow;
+	}
+
+	if (m_fShouldUpdateAppComposites) {
+		m_pDreamUser->ResetAppComposite();
+		m_pDreamUIBar->ResetAppComposite();
+		m_pDreamControlView->ResetAppComposite();
+
+		m_fShouldUpdateAppComposites = false;
+	}
+
+Error:
 	return r;
 }
 
@@ -615,6 +668,20 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
+	RESULT r = R_PASS;
+
+	if (!m_fSeated) {
+		CB(seatPosition < m_seatLookup.size());
+		CR(SetRoundtablePosition(seatPosition));
+		m_fSeated = true;
+		m_fShouldUpdateAppComposites = true;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	RESULT r = R_PASS;
 
@@ -632,20 +699,23 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
 	remoteSeatingPosition -= 1;
 
-	LOG(INFO) << "HandlePeersUpdate " << localSeatingPosition;
-	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
+	DOSLOG(INFO, "OnNewDreamPeer local seat position %v", localSeatingPosition);
+	//OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
 	if (!m_fSeated) {
 		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
 		CR(SetRoundtablePosition(localSeatingPosition));
+
 		m_fSeated = true;
+		m_fShouldUpdateAppComposites = true;
 	}
 	//*/
 
 	// Assign Model From Pool and position peer
+	pDreamPeer->SetVisible(false);
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
 	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
-	pDreamPeer->SetVisible();
+	pDreamPeer->SetVisible(true);
 
 	// Turn on sound
 	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);
@@ -654,13 +724,18 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
 	}
 
+	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
+		m_pDreamBrowser->StartReceiving(pPeerConnection);
+		m_pendingAssetReceiveUserID = -1;
+	}
+
 Error:
 	return r;
 }
 
 RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	RESULT r = R_PASS;
-	//LOG(INFO) << "data received";
+	//DOSLOG(INFO, "[DreamGarage] Data received");
 
 	/*
 	if (pDataMessage) {
@@ -690,6 +765,11 @@ RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage
 		case DreamGarageMessage::type::UPDATE_HAND: {
 			UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDreamMessage);
 			CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
+		} break;
+
+		case DreamGarageMessage::type::UPDATE_MOUTH: {
+			UpdateMouthMessage *pUpdateMouthMessage = reinterpret_cast<UpdateMouthMessage*>(pDreamMessage);
+			CR(HandleMouthUpdateMessage(pPeerConnection, pUpdateMouthMessage));
 		} break;
 
 		case DreamGarageMessage::type::AUDIO_DATA: {
@@ -734,7 +814,7 @@ user* DreamGarage::ActivateUser(long userId) {
 	return nullptr;
 }
 
-RESULT DreamGarage::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
@@ -812,6 +892,23 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage) {
+	RESULT r = R_PASS;
+
+	float mouthSize = pUpdateMouthMessage->GetMouthSize();
+	float mouthScale = mouthSize * 10.0f;
+	util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	pDreamPeer->UpdateMouth(mouthScale);
+
+Error:
+	return r;
+}
+
+// This function is currently defunct, but will be removed when the actual audio infrastructure is turned on
 RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
@@ -860,10 +957,45 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 	//*/
 	if (m_pDreamBrowser != nullptr) {
-		m_pDreamBrowser->SetVisible(true);
+		//m_pDreamBrowser->SetVisible(true);
 		//m_pDreamBrowser->FadeQuadToBlack();
 		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
+	return r;
+}
+
+RESULT DreamGarage::OnReceiveAsset(long userID) {
+	RESULT r = R_PASS;
+	if (m_pDreamBrowser != nullptr) {
+
+		m_pDreamBrowser->PendReceiving();
+
+		// if not connected yet, save the userID and start receiving during
+		// OnNewPeerConnection; otherwise this user should receive the dream message
+		// to start receiving
+		if (FindPeer(userID) == nullptr) {
+			m_pendingAssetReceiveUserID = userID;
+		}
+
+		//m_pDreamBrowser->StartReceiving();
+	}
+	return r;
+}
+
+RESULT DreamGarage::OnStopSending() {
+	RESULT r = R_PASS;
+	CR(m_pDreamBrowser->StopSending());
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnStopReceiving() {
+	RESULT r = R_PASS;
+	CR(m_pDreamBrowser->StopReceiving());
+
+	m_pendingAssetReceiveUserID = -1;
+
+Error:
 	return r;
 }
 

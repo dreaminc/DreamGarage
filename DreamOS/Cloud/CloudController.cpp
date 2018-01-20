@@ -1,5 +1,4 @@
 #include "CloudController.h"
-#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -8,8 +7,6 @@
 //#include "Cloud/Message/UpdateHandMessage.h"
 //#include "Cloud/Message/UpdateHeadMessage.h"
 //#include "Cloud/Message/AudioDataMessage.h"
-
-#include "DreamConsole/DreamConsole.h"
 
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"
@@ -34,7 +31,7 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelStringMessageCallback(nullptr),
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
+	// empty
 }
 
 CloudController::~CloudController() {
@@ -46,12 +43,16 @@ CloudController::~CloudController() {
 	}
 }
 
-RESULT CloudController::ProcessingThread() {
+RESULT CloudController::CloudThreadProcess() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("ProcessingThread start");
 
-	CR(Login());
+	// TODO: This should be removed
+	if (m_fLoginOnStart) {
+		CR(Login());
+	}
+
 	m_fRunning = true;
 
 	// Message pump goes here
@@ -64,26 +65,85 @@ RESULT CloudController::ProcessingThread() {
 	}
 #endif
 
-	DEBUG_LINEOUT("ProcessingThread end");
+	DEBUG_LINEOUT("CloudThreadProcess End");
 
 Error:
 	return r;
 }
 
-RESULT CloudController::Start() {
+RESULT CloudController::CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID) {
 	RESULT r = R_PASS;
 
-	if (m_fRunning) {
-		// cloud already running
-		HUD_OUT("cloud trying to start but already running");
-		return R_FAIL;
+	DEBUG_LINEOUT("CloudThreadProcess start");
+
+	if (m_fLoginOnStart) {
+		DEBUG_LINEOUT("Logging into server with user credentials");
+
+		CN(m_pUserController);
+		CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+
+		DEBUG_LINEOUT("Loading user profile");
+
+		// Get user profile
+		CRM(m_pUserController->LoadProfile(), "Failed to load profile");
+		CRM(m_pUserController->LoadTwilioNTSInformation(), "Failed to load Twilio NTS information");
+
+		// Set this in the cloud implementation
+		m_pEnvironmentController->SetTwilioNTSInformation(m_pUserController->GetTwilioNTSInformation());
+		m_pEnvironmentController->SetUser(m_pUserController->GetUser());
+
+		DEBUG_LINEOUT("Connecting to Environment ID %d", environmentID);
+
+		// Connect to environment 
+		CN(m_pEnvironmentController);
+		CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser(), environmentID));
 	}
+
+	m_fRunning = true;
+
+	// Message pump goes here
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::ThreadBlockingMessageLoop();
+#else
+#pragma message ("not implemented message loop")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	DEBUG_LINEOUT("CloudThreadProcess End");
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Start(bool fLoginOnStart) {
+	RESULT r = R_PASS;
+
+	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
 
 	DEBUG_LINEOUT("CloudController::Start");
 
-	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
+	m_fLoginOnStart = fLoginOnStart;
 
-//Error:
+	m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Start(std::string strUsername, std::string strPassword, long environmentID) {
+	RESULT r = R_PASS;
+
+	CBM((m_fRunning == false), "Error: Cloud controller trying to start but already running");
+
+	DEBUG_LINEOUT("CloudController::Start");
+
+	m_fLoginOnStart = true;
+
+	m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
+
+Error:
 	return r;
 }
 
@@ -91,7 +151,6 @@ RESULT CloudController::Stop() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CloudController::Stop");
-	HUD_OUT("login into Relativity ...");
 
 	m_fRunning = false;
 
@@ -225,6 +284,19 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnNewSocketConnection(int seatPosition) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnNewSocketConnection(seatPosition));
+	}
+
+Error:
+	return r;
+}
+
+//RESULT 
+
 RESULT CloudController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -292,6 +364,39 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnReceiveAsset(long userID) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnReceiveAsset(userID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopSending() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopSending());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnStopReceiving() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnStopReceiving());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnDataChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -314,14 +419,28 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
+RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnAudioData(pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pPeerConnectionObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
+	RESULT r = R_PASS;
+
+	long senderUserID = pPeerConnection->GetPeerUserID();
+	long recieverUserID = pPeerConnection->GetUserID();
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -407,8 +526,8 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 	long environmentID;
 
 	if (strOTK == "INVALIDONETIMEKEY") {
-		HUD_OUT(("Login user " + strUsername + "...").c_str());
-		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
+		DEBUG_LINEOUT(("Login user " + strUsername + "...").c_str());
+		DEBUG_LINEOUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		// TODO: command line / config file - right now hard coded
 		CN(m_pUserController);
@@ -416,14 +535,17 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 	}
 	else {
 		// TODO: If OTK provided log in with that instead
-		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
-		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
+		DEBUG_LINEOUT(("Login with OTK " + strOTK + "...").c_str());
+		DEBUG_LINEOUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
+		// TODO: We should move to this, but right now this is passed by cmd line
+		long tempEnvironmentID;
 		CN(m_pUserController);
-		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
+		CRM(m_pUserController->LoginWithOTK(strOTK, tempEnvironmentID), "Failed to login with OTK");
+		//strEnvironment = std::to_string(environmentID);
 	}
 
-	HUD_OUT("Loading user profile...");
+	DEBUG_LINEOUT("Loading user profile...");
 
 	// Get user profile
 	// TODO: This should go into an API controller
@@ -443,13 +565,13 @@ RESULT CloudController::LoginUser(std::string strUsername, std::string strPasswo
 		environmentID = (long)(atoi(strEnvironment.c_str()));
 	}
 
-	HUD_OUT("Connecting to Environment ID %d", environmentID);
+	DEBUG_LINEOUT("Connecting to Environment ID %d", environmentID);
 
 	// Connect to environment 
 	CN(m_pEnvironmentController);
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser(), environmentID));
 
-	HUD_OUT("User is loaded and logged in");
+	DEBUG_LINEOUT("User is loaded and logged in");
 
 Error:
 	return r;
@@ -537,7 +659,6 @@ void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
 	return fnUIThreadCallback(msgID, data);
 }
 
-
 // Send some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
@@ -565,6 +686,8 @@ Error:
 	return r;
 }
 
+
+
 // Broadcast some messages
 // TODO: This is duplicated code - use this in the below functions
 RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
@@ -590,28 +713,94 @@ Error:
 	return r;
 }
 
-
-
-RESULT CloudController::Notify(CmdPromptEvent *event) {
+// Audio 
+RESULT CloudController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("login : login to Dream");
-		HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
-	}
+	CB(m_fRunning);
 
-	if (event->GetArg(1).compare("login") == 0) {
-		//
-		Start();
-	}
+	CN(m_pEnvironmentController);
+	CN(m_pEnvironmentController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
-	if (event->GetArg(1).compare("msg") == 0) {
-		std::string st(event->GetArg(2));
-		BroadcastDataChannelStringMessage(st);
-	}
-
-//Error:
+Error:
 	return r;
+}
+
+float CloudController::GetRunTimeMicAverage() {
+	if (m_pEnvironmentController != nullptr) {
+		return m_pEnvironmentController->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
+
+
+// Video
+RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::BroadcastTextureFrame(texture *pTexture, int level, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+
+	CN(m_pEnvironmentController);
+	CN(pTexture);
+
+	CR(pTexture->LoadImageFromTexture(0, pixelFormat));
+
+	// Broadcast the data
+	CR(m_pEnvironmentController->BroadcastVideoFrame(
+		pTexture->GetImageBuffer(), pTexture->GetWidth(), pTexture->GetHeight(), pTexture->GetChannels()
+	));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	CR(m_pEnvironmentController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	CR(m_pEnvironmentController->StopVideoStreaming());
+
+Error:
+	return r;
+}
+
+bool CloudController::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+
+	CB(m_fRunning);
+	CN(m_pEnvironmentController);
+
+	return m_pEnvironmentController->IsVideoStreamingRunning();
+
+Error:
+	return false;
 }
 
 // TODO: Fix inconsistency with proxy pattern (webrtc is correct, proxy shouldn't include register observer for example)

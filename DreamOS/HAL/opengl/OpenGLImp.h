@@ -36,23 +36,11 @@ class mesh;
 
 class OpenGLImp : public HALImp {
 private:
-	// TODO: Create an OpenGL Program class which should combine
-	// the shaders since we might want to jump around OGL programs in the future
-	//OGLProgram *m_pOGLRenderProgram;
-	//OGLProgram *m_pOGLProgramShadowDepth;
-	//OGLProgram *m_pOGLProgramCapture;		// temp for testing
-	//OGLProgram *m_pOGLSkyboxProgram;
-	//OGLProgram *m_pOGLReferenceGeometryProgram;
-	//OGLProgram *m_pOGLOverlayProgram;
-	//OGLProgram *m_pOGLFlatProgram; 
-
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
 	version m_versionOGL;
 	version m_versionGLSL;
-
-	std::unique_ptr<OGLDreamConsole> m_pOGLDreamConsole;
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -63,7 +51,7 @@ public:
 	version GetOGLVersion() { return m_versionOGL; }
 	version GetGLSLVersion() { return m_versionGLSL; }
 
-	// TODO: Remove and use param pack fn
+	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(double width, double height, point ptOrigin, vector vNormal = vector::jVector()) override;
@@ -74,6 +62,7 @@ public:
 
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) override;
+	virtual DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f)) override;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
@@ -85,8 +74,8 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	
-	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) override;
+	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) override;
 	virtual texture* MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(const texture &srcTexture) override;
 	
@@ -233,6 +222,9 @@ public:
 	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 	RESULT glGenerateMipmap(GLenum target);
+	RESULT GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
+	RESULT GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels);
+	RESULT GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels);
 
 	// Queries
 	RESULT glGenQueries(GLsizei n, GLuint *ids);

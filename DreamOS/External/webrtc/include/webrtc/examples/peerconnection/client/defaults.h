@@ -8,13 +8,12 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_
-#define WEBRTC_EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_
-#pragma once
+#ifndef EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_
+#define EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_
+
+#include <stdint.h>
 
 #include <string>
-
-#include "webrtc/base/basictypes.h"
 
 extern const char kAudioLabel[];
 extern const char kVideoLabel[];
@@ -27,4 +26,4 @@ std::string GetPeerConnectionString();
 std::string GetDefaultServerName();
 std::string GetPeerName();
 
-#endif  // WEBRTC_EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_
+#endif  // EXAMPLES_PEERCONNECTION_CLIENT_DEFAULTS_H_

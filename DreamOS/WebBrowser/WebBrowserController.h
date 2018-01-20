@@ -4,12 +4,18 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/CEFBrowser/WebBrowserController.h
+// DreamOS/WebBrowser/WebBrowser.h
 
 #include <memory>
 #include <functional>
 
 #include <vector>
+
+#include "Cloud/Environment/EnvironmentAsset.h"
+
+class DOMNode;
+class DOMDocument;
+class AudioPacket;
 
 struct WebBrowserPoint {
 	int x;
@@ -37,6 +43,7 @@ struct WebBrowserMouseEvent {
 };
 
 class WebRequest;
+class DOMNode;
 
 // TODO: Revisit these functions 
 class WebBrowserController {
@@ -50,9 +57,12 @@ public:
 	class observer {
 	public:
 		virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) = 0;
-		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
+		virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) = 0;
+		virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) = 0;
 		virtual RESULT OnLoadStart() = 0;
-		virtual RESULT OnLoadEnd(int httpStatusCode) = 0;
+		virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) = 0;
+		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
+		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 	};
 
 public:
@@ -66,6 +76,8 @@ public:
 	// This function can be called by any thread.
 	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
 
+	virtual RESULT CloseBrowser() = 0;
+
 	// Mouse
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) = 0;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) = 0;
@@ -75,10 +87,19 @@ public:
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) = 0;
 	virtual RESULT SendKeySequence(const std::string& strKeySequence) = 0;
 
+	// Page controls
+	virtual RESULT GoBack() = 0;
+	virtual RESULT GoForward() = 0;
+	virtual bool CanGoBack() = 0;
+	virtual bool CanGoForward() = 0;	
+
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
 	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) = 0;
+
+	// Get the pending audio packets
+	virtual RESULT PollPendingAudioPackets(int &numAudioPacketsProcessed) = 0;
 
 	// Resize the browser.
 	virtual RESULT Resize(unsigned int width, unsigned int height) = 0;
@@ -91,6 +112,11 @@ public:
 
 	virtual RESULT Shutdown() = 0;
 
+	// frames
+	virtual size_t GetFrameCount() = 0;
+
+	// DOM
+	//virtual RESULT GetFocusedNode() = 0;
 
 	std::string GetID() {
 		return m_strID;

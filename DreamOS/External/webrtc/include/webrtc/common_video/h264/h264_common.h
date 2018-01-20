@@ -8,14 +8,13 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_COMMON_VIDEO_H264_H264_COMMON_H_
-#define WEBRTC_COMMON_VIDEO_H264_H264_COMMON_H_
+#ifndef COMMON_VIDEO_H264_H264_COMMON_H_
+#define COMMON_VIDEO_H264_H264_COMMON_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/base/common.h"
-#include "webrtc/base/buffer.h"
+#include "rtc_base/buffer.h"
 
 namespace webrtc {
 
@@ -77,7 +76,7 @@ NaluType ParseNaluType(uint8_t data);
 // the 03 emulation byte.
 
 // Parse the given data and remove any emulation byte escaping.
-std::unique_ptr<rtc::Buffer> ParseRbsp(const uint8_t* data, size_t length);
+std::vector<uint8_t> ParseRbsp(const uint8_t* data, size_t length);
 
 // Write the given data to the destination buffer, inserting and emulation
 // bytes in order to escape any data the could be interpreted as a start
@@ -86,4 +85,4 @@ void WriteRbsp(const uint8_t* bytes, size_t length, rtc::Buffer* destination);
 }  // namespace H264
 }  // namespace webrtc
 
-#endif  // WEBRTC_COMMON_VIDEO_H264_H264_COMMON_H_
+#endif  // COMMON_VIDEO_H264_H264_COMMON_H_

@@ -1,6 +1,6 @@
 #include "camera.h"
 
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 
 #define DEFAULT_NEAR_PLANE 0.1f
 #define DEFAULT_FAR_PLANE 1000.0f
@@ -203,7 +203,7 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 /*
 RESULT camera::Notify(TimeEvent *event) {
-	//LOG(INFO) << "time";
+	//DOSLOG(INFO, "[camera] time");
 
 	double dt = event->m_deltaTime;
 

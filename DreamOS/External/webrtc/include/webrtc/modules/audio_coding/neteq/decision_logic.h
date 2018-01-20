@@ -8,14 +8,14 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_
-#define WEBRTC_MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_
+#ifndef MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_
+#define MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_
 
-#include "webrtc/base/constructormagic.h"
-#include "webrtc/modules/audio_coding/neteq/defines.h"
-#include "webrtc/modules/audio_coding/neteq/include/neteq.h"
-#include "webrtc/modules/audio_coding/neteq/tick_timer.h"
-#include "webrtc/typedefs.h"
+#include "modules/audio_coding/neteq/defines.h"
+#include "modules/audio_coding/neteq/include/neteq.h"
+#include "modules/audio_coding/neteq/tick_timer.h"
+#include "rtc_base/constructormagic.h"
+#include "typedefs.h"  // NOLINT(build/include)
 
 namespace webrtc {
 
@@ -26,7 +26,7 @@ class DelayManager;
 class Expand;
 class PacketBuffer;
 class SyncBuffer;
-struct RTPHeader;
+struct Packet;
 
 // This is the base class for the decision tree implementations. Derived classes
 // must implement the method GetDecisionSpecialized().
@@ -66,19 +66,18 @@ class DecisionLogic {
 
   // Returns the operation that should be done next. |sync_buffer| and |expand|
   // are provided for reference. |decoder_frame_length| is the number of samples
-  // obtained from the last decoded frame. If there is a packet available, the
-  // packet header should be supplied in |packet_header|; otherwise it should
-  // be NULL. The mode resulting form the last call to NetEqImpl::GetAudio is
-  // supplied in |prev_mode|. If there is a DTMF event to play, |play_dtmf|
-  // should be set to true. The output variable |reset_decoder| will be set to
-  // true if a reset is required; otherwise it is left unchanged (i.e., it can
-  // remain true if it was true before the call).
-  // This method end with calling GetDecisionSpecialized to get the actual
-  // return value.
+  // obtained from the last decoded frame. If there is a packet available, it
+  // should be supplied in |next_packet|; otherwise it should be NULL. The mode
+  // resulting from the last call to NetEqImpl::GetAudio is supplied in
+  // |prev_mode|. If there is a DTMF event to play, |play_dtmf| should be set to
+  // true. The output variable |reset_decoder| will be set to true if a reset is
+  // required; otherwise it is left unchanged (i.e., it can remain true if it
+  // was true before the call).  This method end with calling
+  // GetDecisionSpecialized to get the actual return value.
   Operations GetDecision(const SyncBuffer& sync_buffer,
                          const Expand& expand,
                          size_t decoder_frame_length,
-                         const RTPHeader* packet_header,
+                         const Packet* next_packet,
                          Modes prev_mode,
                          bool play_dtmf,
                          size_t generated_noise_samples,
@@ -124,18 +123,17 @@ class DecisionLogic {
 
   // Returns the operation that should be done next. |sync_buffer| and |expand|
   // are provided for reference. |decoder_frame_length| is the number of samples
-  // obtained from the last decoded frame. If there is a packet available, the
-  // packet header should be supplied in |packet_header|; otherwise it should
-  // be NULL. The mode resulting form the last call to NetEqImpl::GetAudio is
-  // supplied in |prev_mode|. If there is a DTMF event to play, |play_dtmf|
-  // should be set to true. The output variable |reset_decoder| will be set to
-  // true if a reset is required; otherwise it is left unchanged (i.e., it can
-  // remain true if it was true before the call).
-  // Should be implemented by derived classes.
+  // obtained from the last decoded frame. If there is a packet available, it
+  // should be supplied in |next_packet|; otherwise it should be NULL. The mode
+  // resulting from the last call to NetEqImpl::GetAudio is supplied in
+  // |prev_mode|. If there is a DTMF event to play, |play_dtmf| should be set to
+  // true. The output variable |reset_decoder| will be set to true if a reset is
+  // required; otherwise it is left unchanged (i.e., it can remain true if it
+  // was true before the call).  Should be implemented by derived classes.
   virtual Operations GetDecisionSpecialized(const SyncBuffer& sync_buffer,
                                             const Expand& expand,
                                             size_t decoder_frame_length,
-                                            const RTPHeader* packet_header,
+                                            const Packet* next_packet,
                                             Modes prev_mode,
                                             bool play_dtmf,
                                             bool* reset_decoder,
@@ -167,4 +165,4 @@ class DecisionLogic {
 };
 
 }  // namespace webrtc
-#endif  // WEBRTC_MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_
+#endif  // MODULES_AUDIO_CODING_NETEQ_DECISION_LOGIC_H_

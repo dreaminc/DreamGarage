@@ -11,6 +11,79 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+RESULT UIKeyboardHandle::Show() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ShowKeyboard());
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::Hide() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(HideKeyboard());
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::SendUpdateComposite(float depth) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateComposite(depth));
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateComposite(depth, ptOrigin, qOrigin));
+Error:
+	return r;
+}
+
+bool UIKeyboardHandle::IsVisible() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	return IsKeyboardVisible();
+Error:
+	//TODO: could be a problem because nullptr is equal to false
+	return nullptr;
+}
+
+RESULT UIKeyboardHandle::ShowTitleView() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ShowKeyboardTitleView());
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(UpdateKeyboardTitleView(pIconTexture,strTitle));
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::PopulateTextBox(std::string strText) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PopulateKeyboardTextBox(strText));
+Error:
+	return r;
+}
+
+RESULT UIKeyboardHandle::SendPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetPasswordFlag(fIsPassword));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -23,8 +96,12 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	std::shared_ptr<font> pFont;
 	std::wstring wstrFont;
 
+	SetAppName("UIKeyboard");
+	SetAppDescription("Virtual text entry");
+
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
+
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
@@ -42,13 +119,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pHeaderContainer = GetComposite()->AddComposite();
 
-	//TODO: should not need defaults here anymore
-	m_pLeftMallet = new UIMallet(GetDOS());
-	CN(m_pLeftMallet);
-
-	m_pRightMallet = new UIMallet(GetDOS());
-	CN(m_pRightMallet);
-
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
 
@@ -64,6 +134,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pDefaultIconTexture = GetComposite()->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	{
 		//Setup textbox
@@ -79,19 +150,22 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 			m_pFont,
 			"",
 			m_surfaceWidth - 0.02f,
+			//0.25f,
 			m_lineHeight * m_numLines, 
-			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
 
 		m_pHeaderContainer->AddObject(m_pTextBoxText);
 
 		//Setup title / icon
 		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
 		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		
+		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
 
 		m_pFont->SetLineHeight(0.050f);
 		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
-			"",
+			"Website",
 			m_surfaceWidth - 0.02f,
 			0.050,
 			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
@@ -117,6 +191,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
+	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 Error:
 	return r;
@@ -243,32 +318,31 @@ RESULT UIKeyboard::Update(void *pContext) {
 	std::vector<UIKey*> activeKeysToRemove;
 
 	// skip keyboard interaction if not visible
-	CBR((IsVisible()), R_SKIPPED);
+	CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
+	if (m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+		CB(userUIDs.size() == 1);
+		m_userAppUID = userUIDs[0];
+
+		//Capture user app
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+		CN(m_pUserHandle);
+	}
+	//CBR(m_pUserHandle != nullptr && m_pUserHandle->GetAppState(), R_SKIPPED);
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
 	CN(pProxy);
 
-	// Update Mallet Positions
-	hand *pHand = pDOS->GetHand(HAND_TYPE::HAND_LEFT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	pHand = pDOS->GetHand(HAND_TYPE::HAND_RIGHT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
-
-	// Update Keys
+	// Update Keys if the app is active
 	int i = 0;
-	for (auto &mallet : { m_pLeftMallet, m_pRightMallet })
+	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	CNR(pLMallet, R_SKIPPED);
+	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	CNR(pRMallet, R_SKIPPED);
+
+	//  Note: this predictive collision functionality is duplicated in control view
+	for (auto &mallet : { pLMallet, pRMallet })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
 		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
@@ -284,7 +358,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
 			// if it accounted for the radius, it would be able to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
-			if (!key) continue;
+			if (!key) {
+				CR(mallet->SetDirty());
+				continue;
+			}
 			CR(AddActiveKey(key));
 			keyCollisions[i] = key;
 
@@ -303,7 +380,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		auto key = keyCollisions[0];
 		point ptPosition = key->m_pQuad->GetPosition();
 		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
-		key->m_pQuad->SetPosition(point(ptPosition.x(), y - m_pLeftMallet->GetRadius(), ptPosition.z()));
+		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLMallet->GetRadius(), ptPosition.z()));
 	}
 
 
@@ -319,7 +396,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
 				controllerType = (ControllerType)(j);
-				pMallet = (j == 0) ? m_pLeftMallet : m_pRightMallet;
+				pMallet = (j == 0) ? pLMallet : pRMallet;
 			}
 		}
 
@@ -383,12 +460,18 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
+DreamAppHandle* UIKeyboard::GetAppHandle() {
+	return (UIKeyboardHandle*)(this);
+}
+
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	UIKeyboard *pUIKeyboard = new UIKeyboard(pDreamOS, pContext);
 	return pUIKeyboard;
 }
 
 RESULT UIKeyboard::ShowKeyboard() {
+	RESULT r = R_PASS;
+
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -397,6 +480,9 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
+		m_pTitleIcon->SetVisible(false);
+		m_pTitleText->SetVisible(false);
+		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
 		return r;
@@ -406,14 +492,33 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		m_pLeftMallet->Show();
-		m_pRightMallet->Show();
+		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
+		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
+		CR(SetAnimatingState(UIKeyboard::state::VISIBLE));
+
+		if (m_pUserHandle == nullptr) {
+			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+			CB(userUIDs.size() == 1);
+			m_userAppUID = userUIDs[0];
+
+			//Capture user app
+			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
+			CN(m_pUserHandle);
+		}
+		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		CNR(pLMallet, R_SKIPPED);
+		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		CNR(pRMallet, R_SKIPPED);
+
+		pLMallet->SetDirty();
+		pRMallet->SetDirty();
+
 	Error:
 		return r;
 	};
 
 	DimObj *pObj = GetComposite();
-	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
@@ -424,31 +529,33 @@ RESULT UIKeyboard::ShowKeyboard() {
 		fnStartCallback,
 		fnEndCallback,
 		this
-	);
-	return R_PASS;
+	));
+Error:
+	return r;
 }
 
 RESULT UIKeyboard::HideKeyboard() {
+
+	RESULT r = R_PASS;
 
 	auto fnCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
-		m_pLeftMallet->Hide();
-		m_pRightMallet->Hide();
-
 		// full press of key that clears whole string
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 0));
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
+		CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	Error:
 		return r;
 	};
 
 	DimObj *pObj = GetComposite();
+
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
@@ -462,7 +569,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		this
 	);
 
-	return R_PASS;
+	return r;
 }
 
 RESULT UIKeyboard::HideSurface() {
@@ -470,7 +577,17 @@ RESULT UIKeyboard::HideSurface() {
 }
 
 bool UIKeyboard::IsVisible() {
-	return GetComposite()->IsVisible();
+	if (m_keyboardState != UIKeyboard::state::HIDDEN) {
+		return true;
+	}
+
+	else {
+		return false;
+	}
+}
+
+bool UIKeyboard::IsKeyboardVisible() {
+	return IsVisible();
 }
 
 RESULT UIKeyboard::SetVisible(bool fVisible) {
@@ -546,6 +663,11 @@ RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT UIKeyboard::SetAnimatingState(UIKeyboard::state keyboardState) {
+	m_keyboardState = keyboardState;
+	return R_PASS;
+}
+
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	RESULT r = R_PASS;
 
@@ -561,27 +683,6 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	
 Error:
 	return r;
-}
-
-RESULT UIKeyboard::SetMallets(UIMallet *leftMallet, UIMallet *rightMallet) {
-	RESULT r = R_PASS;
-
-	CN(leftMallet);
-	m_pLeftMallet = leftMallet;
-
-	CN(rightMallet);
-	m_pRightMallet = rightMallet;
-
-Error:
-	return R_PASS;
-}
-
-UIMallet* UIKeyboard::GetRightMallet() {
-	return m_pRightMallet;
-}
-
-UIMallet* UIKeyboard::GetLeftMallet() {
-	return m_pLeftMallet;
 }
 
 RESULT UIKeyboard::UpdateTextBox(int chkey) {
@@ -606,17 +707,27 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		// DreamUIBar in some way in the future
 
 		//HideKeyboard();
+		//m_pUserHandle->SendKBEnterEvent();
+		m_pUserHandle->SendUserObserverEvent(UserObserverEventType::KB_ENTER);
 	}
 
 	else if (chkey == 0x01) {
 		m_pTextBoxText->SetText("");
 	}
+	
+	// TODO: better way to refresh textbox using text dirty flag
+	else if (chkey == 0) {
+		auto strCurrentText = m_pTextBoxText->GetText();
+		m_pTextBoxText->SetText("");
+		m_pTextBoxText->SetText(strCurrentText);
+	}
 
 	else if (chkey == SVK_BACK) {
 		auto strTextbox = m_pTextBoxText->GetText();
-		if (strTextbox.size() > 0)
+		if (strTextbox.size() > 0) {
 			strTextbox.pop_back();
 			m_pTextBoxText->SetText(strTextbox);
+		}
 	}
 
 	else if (chkey == SVK_CONTROL) {
@@ -629,26 +740,34 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		}
 		CR(UpdateKeyboardLayout(newType));
 
-	}
+	}	
 
 	else {
 		std::string strNew = m_pTextBoxText->GetText();
 		strNew += chkey;
-		m_pTextBoxText->SetText(strNew);
+		m_pTextBoxText->SetText(strNew);	
 
 		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
+			CR(UpdateKeyState((SenseVirtualKey)(chkey), 0));
 			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
 		}
 	}
-
 
 Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
+RESULT UIKeyboard::PopulateKeyboardTextBox(std::string strText) {
 	RESULT r = R_PASS;
+	CR(m_pTextBoxText->SetText(strText));
+Error:
+	return r;
+}
 
+RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
+	RESULT r = R_PASS;
+	m_pTitleIcon->SetVisible(true);
+	m_pTitleText->SetVisible(true);
 	if (pIconTexture != nullptr) {
 		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}
@@ -658,20 +777,74 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateComposite(float height, float depth) {
+RESULT UIKeyboard::ShowKeyboardTitleView() {
+	RESULT r = R_PASS;
+	CR(m_pTitleIcon->SetVisible(true));
+	CR(m_pTitleText->SetVisible(true));
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateComposite(float depth) {
 	RESULT r = R_PASS;
 
 	point ptHeader = m_pHeaderContainer->GetPosition();
 	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
+
 	float offset = m_surfaceHeight / 2.0f;
 	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
-	//float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
-	CR(UpdateCompositeWithHands(height));
+	point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+
+	point ptOrigin;
+	quaternion qOrigin;
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+
+	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
+	GetComposite()->SetOrientation(qOrigin);
+
 	m_ptComposite = GetComposite()->GetPosition();
 
 Error:
+	return r;
+}
+
+RESULT UIKeyboard::SetPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+
+	if (fIsPassword) {
+		m_pTextBoxText->AddFlags(text::flags::PASSWORD);
+	}
+	else {
+		m_pTextBoxText->RemoveFlags(text::flags::PASSWORD);
+	}
+
+	return R_PASS;
+}
+
+RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
+	RESULT r = R_PASS;
+
+	point ptHeader = m_pHeaderContainer->GetPosition();
+	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
+
+	float offset = m_surfaceHeight / 2.0f;
+	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
+
+	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
+
+	point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+
+	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
+	GetComposite()->SetOrientation(qOrigin);
+
+	m_ptComposite = GetComposite()->GetPosition();
+
+//Error:
 	return r;
 }
 
@@ -777,22 +950,4 @@ RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
 RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	m_keyReleaseThreshold = threshold;
 	return R_PASS;
-}
-
-RESULT UIKeyboard::SetPath(std::string strPath) {
-	m_strPath = strPath;
-	return R_PASS;
-}
-
-RESULT UIKeyboard::SetScope(std::string strScope) {
-	m_strScope = strScope;
-	return R_PASS;
-}
-
-std::string UIKeyboard::GetPath() {
-	return m_strPath;
-}
-
-std::string UIKeyboard::GetScope() {
-	return m_strScope;
 }

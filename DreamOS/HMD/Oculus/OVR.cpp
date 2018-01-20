@@ -11,7 +11,7 @@
 
 #include "Extras/OVR_Math.h"
 
-#include "DreamConsole/DreamConsole.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "OVRHMDSinkNode.h"
 
@@ -98,7 +98,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
-	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+	//OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+	DOSLOG(INFO, "HMD Oculus Rift Initialized ");
 
 	// Controller
 
@@ -126,15 +127,21 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// ptAdjust created from manual testing
 	{
 		point ptAdjust = point(0.0f, 0.01f, -0.0057f);
-		m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj");
+		m_pLeftControllerModel = m_pParentSandbox->MakeModel(L"\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj");
 		auto pMesh = m_pLeftControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(-0.00629f, 0.02522f, -0.03469f) + ptAdjust);
-		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		m_pParentSandbox->AddObject(pMesh.get());
+		//pMesh->SetVisible(false);
 
-		m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
+		m_pRightControllerModel = m_pParentSandbox->MakeModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
 		pMesh = m_pRightControllerModel->GetFirstChild<mesh>();
 		pMesh->SetPosition(point(0.00629f, 0.02522f, -0.03469f) + ptAdjust);
-		pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		pMesh->SetOrientation(quaternion::MakeQuaternionWithEuler(39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+		//pMesh->SetOrientationOffsetDeg(39.4f, 0.0f, 0.0f);
+		m_pParentSandbox->AddObject(pMesh.get());
+		//pMesh->SetVisible(false);
 	}
 
 #endif
@@ -151,26 +158,22 @@ Error:
 
 
 
-VirtualObj *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
+composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {
 		case CONTROLLER_LEFT: {
-			#ifdef _USE_TEST_APP
-				return m_pLeftControllerModel->GetFirstChild<sphere>().get();
-			#else
-				return m_pLeftControllerModel;
-			#endif
+			return m_pLeftControllerModel;
 		} break;
 
 		case CONTROLLER_RIGHT: {
-			#ifdef _USE_TEST_APP
-				return m_pRightControllerModel->GetFirstChild<sphere>().get();
-			#else
-				return m_pRightControllerModel;
-			#endif
+			return m_pRightControllerModel;
 		} break;
 	}
 
 	return nullptr;
+}
+
+HMDDeviceType OVRHMD::GetDeviceType() {
+	return HMDDeviceType::OCULUS;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
@@ -319,15 +322,15 @@ RESULT OVRHMD::UpdateHMD() {
 		qOffset.SetQuaternionRotationMatrix(qRotation);
 		qRotation.Reverse();
 
-		int i = 0;
-		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
+		for (int i = 0; i < 2; i++) {
 
+			auto& hand = i == 0 ? m_pLeftHand : m_pRightHand;
 			auto& pModel = i == 0 ? m_pLeftControllerModel : m_pRightControllerModel;
 
 			if (trackingState.HandStatusFlags[i] != 3) {
 				hand->SetTracked(false);
-				hand->SetVisible(false);
-				pModel->SetVisible(false);
+				//hand->SetVisible(false);
+				//pModel->SetVisible(false);
 				continue;
 			}
 
@@ -350,12 +353,10 @@ RESULT OVRHMD::UpdateHMD() {
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
-			pModel->SetVisible(true);
+			//pModel->SetVisible(true);
 
 			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
 			UpdateSenseController(type, inputState);
-
-			i += 1;
 		}
 	}
 
@@ -379,8 +380,10 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	//0x0400 - Left stick press
 	//0x100000 - Left menu
 
-	cState.fMenu = (inputState.Buttons & 1<<20) != 0;
-	cState.fMenu = ((inputState.Buttons & 1<<1) != 0) || cState.fMenu;
+//	cState.fMenu = (inputState.Buttons & 1<<20) != 0;
+	// B and Y spawn the menu event
+	cState.fMenu = ((inputState.Buttons & 1<<1) != 0);
+	cState.fMenu = ((inputState.Buttons & 1<<9) != 0) || cState.fMenu;
 
 	// TODO: should probably change this value in controllerState to 'fSelected'
 	//cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;

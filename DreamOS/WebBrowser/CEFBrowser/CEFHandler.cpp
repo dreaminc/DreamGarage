@@ -20,6 +20,11 @@
 
 #include "CEFApp.h"
 
+#include "Core/Utilities.h"
+#include "CEFDOMNode.h"
+
+#include "CEFResourceHandler.h"
+
 #pragma warning(default : 4067)
 
 // Initialize and allocate the instance
@@ -51,6 +56,11 @@ Error:
 
 // Handler Routing
 // Render handler is done at CEFApp to get access to all of the Browser Controllers
+
+CefRefPtr<CefAudioHandler> CEFHandler::GetAudioHandler() {
+	return this;
+}
+
 CefRefPtr<CefRenderHandler> CEFHandler::GetRenderHandler() { 
 	return this;
 }
@@ -65,6 +75,74 @@ CefRefPtr<CefLifeSpanHandler> CEFHandler::GetLifeSpanHandler() {
 
 CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
+}
+
+CefRefPtr<CefRequestHandler> CEFHandler::GetRequestHandler() {
+	return this;
+}
+
+bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, CefProcessId sourceCEFProcessID, CefRefPtr<CefProcessMessage> pCEFProcessMessage) {
+	RESULT r = R_PASS;
+
+	const std::string& strMessageName = pCEFProcessMessage->GetName();
+	CEFDOMNode *pCEFDOMNode = nullptr;
+
+	bool fHandled = false;
+
+	auto tokens = util::TokenizeString(strMessageName, "::");
+	CB((tokens.size() == 2));
+
+	{
+		std::string strObjectName = tokens[0];
+		std::string strMethodName = tokens[1];
+
+		if (strObjectName == "DreamCEFApp") {
+			if (strMethodName == "OnFocusedNodeChanged") {
+				
+				auto pCEFProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+				size_t numArgs = pCEFProcessMessageArguments->GetSize();
+
+				CB((numArgs > 0));
+
+				int cefBrowserID = pCefBrowser->GetIdentifier();
+
+				//CB((cefBrowserID == cefProcBrowserID));
+
+				// Strings
+				std::string strElementTagName = pCEFProcessMessageArguments->GetString(0);
+
+				std::string strName = pCEFProcessMessageArguments->GetString(1);
+				std::string strValue = pCEFProcessMessageArguments->GetString(2);
+
+				// Editable
+				bool fEditable = pCEFProcessMessageArguments->GetBool(3);
+
+				// Type
+				cef_dom_node_type_t cefDOMNodeType = (cef_dom_node_type_t)(pCEFProcessMessageArguments->GetInt(4));
+				
+				// Attributes
+				std::string strNodeTypeAttributeValue = pCEFProcessMessageArguments->GetString(5);
+
+				// Create the node
+				pCEFDOMNode = new CEFDOMNode(cefDOMNodeType, strName, strElementTagName, strValue, fEditable, strNodeTypeAttributeValue);
+			
+
+				if (m_pCEFHandlerObserver != nullptr) {
+					CR(m_pCEFHandlerObserver->OnFocusedNodeChanged(cefBrowserID, -1, pCEFDOMNode));
+				}
+
+				fHandled = true;
+			}
+		}
+	}
+
+Error:
+	if (pCEFDOMNode != nullptr) {
+		delete pCEFDOMNode;
+		pCEFDOMNode = nullptr;
+	}
+
+	return fHandled;
 }
 
 /*
@@ -95,6 +173,8 @@ void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	
 	m_cefBrowsers.push_back(pCEFBrowser);
 	m_fBrowserRunning = true;
+
+	int browserID = pCEFBrowser->GetIdentifier();
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::make_shared<CEFBrowserController>(pCEFBrowser);
 	CN(pCEFBrowserController);
@@ -143,6 +223,12 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 		m_fBrowserRunning = false;
 		//CefQuitMessageLoop();
 	}
+}
+
+bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
+	// false to allow pop up, true to cancel creation
+	frame->LoadURL(target_url);	// push URL to current frame
+	return true;
 }
 
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
@@ -241,7 +327,7 @@ Error:
 
 void CEFHandler::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFHANDLE: OnPaint");
+	//DEBUG_LINEOUT("CEFHANDLE: OnPaint");
 
 	CN(m_pCEFHandlerObserver);
 	CR(m_pCEFHandlerObserver->OnPaint(pCEFBrowser, type, dirtyRects, pBuffer, width, height));
@@ -250,3 +336,112 @@ Error:
 	return;
 }
 
+// Audio Handler
+void CEFHandler::OnAudioData(CefRefPtr<CefBrowser> browser, int frames, int channels, int bits_per_sample, const void* data_buffer) {
+	RESULT r = R_PASS;
+
+	//DEBUG_LINEOUT("CEFHandle: OnAudioData");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnAudioData(browser, frames, channels, bits_per_sample, data_buffer));
+
+Error:
+	return;
+}
+
+RESULT CEFHandler::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pCEFHandlerObserver->GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL));
+
+Error:
+	return r;
+}
+
+CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) {
+	
+	CefString strRequestURL = request->GetURL();
+	CefRequest::HeaderMap requestHeaders;
+	request->GetHeaderMap(requestHeaders);
+	bool fUsesAuthentication = false;
+
+	// Check for an authorization token
+	for (std::multimap<CefString, CefString>::iterator it = requestHeaders.begin(); it != requestHeaders.end(); ++it) {
+		if (it->first == "Authorization") {
+			fUsesAuthentication = true;
+		}
+	}
+
+	if (fUsesAuthentication) {	// If the link uses an authorization token we need to save it
+		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
+		it = m_savedRequestHeaders.find(strRequestURL);
+
+		if (it != m_savedRequestHeaders.end()) {	// If the link already exists, update the headers
+			it->second = requestHeaders;
+		}
+
+		else if (it == m_savedRequestHeaders.end()) {	// Otherwise insert it
+			m_savedRequestHeaders.insert(std::pair<CefString, std::multimap<CefString, CefString>>(strRequestURL, requestHeaders));
+		}
+	}
+
+	else {	// If the link doesn't have an auth header we need to check if it's one of the saved links
+		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
+		it = m_savedRequestHeaders.find(strRequestURL);
+
+		if (it != m_savedRequestHeaders.end()) {	// If it is, insert the headers
+			requestHeaders = it->second;
+		}
+	}
+
+	request->SetHeaderMap(requestHeaders);
+	
+	return RV_CONTINUE;
+}
+
+bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
+	
+	/*
+	// This is a gut check to see that the right headers are in the right place
+	// TODO: comment out if not in testing
+	CefRequest::HeaderMap cefHeaders;
+	response->GetHeaderMap(cefHeaders);
+
+	CefResponse::HeaderMap::iterator headeritem;
+	DEBUG_LINEOUT("OnResourceResponse::Response headers size = %i", (int)cefHeaders.size());
+
+	int i = 0;
+	for (headeritem = cefHeaders.begin(); headeritem != cefHeaders.end(); headeritem++) {
+		DEBUG_LINEOUT("[%i]: ['%s','%s']", i++, headeritem->first.ToString().c_str(), headeritem->second.ToString().c_str());
+	}
+	//*/
+
+	return false;
+}
+
+CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefFrame> pCefFrame, CefRefPtr<CefRequest> pCefRequest) {
+	RESULT r = R_PASS;
+	
+	// Uncomment to skip all custom resource handling code
+	//return nullptr;
+
+	ResourceHandlerType resourceHandlerType;
+	CefString strCEFURL = pCefRequest->GetURL();
+	GetResourceHandlerType(resourceHandlerType, pCefBrowser, strCEFURL);	
+
+	switch (resourceHandlerType) {
+	case (ResourceHandlerType::DREAM): {
+		CefRefPtr<CefResourceHandler> pCefResourceHandler = CefRefPtr<CefResourceHandler>(new CEFResourceHandler(pCefBrowser, pCefFrame, pCefRequest));
+		CN(pCefResourceHandler);
+
+		return pCefResourceHandler;
+	} break;
+
+	case (ResourceHandlerType::DEFAULT): {
+		return nullptr;
+	} break;
+	}
+
+Error:
+	return nullptr;
+}

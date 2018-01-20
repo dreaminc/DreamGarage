@@ -182,6 +182,12 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap")),
 		"Failed to initialize glGenerateMipmap extension");
 
+	CNMW((m_glGetnTexImage = (PFNGLGETNTEXIMAGEPROC)wglGetProcAddress("glGetnTexImage")),
+		"Failed to initialize glGetnTexImage extension");
+
+	CNMW((m_glGetTextureImage = (PFNGLGETTEXTUREIMAGEPROC)wglGetProcAddress("glGetTextureImage")),
+		"Failed to initialize glGetTextureImage extension");
+
 	// FBO
 	CNMW((m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers")),
 		"Failed to initialzie glGenFramebuffers extension");

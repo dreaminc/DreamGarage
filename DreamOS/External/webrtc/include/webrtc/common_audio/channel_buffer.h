@@ -8,16 +8,16 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_CHANNEL_BUFFER_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_CHANNEL_BUFFER_H_
+#ifndef COMMON_AUDIO_CHANNEL_BUFFER_H_
+#define COMMON_AUDIO_CHANNEL_BUFFER_H_
 
 #include <string.h>
 
 #include <memory>
 
-#include "webrtc/base/checks.h"
-#include "webrtc/base/gtest_prod_util.h"
-#include "webrtc/common_audio/include/audio_util.h"
+#include "common_audio/include/audio_util.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/gtest_prod_util.h"
 
 namespace webrtc {
 
@@ -94,7 +94,7 @@ class ChannelBuffer {
   // 0 <= sample < |num_frames_per_band_|
   const T* const* bands(size_t channel) const {
     RTC_DCHECK_LT(channel, num_channels_);
-    RTC_DCHECK_GE(channel, 0u);
+    RTC_DCHECK_GE(channel, 0);
     return &bands_[channel * num_bands_];
   }
   T* const* bands(size_t channel) {
@@ -153,6 +153,7 @@ class ChannelBuffer {
 class IFChannelBuffer {
  public:
   IFChannelBuffer(size_t num_frames, size_t num_channels, size_t num_bands = 1);
+  ~IFChannelBuffer();
 
   ChannelBuffer<int16_t>* ibuf();
   ChannelBuffer<float>* fbuf();
@@ -182,4 +183,4 @@ class IFChannelBuffer {
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_CHANNEL_BUFFER_H_
+#endif  // COMMON_AUDIO_CHANNEL_BUFFER_H_

@@ -12,20 +12,14 @@
 #include "OGLObj.h"
 #include "Primitives/user.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLUser : public user, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
-	OGLUser(OpenGLImp *pParentImp) :
-		user(pParentImp),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLUser(OpenGLImp *pParentImp);
 };
+#pragma warning(pop)
 
 #endif // ! OGL_USER_H_

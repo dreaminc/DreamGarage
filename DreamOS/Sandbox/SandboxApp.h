@@ -42,12 +42,14 @@ class FlatContext;
 class sphere; 
 class cylinder;
 class DimRay;
+class DimPlane;
 class volume; 
 class texture; 
 class skybox;
 class model;
 class user;
 class Message;
+class DreamAppMessage;
 
 class UIKeyboardLayout;
 
@@ -57,7 +59,6 @@ class SandboxApp :
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
 	public Subscriber<SenseMouseEvent>,
-	public Subscriber<CmdPromptEvent>, 
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
 	public valid 
@@ -69,6 +70,7 @@ public:
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
 		unsigned fMouseLook : 1;
+		unsigned fInitCloud : 1;
 	};
 
 private:
@@ -150,7 +152,6 @@ private:
 	RESULT SetMouseIntersectObjects(bool fMouseIntersectObjects);
 	bool IsMouseIntersectObjects();
 
-	RESULT Notify(CmdPromptEvent *event);
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseTypingEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
@@ -174,11 +175,14 @@ public:
 	RESULT SetGravityState(bool fEnabled);
 
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
@@ -291,6 +295,9 @@ public:
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
+	DimPlane* MakePlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
+	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
+
 	text *AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 
@@ -307,8 +314,8 @@ public:
 	text* AddText(std::shared_ptr<font> pFont, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	text* AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 
-	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
 
@@ -335,8 +342,13 @@ public:
 	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
 	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
 
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 	// IO
 public:

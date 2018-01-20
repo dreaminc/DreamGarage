@@ -23,7 +23,7 @@
 #include "color.h"
 #include "BoundingBox.h"
 
-class volume : public DimObj {
+class volume : public virtual DimObj {
 public:
 	typedef enum {
 		CUBE,

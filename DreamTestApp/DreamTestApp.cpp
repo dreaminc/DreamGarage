@@ -1,4 +1,4 @@
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 #include "DreamTestApp.h"
 #include <string>
 
@@ -16,9 +16,10 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fInitCloud = true;		// TODO: This is currently breaking stuff
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:
@@ -31,12 +32,10 @@ RESULT DreamTestApp::LoadScene() {
 	// IO
 	RegisterSubscriber((SenseVirtualKey)('N'), this);
 
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
-
 	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = false;
+	halconf.fRenderReferenceGeometry = true;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -44,16 +43,18 @@ RESULT DreamTestApp::LoadScene() {
 
 	// Push to a test suite factory in testing
 
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SANDBOX, this);
 
 	CN(m_pTestSuite);
 
@@ -108,10 +109,26 @@ RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> p
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT DreamTestApp::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamTestApp::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+	// Uncomment the below for use with Dream Peer testing (should iron this out in general)
+
+	//// Create a new peer
+	//auto pDreamPeer = CreateNewPeer(pPeerConnection);
+	//CN(pDreamPeer);
+	//
+	//CR(pDreamPeer->RegisterDreamPeerObserver(this));
+
+Error:
+	return r;
+}
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
@@ -119,7 +136,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	switch (kbEvent->KeyCode) {
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
-				HUD_OUT("Key 'N' is pressed - next test");
+				//HUD_OUT("Key 'N' is pressed - next test");
 				m_pTestSuite->NextTest();
 			}
 		} break;
@@ -138,15 +155,6 @@ RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 		pDimObj->SetVertexColor(color(COLOR_PINK));
 	}
-
-//Error:
-	return r;
-}
-
-RESULT DreamTestApp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	HUD_OUT("DreamAPP command");
 
 //Error:
 	return r;

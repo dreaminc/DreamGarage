@@ -1,6 +1,6 @@
 #include "OpenGLImp.h"
 
-#include "Logger/Logger.h"
+#include "DreamLogger/DreamLogger.h"
 #include "easylogging++.h"
 
 #include "OGLObj.h"
@@ -31,12 +31,10 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
+#include "OGLPlane.h"
 #include "OGLAttachment.h"
 
 #include "OGLViewportDisplay.h"
-
-#include "DreamConsole/DreamConsole.h"
-#include "OGLDreamConsole.h"
 
 #include "Core/Utilities.h"
 
@@ -57,7 +55,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 }
 
 OpenGLImp::~OpenGLImp() {
-	m_pOGLDreamConsole.release();
+	// empty
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
@@ -546,6 +544,23 @@ Error:
 	return nullptr;
 }
 
+DimPlane* OpenGLImp::MakePlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+
+	DimPlane *pPlane = new OGLPlane(this, ptOrigin, vNormal);
+	CN(pPlane);
+
+	//Success:
+	return pPlane;
+
+Error:
+	if (pPlane != nullptr) {
+		delete pPlane;
+		pPlane = nullptr;
+	}
+	return nullptr;
+}
+
 sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
@@ -895,7 +910,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
@@ -931,10 +946,10 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
+texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, format, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, pixelFormat, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -1796,6 +1811,36 @@ RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
 
 	m_OpenGLExtensions.glGenerateMipmap(target);
 	CRM(CheckGLError(), "glGenerateMipmap failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels) {
+	RESULT r = R_PASS;
+
+	glGetTexImage(target, level, format, type, pixels);
+	CRM(CheckGLError(), "glGetTexImage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetTextureImage(GLuint texture, GLint level, GLenum format, GLenum type, GLsizei bufSize, GLvoid *pixels) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetTextureImage(texture, level, format, type, bufSize, pixels);
+	CRM(CheckGLError(), "glGetTextureImage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetnTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLsizei bufSize, void *pixels) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetnTexImage(target, level, format, type, bufSize, pixels);
+	CRM(CheckGLError(), "glGetnTexImage failed");
 
 Error:
 	return r;

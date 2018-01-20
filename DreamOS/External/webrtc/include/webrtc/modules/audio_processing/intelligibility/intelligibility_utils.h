@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_
-#define WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_
+#ifndef MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_
+#define MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_
 
 #include <complex>
 #include <vector>
@@ -48,6 +48,8 @@ class GainApplier {
  public:
   GainApplier(size_t freqs, float relative_change_limit);
 
+  ~GainApplier();
+
   // Copy |in_block| to |out_block|, multiplied by the current set of gains,
   // and step the current set of gains towards the target set.
   void Apply(const std::complex<float>* in_block,
@@ -63,8 +65,22 @@ class GainApplier {
   std::vector<float> current_;
 };
 
+// Helper class to delay a signal by an integer number of samples.
+class DelayBuffer {
+ public:
+  DelayBuffer(size_t delay, size_t num_channels);
+
+  ~DelayBuffer();
+
+  void Delay(float* const* data, size_t length);
+
+ private:
+  std::vector<std::vector<float>> buffer_;
+  size_t read_index_;
+};
+
 }  // namespace intelligibility
 
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_
+#endif  // MODULES_AUDIO_PROCESSING_INTELLIGIBILITY_INTELLIGIBILITY_UTILS_H_

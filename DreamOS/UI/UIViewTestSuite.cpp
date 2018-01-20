@@ -3,6 +3,7 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -213,13 +214,14 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
+	CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	CR(AddTestKeyboardAngle());
+	//CR(AddTestKeyboardAngle());
 	//CR(AddTestCurvedTitle());
+	//CR(AddTestDreamControlView());
 
 Error:
 	return r;
@@ -653,6 +655,13 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
+			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+			CN(pDreamUser);
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			CN(pDreamUIBar);
+		}
+
+		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
 			auto pCommandLineManager = CommandLineManager::instance();
 			DEBUG_LINEOUT("Initializing Cloud Controller");
@@ -665,20 +674,12 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 			}
-			//*
-			for (int i = -4; i < 5; i++) {
-				pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
-				CN(pQuad);
-				pQuad->RotateXByDeg(90.0f);
-				pQuad->SetPosition(i * 1.05f, 0.0f, 3.5f);
-				CR(m_pDreamOS->AddObjectToUIGraph(pQuad));
-			}
-			//*/
 
+			auto pDreamUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+			CN(pDreamUser);
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
 			CN(pDreamUIBar);
-			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
-			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
+			
 
 			CR(m_pDreamOS->InitializeKeyboard());
 			
@@ -694,15 +695,34 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pSphere->SetPosition(ptcam + point(-0.5f, 1.0f, 0.0f));
 		}
 
+
 	Error:
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize,
-		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
-		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
-		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
-		nullptr);
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local UIView Test");
@@ -744,7 +764,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			}
 			if (eventType == SENSE_CONTROLLER_MENU_UP) {
 				//hardcoded values taken from DreamUIBar
-				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
+				CR(pKeyboard->UpdateComposite(/*-0.23f,*/ -0.30f));
 			}
 		Error:
 			return r;
@@ -792,10 +812,10 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 			pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pTestContext->pKeyboard->ShowKeyboard();
-			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
-			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
-			m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
-			m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
+//			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
+//			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
+			//m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
+			//m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
@@ -871,9 +891,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pTestContext->pTextBoxText->SetText(strCurrentAngle);
 			float rotationAngle = (pTestContext->malletAngle * (float)(M_PI) / 180.0f);
 
-			pTestContext->pKLeftMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-			pTestContext->pKRightMallet->SetHeadOffset(point(0.0f, sin(rotationAngle) / 5, cos(rotationAngle) / 5));
-		}
+	}
 
 	Error:
 		return R_PASS;
@@ -1011,6 +1029,80 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 
 	pUITest->SetTestName("Local UIView Test");
 	pUITest->SetTestDescription("Test to show curved Title");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::AddTestDreamControlView() {	
+	RESULT r = R_PASS;
+	
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::string strURL = "http://www.youtube.com";
+
+		std::shared_ptr<UIKeyboard> pUIKeyboard = nullptr;
+
+		CN(m_pDreamOS);
+		UIStageProgram *pUIStageProgram = nullptr;
+		CR(SetupUIStagePipeline(pUIStageProgram));
+
+		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			quad *pQuad = nullptr;
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			CN(pDreamUIBar);
+			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
+
+			//CR(m_pDreamOS->InitializeKeyboard());
+	
+			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);	// setup browser
+			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetDiagonalSize(10.0f);
+			pDreamBrowser->SetURI(strURL);
+
+			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+			pUIKeyboard->SetVisible(true);
+
+			auto& pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, nullptr);
+	CN(pUITest);
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Full Test of DreamControlView");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
 

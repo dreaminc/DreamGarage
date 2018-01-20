@@ -34,6 +34,7 @@ typedef enum {
 	PATH_FONT,
 	PATH_MODEL,
 	PATH_DATA,
+	PATH_SOUND,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -54,7 +55,8 @@ class PathManager : public valid {
 		L"TEXTURE_CUBE",
 		L"FONT",
 		L"MODEL",
-		L"DATA"
+		L"DATA",
+		L"SOUND"
 	};
 
 	int m_cszPathValues_n;
@@ -125,6 +127,8 @@ public:
 
 	RESULT GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr);
 	RESULT GetFilePathForName(PATH_VALUE_TYPE type, const wchar_t *pszName, std::wstring strFilename, std::wstring &strFilePath);
+
+	FILE* OpenFile(PATH_VALUE_TYPE type, wchar_t* pszFile, wchar_t* pszMode);
 
 private:
 	UID m_uid;

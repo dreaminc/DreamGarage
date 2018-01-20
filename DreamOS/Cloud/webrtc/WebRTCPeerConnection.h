@@ -9,18 +9,28 @@
 
 #include <memory>
 
-#include "webrtc/base/common.h"
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+//#include "rtc_base/common.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
+
+#include "media/base/videocommon.h"
+#include "api/video/video_frame.h"
 
 #include "WebRTCICECandidate.h"
 #include "WebRTCIceConnection.h"
 
 #include "Primitives/Proxy.h"
 
+#include "Primitives/color.h"
+
+#include "pc/localaudiosource.h"
+
 class WebRTConductor;
+class WebRTCLocalAudioSource;
+class WebRTCLocalAudioTrack;
 class User;
 class TwilioNTSInformation;
+class AudioPacket;
 
 class WebRTCPeerConnectionProxy : public Proxy<WebRTCPeerConnectionProxy> {
 public:
@@ -32,6 +42,7 @@ class WebRTCPeerConnection :
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
 	public webrtc::AudioTrackSinkInterface,
+	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
 	public WebRTCPeerConnectionProxy
 {
 public:
@@ -60,7 +71,8 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
-		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -70,12 +82,16 @@ public:
 	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
 	~WebRTCPeerConnection();
 
-	RESULT AddStreams();
+	// TODO: Generalize this when we add renegotiation 
+	// so that they're not hard coded per WebRTCCommon
+	RESULT AddStreams(bool fAddDataChannel = true);
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
+	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
-	RESULT SetPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	
 	RESULT ClearSessionDescriptionProtocols();
 	RESULT ClearLocalSessionDescriptionProtocol();
 	RESULT ClearRemoteSessionDescriptionProtocol();
@@ -114,6 +130,9 @@ protected:
 	// webrtc::AudioTrackSinkInterface
 	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
+	// rtc::VideoSinkInterface<cricket::VideoFrame>
+	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
 	RESULT CreatePeerConnection(bool dtls);
@@ -125,14 +144,26 @@ public:
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
+	// Video
+	RESULT SendVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
+
+	// Audio
+	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
+
 protected:
 	// TODO: Move to peer Connection
 	bool IsPeerConnectionInitialized();
 
 
 public:
-	// Video (TODO eventually)
-	cricket::VideoCapturer* OpenVideoCaptureDevice();
+	// Video
+	std::unique_ptr<cricket::VideoCapturer> OpenVideoCaptureDevice();
+
+	RESULT InitializeVideoCaptureDevice(std::string strDeviceName);
+	std::unique_ptr<cricket::VideoCapturer> m_pCricketVideoCapturer = nullptr;
 
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }
@@ -141,7 +172,18 @@ public:
 	bool IsOfferer() { return (m_fOffer == true); }
 	bool IsAnswerer() { return (m_fOffer == false); }
 
+	long GetUserID() { return m_userID; }
+	RESULT SetUserID(long userID) { m_userID = userID; return R_PASS; }
+
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> GetWebRTCPeerConnectionInterface() { return m_pWebRTCPeerConnectionInterface; }
+
+	// Convenience Function
+	std::string GetLogSignature() {
+		return (std::string("[WebRTCPeerConnection] PID:") + std::to_string(GetPeerConnectionID()) + 
+			" UserID:" + std::to_string(GetUserID()) +
+			" PeerID:" + std::to_string(GetPeerUserID() )
+		);
+	}
 
 public:
 	std::string GetPeerConnectionString();
@@ -168,6 +210,7 @@ private:
 
 	long m_peerConnectionID;
 	int m_WebRTCPeerID;
+	long m_userID;
 
 	bool m_fOffer;	// TODO: this needs to be generalized
 	bool m_fSDPSet;	// TODO: temp
@@ -191,6 +234,10 @@ private:
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
+
+
+	// local audio sources
+	std::map<std::string, rtc::scoped_refptr<WebRTCLocalAudioSource>> m_pWebRTCLocalAudioSources;
 };
 
 

@@ -37,6 +37,8 @@ public:
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestKeyboardAngle();
 	RESULT AddTestCurvedTitle();
+	RESULT AddTestDreamControlView();
+	RESULT AddTestDreamBaseUI();
 
 	virtual RESULT AddTests() override;
 

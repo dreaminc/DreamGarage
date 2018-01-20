@@ -23,20 +23,22 @@
 // ssrc_groups = {{SIM,{10,20,30}, {FEC,{10,11}, {FEC, {20,21}, {FEC {30,31}}}
 // Please see RFC 5576.
 
-#ifndef WEBRTC_MEDIA_BASE_STREAMPARAMS_H_
-#define WEBRTC_MEDIA_BASE_STREAMPARAMS_H_
+#ifndef MEDIA_BASE_STREAMPARAMS_H_
+#define MEDIA_BASE_STREAMPARAMS_H_
+
+#include <stdint.h>
 
 #include <algorithm>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "webrtc/base/basictypes.h"
-#include "webrtc/base/constructormagic.h"
+#include "rtc_base/constructormagic.h"
 
 namespace cricket {
 
 extern const char kFecSsrcGroupSemantics[];
+extern const char kFecFrSsrcGroupSemantics[];
 extern const char kFidSsrcGroupSemantics[];
 extern const char kSimSsrcGroupSemantics[];
 
@@ -112,14 +114,26 @@ struct StreamParams {
 
   // Convenience function to add an FID ssrc for a primary_ssrc
   // that's already been added.
-  inline bool AddFidSsrc(uint32_t primary_ssrc, uint32_t fid_ssrc) {
+  bool AddFidSsrc(uint32_t primary_ssrc, uint32_t fid_ssrc) {
     return AddSecondarySsrc(kFidSsrcGroupSemantics, primary_ssrc, fid_ssrc);
   }
 
   // Convenience function to lookup the FID ssrc for a primary_ssrc.
   // Returns false if primary_ssrc not found or FID not defined for it.
-  inline bool GetFidSsrc(uint32_t primary_ssrc, uint32_t* fid_ssrc) const {
+  bool GetFidSsrc(uint32_t primary_ssrc, uint32_t* fid_ssrc) const {
     return GetSecondarySsrc(kFidSsrcGroupSemantics, primary_ssrc, fid_ssrc);
+  }
+
+  // Convenience function to add an FEC-FR ssrc for a primary_ssrc
+  // that's already been added.
+  bool AddFecFrSsrc(uint32_t primary_ssrc, uint32_t fecfr_ssrc) {
+    return AddSecondarySsrc(kFecFrSsrcGroupSemantics, primary_ssrc, fecfr_ssrc);
+  }
+
+  // Convenience function to lookup the FEC-FR ssrc for a primary_ssrc.
+  // Returns false if primary_ssrc not found or FEC-FR not defined for it.
+  bool GetFecFrSsrc(uint32_t primary_ssrc, uint32_t* fecfr_ssrc) const {
+    return GetSecondarySsrc(kFecFrSsrcGroupSemantics, primary_ssrc, fecfr_ssrc);
   }
 
   // Convenience to get all the SIM SSRCs if there are SIM ssrcs, or
@@ -238,6 +252,13 @@ const StreamParams* GetStream(const StreamParamsVec& streams,
   return found == streams.end() ? nullptr : &(*found);
 }
 
+template <class Condition>
+StreamParams* GetStream(StreamParamsVec& streams, Condition condition) {
+  StreamParamsVec::iterator found =
+      std::find_if(streams.begin(), streams.end(), condition);
+  return found == streams.end() ? nullptr : &(*found);
+}
+
 inline const StreamParams* GetStreamBySsrc(const StreamParamsVec& streams,
                                            uint32_t ssrc) {
   return GetStream(streams,
@@ -247,6 +268,14 @@ inline const StreamParams* GetStreamBySsrc(const StreamParamsVec& streams,
 inline const StreamParams* GetStreamByIds(const StreamParamsVec& streams,
                                           const std::string& groupid,
                                           const std::string& id) {
+  return GetStream(streams, [&groupid, &id](const StreamParams& sp) {
+    return sp.groupid == groupid && sp.id == id;
+  });
+}
+
+inline StreamParams* GetStreamByIds(StreamParamsVec& streams,
+                                    const std::string& groupid,
+                                    const std::string& id) {
   return GetStream(streams,
       [&groupid, &id](const StreamParams& sp) {
         return sp.groupid == groupid && sp.id == id;
@@ -289,8 +318,8 @@ inline bool RemoveStreamByIds(StreamParamsVec* streams,
 }
 
 // Checks if |sp| defines parameters for a single primary stream. There may
-// be an RTX stream associated with the primary stream. Leaving as non-static so
-// we can test this function.
+// be an RTX stream or a FlexFEC stream (or both) associated with the primary
+// stream. Leaving as non-static so we can test this function.
 bool IsOneSsrcStream(const StreamParams& sp);
 
 // Checks if |sp| defines parameters for one Simulcast stream. There may be RTX
@@ -300,4 +329,4 @@ bool IsSimulcastStream(const StreamParams& sp);
 
 }  // namespace cricket
 
-#endif  // WEBRTC_MEDIA_BASE_STREAMPARAMS_H_
+#endif  // MEDIA_BASE_STREAMPARAMS_H_

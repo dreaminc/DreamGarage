@@ -50,13 +50,11 @@ public:
 
 	RESULT Initialize();
 
+	RESULT AddTestBrowserURL();
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
-	RESULT AddTestDreamUIBar();
-	RESULT AddTestBrowser();
 	RESULT AddTestBrowserRequest();
 	RESULT AddTestBrowserRequestWithMenuAPI();
-	RESULT AddTestKeyboard();
 	RESULT AddTestUIView();
 	RESULT AddTestUIMenuItem();
 	RESULT AddTestFont();
@@ -70,6 +68,18 @@ public:
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
+	virtual RESULT OnReceiveAsset(long userID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopSending() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceiving() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 public:
 	virtual RESULT Notify(SenseControllerEvent *event) override;
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
@@ -77,9 +87,8 @@ public:
 	virtual RESULT Notify(UIEvent *mEvent) override;
 
 private:
-	RESULT SetupPipeline();
+	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupUINodePipeline();
-	RESULT SetupDreamAppPipeline();
 
 private:
 	DreamOS *m_pDreamOS;

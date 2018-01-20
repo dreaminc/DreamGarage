@@ -8,12 +8,12 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_
-#define WEBRTC_MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_
+#ifndef MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_
+#define MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_
 
 #include <Streams.h> // Include base DS filter header files
 
-#include "webrtc/modules/video_capture/video_capture_defines.h"
+#include "modules/video_capture/video_capture_defines.h"
 
 namespace webrtc
 {
@@ -29,14 +29,11 @@ class CaptureSinkFilter;
 class CaptureInputPin: public CBaseInputPin
 {
 public:
-    int32_t _moduleId;
-
     VideoCaptureCapability _requestedCapability;
     VideoCaptureCapability _resultingCapability;
     HANDLE _threadHandle;
 
-    CaptureInputPin(int32_t moduleId,
-                    IN TCHAR* szName,
+    CaptureInputPin(IN TCHAR* szName,
                     IN CaptureSinkFilter* pFilter,
                     IN CCritSec * pLock,
                     OUT HRESULT * pHr,
@@ -56,8 +53,7 @@ public:
     CaptureSinkFilter(IN TCHAR * tszName,
                       IN LPUNKNOWN punk,
                       OUT HRESULT * phr,
-                      VideoCaptureExternal& captureObserver,
-                      int32_t moduleId);
+                      VideoCaptureExternal& captureObserver);
     virtual ~CaptureSinkFilter();
 
     //  --------------------------------------------------------------------
@@ -93,8 +89,7 @@ private:
     CCritSec m_crtRecv;  //  receiver lock; always acquire before filter lock
     CaptureInputPin * m_pInput;
     VideoCaptureExternal& _captureObserver;
-    int32_t _moduleId;
 };
 }  // namespace videocapturemodule
 }  // namespace webrtc
-#endif // WEBRTC_MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_
+#endif // MODULES_VIDEO_CAPTURE_MAIN_SOURCE_WINDOWS_SINK_FILTER_DS_H_

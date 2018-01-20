@@ -24,9 +24,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestUserModel());
+	CR(TestNestedOBB());
+
+	CR(AddTestText());
 
 	CR(AddTestModel());
+
+	CR(AddTestUserModel());
 
 	CR(AddTestModelInstancing());
 	
@@ -42,8 +46,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestSkybox());
 
-	CR(TestNestedOBB());
-
 	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestMouseDrag());
@@ -57,8 +59,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestSenseHaptics());
 	
 	CR(AddTestBlinnPhongShader());
-
-	CR(AddTestText());
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
 
@@ -344,7 +344,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
@@ -485,21 +485,13 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 		
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -516,7 +508,7 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
@@ -608,14 +600,14 @@ RESULT HALTestSuite::TestNestedOBB() {
 
 	struct TestContext {
 		composite *pComposite = nullptr;
-		std::shared_ptr<volume> pVolume[8] = { nullptr };
 	} *pTestContext = new TestContext();
 
 	float width = 0.5f;
 	float height = width;
 	float length = width;
+	float padding = 0.75f;
 
-	float padding = 0.5f;
+	int numDimension = 5;
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -623,110 +615,42 @@ RESULT HALTestSuite::TestNestedOBB() {
 		m_pDreamOS->SetGravityState(false);
 
 		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		CR(pHAL->MakeCurrentContext());
-
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		/*
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		//*/
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Connect Program to Display
-
-		// Connected in parallel (order matters)
-		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-
-		CR(pHAL->ReleaseCurrentContext());
+		CR(SetupSkyboxPipeline("environment"));
 
 		// Objects 
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
 			pTestContext->pComposite = m_pDreamOS->AddComposite();
 			CN(pTestContext->pComposite);
+
 			pTestContext->pComposite->InitializeOBB();
 			pTestContext->pComposite->SetPosition(0.0f, 0.0f, -5.0f);
-		pTestContext->pComposite->Scale(0.5f);
+			pTestContext->pComposite->Scale(0.5f);
 
-			pTestContext->pVolume[0] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[0]);
-			pTestContext->pVolume[0]->SetPosition(point(-1.0f, -1.0f, -1.0f));
+			for (int i = 0; i < numDimension; i++) {
 
-			pTestContext->pVolume[1] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[1]);
-			pTestContext->pVolume[1]->SetPosition(point(1.0f, 1.0f, 1.0f));
+				float xPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * i);
 
-			pTestContext->pVolume[2] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[2]);
-			pTestContext->pVolume[2]->SetPosition(point(1.0f, 1.0f, -1.0f));
+				for (int j = 0; j < numDimension; j++) {
 
-			pTestContext->pVolume[3] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[3]);
-			pTestContext->pVolume[3]->SetPosition(point(1.0f, -1.0f, -1.0f));
+					float yPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * j);
 
-			pTestContext->pVolume[4] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[4]);
-			pTestContext->pVolume[4]->SetPosition(point(1.0f, -1.0f, 1.0f));
+					for (int k = 0; k < numDimension; k++) {
 
-			pTestContext->pVolume[5] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[5]);
-			pTestContext->pVolume[5]->SetPosition(point(-1.0f, 1.0f, 1.0f));
+						float zPos = -((float)numDimension / 2.0f) * (width + padding) + ((width + padding) * k);
 
-			pTestContext->pVolume[6] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[6]);
-			pTestContext->pVolume[6]->SetPosition(point(-1.0f, 1.0f, -1.0f));
+						auto pVolume = pTestContext->pComposite->AddVolume(width);
+						CN(pVolume);
 
-			pTestContext->pVolume[7] = pTestContext->pComposite->AddVolume(width);
-			CN(pTestContext->pVolume[7]);
-			pTestContext->pVolume[7]->SetPosition(point(-1.0f, -1.0f, 1.0f));
+						pVolume->SetPosition(point(xPos, yPos, zPos));
+					}
+				}
+			}
 		}
 
 
@@ -747,7 +671,7 @@ RESULT HALTestSuite::TestNestedOBB() {
 		CN(pTestContext);
 
 		pTestContext->pComposite->RotateYByDeg(0.035f);
-		pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+		//pTestContext->pVolume[2]->RotateYByDeg(0.035f);
 
 	Error:
 		return r;
@@ -895,10 +819,10 @@ RESULT HALTestSuite::AddTestUserModel() {
 		sphere *pSphere = nullptr;
 
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
+		///*
 		{
-
 			pTestContext->pComposite = m_pDreamOS->AddComposite();
 			CN(pTestContext->pComposite);
 			pTestContext->pComposite->InitializeOBB();
@@ -918,6 +842,7 @@ RESULT HALTestSuite::AddTestUserModel() {
 
 			pTestContext->pUser->GetHead()->RotateYByDeg(0.035f);
 		}
+		//*/
 
 	Error:
 		return r;
@@ -997,7 +922,7 @@ RESULT HALTestSuite::AddTestModelInstancing() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
 			pTestContext->pModel = m_pDreamOS->MakeModel(L"\\face4\\untitled.obj");
@@ -1099,7 +1024,7 @@ RESULT HALTestSuite::AddTestModel() {
 		sphere *pSphere = nullptr;
 		
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
@@ -1234,21 +1159,13 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1262,7 +1179,7 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 4.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 4.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		{
 			/*
@@ -1410,18 +1327,10 @@ RESULT HALTestSuite::AddTestQuadObject() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1431,7 +1340,7 @@ RESULT HALTestSuite::AddTestQuadObject() {
 
 		CR(pHAL->ReleaseCurrentContext());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 		{
 
 			auto pFlatContext = m_pDreamOS->Add<FlatContext>(1024, 1024, 4);
@@ -1566,14 +1475,6 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// UI shader stage 
 		
 		ProgramNode* pUIStageProgram = pHAL->MakeProgramNode("uistage");
@@ -1583,7 +1484,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		CR(pUIStageProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Connect output as pass-thru to internal blend program
-		CR(pUIStageProgram->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pUIStageProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -1604,7 +1505,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		volume *pVolume = nullptr;
 		quad *pQuad = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			/*
@@ -1718,21 +1619,12 @@ RESULT HALTestSuite::AddTestText() {
 		// Connect output as pass-thru to internal blend program
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		// Debug Console
-		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1749,7 +1641,7 @@ RESULT HALTestSuite::AddTestText() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		
 		{
 			auto pFlatContext = m_pDreamOS->AddFlatContext();
@@ -1767,6 +1659,7 @@ RESULT HALTestSuite::AddTestText() {
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
 			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
 
+			/*
 			pFlatContext->ClearChildren();
 			
 			pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hello", 1.0f, true);
@@ -1776,6 +1669,7 @@ RESULT HALTestSuite::AddTestText() {
 			CN(pQuad);
 			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
 			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+			*/
 
 			
 		}
@@ -1893,7 +1787,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureCopy() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -2116,7 +2010,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
@@ -2236,7 +2130,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlur() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -2339,7 +2233,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderBlurHMD() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -2435,7 +2329,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShader() {
 		volume *pVolume = nullptr;
 		sphere *pSphere = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -2926,7 +2820,7 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 
 			// Set up scene
 			
-			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);

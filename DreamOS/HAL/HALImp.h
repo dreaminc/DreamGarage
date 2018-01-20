@@ -31,6 +31,7 @@
 #include "Primitives/model/mesh.h"
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
+#include "Primitives/DimPlane.h"
 
 #include "Pipeline/Pipeline.h"
 
@@ -161,7 +162,7 @@ public:
 		return pObj;
 	}
 
-	// TODO: Remove and use param pack fn
+	// TODO: Remove and use param pack function
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
@@ -172,6 +173,7 @@ public:
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
 	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) = 0;
+	virtual DimPlane* MakePlane(point ptOrigin, vector vNormal) = 0;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
@@ -183,8 +185,8 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 
-	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) = 0;
+	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
+	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(const texture &srcTexture) = 0;
 

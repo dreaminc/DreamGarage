@@ -2,12 +2,14 @@
 #define UI_KEYBOARD_H_
 
 #include "DreamApp.h"
+#include "DreamAppHandle.h"
 #include "Primitives/TextEntryString.h"
 #include "Primitives/Publisher.h"
 #include "Sense/SenseKeyboard.h"
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
+#include "DreamUserApp.h"
 
 #include <vector>
 #include <string>
@@ -39,11 +41,43 @@ class texture;
 class CollisionManifold;
 class FlatContext;
 
-class UIKeyboard : public DreamApp<UIKeyboard>, public SenseKeyboard {
+class UIKeyboardHandle : public DreamAppHandle {
+public:
+	RESULT Show();
+	RESULT Hide();
+	RESULT SendUpdateComposite(float depth);
+	RESULT SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
+	bool IsVisible();
+	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
+	RESULT ShowTitleView();
+	RESULT PopulateTextBox(std::string strText);
+	RESULT SendPasswordFlag(bool fIsPassword);
+
+private:
+	virtual RESULT ShowKeyboard() = 0;
+	virtual RESULT HideKeyboard() = 0;
+	virtual RESULT UpdateComposite(float depth) = 0;
+	virtual RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) = 0;
+	virtual bool IsKeyboardVisible() = 0;
+	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
+	virtual RESULT ShowKeyboardTitleView() = 0;
+	virtual RESULT PopulateKeyboardTextBox(std::string strText) = 0;
+	virtual RESULT SetPasswordFlag(bool fIsPassword) = 0;
+};
+
+class UIKeyboard :	public DreamApp<UIKeyboard>, 
+					public UIKeyboardHandle, 
+					public SenseKeyboard {
 	friend class DreamAppManager;
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
+
+	enum class state {	// For tracking if keyboard is animating or not
+		HIDDEN,
+		ANIMATING,
+		VISIBLE
+	};
 
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
@@ -57,13 +91,18 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	virtual DreamAppHandle* GetAppHandle() override;
+
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 //Animation
 public:
-	RESULT ShowKeyboard();
-	RESULT HideKeyboard();
+	virtual RESULT ShowKeyboard() override;
+	virtual RESULT HideKeyboard() override;
+
+	virtual bool IsKeyboardVisible() override;
+
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
@@ -93,8 +132,6 @@ public:
 	RESULT SetHeight(float height);
 	float GetAngle();
 	RESULT SetSurfaceAngle(float angle);
-	UIMallet* GetRightMallet();
-	UIMallet* GetLeftMallet();
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
@@ -105,22 +142,15 @@ private:
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
+	RESULT SetAnimatingState(UIKeyboard::state keyboardState);
 	RESULT UpdateTextBox(int chkey);
-	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
-	RESULT UpdateComposite(float height, float depth); // update position/orientation
+	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
+	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
+	virtual RESULT ShowKeyboardTitleView() override;
+	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
+	RESULT UpdateComposite(float depth); // update position/orientation
 
-	//temp
-	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
-
-	// TODO: Temo until better IPC
-public:
-	RESULT SetPath(std::string strPath);
-	RESULT SetScope(std::string strScope);
-	std::string GetPath();
-	std::string GetScope();
-
-	std::string m_strPath;
-	std::string m_strScope;
+	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
 
 private:
 	// layout variables
@@ -146,10 +176,6 @@ private:
 
 	float m_ambientIntensity = AMBIENT_INTENSITY;
 
-	// objects
-	UIMallet *m_pLeftMallet;
-	UIMallet *m_pRightMallet;
-
 	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
 
@@ -160,6 +186,8 @@ private:
 	std::shared_ptr<composite> m_pHeaderContainer;
 
 	std::map<LayoutType, text*> m_layoutAtlas;
+
+	UIKeyboard::state m_keyboardState;
 
 	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
@@ -177,9 +205,13 @@ private:
 	std::shared_ptr<texture> m_pSpaceTexture;
 	std::shared_ptr<texture> m_pSymbolsTexture;
 	std::shared_ptr<texture> m_pUnshiftTexture;
+	std::shared_ptr<texture> m_pDefaultIconTexture;
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
+
+	DreamUserHandle *m_pUserHandle = nullptr;
+	UID m_userAppUID;
 };
 
 #endif // ! UI_KEYBOARD_H_

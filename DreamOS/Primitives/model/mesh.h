@@ -13,7 +13,7 @@
 #include "Primitives/point.h"
 #include "Primitives/color.h"
 
-class mesh : public DimObj {
+class mesh : public virtual DimObj {
 public:
 	virtual RESULT Allocate() override;
 

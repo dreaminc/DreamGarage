@@ -18,9 +18,15 @@
 
 #include "Primitives/hand.h"
 
+#define NAMETAG_BORDER 0.1f
+#define NAMETAG_HEIGHT 0.3f
+#define NAME_LINE_HEIGHT .12f
+#define USERNAME_ANIMATION_DURATION 0.3f
+
 class User;
 class PeerConnection;
 class composite;
+class UIView;
 class DreamOS;
 class user;
 class text;
@@ -85,6 +91,8 @@ protected:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	RESULT ShowUserNameField();
+	RESULT HideUserNameField();
 
 public:
 	RESULT OnDataChannel();
@@ -97,8 +105,13 @@ public:
 
 	RESULT UpdatePeerHandshakeState();
 	bool IsPeerReady();
+	bool IsDataChannel();
 
 	DreamPeerApp::state GetState();
+
+	// Not the most eloquent, revisit in the future
+	bool IsHandshakeRequestHung();
+	bool IsHandshakeRequestAckHung();
 
 	long GetPeerUserID();
 
@@ -113,18 +126,22 @@ public:
 	RESULT ReleaseUserModel();
 
 	RESULT SetVisible(bool fVisibile = true);
+	bool IsVisible();
+	bool IsUserNameVisible();
 	RESULT SetPosition(const point& ptPosition);
 	RESULT SetOrientation(const quaternion& qOrientation);
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
-
+	
+	RESULT SetUsernameAnimationDuration(float animationDuration);
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
 private:
 	long m_peerUserID = -1;
-	
+	std::string m_strScreenName;
+
 	DreamOS *m_pDOS = nullptr;
 	
 	PeerConnection *m_pPeerConnection = nullptr;
@@ -132,14 +149,31 @@ private:
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
 	std::shared_ptr<user> m_pUserModel = nullptr;
-	bool m_fPendingAssignedUserMode = false;
+	bool m_fPendingAssignedUserModel = false;
+	bool m_fGazeInteraction = false;
+	bool m_fVisible = false;
 
 	sphere *m_pSphere = nullptr;
 
 	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
+	
+	double m_msTimeGazeStart;
+	double m_msTimeUserNameDelay = 1250;
+
+	// appear and disappear duration in seconds (direct plug into PushAnimation)
+	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;
+
+	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
+	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
+
+	std::shared_ptr<composite> m_pNameComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
+
+	std::shared_ptr<quad> m_pNameBackground = nullptr;
+	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};

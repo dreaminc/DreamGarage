@@ -1,13 +1,14 @@
-#include "Logger/Logger.h"
 #include "WebRTCImp.h"
 
-#include "webrtc/base/ssladapter.h"
-#include "webrtc/base/win32socketinit.h"
+#include "DreamLogger/DreamLogger.h"
+
+#include "rtc_base/ssladapter.h"
+#include "rtc_base/win32socketinit.h"
 
 #include "WebRTCClient.h"
 #include "WebRTCConductor.h"
 
-#include "webrtc/base/arraysize.h"
+#include "rtc_base/arraysize.h"
 #include "Cloud/CloudController.h"
 #include "Cloud/Environment/PeerConnection.h"
 
@@ -29,7 +30,8 @@ WebRTCImp::~WebRTCImp() {
 
 	//m_pWin32thread->Stop();
 	//m_pWin32thread->Quit();
-	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
+
+	rtc::ThreadManager::Instance()->SetCurrentThread(nullptr);
 	rtc::CleanupSSL();
 }
 
@@ -48,8 +50,11 @@ RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;
 
 	rtc::EnsureWinsockInit();
-	
-	m_pWin32thread = new rtc::Win32Thread();
+
+	m_pWin32SocketServer = new rtc::Win32SocketServer();
+	CN(m_pWin32SocketServer);
+
+	m_pWin32thread = new rtc::Win32Thread(m_pWin32SocketServer);
 	CN(m_pWin32thread);
 
 	rtc::ThreadManager::Instance()->SetCurrentThread(m_pWin32thread);
@@ -185,6 +190,77 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	CR(m_pWebRTCConductor->SendVideoFrame(peerConnectionID, pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+// Audio
+float WebRTCImp::GetRunTimeMicAverage() {
+	if (m_pWebRTCConductor != nullptr) {
+		return m_pWebRTCConductor->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
+}
+
+RESULT WebRTCImp::SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->SendAudioPacket(strAudioTrackLabel, peerConnectionID, pendingAudioPacket));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	CR(m_pWebRTCConductor->StartVideoStreaming(peerConnectionID, pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::StopVideoStreaming(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	CR(m_pWebRTCConductor->StopVideoStreaming(peerConnectionID));
+
+Error:
+	return r;
+}
+
+bool WebRTCImp::IsVideoStreamingRunning(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	return m_pWebRTCConductor->IsVideoStreamingRunning(peerConnectionID);
+
+Error:
+	return false;
+}
+
 RESULT WebRTCImp::SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage) {
 	RESULT r = R_PASS;
 
@@ -201,10 +277,10 @@ Error:
 // Functionality
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer) {
+RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer) {
 	RESULT r = R_PASS;
 
-	CRM(m_pWebRTCConductor->InitializeNewPeerConnection(peerConnectionID, fCreateOffer, true), "Failed to initialize WebRTC Peer Connection");
+	CRM(m_pWebRTCConductor->InitializeNewPeerConnection(peerConnectionID, userID, peerUserID, fCreateOffer, true), "Failed to initialize WebRTC Peer Connection");
 
 Error:
 	return r;
@@ -348,16 +424,22 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) {
+RESULT WebRTCImp::OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnAudioData(peerConnectionID, audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames));
+		CR(m_pWebRTCObserver->OnVideoFrame(peerConnectionID, pVideoFrameDataBuffer, pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnAudioData(strAudioTrackLabel, peerConnectionID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:

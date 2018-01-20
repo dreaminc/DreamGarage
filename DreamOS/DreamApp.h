@@ -16,18 +16,27 @@
 
 class DreamOS;
 class composite;
-//class vector;
+class DreamAppHandle;
+class PeerConnection;
+class DreamAppMessage;
 
 class DreamAppBase {
 	friend class DreamAppManager;
 	friend struct DreamAppBaseCompare;
+	friend class DreamOS;
 
 public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
+
+	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) { return R_NOT_HANDLED; }
+
 	virtual composite *GetComposite() = 0;
+	virtual DreamAppHandle* GetAppHandle();
+	virtual DreamOS *GetDOS() = 0;
+	virtual unsigned int GetHandleLimit();
 
 protected:
 	virtual void *GetAppContext() = 0;
@@ -48,6 +57,32 @@ protected:
 	double GetTimeRun();
 	double GetEffectivePriorityValue() const;
 
+protected:
+
+	virtual std::string GetAppName() {
+		return m_strAppName;
+	}
+
+	RESULT SetAppName(std::string strAppName) {
+		m_strAppName = strAppName;
+		return R_PASS;
+	}
+
+	RESULT SetAppDescription(std::string strAppDescription) {
+		m_strAppDescription = strAppDescription;
+		return R_PASS;
+	}
+
+	UINT64 GetUIDValue() {
+		return m_uid.GetID();
+	}
+
+	UID GetAppUID() {
+		return m_uid;
+	}
+
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
@@ -56,6 +91,11 @@ private:
 	std::string m_strShutdownFlagSignalName;
 
 	bool m_fAddToSceneFlag = false;
+
+private:
+	std::string m_strAppName;
+	std::string m_strAppDescription;
+	UID m_uid;
 };
 
 
@@ -118,30 +158,21 @@ protected:
 	}
 
 	RESULT SetComposite(composite *pComposite) {
+		RESULT r = R_PASS;
+		CBM(m_pCompositeContext == nullptr, "composite is already set");
+
 		m_pCompositeContext = pComposite;
-		return R_PASS;
+
+	Error:
+		return r;
 	}
 
 	static derivedAppType* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};
 
-	RESULT SetAppName(std::string strAppName) {
-		m_strAppName = strAppName;
-		return R_PASS;
-	}
-
-	RESULT SetAppDescription(std::string strAppDescription) {
-		m_strAppDescription = strAppDescription;
-		return R_PASS;
-	}
-
-	DreamOS *GetDOS() {
+	virtual DreamOS *GetDOS() override {
 		return m_pDreamOS;
-	}
-
-	UINT64 GetUIDValue() {
-		return m_uid.GetID();
 	}
 
 	virtual RESULT Print() override {
@@ -153,11 +184,6 @@ private:
 	composite *m_pCompositeContext;
 	DreamOS *m_pDreamOS;
 	void *m_pContext = nullptr;
-
-private:
-	std::string m_strAppName;
-	std::string m_strAppDescription;
-	UID m_uid;
 };
 
 #include "DreamApp.tpp"

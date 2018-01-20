@@ -54,9 +54,6 @@
     <Filter Include="External">
       <UniqueIdentifier>{82d7a177-6e17-489e-8f48-0f30a427b8fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\SOIL">
-      <UniqueIdentifier>{959b6fa9-ce2d-43ef-b7b5-652c05626a9d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="TimeManager">
       <UniqueIdentifier>{8b96d977-b3e9-4a11-a23d-f434f6d4d4ec}</UniqueIdentifier>
     </Filter>
@@ -113,12 +110,6 @@
     </Filter>
     <Filter Include="Cloud\Message">
       <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamConsole">
-      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Logger">
-      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Texture">
       <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
@@ -192,6 +183,18 @@
     <Filter Include="Primitives\image">
       <UniqueIdentifier>{598b61e9-4fb8-41df-97ab-dd5da1438cc2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamLogger">
+      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\easyloggingpp">
+      <UniqueIdentifier>{9349b760-9d5c-476f-9dc4-086ec2b7ffca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamControlView">
+      <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -251,18 +254,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\image_helper.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\SOIL.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\texture.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -271,9 +262,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
       <Filter>HMD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp">
-      <Filter>HAL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
@@ -398,21 +386,6 @@
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\Console.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Logger\Logger.cpp">
-      <Filter>Logger</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
@@ -499,9 +472,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
       <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
-      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
@@ -647,9 +617,6 @@
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp">
-      <Filter>WebBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
@@ -748,9 +715,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp">
       <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp">
       <Filter>HAL\opengl</Filter>
@@ -859,6 +823,141 @@
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp">
       <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppHandle.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\MemoryImageObj.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMDocument.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserFactory.cpp">
+      <Filter>WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
+      <Filter>DreamLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc">
+      <Filter>External\easyloggingpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\AudioPacket.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\CircularBuffer.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLComposite.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLCylinder.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLHand.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMesh.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLModel.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLSkybox.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUser.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTriangle.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVolume.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimPlane.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLPlane.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingPlane.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp">
+      <Filter>DreamControlView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
+      <Filter>DreamControlView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1062,24 +1161,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\image_helper.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\SOIL.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h">
-      <Filter>External\SOIL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h">
       <Filter>HAL\opengl</Filter>
@@ -1346,27 +1427,6 @@
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\Console.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Logger\Logger.h">
-      <Filter>Logger</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
@@ -1574,9 +1634,6 @@
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h">
       <Filter>WebBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h">
-      <Filter>WebBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
@@ -1660,9 +1717,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h">
       <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
       <Filter>HAL\opengl</Filter>
@@ -1928,6 +1982,117 @@
     <ClInclude Include="..\..\..\Primitives\HandType.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppHandle.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCTestSuite.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\MemoryImageObj.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\DOMNode.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\DOMDocument.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMDocument.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserFactory.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamBrowserMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\LeapHand.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h">
+      <Filter>DreamLogger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h">
+      <Filter>External\easyloggingpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundTestSuite.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundClientFactory.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\AudioPacket.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioSource.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCLocalAudioTrack.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\CircularBuffer.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundBuffer.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFile.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundFileWave.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimPlane.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLPlane.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingPlane.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h">
+      <Filter>DreamControlView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
+      <Filter>DreamControlView</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2112,6 +2277,9 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\DreamApp.tpp">
+      <Filter>DreamOS</Filter>
+    </None>
+    <None Include="..\..\..\DreamOS.tpp">
       <Filter>DreamOS</Filter>
     </None>
   </ItemGroup>

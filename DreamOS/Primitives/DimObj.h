@@ -64,7 +64,7 @@ private:
 public:
 
 	DimObj();
-	~DimObj();
+	virtual ~DimObj();
 
 	// TODO: rename
 	enum class MaterialTexture { 
@@ -189,15 +189,19 @@ public:
 protected:
 	DimObj* m_pParent = nullptr;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
+	//std::vector<std::shared_ptr<VirtualObj>> *m_pObjects = nullptr;
 
 	// Bounding Volume
 public:
 	virtual RESULT UpdateBoundingVolume();
+
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
 	RESULT InitializeBoundingQuad();
 	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
+	RESULT InitializeBoundingPlane(point ptOrigin, vector vNormal);
+
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
 	// OnManipulation is called by VirtualObj every time a manipulation occurs - this is a chance for

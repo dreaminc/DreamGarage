@@ -3,6 +3,7 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 #include "BoundingQuad.h"
+#include "BoundingPlane.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -39,6 +40,15 @@ RESULT DimObj::Destroy() {
 		delete[] m_pVertices;
 		m_pVertices = nullptr;
 	}
+
+	/*
+	if (m_pObjects != nullptr) {
+		ClearChildren();
+
+		delete m_pObjects;
+		m_pObjects = nullptr;
+	}
+	*/
 
 	return R_PASS;
 }
@@ -413,6 +423,7 @@ Error:
 RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront) {
 	if (m_pObjects == nullptr) {
 		m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
+		//m_pObjects = new std::vector<std::shared_ptr<VirtualObj>>();
 	}
 
 	if (fFront) {
@@ -474,7 +485,7 @@ bool DimObj::HasChildren() {
 }
 
 std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
-	return *(m_pObjects.get());
+	return *(m_pObjects);
 }
 
 // Intersections and Collision
@@ -1025,6 +1036,20 @@ RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height,
 	RESULT r = R_PASS;
 
 	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this, ptOrigin, vNormal, width, height));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
+
+	//CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingPlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingPlane>(new BoundingPlane(this, ptOrigin, vNormal));
 	CN(m_pBoundingVolume);
 
 	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);

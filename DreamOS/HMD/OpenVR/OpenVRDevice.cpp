@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#include "DreamConsole/DreamConsole.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "OpenVRHMDSinkNode.h"
 
@@ -93,7 +93,7 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CN(m_pSenseController);
 	CR(m_pSenseController->Initialize());
 
-	OVERLAY_DEBUG_OUT("HMD Vive - On");
+	DOSLOG(INFO, "HMD Vive Initialized");
 
 Error:
 	return r;
@@ -112,21 +112,45 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 	RESULT r = R_PASS;
 
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
-		m_pControllerMeshLeft = pMesh;
+		m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
 		m_pControllerMeshLeftTexture = pTexture;
+		if (m_pLeftController == nullptr) {
+			m_pLeftController = m_pParentSandbox->MakeComposite();
+		}
+		if (!m_pLeftController->HasChildren()) {
+			m_pLeftController->AddObject(m_pControllerMeshLeft);
+		}
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
-		m_pControllerMeshRight = pMesh;
+		m_pControllerMeshRight = std::shared_ptr<mesh>(pMesh);
 		m_pControllerMeshRightTexture = pTexture;
+		if (m_pRightController == nullptr) {
+			m_pRightController = m_pParentSandbox->MakeComposite();
+		}
+		if (!m_pRightController->HasChildren()) {
+			m_pRightController->AddObject(m_pControllerMeshRight);
+		}
 	}
 	else if (controllerRole == vr::TrackedControllerRole_Invalid) {
 		if (m_pControllerMeshLeft == nullptr) {
-			m_pControllerMeshLeft = pMesh;
+			m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
 			m_pControllerMeshLeftTexture = pTexture;
+			if (m_pLeftController == nullptr) {
+				m_pLeftController = m_pParentSandbox->MakeComposite();
+			}
+			if (!m_pLeftController->HasChildren()) {
+				m_pLeftController->AddObject(m_pControllerMeshLeft);
+			}
 		}
 		else if (m_pControllerMeshRight == nullptr) {
-			m_pControllerMeshRight = pMesh;
+			m_pControllerMeshRight = std::shared_ptr<mesh>(pMesh);
 			m_pControllerMeshRightTexture = pTexture;
+			if (m_pRightController == nullptr) {
+				m_pRightController = m_pParentSandbox->MakeComposite();
+			}
+			if (!m_pRightController->HasChildren()) {
+				m_pRightController->AddObject(m_pControllerMeshRight);
+			}
 		}
 		else {
 			CBM((0), "Invalid controller role and both controllers already set");
@@ -201,6 +225,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	
 	//model *pModel = nullptr;
 	mesh *pControllerMesh = m_pParentSandbox->AddMesh(verts, indices);
+
+	//TODO: looks a little better, but there is still likely a problem with how the controllers are positioned
+	pControllerMesh->SetScale(vector(0.9f));
 	//pModel->SetMaterialAmbient(1.0f);
 	CNM(pControllerMesh, "Open VR Controller Models failed to load");
 
@@ -214,7 +241,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	void *pBuffer = (void*)(pRenderModelTexture->rubTextureMapData);
 	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
 
-	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, texture::PixelFormat::Unspecified, channels, pBuffer, pBuffer_n);
+	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, PIXEL_FORMAT::Unspecified, channels, pBuffer, pBuffer_n);
 	pControllerMesh->SetDiffuseTexture(pTexture);
 
 	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
@@ -257,30 +284,34 @@ Error:
 	return r;
 }
 
-VirtualObj *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType) {
-	/*
+composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType) {
+	//*
 	switch (controllerType) {
 	case CONTROLLER_LEFT: {
 #ifdef _USE_TEST_APP
-		return m_pLeftControllerModel->GetFirstChild<sphere>().get();
+		return m_pLeftController;
 #else
-		return m_pLeftControllerModel;
+		return m_pLeftController;
 #endif
 	} break;
 
 	case CONTROLLER_RIGHT: {
 #ifdef _USE_TEST_APP
-		return m_pRightControllerModel->GetFirstChild<sphere>().get();
+		return m_pRightController;
 #else
-		return m_pRightControllerModel;
+		return m_pRightController;
 #endif
 	} break;
 	}
-	*/
+	
 
 	// TODO:! 
 
 	return nullptr;
+}
+
+HMDDeviceType OpenVRDevice::GetDeviceType() {
+	return HMDDeviceType::VIVE;
 }
 
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
@@ -448,8 +479,10 @@ RESULT OpenVRDevice::UpdateHMD() {
 					qOrientation.Reverse();
 
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerMeshLeft != nullptr) {
-						m_pControllerMeshLeft->SetPosition(ptControllerPosition);
-						m_pControllerMeshLeft->SetOrientation(qOrientation);
+						//m_pControllerMeshLeft->SetPosition(ptControllerPosition);
+						//m_pControllerMeshLeft->SetOrientation(qOrientation);
+						m_pLeftController->SetPosition(ptControllerPosition);
+						m_pLeftController->SetOrientation(qOrientation);
 
 						m_pLeftHand->SetPosition(ptControllerPosition);
 						m_pLeftHand->SetOrientation(qOrientation);
@@ -459,8 +492,10 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pLeftHand->SetTracked(true);
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerMeshRight != nullptr) {
-						m_pControllerMeshRight->SetPosition(ptControllerPosition);
-						m_pControllerMeshRight->SetOrientation(qOrientation);
+						//m_pControllerMeshRight->SetPosition(ptControllerPosition);
+						//m_pControllerMeshRight->SetOrientation(qOrientation);
+						m_pRightController->SetPosition(ptControllerPosition);
+						m_pRightController->SetOrientation(qOrientation);
 
 						m_pRightHand->SetPosition(ptControllerPosition);
 						m_pRightHand->SetOrientation(qOrientation);

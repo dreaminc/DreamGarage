@@ -67,6 +67,16 @@ std::shared_ptr<composite> user::GetHead() {
 	return m_pHead;
 }
 
+std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
+	if (type == HAND_TYPE::HAND_LEFT) {
+		return m_pLeftHand;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		return m_pRightHand;
+	}
+	return nullptr;
+}
+
 RESULT user::Activate(user::CONTROLLER_TYPE type) {
 
 	SetVisible(true);
@@ -76,6 +86,7 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 	return R_PASS;
 }
 
+//TODO: why doesn't this use hand::SetHandState(pHandState)
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
@@ -100,6 +111,8 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 
 	pHand->SetPosition(ptHand);
 	pHand->SetOrientation(qHandOrientation);
+	pHand->SetTracked(pHandState.fTracked);
+	pHand->SetVisible(pHand->IsTracked());
 
 Error:
 	return r;

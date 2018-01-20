@@ -8,17 +8,20 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_VIDEO_CODING_PACKET_BUFFER_H_
-#define WEBRTC_MODULES_VIDEO_CODING_PACKET_BUFFER_H_
+#ifndef MODULES_VIDEO_CODING_PACKET_BUFFER_H_
+#define MODULES_VIDEO_CODING_PACKET_BUFFER_H_
 
+#include <memory>
+#include <set>
 #include <vector>
 
-#include "webrtc/base/criticalsection.h"
-#include "webrtc/base/thread_annotations.h"
-#include "webrtc/modules/include/module_common_types.h"
-#include "webrtc/modules/video_coding/packet.h"
-#include "webrtc/modules/video_coding/rtp_frame_reference_finder.h"
-#include "webrtc/modules/video_coding/sequence_number_util.h"
+#include "modules/include/module_common_types.h"
+#include "modules/video_coding/packet.h"
+#include "modules/video_coding/rtp_frame_reference_finder.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/numerics/sequence_number_util.h"
+#include "rtc_base/scoped_ref_ptr.h"
+#include "rtc_base/thread_annotations.h"
 
 namespace webrtc {
 
@@ -29,23 +32,44 @@ namespace video_coding {
 class FrameObject;
 class RtpFrameObject;
 
-class OnCompleteFrameCallback {
+// A received frame is a frame which has received all its packets.
+class OnReceivedFrameCallback {
  public:
-  virtual ~OnCompleteFrameCallback() {}
-  virtual void OnCompleteFrame(std::unique_ptr<FrameObject> frame) = 0;
+  virtual ~OnReceivedFrameCallback() {}
+  virtual void OnReceivedFrame(std::unique_ptr<RtpFrameObject> frame) = 0;
 };
 
 class PacketBuffer {
  public:
+  static rtc::scoped_refptr<PacketBuffer> Create(
+      Clock* clock,
+      size_t start_buffer_size,
+      size_t max_buffer_size,
+      OnReceivedFrameCallback* frame_callback);
+
+  virtual ~PacketBuffer();
+
+  // Returns true if |packet| is inserted into the packet buffer, false
+  // otherwise. The PacketBuffer will always take ownership of the
+  // |packet.dataPtr| when this function is called. Made virtual for testing.
+  virtual bool InsertPacket(VCMPacket* packet);
+  void ClearTo(uint16_t seq_num);
+  void Clear();
+  void PaddingReceived(uint16_t seq_num);
+
+  // Timestamp (not RTP timestamp) of the last received packet/keyframe packet.
+  rtc::Optional<int64_t> LastReceivedPacketMs() const;
+  rtc::Optional<int64_t> LastReceivedKeyframePacketMs() const;
+
+  int AddRef() const;
+  int Release() const;
+
+ protected:
   // Both |start_buffer_size| and |max_buffer_size| must be a power of 2.
   PacketBuffer(Clock* clock,
                size_t start_buffer_size,
                size_t max_buffer_size,
-               OnCompleteFrameCallback* frame_callback);
-
-  bool InsertPacket(const VCMPacket& packet);
-  void ClearTo(uint16_t seq_num);
-  void Clear();
+               OnReceivedFrameCallback* frame_callback);
 
  private:
   friend RtpFrameObject;
@@ -75,52 +99,75 @@ class PacketBuffer {
   Clock* const clock_;
 
   // Tries to expand the buffer.
-  bool ExpandBufferSize() EXCLUSIVE_LOCKS_REQUIRED(crit_);
+  bool ExpandBufferSize() RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
 
   // Test if all previous packets has arrived for the given sequence number.
-  bool IsContinuous(uint16_t seq_num) const EXCLUSIVE_LOCKS_REQUIRED(crit_);
+  bool PotentialNewFrame(uint16_t seq_num) const
+      RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
 
   // Test if all packets of a frame has arrived, and if so, creates a frame.
-  // May create multiple frames per invocation.
-  void FindFrames(uint16_t seq_num) EXCLUSIVE_LOCKS_REQUIRED(crit_);
+  // Returns a vector of received frames.
+  std::vector<std::unique_ptr<RtpFrameObject>> FindFrames(uint16_t seq_num)
+      RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
 
   // Copy the bitstream for |frame| to |destination|.
-  bool GetBitstream(const RtpFrameObject& frame, uint8_t* destination);
+  // Virtual for testing.
+  virtual bool GetBitstream(const RtpFrameObject& frame, uint8_t* destination);
 
   // Get the packet with sequence number |seq_num|.
-  VCMPacket* GetPacket(uint16_t seq_num);
+  // Virtual for testing.
+  virtual VCMPacket* GetPacket(uint16_t seq_num)
+      RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
 
   // Mark all slots used by |frame| as not used.
-  void ReturnFrame(RtpFrameObject* frame);
+  // Virtual for testing.
+  virtual void ReturnFrame(RtpFrameObject* frame);
+
+  void UpdateMissingPackets(uint16_t seq_num)
+      RTC_EXCLUSIVE_LOCKS_REQUIRED(crit_);
 
   rtc::CriticalSection crit_;
 
   // Buffer size_ and max_size_ must always be a power of two.
-  size_t size_ GUARDED_BY(crit_);
+  size_t size_ RTC_GUARDED_BY(crit_);
   const size_t max_size_;
 
   // The fist sequence number currently in the buffer.
-  uint16_t first_seq_num_ GUARDED_BY(crit_);
-
-  // The last sequence number currently in the buffer.
-  uint16_t last_seq_num_ GUARDED_BY(crit_);
+  uint16_t first_seq_num_ RTC_GUARDED_BY(crit_);
 
   // If the packet buffer has received its first packet.
-  bool first_packet_received_ GUARDED_BY(crit_);
+  bool first_packet_received_ RTC_GUARDED_BY(crit_);
+
+  // If the buffer is cleared to |first_seq_num_|.
+  bool is_cleared_to_first_seq_num_ RTC_GUARDED_BY(crit_);
 
   // Buffer that holds the inserted packets.
-  std::vector<VCMPacket> data_buffer_ GUARDED_BY(crit_);
+  std::vector<VCMPacket> data_buffer_ RTC_GUARDED_BY(crit_);
 
   // Buffer that holds the information about which slot that is currently in use
   // and information needed to determine the continuity between packets.
-  std::vector<ContinuityInfo> sequence_buffer_ GUARDED_BY(crit_);
+  std::vector<ContinuityInfo> sequence_buffer_ RTC_GUARDED_BY(crit_);
 
-  // Frames that have received all their packets are handed off to the
-  // |reference_finder_| which finds the dependencies between the frames.
-  RtpFrameReferenceFinder reference_finder_;
+  // Called when a received frame is found.
+  OnReceivedFrameCallback* const received_frame_callback_;
+
+  // Timestamp (not RTP timestamp) of the last received packet/keyframe packet.
+  rtc::Optional<int64_t> last_received_packet_ms_ RTC_GUARDED_BY(crit_);
+  rtc::Optional<int64_t> last_received_keyframe_packet_ms_
+      RTC_GUARDED_BY(crit_);
+
+  rtc::Optional<uint16_t> newest_inserted_seq_num_ RTC_GUARDED_BY(crit_);
+  std::set<uint16_t, DescendingSeqNumComp<uint16_t>> missing_packets_
+      RTC_GUARDED_BY(crit_);
+
+  // Indicates if we should require SPS, PPS, and IDR for a particular
+  // RTP timestamp to treat the corresponding frame as a keyframe.
+  const bool sps_pps_idr_is_h264_keyframe_;
+
+  mutable volatile int ref_count_ = 0;
 };
 
 }  // namespace video_coding
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_VIDEO_CODING_PACKET_BUFFER_H_
+#endif  // MODULES_VIDEO_CODING_PACKET_BUFFER_H_

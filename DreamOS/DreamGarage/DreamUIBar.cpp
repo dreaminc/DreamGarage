@@ -12,6 +12,9 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
+#include "DreamControlView/DreamControlView.h"
+
+#include "DreamBrowser.h"
 
 #include "Primitives/font.h"
 
@@ -20,6 +23,14 @@
 #include "Cloud/HTTP/HTTPController.h"
 
 #include "HAL/UIStageProgram.h"
+
+RESULT DreamUIBarHandle::SendShowRootMenu() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(ShowRootMenu());
+Error:
+	return r;
+}
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
@@ -52,11 +63,34 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
+	
+	// Makes sense for UIBar to always have a user run with it for now
+	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
+	
+	CB(userUIDs.size() == 1);
+	m_userUID = userUIDs[0];
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
+	//TODO: could move this logic up to DreamUserObserver, and then only 
+	if (GetDOS()->GetHMD() != nullptr) {
+		switch (GetDOS()->GetHMD()->GetDeviceType()) {
+		case HMDDeviceType::OCULUS: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		case HMDDeviceType::VIVE: {
+			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
+		}
+
+		CN(m_pOverlayLeft);
+		CN(m_pOverlayRight);
+	}
 
 	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
@@ -71,15 +105,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pScrollView = m_pView->AddUIScrollView();
 	//m_pScrollView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pScrollView);
-
-	m_pLeftMallet = new UIMallet(GetDOS());
-	CN(m_pLeftMallet);
-
-	m_pRightMallet = new UIMallet(GetDOS());
-	CN(m_pRightMallet);
-
-	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
@@ -100,6 +125,9 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 		//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
 	}
 
+	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+	CN(m_pUserHandle);
+
 Error:
 	return r;
 }
@@ -111,19 +139,27 @@ RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<quad> pSurface = nullptr;
+	vector vSurface;
+	vector vRotation;
+	quaternion qRotation;
+	quaternion qSurface;
+
+	CNR(pButtonContext, R_SKIPPED);
+	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
-	auto pSurface = pSelected->GetSurface();
+	pSurface = pSelected->GetSurface();
 
 	//vector for captured object movement
-	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
+	qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
-	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
-
+	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 	//vector for captured object collisions
-	quaternion qRotation = pSurface->GetOrientation(true);
+	qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
-	vector vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
-	
+	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
+	CBR(m_pScrollView->IsVisible(), R_SKIPPED);
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	//don't capture buttons that are out of view
@@ -156,26 +192,11 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 	return r;
 }
 
-RESULT DreamUIBar::HandleMenuUp(void* pContext) {
+RESULT DreamUIBar::PopPath() {
+
 	RESULT r = R_PASS;
 
-	auto pItemsView = m_pScrollView->GetMenuItemsView();
-
-	//Initial keyboard separation
-	{
-		auto pKeyboard = GetDOS()->CaptureKeyboard();
-
-		if (pKeyboard != nullptr) {
-			if (m_pathStack.empty()) {
-				pKeyboard->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
-			}
-			else if (pKeyboard->IsVisible()) {
-				pKeyboard->HideKeyboard();
-			}
-		}
-
-		CR(GetDOS()->ReleaseKeyboard());
-	}
+	std::shared_ptr<MenuNode> pNode = nullptr;
 
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
 	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
@@ -183,60 +204,235 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
+	CBR(!m_pathStack.empty(), R_SKIPPED);
 
-	if (m_pathStack.empty()) {
-		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
-		UpdateCompositeWithHands(m_menuHeight);
-		
-		point ptOrigin = GetComposite()->GetPosition();
-		vector vLookXZ = GetCameraLookXZ();
-		
-		m_pUIStageProgram->SetOriginDirection(vLookXZ);
+	CR(m_pScrollView->HideAllButtons());
 
-		ptOrigin += vLookXZ * (m_menuDepth);
-		
-		m_pUIStageProgram->SetOriginPoint(ptOrigin);
+	m_pathStack.pop();
+
+	CBR(!m_pathStack.empty(), R_SKIPPED);
+	pNode = m_pathStack.top();
+
+	CR(RequestIconFile(pNode));
+
+	CR(m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle()));
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	point ptOrigin;
+	quaternion qOrigin;
+	vector vCameraToMenu;
+
+	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	
+	GetComposite()->SetPosition(ptOrigin);
+	GetComposite()->SetOrientation(qOrigin);
+
+	vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+	vCameraToMenu.y() = 0.0f;
+	vCameraToMenu.Normalize();
+
+	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
+	// TODO: This offset doesn't behave quite as expected, 
+	// will probably need corrections whenever we change menu position
+	ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
+
+	m_pUIStageProgram->SetOriginPoint(ptOrigin);
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ShowRootMenu() {
+	RESULT r = R_PASS;
+
+	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
+	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
+
+	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
+
+	//CBR(m_pathStack.empty(), R_SKIPPED);
+	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+
+	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
+	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+	m_pPendingIconTexture = m_pShareIcon.get();
+
+	CR(ResetAppComposite());
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
+	RESULT r = R_PASS;
+
+	switch (type) {
+		case UserObserverEventType::BACK: {
+		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+			if (m_pKeyboardHandle != nullptr) {
+				CR(m_pKeyboardHandle->Hide());
+				CR(m_pUserHandle->SendReleaseKeyboard());
+				m_pKeyboardHandle = nullptr;
+
+				CR(RequestMenu());
+				//break;
+			}
+
+			else if (!m_pathStack.empty()) {
+				CR(PopPath());
+
+				// if the stack is empty after popping from the path, hide the app
+				CBR(m_pathStack.empty(), R_SKIPPED);
+				CR(m_pUserHandle->SendClearFocusStack());
+				CR(HideApp());
+				//*
+				{
+					// if the user is currently streaming, show the control view
+					bool fStreaming = false;
+					CR(m_pUserHandle->RequestStreamingState(fStreaming));
+					if (fStreaming) {
+					//	CR(ShowControlView(false));
+						CR(ShowControlView());
+					}
+				}
+				//*/
+				//break;
+			}
+
+			else {
+				CR(ShowRootMenu());
+			}
+
+		} break;
+
+		case UserObserverEventType::DISMISS: {
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->Hide();
+				m_pUserHandle->SendReleaseKeyboard();
+				m_pKeyboardHandle = nullptr;
+			} 
+			CR(m_pUserHandle->SendClearFocusStack());
+			CR(HideApp());
+			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+				
+		} break;
+
+		case UserObserverEventType::KB_ENTER: {
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->Hide();
+				m_pUserHandle->SendReleaseKeyboard();
+				m_pKeyboardHandle = nullptr;
+			} 
+			//CR(ShowControlView(true));
+			m_pUserHandle->SendPreserveSharingState(true);
+			CR(SendURLToBrowser());
+		} break;
+	}
+
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::SendURLToBrowser() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendURLtoBrowser());
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+	return r;
+}
+
+RESULT DreamUIBar::ShowControlView() {
+
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CN(m_pUserHandle);
+	if (!pDreamControlViewHandle->IsAppVisible()) {
+		CR(pDreamControlViewHandle->ShowApp());
+		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
+	}
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+	return r;
+}
+
+
+texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
+	texture *pTexture = nullptr;
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pTexture = m_pOverlayLeft;
 	}
 	else {
-		m_pathStack.pop();
+		pTexture = m_pOverlayRight;
+	}
 
-		if (!m_pathStack.empty()) {
-			auto pNode = m_pathStack.top();
-			if (pNode->GetTitle() == "Share") {
-				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
-			}
-			else {
-				auto strURI = pNode->GetThumbnailURL();
-				if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-					MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
-					pTempMenuNode->SetName("root_menu_title");
-					CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
-				}
-			}
+	return pTexture;
+}
 
-			SelectMenuItem();
-			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
-		}
-		else {
-			CR(HideMenu());
+RESULT DreamUIBar::RequestMenu() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<MenuNode> pNode;
+	CBR(!m_pathStack.empty(), R_SKIPPED);
+
+	pNode = m_pathStack.top();
+
+	CR(RequestIconFile(pNode));
+
+	m_pathStack.pop();
+	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
+	RESULT r = R_PASS;
+
+	if (pMenuNode->GetTitle() == "Share") {
+	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
+		m_pPendingIconTexture = m_pShareIcon.get();
+	}
+	else {
+		auto strURI = pMenuNode->GetIconURL();
+		if (strURI != "") {
+			MenuNode* pTempMenuNode = new MenuNode();
+			pTempMenuNode->SetName("root_menu_title");
+			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 		}
 	}
+
 Error:
 	return r;
 }
 
 RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-
 	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(m_pRightMallet->GetMalletHead());
-
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 	CBR(pSelected, R_OBJECT_NOT_FOUND);
@@ -248,33 +444,24 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	CBR(m_menuState == MenuState::NONE, R_PASS);
 
-	//hack - need to make sure the root node is added to the path
-	// even though it is not selected through this method
-	// ideally, some kind of path is managed in the cloud instead
-	if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
+	CNR(m_pUserHandle, R_SKIPPED);
+	auto pLeftMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	auto pRightMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	CN(pLeftMallet);
+	CN(pRightMallet);
 
-	auto pMalletHead = pSelected->GetInteractionObject();
-	if (pMalletHead != nullptr) {
-		if (pMalletHead == m_pLeftMallet->GetMalletHead()) {
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-		}
-		else if (pMalletHead == m_pRightMallet->GetMalletHead()) {
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-		}
-	}
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
 
+	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
+	// should check if website
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			const std::string& strScope = pSubMenuNode->GetScope();
 			const std::string& strPath = pSubMenuNode->GetPath();
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
-			auto strURI = pSubMenuNode->GetIconURL();
-			if (strURI != "") {
-				MenuNode* pTempMenuNode = new MenuNode();
-				pTempMenuNode->SetName("root_menu_title");
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
-			}
+			CR(RequestIconFile(pSubMenuNode));
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
@@ -289,38 +476,66 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-				//brow
+
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
-				m_pLeftMallet->Hide();
-				m_pRightMallet->Hide();
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+
+				CR(UpdateBrowser(strScope, strPath));
+
+//				CR(ShowControlView(false));
+				CR(ShowControlView());
 			}
+//*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 
-				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
-				m_pathStack.push(pSubMenuNode);
+				//m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
-				// TODO: This is temporary until we have better IPC
-				{
-					auto pKeyboard = GetDOS()->CaptureKeyboard();
-					if (pKeyboard != nullptr) {
-						pKeyboard->SetPath(strPath);
-						pKeyboard->SetScope(strScope);
+				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+				CN(m_pKeyboardHandle);
+				CR(m_pKeyboardHandle->Show());
 
-						pKeyboard->ShowKeyboard();
-					}
-					CR(GetDOS()->ReleaseKeyboard());
-				}
+				//Release keyboard is called when Hide would be called
+				//CR(m_pUserHandle->SendReleaseKeyboard());
+				//m_pKeyboardHandle = nullptr;
+
+				//TODO: why does this need to happen
+				CR(UpdateBrowser(strScope, strPath));
 			}
+//*/
 		}
 	}
 
 Error:
+	return r;
+}
+
+RESULT DreamUIBar::UpdateBrowser(std::string strScope, std::string strPath) {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendBrowserScopeAndPath(strScope, strPath));
+
+	/*
+	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
+	CN(pBrowserHandle);
+	pBrowserHandle->SetScope(strScope);
+	pBrowserHandle->SetPath(strPath);
+	//*/
+Error:
+	/*
+	if (pBrowserHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pBrowserHandle, this);
+	}
+	//*/
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -355,8 +570,6 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
 
-	m_pLeftMallet->Show();
-	m_pRightMallet->Show();
 	m_menuState = MenuState::ANIMATING;
 Error:
 	return r;
@@ -369,23 +582,6 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Copy into temp vector
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
 	m_downloadQueue.clear();
-
-	RotationMatrix qOffset = RotationMatrix();
-	hand *pHand = pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	pHand = pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-	CNR(pHand, R_OBJECT_NOT_FOUND);
-
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
 	CR(m_pScrollView->Update());
 
@@ -412,20 +608,19 @@ RESULT DreamUIBar::Update(void *pContext) {
 		}
 
 		if (pMenuNodeTitle == "root_menu_title") {
-			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-
+			//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
+			m_pPendingIconTexture = pTexture;
 			//TODO: May want to move downloading outside of DreamUIBar
-			auto pKeyboard = GetDOS()->CaptureKeyboard();
-			if (pKeyboard != nullptr)
-				pKeyboard->UpdateTitle(pTexture, "Website");
-			CR(GetDOS()->ReleaseKeyboard());
+			//TODO: the only time the title view is used is to show the chrome icon and "Website" title
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+			}
 		}
 		
 		if (pBufferVector != nullptr) {
 			pBufferVector = nullptr;
 		}
 
-		//m_downloadQueue.pop();
 	}
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
@@ -457,19 +652,24 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
-			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
-			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 			pButtons.emplace_back(pButton);
 		}
 
-		m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
-		
-		CR(m_pScrollView->UpdateMenuButtons(pButtons));
+		if (m_pMenuNode->GetNodeType() != MenuNode::type::ACTION) {
+
+			m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
+			
+			CR(m_pScrollView->UpdateMenuButtons(pButtons));
+			
+			if (m_pPendingIconTexture != nullptr) {
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
+				m_pPendingIconTexture = nullptr;
+			}
+		}
 
 
+		CR(ShowApp());
 
-		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), 
-					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 	}
 
 Error:
@@ -497,13 +697,16 @@ RESULT DreamUIBar::ClearMenuState(void* pContext) {
 	return r;
 }
 
-RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
+RESULT DreamUIBar::HideApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
 	m_menuState = MenuState::ANIMATING;
-	m_pLeftMallet->Hide();
-	m_pRightMallet->Hide();
+
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		return r;
+	};
 
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -535,12 +738,35 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
+RESULT DreamUIBar::ShowApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
 	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+	//m_pScrollView->Show();
 //*
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		CN(pDreamUIBar);
+
+		CR(pDreamUIBar->UpdateMenu(pContext));
+	Error:
+		return r;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		CN(pDreamUIBar);
+
+		CR(pDreamUIBar->ClearMenuState(pContext));
+	Error:
+		return r;
+	};
+
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
@@ -609,16 +835,7 @@ std::vector<std::string> DreamUIBar::GetStringHeaders() {
 }
 
 RESULT DreamUIBar::Notify(UIEvent *pEvent) {
-	RESULT r = R_PASS;
-
-	switch (pEvent->m_eventType) {
-	case (UIEventType::UI_MENU): {
-		CR(HandleMenuUp(pEvent->m_pObj));
-	} break;
-	}
-
-Error:
-	return r;
+	return R_PASS;
 }
 
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
@@ -631,11 +848,6 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	return R_PASS;
 }
 
-UIMallet* DreamUIBar::GetRightMallet() {
-	return m_pRightMallet;
+DreamAppHandle* DreamUIBar::GetAppHandle() {
+	return (DreamAppHandle*)(this);
 }
-
-UIMallet* DreamUIBar::GetLeftMallet() {
-	return m_pLeftMallet;
-}
-

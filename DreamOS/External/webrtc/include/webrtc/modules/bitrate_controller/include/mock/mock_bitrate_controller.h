@@ -8,11 +8,11 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_
-#define WEBRTC_MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_
+#ifndef MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_
+#define MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_
 
-#include "testing/gmock/include/gmock/gmock.h"
-#include "webrtc/modules/bitrate_controller/include/bitrate_controller.h"
+#include "modules/bitrate_controller/include/bitrate_controller.h"
+#include "test/gmock.h"
 
 namespace webrtc {
 namespace test {
@@ -38,6 +38,7 @@ class MockBitrateController : public BitrateController {
   MOCK_METHOD3(ResetBitrates,
                void(int bitrate_bps, int min_bitrate_bps, int max_bitrate_bps));
   MOCK_METHOD1(UpdateDelayBasedEstimate, void(uint32_t bitrate_bps));
+  MOCK_METHOD1(UpdateProbeBitrate, void(uint32_t bitrate_bps));
   MOCK_METHOD1(SetEventLog, void(RtcEventLog* event_log));
   MOCK_CONST_METHOD1(AvailableBandwidth, bool(uint32_t* bandwidth));
   MOCK_METHOD1(SetReservedBitrate, void(uint32_t reserved_bitrate_bps));
@@ -50,4 +51,4 @@ class MockBitrateController : public BitrateController {
 }  // namespace test
 }  // namespace webrtc
 
-#endif  // WEBRTC_MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_
+#endif  // MODULES_BITRATE_CONTROLLER_INCLUDE_MOCK_MOCK_BITRATE_CONTROLLER_H_

@@ -9,6 +9,7 @@
 #include <HMD/Oculus/OVR.h>
 
 #include "DreamAppManager.h"
+#include "DreamAppMessage.h"
 
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
@@ -77,51 +78,8 @@ bool SandboxApp::IsMouseIntersectObjects() {
 	return m_fMouseIntersectObjects;
 }
 
-RESULT SandboxApp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("intersect") == 0) {
-		m_pHALImp->SetRenderReferenceGeometry(true);
-		SetMouseIntersectObjects(!IsMouseIntersectObjects());
-	}
-
-	return r;
-}
-
 RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
-	RESULT r = R_PASS;
-
-	if (kbEvent->m_pSenseKeyboard) {
-		SenseVirtualKey keyCode = kbEvent->KeyCode;
-
-		if (kbEvent->KeyState) {
-			if (m_pHALImp->IsRenderProfiler() == false) {
-				if (keyCode == SVK_TAB) {
-					// quick hack to enable dream console in production but only using several tab hits
-#ifdef PRODUCTION_BUILD
-					static int hits = 0;
-					hits++;
-					if (hits > 7) {
-						m_pHALImp->SetRenderProfiler(true);
-						DreamConsole::GetConsole()->SetInForeground(true);
-					}
-#else
-					m_pHALImp->SetRenderProfiler(true);
-					DreamConsole::GetConsole()->SetInForeground(true);
-#endif // PRODUCTION_BUILD
-				}
-			}
-			else {
-				if (keyCode == SVK_TAB) {
-					m_pHALImp->SetRenderProfiler(false);
-					DreamConsole::GetConsole()->SetInForeground(false);
-				}
-			}
-		}
-	}
-
-	//Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
@@ -240,10 +198,6 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
-	// Register Dream Console to keyboard events
-	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
-	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
-
 	CR(RegisterSubscriber(SVK_TAB, this));
 
 	//camera *pCamera = m_pHALImp->GetCamera();
@@ -313,10 +267,11 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
+	//TODO: broken for now
+//	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
+//	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
-Error:
+//Error:
 	return r;
 }
 
@@ -465,7 +420,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
+		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
 	}
@@ -555,7 +510,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
 
 	// Generalize this module pattern
-	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+	if (m_SandboxConfiguration.fInitCloud) {
+		CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+	}
+
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 
@@ -571,20 +529,12 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
-	CommandLineManager::instance()->ForEach([](const std::string& arg) {
-		HUD_OUT(("arg :" + arg).c_str());
-	});
-
 	// Auto Login Handling
 	// This is done in DreamOS now
 	//if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
 	//	// auto login
 	//	m_pCloudController->Start();
 	//}
-
-	// Register with command prompt
-	// TODO: This should be changed to a command pattern
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Sandbox, this);
 
 Error:
 	return r;
@@ -830,6 +780,10 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RemoveObjectFromInteractionGraph(VirtualObj *pObject) {
+	return m_pInteractionGraph->RemoveObject(pObject);
+}
+
 RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
@@ -857,6 +811,14 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
+	return m_pUISceneGraph->RemoveObject(pObject);
+}	   
+	   
+RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
+	return m_pUIClippingSceneGraph->RemoveObject(pObject);
+}
+
 /*
 RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
@@ -872,16 +834,25 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
-	if (pObj != nullptr)
+
+	if (pObj != nullptr) {
 		CR(m_pInteractionEngine->RemoveAnimationObject(pObj));
+	}
 
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
 	CR(m_pUIClippingSceneGraph->RemoveObject(pObject));
+
+	CR(m_pInteractionEngine->RemoveObject(pObject, m_pInteractionGraph));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
+	//if (pObject != nullptr) {
+	//	delete pObject;
+	//	pObject = nullptr;
+	//}
+
 	return r;
 }
 
@@ -1041,7 +1012,27 @@ Error:
 	return nullptr;
 }
 
+DimPlane* SandboxApp::MakePlane(point ptOrigin, vector vNormal) {
+	return m_pHALImp->MakePlane(ptOrigin, vNormal);
+}
 
+DimPlane* SandboxApp::AddPlane(point ptOrigin, vector vNormal) {
+	RESULT r = R_PASS;
+	DimPlane* pPlane = MakePlane(ptOrigin, vNormal);
+	CN(pPlane);
+
+	CR(AddObject(pPlane));
+
+	//Success:
+	return pPlane;
+
+Error:
+	if (pPlane != nullptr) {
+		delete pPlane;
+		pPlane = nullptr;
+	}
+	return nullptr;
+}
 
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
@@ -1324,11 +1315,11 @@ texture* SandboxApp::MakeTexture(const texture &srcTexture) {
 	return m_pHALImp->MakeTexture(srcTexture);
 }
 
-texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, format, channels, pBuffer, pBuffer_n);
+texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
-texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* SandboxApp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }
 
@@ -1561,6 +1552,10 @@ RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObser
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
+RESULT SandboxApp::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	return m_pCloudController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
+}
+
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
@@ -1568,6 +1563,29 @@ RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CN(pPeerConnection);
+	CN(pDreamAppMessage);
+
+	CR(m_pDreamAppManager->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
+
+	CR(BroadcastDataMessage(pDreamAppMessage));
+
+Error:
+	return r;
 }
 
 // TimeManager

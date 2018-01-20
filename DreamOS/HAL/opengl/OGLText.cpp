@@ -92,7 +92,3 @@ RESULT OGLText::SetText(const std::string& strText) {
 Error:
 	return r;
 }
-
-DimObj *OGLText::GetDimObj() {
-	return (DimObj*)this;
-}

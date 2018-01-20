@@ -19,6 +19,7 @@ class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
 class BoundingQuad;
+class BoundingPlane;
 
 class CollisionManifold;
 
@@ -40,6 +41,7 @@ public:
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;
 	virtual bool Intersect(const BoundingQuad& rhs) = 0;
+	virtual bool Intersect(const BoundingPlane& rhs) = 0;
 
 	virtual bool Intersect(point& pt) = 0;
 	virtual bool Intersect(const ray &rCast) = 0;
@@ -50,6 +52,7 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingPlane& rhs) = 0;
 
 	virtual CollisionManifold Collide(const ray &rCast) = 0;
 

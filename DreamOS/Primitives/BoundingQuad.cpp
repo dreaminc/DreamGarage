@@ -1,6 +1,7 @@
 #include "BoundingQuad.h"
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingPlane.h"
 #include <algorithm>
 
 #include "VirtualObj.h"
@@ -31,7 +32,29 @@ bool BoundingQuad::Intersect(const BoundingBox& rhs) {
 }
 
 bool BoundingQuad::Intersect(const BoundingQuad& rhs) {
-	// TODO:
+
+	// Do both
+	for (int i = 0; i < 4; i++) {
+		line edgeQuad = static_cast<BoundingQuad>(rhs).GetAbsoluteQuadEdge((QuadEdge)(i));
+
+		if (Intersect(edgeQuad)) {
+			return true;
+		}
+	}	
+
+	for (int i = 0; i < 4; i++) {
+		line edgeQuad = GetAbsoluteQuadEdge((QuadEdge)(i));
+
+		if (static_cast<BoundingQuad>(rhs).Intersect(edgeQuad)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool BoundingQuad::Intersect(const BoundingPlane& rhs) {
+	// TODO: 
 
 	return false;
 }
@@ -43,6 +66,37 @@ bool BoundingQuad::Intersect(point& pt) {
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	point ptCollide;
+
+	// Do for both
+
+	vector vNormal = GetAbsoluteNormal();
+
+	for (int i = 0; i < 4; i++) {
+		line edgeQuad = static_cast<BoundingQuad>(rhs).GetAbsoluteQuadEdge((QuadEdge)(i));
+
+		if (Intersect(edgeQuad, &ptCollide)) {
+			float penetration = 0.0f;	// TODO: Fix this
+			manifold.AddContactPoint(ptCollide, vNormal, -penetration, 1);
+		}
+	}
+
+	vNormal = static_cast<BoundingQuad>(rhs).GetAbsoluteNormal();
+
+	for (int i = 0; i < 4; i++) {
+		line edgeQuad = GetAbsoluteQuadEdge((QuadEdge)(i));
+
+		if (static_cast<BoundingQuad>(rhs).Intersect(edgeQuad, &ptCollide)) {
+			float penetration = 0.0f;	// TODO: Fix this
+			manifold.AddContactPoint(ptCollide, vNormal, -penetration, 1);
+		}
+	}
+
+	return manifold;
+}
+
+CollisionManifold BoundingQuad::Collide(const BoundingPlane& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// TODO:
@@ -160,6 +214,45 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
+// TODO: Push some of this functionality into primitives potentially 
+bool BoundingQuad::Intersect(const line& l, point *pptCollision) {
+	double t = -1.0f;
+
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
+
+	ray r = static_cast<line>(l).GetRay();
+
+	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
+	double denom = r.GetVector().Normal().dot(vNormal);
+
+	if (denom != 0) {
+		t /= denom;
+
+		if (t >= 0 && t < static_cast<line>(l).length()) {
+			quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+			RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+			point ptPlane = inverse(rotMat) * ((r.GetOrigin() + r.GetVector() * t) - GetAbsoluteOrigin());
+
+			if (ptPlane.x() < GetWidth(true) / 2.0f && ptPlane.x() > -GetWidth(true) / 2.0f &&
+				ptPlane.z() < GetHeight(true) / 2.0f && ptPlane.z() > -GetHeight(true) / 2.0f)
+			{
+				if (pptCollision != nullptr) {
+					*pptCollision = r.GetOrigin() + (r.GetVector() * t);
+				}
+
+				return true;
+			}
+		}
+	}
+	else {
+		// parallel 
+	}
+
+	return false;
+}
+
 bool BoundingQuad::Intersect(const ray& r) {
 	double t = -1.0f;
 
@@ -254,6 +347,13 @@ double BoundingQuad::GetHeight(bool fAbsolute) {
 
 vector BoundingQuad::GetNormal() {
 	return m_vNormal;
+}
+
+vector BoundingQuad::GetAbsoluteNormal() {
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix matRotation = RotationMatrix(qOrientation);
+	vector vNormal = (matRotation * m_vNormal);
+	return vNormal.Normal();
 }
 
 // This will re-orient the HV perpendicular to the normal
@@ -373,4 +473,70 @@ point BoundingQuad::GetQuadPoint(QuadPoint ptType) {
 	//ptRet = ptRet + GetOrigin();
 		
 	return ptRet;
+}
+
+point BoundingQuad::GetAbsoluteQuadPoint(QuadPoint ptType) {
+	point ptRet = point();
+
+	double halfWidth = m_width / 2.0f;
+	double halfHeight = m_height / 2.0f;
+
+	switch (ptType) {
+	case QuadPoint::TOP_RIGHT: {
+		ptRet.x() += halfWidth;
+		ptRet.z() += halfHeight;
+	} break;
+
+	case QuadPoint::TOP_LEFT: {
+		ptRet.x() -= halfWidth;
+		ptRet.z() += halfHeight;
+	} break;
+
+	case QuadPoint::BOTTOM_RIGHT: {
+		ptRet.x() += halfWidth;
+		ptRet.z() -= halfHeight;
+	} break;
+
+	case QuadPoint::BOTTOM_LEFT: {
+		ptRet.x() -= halfWidth;
+		ptRet.z() -= halfHeight;
+	} break;
+	}
+
+	// Absolute Orientation
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix matRotation(qOrientation);
+	ptRet = matRotation * ptRet;
+
+	ptRet = ptRet + GetOrigin();
+
+	return ptRet;
+}
+
+line BoundingQuad::GetAbsoluteQuadEdge(QuadEdge edgeType) {
+	point ptA, ptB;
+
+	switch (edgeType) {
+		case QuadEdge::LEFT: {
+			ptB = GetAbsoluteQuadPoint(QuadPoint::TOP_LEFT);
+			ptA = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_LEFT);
+		} break;
+
+		case QuadEdge::RIGHT: {
+			ptB = GetAbsoluteQuadPoint(QuadPoint::TOP_RIGHT);
+			ptA = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_RIGHT);
+		} break;
+
+		case QuadEdge::TOP: {
+			ptB = GetAbsoluteQuadPoint(QuadPoint::TOP_RIGHT);
+			ptA = GetAbsoluteQuadPoint(QuadPoint::TOP_LEFT);
+		} break;
+
+		case QuadEdge::BOTTOM: {
+			ptB = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_RIGHT);
+			ptA = GetAbsoluteQuadPoint(QuadPoint::BOTTOM_LEFT);
+		} break;
+	}
+
+	return line(ptA, ptB);
 }

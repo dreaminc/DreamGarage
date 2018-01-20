@@ -1,8 +1,7 @@
 #include "EnvironmentController.h"
 #include "Cloud/CloudController.h"
 
-#include "Logger/Logger.h"
-#include "easylogging++.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "Cloud/User/User.h"
 
@@ -14,8 +13,6 @@
 
 #include "Primitives/Types/UID.h"
 #include "Primitives/Types/guid.h"
-
-#include "DreamConsole/DreamConsole.h"
 
 #include "Cloud/CloudMessage.h"
 
@@ -58,6 +55,11 @@ RESULT EnvironmentController::Initialize() {
 
 	// Register Methods
 	CR(RegisterMethod("share", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("send", std::bind(&EnvironmentController::OnSendAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
+	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
+	CR(RegisterMethod("stop_receiving", std::bind(&EnvironmentController::OnStopReceiving, this, std::placeholders::_1)));
+	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
 
 Error:
 	return r;
@@ -163,8 +165,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 
 	m_fConnected = true;
 
-	LOG(INFO) << "(Cloud) user connected to socket:user=" << user;
-	OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(environmentID));
+	DOSLOG(INFO, "[EnvironmentController] user connected to socket:user=%v", user);
 
 Error:
 	return r;
@@ -275,7 +276,7 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 
 	CR(SendEnvironmentSocketData(strData, state::SET_SDP_OFFER));
 
-	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
+	DOSLOG(INFO, "[EnvironmentController] offer was sent to cloud, msg=%v", strData);
 
 Error:
 	return r;
@@ -451,6 +452,30 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RequestStopSharing(long assetID, std::string strStorageProviderScope, std::string strPath) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_asset"] = nlohmann::json::object();
+	jsonPayload["environment_asset"]["path"] = strPath;
+
+	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
+	jsonPayload["environment_asset"]["id"] = assetID;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_asset.stop_sharing"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_STOP_SHARING));
+
+Error:
+	return r;
+}
+
 
 RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	DEBUG_LINEOUT("%d Peers Environment: %d", (int)(m_environmentPeers.size()), (int)(m_environment.GetEnvironmentID()));
@@ -542,7 +567,7 @@ RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection)
 	CBM((pPeerConnection->GetOfferUserID() == s_user.GetUserID()), "User ID mismatch offer user ID of peer connection");
 	CR(SetSDPOffer(s_user, pPeerConnection));
 
-	LOG(INFO) << "OnSDPOfferSuccess";
+	DOSLOG(INFO, "OnSDPOfferSuccess");
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -557,7 +582,7 @@ RESULT EnvironmentController::OnSDPAnswerSuccess(PeerConnection *pPeerConnection
 	CBM((pPeerConnection->GetAnswerUserID() == s_user.GetUserID()), "User ID mismatch answer user ID of peer connection");
 	CR(SetSDPAnswer(s_user, pPeerConnection));
 
-	LOG(INFO) << "OnSDPAnswerSuccess";
+	DOSLOG(INFO, "OnSDPAnswerSuccess");
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -593,6 +618,7 @@ RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloud
 		//CR(pEnvironmentAsset->PrintEnvironmentAsset());
 
 		if (m_pEnvironmentControllerObserver != nullptr) {
+			// Moving to Send/Receive paradigm
 			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
 		}
 	}
@@ -601,10 +627,79 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+	//int peerID = jsonPayload["/user"_json_pointer].get<int>();
+
+	//*
+	if (jsonEnvironmentAsset.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
+		// actually doesn't need to do anything, OnVideoFrame in DOS does a peer connection check
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnReceiveAsset(pEnvironmentAsset->GetUserID()));
+		}
+	}
+	//*/
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnStopReceiving());
+		}
+	}
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	if (jsonEnvironmentAsset.size() != 0) {
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnStopSending());
+		}
+	}
+Error:
+	return r;
+}
+
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
-
-	LOG(INFO) << "(Cloud) websocket msg" << strMessage;
 
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 
@@ -613,8 +708,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
 		// message error
 
-		LOG(ERROR) << "(cloud) websocket msg error (could be a user already logged in)";
-		HUD_OUT("websocket msg error (could be a user already logged in)");
+		DOSLOG(ERR, "[EnvironmentController] websocket msg error (could be a user already logged in)");
 
 		return;
 	}
@@ -633,21 +727,32 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
-			LOG(INFO) << "(cloud) HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod ,jsonPayload);
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
-			LOG(INFO) << "(cloud) HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage RESPONSE %v, %v", strMethod ,jsonPayload);
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
 		else {
-			LOG(ERROR) << "(cloud) websocket msg type unknown";
+			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
 		}
 	}
+	else if (strTokens[0] == "socket_connection") {
+		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
+		strMethod = strTokens[1];
+		
+		if (strType == "response") {
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage RESPONSE %v, %v", strMethod ,jsonPayload);
+			
+			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
+		}
+
+	}
 	else {
-		LOG(ERROR) << "(cloud) websocket msg method unknown";
+		DOSLOG(ERR, "[EnvironmentController] websocket msg method unknown");
 	}
 
 	if (pCloudMessage->GetController() == "menu") {
@@ -761,7 +866,6 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionOpen");
-	HUD_OUT("HandleWebsocketConnectionOpen");
 
 	m_state = state::SOCKET_CONNECTED;
 
@@ -773,12 +877,10 @@ void EnvironmentController::HandleWebsocketConnectionOpen() {
 
 void EnvironmentController::HandleWebsocketConnectionClose() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionClose");
-	HUD_OUT("HandleWebsocketConnectionClose");
 }
 
 void EnvironmentController::HandleWebsocketConnectionFailed() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionFailed");
-	HUD_OUT("HandleWebsocketConnectionFailed");
 }
 
 RESULT EnvironmentController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
@@ -819,6 +921,66 @@ RESULT EnvironmentController::BroadcastDataChannelMessage(uint8_t *pDataChannelB
 
 Error:
 	return r;
+}
+
+// Video
+RESULT EnvironmentController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->StartVideoStreaming(pxDesiredWidth, pxDesiredHeight, desiredFPS, pixelFormat));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::StopVideoStreaming() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->StopVideoStreaming());
+
+Error:
+	return r;
+}
+
+bool EnvironmentController::IsVideoStreamingRunning() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	return m_pPeerConnectionController->IsVideoStreamingRunning();
+
+Error:
+	return false;
+}
+
+// Audio
+RESULT EnvironmentController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CN(m_pPeerConnectionController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+
+Error:
+	return r;
+}
+
+float EnvironmentController::GetRunTimeMicAverage() {
+	if (m_pPeerConnectionController != nullptr) {
+		return m_pPeerConnectionController->GetRunTimeMicAverage();
+	}
+
+	return 0.0f;
 }
 
 RESULT EnvironmentController::SetUser(User currentUser) {
@@ -862,6 +1024,17 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnNewSocketConnection(int seatPosition) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnNewSocketConnection(seatPosition));
+	}
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
@@ -895,11 +1068,22 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+RESULT EnvironmentController::OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+		CR(m_pEnvironmentControllerObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnVideoFrame(pPeerConnection, pVideoFrameDataBuffer, pxWidth, pxHeight));
 	}
 
 Error:

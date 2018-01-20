@@ -19,8 +19,7 @@
 #include "OGLProgramBlendQuad.h"
 #include "OGLProgramBlurQuad.h"
 #include "OGLProgramUIStage.h"
-
-#include "OGLDreamConsole.h"
+#include "OGLProgramDebugOverlay.h"
 
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
@@ -38,12 +37,12 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
-	{ "debugconsole", OGLPROGRAM_DEBUG_CONSOLE },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
 	{ "blur", OGLPROGRAM_BLUR_QUAD },
 	{ "uistage", OGLPROGRAM_UI_STAGE },
+	{ "debug_overlay", OGLPROGRAM_DEBUG_OVERLAY },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -154,13 +153,6 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL shadow depth Program");
 		} break;
 
-		case OGLPROGRAM_DEBUG_CONSOLE: {
-			pOGLProgram = new OGLDreamConsole(pParentImp);
-			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"TextureBitBlit.vert", L"TextureBitBlit.frag", versionOGL),
-				"Failed to initialize OGL debug console overlay Program");
-		} break;
-
 		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
 			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
@@ -194,6 +186,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blurquad.vert", L"blurquad.frag", versionOGL),
 				"Failed to initialize OGL blur quad Program");
+		} break;
+
+		case OGLPROGRAM_DEBUG_OVERLAY: {
+			pOGLProgram = new OGLProgramDebugOverlay(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL),
+				"Failed to initialize OGL minimal Program");
 		} break;
 
 		case OGLPROGRAM_CUSTOM:

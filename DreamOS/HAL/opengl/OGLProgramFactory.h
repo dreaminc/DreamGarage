@@ -25,15 +25,18 @@ typedef enum {
 	OGLPROGRAM_CUSTOM,
 	OGLPROGRAM_SHADOW_DEPTH,
 	OGLPROGRAM_REFERENCE,
+	
 	// Production shaders - using features from previous shaders 
 	OGLPROGRAM_ENVIRONMENT_OBJECTS, // used for models in the environment such as head and hands
-	OGLPROGRAM_DEBUG_CONSOLE,
 	OGLPROGRAM_SCREEN_QUAD,
 	OGLPROGRAM_DEPTH_PEEL,
 	OGLPROGRAM_BLEND_QUAD,
 	OGLPROGRAM_BLUR_QUAD,
 	OGLPROGRAM_UI_STAGE,
-	// /Production shaders
+
+	// Testing Shader Programs
+	OGLPROGRAM_DEBUG_OVERLAY,
+
 	OGLPROGRAM_INVALID
 } OGLPROGRAM_TYPE;
 

@@ -1,6 +1,8 @@
-#include "Logger/Logger.h"
-#include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
+
+#include "DreamLogger/DreamLogger.h"
+
+#include "Project/Windows/DreamOS/resource.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
 #include "Cloud/CloudControllerFactory.h"
@@ -11,8 +13,6 @@
 #include "Win64Mouse.h"
 
 #include <string>
-
-#include "DreamConsole/DreamConsole.h"
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -93,29 +93,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		this												// lpParam
 	);
 
-	// TODO: Move into Sandbox virtual function
-	// Create the Keyboard and Mouse
-	/*
-	m_pWin64Keyboard = new Win64Keyboard(this);
-	m_pWin64Mouse = new Win64Mouse(this);
-
-	// Initialize Mouse 
-	m_pWin64Mouse->CaptureMouse();
-	m_pWin64Mouse->CenterMousePosition();
-	*/
-
-	// Sense Leap Motion Device (TODO: temporarily here!)
-	//m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
-	//CN(m_pSenseLeapMotion);
-
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
-	/*
-	// Initialize Time Manager
-	m_pTimeManager = new TimeManager();
-	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CVM(m_pTimeManager, "Failed to validate Time Manager");
-	*/
 //TODO: use this label
 //Success:
 	Validate();
@@ -236,7 +215,6 @@ RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
-
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
 	// TODO: Remove this code
@@ -464,7 +442,7 @@ RESULT Windows64App::Show() {
 
 	// Show the window
 	//CBM(ShowWindow(m_hwndWindow, SW_SHOWDEFAULT), "Failed to show win64app window");
-	//CBM(UpdateWindow(m_hwndWindow), "Faield to update win64app window");
+	//CBM(UpdateWindow(m_hwndWindow), "Failed to update win64app window");
 
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
@@ -475,9 +453,8 @@ RESULT Windows64App::Show() {
 		FALSE,      // not signaled
 		(LPTSTR)L"CloseSplashScreenEvent"); // event name
 
-	BOOL res = SetEvent(hCloseSplashScreenEvent);
-
-	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
+	BOOL fResult = SetEvent(hCloseSplashScreenEvent);
+	DOSLOG(INFO, "[Windows64App] signaling splash to close %v", (fResult ? "OK" : "FAIL"));
 
 	CloseHandle(hCloseSplashScreenEvent);
 	

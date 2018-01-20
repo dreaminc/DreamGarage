@@ -11,6 +11,8 @@
 #include "Types/UID.h"
 #include <vector>
 
+#include "color.h"
+
 #define NUM_CUBE_MAP_TEXTURES 6
 
 class image;
@@ -46,21 +48,13 @@ public:
 		CUBE_MAP_INVALID 
 	};
 
-	enum class PixelFormat {
-		Unspecified, // this will generate an RGB/RGBA based on the number of channels
-		RGB,
-		RGBA,
-		BGR,
-		BGRA
-	};
-
 public:
 	texture();
 	texture(const texture& tex);
 	texture(texture::TEXTURE_TYPE type);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples = 0);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
-	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
+	texture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT format, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
 
 	// Loads from a file buffer (file loaded into buffer)
 	texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
@@ -93,7 +87,10 @@ public:
 	RESULT LoadCubeMapByName(const wchar_t * pszName);
 	RESULT CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
 
-	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
+	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat);
+
+	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat);
+	virtual RESULT UpdateDimensions(int width, int height);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 
@@ -105,8 +102,8 @@ public:
 	int GetSamples() { return m_samples; }
 	int GetLevels() { return m_levels; }
 
-	PixelFormat GetPixelFormat() {
-		return m_format;
+	PIXEL_FORMAT GetPixelFormat() {
+		return m_pixelFormat;
 	}
 
 	RESULT SetParams(int pxWidth, int pxHeight, int channels, int samples = 1, int levels = 0);
@@ -161,16 +158,18 @@ public:
 		}
 	}
 
-	RESULT SetFormat(PixelFormat format) {
-		m_format = format;
+	RESULT SetFormat(PIXEL_FORMAT format) {
+		m_pixelFormat = format;
 		return R_PASS;
 	}
 
 	bool IsDistanceMapped();
 	RESULT SetDistanceMapped();
 
+	uint8_t *GetImageBuffer();
+
 protected:
-	PixelFormat	m_format = PixelFormat::Unspecified;
+	PIXEL_FORMAT m_pixelFormat = PIXEL_FORMAT::Unspecified;
 	TEXTURE_TYPE m_type;
 
 	int m_width = 0;

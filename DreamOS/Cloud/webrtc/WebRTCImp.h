@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "WebRTCCommon.h"
-#include "webrtc/base/win32socketserver.h"
+#include "rtc_base/win32socketserver.h"
 
 #include "WebRTCConductor.h"
 
@@ -24,7 +24,7 @@
 
 #include "Primitives/Proxy.h"
 
-class WebRTCClient;
+//class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
 
@@ -54,7 +54,8 @@ public:
 		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannel(long peerConnectionID) = 0;
 		virtual RESULT OnAudioChannel(long peerConnectionID) = 0;
@@ -64,7 +65,7 @@ public:
 	WebRTCImp(CloudController *pParentCloudController);
 	~WebRTCImp();
 
-	friend class WebRTCClient;
+	//friend class WebRTCClient;
 	friend class WebRTCConductor;
 
 	RESULT Shutdown();
@@ -91,10 +92,18 @@ public:
 
 	// Functionality
 	// TODO: Hand around PeerConnection object instead of peerConnectionID?
-	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer);
+	RESULT InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer);
 
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+	RESULT SendVideoFrame(long peerConnectionID, uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(long peerConnectionID, int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming(long peerConnectionID);
+	bool IsVideoStreamingRunning(long peerConnectionID);
+
+	// Audio
+	RESULT SendAudioPacket(const std::string &strAudioTrackLabel, long peerConnectionID, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
 
 	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
 	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -122,7 +131,8 @@ protected:
 	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnVideoFrame(long peerConnectionID, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	virtual RESULT OnRenegotiationNeeded(long peerConnectionID) override;
 	virtual RESULT OnDataChannel(long peerConnectionID) override;
 	virtual RESULT OnAudioChannel(long peerConnectionID) override;
@@ -133,7 +143,9 @@ protected:
 
 private:
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	rtc::Win32Thread* m_pWin32thread;
+	
+	rtc::Win32Thread* m_pWin32thread = nullptr;
+	rtc::Win32SocketServer* m_pWin32SocketServer = nullptr;
 
 	DWORD m_UIThreadID;
 	std::string m_strServer;

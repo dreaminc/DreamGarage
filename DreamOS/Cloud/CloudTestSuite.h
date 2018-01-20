@@ -47,6 +47,18 @@ public:
 	// Environment Asset Callback
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
+	virtual RESULT OnReceiveAsset(long userID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopSending() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceiving() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 private:
 	CloudController *GetCloudController();
 

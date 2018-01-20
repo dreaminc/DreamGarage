@@ -28,6 +28,7 @@
 #include "Primitives/sphere.h"
 #include "Primitives/cylinder.h"
 #include "Primitives/DimRay.h"
+#include "Primitives/DimPlane.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
@@ -39,16 +40,19 @@
 #include "DreamAppManager.h"
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
+#include "DreamAppHandle.h"
 
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
 class DreamMessage;
+class DreamAppMessage;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
 
+#include "DreamVideoStreamSubscriber.h"
 
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
@@ -58,6 +62,7 @@ class DreamOS :
 	public DreamPeerApp::DreamPeerAppObserver
 {
 	friend class CloudTestSuite;
+	friend class DreamAppBase;
 
 	// TODO: this needs to be revisited
 	friend class UIModule;
@@ -69,6 +74,17 @@ class DreamOS :
 	friend class AnimationTestSuite;
 	friend class DreamOSTestSuite;
 	friend class CollisionTestSuite;
+	friend class WebRTCTestSuite;
+	friend class SoundTestSuite;
+	friend class SandboxTestSuite;
+
+public:
+	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
+	PeerConnection *m_pVideoSteamPeerConnectionSource = nullptr;
+
+	RESULT RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+	bool IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 
 public:
 	DreamOS();
@@ -90,15 +106,30 @@ public:
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
 	// EnvironmentObserver
+	// TODO: This should be encapsulated in it's own object
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnReceiveAsset(long userID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopSending() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnStopReceiving() override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -109,6 +140,9 @@ public:
 	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) = 0;
 	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
+
+	// Handle the Dream App Messages
+	RESULT OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
 
 	// Peers
 	RESULT HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage);
@@ -124,6 +158,8 @@ protected:
 	RESULT RemovePeer(long peerUserID);
 	RESULT RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer);
 	DreamPeerApp::state GetPeerState(long peerUserID);
+
+	RESULT CheckDreamPeerAppStates();
 
 private:
 	std::map<long, std::shared_ptr<DreamPeerApp>> m_dreamPeerApps;
@@ -146,35 +182,25 @@ protected:
 public:
 	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
 
-	// TODO: This is here because of template sillyness - but should be 
-	// put into a .tpp file with an #include of said tpp file at the end
-	// of the header
 	template<class derivedAppType>
-	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext, bool fAddToScene = true) {
-		RESULT r = R_PASS;
-		
-		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext, fAddToScene);
-		CNM(pDreamApp, "Failed to create app");
+	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext, bool fAddToScene = true);
 
-		return pDreamApp;
-
-	Error:
-		if (pDreamApp != nullptr) {
-			pDreamApp = nullptr;
-		}
-
-		return nullptr;
-	}
-	
 	template<class derivedAppType>
-	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp) {
-		RESULT r = R_PASS;
+	RESULT ShutdownDreamApp(std::shared_ptr<derivedAppType> pDreamApp);
 
-		CR(m_pSandbox->m_pDreamAppManager->ShutdownApp<derivedAppType>(pDreamApp));
+	DreamAppHandle* RequestCaptureAppUnique(std::string strAppName, DreamAppBase* pHoldingApp);
+	DreamAppHandle* CaptureApp(UID uid, DreamAppBase* pHoldingApp);
 
-	Error:
-		return r;
-	}
+	RESULT ReleaseApp(DreamAppHandle* pHandle, UID appUID, DreamAppBase* pHoldingApp);
+	RESULT RequestReleaseAppUnique(DreamAppHandle* pHandle, DreamAppBase* pHoldingApp);
+
+	std::vector<UID> GetAppUID(std::string strAppName);
+	UID GetUniqueAppUID(std::string strAppName);
+
+	//template<class derivedAppType>
+	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
+
+	//std::map<DreamAppHandleBase*, std::vector<DreamAppBase*>> m_capturedApps;
 
 //protected:
 public:
@@ -190,11 +216,14 @@ public:
 	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
@@ -254,9 +283,10 @@ public:
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
 
-	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
 
@@ -312,6 +342,10 @@ protected:
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+
+	// Dream App Messaging 
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	// IO
 //protected:
@@ -327,21 +361,19 @@ protected:
 
 protected:
 	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+
+public:
 	const SandboxApp::configuration& GetSandboxConfiguration();
 
 private:
 	SandboxApp *m_pSandbox;
 
 // System Applications
-// Should flesh out a better arch here
-public:
-	std::shared_ptr<UIKeyboard> CaptureKeyboard();
-	RESULT ReleaseKeyboard();
-
 private:
-	//TODO: generalize when there are more system apps
-	bool m_fKeyboardCaptured = false;
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
+
+	// currently used by DreamGarage to dismiss UI when being seated (temporary)
+protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 
 private:
@@ -355,5 +387,7 @@ private:
 
 	std::map<std::wstring, std::shared_ptr<font>> m_fonts;
 };
+
+#include "DreamOS.tpp"
 
 #endif	// ! DREAM_OS_H_

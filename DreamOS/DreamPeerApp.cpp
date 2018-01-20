@@ -1,6 +1,15 @@
 #include "DreamPeerApp.h"
 #include "DreamOS.h"
 
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
+
+#include "Primitives/font.h"
+
+#include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/Environment/PeerConnection.h"
+#include "UI/UIView.h"
+
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
 	m_pDOS(pDOS),
@@ -73,10 +82,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	// If pending user mode - add to composite here
-	if (m_fPendingAssignedUserMode) {
+	if (m_fPendingAssignedUserModel) {
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
-		m_fPendingAssignedUserMode = false;
+		m_fPendingAssignedUserModel = false;
 	}
 
 	//if (m_pSphere == nullptr) {
@@ -84,6 +93,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	//	CN(m_pSphere);
 	//}
 
+	/*
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
@@ -93,6 +103,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		// event when the peer is looking at something that consumes these events
 		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
+	//*/
 
 	if (m_pPhantomVolume == nullptr) {
 		m_pPhantomVolume = GetComposite()->AddVolume(2.0f);
@@ -101,26 +112,66 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	}
 
 	///*
+	if (m_pNameComposite == nullptr) {
+		m_pNameComposite = GetComposite()->AddComposite();
+		
+		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
+	}
+
 	if (m_pFont == nullptr) {
 		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 		CN(m_pFont);
+		m_pFont->SetLineHeight(NAME_LINE_HEIGHT);
+		
 	}
 
-	if (m_pTextUserName == nullptr) {
+	if (m_pNameBackground == nullptr) {
+		CN(m_pNameComposite);
+
+		m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
+		CN(m_pNameBackground);
+
+		m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
+		
+		m_pNameBackground->SetVisible(false);
+		
+		m_pTextBoxTexture = GetComposite()->MakeTexture(L"user-nametag-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
+		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+		m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
+	}
+
+	if (m_pTextUserName == nullptr && m_strScreenName != "") {
 		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
-			"u mad bro",
-			1.0,
-			0.25,
-			text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD));
+			m_strScreenName,
+			0.9 - NAMETAG_BORDER,
+			0.2 - NAMETAG_BORDER,
+			text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 		CN(m_pTextUserName);
 
-		CR(GetComposite()->AddObject(m_pTextUserName));
-
-		m_pTextUserName->SetPosition(point(0.0f, 1.0f, 0.0f));
-		m_pTextUserName->SetOrientationOffsetDeg(90.0f, 180.0f, 0.0f);
 		m_pTextUserName->SetVisible(false);
+
+		m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
+		CR(m_pNameComposite->AddObject(m_pTextUserName));
+		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+		m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 	}
+	
+	if (m_pUserModel != nullptr) {
+		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+	}
+	
+	if (m_fGazeInteraction) {
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay) {
+			ShowUserNameField();
+			m_fGazeInteraction = false;
+		}
+	}
+
 	//*/
 
 Error:
@@ -132,6 +183,7 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 
 	if (mEvent->m_pInteractionObject != nullptr) {
 		CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
+		CNR(m_pUserModel, R_SKIPPED);
 	}
 
 	//if (m_pSphere != nullptr) {
@@ -141,15 +193,27 @@ RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			m_pTextUserName->SetVisible(true);
+			// can't rely on m_pUserModel existing as the peer enters and leaves
+			if (IsVisible() && !IsUserNameVisible()) {
+				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+				m_fGazeInteraction = true;
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			// stub
+			if (IsVisible() && !IsUserNameVisible() && !m_fGazeInteraction) {
+				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+				m_fGazeInteraction = true;
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_pTextUserName->SetVisible(false);
+			m_fGazeInteraction = false;
+			if (IsUserNameVisible()) {
+				HideUserNameField();
+			}
 		} break;
 
 		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
@@ -173,6 +237,115 @@ Error:
 	return r;
 }
 
+RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
+	m_userNameAnimationDuration = animationDuration;
+	return R_PASS;
+}
+
+RESULT DreamPeerApp::HideUserNameField() {
+	RESULT r = R_PASS;
+	
+	auto fnStartCallback = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+		m_pNameComposite->SetVisible(false);
+		return R_PASS;
+	};
+	/*
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pTextUserName.get(),
+		m_hiddenColor,
+		0.5,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+	//*/
+	///*
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pTextUserName.get(),
+		m_hiddenColor,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pNameBackground.get(),
+		m_hiddenColor,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+	//*/
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::ShowUserNameField() {
+	RESULT r = R_PASS;
+
+	auto fnStartCallback = [&](void *pContext) {
+		m_pNameComposite->SetVisible(true);
+		return R_PASS;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
+
+		return R_PASS;
+	};	
+
+	m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+	//* quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
+	/*
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pNameComposite.get(),
+		m_visibleColor,
+		0.5,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+	//*/
+	///*
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pNameBackground.get(),
+		m_backgroundColor,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pTextUserName.get(),
+		m_visibleColor,
+		m_userNameAnimationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		fnStartCallback,
+		fnEndCallback,
+		this
+	));
+	//*/
+Error:
+	return r;
+}
+
 RESULT DreamPeerApp::RegisterDreamPeerObserver(DreamPeerAppObserver* pDreamPeerObserver) {
 	RESULT r = R_PASS;
 
@@ -186,6 +359,22 @@ Error:
 
 DreamPeerApp::state DreamPeerApp::GetState() {
 	return m_state;
+}
+
+bool DreamPeerApp::IsHandshakeRequestHung() {
+	if (m_peerConnectionState.fSentHandshakeRequest == true && m_peerConnectionState.fReceivedHandshakeAck == false) {
+		return true;
+	}
+
+	return false;
+}
+
+bool DreamPeerApp::IsHandshakeRequestAckHung() {
+	if (m_peerConnectionState.fReceivedHandshakeAck == true && m_peerConnectionState.fSentHandshakeRequestACK == false) {
+		return true;
+	}
+
+	return false;
 }
 
 RESULT DreamPeerApp::SetState(DreamPeerApp::state peerState) {
@@ -218,7 +407,12 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	CN(pPeerConnection);
+
 	m_pPeerConnection = pPeerConnection;
+	m_peerUserID = m_pPeerConnection->GetPeerUserID();	
+	
+	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);
 
 Error:
 	return r;
@@ -233,7 +427,8 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
-	m_fPendingAssignedUserMode = true;
+	m_pUserModel->SetVisible(m_fVisible);
+	m_fPendingAssignedUserModel = true;
 
 Error:
 	return r;
@@ -250,14 +445,42 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::SetVisible(bool fVisibile) {
+RESULT DreamPeerApp::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
+	std::shared_ptr<hand> pHand = nullptr;
+
+	m_fVisible = fVisible;
 
 	CN(m_pUserModel);
-	CR(m_pUserModel->SetVisible(fVisibile));
+	CR(m_pUserModel->SetVisible(fVisible));
+	
+	if (m_pNameComposite != nullptr) {
+		m_pNameComposite->SetVisible(fVisible, false);
+	}
+
+	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
+	CN(pHand);
+	pHand->SetVisible(fVisible);
+
+	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT);
+	CN(pHand);
+	pHand->SetVisible(fVisible);
 
 Error:
 	return r;
+}
+
+bool DreamPeerApp::IsVisible() {
+	return m_fVisible;
+}
+
+bool DreamPeerApp::IsUserNameVisible() {
+	if (m_pTextUserName != nullptr && m_pNameBackground != nullptr) {
+		return m_pTextUserName->IsVisible() && m_pNameBackground->IsVisible();
+	}
+	else {
+		return false;
+	}
 }
 
 RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
@@ -276,7 +499,6 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 
 	CN(m_pUserModel);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
-	m_pTextUserName->SetOrientation(qOrientation);
 
 Error:
 	return r;
@@ -343,6 +565,10 @@ Error:
 	return r;
 }
 
+bool DreamPeerApp::IsDataChannel() {
+	return m_peerConnectionState.fDataChannel;
+}
+
 RESULT DreamPeerApp::OnAudioChannel() {
 	RESULT r = R_PASS;
 
@@ -383,7 +609,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeRequest() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == false));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == false));
 	m_peerConnectionState.fSentHandshakeRequest = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -395,9 +621,9 @@ Error:
 RESULT DreamPeerApp::ReceivedHandshakeACK() {
 	RESULT r = R_PASS;
 
-	CB((m_peerConnectionState.fSentHandshakeRequest == true));
+//	CB((m_peerConnectionState.fSentHandshakeRequest == true));
 
-	m_peerConnectionState.fSentHandshakeRequest = false;
+//	m_peerConnectionState.fSentHandshakeRequest = false;
 	m_peerConnectionState.fReceivedHandshakeAck = true;
 
 	CR(UpdatePeerHandshakeState());
@@ -420,7 +646,7 @@ Error:
 RESULT DreamPeerApp::SentHandshakeACK() {
 	RESULT r = R_PASS;
 
-	m_peerConnectionState.fReceivedHandshakeRequest = false;
+	//m_peerConnectionState.fReceivedHandshakeRequest = false;
 	m_peerConnectionState.fSentHandshakeRequestACK = true;
 
 	CR(UpdatePeerHandshakeState());

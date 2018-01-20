@@ -10,25 +10,18 @@
 #include "OGLObj.h"
 #include "Primitives/composite.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLComposite : public composite, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
+public:
+	OGLComposite(OpenGLImp *pParentImp);
 
 public:
-	OGLComposite(OpenGLImp *pParentImp) :
-		composite(pParentImp),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
-
 	// TODO: Need to make this better
-	RESULT UpdateBuffers() override {
-		return UpdateOGLBuffers();
-	}
+	virtual RESULT UpdateBuffers() override;
 };
+#pragma warning(pop)
 
 #endif // ! OGL_COMPOSITE_H_

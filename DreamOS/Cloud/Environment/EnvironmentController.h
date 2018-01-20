@@ -30,6 +30,7 @@ class EnvironmentControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
+	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -62,6 +63,7 @@ public:
 
 		// Assets
 		ENVIRONMENT_ASSET_SHARE,
+		ENVIRONMENT_STOP_SHARING,
 
 		INVALID
 	};
@@ -77,16 +79,21 @@ public:
 	class EnvironmentControllerObserver {
 	public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) = 0;
 		
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 		
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
+		virtual RESULT OnStopSending() = 0;
+		virtual RESULT OnStopReceiving() = 0;;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
@@ -116,7 +123,12 @@ public:
 	// TODO: Note - Register Controller Observer pattern needs to be fixed here
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
+	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") override;
 	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage);
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	long GetUserID();
@@ -146,10 +158,12 @@ private:
 
 	// PeerConnectionControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
@@ -167,6 +181,16 @@ public:
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	// Video
+	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
+	RESULT StartVideoStreaming(int pxDesiredWidth, int pxDesiredHeight, int desiredFPS, PIXEL_FORMAT pixelFormat);
+	RESULT StopVideoStreaming();
+	bool IsVideoStreamingRunning();
+
+	// Audio
+	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
+	float GetRunTimeMicAverage();
 
 	RESULT SetUser(User currentUser);
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);

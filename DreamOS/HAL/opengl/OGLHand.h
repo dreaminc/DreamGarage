@@ -12,20 +12,14 @@
 #include "OGLObj.h"
 #include "Primitives/hand.h"
 
+// Pyramid inheritance throws a dominance warning which needs to be suppressed 
+// until c++ adds a special keyword to deal with this issue, this is by design
+#pragma warning(push)
+#pragma warning(disable : 4250)
 class OGLHand : public hand, public OGLObj {
-protected:
-	DimObj *GetDimObj() {
-		return (DimObj*)this;
-	}
-
 public:
-	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type) :
-		hand(pParentImp, type),
-		OGLObj(pParentImp)
-	{
-		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
-	}
+	OGLHand(OpenGLImp *pParentImp, HAND_TYPE type);
 };
+#pragma warning(pop)
 
 #endif // ! OGL_HAND_H_

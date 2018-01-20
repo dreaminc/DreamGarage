@@ -16,10 +16,13 @@ public:
 		UI,
 		UIVIEW,
 		CLOUD,
+		WEBRTC,
 		HAL,
 		MATH,
 		ANIMATION,
 		OS,
+		SOUND,
+		SANDBOX,
 		INVALID
 	} ;
 

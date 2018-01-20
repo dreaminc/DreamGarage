@@ -2,6 +2,9 @@
 
 #include "DreamOS.h"
 
+#include "Cloud/Environment/PeerConnection.h"
+#include "DreamAppMessage.h"
+
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -48,6 +51,47 @@ RESULT DreamAppManager::SetMinFrameRate(double minFrameRate) {
 	return R_PASS;
 }
 
+RESULT DreamAppManager::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	auto dreamApps = GetDreamApp(pDreamAppMessage->GetDreamAppName());
+	CB((dreamApps.size() > 0));
+
+	for (auto &pDreamApp : dreamApps) {
+		CR(pDreamApp->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
+	}
+
+Error:
+	return r;
+}
+
+// TODO: This is not currently handling multiple apps with the same name
+std::vector<DreamAppBase*> DreamAppManager::GetDreamApp(std::string strDreamAppName) {
+	std::vector<DreamAppBase*> returnAppVector;
+
+	for (auto dreamAppEntry : m_appRegistry) {
+		auto &pDreamApp = dreamAppEntry.second;
+
+		if (pDreamApp->GetAppName() == strDreamAppName) {
+			returnAppVector.push_back(pDreamApp);
+		}
+	}
+
+	return returnAppVector;
+}
+
+bool DreamAppManager::FindDreamAppWithName(std::string strDreamAppName) {
+	for (auto dreamAppEntry : m_appRegistry) {
+		auto &pDreamApp = dreamAppEntry.second;
+
+		if (pDreamApp->GetAppName() == strDreamAppName) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 RESULT DreamAppManager::Update() {
 	RESULT r = R_PASS;
 
@@ -83,6 +127,12 @@ RESULT DreamAppManager::Update() {
 					// On shut down, don't update or push into run queue
 					CR(pDreamApp->Shutdown(nullptr));
 					CR(m_pDreamOS->RemoveObject(pDreamApp->GetComposite()));
+
+					UID pDreamAppUID = pDreamApp->GetAppUID();
+					if (m_appRegistry.count(pDreamAppUID) > 0) {
+						m_appRegistry.erase(pDreamAppUID);
+					}
+
 					continue;
 				}
 
@@ -145,6 +195,69 @@ RESULT DreamAppManager::ClearPriorityQueue() {
 
 		m_appPriorityQueue.pop();
 		//*/
+	}
+
+Error:
+	return r;
+}
+
+std::vector<UID> DreamAppManager::GetAppUID(std::string strName) {
+	std::vector<UID> appUIDs;
+	for (auto pApp : m_appRegistry) {
+		if (pApp.second->GetAppName() == strName) {
+			appUIDs.emplace_back(pApp.first);
+		}
+	}
+	return appUIDs;
+}
+
+DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingApp) {
+	DreamAppHandle* pAppHandle = nullptr;
+	RESULT r = R_PASS;
+
+	CN(pRequestingApp);
+//	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
+	CB(m_appRegistry.count(uid) > 0);
+	auto pApp = m_appRegistry[uid];
+	CN(pApp);
+	CB(pApp->GetAppUID() == uid);
+
+	//TODO: the real thing limiting getting a handle is whether there
+	//stored in the map, not whether the 'AppState' is true or not
+	//CB(m_appHandleRegistry.count(uid) == 0);
+	CB(	m_appHandleRegistry.count(uid) == 0 || 
+		pApp->GetHandleLimit() == -1 ||
+		m_appHandleRegistry[uid].size() < pApp->GetHandleLimit());
+	
+	pAppHandle = pApp->GetAppHandle();
+	pAppHandle->SetAppState(true);
+
+	CB(pAppHandle->GetAppState());
+	m_appHandleRegistry[uid].emplace_back(std::pair<DreamAppHandle*, DreamAppBase*>(pAppHandle, pRequestingApp));
+
+	return pAppHandle;
+Error:
+	return nullptr;
+}
+
+//TODO: ReleaseApp could function with only the uid argument
+RESULT DreamAppManager::ReleaseApp(DreamAppHandle* pHandle, UID uid, DreamAppBase* pRequestingApp) {
+	RESULT r = R_PASS;
+
+	//currently only allowing one captured app
+	CN(pHandle);
+	pHandle->SetAppState(false);
+
+	{
+		CB(m_appHandleRegistry.count(uid) > 0);
+
+		auto regBegin = m_appHandleRegistry[uid].begin();
+		auto regEnd = m_appHandleRegistry[uid].end();
+		auto appPair = std::pair<DreamAppHandle*, DreamAppBase*>(pHandle, pRequestingApp);
+
+		auto appPairIt = std::find(regBegin, regEnd, appPair);
+		CB(appPairIt != regEnd);
+		m_appHandleRegistry[uid].erase(appPairIt);
 	}
 
 Error:

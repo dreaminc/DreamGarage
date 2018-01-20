@@ -55,17 +55,13 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	CR(AddTestFont());
 
-	CR(AddTestBrowser());
-
-	CR(AddTestKeyboard());
+	CR(AddTestBrowserURL());
 
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestBrowserRequest());
-
-	CR(AddTestFont());
 
 	CR(AddTestUIMenuItem());
 
@@ -82,7 +78,6 @@ RESULT UITestSuite::AddTests() {
 
 	//CR(AddTestKeyboard());
 
-	//CR(AddTestBrowser());
 //	CR(AddTestInteractionFauxUI());
 
 
@@ -232,7 +227,7 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 
 		CR(SetupPipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			///*
@@ -328,7 +323,7 @@ RESULT UITestSuite::AddTestUIMenuItem() {
 
 		CR(SetupUINodePipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -418,7 +413,7 @@ RESULT UITestSuite::AddTestFont() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -426,7 +421,7 @@ RESULT UITestSuite::AddTestFont() {
 			CN(pFont);
 
 			// Fit to Scale
-			/*
+			//*
 			auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight * 4.0f , text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight, text::flags::TRAIL_ELLIPSIS);
 			CN(pText);
@@ -435,17 +430,19 @@ RESULT UITestSuite::AddTestFont() {
 
 			pTestContext->pText = pText;
 			pTestContext->timeLastUpdate = std::chrono::system_clock::now();
-			*/
+			//*/
 
+			/*
 			auto pText = m_pDreamOS->AddText(pFont, "abcdefghijklmnopqrstuvwxyz", lineHeight * 5.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, "abc def ghi jkl mno pqr stu vwx yz", lineHeight * 5.0f, lineHeight * 4.0f, text::flags::WRAP );
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
+			//*/
 
 			//pText->SetText("testing this \nthing");
 
-			/*
+			//*
 			pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
 			CN(pText);
 			//pText->RenderToQuad();
@@ -487,6 +484,49 @@ RESULT UITestSuite::AddTestFont() {
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
 			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.3f, 0.6f, text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, -2.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "password", 1.3f, 0.6f, text::flags::PASSWORD | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, -1.2f, 0.0f));
+
+			//expect "stestsword"
+			pText = m_pDreamOS->AddText(pFont, "password", 1.7f, 0.6f, text::flags::USE_CURSOR | text::flags::RENDER_QUAD);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 1.2f, 0.0f));
+			pText->SetCursorIndex(3);
+			pText->AddCharacter("t");
+			pText->AddCharacter("e");
+			pText->AddCharacter("s");
+			pText->AddCharacter("t");
+
+			pText->SetCursorIndex(2);
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			
+			// expect "passwordt"
+			pText = m_pDreamOS->AddText(pFont, "password", 2.0f, 0.6f, text::flags::RENDER_QUAD);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 2.2f, 0.0f));
+
+			// cursor index is not used while the USE_CURSOR flag is unset
+			pText->SetCursorIndex(3);
+			pText->AddCharacter("t");
+			pText->AddCharacter("e");
+			pText->AddCharacter("s");
+			pText->AddCharacter("t");
+			
+			pText->SetCursorIndex(2);
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
+			pText->RemoveCharacter();
 			//*/
 
 			// Layout
@@ -690,6 +730,82 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestBrowserURL() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		//std::string strURL = "http://www.youtube.com";
+		std::string strURL = "https://www.youtube.com/watch?v=K0igLdIH-Zc";
+
+		WebRequest webRequest;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		// Light it up
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the Shared View App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(10.0f);
+
+		
+		pDreamBrowser->SetURI(strURL);
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser URL Test");
+	pUITest->SetTestDescription("Basic test of browser working with a URL");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestBrowserRequest() {
 	RESULT r = R_PASS;
 
@@ -779,61 +895,6 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::SetupDreamAppPipeline() {
-	RESULT r = R_PASS;
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	//CR(pHAL->MakeCurrentContext());
-
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
-
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-Error:
-	return r;
-}
-
 RESULT UITestSuite::SetupUINodePipeline() {
 	RESULT r = R_PASS;
 
@@ -883,7 +944,7 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::SetupPipeline() {
+RESULT UITestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -895,11 +956,7 @@ RESULT UITestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 	
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -919,206 +976,6 @@ RESULT UITestSuite::SetupPipeline() {
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
-
-Error:
-	return r;
-}
-
-RESULT UITestSuite::AddTestDreamUIBar() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
-
-	auto fnInitialize = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		CN(m_pDreamOS);
-
-		CR(SetupDreamAppPipeline());
-		{
-			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
-		}
-
-	Error:
-		return r;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
-	};
-
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
-	CN(pUITest);
-
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
-
-Error:
-	return r;
-}
-
-RESULT UITestSuite::AddTestBrowser() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 6000.0f;
-	int nRepeats = 1;
-
-	auto fnInitialize = [&](void *pContext) {
-		RESULT r = R_PASS;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-
-		std::string strURL = "http://www.youtube.com";
-
-		CN(m_pDreamOS);
-
-		CR(SetupDreamAppPipeline());
-
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-
-		// Create the Shared View App
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
-
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(10.0f);
-
-		//pDreamContentView->SetScreenTexture(L"crate_color.png");
-		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
-		pDreamBrowser->SetURI(strURL);
-
-	Error:
-		return R_PASS;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code
-	auto fnUpdate = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		CR(r);
-
-	Error:
-		return r;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
-	};
-
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
-	CN(pUITest);
-
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(nRepeats);
-
-Error:
-	return r;
-}
-
-RESULT UITestSuite::AddTestKeyboard() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 10000.0;
-
-	struct TestContext : public Subscriber<SenseControllerEvent> {
-		std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
-
-		virtual RESULT Notify(SenseControllerEvent *event) override {
-			RESULT r = R_PASS;
-			if (event->type == SENSE_CONTROLLER_MENU_UP) {
-				//hardcoded values taken from DreamUIBar
-				CR(pKeyboard->UpdateComposite(-0.23f, -0.30f));
-			}
-		Error:
-			return r;
-		}
-	};
-	TestContext *pTestContext = new TestContext();
-
-	auto fnInitialize = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		CR(Initialize());
-		CR(SetupDreamAppPipeline());
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
-
-		CN(m_pDreamOS);
-
-		pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
-		pTestContext->pKeyboard->ShowKeyboard();
-		CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_UP, pTestContext));
-
-	Error:
-		return r;
-	};
-
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
-	};
-
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-	CN(pUITest);
-
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
-	pUITest->SetTestDuration(sTestTime);
-	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
@@ -1234,7 +1091,7 @@ RESULT UITestSuite::AddTestSharedContentView() {
 
 		CR(SetupPipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
 		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
@@ -1438,43 +1295,44 @@ Error:
 	return r;
 }
 
+// TODO: fix with new console 
 RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	OVERLAY_DEBUG_SET("event", "none");
+	//OVERLAY_DEBUG_SET("event", "none");
 
 	if (event->state.type == CONTROLLER_RIGHT) {
 		if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
-			OVERLAY_DEBUG_SET("event", "trigger move");
+			//OVERLAY_DEBUG_SET("event", "trigger move");
 		}
 		else if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
-			OVERLAY_DEBUG_SET("event", "pad move");
+			//OVERLAY_DEBUG_SET("event", "pad move");
 		}
 
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			OVERLAY_DEBUG_SET("event", "trigger down");
+			//OVERLAY_DEBUG_SET("event", "trigger down");
 		}
 
 		// TODO:  soon this code will be replaced with api requests, 
 		// as opposed to accessing the hard coded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			OVERLAY_DEBUG_SET("event", "trigger up");
+			//OVERLAY_DEBUG_SET("event", "trigger up");
 //			CR(m_pDreamUIBar->HandleSelect());
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			OVERLAY_DEBUG_SET("event", "menu up");
+			//OVERLAY_DEBUG_SET("event", "menu up");
 //			CR(m_pDreamUIBar->HandleMenuUp());
 		}
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
-		OVERLAY_DEBUG_SET("event", "grip down");
+		//OVERLAY_DEBUG_SET("event", "grip down");
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_UP) {
-		OVERLAY_DEBUG_SET("event", "grip up");
+		//OVERLAY_DEBUG_SET("event", "grip up");
 	}
 	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
-		OVERLAY_DEBUG_SET("event", "menu down");
+		//OVERLAY_DEBUG_SET("event", "menu down");
 	}
 //Error:
 	return r;

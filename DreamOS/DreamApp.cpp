@@ -63,3 +63,23 @@ double DreamAppBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
 }
 
+DreamAppHandle* DreamAppBase::GetAppHandle() {
+	return nullptr;
+}
+
+RESULT DreamAppBase::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	DreamOS *pDOS = GetDOS();
+
+	CN(pDOS);
+	CR(pDOS->BroadcastDreamAppMessage(pDreamAppMessage));
+
+Error:
+	return r;
+}
+
+unsigned int DreamAppBase::GetHandleLimit() {
+	return 1;
+}
+

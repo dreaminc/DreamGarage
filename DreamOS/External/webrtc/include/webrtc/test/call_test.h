@@ -7,23 +7,27 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifndef WEBRTC_TEST_CALL_TEST_H_
-#define WEBRTC_TEST_CALL_TEST_H_
+#ifndef TEST_CALL_TEST_H_
+#define TEST_CALL_TEST_H_
 
 #include <memory>
 #include <vector>
 
-#include "webrtc/call.h"
-#include "webrtc/test/fake_audio_device.h"
-#include "webrtc/test/fake_decoder.h"
-#include "webrtc/test/fake_encoder.h"
-#include "webrtc/test/frame_generator_capturer.h"
-#include "webrtc/test/rtp_rtcp_observer.h"
+#include "call/call.h"
+#include "call/rtp_transport_controller_send.h"
+#include "logging/rtc_event_log/rtc_event_log.h"
+#include "test/encoder_settings.h"
+#include "test/fake_audio_device.h"
+#include "test/fake_decoder.h"
+#include "test/fake_encoder.h"
+#include "test/fake_videorenderer.h"
+#include "test/frame_generator_capturer.h"
+#include "test/rtp_rtcp_observer.h"
+#include "test/single_threaded_task_queue.h"
 
 namespace webrtc {
 
 class VoEBase;
-class VoECodec;
 
 namespace test {
 
@@ -35,7 +39,9 @@ class CallTest : public ::testing::Test {
   virtual ~CallTest();
 
   static const size_t kNumSsrcs = 3;
-
+  static const int kDefaultWidth = 320;
+  static const int kDefaultHeight = 180;
+  static const int kDefaultFramerate = 30;
   static const int kDefaultTimeoutMs;
   static const int kLongTimeoutMs;
   static const uint8_t kVideoSendPayloadType;
@@ -44,13 +50,20 @@ class CallTest : public ::testing::Test {
   static const uint8_t kRedPayloadType;
   static const uint8_t kRtxRedPayloadType;
   static const uint8_t kUlpfecPayloadType;
+  static const uint8_t kFlexfecPayloadType;
   static const uint8_t kAudioSendPayloadType;
+  static const uint8_t kPayloadTypeH264;
+  static const uint8_t kPayloadTypeVP8;
+  static const uint8_t kPayloadTypeVP9;
   static const uint32_t kSendRtxSsrcs[kNumSsrcs];
   static const uint32_t kVideoSendSsrcs[kNumSsrcs];
   static const uint32_t kAudioSendSsrc;
+  static const uint32_t kFlexfecSendSsrc;
   static const uint32_t kReceiverLocalVideoSsrc;
   static const uint32_t kReceiverLocalAudioSsrc;
   static const int kNackRtpHistoryMs;
+  static const uint8_t kDefaultKeepalivePayloadType;
+  static const std::map<uint8_t, MediaType> payload_type_map_;
 
  protected:
   // RunBaseTest overwrites the audio_state and the voice_engine of the send and
@@ -66,15 +79,28 @@ class CallTest : public ::testing::Test {
 
   void CreateSendConfig(size_t num_video_streams,
                         size_t num_audio_streams,
+                        size_t num_flexfec_streams,
                         Transport* send_transport);
+
   void CreateMatchingReceiveConfigs(Transport* rtcp_send_transport);
 
-  void CreateFrameGeneratorCapturerWithDrift(Clock* drift_clock, float speed);
-  void CreateFrameGeneratorCapturer();
-  void CreateFakeAudioDevices();
+  void CreateFrameGeneratorCapturerWithDrift(Clock* drift_clock,
+                                             float speed,
+                                             int framerate,
+                                             int width,
+                                             int height);
+  void CreateFrameGeneratorCapturer(int framerate, int width, int height);
+  void CreateFakeAudioDevices(
+      std::unique_ptr<FakeAudioDevice::Capturer> capturer,
+      std::unique_ptr<FakeAudioDevice::Renderer> renderer);
 
   void CreateVideoStreams();
   void CreateAudioStreams();
+  void CreateFlexfecStreams();
+
+  void AssociateFlexfecStreamsWithVideoStreams();
+  void DissociateFlexfecStreamsFromVideoStreams();
+
   void Start();
   void Stop();
   void DestroyStreams();
@@ -82,7 +108,9 @@ class CallTest : public ::testing::Test {
 
   Clock* const clock_;
 
+  std::unique_ptr<webrtc::RtcEventLog> event_log_;
   std::unique_ptr<Call> sender_call_;
+  RtpTransportControllerSend* sender_call_transport_controller_;
   std::unique_ptr<PacketTransport> send_transport_;
   VideoSendStream::Config video_send_config_;
   VideoEncoderConfig video_encoder_config_;
@@ -96,13 +124,20 @@ class CallTest : public ::testing::Test {
   std::vector<VideoReceiveStream*> video_receive_streams_;
   std::vector<AudioReceiveStream::Config> audio_receive_configs_;
   std::vector<AudioReceiveStream*> audio_receive_streams_;
+  std::vector<FlexfecReceiveStream::Config> flexfec_receive_configs_;
+  std::vector<FlexfecReceiveStream*> flexfec_receive_streams_;
 
   std::unique_ptr<test::FrameGeneratorCapturer> frame_generator_capturer_;
   test::FakeEncoder fake_encoder_;
   std::vector<std::unique_ptr<VideoDecoder>> allocated_decoders_;
   size_t num_video_streams_;
   size_t num_audio_streams_;
+  size_t num_flexfec_streams_;
   rtc::scoped_refptr<AudioDecoderFactory> decoder_factory_;
+  rtc::scoped_refptr<AudioEncoderFactory> encoder_factory_;
+  test::FakeVideoRenderer fake_renderer_;
+
+  SingleThreadedTaskQueueForTesting task_queue_;
 
  private:
   // TODO(holmer): Remove once VoiceEngine is fully refactored to the new API.
@@ -112,12 +147,10 @@ class CallTest : public ::testing::Test {
     VoiceEngineState()
         : voice_engine(nullptr),
           base(nullptr),
-          codec(nullptr),
           channel_id(-1) {}
 
     VoiceEngine* voice_engine;
     VoEBase* base;
-    VoECodec* codec;
     int channel_id;
   };
 
@@ -126,6 +159,8 @@ class CallTest : public ::testing::Test {
 
   VoiceEngineState voe_send_;
   VoiceEngineState voe_recv_;
+  rtc::scoped_refptr<AudioProcessing> apm_send_;
+  rtc::scoped_refptr<AudioProcessing> apm_recv_;
 
   // The audio devices must outlive the voice engines.
   std::unique_ptr<test::FakeAudioDevice> fake_send_audio_device_;
@@ -134,6 +169,7 @@ class CallTest : public ::testing::Test {
 
 class BaseTest : public RtpRtcpObserver {
  public:
+  BaseTest();
   explicit BaseTest(unsigned int timeout_ms);
   virtual ~BaseTest();
 
@@ -142,18 +178,32 @@ class BaseTest : public RtpRtcpObserver {
 
   virtual size_t GetNumVideoStreams() const;
   virtual size_t GetNumAudioStreams() const;
+  virtual size_t GetNumFlexfecStreams() const;
+
+  virtual std::unique_ptr<FakeAudioDevice::Capturer> CreateCapturer();
+  virtual std::unique_ptr<FakeAudioDevice::Renderer> CreateRenderer();
+  virtual void OnFakeAudioDevicesCreated(FakeAudioDevice* send_audio_device,
+                                         FakeAudioDevice* recv_audio_device);
 
   virtual Call::Config GetSenderCallConfig();
   virtual Call::Config GetReceiverCallConfig();
+  virtual void OnRtpTransportControllerSendCreated(
+      RtpTransportControllerSend* controller);
   virtual void OnCallsCreated(Call* sender_call, Call* receiver_call);
 
-  virtual test::PacketTransport* CreateSendTransport(Call* sender_call);
-  virtual test::PacketTransport* CreateReceiveTransport();
+  virtual test::PacketTransport* CreateSendTransport(
+      SingleThreadedTaskQueueForTesting* task_queue,
+      Call* sender_call);
+  virtual test::PacketTransport* CreateReceiveTransport(
+      SingleThreadedTaskQueueForTesting* task_queue);
 
   virtual void ModifyVideoConfigs(
       VideoSendStream::Config* send_config,
       std::vector<VideoReceiveStream::Config>* receive_configs,
       VideoEncoderConfig* encoder_config);
+  virtual void ModifyVideoCaptureStartResolution(int* width,
+                                                 int* heigt,
+                                                 int* frame_rate);
   virtual void OnVideoStreamsCreated(
       VideoSendStream* send_stream,
       const std::vector<VideoReceiveStream*>& receive_streams);
@@ -165,8 +215,17 @@ class BaseTest : public RtpRtcpObserver {
       AudioSendStream* send_stream,
       const std::vector<AudioReceiveStream*>& receive_streams);
 
+  virtual void ModifyFlexfecConfigs(
+      std::vector<FlexfecReceiveStream::Config>* receive_configs);
+  virtual void OnFlexfecStreamsCreated(
+      const std::vector<FlexfecReceiveStream*>& receive_streams);
+
   virtual void OnFrameGeneratorCapturerCreated(
       FrameGeneratorCapturer* frame_generator_capturer);
+
+  virtual void OnStreamsStopped();
+
+  std::unique_ptr<webrtc::RtcEventLog> event_log_;
 };
 
 class SendTest : public BaseTest {
@@ -178,6 +237,7 @@ class SendTest : public BaseTest {
 
 class EndToEndTest : public BaseTest {
  public:
+  EndToEndTest();
   explicit EndToEndTest(unsigned int timeout_ms);
 
   bool ShouldCreateReceivers() const override;
@@ -186,4 +246,4 @@ class EndToEndTest : public BaseTest {
 }  // namespace test
 }  // namespace webrtc
 
-#endif  // WEBRTC_TEST_CALL_TEST_H_
+#endif  // TEST_CALL_TEST_H_

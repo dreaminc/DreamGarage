@@ -19,6 +19,7 @@
 class UserControllerProxy : public ControllerProxy {
 public:
 	virtual std::string GetUserToken() = 0;
+	virtual std::string GetPeerScreenName(long peerUserID) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -49,6 +50,7 @@ public:
 	
 	// Loads the user profile using the token
 	RESULT LoadProfile();
+	RESULT GetPeerProfile(long peerUserID);
 	RESULT LoadTwilioNTSInformation();
 
 	bool IsLoggedIn();
@@ -56,6 +58,7 @@ public:
 	// UserControllerProxy
 	UserControllerProxy* GetUserControllerProxy();
 	virtual std::string GetUserToken() override;
+	virtual std::string GetPeerScreenName(long peerUserID) override;
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) { return R_NOT_IMPLEMENTED; }
 
@@ -66,7 +69,7 @@ private:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
-	RESULT LoginWithOTK(std::string& strOTK);
+	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
 	long GetUserDefaultEnvironmentID();
 	User GetUser();
@@ -77,7 +80,7 @@ public:
 private:
 	bool m_fLoggedIn = false;
 	std::string	m_strToken;
-
+	std::string m_strPeerScreenName;
 	User m_user;
 	TwilioNTSInformation m_twilioNTSInformation;
 };

@@ -725,11 +725,80 @@ RESULT InteractionEngine::UpdateCapturedObjectStore() {
 	return R_PASS;
 }
 
+RESULT InteractionEngine::RemoveActiveObjects(std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove, std::pair<ActiveObject::type, ActiveObjectQueue*> activeObjectQueuePair, VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	for (auto &pActiveObject : activeObjectsToRemove[pInteractionObject]) {
+		// Notify no longer intersected
+		CR(activeObjectQueuePair.second->RemoveActiveObject(pActiveObject, pInteractionObject));
+
+		InteractionObjectEvent interactionEvent;
+
+		// Notify element intersect continue
+		// This uses the last available point
+		// TODO: Add projection , find exit point, do we need that?
+
+		if (activeObjectQueuePair.first == ActiveObject::type::INTERSECT) {
+			interactionEvent.m_eventType = InteractionEventType::ELEMENT_INTERSECT_ENDED;
+			interactionEvent.m_interactionRay = pInteractionObject->GetRay();
+		}
+		else if (activeObjectQueuePair.first == ActiveObject::type::COLLIDE) {
+			interactionEvent.m_eventType = InteractionEventType::ELEMENT_COLLIDE_ENDED;
+			interactionEvent.m_pInteractionObject = pInteractionObject;
+		}
+
+		interactionEvent.m_pObject = pActiveObject->GetObject();
+		interactionEvent.m_pEventObject = pActiveObject->GetEventObject();
+		interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
+		interactionEvent.m_activeState = pActiveObject->GetState();
+
+		// Lets cross check against active event objects to ensure against double releases 
+		// This will prevent the end event
+		if(activeObjectQueuePair.second->HasActiveEventObject(pInteractionObject, pActiveObject->GetEventObject()) == false) {
+			CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::RemoveObject(VirtualObj *pEventObject, ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+
+	for (auto &activeObjectQueuePair : m_activeObjectQueues) {
+		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
+		for (auto &pInteractionObject : m_interactionObjects) {
+			for (auto &pActiveObject : activeObjectQueuePair.second[pInteractionObject]) {
+				// Add to remove list if not intersected in current frame
+				if (pActiveObject->GetEventObject() == pEventObject) {
+					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+				}
+			}
+			auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueuePair.first, &activeObjectQueuePair.second);
+			CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
+		}
+	}
+
+	for (auto& capturePair : m_capturedObjects) {
+		for (auto& capturedObj : capturePair.second) {
+			if (capturedObj->GetObject() == pEventObject) {
+				m_capturedObjectsToRelease.emplace_back(std::pair<VirtualObj*, CapturedObj*>(capturePair.first, capturedObj));
+			}
+		}
+	}
+
+	UpdateCapturedObjectStore();
+
+Error:
+	return r;
+}
 
 // TODO: This is temporary
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
+	//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
 	for (auto &activeObjectQueue : m_activeObjectQueues) {
 
 		std::vector<VirtualObj*> capturedObjectsToRemove;
@@ -756,39 +825,9 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
 				}
 			}
-
-			for (auto &pActiveObject : activeObjectsToRemove[pInteractionObject]) {
-				// Notify no longer intersected
-				CR(activeObjectQueue.second.RemoveActiveObject(pActiveObject, pInteractionObject));
-
-				InteractionObjectEvent interactionEvent;
-
-				// Notify element intersect continue
-				// This uses the last available point
-				// TODO: Add projection , find exit point, do we need that?
-
-				if (activeObjectQueue.first == ActiveObject::type::INTERSECT) {
-					interactionEvent.m_eventType = InteractionEventType::ELEMENT_INTERSECT_ENDED;
-					interactionEvent.m_interactionRay = pInteractionObject->GetRay();
-				}
-				else if (activeObjectQueue.first == ActiveObject::type::COLLIDE) {
-					interactionEvent.m_eventType = InteractionEventType::ELEMENT_COLLIDE_ENDED;
-					interactionEvent.m_pInteractionObject = pInteractionObject;
-				}
-
-				interactionEvent.m_pObject = pActiveObject->GetObject();
-				interactionEvent.m_pEventObject = pActiveObject->GetEventObject();
-				interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
-				interactionEvent.m_activeState = pActiveObject->GetState();
-
-				// Lets cross check against active event objects to ensure against double releases 
-				// This will prevent the end event
-				if(activeObjectQueue.second.HasActiveEventObject(pInteractionObject, pActiveObject->GetEventObject()) == false) {
-					CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
-				}
-			}
+			auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
+			CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
 		}
-
 		CR(UpdateCapturedObjectStore());
 	}
 

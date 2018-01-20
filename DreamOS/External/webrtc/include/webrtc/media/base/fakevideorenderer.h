@@ -8,43 +8,42 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef WEBRTC_MEDIA_BASE_FAKEVIDEORENDERER_H_
-#define WEBRTC_MEDIA_BASE_FAKEVIDEORENDERER_H_
+#ifndef MEDIA_BASE_FAKEVIDEORENDERER_H_
+#define MEDIA_BASE_FAKEVIDEORENDERER_H_
 
-#include "webrtc/base/logging.h"
-#include "webrtc/base/sigslot.h"
-#include "webrtc/media/base/videoframe.h"
-#include "webrtc/media/base/videosinkinterface.h"
+#include "api/video/video_frame.h"
+#include "media/base/videosinkinterface.h"
+#include "rtc_base/criticalsection.h"
+#include "rtc_base/logging.h"
 
 namespace cricket {
 
 // Faked video renderer that has a callback for actions on rendering.
-class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
+class FakeVideoRenderer : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
  public:
   FakeVideoRenderer()
       : errors_(0),
         width_(0),
         height_(0),
         rotation_(webrtc::kVideoRotation_0),
-        timestamp_(0),
+        timestamp_us_(0),
         num_rendered_frames_(0),
         black_frame_(false) {}
 
-  virtual void OnFrame(const VideoFrame& frame) {
+  virtual void OnFrame(const webrtc::VideoFrame& frame) {
     rtc::CritScope cs(&crit_);
     // TODO(zhurunz) Check with VP8 team to see if we can remove this
     // tolerance on Y values. Some unit tests produce Y values close
     // to 16 rather than close to zero, for supposedly black frames.
     // Largest value observed is 34, e.g., running
-    // P2PTestConductor.LocalP2PTest16To9 (peerconnection_unittests).
+    // PeerConnectionIntegrationTest.SendAndReceive16To9AspectRatio.
     black_frame_ = CheckFrameColorYuv(0, 48, 128, 128, 128, 128, &frame);
     // Treat unexpected frame size as error.
     ++num_rendered_frames_;
     width_ = frame.width();
     height_ = frame.height();
     rotation_ = frame.rotation();
-    timestamp_ = frame.GetTimeStamp();
-    SignalRenderFrame(&frame);
+    timestamp_us_ = frame.timestamp_us();
   }
 
   int errors() const { return errors_; }
@@ -61,9 +60,9 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
     return rotation_;
   }
 
-  int64_t timestamp() const {
+  int64_t timestamp_us() const {
     rtc::CritScope cs(&crit_);
-    return timestamp_;
+    return timestamp_us_;
   }
   int num_rendered_frames() const {
     rtc::CritScope cs(&crit_);
@@ -74,9 +73,6 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
     return black_frame_;
   }
 
-  sigslot::signal3<int, int, int> SignalSetSize;
-  sigslot::signal1<const VideoFrame*> SignalRenderFrame;
-
  private:
   static bool CheckFrameColorYuv(uint8_t y_min,
                                  uint8_t y_max,
@@ -84,16 +80,18 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
                                  uint8_t u_max,
                                  uint8_t v_min,
                                  uint8_t v_max,
-                                 const cricket::VideoFrame* frame) {
+                                 const webrtc::VideoFrame* frame) {
     if (!frame || !frame->video_frame_buffer()) {
       return false;
     }
+    rtc::scoped_refptr<const webrtc::I420BufferInterface> i420_buffer =
+        frame->video_frame_buffer()->ToI420();
     // Y
     int y_width = frame->width();
     int y_height = frame->height();
-    const uint8_t* y_plane = frame->video_frame_buffer()->DataY();
+    const uint8_t* y_plane = i420_buffer->DataY();
     const uint8_t* y_pos = y_plane;
-    int32_t y_pitch = frame->video_frame_buffer()->StrideY();
+    int32_t y_pitch = i420_buffer->StrideY();
     for (int i = 0; i < y_height; ++i) {
       for (int j = 0; j < y_width; ++j) {
         uint8_t y_value = *(y_pos + j);
@@ -104,14 +102,14 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
       y_pos += y_pitch;
     }
     // U and V
-    int chroma_width = (frame->width() + 1)/2;
-    int chroma_height = (frame->height() + 1)/2;
-    const uint8_t* u_plane = frame->video_frame_buffer()->DataU();
-    const uint8_t* v_plane = frame->video_frame_buffer()->DataV();
+    int chroma_width = i420_buffer->ChromaWidth();
+    int chroma_height = i420_buffer->ChromaHeight();
+    const uint8_t* u_plane = i420_buffer->DataU();
+    const uint8_t* v_plane = i420_buffer->DataV();
     const uint8_t* u_pos = u_plane;
     const uint8_t* v_pos = v_plane;
-    int32_t u_pitch = frame->video_frame_buffer()->StrideU();
-    int32_t v_pitch = frame->video_frame_buffer()->StrideV();
+    int32_t u_pitch = i420_buffer->StrideU();
+    int32_t v_pitch = i420_buffer->StrideV();
     for (int i = 0; i < chroma_height; ++i) {
       for (int j = 0; j < chroma_width; ++j) {
         uint8_t u_value = *(u_pos + j);
@@ -133,7 +131,7 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
   int width_;
   int height_;
   webrtc::VideoRotation rotation_;
-  int64_t timestamp_;
+  int64_t timestamp_us_;
   int num_rendered_frames_;
   bool black_frame_;
   rtc::CriticalSection crit_;
@@ -141,4 +139,4 @@ class FakeVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
 
 }  // namespace cricket
 
-#endif  // WEBRTC_MEDIA_BASE_FAKEVIDEORENDERER_H_
+#endif  // MEDIA_BASE_FAKEVIDEORENDERER_H_
