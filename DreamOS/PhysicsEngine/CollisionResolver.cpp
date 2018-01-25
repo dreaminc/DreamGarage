@@ -137,7 +137,8 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		*/
 
 		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.05f;		// Penetration percentage to correct
+			const double percentCorrection = 1.000025f;		// Penetration percentage to correct
+			//const double percentCorrection = 0.95f;		// Penetration percentage to correct
 			vector vCorrection = vNormal * penetration * (percentCorrection);
 			
 			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
@@ -168,7 +169,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.6f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
 		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
@@ -208,6 +209,9 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vTorqueA = vImpulse.cross(vRefA) * (-1.0f) * angularInertiaA;
 		vector vTorqueB = vImpulse.cross(vRefB) * (1.0f) * angularInertiaB;
 
+		//vector vTorqueA = vImpulseA.cross(vRefA) * angularInertiaA * -1.0f;
+		//vector vTorqueB = vImpulseB.cross(vRefB) * angularInertiaB * -1.0f;
+
 		vTorqueA.w() = 0.0f;
 		vTorqueB.w() = 0.0f;
 
@@ -236,7 +240,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		pObjB->ApplyTorqueImpulse(vTorqueB);
 
 		// Friction
-		double uConstant = 0.3f;
+		double uConstant = 0.4f;
 		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
 		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f * uConstant;
 		jFrictionImpulse /= denom;
@@ -244,10 +248,10 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		if (vTangent.IsValid() && jFrictionImpulse != 0.0f) {
 			vector vFrictionImpulse = vTangent * jFrictionImpulse * uConstant;
 
-			vector vFrictionImpulseA = vFrictionImpulse * (1.0f);				// *kgInverseMassA;
-			vector vFrictionImpulseB = vFrictionImpulse * (-1.0f);				// *-kgInverseMassB;
-			vector vFrictionTorqueA = vFrictionImpulse.cross(vRefA) * (-1.0f);	// *angularInertiaA;
-			vector vFrictionTorqueB = vFrictionImpulse.cross(vRefB) * (1.0f);	// *angularInertiaB;
+			vector vFrictionImpulseA = vFrictionImpulse * (1.0f);				// * kgInverseMassA;
+			vector vFrictionImpulseB = vFrictionImpulse * (-1.0f);				// * -kgInverseMassB;
+			vector vFrictionTorqueA = vFrictionImpulse.cross(vRefA) * (-1.0f);	// * angularInertiaA;
+			vector vFrictionTorqueB = vFrictionImpulse.cross(vRefB) * (1.0f);	// * angularInertiaB;
 
 			pObjA->Impulse(vFrictionImpulseA);
 			pObjB->Impulse(vFrictionImpulseB);

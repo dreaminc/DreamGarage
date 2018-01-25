@@ -11,6 +11,8 @@
 #include <functional>
 #include <memory>
 
+#include "Scene/ObjectStoreNode.h"
+
 class DreamOS;
 
 class PhysicsEngineTestSuite : public TestSuite {
@@ -20,6 +22,8 @@ public:
 
 	virtual RESULT AddTests() override;
 
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
+
 	RESULT AddTestCompositeRay();
 	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
@@ -27,6 +31,7 @@ public:
 	RESULT AddTestRayQuadsComposite();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
+	RESULT AddTestVolumeToPlaneVolumeDominos();
 	RESULT AddTestVolumeToPlaneVolume();
 	RESULT AddTestSphereVsSphereArray();
 	RESULT AddTestSphereVsSphere();
@@ -51,11 +56,11 @@ public:
 
 
 private:
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 	RESULT ResetTest(void *pContext);
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 
 };
 

@@ -6,6 +6,7 @@
 
 #include "VirtualObj.h"
 #include "PhysicsEngine/CollisionManifold.h"
+#include "PhysicsEngine/Simplex.h"
 
 BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
 	BoundingVolume(pParentObject),
@@ -111,8 +112,180 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
-bool BoundingBox::Intersect(const BoundingBox& rhs) {
+point BoundingBox::GetFarthestPointInDirection(vector vDirection) {
+	
+	// First orient vDirection to box (easier if AABB)
+
 	if (m_type == Type::AABB) {
+		point ptReturn;
+	
+		point ptMax = GetMaxPoint();
+		point ptMin = GetMinPoint();
+	
+		ptReturn.x() = vDirection.x() >= 0 ? ptMax.x() : ptMin.x();
+		ptReturn.y() = vDirection.y() >= 0 ? ptMax.y() : ptMin.y();
+		ptReturn.z() = vDirection.z() >= 0 ? ptMax.z() : ptMin.z();
+	
+		return ptReturn;
+	}
+	else {
+		RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());
+		vector vDirectionAdjust = inverse(matRotation) * vDirection;
+
+		point ptReturn;
+
+		point ptMax = GetHalfVector();
+
+		ptReturn.x() = vDirectionAdjust.x() >= 0 ? ptMax.x() : -ptMax.x();
+		ptReturn.y() = vDirectionAdjust.y() >= 0 ? ptMax.y() : -ptMax.y();
+		ptReturn.z() = vDirectionAdjust.z() >= 0 ? ptMax.z() : -ptMax.z();
+
+		ptReturn = GetOrigin() + (vector)(matRotation * ptReturn);
+
+		return ptReturn;
+	}
+
+	// Keeping this since it's pretty useful code for a point cloud 
+	//BoundingBox::BoxPoint bestBoxPoint;
+	//float bestDotProd = -INFINITY;
+	//point ptBestPoint;
+	//
+	//for (int i = 0; i < (int)BoundingBox::BoxPoint::INVALID; i++) {
+	//	point ptBox = GetBoxPoint((BoundingBox::BoxPoint)(i), true);
+	//
+	//	float d = ((vector)(ptBox)).dot(vDirection);
+	//
+	//	if (d > bestDotProd) {
+	//		bestBoxPoint = (BoundingBox::BoxPoint)(i);
+	//		bestDotProd = d;
+	//		ptBestPoint = ptBox;
+	//	}
+	//
+	//}
+	//
+	//return ptBestPoint;	
+}
+
+point BoundingBox::GetSupportPoint(const BoundingBox& bbA, const BoundingBox& bbB, vector vDirection) {
+	point ptBBA = static_cast<BoundingBox>(bbA).GetFarthestPointInDirection(vDirection);
+	point ptBBB = static_cast<BoundingBox>(bbB).GetFarthestPointInDirection(-1.0f * vDirection);
+
+	return (point)(ptBBA - ptBBB);
+}
+
+// Project half size onto vector axis
+double BoundingBox::TransformToAxis(const vector &vAxis) {
+	double retVal = 0.0f;
+
+	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
+	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
+	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
+
+	return retVal;
+}
+
+double TransformToAxis(const vector &vAxis, vector vHalfVector, const vector vAxes[3]) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.dot(vAxes[0]));
+	retVal += vHalfVector.y() * std::abs(vAxis.dot(vAxes[1]));
+	retVal += vHalfVector.z() * std::abs(vAxis.dot(vAxes[2]));
+
+	return retVal;
+}
+
+double TransformToAxisAABB(vector vAxis, vector vHalfVector) {
+	double retVal = 0.0f;
+
+	retVal += vHalfVector.x() * std::abs(vAxis.x());
+	retVal += vHalfVector.y() * std::abs(vAxis.y());
+	retVal += vHalfVector.z() * std::abs(vAxis.z());
+
+	return retVal;
+}
+
+// This treats box A as AABB and box B as OBB
+double OverlapAxisDistanceAABBOBB(const vector &vAxis,
+	vector vHalfVectorA, vector vAxesA[3],
+	vector vHalfVectorB, point ptOriginB, vector vAxesB[3])
+{
+
+	double projectA = TransformToAxisAABB(vAxis, vHalfVectorA);
+
+	//double projectA = TransformToAxis(vAxis, vHalfVectorA, vAxesA);
+	double projectB = TransformToAxis(vAxis, vHalfVectorB, vAxesB);
+
+	// Which direction (negate the axis)
+	double distanceBetweenObjects = ((vector)ptOriginB).dot(vAxis);
+	distanceBetweenObjects = std::abs(distanceBetweenObjects);
+
+	return (projectA + projectB) - distanceBetweenObjects;
+}
+
+bool IntersectSATAABB(const BoundingBox& lhs, const BoundingBox& rhs) {
+	
+	double temp;
+	double minAxisDistance = std::numeric_limits<double>::infinity();
+	vector vAxis, vAxisTemp;
+	float penetration = 0.0f;
+
+	// Move test into space of this bounding box
+	point ptBoxAOrigin = static_cast<BoundingBox>(lhs).GetAbsoluteOrigin();
+	vector vBoxAHV = static_cast<BoundingBox>(lhs).GetHalfVector();
+	quaternion qBoxAOrientation = static_cast<BoundingBox>(lhs).GetAbsoluteOrientation();
+
+	RotationMatrix matRotation = RotationMatrix(qBoxAOrientation);
+	auto matTransposeRotation = transpose(matRotation);
+
+	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
+	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
+	quaternion qBoxBOrientation = static_cast<BoundingBox>(rhs).GetAbsoluteOrientation();
+
+	vector vAxesA[3], vAxesB[3];
+
+	// Probably can replace this
+	vAxesA[0] = vector::iVector(1.0f);
+	vAxesA[1] = vector::jVector(1.0f);
+	vAxesA[2] = vector::kVector(1.0f);
+
+	// Get Box B axes in A space
+	for (int i = 0; i < 3; i++) {
+		vAxesB[i] = matTransposeRotation * static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i));
+	}
+	ptBoxBOrigin = matTransposeRotation * (ptBoxBOrigin - ptBoxAOrigin);
+
+	for (int i = 0; i < 3; i++) {
+		vector vAxisA = vAxesA[i];
+
+		// Self Box Axes
+		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisA, vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+			return false;
+		}
+
+		// The other box Axes (todo: test if it's an OBB)
+		if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxesB[i], vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+			return false;
+		}
+
+		// Go through the cross product of each of the axes
+		for (int j = 0; j < 3; j++) {
+			vector vAxisB = vAxesB[j];
+
+			// Ensure not same
+			if (vAxisA != vAxisB) {
+				if (temp = OverlapAxisDistanceAABBOBB(vAxisTemp = vAxisB.cross(vAxisA), vBoxAHV, vAxesA, vBoxBHV, ptBoxBOrigin, vAxesB) < 0.0f) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool BoundingBox::IntersectSAT(const BoundingBox& rhs) {
+	if (m_type == Type::AABB) {
+		// TODO: Doesn't think about other box as AABB or not
 		point ptMaxA = GetAbsoluteOrigin() + GetHalfVector();
 		point ptMinA = GetAbsoluteOrigin() - GetHalfVector();
 
@@ -152,44 +325,627 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	return false;
 }
 
+bool BoundingBox::IntersectGJK(const BoundingBox& rhs) {
+	Simplex intersectionSimplex = Simplex();
+
+	vector vDirection = vector::iVector(1.0f);
+
+	// First point
+	point ptSupport = GetSupportPoint(*this, rhs, vDirection);
+	intersectionSimplex.UpdateSimplex(ptSupport, &vDirection);
+
+	do {
+		ptSupport = GetSupportPoint(*this, rhs, vDirection);
+
+		if (vDirection.dot(ptSupport) < 0.0f) {
+			return false;
+		}
+
+		if (intersectionSimplex.UpdateSimplex(ptSupport, &vDirection)) {
+			return true;
+		}
+
+	} while (1);
+
+	return false;
+}
+
+bool BoundingBox::Intersect(const BoundingBox& rhs) {
+
+	return IntersectSATAABB(*this, rhs);
+	//return IntersectSAT(rhs);
+	//return IntersectGJK(rhs);
+	
+}
+
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
+	return CollideSAT(rhs);
+	//return CollideBruteForce(rhs);
+
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
-	// SAT to get contact normal 
-	// TODO: Push to contained function, repeated from above
-	double temp;
-	double minAxisDistance = std::numeric_limits<double>::infinity();
+	// TODO:
+
+	return manifold;
+}
+
+// http://www.willperone.net/Code/coderr.php
+vector BoundingBox::GetHalfVector(bool fAbsolute) {
+	vector vScale = GetScale(fAbsolute);
+
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+
+		double width = 0.0f;
+		double height = 0.0f;
+		double length = 0.0f;
+
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+
+			if (pt.x() > width)
+				width = pt.x();
+
+			if (pt.y() > height)
+				height = pt.y();
+
+			if (pt.z() > length)
+				length = pt.z();
+		}
+
+		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
+	}
+
+	// Otherwise it's OBB
+	//return m_vHalfSize;
+	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
+}
+
+double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	double selfProject = TransformToAxis(vAxis);
+	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
+
+	return (selfProject + rhsProject) - std::abs(vToCenter.dot(vAxis));
+}
+
+bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	//double selfProject = TransformToAxis(vAxis);
+	//double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	//return (OverlapOnAxisDistance(rhs, vAxis) <= (selfProject + rhsProject));
+	return (OverlapOnAxisDistance(rhs, vAxis) >= 0.0f);
+}
+
+//double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
+//	// Project the half-size of one onto axis
+//	double selfProject = TransformToAxis(vAxis);
+//	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+//
+//	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
+//	return (selfProject + rhsProject) - std::abs(vToCenter.dot(vAxis));
+//}
+
+vector BoundingBox::GetAxis(BoxAxis boxAxis, bool fOriented) {
+	vector retVector = vector(0.0f, 0.0f, 0.0f);
+
+	switch (boxAxis) {
+	case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
+	case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
+	case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+	}
+
+	// Rotate by OBB if so
+	//if (m_type == Type::OBB) {
+	if (fOriented && m_type == Type::OBB) {
+		retVector = RotationMatrix(GetAbsoluteOrientation()) * retVector;
+		retVector.Normalize();
+	}
+
+	return retVector;
+}
+
+inline double GetAABBOBBSeparation(vector vAxis, vector vTranslation,
+	vector vAABBHalfVector, vector vOBBHalfVector, matrix<float, 4, 4> matRelRotation)
+{
+	double translation = std::abs(vTranslation.dot(vAxis));
+
+	//double projAABB = std::abs(vAABBHalfVector.dot(vAxis)); //+ std::abs(vOBBHalfVector.dot(vAxis));
+
+	vector vAxisAX = vector::iVector(1.0f);
+	vector vAxisAY = vector::jVector(1.0f);
+	vector vAxisAZ = vector::kVector(1.0f);
+
+	double projAABB = std::abs(vAABBHalfVector.x() * vAxis.dot(vAxisAX));
+	projAABB += std::abs(vAABBHalfVector.y() * vAxis.dot(vAxisAY));
+	projAABB += std::abs(vAABBHalfVector.z() * vAxis.dot(vAxisAZ));
+	
+	vector vAxisBX = ((vector)(matRelRotation * vector::iVector(1.0f))).Normal();
+	vector vAxisBY = ((vector)(matRelRotation * vector::jVector(1.0f))).Normal();
+	vector vAxisBZ = ((vector)(matRelRotation * vector::kVector(1.0f))).Normal();
+
+	double projOBB = std::abs(vOBBHalfVector.x() * vAxis.dot(vAxisBX));
+	projOBB += std::abs(vOBBHalfVector.y() * vAxis.dot(vAxisBY));
+	projOBB += std::abs(vOBBHalfVector.z() * vAxis.dot(vAxisBZ));
+
+	double separation = translation - (projOBB + projAABB);
+
+	return separation;
+}
+
+// TODO: Before done - clean everything up and create a proper transpose matrix function
+
+#define SAT_EPSILON 1.192092896e-07f
+
+CollisionManifold BoundingBox::CollideSAT(const BoundingBox& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	double minSeparationDistance = -INFINITY;
 	vector vAxis, vAxisTemp;
+	double penetration = 0.0f;
+	float separation = 0.0f;
+
+	// Move test into space of this bounding box
+	point ptBoxAOrigin = GetAbsoluteOrigin();
+	vector vBoxAHV = GetHalfVector();
+
+	RotationMatrix matRotationA = RotationMatrix(GetAbsoluteOrientation());
+	auto matTransposeRotationA = transpose(matRotationA);
+
+	point ptBoxBOrigin = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin();
+	vector vBoxBHV = static_cast<BoundingBox>(rhs).GetHalfVector();
+
+	RotationMatrix matRotationB = RotationMatrix(static_cast<BoundingBox>(rhs).GetAbsoluteOrientation());
+
+	vector vAxesA[3], vAxesB[3];
+
+	vAxesA[0] = vector::iVector(1.0f); 
+	vAxesA[1] = vector::jVector(1.0f); 
+	vAxesA[2] = vector::kVector(1.0f);
+
+	vector vTranslationAB = matTransposeRotationA * (ptBoxBOrigin - ptBoxAOrigin);
+	auto matRelativeRotation = matTransposeRotationA * matRotationB;
+
+	vector vBHVRelativeToA = matRelativeRotation * vBoxBHV;
+	vBHVRelativeToA = absolute(vBHVRelativeToA);
+
+	// Get Box B axes in A space
 	for (int i = 0; i < 3; i++) {
-		// Self Box Axes
-		if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = GetAxis(BoundingBox::BoxAxis(i)))) {
-			if (temp < minAxisDistance) {
-				minAxisDistance = temp;
-				vAxis = vAxisTemp;
-			}
-			//break;
-		}
+		vAxesB[i] = matRelativeRotation * vAxesA[i];
+		vAxesB[i].Normalize();
+	}
 
-		// The other box Axes (todo: test if it's an OBB)
-		if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i)))) {
-			if (temp < minAxisDistance) {
-				minAxisDistance = temp;
-				vAxis = vAxisTemp;
-			}
-			//break;
-		}
+	for (int i = 0; i < 3; i++) {
+		vAxisTemp = vAxesA[i];
 
-		// Go through the cross product of each of the axes
+		separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+		if (separation > (minSeparationDistance + SAT_EPSILON)) {
+			minSeparationDistance = separation;
+			penetration = separation;
+			vAxis = vAxisTemp;
+		}
+	}
+
+	for (int i = 0; i < 3; i++) {
+		vAxisTemp = vAxesB[i];
+		separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+		if (separation > (minSeparationDistance + SAT_EPSILON)) {
+			minSeparationDistance = separation;
+			penetration = separation;
+			vAxis = vAxisTemp;
+		}
+	}
+
+	///*
+	// Go through the cross product of each of the axes
+	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = GetAxis(BoundingBox::BoxAxis(i)).cross(static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(j))))) {
-				if (temp < minAxisDistance) {
-					minAxisDistance = temp;
+
+			// Ensure not same
+			if (vAxesB[j] != vAxesA[i]) {
+
+				vAxisTemp = vAxesA[i].NormalizedCross(vAxesB[j]);
+				//vAxisTemp = vAxesB[j].cross(vAxesA[i]);
+
+				separation = GetAABBOBBSeparation(vAxisTemp, vTranslationAB, vBoxAHV, vBoxBHV, matRelativeRotation);
+				if (separation > minSeparationDistance + SAT_EPSILON) {
+					minSeparationDistance = separation;
+					penetration = separation;
 					vAxis = vAxisTemp;
 				}
-				break;
 			}
 		}
 	}
+	//*/
+
+
+	// Use translation vector to figure out direction of normal
+	if (vAxis.dot(vTranslationAB) < 0.0f) {
+		vAxis *= -1.0f;
+	}
+	//
+	vector vNormal = matRotationA * vAxis;
+
+	// Find the incident vector - Find most negative dot prod
+	vector vFaceVectorReference;
+	vector vFaceVectorIncident;
+	float bestDotProdIncident = 0.0f;
+	float bestDotProdReference = 0.0f;
+	int bestAxisIncident = 0;
+	int bestAxisReference = 0;
+	bool fNegativeIncident = false;
+	bool fNegativeReference = false;
+	float d;
+
+	// There is definitely a faster way to do this
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 2; j++) {
+			vector vTemp;
+
+			// Reference Face
+			if (j == 1) {
+				vTemp = (-1.0f * vAxesA[i]);
+			}
+			else {
+				vTemp = (vAxesA[i]);
+			}
+
+			// Use axis (not normal)
+			d = vAxis.dot(vTemp);
+
+			if (d > bestDotProdReference + SAT_EPSILON) {
+
+				bestDotProdReference = d;
+				bestAxisReference = i;
+				fNegativeReference = (bool)(j);
+
+				vFaceVectorReference = vTemp;
+			}
+
+			// Incident Face
+			if(j == 1) {
+				vTemp = matRotationB * (-1.0f * vAxesA[i]);
+			}
+			else {
+				vTemp = matRotationB * vAxesA[i];
+			}
+
+			d = vNormal.dot(vTemp);
+
+			if (d < (bestDotProdIncident - SAT_EPSILON)) {
+
+				bestDotProdIncident = d;
+				bestAxisIncident = i;
+				fNegativeIncident = (bool)(j);
+
+				vFaceVectorIncident = vTemp;
+			}
+		}
+	}
+
+	// Iterate the incident face points against box A
+
+	// Get the incident face given the axis
+	BoundingBox::face boxBIncidentFace = BoundingBox::face(bestAxisIncident, fNegativeIncident, vBoxBHV);
+
+	// TODO: formalize this
+	// Apply rotation of B
+	//boxBIncidentFace.ApplyMatrix(matRotationB);
+	
+	// Apply A
+	//boxBIncidentFace.ApplyMatrix(matTransposeRotationA);
+
+	boxBIncidentFace.ApplyMatrix(matRelativeRotation);
+	boxBIncidentFace.Translate(vTranslationAB);
+
+	// Debug: This will add the incident face
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxBIncidentFace.m_points[i];
+	//	//ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
+
+	///*
+	// Now that we have the face, clip it against our planes
+	for (int i = 0; i < 4; i++) {
+		float xAbsVal = std::abs(boxBIncidentFace.m_points[i].x());
+		float yAbsVal = std::abs(boxBIncidentFace.m_points[i].y());
+		float zAbsVal = std::abs(boxBIncidentFace.m_points[i].z());
+
+		if (xAbsVal < vBoxAHV.x() &&
+			yAbsVal < vBoxAHV.y() &&
+			zAbsVal < vBoxAHV.z()) 
+		{
+			// point is in there, re-orient
+			point ptContact = (matRotationA * boxBIncidentFace.m_points[i]) + ptBoxAOrigin;
+			penetration = -minSeparationDistance;
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
+	}
+	//*/
+
+	// Iterate the reference face points against box B
+	///*
+	// Reference Face
+	BoundingBox::face boxAReferenceFace = BoundingBox::face(bestAxisReference, fNegativeReference, vBoxAHV);
+
+	//// Debug: This will add the reference face
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxAReferenceFace.m_points[i];
+	//	ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
+
+	// TODO: formalize this
+	// Apply rotation of B
+	auto matTransposeRotationB = transpose(matRotationB);
+	boxAReferenceFace.ApplyMatrix(matRotationA);
+	boxAReferenceFace.Translate(ptBoxAOrigin - ptBoxBOrigin);
+
+	// Apply A
+	boxAReferenceFace.ApplyMatrix(matTransposeRotationB);
+
+	//// Debug: This will add the reference face
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxAReferenceFace.m_points[i];
+	//	//ptRef = (matRotationB * ptRef) + ptBoxBOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
+
+	// Now we have the reference face in terms of B, test against B
+	for (int i = 0; i < 4; i++) {
+		float xAbsVal = std::abs(boxAReferenceFace.m_points[i].x());
+		float yAbsVal = std::abs(boxAReferenceFace.m_points[i].y());
+		float zAbsVal = std::abs(boxAReferenceFace.m_points[i].z());
+
+		if (xAbsVal < vBoxBHV.x() &&
+			yAbsVal < vBoxBHV.y() &&
+			zAbsVal < vBoxBHV.z())
+		{
+			// point is in there, re-orient
+			point ptContact = (matRotationB * boxAReferenceFace.m_points[i]) + ptBoxBOrigin;
+			penetration = -minSeparationDistance;
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
+
+		// TODO: I don't think this is right,
+		// but we need to not pass back the supporting edge
+		// collisions sometimes (this needs to be more general)
+		//if (manifold.NumContacts() > 0) {
+		//	return manifold;
+		//}
+	}
+	//*/
+
+	// Edges
+	///*
+
+	//for (int i = 0; i < 4; i++) {
+	//	point ptRef = boxBIncidentFace.m_points[i];
+	//	//ptRef = (matRotationA * ptRef) + ptBoxAOrigin;
+	//	manifold.AddContactPoint(ptRef, vNormal, penetration, 1);
+	//}
+
+	// Incident Face
+
+	for (int j = 0; j < 4; j++) {
+		line edgeLine; 
+		
+		int a = j + 1;
+		int b = j;
+
+		if (j == 3) {
+			a = 0;
+			b = j;
+		}
+
+		edgeLine = line(boxBIncidentFace.m_points[a], boxBIncidentFace.m_points[b]);
+
+		vector vEdgeDirection = edgeLine.GetVector();
+
+		// We can now test intersection as if it's an AABB
+		point ptMax = (point)vBoxAHV;
+		point ptMin = (point)(-1.0f * vBoxAHV);
+
+		double tNear = -INFINITY;
+		double tFar = INFINITY;
+		bool fMiss = false;
+
+		for (int i = 0; i < 3; i++) {
+
+			if (std::abs(vEdgeDirection(i)) < DREAM_EPSILON) {
+				if (ptMin(i) - edgeLine.a()(i) > 0 || ptMax(i) - edgeLine.a()(i) < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+			else {
+				double t1 = (ptMin(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+				double t2 = (ptMax(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+
+				double tMin = std::min(t1, t2);
+				double tMax = std::max(t1, t2);
+
+				if (tMin > tNear)
+					tNear = tMin;
+
+				if (tMax < tFar)
+					tFar = tMax;
+
+				if (tNear > tFar || tFar < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+		}
+
+		if (fMiss) {
+			continue;
+		}
+
+		if ((tNear >= 0 && tNear <= 1) && (tFar >= 0 && tFar <= 1)) {
+			point ptEdgeMin = edgeLine.a() + (vEdgeDirection * tNear);
+			point ptEdgeMax = edgeLine.a() + (vEdgeDirection * tFar);
+			point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
+		
+			point ptContact = (matRotationA * ptEdgeMid) + ptBoxAOrigin;
+			penetration = -minSeparationDistance;
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
+	}	
+
+	// Reference Face
+	for (int j = 0; j < 4; j++) {
+		line edgeLine;
+
+		int a = j + 1;
+		int b = j;
+
+		if (j == 3) {
+			a = 0;
+			b = j;
+		}
+
+		edgeLine = line(boxAReferenceFace.m_points[a], boxAReferenceFace.m_points[b]);
+
+		vector vEdgeDirection = edgeLine.GetVector();
+
+		// We can now test intersection as if it's an AABB
+		point ptMax = (point)vBoxBHV;
+		point ptMin = (point)(-1.0f * vBoxBHV);
+
+		double tNear = -INFINITY;
+		double tFar = INFINITY;
+		bool fMiss = false;
+
+		for (int i = 0; i < 3; i++) {
+
+			if (std::abs(vEdgeDirection(i)) < DREAM_EPSILON) {
+				if (ptMin(i) - edgeLine.a()(i) > 0 || ptMax(i) - edgeLine.a()(i) < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+			else {
+				double t1 = (ptMin(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+				double t2 = (ptMax(i) - edgeLine.a()(i)) / vEdgeDirection(i);
+
+				double tMin = std::min(t1, t2);
+				double tMax = std::max(t1, t2);
+
+				if (tMin > tNear)
+					tNear = tMin;
+
+				if (tMax < tFar)
+					tFar = tMax;
+
+				if (tNear > tFar || tFar < 0) {
+					fMiss = true;
+					continue;
+				}
+			}
+		}
+
+		if (fMiss) {
+			continue;
+		}
+
+		if ((tNear >= 0 && tNear <= 1) && (tFar >= 0 && tFar <= 1)) {
+			point ptEdgeMin = edgeLine.a() + (vEdgeDirection * tNear);
+			point ptEdgeMax = edgeLine.a() + (vEdgeDirection * tFar);
+			point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
+
+			point ptContact = (matRotationB * ptEdgeMid) + ptBoxBOrigin;
+			penetration = -minSeparationDistance;
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+		}
+	}
+	//*/
+
+	return manifold;
+}
+
+BoundingBox::face::face() {
+	// empty
+}
+
+BoundingBox::face::face(int axis, bool fNegative, vector vHalfVector) {
+	switch (axis) {
+		// x axis
+		case 0: {
+			float xVal = vHalfVector.x();
+			if (fNegative)
+				xVal *= -1.0f;
+
+			m_points[0] = point(xVal, vHalfVector.y(), vHalfVector.z());
+			m_points[1] = point(xVal, -vHalfVector.y(), vHalfVector.z());
+			m_points[2] = point(xVal, vHalfVector.y(), -vHalfVector.z());
+			m_points[3] = point(xVal, -vHalfVector.y(), -vHalfVector.z());
+
+			if(fNegative)
+				m_vNormal = vector::iVector(-1.0f);
+			else
+				m_vNormal = vector::iVector(1.0f);
+		} break;
+
+		// y axis
+		case 1: {
+			float yVal = vHalfVector.y();
+			if (fNegative)
+				yVal *= -1.0f;
+
+			m_points[0] = point(-vHalfVector.x(), yVal, vHalfVector.z());
+			m_points[1] = point(vHalfVector.x(), yVal, vHalfVector.z());
+			m_points[2] = point(-vHalfVector.x(), yVal, -vHalfVector.z());
+			m_points[3] = point(vHalfVector.x(), yVal, -vHalfVector.z());
+
+			if (fNegative)
+				m_vNormal = vector::jVector(-1.0f);
+			else
+				m_vNormal = vector::jVector(1.0f);
+		} break;
+
+		// z axis
+		case 2: {
+			float zVal = vHalfVector.z();
+			if (fNegative)
+				zVal *= -1.0f;
+
+			m_points[0] = point(vHalfVector.x(), vHalfVector.y(), zVal);
+			m_points[1] = point(-vHalfVector.x(), vHalfVector.y(), zVal);
+			m_points[2] = point(vHalfVector.x(), -vHalfVector.y(), zVal);
+			m_points[3] = point(-vHalfVector.x(), -vHalfVector.y(), zVal);
+
+			if (fNegative)
+				m_vNormal = vector::kVector(-1.0f);
+			else
+				m_vNormal = vector::kVector(1.0f);
+		} break;
+	}
+}
+
+RESULT BoundingBox::face::ApplyMatrix(matrix<float, 4, 4> mat) {
+	for (int i = 0; i < 4; i++) {
+		m_points[i] = mat * m_points[i];
+	}
+
+	m_vNormal = mat * m_vNormal;
+
+	return R_PASS;
+}
+
+RESULT BoundingBox::face::Translate(vector vTranslation) {
+	for (int i = 0; i < 4; i++) 
+		m_points[i].translate(vTranslation);
+
+	return R_PASS;
+}
+
+CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// Point vs Face
 	// Do for both objects
@@ -379,6 +1135,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				if (std::abs(vRay(i)) < DREAM_EPSILON) {
 					if (ptMin(i) - lineBoxEdgeB.a()(i) > 0 || ptMax(i) - lineBoxEdgeB.a()(i) < 0) {
 						fMiss = true;
+						continue;
 					}
 				}
 				else {
@@ -394,8 +1151,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					if (tMax < tFar)
 						tFar = tMax;
 
-					if (tNear > tFar || tFar < 0)
+					if (tNear > tFar || tFar < 0) {
 						fMiss = true;
+						continue;
+					}
 				}
 			}
 
@@ -510,13 +1269,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					penetration *= -1.0f;
 				//}
 
+				// This is a bit of a hack, but will ensure normal facing out
+				if (vNormalOriented.dot(ptContact - ptBoxAOrigin) < 0) {
+					vNormalOriented = vNormalOriented * -1.0f;
+				}
+
 				//manifold.Clear();
 				if (weight == 2) {
 					point ptContactPointA = (RotationMatrix(qBoxAOrientation) * ptEdgeMin) + ptBoxAOrigin;
 					point ptContactPointB = (RotationMatrix(qBoxAOrientation) * ptEdgeMax) + ptBoxAOrigin;
 
 					// TODO: THIS IS NOT GENERAL
-					vNormalOriented = vNormalTemp;
+					//vNormalOriented = vNormalTemp;
 
 					manifold.AddContactPoint(ptContactPointA, vNormalOriented, penetration, 1);
 					manifold.AddContactPoint(ptContactPointB, vNormalOriented, penetration, 1);
@@ -524,7 +1288,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				else {
 
 					// TODO: THIS IS NOT GENERAL
-					vNormalOriented = vNormalTemp;
+					//vNormalOriented = vNormalTemp;
 
 					manifold.AddContactPoint(ptContact, vNormalOriented, penetration, 1);
 				}
@@ -615,24 +1379,6 @@ CollisionManifold BoundingBox::Collide(const ray &rCast) {
 	return manifold;
 }
 
-vector BoundingBox::GetBoxFaceNormal(BoxFace faceType) {
-	vector vNormal;
-
-	switch (faceType) {
-	case BoxFace::TOP: vNormal = vector::jVector(1.0f); break;
-	case BoxFace::BOTTOM: vNormal = vector::jVector(-1.0f); break;
-	case BoxFace::RIGHT: vNormal = vector::iVector(1.0f); break;
-	case BoxFace::LEFT: vNormal = vector::iVector(-1.0f); break;
-	case BoxFace::FRONT: vNormal = vector::kVector(1.0f); break;
-	case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
-	}
-
-	vNormal = RotationMatrix(GetAbsoluteOrientation()) * vNormal;
-	vNormal.Normalize();
-
-	return vNormal;
-}
-
 bool BoundingBox::Intersect(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Intersect(*this);
 }
@@ -667,85 +1413,6 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 	m_vHalfSize = (ptMax - GetOrigin());
 	//m_vHalfSize = ptMax;
 	return R_PASS;
-}
-
-// http://www.willperone.net/Code/coderr.php
-vector BoundingBox::GetHalfVector(bool fAbsolute) {
-	vector vScale = GetScale(fAbsolute);
-
-	if (m_type == Type::AABB) {
-		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
-
-		double width = 0.0f;
-		double height = 0.0f;
-		double length = 0.0f;
-
-		for (int i = 0; i < 8; i++) {
-			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-
-			if (pt.x() > width)
-				width = pt.x();
-
-			if (pt.y() > height)
-				height = pt.y();
-
-			if (pt.z() > length)
-				length = pt.z();
-		}
-
-		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
-	}
-	
-	// Otherwise it's OBB
-	//return m_vHalfSize;
-	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
-}
-
-double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
-	// Project the half-size of one onto axis
-	double selfProject = TransformToAxis(vAxis);
-	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
-
-	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
-
-	return std::abs(vToCenter.dot(vAxis));
-}
-
-bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
-	// Project the half-size of one onto axis
-	double selfProject = TransformToAxis(vAxis);
-	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
-
-	return (OverlapOnAxisDistance(rhs, vAxis) <= (selfProject + rhsProject));
-}
-
-// Project half size onto vector axis
-double BoundingBox::TransformToAxis(const vector &vAxis) {
-	double retVal = 0.0f;
-
-	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
-	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
-	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
-
-	return retVal;
-}
-
-vector BoundingBox::GetAxis(BoxAxis boxAxis) {
-	vector retVector = vector(0.0f, 0.0f, 0.0f);
-
-	switch (boxAxis) {
-		case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
-		case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
-		case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
-	}
-
-	// Rotate by OBB if so
-	if (m_type == Type::OBB) {
-		retVector = RotationMatrix(GetAbsoluteOrientation()) * retVector;
-		retVector.Normalize();
-	}
-
-	return retVector;
 }
 
 // TODO: Replace with Transform to AABB function - in volume as well
@@ -961,73 +1628,146 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
 	return retPoint;
 }
 
-BoundingBox::face BoundingBox::GetFace(BoxFace faceType) {
+BoundingBox::face BoundingBox::GetFace(BoxFace faceType, bool fOriented) {
 	BoundingBox::face faceBox;
+
 	faceBox.m_type = faceType;
 
 	switch (faceType) {
 		case BoxFace::TOP: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR, fOriented);
 		} break;
 
 		case BoxFace::BOTTOM: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR, fOriented);
 		} break;
 
 		case BoxFace::LEFT: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR, fOriented);
 		} break;
 
 		case BoxFace::RIGHT: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR, fOriented);
 		} break;
 
 		case BoxFace::FRONT: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR, fOriented);
 		} break;
 
 		case BoxFace::BACK: {
-			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
-			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
-			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
-			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR, fOriented);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR, fOriented);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR, fOriented);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR, fOriented);
 		} break;
 	}
 
+	faceBox.m_vNormal = GetBoxFaceNormal(faceType, fOriented);
+
 	return faceBox;
+}
+
+vector BoundingBox::GetBoxFaceNormal(BoxFace faceType, bool fOriented) {
+	vector vNormal;
+
+	switch (faceType) {
+		case BoxFace::TOP: vNormal = vector::jVector(1.0f); break;
+		case BoxFace::BOTTOM: vNormal = vector::jVector(-1.0f); break;
+		case BoxFace::RIGHT: vNormal = vector::iVector(1.0f); break;
+		case BoxFace::LEFT: vNormal = vector::iVector(-1.0f); break;
+		case BoxFace::FRONT: vNormal = vector::kVector(1.0f); break;
+		case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
+	}
+
+	// Rotate if needed 
+	if (fOriented) {
+		vNormal = RotationMatrix(GetAbsoluteOrientation()) * vNormal;
+		vNormal.Normalize();
+	}
+
+	return vNormal;
 }
 
 line BoundingBox::GetBoxEdge(BoxEdge edgeType) {
 	line lineEdge;
 
 	switch (edgeType) {
-	case BoxEdge::TOP_RIGHT: lineEdge = line(GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR), GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); break;
-	case BoxEdge::TOP_LEFT: lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_NEAR), GetBoxPoint(BoxPoint::TOP_LEFT_FAR)); break;
-	case BoxEdge::TOP_NEAR: lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_NEAR), GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR)); break;
-	case BoxEdge::TOP_FAR: lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_FAR), GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); break;
-	case BoxEdge::BOTTOM_RIGHT: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR), GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR)); break;
-	case BoxEdge::BOTTOM_LEFT: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR)); break;
-	case BoxEdge::BOTTOM_NEAR: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR)); break;
-	case BoxEdge::BOTTOM_FAR: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR), GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR)); break;
-	case BoxEdge::LEFT_NEAR: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), GetBoxPoint(BoxPoint::TOP_LEFT_NEAR)); break;
-	case BoxEdge::LEFT_FAR: lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR), GetBoxPoint(BoxPoint::TOP_LEFT_FAR)); break;
-	case BoxEdge::RIGHT_NEAR:lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR), GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR)); break;
-	case BoxEdge::RIGHT_FAR:lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR), GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); break;
+
+		case BoxEdge::TOP_RIGHT: {
+			lineEdge = line(GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR), 
+							GetBoxPoint(BoxPoint::TOP_RIGHT_FAR));
+		} break;
+
+		case BoxEdge::TOP_LEFT: {
+			lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_NEAR), 
+							GetBoxPoint(BoxPoint::TOP_LEFT_FAR)); 
+		} break;
+	
+		case BoxEdge::TOP_NEAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_NEAR), 
+							GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR)); 
+		} break;
+	
+		case BoxEdge::TOP_FAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::TOP_LEFT_FAR), 
+							GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); 
+		} break;
+	
+		case BoxEdge::BOTTOM_RIGHT: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR), 
+							GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR)); 
+		} break;
+	
+		case BoxEdge::BOTTOM_LEFT: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), 
+							GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR)); 
+		} break;
+	
+		case BoxEdge::BOTTOM_NEAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), 
+							GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR)); 
+		} break;
+	
+		case BoxEdge::BOTTOM_FAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR), 
+							GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR)); 
+		} break;
+	
+		case BoxEdge::LEFT_NEAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR), 
+							GetBoxPoint(BoxPoint::TOP_LEFT_NEAR)); 
+		} break;
+
+		case BoxEdge::LEFT_FAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR), 
+							GetBoxPoint(BoxPoint::TOP_LEFT_FAR)); 
+		} break;
+
+		case BoxEdge::RIGHT_NEAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR), 
+							GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR)); 
+		} break;
+
+		case BoxEdge::RIGHT_FAR: {
+			lineEdge = line(GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR), 
+							GetBoxPoint(BoxPoint::TOP_RIGHT_FAR)); 
+		} break;
+
 	}
 
 	return lineEdge;

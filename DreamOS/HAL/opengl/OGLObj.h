@@ -26,6 +26,7 @@ public:
 	// or externally from the object (TODO: factory class needed)
 	virtual RESULT OGLInitialize();
 	RESULT UpdateOGLBuffers();
+	virtual RESULT UpdateBuffers() override;
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 

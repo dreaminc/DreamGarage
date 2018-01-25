@@ -239,9 +239,30 @@ public:
 		return determinant(retMatrix);
 	}
 
+	matrix<TMatrix, 1, M> row(unsigned r) {
+		matrix<TMatrix, 1, M> retMatrix;
+		retMatrix.clear();
+
+		for (int i = 0; i < M; i++) {
+			retMatrix.element(0, i) = element(r, i);
+		}
+
+		return retMatrix;
+	}
+
+	matrix<TMatrix, N, 1> column(unsigned c) {
+		matrix<TMatrix, N, 1> retMatrix;
+
+		for (int i = 0; i < N; i++) {
+			retMatrix.element(i, 0) = element(i, c);
+		}
+
+		return retMatrix;
+	}
+
 	// This is a zero based matrix, so adding one for the power (but -1^0 == 1 so the math should actually work regardless)
 	TMatrix cofactor(unsigned i, unsigned j) {
-		TMatrix signVal = pow(-1, ((i+1) + (j+1)));		
+		TMatrix signVal = pow(-1, ((i + 1) + (j + 1)));		
 		return (signVal * minor(i, j));
 	}
 
@@ -933,6 +954,37 @@ matrix<TMat4x4, 4, 4> inverse(matrix<TMat4x4, 4, 4> mat) {
 	retMatrix *= (1.0f / matDeterminant);
 
 Error:
+	return retMatrix;
+}
+
+// TODO: Add Transpose
+template <typename TMat4x4, int N>
+matrix<TMat4x4, N, N> transpose(matrix<TMat4x4, N, N> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat4x4, 4, 4> retMatrix;
+	retMatrix.clear();
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			retMatrix.element(i, j) = mat.element(j, i);
+		}
+	}
+
+	return retMatrix;
+}
+
+template <typename TMat4x4, int N, int M>
+matrix<TMat4x4, N, M> absolute(matrix<TMat4x4, N, M> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat4x4, N, M> retMatrix;
+	retMatrix.clear();
+
+	for (int i = 0; i < N * M; i++) {
+		retMatrix(i) = (TMat4x4)(std::fabs((double)(mat(i))));
+	}
+
 	return retMatrix;
 }
 

@@ -530,27 +530,18 @@ bool DimObj::Intersect(VirtualObj* pObj, int depth) {
 CollisionManifold DimObj::Collide(VirtualObj* pObj, int depth) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 
-	/*
 	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
 		return CollisionManifold(this, pObj);
 	}
 	else {
-		return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
-	}
-	//*/
-
-	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
-		return CollisionManifold(this, pObj);
-	}
-	else {
-		if (Intersect(pObj)) {
+		//if (Intersect(pObj)) {
 			if (HasChildren()) {
 				for (auto &pChild : GetChildren()) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
-					if (pDimChild->Intersect(pObj)) {
+					//if (pDimChild->Intersect(pObj)) {
 						return pDimChild->Collide(pObj, (depth + 1));
-					}
+					//}
 				}
 
 				return CollisionManifold(this, pObj);
@@ -558,7 +549,7 @@ CollisionManifold DimObj::Collide(VirtualObj* pObj, int depth) {
 			else {
 				return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
 			}
-		}
+		//}
 	}
 
 	return CollisionManifold(this, pObj);

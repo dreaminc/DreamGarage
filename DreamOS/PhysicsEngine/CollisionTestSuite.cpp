@@ -22,13 +22,15 @@ CollisionTestSuite::~CollisionTestSuite() {
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestOBBOBB());
+
+	CR(AddTestSphereSphere());
+
 	CR(AddTestQuadQuad());
 
 	CR(AddTestSphereOBB());
 
 	CR(AddTestSphereQuad());
-
-	CR(AddTestSphereSphere());
 
 	CR(AddTestPlaneQuad());
 
@@ -45,6 +47,8 @@ RESULT CollisionTestSuite::AddTests() {
 	CR(AddTestScaledCompositeRay());
 
 	CR(AddTestRayModel());
+
+	CR(SetupSkyboxPipeline("minimal"));
 
 Error:
 	return r;
@@ -77,23 +81,23 @@ RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) 
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Debug Overlay
-	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
-	CN(pDebugOverlay);
-	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	// Debug Overlay
+	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+	CN(pDebugOverlay);
+	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -110,7 +114,6 @@ RESULT CollisionTestSuite::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Will reset the sandbox as needed between tests
-
 	CR(m_pSceneGraph->RemoveAllObjects());
 
 	CN(m_pDreamOS);
@@ -577,6 +580,295 @@ Error:
 	return r;
 }
 
+RESULT CollisionTestSuite::AddTestOBBOBB() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 500.0f;
+	
+
+	enum class TestOrientation {
+		EDGE_EDGE,
+		EDGE_EDGE_AABB,
+		POINT_FACE,
+		POINT_FACE_X,
+		POINT_EDGE,
+		FACE_FACE,
+		AABB_AABB_X,
+		AABB_AABB_Y,
+		AABB_AABB_Z,
+		EDGE_FACE
+	} testOrientation;
+
+	//int nRepeats = (int)(TestOrientation::EDGE_FACE);
+	int nRepeats = 1;
+
+	testOrientation = TestOrientation::EDGE_EDGE;
+	//testOrientation = TestOrientation::EDGE_EDGE_AABB;
+	//testOrientation = TestOrientation::POINT_FACE;
+	//testOrientation = TestOrientation::POINT_FACE_X;
+	//testOrientation = TestOrientation::EDGE_FACE;
+	//testOrientation = TestOrientation::FACE_FACE;
+	//testOrientation = TestOrientation::AABB_AABB_X;
+	//testOrientation = TestOrientation::AABB_AABB_Y;
+	//testOrientation = TestOrientation::AABB_AABB_Z;
+	//testOrientation = (TestOrientation)(nRepeats);
+
+	struct TestContext {
+		volume *pOBBA = nullptr;
+		volume *pOBBB = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+		float translateYA = 0.0f;
+		float translateYB = 0.0f;
+	} *pTestContext = new TestContext();
+
+	
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// Objects
+
+		switch (testOrientation) {
+			case TestOrientation::EDGE_EDGE: {
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(2.0f, -1.5f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->SetPosition(2.0f, -0.2f, 0.0f);
+				pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
+
+				auto pVol = m_pDreamOS->AddVolume(1.0f);
+				pVol->SetMaterialColors(COLOR_AQUA);
+			} break;
+
+			case TestOrientation::EDGE_EDGE_AABB: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->SetPosition(-1.25f, -0.25f, -0.5f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(-2.0f, -1.0f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(90.0f, 90.0f, 180.0f);
+				//pTestContext->pOBBA->RotateByDeg(45.0f, 0.0f, 0.0f);
+
+				auto pVol = m_pDreamOS->AddVolume(1.0f);
+				pVol->SetMaterialColors(COLOR_AQUA);
+			} break;
+
+			case TestOrientation::FACE_FACE: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBA);
+				pTestContext->pOBBA->SetPosition(-2.0f, -1.5f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBB);
+				pTestContext->pOBBB->SetPosition(-1.1f, -0.6f, 0.0f);
+				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 53.0f);
+			} break;
+
+			case TestOrientation::POINT_FACE: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 90.0f);
+				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 180.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(point(0.0f, -0.25f, 0.0f));
+				pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 45.0f);
+				//pTestContext->pOBBB->RotateByDeg(45.0f, 0.0f, 0.0f);
+				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, -35.0f);
+			} break;
+
+			case TestOrientation::POINT_FACE_X: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBA->SetPosition(point(0.25f, -1.0f, 0.0f));
+				pTestContext->pOBBA->RotateYByDeg(45.0f);
+				pTestContext->pOBBA->RotateZByDeg(45.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				pTestContext->pOBBB->SetPosition(point(-1.0f, -1.0f, 0.0f));
+
+			} break;
+
+			case TestOrientation::EDGE_FACE: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(0.5f, 0.5f, 1.0f);
+				pTestContext->pOBBA->SetPosition(-1.0f, -0.45f, 0.0f);
+				//pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 135.0f);
+				pTestContext->pOBBA->RotateByDeg(0.0f, 0.0f, 45.0f);
+				//pTestContext->translateYB = -0.001f;
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(5.0f, 5.0f, 0.5f);
+				pTestContext->pOBBB->SetPosition(0.0f, -1.0f, 0.0f);
+				//pTestContext->pOBBB->RotateByDeg(0.0f, 0.0f, 45.0f);
+				//pTestContext->pOBBB->RotateByDeg(0.0f, 180.0f, 0.0f);
+				//pTestContext->translateYB = -0.001f;
+
+			} break;
+
+			case TestOrientation::AABB_AABB_X: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBA);
+				pTestContext->pOBBA->SetPosition(-1.5f, 0.0f, 0.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBB);
+				pTestContext->pOBBB->SetPosition(0.0f, -0.0f, 0.0f);
+			} break;
+
+			case TestOrientation::AABB_AABB_Y: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBA);
+				pTestContext->pOBBA->SetPosition(0.0f, -1.5f, 0.0f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBB);
+				pTestContext->pOBBB->SetPosition(0.0f, -0.0f, 0.0f);
+			} break;
+
+			case TestOrientation::AABB_AABB_Z: {
+				pTestContext->pOBBA = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBA);
+				pTestContext->pOBBA->SetPosition(0.0f, -2.0f, 1.5f);
+
+				pTestContext->pOBBB = m_pDreamOS->AddVolume(1.0f);
+				CN(pTestContext->pOBBB);
+				pTestContext->pOBBB->SetPosition(0.0f, -2.0f, 0.0f);
+			} break;
+		}
+
+		pTestContext->pOBBA->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pOBBB->SetMaterialColors(COLOR_RED);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pOBBA);
+		CN(pTestContext->pOBBB);
+
+		//pTestContext->pOBBA->translateX(-0.0002f);
+		//pTestContext->pOBBA->translateY(-0.0002f);
+
+		//pTestContext->pOBBB->translateX(-0.0001f);
+		//pTestContext->pOBBB->translateY(-0.00005f);
+		//pTestContext->pOBBB->translateZ(0.0001f);
+
+		pTestContext->pOBBA->RotateZByDeg(0.01f);
+		//pTestContext->pOBBB->RotateZByDeg(0.02f);
+		//pTestContext->pOBBB->RotateYByDeg(0.024f);
+		//pTestContext->pOBBA->RotateZByDeg(-0.02f);
+		//pTestContext->pOBBA->RotateXByDeg(-0.01f);
+		//pTestContext->pOBBB->RotateYByDeg(0.04f);
+
+		for (int i = 0; i < 4; i++)
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for collisions 
+		if (pTestContext->pOBBA->Intersect(pTestContext->pOBBB)) 
+		{
+			CollisionManifold manifold = pTestContext->pOBBA->Collide(pTestContext->pOBBB);
+			//CollisionManifold manifold = pTestContext->pOBBB->Collide(pTestContext->pOBBA);
+			
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+			
+						ray rPoint = ray(manifold.GetContactPoint(i).GetPoint(), manifold.GetContactPoint(i).GetNormal());
+
+						pTestContext->pCollidePointRay[i]->SetVisible(true);
+						pTestContext->pCollidePointRay[i]->UpdateFromRay(rPoint);
+						//pTestContext->pCollidePointRay[i]->SetRayVertices(manifold.GetContactPoint(i).GetPenetration() * 10.0f);
+						
+						pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+
+						//if(manifold.GetContactPoint(i).GetPenetration() < 0.0f)
+						//	pTestContext->pCollidePointRay[i]->SetRayVertices(-1.0f);
+						//else
+						//	pTestContext->pCollidePointRay[i]->SetRayVertices(1.0f);
+
+						pTestContext->pCollidePointRay[i]->UpdateBuffers();
+					}
+			
+					//pTestContext->pCollidePoint[0]->SetVisible(true);
+					//pTestContext->pCollidePoint[0]->SetOrigin(manifold.GetContactPoint());
+				}
+			}
+
+			pTestContext->pOBBA->SetMaterialColors(COLOR_GREEN);
+		}
+		else {
+			//pTestContext->pOBBA->translateY(pTestContext->translateYA);
+			//pTestContext->pOBBB->translateY(pTestContext->translateYB);
+			pTestContext->pOBBA->SetMaterialColors(COLOR_BLUE);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	//CR(SetupSkyboxPipeline("minimal"));
+
+	pNewTest->SetTestName("Plane vs Plane Test");
+	pNewTest->SetTestDescription("Plane vs Plane Test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT CollisionTestSuite::AddTestQuadQuad() {
 	RESULT r = R_PASS;
 
@@ -840,6 +1132,8 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
 			CN(pTestContext->pCollidePoint[i]);
 
+			pTestContext->pCollidePoint[i]->SetMaterialColors(COLOR_BLACK);
+
 			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
 
 			pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -865,7 +1159,7 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 		CN(pTestContext->pSphereB);
 
 		//pTestContext->pSphereA->translateY(0.0005f);
-		pTestContext->pSphereB->translateY(-0.0005f);
+		pTestContext->pSphereB->translateY(-0.0002f);
 
 		//for (int i = 0; i < 4; i++)
 		//	pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -885,13 +1179,13 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 
 			pTestContext->pSphereA->SetMaterialColors(COLOR_GREEN);
 
-			pTestContext->pSphereA->SetVisible(false);
-			pTestContext->pSphereB->SetVisible(false);
+			//pTestContext->pSphereA->SetVisible(false);
+			//pTestContext->pSphereB->SetVisible(false);
 		}
 		else {
 
-			pTestContext->pSphereA->SetVisible(true);
-			pTestContext->pSphereB->SetVisible(true);
+			//pTestContext->pSphereA->SetVisible(true);
+			//pTestContext->pSphereB->SetVisible(true);
 
 			pTestContext->pSphereA->SetMaterialColors(COLOR_BLUE);
 		}

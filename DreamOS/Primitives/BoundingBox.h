@@ -67,9 +67,18 @@ public:
 		INVALID
 	};
 
-	struct face {
+	class face {
+	public:
+		face();
+		face(int axis, bool fNegative, vector vHalfVector);
+
+		RESULT ApplyMatrix(matrix<float, 4, 4> mat);
+		RESULT Translate(vector vTranslation);
+
+	public:
 		BoxFace m_type;
 		point m_points[4];
+		vector m_vNormal;
 	};
 
 public:
@@ -82,11 +91,17 @@ public:
 	virtual bool Intersect(const BoundingQuad& rhs) override;
 	virtual bool Intersect(const BoundingPlane& rhs) override;
 
+	bool IntersectSAT(const BoundingBox& rhs);
+	bool IntersectGJK(const BoundingBox& rhs);
+
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
 	virtual bool Intersect(const ray& r) override;
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
+	CollisionManifold CollideSAT(const BoundingBox& rhs);
+	CollisionManifold CollideBruteForce(const BoundingBox& rhs);	// This is old and normals are broken
+
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
 	virtual CollisionManifold Collide(const BoundingPlane& rhs) override;
@@ -105,7 +120,7 @@ public:
 
 	// Separating Axis Theorem (SAT) early test
 	double TransformToAxis(const vector &vAxis);
-	vector GetAxis(BoxAxis boxAxis);
+	vector GetAxis(BoxAxis boxAxis, bool fOriented = true);
 	bool OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis);
 	double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis);
 
@@ -125,11 +140,14 @@ public:
 	virtual point GetMinPointOriented(bool fAbsolute = false) override;
 	virtual point GetMaxPointOriented(bool fAbsolute = false) override;
 
+	point GetFarthestPointInDirection(vector vDirection);
+	static point GetSupportPoint(const BoundingBox& rhs, const BoundingBox& lhs, vector vDirection);
+
 	BoundingBox GetBoundingAABB();
 
 	point GetBoxPoint(BoxPoint ptType, bool fOriented = true);
-	BoundingBox::face GetFace(BoxFace faceType);
-	vector GetBoxFaceNormal(BoxFace faceType);
+	BoundingBox::face GetFace(BoxFace faceType, bool fOriented = true);
+	vector GetBoxFaceNormal(BoxFace faceType, bool fOriented = true);
 	line GetBoxEdge(BoxEdge edgeType);
 
 protected:

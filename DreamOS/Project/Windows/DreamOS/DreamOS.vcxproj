@@ -798,6 +798,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingPlane.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp" />
@@ -1140,6 +1141,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingPlane.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingQuad.h" />

@@ -953,6 +953,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp">
       <Filter>DreamControlView</Filter>
     </ClCompile>
@@ -2086,6 +2089,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h">
+      <Filter>PhysicsEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h">
       <Filter>DreamControlView</Filter>

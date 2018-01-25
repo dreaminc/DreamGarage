@@ -20,6 +20,16 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(SetupSkyboxPipeline("blinnphong"));
+
+	CR(AddTestVolumeToPlaneVolumeDominos());
+
+	CR(AddTestVolumeToPlaneVolume());
+
+	CR(AddTestVolumeVolumePointFace());
+
+	CR(AddTestVolumeVolumeEdge());
+
 	CR(AddTestRayQuadsComposite());
 	CR(AddTestRayQuads());
 
@@ -39,62 +49,13 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeRay());
 	CR(AddTestSphereVsSphereArray());
-	CR(AddTestVolumeVolumePointFace());
-	CR(AddTestVolumeVolumeEdge());
 	CR(AddTestCompositeCollisionVolumeSphere());
 	CR(AddTestCompositeCollisionSphereVolume());
 	CR(AddTestCompositeCollisionSpheres());
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());
-	CR(AddTestVolumeToPlaneVolume());
 	CR(AddTestBallVolume());
-
-Error:
-	return r;
-}
-
-RESULT PhysicsEngineTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
-	RESULT r = R_PASS;
-
-	// Set up the pipeline
-	HALImp *pHAL = m_pDreamOS->GetHALImp();
-	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	CR(pHAL->MakeCurrentContext());
-
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-	CR(pHAL->ReleaseCurrentContext());
-
-	light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 Error:
 	return r;
@@ -860,14 +821,12 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	double sTestTime = 15.0f;
 	int nRepeats = 1;
 
-	volume *pVolume = nullptr;
-
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext){
 		m_pDreamOS->SetGravityState(false);
 
 		// Ball to Volume
-		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		volume *pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
 
 		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(10.0f);
@@ -1369,7 +1328,7 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6.0f;
+	double sTestTime = 60.0f;
 	int nRepeats = 1;
 
 	// Initialize Code 
@@ -1379,7 +1338,9 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 
 		// Volume vs Volume point - face
 
-		auto pVolume = m_pDreamOS->AddVolume(0.5f);
+		volume *pVolume = nullptr;
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolume);
 		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
@@ -1392,6 +1353,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		CN(pVolume);
 		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(1.0f);
+		//pVolume->SetVelocity(-1.0f / 2, 0.0f, 0.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
@@ -1402,6 +1364,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		pVolume->SetMass(1.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
+		///*
 		pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
@@ -1429,6 +1392,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+		//*/
 	
 	Error:
 		return R_PASS;
@@ -1462,35 +1426,242 @@ Error:
 	return r;
 }
 
+RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolumeDominos() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 215.0f;
+	int nRepeats = 1;
+
+
+	class TestContext {
+	public:
+		sphere * pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+
+
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		volume *pVolume = nullptr;
+
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
+		}
+
+		// Volume to "plane"
+		//pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(10.0, 10.0, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-4.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->AddAngularMomentum(vector(0.0f, 0.0f, -0.1f));
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-0.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.5f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.125, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(4.0f, -1.99f, 0.0f));
+		pVolume->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Volume vs Volume Plane");
+	pNewTest->SetTestDescription("Volume colliding with immovable volume");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 15.0f;
+	double sTestTime = 215.0f;
 	int nRepeats = 1;
 
+	
+	class TestContext {
+	public:
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+		DimRay *pCollidePointRay[4] = { nullptr, nullptr, nullptr, nullptr };
+		
+
+	} *pTestContext = new TestContext();
+
 	// Initialize Code 
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(true);
 
-		// Volume to "plane"
-		auto pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
-		CN(pVolume);
+		volume *pVolume = nullptr;
 
+		// Test Context
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->MakeSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+			pTestContext->pCollidePointRay[i] = m_pDreamOS->MakeRay(point(), vector::jVector(-1.0f), 1.0f);
+			CN(pTestContext->pCollidePointRay[i]);
+			m_pSceneGraph->PushObject(pTestContext->pCollidePointRay[i]);
+			pTestContext->pCollidePointRay[i]->SetVisible(false);
+		}
+
+		// Volume to "plane"
+		//pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
+		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 		pVolume->SetMass(100000.0f);
 		pVolume->SetImmovable(true);
-
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
-		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 0.5f);
 		CN(pVolume);
-
 		pVolume->SetPosition(point(0.5f, 1.0f, 0.0f));
 		pVolume->SetMass(1.0f);
-		pVolume->RotateZByDeg(45.0f);
-
+		pVolume->RotateZByDeg(25.0f);
+		//pVolume->RotateZByDeg(-15.01f);
 		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		//pQuad = AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector::jVector(1.0f));
@@ -1518,7 +1689,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Volume vs Volume Plane");
@@ -1896,9 +2067,9 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 6.0f;
+	double sTestTime = 60.0f;
 	int nRepeats = 5;
-	static int nRepeatCounter = 0;
+	static int nRepeatCounter = 5;
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
@@ -1906,6 +2077,8 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 		m_pDreamOS->SetGravityState(false);
 
 		// Volume vs Volume edge edge
+
+		CR(SetupSkyboxPipeline("blinnphong"));
 
 		volume *pVolume = nullptr;
 
@@ -2028,6 +2201,59 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 				pVolume->RotateYByDeg(45.0f);				
 				pVolume->SetMass(1.0f);
 				CR(m_pDreamOS->AddPhysicsObject(pVolume));
+			} break;
+
+			case 5: {
+				// case 3
+				pVolume = m_pDreamOS->AddVolume(0.5f);
+				CN(pVolume);
+				pVolume->SetPosition(point(4.0f, 0.0f, 0.0f));
+				pVolume->RotateYByDeg(45.0f);
+				pVolume->SetMass(1.0f);
+				pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+				CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+				pVolume = m_pDreamOS->AddVolume(0.5f);
+				CN(pVolume);
+				pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+				pVolume->SetMass(1.0f);
+				//pVolume->RotateZByDeg(45.0f);
+				CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+				//pVolume = m_pDreamOS->AddVolume(0.5f);
+				//CN(pVolume);
+				//pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+				//pVolume->SetMass(1.0f);
+				//pVolume->RotateYByDeg(45.0f);
+				//CR(m_pDreamOS->AddPhysicsObject(pVolume));
+				//
+				//pVolume = m_pDreamOS->AddVolume(0.5f);
+				//CN(pVolume);
+				//pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+				//pVolume->SetMass(1.0f);
+				//pVolume->RotateZByDeg(45.0f);
+				//CR(m_pDreamOS->AddPhysicsObject(pVolume));
+				//
+				//pVolume = m_pDreamOS->AddVolume(0.5f);
+				//CN(pVolume);
+				//pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+				//pVolume->RotateYByDeg(45.0f);
+				//pVolume->SetMass(1.0f);
+				//m_pDreamOS->AddPhysicsObject(pVolume);
+				//
+				//pVolume = m_pDreamOS->AddVolume(0.5f);
+				//CN(pVolume);
+				//pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+				//pVolume->SetMass(1.0f);
+				//pVolume->RotateZByDeg(45.0f);
+				//CR(m_pDreamOS->AddPhysicsObject(pVolume));
+				//
+				//pVolume = m_pDreamOS->AddVolume(0.5f);
+				//CN(pVolume);
+				//pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+				//pVolume->RotateYByDeg(45.0f);
+				//pVolume->SetMass(1.0f);
+				//CR(m_pDreamOS->AddPhysicsObject(pVolume));
 			} break;
 		}
 
@@ -3049,6 +3275,64 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereQuads() {
 	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT PhysicsEngineTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	// Debug Overlay
+	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+	CN(pDebugOverlay);
+	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+	//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+	light *pLight = m_pDreamOS->AddLight(LIGHT_SPOT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 Error:
 	return r;
