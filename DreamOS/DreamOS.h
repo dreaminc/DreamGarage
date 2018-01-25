@@ -106,6 +106,7 @@ public:
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
@@ -120,7 +121,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnReceiveAsset() override {
+	virtual RESULT OnReceiveAsset(long userID) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

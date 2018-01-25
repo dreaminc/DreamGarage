@@ -322,9 +322,9 @@ RESULT OVRHMD::UpdateHMD() {
 		qOffset.SetQuaternionRotationMatrix(qRotation);
 		qRotation.Reverse();
 
-		int i = 0;
-		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
+		for (int i = 0; i < 2; i++) {
 
+			auto& hand = i == 0 ? m_pLeftHand : m_pRightHand;
 			auto& pModel = i == 0 ? m_pLeftControllerModel : m_pRightControllerModel;
 
 			if (trackingState.HandStatusFlags[i] != 3) {
@@ -357,8 +357,6 @@ RESULT OVRHMD::UpdateHMD() {
 
 			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
 			UpdateSenseController(type, inputState);
-
-			i += 1;
 		}
 	}
 

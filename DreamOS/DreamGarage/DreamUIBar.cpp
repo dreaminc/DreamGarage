@@ -12,7 +12,7 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
-#include "DreamControlView.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "DreamBrowser.h"
 
@@ -299,7 +299,8 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 					bool fStreaming = false;
 					CR(m_pUserHandle->RequestStreamingState(fStreaming));
 					if (fStreaming) {
-						CR(ShowControlView(false));
+					//	CR(ShowControlView(false));
+						CR(ShowControlView());
 					}
 				}
 				//*/
@@ -330,7 +331,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			CR(ShowControlView(true));
+			//CR(ShowControlView(true));
+			m_pUserHandle->SendPreserveSharingState(true);
+			CR(SendURLToBrowser());
 		} break;
 	}
 
@@ -339,7 +342,22 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowControlView(bool fSendURL) {
+RESULT DreamUIBar::SendURLToBrowser() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendURLtoBrowser());
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+	return r;
+}
+
+RESULT DreamUIBar::ShowControlView() {
+
 	RESULT r = R_PASS;
 
 	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
@@ -348,9 +366,6 @@ RESULT DreamUIBar::ShowControlView(bool fSendURL) {
 	if (!pDreamControlViewHandle->IsAppVisible()) {
 		CR(pDreamControlViewHandle->ShowApp());
 		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		if (fSendURL) {
-			(pDreamControlViewHandle->SendURLtoBrowser());
-		}	
 	}
 
 Error:
@@ -359,6 +374,7 @@ Error:
 	}
 	return r;
 }
+
 
 texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
@@ -468,7 +484,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				CR(UpdateBrowser(strScope, strPath));
 
-				CR(ShowControlView(false));
+//				CR(ShowControlView(false));
+				CR(ShowControlView());
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -500,14 +517,24 @@ Error:
 RESULT DreamUIBar::UpdateBrowser(std::string strScope, std::string strPath) {
 	RESULT r = R_PASS;
 
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	CN(pDreamControlViewHandle);
+	CR(pDreamControlViewHandle->SendBrowserScopeAndPath(strScope, strPath));
+
+	/*
 	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
 	CN(pBrowserHandle);
 	pBrowserHandle->SetScope(strScope);
 	pBrowserHandle->SetPath(strPath);
-
+	//*/
 Error:
+	/*
 	if (pBrowserHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pBrowserHandle, this);
+	}
+	//*/
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
 	return r;
 }

@@ -14,6 +14,7 @@
 
 #include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
+#include "Cloud/Environment/EnvironmentAsset.h"
 
 #include <map>
 #include <vector>
@@ -181,6 +182,8 @@ public:
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
 
+	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
+
 	virtual RESULT HandleBackEvent() override;
 	virtual RESULT HandleForwardEvent() override;
 	virtual RESULT HandleStopEvent() override;
@@ -211,7 +214,8 @@ public:
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT StopSending();
-	RESULT StartReceiving();
+	RESULT StartReceiving(PeerConnection *pPeerConnection);
+	RESULT PendReceiving();
 	RESULT StopReceiving();
 	virtual RESULT SetURI(std::string strURI) override;
 	RESULT LoadRequest(const WebRequest &webRequest);
@@ -276,15 +280,23 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
+	bool m_fReadyForFrame = false;
 
 	TextEntryString m_strEntered;
 	
 	std::string m_strScope;
 	std::string m_strPath;
+	std::string m_strContentType;
 	long m_currentEnvironmentAssetID = 0;
+	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
 
 	DreamBrowserMessage::type m_currentMessageType;
 	DreamBrowserMessage::type m_currentAckType;
+
+	bool m_fShowControlView = false;
+
+	bool m_fShouldBeginStream = true;
+
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

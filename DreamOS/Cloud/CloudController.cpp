@@ -284,6 +284,19 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnNewSocketConnection(int seatPosition) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnNewSocketConnection(seatPosition));
+	}
+
+Error:
+	return r;
+}
+
+//RESULT 
+
 RESULT CloudController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -351,11 +364,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnReceiveAsset() {
+RESULT CloudController::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
 
 	if (m_pEnvironmentObserver != nullptr) {
-		CR(m_pEnvironmentObserver->OnReceiveAsset());
+		CR(m_pEnvironmentObserver->OnReceiveAsset(userID));
 	}
 
 Error:

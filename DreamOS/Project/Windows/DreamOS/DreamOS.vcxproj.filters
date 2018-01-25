@@ -192,6 +192,9 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamControlView">
+      <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -713,9 +716,6 @@
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -899,9 +899,6 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIControlBar.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
@@ -958,6 +955,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp">
       <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp">
+      <Filter>DreamControlView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
+      <Filter>DreamControlView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1718,9 +1721,6 @@
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -2072,9 +2072,6 @@
     <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIControlBar.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
@@ -2095,6 +2092,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h">
+      <Filter>DreamControlView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
+      <Filter>DreamControlView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

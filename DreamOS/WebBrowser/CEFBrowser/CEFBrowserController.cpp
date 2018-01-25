@@ -341,6 +341,14 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::CloseBrowser() {
+	RESULT r = R_PASS;
+
+	m_pCEFBrowser->GetHost()->CloseBrowser(true);
+
+	return r;
+}
+
 // TODO: Mouse wheel
 /*--cef()--
 virtual void SendMouseWheelEvent(const CefMouseEvent& event,
@@ -496,6 +504,15 @@ RESULT CEFBrowserController::OnFocusedNodeChanged(int cefBrowserID, int cefFrame
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		CR(m_pWebBrowserControllerObserver->OnNodeFocusChanged(pCEFDOMNode));
 	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
 
 Error:
 	return r;

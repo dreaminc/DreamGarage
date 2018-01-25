@@ -61,6 +61,7 @@ public:
 	//virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	//virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	//
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
@@ -71,7 +72,7 @@ public:
 
 	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
-	virtual RESULT OnReceiveAsset() override;
+	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 
@@ -116,6 +117,8 @@ private:
 	float m_keepOutAngle = 5.0f;
 
 	bool m_fShouldUpdateAppComposites = false;
+
+	long m_pendingAssetReceiveUserID = -1;
 
 	// UI
 	//ViewMatrix *m_pClippingView;

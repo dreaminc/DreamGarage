@@ -74,6 +74,9 @@ public:
 
 	RESULT RequestStreamingState(bool& fStreaming);
 	RESULT SendStreamingState(bool fStreaming);
+	RESULT SendPreserveSharingState(bool fIsSharing);
+
+	RESULT SendStopSharing();
 
 	RESULT RequestResetAppComposite();
 
@@ -95,6 +98,9 @@ private:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
 	virtual RESULT SetStreamingState(bool fStreaming) = 0;
+	virtual RESULT PreserveSharingState(bool fIsSharing) = 0;
+
+	virtual RESULT StopSharing() = 0;
 
 	virtual RESULT ResetAppComposite() = 0;
 
@@ -142,19 +148,23 @@ public:
 
 	virtual RESULT GetStreamingState(bool& fStreaming) override;
 	virtual RESULT SetStreamingState(bool fStreaming) override;
+	virtual RESULT PreserveSharingState(bool fIsSharing) override;
+
+	virtual RESULT StopSharing() override;
 
 	virtual RESULT ResetAppComposite() override;
 
 protected:
 
-	RESULT UpdateHands();
+	RESULT UpdateHand(HAND_TYPE type);
+	RESULT UpdateOverlayTexture(HAND_TYPE type);
+	RESULT UpdateOverlayTextures();
 
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
 
 private:
 	//user *m_pUserModel = nullptr;
-	std::shared_ptr<volume> m_pVolume = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
 	hand* m_pLeftHand = nullptr;
@@ -183,6 +193,7 @@ private:
 
 	bool m_fCollisionLeft = false;
 	bool m_fCollisionRight = false;
+	bool m_fIsSharing = false;
 
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;

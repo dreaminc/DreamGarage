@@ -11,6 +11,8 @@
 
 #include <vector>
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 class DOMNode;
 class DOMDocument;
 class AudioPacket;
@@ -60,6 +62,7 @@ public:
 		virtual RESULT OnLoadStart() = 0;
 		virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) = 0;
 		virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) = 0;
+		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 	};
 
 public:
@@ -72,6 +75,8 @@ public:
 	// Poll for the current frame of the browser.
 	// This function can be called by any thread.
 	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
+
+	virtual RESULT CloseBrowser() = 0;
 
 	// Mouse
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) = 0;
@@ -86,7 +91,7 @@ public:
 	virtual RESULT GoBack() = 0;
 	virtual RESULT GoForward() = 0;
 	virtual bool CanGoBack() = 0;
-	virtual bool CanGoForward() = 0;
+	virtual bool CanGoForward() = 0;	
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
@@ -106,7 +111,6 @@ public:
 	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;
 
 	virtual RESULT Shutdown() = 0;
-
 
 	// frames
 	virtual size_t GetFrameCount() = 0;

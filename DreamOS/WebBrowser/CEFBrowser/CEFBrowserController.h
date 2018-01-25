@@ -78,9 +78,12 @@ public:
 	//RESULT OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefRefPtr<CefDOMNode> pCEFDOMNode);
 	RESULT OnFocusedNodeChanged(int cefBrowserID, int cefFrameID, CEFDOMNode *pCEFDOMNode);
 
+	RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL);
+
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
 	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;
+	virtual RESULT CloseBrowser() override;
 
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) override;
 	virtual RESULT SendKeySequence(const std::string& strKeySequence) override;

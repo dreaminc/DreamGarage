@@ -79,6 +79,7 @@ public:
 	class EnvironmentControllerObserver {
 	public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -90,7 +91,7 @@ public:
 		
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
-		virtual RESULT OnReceiveAsset() = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;;
 	};
@@ -157,6 +158,7 @@ private:
 
 	// PeerConnectionControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;

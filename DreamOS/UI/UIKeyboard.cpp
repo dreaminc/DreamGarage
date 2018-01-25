@@ -76,6 +76,14 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardHandle::SendPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(SetPasswordFlag(fIsPassword));
+Error:
+	return r;
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -126,6 +134,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pDefaultIconTexture = GetComposite()->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	{
 		//Setup textbox
@@ -150,11 +159,13 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		//Setup title / icon
 		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
 		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		
+		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
 
 		m_pFont->SetLineHeight(0.050f);
 		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
-			"",
+			"Website",
 			m_surfaceWidth - 0.02f,
 			0.050,
 			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
@@ -800,6 +811,19 @@ RESULT UIKeyboard::UpdateComposite(float depth) {
 
 Error:
 	return r;
+}
+
+RESULT UIKeyboard::SetPasswordFlag(bool fIsPassword) {
+	RESULT r = R_PASS;
+
+	if (fIsPassword) {
+		m_pTextBoxText->AddFlags(text::flags::PASSWORD);
+	}
+	else {
+		m_pTextBoxText->RemoveFlags(text::flags::PASSWORD);
+	}
+
+	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {

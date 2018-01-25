@@ -6,6 +6,9 @@
 EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/id"_json_pointer].is_number_integer())
 		m_assetID = jsonMenuNode["/id"_json_pointer].get<long>();
+
+	if (jsonMenuNode["/user"_json_pointer].is_number_integer())
+		m_userID = jsonMenuNode["/user"_json_pointer].get<long>();
 	
 	if (jsonMenuNode["/title"_json_pointer].is_string())
 		m_strTitle = jsonMenuNode["/title"_json_pointer].get<std::string>();
@@ -14,6 +17,17 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 		m_strPath = jsonMenuNode["/path"_json_pointer].get<std::string>();
 
 	if (jsonMenuNode.find("external_request") != jsonMenuNode.end()) {
+		if (jsonMenuNode["/external_request/resource_handler"_json_pointer].is_string()) {
+			std::string strResourceHandlerType = jsonMenuNode["/external_request/resource_handler"_json_pointer].get<std::string>();
+			if (strResourceHandlerType == "ResourceHandler.Dream") {
+				m_resourceHandlerType = ResourceHandlerType::DREAM;
+			}
+
+			else {
+				m_resourceHandlerType = ResourceHandlerType::DEFAULT;
+			}
+		}
+
 		if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
 			m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
 
@@ -27,6 +41,10 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 
 			}
 		}
+	}
+
+	if (jsonMenuNode["/content_control_type"_json_pointer].is_string()) {
+		m_strContentType = jsonMenuNode["/content_control_type"_json_pointer].get<std::string>();
 	}
 
 	if (jsonMenuNode["/storage_provider_scope"_json_pointer].is_string())
@@ -83,12 +101,24 @@ const std::string& EnvironmentAsset::GetURL() {
 	return m_strURL;
 }
 
+ResourceHandlerType EnvironmentAsset::GetResourceHandlerType() {
+	return m_resourceHandlerType;
+}
+
+const std::string& EnvironmentAsset::GetContentType() {
+	return m_strContentType;
+}
+
 std::multimap<std::string, std::string> EnvironmentAsset::GetHeaders() {
 	return m_headers;
 }
 
 long EnvironmentAsset::GetAssetID() {
 	return m_assetID;
+}
+
+long EnvironmentAsset::GetUserID() {
+	return m_userID;
 }
 
 std::string EnvironmentAsset::GetURI() {

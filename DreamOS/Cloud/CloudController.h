@@ -69,6 +69,7 @@ public:
 	class PeerConnectionObserver {
 	public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnNewSocketConnection(int seatPosition) = 0;
 		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
@@ -81,7 +82,7 @@ public:
 	class EnvironmentObserver {
 	public:
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnReceiveAsset() = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;
 	};
@@ -160,6 +161,7 @@ public:
 
 	// EnvironmentControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnNewSocketConnection(int seatPosition) override;
 	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
@@ -167,7 +169,7 @@ public:
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
-	virtual RESULT OnReceiveAsset() override;
+	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;

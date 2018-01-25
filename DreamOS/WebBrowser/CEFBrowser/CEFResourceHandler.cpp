@@ -21,7 +21,7 @@ CEFResourceHandler::~CEFResourceHandler() {
 ///
 /*--cef()--*/
 bool CEFResourceHandler::ProcessRequest(CefRefPtr<CefRequest> pCefRequest, CefRefPtr<CefCallback> pCefCallback) {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	/*
 	// Here for testing purposes (this will output the request headers)
@@ -186,4 +186,4 @@ void CEFResourceHandler::OnRequestComplete(CefRefPtr<CefURLRequest> pCefRequest)
 	if (m_pCefProcessRequestCallback != nullptr) {
 		m_pCefProcessRequestCallback->Continue();
 	}
-}
+} 

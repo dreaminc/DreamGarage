@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 #include "UI/UIKeyboard.h"
 #include "DreamGarage/DreamUIBar.h"
-#include "DreamGarage/DreamControlView.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "UI/UIMallet.h"
 
@@ -71,6 +71,14 @@ Error:
 	return r;
 }
 
+RESULT DreamUserHandle::SendStopSharing() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(StopSharing());
+Error:
+	return r;
+}
+
 RESULT DreamUserHandle::SendKBEnterEvent() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -115,6 +123,14 @@ RESULT DreamUserHandle::SendStreamingState(bool fStreaming) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetStreamingState(fStreaming));
+Error:
+	return r;
+}
+
+RESULT DreamUserHandle::SendPreserveSharingState(bool fIsSharing) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(PreserveSharingState(fIsSharing));
 Error:
 	return r;
 }
@@ -231,7 +247,6 @@ unsigned int DreamUserApp::GetHandleLimit() {
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	RotationMatrix qOffset; // mallet positioning
 	quaternion qOrientation;
 
 	// update user interaction ray
@@ -244,14 +259,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
 
-	/*
-	if (m_pVolume == nullptr) {
-		m_pVolume = GetComposite()->AddVolume(1.0f);
-		CN(m_pVolume);
-		m_pVolume->SetVisible(false);
-	}
-	//*/
-	
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f);
 		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
@@ -260,92 +267,118 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 
-	CBR(m_pLeftHand, R_SKIPPED);
-
-	// Update Mallet Positions
-	CNR(m_pLeftHand, R_SKIPPED);
-	CNR(m_pRightHand, R_SKIPPED);
-
-	qOffset.SetQuaternionRotationMatrix(m_pLeftHand->GetOrientation());
-
-	if (m_pLeftMallet)
-		m_pLeftMallet->GetMalletHead()->MoveTo(m_pLeftHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
-
-	CBR(m_pRightHand, R_SKIPPED);
-	qOffset = RotationMatrix();
-	qOffset.SetQuaternionRotationMatrix(m_pRightHand->GetOrientation());
-
-	if (m_pRightMallet)
-		m_pRightMallet->GetMalletHead()->MoveTo(m_pRightHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
-
-	if (m_fCollisionLeft || m_fCollisionRight) {
-		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
-		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
-
-			m_pLeftHand->SetOverlayVisible(true);
-			m_pRightHand->SetOverlayVisible(true);
-
-
-			if (m_appStack.empty()) {
-				m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-				m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-			}
-			else {
-				//*
-				auto pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_RIGHT);
-				if (pTexture == nullptr) {
-					m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
-				}
-				else {
-					m_pRightHand->SetOverlayTexture(pTexture);
-				}
-
-				pTexture = m_appStack.top()->GetOverlayTexture(HAND_TYPE::HAND_LEFT);
-				if (pTexture == nullptr) {
-					m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);
-				}
-				else {
-					m_pLeftHand->SetOverlayTexture(pTexture);
-				}
-				//*/
-			}
-		}
-	}
-
 	if (m_pMenuHandle == nullptr) {
 		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
 		CB(menuUIDs.size() == 1);
 		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
 	}
 
-	CR(UpdateHands());
+	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
+	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
 }
 
-RESULT DreamUserApp::UpdateHands() {
+RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
-	CR(m_pLeftHand->Update());
-	if (!m_pLeftHand->IsTracked() && m_pLeftMallet->GetMalletHead()->IsVisible()) {
-		m_pLeftMallet->Hide();
-	} 
-	else if (m_pLeftHand->IsTracked() && !m_appStack.empty() && !m_pLeftMallet->GetMalletHead()->IsVisible()) {
-		m_pLeftMallet->Show();
+	hand *pHand = nullptr;
+	UIMallet *pMallet = nullptr;
+	bool fRayHandCollision = false;
+	RotationMatrix qOffset; 
+
+	// define variables based on hand type
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pHand = m_pLeftHand;
+		pMallet = m_pLeftMallet;
+		fRayHandCollision = m_fCollisionLeft;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		pHand = m_pRightHand;
+		pMallet = m_pRightMallet;
+		fRayHandCollision = m_fCollisionRight;
 	}
 
-	CR(m_pRightHand->Update());
-	if (!m_pRightHand->IsTracked() && m_pRightMallet->GetMalletHead()->IsVisible()) {
-		m_pRightMallet->Hide();
-	} 
-	else if (m_pRightHand->IsTracked() && !m_appStack.empty() && !m_pRightMallet->GetMalletHead()->IsVisible()) {
-		m_pRightMallet->Show();
+	CNR(pHand, R_SKIPPED);
+
+	CR(pHand->Update());
+
+	// Update Mallet Position
+	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+	if (pMallet != nullptr) {
+		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetHeadOffset()));
 	}
+
+	// Update Mallet Visibility
+	if (!pHand->IsTracked() && pMallet->GetMalletHead()->IsVisible()) { // || m_appStack.empty()?
+		pMallet->Hide();
+	} 
+	else if (pHand->IsTracked() && !m_appStack.empty() && !pMallet->GetMalletHead()->IsVisible()) {
+		pMallet->Show();
+	}
+
+	// Update Overlay visibility / texture
+	if (fRayHandCollision) {
+		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
+
+			pHand->SetOverlayVisible(true);
+
+			//UpdateOverlayTexture(type);
+			UpdateOverlayTextures();
+			if (m_appStack.empty()) {
+				pHand->SetModelState(hand::ModelState::CONTROLLER);
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::UpdateOverlayTexture(HAND_TYPE type) {
+	RESULT r = R_PASS;
+
+	hand *pHand = nullptr;
+	texture *pDefaultTexture = nullptr;
+	texture *pOverlayTexture = nullptr;
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		pHand = m_pLeftHand;
+		pDefaultTexture = m_pTextureDefaultGazeLeft;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		pHand = m_pRightHand;
+		pDefaultTexture = m_pTextureDefaultGazeRight;
+	}
+
+	CNR(pHand, R_SKIPPED);
+	CNR(pDefaultTexture, R_SKIPPED);
+
+	if (!m_appStack.empty()) {
+		pOverlayTexture = m_appStack.top()->GetOverlayTexture(type);
+	}
+
+	if (pOverlayTexture != nullptr) {
+		CR(pHand->SetOverlayTexture(pOverlayTexture));
+	}
+	else {
+		CR(pHand->SetOverlayTexture(pDefaultTexture));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::UpdateOverlayTextures() {
+	RESULT r = R_PASS;
+
+	CR(UpdateOverlayTexture(HAND_TYPE::HAND_LEFT));
+	CR(UpdateOverlayTexture(HAND_TYPE::HAND_RIGHT));
 
 Error:
 	return r;
@@ -380,6 +413,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 			m_appStack.push(m_pMenuHandle);
 
+			UpdateOverlayTextures();
 			//currently, the user app always has the menu handle
 			//GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
 		}
@@ -465,9 +499,35 @@ Error:
 RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 	RESULT r = R_PASS;
 
+	if (m_appStack.empty()) {
+		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pLeftMallet->Show();
+		m_pRightMallet->Show();
+	}
+
 	m_appStack.push(pObserver);
 
 //Error:
+	return r;
+}
+
+RESULT DreamUserApp::StopSharing() {
+	RESULT r = R_PASS;
+
+	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+
+	CBR(!m_appStack.empty(), R_SKIPPED);
+
+	if (m_appStack.top() == pDreamControlViewHandle) {
+		m_pKeyboardHandle->Hide();
+		CR(ClearFocusStack());
+	}
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 	return r;
 }
 
@@ -487,10 +547,12 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 	RESULT r = R_PASS;
 
 	ResetAppComposite();
-	if (!m_fStreaming) {
+	if (!m_fStreaming && !m_fIsSharing) {
 		CR(m_pLeftMallet->Hide());
 		CR(m_pRightMallet->Hide());
 
+		UpdateOverlayTextures();
+		//stay with controller models if the user is currently looking at them
 		if (!(m_fCollisionLeft || m_fCollisionRight)) {
 			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 			CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
@@ -522,20 +584,20 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	type = pHand->GetHandState().handType;
 	CBR(type == HAND_TYPE::HAND_LEFT || type == HAND_TYPE::HAND_RIGHT, R_SKIPPED);
 
+	pDreamOS->AddObject(pHand);
+	CR(pHand->InitializeWithContext(pDreamOS));
+	pHand->SetModelState(hand::ModelState::HAND);
+
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
-		GetDOS()->AddObject(m_pLeftHand);
-		CR(m_pLeftHand->InitializeWithContext(pDreamOS));
-		CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 		m_pLeftHand->SetOverlayTexture(m_pTextureDefaultGazeLeft);	
 	}
 	else {
 		m_pRightHand = pHand;
-		GetDOS()->AddObject(m_pRightHand);
-		CR(m_pRightHand->InitializeWithContext(pDreamOS));
-		CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
 		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
 	}
+
+	pHand->SetOverlayVisible(false);
 
 	auto pVolume = pHand->GetPhantomVolume().get();
 	CNR(pVolume, R_SKIPPED);
@@ -602,9 +664,6 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	vector vUp = vector(0.0f, 1.0f, 0.0f);
 
 	CN(pCamera);
-	CN(m_pLeftHand);
-	CN(m_pRightHand);
-
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
 		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
@@ -681,6 +740,11 @@ RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
 
 RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
 	m_fStreaming = fStreaming;
+	return R_PASS;
+}
+
+RESULT DreamUserApp::PreserveSharingState(bool fIsSharing) {
+	m_fIsSharing = fIsSharing;
 	return R_PASS;
 }
 
