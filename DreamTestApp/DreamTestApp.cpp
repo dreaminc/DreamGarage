@@ -130,6 +130,10 @@ Error:
 	return r;
 }
 
+RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 	
