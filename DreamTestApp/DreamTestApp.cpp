@@ -131,22 +131,7 @@ Error:
 }
 
 RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
-	RESULT r = R_PASS;
-
-	CR(r);
-
-	// Just here for the override, though it could be implemented
-	/*
-	if (!m_fSeated) {
-		CB(seatPosition < m_seatLookup.size());
-		CR(SetRoundtablePosition(seatPosition));
-		m_fSeated = true;
-		m_fShouldUpdateAppComposites = true;
-	}
-	//*/
-
-Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
