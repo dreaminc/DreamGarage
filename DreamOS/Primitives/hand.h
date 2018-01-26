@@ -16,7 +16,12 @@
 #include <memory>
 
 #define HAND_ANIMATION_DURATION 0.25f
+
+// overlay values
 #define OVERLAY_ANIMATION_DURATION 0.5f
+#define OVERLAY_VOLUME_WIDTH 0.15f // hands seem to be rotated in an unintuitive way
+#define OVERLAY_VOLUME_HEIGHT 0.1f 
+#define OVERLAY_VOLUME_DEPTH 0.15f
 
 // oculus values
 #define OVR_OVERLAY_SCALE 0.035f
@@ -129,6 +134,9 @@ protected:
 
 	// collision volume
 	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
+	float m_volumeWidth = OVERLAY_VOLUME_WIDTH;
+	float m_volumeHeight = OVERLAY_VOLUME_HEIGHT;
+	float m_volumeDepth = OVERLAY_VOLUME_DEPTH;
 
 	ModelState m_modelState = ModelState::HAND;
 };

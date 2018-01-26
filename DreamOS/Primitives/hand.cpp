@@ -10,7 +10,14 @@
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {
-	Initialize(type);
+	RESULT r = R_PASS;
+	CR(Initialize(type));
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
@@ -51,8 +58,9 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
-						
-	m_pPhantomVolume = MakeVolume(0.15, 0.15, 0.01);	// This is the "hitbox" for the controller overlay 
+
+	// This is the "hitbox" for the controller overlay 
+	m_pPhantomVolume = MakeVolume(m_volumeWidth, m_volumeHeight, m_volumeDepth);	
 	CN(m_pPhantomVolume);
 	m_pPhantomVolume->SetVisible(false);
 	AddObject(m_pPhantomVolume);
@@ -155,7 +163,6 @@ RESULT hand::SetModelState(ModelState modelState) {
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
-		m_pOverlayQuad->SetVisible(m_fTracked && m_pOverlayQuad->IsVisible());
 		//m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
 	} break;
@@ -178,7 +185,8 @@ RESULT hand::Update() {
 		m_pController->SetVisible(m_fTracked);
 //		if (!m_pOverlayQuad->IsVisible())
 //			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
-		m_pOverlayQuad->SetVisible(m_pOverlayQuad->IsVisible() && m_fTracked);
+		m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_pOverlayQuad->IsVisible() && m_fTracked);
+		//m_fOverlayVisible = m_pOverlayQuad->IsVisible(); //??
 	} break;
 	}
 

@@ -131,6 +131,7 @@ private:
 // ControlBarObserver 
 private:
 	bool CanPressButton(UIButton* pButtonContext);
+	RESULT SetIsMinimizedFlag(bool fIsMinimized);
 
 	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) override;
 	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) override;
