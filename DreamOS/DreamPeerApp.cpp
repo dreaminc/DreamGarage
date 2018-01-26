@@ -166,7 +166,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	if (m_fGazeInteraction) {
 		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay) {
+		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay && !IsUserNameVisible()) {
 			ShowUserNameField();
 			m_fGazeInteraction = false;
 		}

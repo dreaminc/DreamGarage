@@ -326,12 +326,16 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 
 		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
 
-			pHand->SetOverlayVisible(true);
+			//pHand->SetOverlayVisible(true);
+			m_pLeftHand->SetOverlayVisible(true);
+			m_pRightHand->SetOverlayVisible(true);
 
 			//UpdateOverlayTexture(type);
 			UpdateOverlayTextures();
 			if (m_appStack.empty()) {
-				pHand->SetModelState(hand::ModelState::CONTROLLER);
+				//pHand->SetModelState(hand::ModelState::CONTROLLER);
+				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 			}
 		}
 	}
@@ -426,11 +430,12 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	case (ELEMENT_INTERSECT_BEGAN): {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		auto pEventObj = mEvent->m_pEventObject;
+		auto pInteractionObj = mEvent->m_pInteractionObject;
 
 		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
 		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
 
-		if (pEventObj == pLeftVolume || pEventObj == pRightVolume) {
+		if (pInteractionObj == m_pOrientationRay.get() && (pEventObj == pLeftVolume || pEventObj == pRightVolume)) {
 			m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 
 			if (pEventObj == pLeftVolume) {
@@ -447,6 +452,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		auto pEventObj = mEvent->m_pEventObject;
 		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
 		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
+
 		if (pEventObj == pLeftVolume || pEventObj == pRightVolume) {
 			if (pEventObj == pLeftVolume) {
 				m_fCollisionLeft = false;
@@ -586,7 +592,6 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	pDreamOS->AddObject(pHand);
 	CR(pHand->InitializeWithContext(pDreamOS));
-	pHand->SetModelState(hand::ModelState::HAND);
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
@@ -598,6 +603,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	}
 
 	pHand->SetOverlayVisible(false);
+	pHand->SetModelState(hand::ModelState::HAND);
 
 	auto pVolume = pHand->GetPhantomVolume().get();
 	CNR(pVolume, R_SKIPPED);

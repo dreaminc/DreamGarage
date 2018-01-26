@@ -742,6 +742,9 @@ RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
 	CR(HideView());
+
+	SetIsMinimizedFlag(false);
+
 	CNR(m_pBrowserHandle, R_SKIPPED);
 
 Error:
@@ -959,12 +962,26 @@ Error:
 	return false;
 }
 
+RESULT DreamControlView::SetIsMinimizedFlag(bool fIsMinimized) {
+	RESULT r = R_PASS;
+
+	m_fIsMinimized = fIsMinimized;
+	if (m_fIsMinimized) {
+		CR(m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetShowTexture()));
+	}
+	else {
+		CR(m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetHideTexture()));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamControlView::HandleStopPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
-	m_fIsMinimized = false;
 
 	CR(m_pBrowserHandle->SendStopEvent());
 	CN(m_pUserHandle);
@@ -988,8 +1005,7 @@ RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pCo
 
 		auto fnEndCallback = [&](void *pContext) {
 			GetViewQuad()->SetVisible(false);
-			m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetShowTexture());
-			m_fIsMinimized = true;
+			SetIsMinimizedFlag(true);
 			m_strURL = "";
 			return R_PASS;
 		};
@@ -1012,7 +1028,6 @@ RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pCo
 	else {
 		auto fnStartCallback = [&](void *pContext) {
 			GetViewQuad()->SetVisible(true);
-			m_fIsMinimized = false;
 			return R_PASS;
 		};
 
@@ -1022,7 +1037,7 @@ RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pCo
 			m_fMouseDown[0] = false;
 			m_fMouseDown[1] = false;
 
-			m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetHideTexture());
+			SetIsMinimizedFlag(false);
 //		Error:
 			return r;
 		};
