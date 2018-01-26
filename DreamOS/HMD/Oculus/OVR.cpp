@@ -314,6 +314,9 @@ RESULT OVRHMD::UpdateHMD() {
 		ovrInputState inputState;
 		ovr_GetInputState(m_ovrSession, ovrControllerType::ovrControllerType_Touch, &inputState);
 
+		UpdateSenseController(ovrControllerType_LTouch, inputState);
+		UpdateSenseController(ovrControllerType_RTouch, inputState);
+
 		point offset = m_pParentSandbox->GetCamera()->camera::GetPosition();
 
 		RotationMatrix qOffset = RotationMatrix();
@@ -354,9 +357,6 @@ RESULT OVRHMD::UpdateHMD() {
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;
 			hand->SetTracked(true);
 			//pModel->SetVisible(true);
-
-			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
-			UpdateSenseController(type, inputState);
 		}
 	}
 
