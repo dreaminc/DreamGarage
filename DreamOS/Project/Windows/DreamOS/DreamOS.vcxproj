@@ -697,6 +697,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationDisplayManager.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationManager.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.cpp" />
@@ -980,6 +981,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\CommonTypes.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationDisplayManager.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationManager.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.h" />
@@ -1307,7 +1309,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserFactory.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h" />
-    <ClInclude Include="D3D11DesktopController.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

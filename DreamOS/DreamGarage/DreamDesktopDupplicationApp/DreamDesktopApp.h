@@ -65,12 +65,12 @@ public:
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
-	virtual RESULT OnPaint(const void *pBuffer, int width, int height) override;
+	RESULT OnPaint(const void *pBuffer, int width, int height);
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);
-	//RESULT SetNormalVector(vector vNormal);
+	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
 	//RESULT FadeQuadToBlack();
@@ -86,7 +86,7 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	// Video Streaming stuffs
 	RESULT StopSending();
 	RESULT StartReceiving();
 	RESULT StopReceiving();
@@ -115,6 +115,8 @@ protected:
 private:
 	std::shared_ptr<quad> m_pDesktopQuad = nullptr;
 	std::shared_ptr<texture> m_pDesktopTexture = nullptr;
+
+	std::shared_ptr<D3D11DesktopController> m_pDesktopController = nullptr;
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 

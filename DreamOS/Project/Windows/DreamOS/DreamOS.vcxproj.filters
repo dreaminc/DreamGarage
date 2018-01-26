@@ -2174,7 +2174,7 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11DesktopController.h">
+    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
   </ItemGroup>
