@@ -1,5 +1,6 @@
 #include "DreamDesktopApp.h"
 #include "DreamOS.h"
+#include "D3D11DesktopController.h"
 #include <limits.h>
 #include "Core/Utilities.h"
 
@@ -393,6 +394,9 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 
 	GetComposite()->SetVisible(true);
 
+	m_pDesktopController = std::make_shared<D3D11DesktopController>(D3D11DesktopController());
+	m_pDesktopController->RegisterDesktopControllerObserver(this);
+
 	monitorToOutput = 1;	// assuming we want to duplicate the main desktop for now
 
 	// Event used by the threads to signal an unexpected error and we want to quit the app
@@ -614,6 +618,105 @@ RESULT DreamDesktopApp::OnPaint(const void *pBuffer, int width, int height) {
 		(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
 		
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::SetPosition(point ptPosition) {
+	RESULT r = R_PASS;
+
+	GetComposite()->SetPosition(ptPosition);
+
+	return r;
+}
+
+
+RESULT DreamDesktopApp::SetAspectRatio(float aspectRatio) {
+	m_aspectRatio = aspectRatio;
+
+	if (m_pDesktopQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::SetDiagonalSize(float diagonalSize) {
+	m_diagonalSize = diagonalSize;
+
+	if (m_pDesktopQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::SetNormalVector(vector vNormal) {
+	m_vNormal = vNormal.Normal();
+
+	if (m_pDesktopQuad != nullptr) {
+		return UpdateViewQuad();
+	}
+
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
+	GetComposite()->SetPosition(ptPosition);
+	m_diagonalSize = diagonal;
+	m_aspectRatio = aspectRatio;
+	m_vNormal = vNormal.Normal();
+
+	if (m_pDesktopQuad != nullptr) {
+		return UpdateViewQuad();
+	}
+
+	return R_PASS;
+}
+
+float DreamDesktopApp::GetHeight() {
+	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+float DreamDesktopApp::GetWidth() {
+	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+vector DreamDesktopApp::GetNormal() {
+	return m_vNormal;
+}
+
+point DreamDesktopApp::GetOrigin() {
+	return GetComposite()->GetOrigin();
+}
+
+RESULT DreamDesktopApp::UpdateViewQuad() {
+	RESULT r = R_PASS;
+
+	CR(m_pDesktopQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
+
+	// Flip UV vertically
+	///*
+	if (r != R_SKIPPED) {
+		m_pDesktopQuad->FlipUVVertical();
+	}
+	//*/
+
+	CR(m_pDesktopQuad->SetDirty());
+
+	CR(m_pDesktopQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
+
+Error:
+	return r;
+}
+
+bool DreamDesktopApp::IsVisible() {
+	return m_pDesktopQuad->IsVisible();
+}
+
+RESULT DreamDesktopApp::SetVisible(bool fVisible) {
+	RESULT r = R_PASS;
+
+	CR(m_pDesktopQuad->SetVisible(fVisible));
 
 Error:
 	return r;

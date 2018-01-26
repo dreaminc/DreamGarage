@@ -963,7 +963,7 @@
       <Filter>DreamControlView</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
-      <Filter>DreamControlView</Filter> 
+      <Filter>DreamControlView</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationDisplayManager.cpp">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
@@ -978,6 +978,9 @@
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.cpp">
+      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.cpp">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2135,7 +2138,7 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11DesktopController.h">
+    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
   </ItemGroup>

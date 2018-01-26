@@ -11,7 +11,7 @@
 //
 class D3D11DesktopDuplicationManager : public D3D11DesktopController
 {
-	RESULT RegisterDesktopAppObserver(D3D11DesktopDuplicationManager::observer* pDesktopControllerObserver);
+
 public:
 	D3D11DesktopDuplicationManager();
 	~D3D11DesktopDuplicationManager();
