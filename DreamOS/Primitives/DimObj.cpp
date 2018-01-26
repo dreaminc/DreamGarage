@@ -539,9 +539,9 @@ CollisionManifold DimObj::Collide(VirtualObj* pObj, int depth) {
 				for (auto &pChild : GetChildren()) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
-					//if (pDimChild->Intersect(pObj)) {
+					if (pDimChild->Intersect(pObj)) {
 						return pDimChild->Collide(pObj, (depth + 1));
-					//}
+					}
 				}
 
 				return CollisionManifold(this, pObj);
