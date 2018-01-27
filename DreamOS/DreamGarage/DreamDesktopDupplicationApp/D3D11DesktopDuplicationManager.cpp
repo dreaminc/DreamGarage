@@ -291,6 +291,7 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 		Data->DirtyCount = BufSize / sizeof(RECT);
 
 		Data->MetaData = m_MetaDataBuffer;
+		m_pDesktopControllerObserver->OnDataBuffer(m_MetaDataBuffer);
 	}
 
 	Data->Frame = m_AcquiredDesktopImage;

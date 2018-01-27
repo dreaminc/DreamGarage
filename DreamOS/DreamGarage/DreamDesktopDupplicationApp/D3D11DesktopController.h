@@ -8,6 +8,7 @@ public:
 	class observer {
 	public:
 		virtual RESULT OnPaint(const void *pBuffer, int width, int height) = 0;
+		virtual RESULT OnDataBuffer(unsigned char* pBuffer) = 0;
 	};
 
 	RESULT RegisterDesktopControllerObserver(D3D11DesktopController::observer* pDesktopControllerObserver);

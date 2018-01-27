@@ -65,7 +65,8 @@ public:
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
-	RESULT OnPaint(const void *pBuffer, int width, int height);
+	virtual RESULT OnPaint(const void *pBuffer, int width, int height) override;
+	virtual RESULT OnDataBuffer(unsigned char* pBuffer) override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
