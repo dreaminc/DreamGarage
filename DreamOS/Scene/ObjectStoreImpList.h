@@ -47,8 +47,6 @@ protected:
 private:	
 	std::vector<light*> m_lights;		
 
-	skybox *m_pSkybox;
-
 	std::list<VirtualObj*>::iterator m_objectIterator;
 
 };
