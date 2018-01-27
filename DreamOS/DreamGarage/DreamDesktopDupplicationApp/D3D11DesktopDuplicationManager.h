@@ -21,8 +21,6 @@ public:
 	DUPL_RETURN GetMouse(_Inout_ PTR_INFO* PtrInfo, _In_ DXGI_OUTDUPL_FRAME_INFO* FrameInfo, INT OffsetX, INT OffsetY);
 	void GetOutputDesc(_Out_ DXGI_OUTPUT_DESC* DescPtr);
 
-	RESULT SendTextureBuffer();
-
 private:
 
 	// vars

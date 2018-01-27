@@ -466,8 +466,6 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	}
 	*/
 
-	// TODO: make the quad here, dimensions, aspect ration, etc...
-
 	DestroyCursor(Cursor);
 
 	//ShowWindow(WindowHandle, nCmdShow);	// replace these
@@ -547,6 +545,7 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 				Ret = DUPL_RETURN_ERROR_UNEXPECTED;
 				}
 			}
+			
 
 			// We start off in occluded state and we should immediate get a occlusion status window message
 			Occluded = true;
@@ -618,6 +617,16 @@ RESULT DreamDesktopApp::OnPaint(const void *pBuffer, int width, int height) {
 		(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
 		
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::OnDataBuffer(unsigned char* pBuffer) {
+	RESULT r = R_PASS;
+
+	CRM(m_pDesktopTexture->Update(pBuffer, 1920, 1080, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+	DEBUG_LINEOUT("Updated Desktop Texture");
 
 Error:
 	return r;

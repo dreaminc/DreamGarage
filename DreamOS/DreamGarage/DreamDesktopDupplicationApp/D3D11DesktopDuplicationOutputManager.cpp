@@ -57,6 +57,12 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	};
 	UINT NumDriverTypes = ARRAYSIZE(DriverTypes);
 
+	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+#ifdef _USE_TEST_APP
+	// If the project is in a debug build, enable the debug layer.
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
 	// Feature levels supported
 	D3D_FEATURE_LEVEL FeatureLevels[] =
 	{
@@ -71,7 +77,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	// Create device
 	for (UINT DriverTypeIndex = 0; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)
 	{
-		hr = D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, 0, FeatureLevels, NumFeatureLevels,
+		hr = D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, creationFlags, FeatureLevels, NumFeatureLevels,
 			D3D11_SDK_VERSION, &m_Device, &FeatureLevel, &m_DeviceContext);
 		if (SUCCEEDED(hr))
 		{
@@ -110,11 +116,11 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	}
 
 	// Register for occlusion status windows message
-	hr = m_Factory->RegisterOcclusionStatusWindow(Window, OCCLUSION_STATUS_MSG, &m_OcclusionCookie);
-	if (FAILED(hr))
-	{
-		return ProcessFailure(m_Device, L"Failed to register for occlusion message", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
+	//hr = m_Factory->RegisterOcclusionStatusWindow(Window, OCCLUSION_STATUS_MSG, &m_OcclusionCookie);
+	//if (FAILED(hr))
+	//{
+	//	return ProcessFailure(m_Device, L"Failed to register for occlusion message", L"Error", hr, SystemTransitionsExpectedErrors);
+	//}
 
 	// Get window size
 	RECT WindowRect;
@@ -123,6 +129,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	UINT Height = WindowRect.bottom - WindowRect.top;
 
 	// Create swapchain for window
+	/*
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
 	RtlZeroMemory(&SwapChainDesc, sizeof(SwapChainDesc));
 
@@ -139,14 +146,14 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	{
 		return ProcessFailure(m_Device, L"Failed to create window swapchain", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
-
+	
 	// Disable the ALT-ENTER shortcut for entering full-screen mode
 	hr = m_Factory->MakeWindowAssociation(Window, DXGI_MWA_NO_ALT_ENTER);
 	if (FAILED(hr))
 	{
 		return ProcessFailure(m_Device, L"Failed to make window association", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
-
+	*/
 	// Create shared texture
 	DUPL_RETURN Return = CreateSharedSurf(SingleOutput, OutCount, DeskBounds);
 	if (Return != DUPL_RETURN_SUCCESS)
@@ -937,6 +944,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitShaders()
 //
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::MakeRTV()
 {
+	/*
 	// Get backbuffer
 	ID3D11Texture2D* BackBuffer = nullptr;
 	HRESULT hr = m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer));
@@ -952,7 +960,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::MakeRTV()
 	{
 		return ProcessFailure(m_Device, L"Failed to create render target view in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
-
+	*/
 	// Set new render target
 	m_DeviceContext->OMSetRenderTargets(1, &m_RTV, nullptr);
 
