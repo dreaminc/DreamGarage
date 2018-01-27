@@ -36,8 +36,6 @@ public:
 	virtual RESULT GetLights(std::vector<light*>*& pLights) = 0;
 
 	// Skybox / Sphere
-	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
-
 	virtual std::list<VirtualObj*> GetList() = 0;
 	virtual std::vector<VirtualObj*> GetObjects() = 0;
 	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) = 0;

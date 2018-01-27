@@ -46,10 +46,6 @@ RESULT ObjectStoreImpList::PushObject(VirtualObj *pObject) {
 	if (pLight != nullptr)
 		return PushLight(pLight);
 
-	skybox *pSkybox = dynamic_cast<skybox*>(pObject);
-	if (pSkybox != nullptr)
-		return SetSkybox(pSkybox);
-	
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 	if (pObject != nullptr)
 		return PushDimensionObject(pDimObj);
@@ -108,16 +104,6 @@ RESULT ObjectStoreImpList::GetLights(std::vector<light*>*& pLights) {
 	pLights = &(m_lights);
 //Error:
 	return r;
-}
-
-RESULT ObjectStoreImpList::SetSkybox(skybox *pSkybox) {
-	m_pSkybox = pSkybox;
-	return R_PASS;
-}
-
-RESULT ObjectStoreImpList::GetSkybox(skybox*& pSkybox) {
-	pSkybox = m_pSkybox;
-	return R_PASS;
 }
 
 VirtualObj *ObjectStoreImpList::FindObjectByUID(UID uid) {
