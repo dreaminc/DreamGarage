@@ -1,9 +1,7 @@
 #include "ObjectStoreImpList.h"
 #include "Primitives/ray.h"
 
-ObjectStoreImpList::ObjectStoreImpList() :
-	m_pSkybox(nullptr)
-{
+ObjectStoreImpList::ObjectStoreImpList() {
 	ResetIterator();
 }
 
