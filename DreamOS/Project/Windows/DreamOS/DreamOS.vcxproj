@@ -701,6 +701,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamOSTestSuite.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
+    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc" />
@@ -978,6 +979,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamOSTestSuite.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
+    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />
