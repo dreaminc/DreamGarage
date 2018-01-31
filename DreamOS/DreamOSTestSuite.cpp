@@ -923,10 +923,6 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
 
 			pTestContext->pDreamShareView = pDreamShareView;
-			// Create the 2D Mouse App
-
-			pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
-			CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
 
 			// Create the Shared View App
 			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);

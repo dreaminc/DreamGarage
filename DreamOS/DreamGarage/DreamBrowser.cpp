@@ -481,10 +481,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
 
-	if (strCurrentURL != "about:blank") {
-		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-	}
-
 	m_strCurrentURL = strCurrentURL;
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
@@ -493,14 +489,10 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
 	}
 
-	if (pDreamShareViewHandle != nullptr) {
+	if (pDreamShareViewHandle != nullptr && strCurrentURL != "about:blank") {
 		pDreamShareViewHandle->SendCastTexture(m_pBrowserTexture);
 		pDreamShareViewHandle->SendCastingEvent();
 	}
-
-#ifndef _USE_TEST_APP
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-#endif
 
 //Error:
 	if (pDreamControlViewHandle != nullptr) {
@@ -650,21 +642,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 */
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	CN(m_pBrowserQuad);
-
-	
-	// Flip UV vertically
-	///*
-	m_pBrowserQuad->FlipUVVertical();
-	//*/
-
-	// attempt to give the browser a matte appearance
-	m_pBrowserQuad->SetMaterialAmbient(0.9f);
-
-	GetComposite()->SetMaterialShininess(0.0f, true);
-	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
-
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
@@ -672,13 +649,13 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	CN(m_pLoadingScreenTexture);
 
 #ifndef _USE_TEST_APP
-	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+	//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 #else
 	// Initialize new browser
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	//m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 #endif
 
 	// Set up mouse / hand cursor model
@@ -776,7 +753,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 			CR(pDreamShareViewHandle->SendLoadingEvent());
 		}
 
-		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 		GetComposite()->SetVisible(true);
 
 	}
@@ -1102,7 +1079,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	switch (pEvent->m_eventType) {
 #ifdef _USE_TEST_APP
 		case ELEMENT_INTERSECT_BEGAN: {
-			if (m_pBrowserQuad->IsVisible()) {
+			//if (m_pBrowserQuad->IsVisible()) {
 				m_pPointerCursor->SetVisible(true);
 
 				WebBrowserMouseEvent webBrowserMouseEvent;
@@ -1115,7 +1092,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				m_fBrowserActive = true;
 
 				fUpdateMouse = true;
-			}
+			//}
 		} break;
 
 		case ELEMENT_INTERSECT_ENDED: {
@@ -1268,27 +1245,17 @@ RESULT DreamBrowser::SetPosition(point ptPosition) {
 RESULT DreamBrowser::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
 
-	if (m_pBrowserQuad != nullptr)
-		return UpdateViewQuad();
-
 	return R_PASS;
 }
 
 RESULT DreamBrowser::SetDiagonalSize(float diagonalSize) {
 	m_diagonalSize = diagonalSize;
 
-	if (m_pBrowserQuad != nullptr)
-		return UpdateViewQuad();
-
 	return R_PASS;
 }
 
 RESULT DreamBrowser::SetNormalVector(vector vNormal) {
 	m_vNormal = vNormal.Normal();
-
-	if (m_pBrowserQuad != nullptr) {
-		return UpdateViewQuad();
-	}
 
 	return R_PASS;
 }
@@ -1299,11 +1266,7 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	m_aspectRatio = aspectRatio;
 	m_vNormal = vNormal.Normal();
 
-if (m_pBrowserQuad != nullptr) {
-	return UpdateViewQuad();
-}
-
-return R_PASS;
+	return R_PASS;
 }
 
 float DreamBrowser::GetHeight() {
@@ -1320,26 +1283,6 @@ vector DreamBrowser::GetNormal() {
 
 point DreamBrowser::GetOrigin() {
 	return GetComposite()->GetOrigin();
-}
-
-RESULT DreamBrowser::UpdateViewQuad() {
-	RESULT r = R_PASS;
-
-	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
-
-	// Flip UV vertically
-	///*
-	if (r != R_SKIPPED) {
-		m_pBrowserQuad->FlipUVVertical();
-	}
-	//*/
-
-	CR(m_pBrowserQuad->SetDirty());
-
-	CR(m_pBrowserQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
-
-Error:
-	return r;
 }
 
 bool DreamBrowser::IsVisible() {
@@ -1453,7 +1396,7 @@ RESULT DreamBrowser::StopSending() {
 		m_pDreamUserHandle->SendStopSharing();
 	}
 
-	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+	//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 	//m_pWebBrowserController->CloseBrowser();
 	//m_pWebBrowserController = nullptr;
 
@@ -1473,7 +1416,12 @@ RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	m_pDreamUserHandle->SendPreserveSharingState(false);
-	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+
+	//TODO: temporary - will be moved to DreamShareView with video streaming stuff
+	DreamShareViewHandle *pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
+	pDreamShareViewHandle->SendCastTexture(m_pBrowserTexture);
+	pDreamShareViewHandle->SendCastingEvent();
+
 	// Switch to input
 	if (IsStreaming()) {
 		SetStreamingState(false);
@@ -1502,6 +1450,9 @@ RESULT DreamBrowser::StartReceiving(PeerConnection *pPeerConnection) {
 	CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, DreamBrowserMessage::type::REQUEST_STREAMING_START));
 
 Error:
+	if (pDreamShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
+	}
 	return r;
 }
 
