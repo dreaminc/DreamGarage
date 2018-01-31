@@ -529,7 +529,7 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 				// First time through the loop so nothing to clean up
 				FirstTime = false;
 			}
-
+			
 			// Re-initialize
 			Ret = OutMgr.InitOutput(WindowHandle, monitorToOutput, &OutputCount, &DeskBounds);
 			if (Ret == DUPL_RETURN_SUCCESS)

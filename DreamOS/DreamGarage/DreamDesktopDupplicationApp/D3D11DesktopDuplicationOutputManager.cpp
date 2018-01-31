@@ -1,4 +1,5 @@
 #include "D3D11DesktopDuplicationOutputManager.h"
+#include <vector>
 using namespace DirectX;
 
 //
@@ -74,10 +75,58 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	UINT NumFeatureLevels = ARRAYSIZE(FeatureLevels);
 	D3D_FEATURE_LEVEL FeatureLevel;
 
-	// Create device
+	// Get the Right adapter
+	std::vector <IDXGIAdapter1*> vAdapters;
+	IDXGIAdapter1 *pAdapter;
+	IDXGIFactory1 *pFactory = NULL;
+	IDXGIOutput *pOutput;
+	std::vector <IDXGIOutput*> vOutputs;
+
+	// Create a DXGIFactory object.
+	if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&pFactory)))
+	{
+		// Should handle this somehow	
+	}
+
+	for (UINT i = 1; pFactory->EnumAdapters1(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; i++)
+	{
+		DXGI_ADAPTER_DESC1 desc1;
+		pAdapter->GetDesc1(&desc1);
+
+		for (UINT i = 0; pAdapter->EnumOutputs(i, &pOutput) != DXGI_ERROR_NOT_FOUND; i++)
+		{
+			DXGI_OUTPUT_DESC DesktopDesc;
+			hr = pOutput->GetDesc(&DesktopDesc);
+			if (SUCCEEDED(hr)) {
+				vOutputs.push_back(pOutput);
+			}
+		}
+
+		if (desc1.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		{
+			continue;	// skip software adapters, can pass in /warp to command line if necessary
+		}
+		IDXGIAdapter *pAdapt = pAdapter;
+		//hr = D3D11CreateDevice(pAdapter, DriverTypes[i], nullptr, creationFlags, FeatureLevels, NumFeatureLevels,
+		//	D3D11_SDK_VERSION, &m_Device, &FeatureLevel, &m_DeviceContext);
+		hr = D3D11CreateDevice(pAdapt, D3D_DRIVER_TYPE_UNKNOWN, nullptr, creationFlags, FeatureLevels, NumFeatureLevels, D3D11_SDK_VERSION, &m_Device, &FeatureLevel, &m_DeviceContext);
+		if (SUCCEEDED(hr))
+		{
+			// Device creation succeeded, no need to loop anymore
+			break;
+		}
+	}
+
+	if (pFactory)
+	{
+		pFactory->Release();
+		pFactory = nullptr;
+	}
+
+	/* Create device
 	for (UINT DriverTypeIndex = 0; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)
 	{
-		hr = D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, creationFlags, FeatureLevels, NumFeatureLevels,
+		hr = D3D11CreateDevice(pAdapter, DriverTypes[DriverTypeIndex], nullptr, creationFlags, FeatureLevels, NumFeatureLevels,
 			D3D11_SDK_VERSION, &m_Device, &FeatureLevel, &m_DeviceContext);
 		if (SUCCEEDED(hr))
 		{
@@ -89,7 +138,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	{
 		return ProcessFailure(m_Device, L"Device creation in D3D11DesktopDuplicationOutputManager failed", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
-
+	//*/
 	// Get DXGI factory
 	IDXGIDevice* DxgiDevice = nullptr;
 	hr = m_Device->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&DxgiDevice));
@@ -241,6 +290,35 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	{
 		return ProcessFailure(m_Device, L"Failed to get parent DXGI Adapter", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
+	
+	// Debugging- list all outputs
+	//*
+	std::vector <IDXGIAdapter*> vAdapters;
+	IDXGIAdapter * pAdapter;
+	IDXGIFactory1* pFactory = NULL;
+	IDXGIOutput *pOutput;
+	std::vector <IDXGIOutput*> vOutputs;
+	// Create a DXGIFactory object.
+	if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory), (void**)&pFactory)))
+	{
+		return ProcessFailure(m_Device, L"Failed to get parent DXGI Adapter", L"Error", hr, SystemTransitionsExpectedErrors);
+	}
+
+	for (UINT i = 0; pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
+	{
+		vAdapters.push_back(pAdapter);
+		DXGI_ADAPTER_DESC pDesc;
+		hr = vAdapters[i]->GetDesc(&pDesc);
+
+		for (UINT i = 0; pAdapter->EnumOutputs(i, &pOutput) != DXGI_ERROR_NOT_FOUND; ++i)
+		{
+			vOutputs.push_back(pOutput);
+			DXGI_OUTPUT_DESC DesktopDesc;
+			pOutput->GetDesc(&DesktopDesc);
+		}
+		
+	}
+	//*/
 
 	// Set initial values so that we always catch the right coordinates
 	DeskBounds->left = INT_MAX;
@@ -279,7 +357,11 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	}
 	else
 	{
-		hr = DxgiAdapter->EnumOutputs(SingleOutput, &DxgiOutput);
+		DXGI_ADAPTER_DESC pDesc;
+		hr = DxgiAdapter->GetDesc(&pDesc);
+		
+		//hr = DxgiAdapter->EnumOutputs(SingleOutput, &DxgiOutput);
+		hr = DxgiAdapter->EnumOutputs(0, &DxgiOutput);
 		if (FAILED(hr))
 		{
 			DxgiAdapter->Release();
@@ -294,7 +376,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 		DxgiOutput = nullptr;
 
 		OutputCount = 1;
-	}
+	}	
 
 	DxgiAdapter->Release();
 	DxgiAdapter = nullptr;
