@@ -188,14 +188,6 @@ Error:
 	return -1;
 }
 
-float DreamBrowserHandle::GetAspectRatioFromBrowser() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetAspectRatio();
-Error:
-	return -1;
-}
-
 RESULT DreamBrowserHandle::RequestBeginStream() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -466,31 +458,6 @@ Error:
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
-	return r;
-}
-
-RESULT DreamBrowser::FadeQuadToBlack() {
-	RESULT r = R_PASS;
-
-	//Fade to black
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		//m_pBrowserQuad->SetVisible(false);
-		return r;
-	};
-
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pBrowserQuad.get(),
-		color(0.0f, 0.0f, 0.0f, 1.0f),
-		0.1f,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		nullptr,
-		fnEndCallback,
-		this
-	));
-
-Error:
 	return r;
 }
 
@@ -1326,10 +1293,6 @@ if (m_pBrowserQuad != nullptr) {
 return R_PASS;
 }
 
-float DreamBrowser::GetAspectRatio() {
-	return m_aspectRatio;
-}
-
 float DreamBrowser::GetHeight() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
@@ -1367,14 +1330,13 @@ Error:
 }
 
 bool DreamBrowser::IsVisible() {
-	return m_pBrowserQuad->IsVisible();
+	return GetComposite()->IsVisible();
 }
 
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 		
-	CR(m_pBrowserQuad->SetVisible(fVisible));
-	//CR(m_pPointerCursor->SetVisible(fVisible));
+	CR(GetComposite()->SetVisible(fVisible));
 Error:
 	return r;
 }
@@ -1569,18 +1531,6 @@ RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
 
 Error:
 	return r;
-}
-
-std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
-	return m_pBrowserTexture;
-}
-
-//TODO: currently unused?
-RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
-	m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
-	SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
-
-	return m_pBrowserQuad->SetDiffuseTexture(pTexture);
 }
 
 DreamBrowser* DreamBrowser::SelfConstruct(DreamOS *pDreamOS, void *pContext) {

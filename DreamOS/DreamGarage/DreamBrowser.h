@@ -73,7 +73,6 @@ public:
 
 	int GetHeightOfBrowser();
 	int GetWidthOfBrowser();
-	float GetAspectRatioFromBrowser();
 
 	RESULT RequestBeginStream();
 
@@ -107,7 +106,6 @@ private:
 
 	virtual int GetBrowserHeight() = 0;
 	virtual int GetBrowserWidth() = 0;
-	virtual float GetAspectRatio() = 0;
 
 	virtual RESULT BeginStream() = 0;
 
@@ -194,15 +192,12 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
-	RESULT FadeQuadToBlack();
-
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
 	float GetWidth();
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
-	virtual float GetAspectRatio() override;
 
 	RESULT UpdateViewQuad();
 
@@ -221,10 +216,6 @@ public:
 	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);
-
-	std::shared_ptr<texture> GetScreenTexture();
-private:
-	RESULT SetScreenTexture(texture *pTexture);
 
 public:
 	// Video Stream Subscriber
