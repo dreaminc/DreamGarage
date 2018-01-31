@@ -739,6 +739,7 @@ Error:
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
 
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
@@ -761,20 +762,32 @@ RESULT DreamBrowser::Update(void *pContext) {
 	//*
 	if (m_fShowControlView) {
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
 
-		CR(pDreamControlViewHandle->ShowApp());
-		pDreamControlViewHandle->SendContentType(m_strContentType);
-		m_fShowControlView = false;
+		if (pDreamControlViewHandle != nullptr) {
+			CR(pDreamControlViewHandle->ShowApp());
+			pDreamControlViewHandle->SendContentType(m_strContentType);
+			m_fShowControlView = false;
+		}
+
+		pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
+
+		if (pDreamShareViewHandle != nullptr) {
+			CR(pDreamShareViewHandle->SendShowEvent());
+			CR(pDreamShareViewHandle->SendLoadingEvent());
+		}
 
 		m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-		m_pBrowserQuad->SetVisible(true);
+		GetComposite()->SetVisible(true);
 
 	}
 	//*/
 Error:
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+
+	if (pDreamShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
 	}
 	return r;
 }
@@ -1503,13 +1516,23 @@ RESULT DreamBrowser::PendReceiving() {
 
 RESULT DreamBrowser::StopReceiving() {
 	RESULT r = R_PASS;
+	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
+
 	m_fReceivingStream = false;
 	CR(SetVisible(false));
-	CR(m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get()));
+
+	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
+	if (pDreamShareViewHandle != nullptr) {
+		pDreamShareViewHandle->SendLoadingEvent();
+	}
 
 	//CR(	BroadcastDreamBrowserMessage(DreamBrowserMessage::type::ACK, 
 	//								 DreamBrowserMessage::type::REPORT_STREAMING_STOP));
+
 Error:
+	if (pDreamShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
+	}
 	return r;
 }
 
