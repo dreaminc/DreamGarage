@@ -156,3 +156,7 @@ RESULT DreamShareView::Hide() {
 Error:
 	return r;
 }
+
+DreamAppHandle* DreamShareView::GetAppHandle() {
+	return (DreamShareViewHandle*)(this);
+}

@@ -55,6 +55,8 @@ public:
 	virtual RESULT Show() override;
 	virtual RESULT Hide() override;
 
+	virtual DreamAppHandle *GetAppHandle() override;
+
 protected:
 	static DreamShareView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 

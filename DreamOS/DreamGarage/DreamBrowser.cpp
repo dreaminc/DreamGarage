@@ -1,5 +1,6 @@
 #include "DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamShareView/DreamShareView.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -510,43 +511,38 @@ Error:
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	auto fnStartCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
 
-		if (strCurrentURL != "about:blank") {
-			m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
-		}
+	if (strCurrentURL != "about:blank") {
+		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	}
 
-		m_strCurrentURL = strCurrentURL;
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
+	m_strCurrentURL = strCurrentURL;
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
+	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+	}
+
+	if (pDreamShareViewHandle != nullptr) {
+		pDreamShareViewHandle->SendCastTexture(m_pBrowserTexture);
+		pDreamShareViewHandle->SendCastingEvent();
+	}
 
 #ifndef _USE_TEST_APP
-		m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 #endif
 
-	Error:
-		if (pDreamControlViewHandle != nullptr) {
-			GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-		}
-		return r;
-	};
+//Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pBrowserQuad.get(),
-		color(1.0f, 1.0f, 1.0f, 1.0f),
-		0.1f,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		nullptr,
-		this
-	));
-
-Error:
+	if (pDreamShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
+	}
 	return r;
 }
 
@@ -567,12 +563,14 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
 
-	auto pKeyboardHandle = m_pDreamUserHandle->RequestKeyboard();
-	if (pKeyboardHandle != nullptr) {
-		pKeyboardHandle->SendPasswordFlag(fMaskPasswordEnabled);
+	if (m_pDreamUserHandle != nullptr) {
+		auto pKeyboardHandle = m_pDreamUserHandle->RequestKeyboard();
+		if (pKeyboardHandle != nullptr) {
+			pKeyboardHandle->SendPasswordFlag(fMaskPasswordEnabled);
+		}
+		m_pDreamUserHandle->SendReleaseKeyboard();
+		pKeyboardHandle = nullptr;
 	}
-	m_pDreamUserHandle->SendReleaseKeyboard();
-	pKeyboardHandle = nullptr;
 
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
@@ -709,6 +707,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 #ifndef _USE_TEST_APP
 	m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 #else
+	// Initialize new browser
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 #endif
 
@@ -741,26 +743,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pPointerCursor->SetVisible(false);
 
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	// Subscribers (children)
-	/*
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), ELEMENT_INTERSECT_ENDED, this));
-
-	// Mouse related
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_SELECT_UP, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pBrowserQuad.get(), INTERACTION_EVENT_WHEEL, this));
-	*/
-
-	/*
-	// Test
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_ENDED, this));
-	CR(GetDOS()->RegisterEventSubscriber(m_pTestQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this));
-	*/
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));

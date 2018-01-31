@@ -40,6 +40,7 @@ public:
 
 	// Casting
 	RESULT AddTestDreamShareView();
+	RESULT AddTestBasicBrowserCast();
 
 private:
 	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
