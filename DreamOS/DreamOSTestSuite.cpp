@@ -339,8 +339,8 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
 				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
-				//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
-				CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
+				//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
+				CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
 
 				SetStreamingState(true);
 			}

@@ -687,7 +687,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp" />
+    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
@@ -959,7 +959,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
-    <ClInclude Include="..\..\..\DreamBrowserMessage.h" />
+    <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />

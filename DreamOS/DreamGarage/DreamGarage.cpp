@@ -728,7 +728,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	}
 
 	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
-		m_pDreamBrowser->StartReceiving(pPeerConnection);
+		m_pDreamShareView->StartReceiving(pPeerConnection);
 		m_pendingAssetReceiveUserID = -1;
 	}
 
@@ -969,9 +969,9 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
-	if (m_pDreamBrowser != nullptr) {
+	if (m_pDreamShareView != nullptr) {
 
-		m_pDreamBrowser->PendReceiving();
+		m_pDreamShareView->PendReceiving();
 
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
@@ -987,14 +987,14 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 
 RESULT DreamGarage::OnStopSending() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopSending());
+	CR(m_pDreamShareView->StopSending());
 Error:
 	return r;
 }
 
 RESULT DreamGarage::OnStopReceiving() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopReceiving());
+	CR(m_pDreamShareView->StopReceiving());
 
 	m_pendingAssetReceiveUserID = -1;
 

@@ -39,7 +39,7 @@ class DOMNode;
 class DreamUserHandle;
 class AudioPacket;
 
-#include "DreamBrowserMessage.h"
+#include "DreamShareViewMessage.h"
 
 class DreamBrowserHandle : public DreamAppHandle {
 public:
@@ -74,8 +74,6 @@ public:
 	int GetHeightOfBrowser();
 	int GetWidthOfBrowser();
 
-	RESULT RequestBeginStream();
-
 private:
 	virtual RESULT SetBrowserScope(std::string strScope) = 0;
 	virtual RESULT SetBrowserPath(std::string strPath) = 0;
@@ -107,16 +105,13 @@ private:
 	virtual int GetBrowserHeight() = 0;
 	virtual int GetBrowserWidth() = 0;
 
-	virtual RESULT BeginStream() = 0;
-
 	virtual RESULT SetURI(std::string strURI) = 0;
 };
 
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
 	public DreamBrowserHandle,
-	public WebBrowserController::observer,
-	public DreamVideoStreamSubscriber
+	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
 
@@ -158,13 +153,7 @@ public:
 	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) override;
 	virtual RESULT ClickBrowser(WebBrowserPoint ptDiff, bool fMouseDown) override;
 
-	virtual RESULT BeginStream() override;
-
-	// Set streaming state in both the browser and the user app
-	RESULT SetStreamingState(bool fStreaming);
-	bool IsStreaming();
-
-	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
+	RESULT BroadcastDreamBrowserMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
 
 	// InteractionObjectEvent
 	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
@@ -190,8 +179,6 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
-	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
-
 	float GetWidth();
 	float GetHeight();
 	vector GetNormal();
@@ -204,28 +191,10 @@ public:
 	virtual RESULT SetBrowserPath(std::string strPath) override;
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
-	RESULT StopSending();
-	RESULT StartReceiving(PeerConnection *pPeerConnection);
-	RESULT PendReceiving();
-	RESULT StopReceiving();
 	virtual RESULT SetURI(std::string strURI) override;
 	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);
-
-public:
-	// Video Stream Subscriber
-	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
-	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
-	RESULT UpdateFromPendingVideoFrame();
-
-	struct PendingFrame {
-		bool fPending = false;
-		int pxWidth = 0;
-		int pxHeight = 0;
-		uint8_t *pDataBuffer = nullptr;
-		size_t pDataBuffer_n = 0;
-	} m_pendingFrame;
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -263,10 +232,6 @@ private:
 	int m_pageDepth = 0; // hack to avoid the loading page on back
 	std::string m_strCurrentURL;
 
-	bool m_fStreaming = false;
-	bool m_fReceivingStream = false;
-	bool m_fReadyForFrame = false;
-
 	TextEntryString m_strEntered;
 	
 	std::string m_strScope;
@@ -274,14 +239,9 @@ private:
 	std::string m_strContentType;
 	long m_currentEnvironmentAssetID = 0;
 	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
-
-	DreamBrowserMessage::type m_currentMessageType;
-	DreamBrowserMessage::type m_currentAckType;
-
 	bool m_fShowControlView = false;
 
-	bool m_fShouldBeginStream = true;
-
+	bool m_fShouldBeginStream = false;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

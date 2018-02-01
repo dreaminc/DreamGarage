@@ -3,6 +3,8 @@
 
 #include "Primitives/quad.h"
 #include "Primitives/texture.h"
+#include "DreamShareViewMessage.h"
+#include "DreamControlView/DreamControlView.h"
 
 RESULT DreamShareViewHandle::SendCastingEvent() {
 	RESULT r = R_PASS;
@@ -117,6 +119,44 @@ RESULT DreamShareView::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
+RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+	RESULT r = R_PASS;
+
+	DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
+	CN(pDreamShareViewMessage);
+
+	//currently, only store the most recent message received
+	m_currentMessageType = pDreamShareViewMessage->GetMessageType();
+	m_currentAckType = pDreamShareViewMessage->GetAckType();
+
+	switch (pDreamShareViewMessage->GetMessageType()) {
+		case DreamShareViewMessage::type::PING: {
+			CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::PING));
+		} break;
+
+		case DreamShareViewMessage::type::ACK: {
+			switch (pDreamShareViewMessage->GetAckType()) {
+				// We get a request streaming start ACK when we requested to start streaming
+				// This will begin broadcasting
+				case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
+					if (IsStreaming()) {
+						// For non-changing stuff we need to send the current frame
+						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+					}
+
+				} break;
+			}
+		} break;
+
+		case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
+			CR(StartReceiving(pPeerConnection));
+		} break;
+	}
+
+Error:
+	return r;
+}
+
 DreamShareView* DreamShareView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamShareView *pDreamApp = new DreamShareView(pDreamOS, pContext);
 	return pDreamApp;
@@ -162,4 +202,236 @@ Error:
 
 DreamAppHandle* DreamShareView::GetAppHandle() {
 	return (DreamShareViewHandle*)(this);
+}
+
+RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	m_pDreamUserHandle->SendPreserveSharingState(false);
+
+	ShowCastingTexture();
+
+	// Switch to input
+	if (IsStreaming()) {
+		SetStreamingState(false);
+
+		// TODO: Turn off streamer etc
+	}
+
+	// Register for Video for the requester peer connection
+	// (this buffers against multi-casts that are incorrect)
+	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	}
+
+	/*
+	// TODO: May not be needed, if not streaming no video is actually being transmitted
+	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+	// Stop video streaming if we're streaming
+	if (GetDOS()->GetCloudController()->IsVideoStreamingRunning()) {
+		CR(GetDOS()->GetCloudController()->StopVideoStreaming());
+	}
+	//*/
+
+	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
+	m_fReceivingStream = true;
+
+	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::REQUEST_STREAMING_START));
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::PendReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = true;
+	//CR(SetVisible(true));
+
+//Error:
+	return r;
+}
+
+RESULT DreamShareView::StopReceiving() {
+	RESULT r = R_PASS;
+	m_fReceivingStream = false;
+	CR(GetComposite()->SetVisible(false));
+
+	ShowLoadingTexture();
+
+	//CR(	BroadcastDreamBrowserMessage(DreamShareViewMessage::type::ACK, 
+	//								 DreamShareViewMessage::type::REPORT_STREAMING_STOP));
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::StopSending() {
+	RESULT r = R_PASS;
+
+	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	CR(SetStreamingState(false));
+
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+
+	if (pDreamControlViewHandle != nullptr) {
+		pDreamControlViewHandle->HideApp();
+		pDreamControlViewHandle->SetControlViewTexture(m_pLoadingTexture);
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+		
+		m_pDreamUserHandle->SendStopSharing();
+	}
+
+	ShowLoadingTexture();
+	Hide();
+
+	//m_pWebBrowserController->CloseBrowser();
+	//m_pWebBrowserController = nullptr;
+
+	// don't stream on the next website load
+	m_fShouldBeginStream = false; 
+	//CR(m_pWebBrowserController->LoadURL("about:blank"));
+	CR(GetComposite()->SetVisible(false));
+
+Error:
+	if (pDreamControlViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+
+	return r;
+}
+
+RESULT DreamShareView::BeginStream() {
+	RESULT r = R_PASS;
+
+	if (m_fReceivingStream) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+		m_fReceivingStream = false;
+	}
+
+	SetStreamingState(false);
+
+	// TODO: May not be needed, if not streaming no video is actually being transmitted 
+	// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+	//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
+
+	//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
+	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+	
+	// This is probably redundant!!!
+	CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+
+	SetStreamingState(true);
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::SetStreamingState(bool fStreaming) {
+	RESULT r = R_PASS;
+
+	m_fStreaming = fStreaming;
+
+	CNR(m_pDreamUserHandle, R_SKIPPED);
+	m_pDreamUserHandle->SendStreamingState(fStreaming);
+
+Error:
+	return r;
+}
+
+bool DreamShareView::IsStreaming() {
+	return m_fStreaming;
+}
+
+
+RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType) {
+	RESULT r = R_PASS;
+
+	DreamShareViewMessage *pDreamBrowserMessage = new DreamShareViewMessage(0, 0, GetAppUID(), msgType, ackType);
+	CN(pDreamBrowserMessage);
+
+	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	// TODO: Create a pending frame thing
+	//CR(m_pBrowserTexture->Update((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight, texture::PixelFormat::RGBA));
+
+	if (m_fReceivingStream) {
+		r = SetupPendingVideoFrame((unsigned char*)(pVideoFrameDataBuffer), pxWidth, pxHeight);
+
+		if (r == R_OVERFLOW) {
+			DEBUG_LINEOUT("Overflow frame!");
+			return R_PASS;
+		}
+
+		CRM(r, "Failed for other reason");
+
+		if (!GetComposite()->IsVisible()) {
+			GetComposite()->SetVisible(true);
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	// TODO: programmatic 
+	int channels = 4;
+
+	CBRM((m_pendingFrame.fPending == false), R_OVERFLOW, "Buffer already pending");
+
+	m_pendingFrame.fPending = true;
+	m_pendingFrame.pxWidth = pxWidth;
+	m_pendingFrame.pxHeight = pxHeight;
+
+	// Allocate
+	// TODO: Might be able to avoid this if the video buffer is not changing size
+	// and just keep the memory allocated instead
+	m_pendingFrame.pDataBuffer_n = sizeof(uint8_t) * pxWidth * pxHeight * channels;
+	//m_pendingFrame.pDataBuffer = (uint8_t*)malloc(m_pendingFrame.pDataBuffer_n);
+
+	m_pendingFrame.pDataBuffer = pVideoFrameDataBuffer;
+
+	CNM(m_pendingFrame.pDataBuffer, "Failed to allocate video buffer mem");
+
+	// Copy
+	//memcpy(m_pendingFrame.pDataBuffer, pVideoFrameDataBuffer, m_pendingFrame.pDataBuffer_n);
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::UpdateFromPendingVideoFrame() {
+	RESULT r = R_PASS;
+
+	CBM(m_pendingFrame.fPending, "No frame pending");
+	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
+
+	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
+
+	// Update texture dimensions if needed
+	CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+	if (r != R_NOT_HANDLED) {
+		DEBUG_LINEOUT("Changed texture dimensions");
+	}
+
+	CRM(m_pCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+
+Error:
+	if (m_pendingFrame.pDataBuffer != nullptr) {
+		delete [] m_pendingFrame.pDataBuffer;
+		m_pendingFrame.pDataBuffer = nullptr;
+
+		memset(&m_pendingFrame, 0, sizeof(PendingFrame));
+	}
+
+	return r;
 }
