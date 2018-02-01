@@ -115,7 +115,6 @@ private:
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
 	public DreamBrowserHandle,
-	public Subscriber<InteractionObjectEvent>, 
 	public WebBrowserController::observer,
 	public DreamVideoStreamSubscriber
 {
@@ -168,7 +167,6 @@ public:
 	RESULT BroadcastDreamBrowserMessage(DreamBrowserMessage::type msgType, DreamBrowserMessage::type ackType = DreamBrowserMessage::type::INVALID);
 
 	// InteractionObjectEvent
-	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
 	bool m_fTestQuadActive = false;
 
@@ -198,8 +196,6 @@ public:
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
-
-	RESULT UpdateViewQuad();
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
@@ -235,7 +231,6 @@ protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
 #ifdef _USE_TEST_APP
@@ -253,7 +248,6 @@ private:
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
-	bool m_fBrowserActive = false;
 
 	int m_browserWidth = 1366;
 	int m_browserHeight = 768;

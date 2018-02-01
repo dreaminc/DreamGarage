@@ -655,7 +655,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-	//m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 #endif
 
 	// Set up mouse / hand cursor model
@@ -687,18 +686,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pPointerCursor->SetVisible(false);
 
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
-
-	// Mouse related
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_SELECT_UP, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_WHEEL, this));
 #endif
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_UP, this));
 
 Error:
 	return r;
@@ -753,7 +741,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 			CR(pDreamShareViewHandle->SendLoadingEvent());
 		}
 
-		//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 		GetComposite()->SetVisible(true);
 
 	}
@@ -767,45 +754,6 @@ Error:
 		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
 	}
 	return r;
-}
-
-WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
-	WebBrowserPoint webPt;
-
-	ptIntersectionContact.w() = 1.0f;
-
-	// First apply transforms to the ptIntersectionContact 
-	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
-	
-	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
-
-	float width = GetWidth();
-	float height = GetHeight();
-
-	float posX = ptAdjustedContact.x();
-	float posY = ptAdjustedContact.y();
-	float posZ = ptAdjustedContact.z();
-
-	// TODO: This is a bit of a hack, should be a better way (this won't account for the quad normal, only orientation
-	// so it might get confused - technically this should never actually happen otherwise since we can force a dimension
-	if (std::abs(posZ) > std::abs(posY)) {
-		posY = posZ;
-	}
-
-	posX /= width / 2.0f;
-	posY /= height / 2.0f;
-
-	posX = (posX + 1.0f) / 2.0f;
-	posY = (posY + 1.0f) / 2.0f;  // flip it
-
-	// TODO: push into WebBrowserController
-	webPt.x = posX * 1366;
-	webPt.y = 768 - (posY * 768);
-
-	//ptAdjustedContact.Print("adj");
-	//DEBUG_LINEOUT("%d %d", webPt.x, webPt.y);
-
-	return webPt;
 }
 
 // TODO: Only update the rect
@@ -1061,181 +1009,6 @@ bool DreamBrowser::IsStreaming() {
 	return m_fStreaming;
 }
 
-// InteractionObjectEvent
-// Note that all of this will only occur if we're in testing mode
-RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
-	RESULT r = R_PASS;
-
-#ifdef _USE_TEST_APP
-	bool fUpdateMouse = false;
-
-	//m_pPointerCursor->SetPosition(pEvent->m_ptContact[0]);
-
-	if (pEvent->m_pObject == m_pTestQuad.get() || m_fTestQuadActive) {
-		return HandleTestQuadInteractionEvents(pEvent);
-	}
-#endif
-
-	switch (pEvent->m_eventType) {
-#ifdef _USE_TEST_APP
-		case ELEMENT_INTERSECT_BEGAN: {
-			//if (m_pBrowserQuad->IsVisible()) {
-				m_pPointerCursor->SetVisible(true);
-
-				WebBrowserMouseEvent webBrowserMouseEvent;
-
-				webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-				CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
-
-				m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-				m_fBrowserActive = true;
-
-				fUpdateMouse = true;
-			//}
-		} break;
-
-		case ELEMENT_INTERSECT_ENDED: {
-			m_pPointerCursor->SetVisible(false);
-
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, true));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-			m_fBrowserActive = false;
-
-			fUpdateMouse = true;
-		} break;
-
-		case ELEMENT_INTERSECT_MOVED: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
-
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-
-			fUpdateMouse = true;
-		} break;
-#endif
-
-		case INTERACTION_EVENT_SELECT_UP: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-
-			//// Determine focused node
-			//CR(m_pWebBrowserController->GetFocusedNode());
-
-		} break;
-
-		case INTERACTION_EVENT_SELECT_DOWN: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
-
-			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-		} break;
-
-		case INTERACTION_EVENT_WHEEL: {
-			WebBrowserMouseEvent webBrowserMouseEvent;
-
-			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			
-			int deltaX = 0;
-			int deltaY = pEvent->m_value * m_scrollFactor;
-
-			CR(m_pWebBrowserController->SendMouseWheel(webBrowserMouseEvent, deltaX, deltaY));
-
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-		} break;
-
-		// Keyboard
-		// TODO: Should be a "typing manager" in between?
-		// TODO: haven't seen any issues with KEY_UP being a no-op
-		case INTERACTION_EVENT_KEY_UP: break;
-		case INTERACTION_EVENT_KEY_DOWN: {
-
-#ifdef _USE_TEST_APP
-			if ((pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) && (pEvent->m_value == SVK_RETURN)) {
-				if (m_fReceivingStream) {
-					CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-					m_fReceivingStream = false;
-				}
-
-				SetStreamingState(false);
-
-				// TODO: May not be needed, if not streaming no video is actually being transmitted 
-				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
-
-				//CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::PING));
-				CR(BroadcastDreamBrowserMessage(DreamBrowserMessage::type::REQUEST_STREAMING_START));
-
-				SetStreamingState(true);
-			}
-#endif
-
-			/*
-			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
-			std::string strURL = "";
-
-			char chKey = (char)(pEvent->m_value);
-			m_strEntered.UpdateString(chKey);
-			
-			if (pEvent->m_value == SVK_RETURN) {
-				SetVisible(true);
-
-				std::string strScope = m_strScope;
-				std::string strTitle = "website";
-				std::string strPath = strURL;
-				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
-			}
-			//*/
-
-			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
-
-		} break;
-	}
-	
-#ifdef _USE_TEST_APP
-	// First point of contact
-	if (fUpdateMouse) {
-		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
-			//m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
-			point ptIntersectionContact = pEvent->m_ptContact[0];
-			ptIntersectionContact.w() = 1.0f;
-
-			point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
-			m_pPointerCursor->SetOrigin(ptAdjustedContact);
-		//}
-	}
-#endif 
-
-	CR(r);
-
-Error:
-	return r;
-}
 
 RESULT DreamBrowser::SetPosition(point ptPosition) {
 	GetComposite()->SetPosition(ptPosition);
@@ -1384,9 +1157,11 @@ RESULT DreamBrowser::StopSending() {
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	DreamShareViewHandle  *pDreamShareViewHandle = nullptr;
 	CR(SetStreamingState(false));
 
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
+	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
 	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->HideApp();
@@ -1396,7 +1171,11 @@ RESULT DreamBrowser::StopSending() {
 		m_pDreamUserHandle->SendStopSharing();
 	}
 
-	//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
+	if (pDreamShareViewHandle != nullptr) {
+		pDreamShareViewHandle->SendLoadingEvent();
+		pDreamShareViewHandle->SendHideEvent();
+	}
+
 	//m_pWebBrowserController->CloseBrowser();
 	//m_pWebBrowserController = nullptr;
 
@@ -1408,6 +1187,10 @@ RESULT DreamBrowser::StopSending() {
 Error:
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
+	}
+
+	if (pDreamShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
 	}
 	return r;
 }
