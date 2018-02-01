@@ -16,6 +16,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -293,6 +294,8 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	auto pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+
 	// ControlView App
 	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
 	CN(m_pDreamControlView);
@@ -311,7 +314,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 	m_pDreamBrowser->SetDiagonalSize(9.0f);
-	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
 	m_pDreamBrowser->SetVisible(false);
 #endif
