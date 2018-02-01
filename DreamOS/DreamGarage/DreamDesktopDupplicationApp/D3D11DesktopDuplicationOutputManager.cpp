@@ -88,7 +88,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 		// Should handle this somehow	
 	}
 
-	for (UINT i = 1; pFactory->EnumAdapters1(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; i++)
+	for (UINT i = 0; pFactory->EnumAdapters1(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; i++)
 	{
 		DXGI_ADAPTER_DESC1 desc1;
 		pAdapter->GetDesc1(&desc1);
