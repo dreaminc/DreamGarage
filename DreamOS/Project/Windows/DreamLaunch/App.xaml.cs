@@ -51,11 +51,13 @@ namespace DreamLaunch {
 
             strCommandLineArgs.Trim();
             strCommandLineArgs.ToLower();
+            strCommandLineArgs = System.Net.WebUtility.UrlDecode(strCommandLineArgs);
 
             string strSquirrelFirstRun = "--squirrel-firstrun";
             strSquirrelFirstRun.Trim();
             strSquirrelFirstRun.ToLower();
 
+            // DEBUG
             //MessageBox.Show(string.Format("{0} is {1} to {2}", strCommandLineArgs, strCommandLineArgs.IndexOf(strSquirrelFirstRun), strSquirrelFirstRun), 
             //    "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
 
