@@ -55,6 +55,9 @@ namespace DreamLaunch {
                 dreamOSProcessStartInfo.Arguments += String.Format("\"{0}\" ", arg);
             }
 
+            // Deal with weird parsing
+            dreamOSProcessStartInfo.Arguments = System.Net.WebUtility.UrlDecode(dreamOSProcessStartInfo.Arguments);
+
             //if (m_strDreamOSPath == null) return -1;
 
             //dreamOSProcessStartInfo.FileName = m_strDreamOSPath;
@@ -71,7 +74,8 @@ namespace DreamLaunch {
             //    exitCode = proc.ExitCode;
             //}
 
-            //MessageBox.Show(string.Format("launching with {0}", dreamOSProcessStartInfo.Arguments), "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
+            // DEBUG
+            //MessageBox.Show(string.Format("DEBUG: launching with {0}", dreamOSProcessStartInfo.Arguments), "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
 
             try {
                 Process.Start(dreamOSProcessStartInfo);
