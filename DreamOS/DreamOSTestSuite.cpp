@@ -729,23 +729,23 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		CN(pTestContext->pUser);
 
 		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
 
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+CNM(pDreamBrowser, "Failed to create dream browser");
 
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(9.0f);
-		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+pDreamBrowser->SetDiagonalSize(9.0f);
+pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
-		pDreamBrowser->SetVisible(false);
+pDreamBrowser->SetVisible(false);
 
-		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-		CN(pDreamUIBar);
-		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+CN(pDreamUIBar);
+CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
-	Error:
-		return r;
+Error:
+return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -756,7 +756,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-	
+
 		return r;
 	};
 
@@ -796,15 +796,51 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-
+		/*
 		SetupDreamAppPipeline();
 		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
 
 		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 		CNM(pDreamDesktop, "Failed to create dream desktop");
-		
+		//*/
 
-	Error:
+		STARTUPINFO si;
+		PROCESS_INFORMATION pi;
+
+		ZeroMemory(&si, sizeof(si));
+		si.cb = sizeof(si);
+		ZeroMemory(&pi, sizeof(pi));
+
+		char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
+		wchar_t wlocation[sizeof(location)];
+		mbstowcs(wlocation, location, sizeof(location) + 1);
+		LPWSTR strLPWlocation = wlocation;
+
+
+		if (!CreateProcess(strLPWlocation,
+			NULL,			// Command line
+			NULL,           // Process handle not inheritable
+			NULL,           // Thread handle not inheritable
+			FALSE,          // Set handle inheritance to FALSE
+			0,              // No creation flags
+			NULL,           // Use parent's environment block
+			NULL,           // Use parent's starting directory 
+			&si,            // Pointer to STARTUPINFO structure
+			&pi)           // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
+			r = R_FAIL;
+		}
+
+		// Wait until child process exits.
+		WaitForSingleObject(pi.hProcess, INFINITE);
+
+		// Close process and thread handles. 
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+
+	//Error:
 		return r;
 	};
 
