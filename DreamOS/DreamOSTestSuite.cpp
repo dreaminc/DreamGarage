@@ -958,23 +958,23 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		CN(pTestContext->pUser);
 
 		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
 
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+CNM(pDreamBrowser, "Failed to create dream browser");
 
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(9.0f);
-		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+pDreamBrowser->SetDiagonalSize(9.0f);
+pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
-		pDreamBrowser->SetVisible(false);
+pDreamBrowser->SetVisible(false);
 
-		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-		CN(pDreamUIBar);
-		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+CN(pDreamUIBar);
+CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
-	Error:
-		return r;
+Error:
+return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -1048,7 +1048,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pTestContext->pDreamShareView = pDreamShareView;
 		}
 
-	Error:
+	//Error:
 		return r;
 	};
 
