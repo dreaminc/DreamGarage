@@ -833,6 +833,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			r = R_FAIL;
 		}
 
+
+
 		// Wait until child process exits.
 		WaitForSingleObject(pi.hProcess, INFINITE);
 
