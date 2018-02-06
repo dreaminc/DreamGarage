@@ -1,21 +1,16 @@
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
-// Copyright (c) Microsoft Corporation. All rights reserved
-
 #include <limits.h>
 
 #include "D3D11DesktopDuplicationDisplayManager.h"
 #include "D3D11DesktopDuplicationManager.h"
 #include "D3D11DesktopDuplicationOutputManager.h"
 #include "D3D11DesktopDuplicationThreadManager.h"
+#include "DDCIPCmessage.h"
 
-//
-// Globals
-//
+#include <windows.h>
+#include <windowsx.h>
+
 D3D11DesktopDuplicationOutputManager OutMgr;
+HWND WindowHandle;
 
 // Below are lists of errors expect from Dxgi API calls when a transition event like mode change, PnpStop, PnpStart
 // desktop switch, TDR or session disconnect/reconnect. In all these cases we want the application to clean up the threads that process
@@ -140,6 +135,24 @@ void DYNAMIC_WAIT::Wait()
     m_WaitCountInCurrentBand++;
 }
 
+BOOL OnCopyData(HWND hWnd, HWND hwndFrom, PCOPYDATASTRUCT pCDS) {
+
+	struct MessageStruct {
+	HWND dreamHandle;
+	HWND duplicationHandle;
+	DDCIPCmessage ddcMessage;
+
+	};
+	MessageStruct *desktopMessage = new MessageStruct();
+
+	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
+	pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
+
+	desktopMessage = (MessageStruct*)pCDS->lpData;
+	SendMessage(desktopMessage->dreamHandle, WM_COPYDATA, (WPARAM)desktopMessage->duplicationHandle, (LPARAM)(LPVOID)&pCDS);
+	}
+	return true;
+}
 
 //
 // Program entry point
@@ -157,7 +170,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     HANDLE TerminateThreadsEvent = nullptr;
 
     // Window
-    HWND WindowHandle = nullptr;
+    WindowHandle = nullptr;
 
     bool CmdResult = ProcessCmdline(&SingleOutput);
     if (!CmdResult)
@@ -222,7 +235,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     // Create window
     RECT WindowRect = {0, 0, 800, 600};
     AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
-    WindowHandle = CreateWindowW(L"ddasample", L"DXGI desktop duplication sample",
+    WindowHandle = CreateWindowW(L"ddasample", L"DreamDesktopDuplication",
                            WS_OVERLAPPEDWINDOW,
                            0, 0,
                            WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top,
@@ -253,18 +266,23 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
         if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
-            if (msg.message == OCCLUSION_STATUS_MSG)
-            {
+            if (msg.message == OCCLUSION_STATUS_MSG) {
                 // Present may not be occluded now so try again
                 Occluded = false;
             }
-            else
-            {
+
+			else if (msg.message == WM_COPYDATA) {
+				MessageBox(WindowHandle, L"Message Received", L"Error", MB_ICONERROR);
+				
+				OnCopyData(msg.hwnd, WindowHandle, (PCOPYDATASTRUCT)msg.lParam);
+			}
+		
+            else {
                 // Process window messages
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
-        }
+        }		
         else if (WaitForSingleObjectEx(UnexpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0)
         {
             // Unexpected error occurred so exit the application

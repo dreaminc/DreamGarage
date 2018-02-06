@@ -17,6 +17,10 @@
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 
+#include <windows.h>
+#include <windowsx.h>
+#include "DDCIPCmessage.h"
+
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -790,7 +794,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	double sTestTime = 10000.0;
 
 	struct TestContext {
-		std::shared_ptr<DreamUserApp> pUser = nullptr;
+		std::shared_ptr<DreamUserApp> pUser = nullptr;	
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -802,7 +806,17 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 		CNM(pDreamDesktop, "Failed to create dream desktop");
-		//*/
+		*/
+		struct MessageStruct {
+			HWND dreamHandle;
+			HWND duplicationHandle;
+			DDCIPCmessage ddcMessage;
+
+		};
+
+		MessageStruct *desktopMessage = new MessageStruct();
+
+		COPYDATASTRUCT desktopCDS;
 
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
@@ -816,7 +830,6 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		mbstowcs(wlocation, location, sizeof(location) + 1);
 		LPWSTR strLPWlocation = wlocation;
 
-
 		if (!CreateProcess(strLPWlocation,
 			NULL,			// Command line
 			NULL,           // Process handle not inheritable
@@ -826,15 +839,62 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			NULL,           // Use parent's environment block
 			NULL,           // Use parent's starting directory 
 			&si,            // Pointer to STARTUPINFO structure
-			&pi)           // Pointer to PROCESS_INFORMATION structure
+			&pi)            // Pointer to PROCESS_INFORMATION structure
 			)
 		{
 			DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
 			r = R_FAIL;
 		}
 
+		HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
+		if (dreamHWND == NULL)
+		{
+			MessageBox(dreamHWND, L"Unable to find the Dream window",
+				L"Error", MB_ICONERROR);
+			return r;
+		}
+		desktopMessage->dreamHandle = dreamHWND;
+		
+		HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+		while (desktopHWND == NULL)
+		{
+			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+		}
 
+		DWORD desktopPID;
+		GetWindowThreadProcessId(desktopHWND, &desktopPID);
+		
+		if (desktopPID == pi.dwProcessId) {
+			DEBUG_LINEOUT("Got DesktopDuplication WindowHandle");
+			desktopMessage->duplicationHandle = desktopHWND;
+		}
 
+		desktopCDS.dwData = (unsigned long)DDCIPCmessage::type::PING;
+		desktopCDS.cbData = sizeof(desktopMessage);
+		desktopCDS.lpData = &desktopMessage;
+
+		SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
+		DWORD dwError = GetLastError();
+		if (dwError != NO_ERROR)
+		{
+			MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
+		}
+		else {
+			DEBUG_LINEOUT("Mesage sent");
+		}
+
+		// Message loop (attempts to update screen when no other messages to process)
+		MSG msg = { 0 };
+		while (WM_QUIT != msg.message)
+		{
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+			{
+				if (msg.message == WM_COPYDATA) {
+					DEBUG_LINEOUT("got it back");
+
+				}
+			}
+		}
 		// Wait until child process exits.
 		WaitForSingleObject(pi.hProcess, INFINITE);
 

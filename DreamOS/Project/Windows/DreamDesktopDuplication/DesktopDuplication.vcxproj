@@ -25,7 +25,6 @@
     <ClInclude Include="D3D11DesktopDuplicationManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationOutputManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationThreadManager.h" />
-    <ClInclude Include="DDCIPCmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D11DesktopController.cpp" />
@@ -156,7 +155,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(OutDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OutDir);$(ProjectDIr)..\..\..\External\DDA\include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

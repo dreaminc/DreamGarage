@@ -4,7 +4,7 @@
 class DDCIPCmessage {
 
 public:
-	enum class type {
+	enum class type : unsigned long {
 		PING,
 		ACK,
 		START,
