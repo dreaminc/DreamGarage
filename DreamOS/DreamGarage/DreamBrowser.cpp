@@ -455,15 +455,21 @@ Error:
 
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
-	
-	if (m_fShouldBeginStream) {
+
+	DreamShareViewHandle *pShareViewHandle = nullptr;
+	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
+	//if (m_fShouldBeginStream) {
 		//CR(BeginStream());
-	} 
-	else {
-		m_fShouldBeginStream = true;
-	}
+		//pShareViewHandle->RequestBeginStream();
+	//} 
+	//else {
+//		m_fShouldBeginStream = true;
+//	}
 
 //Error:
+	if (pShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
+	}
 	return r;
 }
 
@@ -523,6 +529,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		pKeyboardHandle = nullptr;
 	}
 
+	/*
 #ifdef _USE_TEST_APP
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		DEBUG_LINEOUT("editable!");
@@ -533,6 +540,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		m_pPointerCursor->SetVisible(true);
 	}
 #endif
+//*/
 
 Error:
 	if (pDreamControlViewHandle != nullptr) {
@@ -663,20 +671,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
 	m_pTestSphereRelative->SetColor(COLOR_RED);
 	//*/
-
-	m_pTestQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
-	CN(m_pTestQuad);
-	m_pTestQuad->translateX(GetWidth() + 0.5f + 0.1f);
-
-	m_pPointerCursor = GetComposite()->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
-	CN(m_pPointerCursor);
-
-	m_pPointerCursor->SetPivotPoint(point(-0.2f, -0.43f, 0.0f));
-	m_pPointerCursor->SetScale(0.01f);
-	m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
-	m_pPointerCursor->SetMaterialAmbient(1.0f);
-	m_pPointerCursor->SetVisible(false);
-
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 #endif
 
@@ -749,8 +743,14 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
+	DreamShareViewHandle *pShareViewHandle = nullptr;
+	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 //	if (m_fReceivingStream == false) {
-		CN(m_pBrowserTexture);
+	CN(m_pBrowserTexture);
+
+	bool fReceivingStream = false;
+	pShareViewHandle->RequestIsReceivingStream(fReceivingStream);
+	if (!fReceivingStream) {
 
 		// Update texture dimensions if needed
 		CR(m_pBrowserTexture->UpdateDimensions(width, height));
@@ -759,15 +759,21 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 		}
 
 		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-
-		/*
-		if (IsStreaming()) {
-			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
-		}
-		//*/
+	}
+	if (pShareViewHandle != nullptr) {
+		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
+	}
+	/*
+	if (IsStreaming()) {
+		CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+	}
+	//*/
 //	}
 
 Error:
+	if (pShareViewHandle != nullptr) {
+		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
+	}
 	return r;
 }
 
@@ -806,48 +812,6 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
-	RESULT r = R_PASS;
-	/*
-	switch (pEvent->m_eventType) {
-		case ELEMENT_INTERSECT_BEGAN: {
-			m_fTestQuadActive = true;
-		} break;
-
-		case ELEMENT_INTERSECT_MOVED: {
-			// empty
-		} break;
-
-		case ELEMENT_INTERSECT_ENDED: {
-			m_fTestQuadActive = false;
-		} break;
-
-		case INTERACTION_EVENT_SELECT_DOWN: {
-
-			if (m_fReceivingStream) {
-				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
-				m_fReceivingStream = false;
-			}
-
-			SetStreamingState(false);
-
-			// TODO: May not be needed, if not streaming no video is actually being transmitted 
-			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
-			//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
-
-			//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
-			CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
-
-			SetStreamingState(true);
-
-		} break;
-	}
-	//*/
-	CR(r);
-
-Error:
-	return r;
-}
 
 RESULT DreamBrowser::SetPosition(point ptPosition) {
 	GetComposite()->SetPosition(ptPosition);

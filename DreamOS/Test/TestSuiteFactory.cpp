@@ -10,6 +10,7 @@
 #include "Cloud/webrtc/WebRTCTestSuite.h"
 #include "HAL/HALTestSuite.h"
 #include "DreamOSTestSuite.h"
+#include "DreamShareView/MultiContentTestSuite.h"
 #include "Sound/SoundTestSuite.h"
 #include "Sandbox/SandboxTestSuite.h"
 
@@ -46,6 +47,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 		case TEST_SUITE_TYPE::WEBRTC: {
 			CNM(pContext, "This test suite requires DreamOS to be passed as context");
 			pTestSuite = std::make_shared<WebRTCTestSuite>((DreamOS*)pContext);
+		} break;
+
+		case TEST_SUITE_TYPE::MULTICONTENT: {
+			CNM(pContext, "This test suite requires DreamOS to be passed as context");
+			pTestSuite = std::make_shared<MultiContentTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::UI: {

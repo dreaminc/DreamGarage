@@ -22,6 +22,14 @@ Error:
 	return r;
 }
 
+RESULT DreamShareViewHandle::SendStopEvent() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(HandleStopEvent());
+Error:
+	return r;
+}
+
 RESULT DreamShareViewHandle::SendShowEvent() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -38,10 +46,34 @@ Error:
 	return r;
 }
 
+RESULT DreamShareViewHandle::RequestIsReceivingStream(bool &fReceivingStream) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(IsReceivingStream(fReceivingStream));
+Error:
+	return r;
+}
+
 RESULT DreamShareViewHandle::SendCastTexture(std::shared_ptr<texture> pNewCastTexture) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
 	CR(SetCastingTexture(pNewCastTexture));
+Error:
+	return r;
+}
+
+RESULT DreamShareViewHandle::SendVideoFrame(const void* pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(BroadcastVideoFrame(pBuffer, width, height));
+Error:
+	return r;
+}
+
+RESULT DreamShareViewHandle::RequestBeginStream() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+	CR(BeginStream());
 Error:
 	return r;
 }
@@ -112,7 +144,22 @@ RESULT DreamShareView::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamShareView::Update(void *pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	if (m_fReceivingStream && m_pendingFrame.fPending) {
+		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
+	}
+
+	if (m_pDreamUserHandle == nullptr) {
+		auto pDreamOS = GetDOS();
+		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
+		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
+		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
+		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamShareView::Shutdown(void *pContext) {
@@ -178,7 +225,7 @@ RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTextur
 	if (pNewCastTexture == nullptr) {
 		CR(ShowLoadingTexture());
 	}
-	else {
+	else { // if (!m_fReceivingStream) {
 		m_pCastTexture = pNewCastTexture;
 	}
 
@@ -207,7 +254,8 @@ DreamAppHandle* DreamShareView::GetAppHandle() {
 RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	m_pDreamUserHandle->SendPreserveSharingState(false);
+	//if (m_pDreamUserHandle != nullptr)
+	//	m_pDreamUserHandle->SendPreserveSharingState(false);
 
 	ShowCastingTexture();
 
@@ -300,6 +348,22 @@ Error:
 	return r;
 }
 
+RESULT DreamShareView::IsReceivingStream(bool &fReceivingStream) {
+	fReceivingStream = m_fReceivingStream;
+	return R_PASS;
+}
+
+RESULT DreamShareView::HandleStopEvent() {
+	RESULT r = R_PASS;
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+//	CR(m_pEnvironmentControllerProxy->RequestStopSharing(m_currentEnvironmentAssetID, m_strScope, m_strPath));
+	CR(SetStreamingState(false));
+Error:
+	return r;
+}
+
 RESULT DreamShareView::BeginStream() {
 	RESULT r = R_PASS;
 
@@ -351,6 +415,29 @@ RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewMessage::typ
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
 
+Error:
+	return r;
+}
+
+RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+
+	if (!m_fReceivingStream) {
+		CN(m_pCastTexture);
+
+		// Update texture dimensions if needed
+		CR(m_pCastTexture->UpdateDimensions(width, height));
+		if (r != R_NOT_HANDLED) {
+			DEBUG_LINEOUT("Changed chrome texture dimensions");
+		}
+
+		CR(m_pCastTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+
+		//*
+		if (IsStreaming()) {
+			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
+		}
+	}
 Error:
 	return r;
 }

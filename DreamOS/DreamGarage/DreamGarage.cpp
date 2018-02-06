@@ -969,9 +969,9 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
-	if (m_pDreamShareView != nullptr) {
+//	if (m_pDreamShareView != nullptr) {
 
-		m_pDreamShareView->PendReceiving();
+//		m_pDreamShareView->PendReceiving();
 
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
@@ -981,7 +981,7 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 		}
 
 		//m_pDreamBrowser->StartReceiving();
-	}
+//	}
 	return r;
 }
 

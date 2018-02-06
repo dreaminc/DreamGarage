@@ -202,14 +202,6 @@ protected:
 private:
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
-#ifdef _USE_TEST_APP
-	// Test Stuff
-	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
-	sphere *m_pTestSphereAbsolute = nullptr;
-	std::shared_ptr<quad> m_pTestQuad = nullptr;
-	std::shared_ptr<composite> m_pPointerCursor = nullptr;
-#endif
-
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 	DreamUserHandle* m_pDreamUserHandle = nullptr;

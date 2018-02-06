@@ -1,6 +1,7 @@
 #include "DreamControlView.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamUIBar.h"
+#include "DreamShareView/DreamShareView.h"
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
@@ -979,16 +980,19 @@ Error:
 
 RESULT DreamControlView::HandleStopPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
+	DreamShareViewHandle *pShareViewHandle = nullptr;
+	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
+	pShareViewHandle->SendStopEvent();
 
-	CR(m_pBrowserHandle->SendStopEvent());
 	CN(m_pUserHandle);
 	CR(m_pUserHandle->SendClearFocusStack());
 	CR(Hide());
 
 Error:
+	GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
 	return r;
 }
 

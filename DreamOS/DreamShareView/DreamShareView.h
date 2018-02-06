@@ -20,19 +20,30 @@ public:
 	// switch between loading screen and casted texture
 	RESULT SendLoadingEvent();
 	RESULT SendCastingEvent();
+	RESULT SendStopEvent();
 
 	RESULT SendShowEvent();
 	RESULT SendHideEvent();
 
+	RESULT RequestIsReceivingStream(bool &fReceivingStream);
+
 	// idea here is to set the texture being cast here while the 
 	// texture is updated elsewhere
 	RESULT SendCastTexture(std::shared_ptr<texture> pNewCastTexture);
+	RESULT SendVideoFrame(const void* pBuffer, int width, int height);
+	
+	RESULT RequestBeginStream();
+
 private:
 	virtual RESULT ShowLoadingTexture() = 0;
 	virtual RESULT ShowCastingTexture() = 0;
+	virtual RESULT HandleStopEvent() = 0;
 	virtual RESULT Show() = 0;
 	virtual RESULT Hide() = 0;
 	virtual RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) = 0;
+	virtual RESULT IsReceivingStream(bool &fReceivingStream) = 0;
+	virtual RESULT BeginStream() = 0;
+	virtual RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height) = 0;
 };
 
 class DreamShareView :
@@ -41,6 +52,7 @@ class DreamShareView :
 	public DreamVideoStreamSubscriber
 {
 	friend class DreamAppManager;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamShareView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -67,15 +79,18 @@ public:
 	RESULT PendReceiving();
 	RESULT StopReceiving();
 	RESULT StopSending();
+	virtual RESULT IsReceivingStream(bool &fReceivingStream) override;
+	virtual RESULT HandleStopEvent() override;
 
 	// App Messaging
-	RESULT DreamShareView::BeginStream();
+	virtual RESULT DreamShareView::BeginStream() override;
 	RESULT BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
 
 	// Video Stream Subscriber
+	virtual RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height) override;
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();
