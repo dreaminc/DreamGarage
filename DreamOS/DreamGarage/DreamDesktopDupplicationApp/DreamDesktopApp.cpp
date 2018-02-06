@@ -9,6 +9,10 @@
 #include "D3D11DesktopDuplicationThreadManager.h"
 #include "D3D11DesktopDuplicationOutputManager.h"
 
+#include "DDCIPCmessage.h"
+#include <windows.h>
+#include <windowsx.h>
+
 //
 // Globals
 //
@@ -138,225 +142,6 @@ void DYNAMIC_WAIT::Wait()
 	m_WaitCountInCurrentBand++;
 }
 
-
-//
-// Program entry point
-//
-/*
-int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ INT nCmdShow)
-{
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-
-	INT SingleOutput;
-
-	// Synchronization
-	HANDLE UnexpectedErrorEvent = nullptr;
-	HANDLE ExpectedErrorEvent = nullptr;
-	HANDLE TerminateThreadsEvent = nullptr;
-
-	// Window
-	HWND WindowHandle = nullptr;
-
-	bool CmdResult = ProcessCmdline(&SingleOutput);
-	if (!CmdResult)
-	{
-		ShowHelp();
-		return 0;
-	}
-
-	// Event used by the threads to signal an unexpected error and we want to quit the app
-	UnexpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!UnexpectedErrorEvent)
-	{
-		ProcessFailure(nullptr, L"UnexpectedErrorEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
-
-	// Event for when a thread encounters an expected error
-	ExpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!ExpectedErrorEvent)
-	{
-		ProcessFailure(nullptr, L"ExpectedErrorEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
-
-	// Event to tell spawned threads to quit
-	TerminateThreadsEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!TerminateThreadsEvent)
-	{
-		ProcessFailure(nullptr, L"TerminateThreadsEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
-
-	// Load simple cursor
-	HCURSOR Cursor = nullptr;
-	Cursor = LoadCursor(nullptr, IDC_ARROW);
-	if (!Cursor)
-	{
-		ProcessFailure(nullptr, L"Cursor load failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
-
-	// Register class
-	WNDCLASSEXW Wc;
-	Wc.cbSize = sizeof(WNDCLASSEXW);
-	Wc.style = CS_HREDRAW | CS_VREDRAW;
-	Wc.lpfnWndProc = WndProc;
-	Wc.cbClsExtra = 0;
-	Wc.cbWndExtra = 0;
-	Wc.hInstance = hInstance;
-	Wc.hIcon = nullptr;
-	Wc.hCursor = Cursor;
-	Wc.hbrBackground = nullptr;
-	Wc.lpszMenuName = nullptr;
-	Wc.lpszClassName = L"ddasample";
-	Wc.hIconSm = nullptr;
-	if (!RegisterClassExW(&Wc))
-	{
-		ProcessFailure(nullptr, L"Window class registration failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
-
-	// Create window
-	RECT WindowRect = { 0, 0, 800, 600 };
-	AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
-	WindowHandle = CreateWindowW(L"ddasample", L"DXGI desktop duplication sample",
-		WS_OVERLAPPEDWINDOW,
-		0, 0,
-		WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top,
-		nullptr, nullptr, hInstance, nullptr);
-	if (!WindowHandle)
-	{
-		ProcessFailure(nullptr, L"Window creation failed", L"Error", E_FAIL);
-		return 0;
-	}
-
-	DestroyCursor(Cursor);
-
-	ShowWindow(WindowHandle, nCmdShow);
-	UpdateWindow(WindowHandle);
-
-	D3D11DesktopDuplicationThreadManager ThreadMgr;
-	RECT DeskBounds;
-	UINT OutputCount;
-
-	// Message loop (attempts to update screen when no other messages to process)
-	MSG msg = { 0 };
-	bool FirstTime = true;
-	bool Occluded = true;
-	DYNAMIC_WAIT DynamicWait;
-
-	while (WM_QUIT != msg.message)
-	{
-		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
-		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == OCCLUSION_STATUS_MSG)
-			{
-				// Present may not be occluded now so try again
-				Occluded = false;
-			}
-			else
-			{
-				// Process window messages
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-		else if (WaitForSingleObjectEx(UnexpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0)
-		{
-			// Unexpected error occurred so exit the application
-			break;
-		}
-		else if (FirstTime || WaitForSingleObjectEx(ExpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0)
-		{
-			if (!FirstTime)
-			{
-				// Terminate other threads
-				SetEvent(TerminateThreadsEvent);
-				ThreadMgr.WaitForThreadTermination();
-				ResetEvent(TerminateThreadsEvent);
-				ResetEvent(ExpectedErrorEvent);
-
-				// Clean up
-				ThreadMgr.Clean();
-				OutMgr.CleanRefs();
-
-				// As we have encountered an error due to a system transition we wait before trying again, using this dynamic wait
-				// the wait periods will get progressively long to avoid wasting too much system resource if this state lasts a long time
-				DynamicWait.Wait();
-			}
-			else
-			{
-				// First time through the loop so nothing to clean up
-				FirstTime = false;
-			}
-
-			// Re-initialize
-			Ret = OutMgr.InitOutput(WindowHandle, SingleOutput, &OutputCount, &DeskBounds);
-			if (Ret == DUPL_RETURN_SUCCESS)
-			{
-				HANDLE SharedHandle = OutMgr.GetSharedHandle();
-				if (SharedHandle)
-				{
-					Ret = ThreadMgr.Initialize(SingleOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
-				}
-				else
-				{
-					DisplayMsg(L"Failed to get handle of shared surface", L"Error", S_OK);
-					Ret = DUPL_RETURN_ERROR_UNEXPECTED;
-				}
-			}
-
-			// We start off in occluded state and we should immediate get a occlusion status window message
-			Occluded = true;
-		}
-		else
-		{
-			// Nothing else to do, so try to present to write out to window if not occluded
-			if (!Occluded)
-			{
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded);
-			}
-		}
-
-		// Check if for errors
-		if (Ret != DUPL_RETURN_SUCCESS)
-		{
-			if (Ret == DUPL_RETURN_ERROR_EXPECTED)
-			{
-				// Some type of system transition is occurring so retry
-				SetEvent(ExpectedErrorEvent);
-			}
-			else
-			{
-				// Unexpected error so exit
-				break;
-			}
-		}
-	}
-
-	// Make sure all other threads have exited
-	if (SetEvent(TerminateThreadsEvent))
-	{
-		ThreadMgr.WaitForThreadTermination();
-	}
-
-	// Clean up
-	CloseHandle(UnexpectedErrorEvent);
-	CloseHandle(ExpectedErrorEvent);
-	CloseHandle(TerminateThreadsEvent);
-
-	if (msg.message == WM_QUIT)
-	{
-		// For a WM_QUIT message we should return the wParam value
-		return static_cast<INT>(msg.wParam);
-	}
-
-	return 0;
-}
-/*/
 DreamDesktopApp::DreamDesktopApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamDesktopApp>(pDreamOS, pContext)
 {
@@ -431,53 +216,47 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 		return r;
 	}
 
-	// Register class
-	WNDCLASSEXW Wc;
-	Wc.cbSize = sizeof(WNDCLASSEXW);
-	Wc.style = CS_HREDRAW | CS_VREDRAW;
-	Wc.lpfnWndProc = WndProc;
-	Wc.cbClsExtra = 0;
-	Wc.cbWndExtra = 0;
-	//Wc.hInstance = hInstance;		// TODO: will probably need to pull from DOS
-	Wc.hIcon = nullptr;
-	Wc.hCursor = Cursor;
-	Wc.hbrBackground = nullptr;
-	Wc.lpszMenuName = nullptr;
-	Wc.lpszClassName = L"ddasample";
-	Wc.hIconSm = nullptr;
-	if (!RegisterClassExW(&Wc))
-	{
-		ProcessFailure(nullptr, L"Window class registration failed", L"Error", E_UNEXPECTED);
-		return r;
-	}
-
-	// Create window
-	/*RECT WindowRect = { 0, 0, 800, 600 };
-	AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
-	WindowHandle = CreateWindowW(L"ddasample", L"DXGI desktop duplication sample",
-		WS_OVERLAPPEDWINDOW,
-		0, 0,
-		WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top,
-		nullptr, nullptr, hInstance, nullptr);
-	if (!WindowHandle)
-	{
-		ProcessFailure(nullptr, L"Window creation failed", L"Error", E_FAIL);
-		return r;
-	}
-	*/
-
-	DestroyCursor(Cursor);
-
-	//ShowWindow(WindowHandle, nCmdShow);	// replace these
-	//UpdateWindow(WindowHandle);
-
-	
-
 	return r;
 }
 
 RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
+}
+
+BOOL OnCopyData(HWND hWnd, HWND hwndFrom, PCOPYDATASTRUCT pCDS) {
+
+	struct MessageStruct {
+		HWND dreamHandle;
+		HWND duplicationHandle;
+		DDCIPCmessage ddcMessage;
+
+	};
+	MessageStruct *desktopMessage = new MessageStruct();
+
+	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
+		pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
+
+		desktopMessage = (MessageStruct*)pCDS->lpData;
+		SendMessage(desktopMessage->dreamHandle, WM_COPYDATA, (WPARAM)desktopMessage->duplicationHandle, (LPARAM)(LPVOID)&pCDS);
+	}
+
+	return true;
+}
+
+INT_PTR CALLBACK DialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+		// Handle the WM_COPYDATA message in OnCopyData 
+		HANDLE_MSG(hWnd, WM_COPYDATA, OnCopyData);
+
+		// Handle the WM_CLOSE message in OnClose 
+		// HANDLE_MSG(hWnd, WM_CLOSE, OnClose);
+
+	default:
+		return FALSE;
+	}
+	return 0;
 }
 
 RESULT DreamDesktopApp::Update(void *pContext) {

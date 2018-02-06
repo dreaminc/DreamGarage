@@ -21,6 +21,10 @@
 
 #include <chrono>
 
+#include <windows.h>
+#include <windowsx.h>
+#include "DDCIPCmessage.h"
+
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {

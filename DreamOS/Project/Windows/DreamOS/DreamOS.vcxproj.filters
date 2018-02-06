@@ -204,6 +204,9 @@
     <Filter Include="DreamGarage\DreamDesktopApp">
       <UniqueIdentifier>{e098da6a-702b-4db9-be71-1c0068c6a747}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\DDA">
+      <UniqueIdentifier>{db275846-8937-4e38-b55e-a4e9ffce9cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -2176,6 +2179,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\DDA\include\DDCIPCmessage.h">
+      <Filter>External\DDA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
