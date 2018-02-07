@@ -407,7 +407,6 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 	};
 	MessageStruct *desktopMessage = new MessageStruct();
 
-	MessageBox(hWnd, L"Message Processed", L"error", MB_ICONERROR);
 	/*
 	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
 		pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
