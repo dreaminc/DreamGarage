@@ -195,9 +195,6 @@
     <Filter Include="DreamControlView">
       <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamShareView">
-      <UniqueIdentifier>{a5c89bd6-b56b-4917-8ca7-0b81f1e3c36e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -964,9 +961,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
       <Filter>DreamControlView</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp">
-      <Filter>DreamShareView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2104,9 +2098,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
       <Filter>DreamControlView</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h">
-      <Filter>DreamShareView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

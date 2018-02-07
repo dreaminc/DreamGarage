@@ -38,9 +38,6 @@ public:
 	// Capturing Apps
 	RESULT AddTestCaptureApp();
 
-	// Casting
-	RESULT AddTestDreamShareView();
-
 private:
 	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupDreamAppPipeline();
