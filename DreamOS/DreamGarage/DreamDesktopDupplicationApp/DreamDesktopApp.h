@@ -23,14 +23,7 @@
 #include "Primitives/TextEntryString.h"
 
 #include "DreamVideoStreamSubscriber.h"
-
-#include "D3D11DesktopController.h"
-
 #include <limits.h>
-#include "D3D11DesktopDuplicationDisplayManager.h"
-#include "D3D11DesktopDuplicationManager.h"
-#include "D3D11DesktopDuplicationThreadManager.h"
-#include "D3D11DesktopDuplicationOutputManager.h"
 
 class quad;
 class sphere;
@@ -41,8 +34,7 @@ class DreamUserHandle;
 class AudioPacket;
 
 class DreamDesktopApp :
-	public DreamApp<DreamDesktopApp>,
-	public D3D11DesktopController::observer
+	public DreamApp<DreamDesktopApp>
 {
 	friend class DreamAppManager;
 
@@ -64,9 +56,6 @@ public:
 
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
-
-	virtual RESULT OnPaint(const void *pBuffer, int width, int height) override;
-	virtual RESULT OnDataBuffer(unsigned char* pBuffer) override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
@@ -117,8 +106,6 @@ private:
 	std::shared_ptr<quad> m_pDesktopQuad = nullptr;
 	std::shared_ptr<texture> m_pDesktopTexture = nullptr;
 
-	std::shared_ptr<D3D11DesktopController> m_pDesktopController = nullptr;
-
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	// Synchronization
@@ -137,7 +124,7 @@ private:
 
 	bool m_fStreaming = false;
 	bool m_fReceivingStream = false;
-	D3D11DesktopDuplicationThreadManager ThreadMgr;
+
 	RECT DeskBounds;
 	UINT OutputCount;
 

@@ -697,11 +697,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationDisplayManager.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationManager.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationThreadManager.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
@@ -981,11 +976,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\CommonTypes.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopController.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationDisplayManager.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationManager.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationOutputManager.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\D3D11DesktopDuplicationThreadManager.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
