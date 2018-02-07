@@ -135,25 +135,6 @@ void DYNAMIC_WAIT::Wait()
     m_WaitCountInCurrentBand++;
 }
 
-BOOL OnCopyData(HWND hWnd, HWND hwndFrom, PCOPYDATASTRUCT pCDS) {
-
-	struct MessageStruct {
-	HWND dreamHandle;
-	HWND duplicationHandle;
-	DDCIPCmessage ddcMessage;
-
-	};
-	MessageStruct *desktopMessage = new MessageStruct();
-
-	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
-	pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
-
-	desktopMessage = (MessageStruct*)pCDS->lpData;
-	SendMessage(desktopMessage->dreamHandle, WM_COPYDATA, (WPARAM)desktopMessage->duplicationHandle, (LPARAM)(LPVOID)&pCDS);
-	}
-	return true;
-}
-
 //
 // Program entry point
 //
@@ -269,14 +250,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
             if (msg.message == OCCLUSION_STATUS_MSG) {
                 // Present may not be occluded now so try again
                 Occluded = false;
-            }
-
-			else if (msg.message == WM_COPYDATA) {
-				MessageBox(WindowHandle, L"Message Received", L"Error", MB_ICONERROR);
-				
-				OnCopyData(msg.hwnd, WindowHandle, (PCOPYDATASTRUCT)msg.lParam);
-			}
-		
+            }		
             else {
                 // Process window messages
                 TranslateMessage(&msg);
@@ -422,6 +396,29 @@ bool ProcessCmdline(_Out_ INT* Output)
     return true;
 }
 
+
+BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
+
+	struct MessageStruct {
+		HWND dreamHandle;
+		HWND duplicationHandle;
+		DDCIPCmessage ddcMessage;
+
+	};
+	MessageStruct *desktopMessage = new MessageStruct();
+
+	MessageBox(hWnd, L"Message Processed", L"error", MB_ICONERROR);
+	/*
+	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
+		pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
+
+		desktopMessage = (MessageStruct*)pCDS->lpData;
+		SendMessage(desktopMessage->dreamHandle, WM_COPYDATA, (WPARAM)desktopMessage->duplicationHandle, (LPARAM)(LPVOID)&pCDS);
+	}
+	*/
+	return true;
+}
+
 //
 // Window message processor
 //
@@ -440,10 +437,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             OutMgr.WindowResize();
             break;
         }
+		case WM_COPYDATA:
+		{
+			OnCopyData(hWnd, wParam, lParam);
+		}
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
     }
-
     return 0;
 }
 
