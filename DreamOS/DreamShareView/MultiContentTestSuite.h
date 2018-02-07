@@ -36,6 +36,9 @@ public:
 	// Share website stream between users
 	RESULT AddTestMultiPeerBrowser();
 
+	// multiple browsers
+	RESULT AddTestTwoBrowsers();
+
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
@@ -45,6 +48,7 @@ private:
 	// members used with interaction engine events
 	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	std::shared_ptr<DreamBrowser> m_pBrowser2 = nullptr;
 	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
 	sphere *m_pTestSphereAbsolute = nullptr;
 	std::shared_ptr<quad> m_pTestQuad = nullptr;
@@ -55,6 +59,9 @@ private:
 	std::shared_ptr<texture> m_pTestTexture = nullptr;
 	std::shared_ptr<texture> m_pTestTextureUser1 = nullptr;
 	std::shared_ptr<texture> m_pTestTextureUser2 = nullptr;
+
+	std::shared_ptr<quad> m_pTestQuad1 = nullptr;
+	std::shared_ptr<quad> m_pTestQuad2 = nullptr;
 
 	std::string m_strURL;
 };

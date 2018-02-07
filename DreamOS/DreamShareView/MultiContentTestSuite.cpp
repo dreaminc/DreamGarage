@@ -10,6 +10,9 @@
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "WebBrowser/WebBrowserController.h"
+
 #include "Cloud/CloudController.h"
 #include "Cloud/CloudControllerFactory.h"
 #include "Cloud/HTTP/HTTPController.h"
@@ -50,6 +53,8 @@ Error:
 
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestTwoBrowsers());
 
 	CR(AddTestMultiPeerBrowser());
 
@@ -100,6 +105,82 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 
 Error:
 	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestTwoBrowsers() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+
+	auto fnInitialize = [&](void *pContext) {
+
+		RESULT r = R_PASS;
+
+		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+
+		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager = nullptr;
+		CR(SetupPipeline());
+
+		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		m_pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+
+		pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pWebBrowserManager);
+		CR(pWebBrowserManager->Initialize());
+
+
+		m_pTestQuad1 = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1, 1, 1, 1, nullptr, vNormal));
+		CN(m_pTestQuad1);
+
+		m_pTestQuad1->SetMaterialAmbient(0.90f);
+		m_pTestQuad1->FlipUVVertical();
+		m_pTestQuad1->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		m_pTestQuad2 = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1, 1, 1, 1, nullptr, vNormal));
+		CN(m_pTestQuad2);
+
+		m_pTestQuad2->SetMaterialAmbient(0.90f);
+		m_pTestQuad2->FlipUVVertical();
+		m_pTestQuad2->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+//		m_pDreamBrowser->SetBrowserManager(pWebBrowserManager);
+		m_pDreamBrowser->InitializeWithBrowserManager(pWebBrowserManager);
+		m_pBrowser2->InitializeWithBrowserManager(pWebBrowserManager);
+
+		m_pDreamBrowser->SetURI("www.google.com");
+		m_pBrowser2->SetURI("www.trello.com");
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		m_pTestQuad1->SetDiffuseTexture(m_pDreamBrowser->GetScreenTexture().get());
+		m_pTestQuad2->SetDiffuseTexture(m_pBrowser2->GetScreenTexture().get());
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+
 }
 
 RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
@@ -168,6 +249,7 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 		}
 
 	} *pTestContext = new TestContext();
+
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;

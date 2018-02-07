@@ -196,6 +196,12 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
+	// For Testing
+	RESULT SetBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
+	RESULT SetBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController);
+	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
+	std::shared_ptr<texture> GetScreenTexture();
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -234,6 +240,7 @@ private:
 	bool m_fShowControlView = false;
 
 	bool m_fShouldBeginStream = false;
+
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

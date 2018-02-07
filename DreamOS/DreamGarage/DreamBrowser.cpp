@@ -624,9 +624,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 //	GetDOS()->AddObjectToUIGraph(GetComposite());	
 
 	// Set up browser manager
+#ifndef _DEBUG
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+#endif
 /*
 	// Get loading screen URL
 	pCommandLineManager = CommandLineManager::instance();
@@ -652,9 +654,11 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
 #else
 	// Initialize new browser
-	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
-	CN(m_pWebBrowserController);
-	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+	if (m_pWebBrowserManager != nullptr) {
+		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
+		CN(m_pWebBrowserController);
+		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+	}
 #endif
 
 	// Set up mouse / hand cursor model
@@ -738,6 +742,50 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::SetBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager) {
+	RESULT r = R_PASS;
+
+	CN(pWebBrowserManager);
+	m_pWebBrowserManager = pWebBrowserManager;
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController) {
+	RESULT r = R_PASS;
+	CN(pWebBrowserController);
+
+
+	m_pWebBrowserController = pWebBrowserController;
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager) {
+	RESULT r = R_PASS;
+
+	int pxWidth = m_browserWidth;
+	int pxHeight = m_browserHeight;
+	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
+
+	CN(pWebBrowserManager);
+	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
+	m_pWebBrowserManager = pWebBrowserManager;
+
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, "");
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
+	return m_pBrowserTexture;
+}
+
 // TODO: Only update the rect
 // TODO: Turn off CEF when we're not using it
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
@@ -749,7 +797,11 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	CN(m_pBrowserTexture);
 
 	bool fReceivingStream = false;
-	pShareViewHandle->RequestIsReceivingStream(fReceivingStream);
+
+	if (pShareViewHandle != nullptr) {
+		pShareViewHandle->RequestIsReceivingStream(fReceivingStream);
+	}
+
 	if (!fReceivingStream) {
 
 		// Update texture dimensions if needed
