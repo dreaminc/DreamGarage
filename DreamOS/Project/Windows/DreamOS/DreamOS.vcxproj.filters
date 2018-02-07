@@ -854,9 +854,6 @@
     <ClCompile Include="..\..\..\DreamAppMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -966,6 +963,12 @@
       <Filter>DreamControlView</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp">
+      <Filter>DreamShareView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp">
       <Filter>DreamShareView</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2024,9 +2027,6 @@
     <ClInclude Include="..\..\..\DreamAppMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamBrowserMessage.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
@@ -2106,6 +2106,12 @@
       <Filter>DreamControlView</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h">
+      <Filter>DreamShareView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareViewMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h">
       <Filter>DreamShareView</Filter>
     </ClInclude>
   </ItemGroup>

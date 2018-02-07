@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamShareView;
 class UIStageProgram;
 class UpdateMouthMessage;
 
@@ -128,6 +129,7 @@ private:
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
 	std::shared_ptr<DreamControlView> m_pDreamControlView;
+	std::shared_ptr<DreamShareView> m_pDreamShareView;
 };
 
 #endif	// DREAM_GARAGE_H_

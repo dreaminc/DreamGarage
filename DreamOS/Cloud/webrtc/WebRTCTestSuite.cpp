@@ -14,6 +14,7 @@
 
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/Dream2DMouseApp.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "DreamLogger/DreamLogger.h"
 #include "Sound/SoundClientFactory.h"
@@ -731,6 +732,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
+		std::shared_ptr<DreamShareView>	pDreamShareView = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
@@ -784,6 +786,9 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
 		}
 
+		pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
+		CNM(pDreamShareView, "Failed to create dream share view");
+
 		// Create the 2D Mouse App
 		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
 		CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
@@ -798,6 +803,25 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		pDreamBrowser->SetDiagonalSize(10.0f);
 
 		pDreamBrowser->SetURI(strURL);
+
+		pDreamShareView->Show();
+
+		auto pComposite = m_pDreamOS->AddComposite();
+		pComposite->SetPosition(pDreamBrowser->GetOrigin());
+		m_pTestQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(m_pTestQuad);
+		m_pTestQuad->translateX(pDreamBrowser->GetWidth() + 0.5f + 0.1f);
+
+		m_pPointerCursor = pComposite->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
+		CN(m_pPointerCursor);
+
+		m_pPointerCursor->SetPivotPoint(point(-0.2f, -0.43f, 0.0f));
+		m_pPointerCursor->SetScale(0.01f);
+		m_pPointerCursor->SetOrientationOffset(vector((float)M_PI_2, 0.0f, 0.0f));
+		m_pPointerCursor->SetMaterialAmbient(1.0f);
+		m_pPointerCursor->SetVisible(false);
+
+		m_pDreamOS->AddObjectToInteractionGraph(pComposite);
 
 	Error:
 		return r;
@@ -843,6 +867,49 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCTestSuite::HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+	//*
+	switch (pEvent->m_eventType) {
+		case ELEMENT_INTERSECT_BEGAN: {
+	//		m_fTestQuadActive = true;
+		} break;
+
+		case ELEMENT_INTERSECT_MOVED: {
+			// empty
+		} break;
+
+		case ELEMENT_INTERSECT_ENDED: {
+	//		m_fTestQuadActive = false;
+		} break;
+
+		case INTERACTION_EVENT_SELECT_DOWN: {
+/*
+			if (m_fReceivingStream) {
+				CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+				m_fReceivingStream = false;
+			}
+
+			SetStreamingState(false);
+
+			// TODO: May not be needed, if not streaming no video is actually being transmitted 
+			// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
+			//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
+
+			//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
+			CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+
+			SetStreamingState(true);
+
+	//*/
+		} break;
+	}
+	CR(r);
 
 Error:
 	return r;

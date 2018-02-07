@@ -687,7 +687,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp" />
+    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
@@ -702,6 +702,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
     <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
+    <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp" />
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc" />
@@ -959,7 +960,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
-    <ClInclude Include="..\..\..\DreamBrowserMessage.h" />
+    <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
@@ -980,6 +981,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
     <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h" />
+    <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />

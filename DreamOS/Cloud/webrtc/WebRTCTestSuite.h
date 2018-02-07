@@ -10,12 +10,17 @@
 
 #include <functional>
 #include <memory>
+#include "InteractionEngine/InteractionEngine.h"
 
 class DreamOS;
 class CloudController;
 class EnvironmentAsset;
 
 class DreamContentView;
+
+class sphere;
+class quad;
+class composite;
 
 class WebRTCTestSuite : public TestSuite
 {
@@ -40,6 +45,7 @@ public:
 	// Apps
 	RESULT AddTestChromeMultiBrowser();
 	
+	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);
 
 private:
 	CloudController *GetCloudController();
@@ -48,6 +54,12 @@ private:
 private:
 	DreamOS *m_pDreamOS;
 	//CloudController *m_pCloudController = nullptr;
+	//*
+	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
+	sphere *m_pTestSphereAbsolute = nullptr;
+	std::shared_ptr<quad> m_pTestQuad = nullptr;
+	std::shared_ptr<composite> m_pPointerCursor = nullptr;
+	//*/
 };
 
 #endif // ! WEBRTC_TEST_SUITE_H_
