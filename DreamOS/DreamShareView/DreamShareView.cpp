@@ -98,9 +98,6 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	m_pCastQuad->SetDiffuseTexture(m_pLoadingTexture.get());
 
-	GetComposite()->SetMaterialShininess(0.0f, true);
-	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
-
 Error:
 	return r;
 }
@@ -158,8 +155,4 @@ RESULT DreamShareView::Hide() {
 	CR(GetComposite()->SetVisible(false));
 Error:
 	return r;
-}
-
-DreamAppHandle* DreamShareView::GetAppHandle() {
-	return (DreamShareViewHandle*)(this);
 }
