@@ -54,7 +54,7 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestTwoBrowsers());
+	CR(AddTestManyBrowsers());
 
 	CR(AddTestMultiPeerBrowser());
 
@@ -107,51 +107,74 @@ Error:
 	return r;
 }
 
-RESULT MultiContentTestSuite::AddTestTwoBrowsers() {
+RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
-
 		RESULT r = R_PASS;
 
-		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		float diagonalSize = 2.0f;
+		float aspectRatio = ((float)1366 / (float)768);
+		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+		float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
 
 		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
-		std::shared_ptr<CEFBrowserManager> pWebBrowserManager = nullptr;
 		CR(SetupPipeline());
 
-		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		m_pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->pWebBrowserManager);
+		CR(pTestContext->pWebBrowserManager->Initialize());
 
-		pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-		CN(pWebBrowserManager);
-		CR(pWebBrowserManager->Initialize());
+		// starts to break down as the test approaches 20 browsers
+		pTestContext->strURIs = {
+			"www.twitch.tv",
+			"www.youtube.com",
+			"www.google.com",
+			"www.trello.com",
+			"www.slack.com",
+			"www.cnn.com",
+			"www.nyt.com",
+			"www.fivethirtyeight.com",
+			"www.washingtonpost.com",
+			"www.spotify.com",
+			"www.amazon.com",
+			/*
+			"www.bandcamp.com",
+			"www.messenger.com",
+			"www.theindependentsf.com",
+			"www.thechapelsf.com",
+			"www.bottomofthehill.com",
+			"www.dreamos.com",
+			"mail.google.com",
+			"facebook.com",
+			//*/
+			"reddit.com"
+		} ;
 
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
-		m_pTestQuad1 = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1, 1, 1, 1, nullptr, vNormal));
-		CN(m_pTestQuad1);
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 
-		m_pTestQuad1->SetMaterialAmbient(0.90f);
-		m_pTestQuad1->FlipUVVertical();
-		m_pTestQuad1->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pTestContext->pBrowserQuads.emplace_back(std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal)));
+			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
+			pTestContext->pBrowserQuads[i]->FlipUVVertical();
+			pTestContext->pBrowserQuads[i]->SetPosition(point(((i%5)*castWidth * 1.05f)-4.0f, 2.0f - ((i/5)*castHeight * 1.05f), 0.0f));
 
-		m_pTestQuad2 = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1, 1, 1, 1, nullptr, vNormal));
-		CN(m_pTestQuad2);
-
-		m_pTestQuad2->SetMaterialAmbient(0.90f);
-		m_pTestQuad2->FlipUVVertical();
-		m_pTestQuad2->SetPosition(point(1.0f, 0.0f, 0.0f));
-
-//		m_pDreamBrowser->SetBrowserManager(pWebBrowserManager);
-		m_pDreamBrowser->InitializeWithBrowserManager(pWebBrowserManager);
-		m_pBrowser2->InitializeWithBrowserManager(pWebBrowserManager);
-
-		m_pDreamBrowser->SetURI("www.google.com");
-		m_pBrowser2->SetURI("www.trello.com");
+		}
 
 	Error:
 		return r;
@@ -159,8 +182,11 @@ RESULT MultiContentTestSuite::AddTestTwoBrowsers() {
 
 	auto fnUpdate = [&](void *pContext) {
 
-		m_pTestQuad1->SetDiffuseTexture(m_pDreamBrowser->GetScreenTexture().get());
-		m_pTestQuad2->SetDiffuseTexture(m_pBrowser2->GetScreenTexture().get());
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		}
 		return R_PASS;
 	};
 	auto fnTest = [&](void *pContext) {
@@ -170,7 +196,7 @@ RESULT MultiContentTestSuite::AddTestTwoBrowsers() {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Multi-browser");
@@ -180,7 +206,6 @@ RESULT MultiContentTestSuite::AddTestTwoBrowsers() {
 
 Error:
 	return r;
-
 }
 
 RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
