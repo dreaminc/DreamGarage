@@ -742,27 +742,6 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager) {
-	RESULT r = R_PASS;
-
-	CN(pWebBrowserManager);
-	m_pWebBrowserManager = pWebBrowserManager;
-
-Error:
-	return r;
-}
-
-RESULT DreamBrowser::SetBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController) {
-	RESULT r = R_PASS;
-	CN(pWebBrowserController);
-
-
-	m_pWebBrowserController = pWebBrowserController;
-
-Error:
-	return r;
-}
-
 RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager) {
 	RESULT r = R_PASS;
 

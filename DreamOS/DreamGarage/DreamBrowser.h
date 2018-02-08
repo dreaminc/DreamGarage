@@ -196,9 +196,6 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
-	// For Testing
-	RESULT SetBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
-	RESULT SetBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController);
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
 	std::shared_ptr<texture> GetScreenTexture();
 
