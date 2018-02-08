@@ -10,6 +10,9 @@
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "WebBrowser/WebBrowserController.h"
+
 #include "Cloud/CloudController.h"
 #include "Cloud/CloudControllerFactory.h"
 #include "Cloud/HTTP/HTTPController.h"
@@ -50,6 +53,8 @@ Error:
 
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestManyBrowsers());
 
 	CR(AddTestMultiPeerBrowser());
 
@@ -97,6 +102,107 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestManyBrowsers() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		float diagonalSize = 2.0f;
+		float aspectRatio = ((float)1366 / (float)768);
+		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+		float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
+
+		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+		CR(SetupPipeline());
+
+		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->pWebBrowserManager);
+		CR(pTestContext->pWebBrowserManager->Initialize());
+
+		// starts to break down as the test approaches 20 browsers
+		pTestContext->strURIs = {
+			"www.twitch.tv",
+			"www.youtube.com",
+			"www.google.com",
+			"www.trello.com",
+			"www.slack.com",
+			"www.cnn.com",
+			"www.nyt.com",
+			"www.fivethirtyeight.com",
+			"www.washingtonpost.com",
+			"www.spotify.com",
+			"www.amazon.com",
+			/*
+			"www.bandcamp.com",
+			"www.messenger.com",
+			"www.theindependentsf.com",
+			"www.thechapelsf.com",
+			"www.bottomofthehill.com",
+			"www.dreamos.com",
+			"mail.google.com",
+			"facebook.com",
+			//*/
+			"reddit.com"
+		} ;
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+
+			pTestContext->pBrowserQuads.emplace_back(std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal)));
+			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
+			pTestContext->pBrowserQuads[i]->FlipUVVertical();
+			pTestContext->pBrowserQuads[i]->SetPosition(point(((i%5)*castWidth * 1.05f)-4.0f, 2.0f - ((i/5)*castHeight * 1.05f), 0.0f));
+
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -168,6 +274,7 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 		}
 
 	} *pTestContext = new TestContext();
+
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
