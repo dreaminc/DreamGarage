@@ -198,6 +198,9 @@
     <Filter Include="DreamShareView">
       <UniqueIdentifier>{a5c89bd6-b56b-4917-8ca7-0b81f1e3c36e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamUserControlArea">
+      <UniqueIdentifier>{e7693720-b8fe-424c-9d3b-5d6d93aa1029}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -970,6 +973,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp">
       <Filter>DreamShareView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp">
+      <Filter>DreamUserControlArea</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2113,6 +2119,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h">
       <Filter>DreamShareView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h">
+      <Filter>DreamUserControlArea</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
