@@ -650,34 +650,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
 
-#ifndef _USE_TEST_APP
-	//m_pBrowserQuad->SetDiffuseTexture(m_pLoadingScreenTexture.get());
-#else
-	// Initialize new browser
-	if (m_pWebBrowserManager != nullptr) {
-		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
-		CN(m_pWebBrowserController);
-		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-	}
-#endif
-
 	// Set up mouse / hand cursor model
 	///*
 	GetComposite()->InitializeOBB();
 	
-#ifdef _USE_TEST_APP
-	// Test code
-	
-	/*
-	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereAbsolute->SetColor(COLOR_RED);
-	
-	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
-	m_pTestSphereRelative->SetColor(COLOR_RED);
-	//*/
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-#endif
-
 Error:
 	return r;
 }

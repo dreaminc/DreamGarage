@@ -7,6 +7,7 @@
 #include "HAL/opengl/OGLProgram.h"
 
 #include "DreamShareView/DreamShareView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 
@@ -54,6 +55,8 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUserControlAreaLayout());
+
 	CR(AddTestManyBrowsers());
 
 	CR(AddTestMultiPeerBrowser());
@@ -94,14 +97,215 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	} *pTestContext = new TestContext();
+	
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//No HMD
+		//float diagonalSize = 6.0f;
+		float diagonalSize = 0.6f;
+
+		float aspectRatio = ((float)1366 / (float)768);
+		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+		float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
+
+		//TODO: move these values to the proper app
+		// test values based off of castWidth
+		float borderWidth =	1.0323f * castWidth;
+		float borderHeight = (0.594624) * castWidth; // 0.6237f
+		
+		float toolbarButtonWidth = 0.0645f * castWidth;
+		float toolbarButtonHeight = 0.0645f * castWidth;
+
+		float toolbarURLWidth = 0.5484f * castWidth;
+		float toolbarURLHeight = 0.0655f * castWidth;
+
+		float tabBarBorderWidth = 0.2962f * castWidth;
+		float tabBarBorderHeight = 0.675269f * castWidth;
+
+		float tabBarWindowWidth = 0.2640f * castWidth;
+		float tabBarWindowHeight = 0.148387f * castWidth;
+
+		float spaceSize = 0.016129 * castWidth;
+		float fakeSpaceSize = 0.0164875 * castWidth;
+
+		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+
+		point ptOrigin = point(0.0f, 0.0f, 0.0f);
+
+		SetupPipeline();
+
+		//*
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+
+		auto pWebBrowserManager = pTestContext->pUserControlArea->m_pWebBrowserManager;
+		//*/
+
+		/*
+		auto pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		pWebBrowserManager->Initialize();
+		//*/
+		// starts to break down as the test approaches 20 browsers
+		pTestContext->strURIs = {
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.livelovely.com",
+			"www.twitch.tv"
+		} ;
+
+		// Control View background
+		auto pControlBackground = m_pDreamOS->MakeQuad(borderWidth, borderHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pControlBackground);
+		pControlBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-main-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pControlBackground->SetPosition(point(0.0f, 0.0f, -0.0005f));
+
+		//TODO: move to Tabs app
+		auto pTabBackground = m_pDreamOS->MakeQuad(tabBarBorderWidth, tabBarBorderHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pTabBackground);
+		pTabBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-list-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTabBackground->SetPosition(point(borderWidth / 2.0f + spaceSize + tabBarBorderWidth / 2.0f, (borderHeight - tabBarBorderHeight) / 2, -0.0005f));
+
+		//TODO: make control bar app
+		point ptBarLeft = point(-borderWidth / 2.0f, -borderHeight / 2.0f - spaceSize - (toolbarButtonHeight / 2.0f), 0.0f);
+		auto pBackButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pBackButton);
+		pBackButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-back.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pBackButton->SetPosition(ptBarLeft + point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
+
+		auto pForwardButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pForwardButton);
+		pForwardButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-forward.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pForwardButton->SetPosition(ptBarLeft + point(3 * toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
+
+		auto pCloseButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pCloseButton);
+		pCloseButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-close.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pCloseButton->SetPosition(ptBarLeft + point(5 * toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
+		
+		auto pURLButton = m_pDreamOS->MakeQuad(toolbarURLWidth, toolbarURLHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pURLButton);
+		pURLButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		point ptURL = point(0.0f, ptBarLeft.y(), 0.0f);
+		pURLButton->SetPosition(ptURL);
+
+		point ptBarRight = ptURL + point(toolbarURLWidth / 2.0f + spaceSize, 0.0f, 0.0f);
+
+		auto pShareButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pShareButton);
+		pShareButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pShareButton->SetPosition(ptBarRight+ point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
+
+		auto pOpenButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pOpenButton);
+		pOpenButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pOpenButton->SetPosition(ptBarRight + point(3*toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
+
+		auto pMinimizeButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pMinimizeButton);
+		pMinimizeButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pMinimizeButton->SetPosition(ptBarRight+ point(5*toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
+
+		//*
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pControlBackground));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pTabBackground));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pBackButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pForwardButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pCloseButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pURLButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pShareButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pOpenButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pMinimizeButton));
+		//*/
+
+
+		point ptTabBarPosition = point(pTabBackground->GetPosition().x(), castHeight / 2.0f - tabBarWindowHeight / 2.0f, 0.0f);
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+
+			if (i == 0) {
+				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal));
+				pTestContext->pBrowserQuads[i]->SetPosition(ptOrigin);
+			}
+			else {
+				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(tabBarWindowWidth, tabBarWindowHeight, 1, 1, nullptr, vNormal));
+				pTestContext->pBrowserQuads[i]->SetPosition(ptTabBarPosition - point(0.0f, ((i - 1)*(tabBarWindowHeight + fakeSpaceSize)), 0.0f));
+			}
+			pControlArea->GetComposite()->AddObject(pTestContext->pBrowserQuads[i]);
+			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
+			pTestContext->pBrowserQuads[i]->FlipUVVertical();
+		}
+
+//	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//pTestContext->pUserControlArea->Update();
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

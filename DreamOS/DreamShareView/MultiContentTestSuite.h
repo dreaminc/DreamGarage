@@ -30,6 +30,10 @@ public:
 	RESULT SetupPipeline();
 
 public:
+
+	// test out the feel of the first design spec without committing to arch yet
+	RESULT AddTestUserControlAreaLayout();
+
 	// Only share static textures between users
 	//TODO: textures have some problems with deallocation in this test
 	RESULT AddTestMultiPeerBasic();
