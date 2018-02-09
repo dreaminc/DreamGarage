@@ -2,6 +2,7 @@
 
 #include "DreamOS.h"
 #include "DreamUserApp.h"
+#include "DreamGarage/DreamBrowser.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
@@ -19,8 +20,8 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this);
-	CN(m_pDreamUserApp);
+	//m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this);
+	//CN(m_pDreamUserApp);
 
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
@@ -30,25 +31,25 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnAppDidFinishInitializing(void *pContext = nullptr) {
+RESULT DreamUserControlArea::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUserControlArea::Update(void *pContext = nullptr) {
+RESULT DreamUserControlArea::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserManager->Update());
+	//CR(m_pWebBrowserManager->Update());
 
-Error:
+//Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::Shutdown(void *pContext = nullptr) {
+RESULT DreamUserControlArea::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserManager->Shutdown());
+	//CR(m_pWebBrowserManager->Shutdown());
 
-Error:
+//Error:
 	return r;
 }
 
