@@ -10,8 +10,7 @@
 // Handles the task of drawing into a window.
 // Has the functionality to draw the mouse given a mouse shape buffer and position
 //
-class D3D11DesktopDuplicationOutputManager
-{
+class D3D11DesktopDuplicationOutputManager {
 public:
 	D3D11DesktopDuplicationOutputManager();
 	~D3D11DesktopDuplicationOutputManager();
@@ -20,6 +19,8 @@ public:
 	void CleanRefs();
 	HANDLE GetSharedHandle();
 	void WindowResize();
+
+	unsigned char* GetByteTextureBuffer();
 
 private:
 	// Methods
@@ -34,21 +35,23 @@ private:
 	DUPL_RETURN ResizeSwapChain();
 
 	// Vars
-	IDXGISwapChain1* m_SwapChain;
-	ID3D11Device* m_Device;
-	IDXGIFactory2* m_Factory;
-	ID3D11DeviceContext* m_DeviceContext;
-	ID3D11RenderTargetView* m_RTV;
-	ID3D11SamplerState* m_SamplerLinear;
-	ID3D11BlendState* m_BlendState;
-	ID3D11VertexShader* m_VertexShader;
-	ID3D11PixelShader* m_PixelShader;
-	ID3D11InputLayout* m_InputLayout;
-	ID3D11Texture2D* m_SharedSurf;
-	IDXGIKeyedMutex* m_KeyMutex;
-	HWND m_WindowHandle;
-	bool m_NeedsResize;
-	DWORD m_OcclusionCookie;
+	unsigned char* m_pTextureByteBuffer;
+
+	IDXGISwapChain1* m_pSwapChain = nullptr;
+	ID3D11Device* m_pDevice = nullptr;
+	IDXGIFactory2* m_pFactory = nullptr;
+	ID3D11DeviceContext* m_pDeviceContext = nullptr;
+	ID3D11RenderTargetView* m_pRTV = nullptr;
+	ID3D11SamplerState* m_pSamplerLinear = nullptr;
+	ID3D11BlendState* m_pBlendState = nullptr;
+	ID3D11VertexShader* m_pVertexShader = nullptr;
+	ID3D11PixelShader* m_pPixelShader = nullptr;
+	ID3D11InputLayout* m_pInputLayout = nullptr;
+	ID3D11Texture2D* m_pSharedSurf = nullptr;
+	IDXGIKeyedMutex* m_pKeyMutex = nullptr;
+	HWND m_pWindowHandle = nullptr;
+	bool m_fNeedsResize = false;
+	DWORD m_OcclusionCookie = 0;
 };
 
 #endif

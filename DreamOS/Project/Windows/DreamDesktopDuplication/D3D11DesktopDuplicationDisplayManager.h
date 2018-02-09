@@ -6,11 +6,11 @@
 //
 // Handles the task of processing frames
 //
-class DISPLAYMANAGER
+class D3D11DesktopDuplicationDisplayManager
 {
 public:
-	DISPLAYMANAGER();
-	~DISPLAYMANAGER();
+	D3D11DesktopDuplicationDisplayManager();
+	~D3D11DesktopDuplicationDisplayManager();
 	void InitD3D(DX_RESOURCES* Data);
 	ID3D11Device* GetDevice();
 	DUPL_RETURN ProcessFrame(_In_ FRAME_DATA* Data, _Inout_ ID3D11Texture2D* SharedSurf, INT OffsetX, INT OffsetY, _In_ DXGI_OUTPUT_DESC* DeskDesc);
@@ -24,16 +24,16 @@ private:
 	void SetMoveRect(_Out_ RECT* SrcRect, _Out_ RECT* DestRect, _In_ DXGI_OUTPUT_DESC* DeskDesc, _In_ DXGI_OUTDUPL_MOVE_RECT* MoveRect, INT TexWidth, INT TexHeight);
 
 	// variables
-	ID3D11Device* m_Device;
-	ID3D11DeviceContext* m_DeviceContext;
-	ID3D11Texture2D* m_MoveSurf;
-	ID3D11VertexShader* m_VertexShader;
-	ID3D11PixelShader* m_PixelShader;
-	ID3D11InputLayout* m_InputLayout;
-	ID3D11RenderTargetView* m_RTV;
-	ID3D11SamplerState* m_SamplerLinear;
-	BYTE* m_DirtyVertexBufferAlloc;
-	UINT m_DirtyVertexBufferAllocSize;
+	ID3D11Device* m_pDevice;
+	ID3D11DeviceContext* m_pDeviceContext;
+	ID3D11Texture2D* m_pMoveSurf;
+	ID3D11VertexShader* m_pVertexShader;
+	ID3D11PixelShader* m_pPixelShader;
+	ID3D11InputLayout* m_pInputLayout;
+	ID3D11RenderTargetView* m_pRTV;
+	ID3D11SamplerState* m_pSamplerLinear;
+	BYTE* m_pDirtyVertexBufferAlloc;
+	UINT m_pDirtyVertexBufferAllocSize;
 };
 
 #endif

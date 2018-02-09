@@ -19,12 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="D3D11DesktopController.h" />
     <ClInclude Include="D3D11DesktopDuplicationDisplayManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationOutputManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationThreadManager.h" />
+    <ClInclude Include="DesktopDuplication.h" />
+    <ClInclude Include="include\CommonTypes.h" />
+    <ClInclude Include="include\DDCIPCMessage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="D3D11DesktopController.cpp" />
@@ -155,7 +157,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(OutDir);$(ProjectDIr)..\..\..\External\DDA\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OutDir);$(ProjectDIr)include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

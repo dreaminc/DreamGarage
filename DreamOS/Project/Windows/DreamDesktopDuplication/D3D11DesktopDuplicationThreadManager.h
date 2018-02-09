@@ -10,8 +10,7 @@
 
 #include "CommonTypes.h"
 
-class D3D11DesktopDuplicationThreadManager
-{
+class D3D11DesktopDuplicationThreadManager {
 public:
 	D3D11DesktopDuplicationThreadManager();
 	~D3D11DesktopDuplicationThreadManager();
@@ -25,9 +24,9 @@ private:
 	void CleanDx(_Inout_ DX_RESOURCES* Data);
 
 	PTR_INFO m_PtrInfo;
-	UINT m_ThreadCount;
-	_Field_size_(m_ThreadCount) HANDLE* m_ThreadHandles;
-	_Field_size_(m_ThreadCount) THREAD_DATA* m_ThreadData;
+	UINT m_ThreadCount = 0;
+	_Field_size_(m_ThreadCount) HANDLE* m_pThreadHandles = nullptr;
+	_Field_size_(m_ThreadCount) THREAD_DATA* m_pThreadData = nullptr;
 };
 
 #endif

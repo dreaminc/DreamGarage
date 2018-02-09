@@ -9,10 +9,7 @@
 
 DWORD WINAPI DDProc(_In_ void* Param);
 
-D3D11DesktopDuplicationThreadManager::D3D11DesktopDuplicationThreadManager() : m_ThreadCount(0),
-m_ThreadHandles(nullptr),
-m_ThreadData(nullptr)
-{
+D3D11DesktopDuplicationThreadManager::D3D11DesktopDuplicationThreadManager() {
 	RtlZeroMemory(&m_PtrInfo, sizeof(m_PtrInfo));
 }
 
@@ -33,27 +30,27 @@ void D3D11DesktopDuplicationThreadManager::Clean()
 	}
 	RtlZeroMemory(&m_PtrInfo, sizeof(m_PtrInfo));
 
-	if (m_ThreadHandles)
+	if (m_pThreadHandles)
 	{
 		for (UINT i = 0; i < m_ThreadCount; ++i)
 		{
-			if (m_ThreadHandles[i])
+			if (m_pThreadHandles[i])
 			{
-				CloseHandle(m_ThreadHandles[i]);
+				CloseHandle(m_pThreadHandles[i]);
 			}
 		}
-		delete[] m_ThreadHandles;
-		m_ThreadHandles = nullptr;
+		delete[] m_pThreadHandles;
+		m_pThreadHandles = nullptr;
 	}
 
-	if (m_ThreadData)
+	if (m_pThreadData)
 	{
 		for (UINT i = 0; i < m_ThreadCount; ++i)
 		{
-			CleanDx(&m_ThreadData[i].DxRes);
+			CleanDx(&m_pThreadData[i].DxRes);
 		}
-		delete[] m_ThreadData;
-		m_ThreadData = nullptr;
+		delete[] m_pThreadData;
+		m_pThreadData = nullptr;
 	}
 
 	m_ThreadCount = 0;
@@ -107,9 +104,9 @@ void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* Data)
 DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* DesktopDim)
 {
 	m_ThreadCount = OutputCount;
-	m_ThreadHandles = new (std::nothrow) HANDLE[m_ThreadCount];
-	m_ThreadData = new (std::nothrow) THREAD_DATA[m_ThreadCount];
-	if (!m_ThreadHandles || !m_ThreadData)
+	m_pThreadHandles = new (std::nothrow) HANDLE[m_ThreadCount];
+	m_pThreadData = new (std::nothrow) THREAD_DATA[m_ThreadCount];
+	if (!m_pThreadHandles || !m_pThreadData)
 	{
 		return ProcessFailure(nullptr, L"Failed to allocate array for threads", L"Error", E_OUTOFMEMORY);
 	}
@@ -118,25 +115,25 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, U
 	DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
 	for (UINT i = 0; i < m_ThreadCount; ++i)
 	{
-		m_ThreadData[i].UnexpectedErrorEvent = UnexpectedErrorEvent;
-		m_ThreadData[i].ExpectedErrorEvent = ExpectedErrorEvent;
-		m_ThreadData[i].TerminateThreadsEvent = TerminateThreadsEvent;
-		m_ThreadData[i].Output = (SingleOutput < 0) ? i : SingleOutput;
-		m_ThreadData[i].TexSharedHandle = SharedHandle;
-		m_ThreadData[i].OffsetX = DesktopDim->left;
-		m_ThreadData[i].OffsetY = DesktopDim->top;
-		m_ThreadData[i].PtrInfo = &m_PtrInfo;
+		m_pThreadData[i].UnexpectedErrorEvent = UnexpectedErrorEvent;
+		m_pThreadData[i].ExpectedErrorEvent = ExpectedErrorEvent;
+		m_pThreadData[i].TerminateThreadsEvent = TerminateThreadsEvent;
+		m_pThreadData[i].Output = (SingleOutput < 0) ? i : SingleOutput;
+		m_pThreadData[i].TexSharedHandle = SharedHandle;
+		m_pThreadData[i].OffsetX = DesktopDim->left;
+		m_pThreadData[i].OffsetY = DesktopDim->top;
+		m_pThreadData[i].PtrInfo = &m_PtrInfo;
 
-		RtlZeroMemory(&m_ThreadData[i].DxRes, sizeof(DX_RESOURCES));
-		Ret = InitializeDx(&m_ThreadData[i].DxRes);
+		RtlZeroMemory(&m_pThreadData[i].DxRes, sizeof(DX_RESOURCES));
+		Ret = InitializeDx(&m_pThreadData[i].DxRes);
 		if (Ret != DUPL_RETURN_SUCCESS)
 		{
 			return Ret;
 		}
 
 		DWORD ThreadId;
-		m_ThreadHandles[i] = CreateThread(nullptr, 0, DDProc, &m_ThreadData[i], 0, &ThreadId);
-		if (m_ThreadHandles[i] == nullptr)
+		m_pThreadHandles[i] = CreateThread(nullptr, 0, DDProc, &m_pThreadData[i], 0, &ThreadId);
+		if (m_pThreadHandles[i] == nullptr)
 		{
 			return ProcessFailure(nullptr, L"Failed to create thread", L"Error", E_FAIL);
 		}
@@ -253,6 +250,6 @@ void D3D11DesktopDuplicationThreadManager::WaitForThreadTermination()
 {
 	if (m_ThreadCount != 0)
 	{
-		WaitForMultipleObjectsEx(m_ThreadCount, m_ThreadHandles, TRUE, INFINITE, FALSE);
+		WaitForMultipleObjectsEx(m_ThreadCount, m_pThreadHandles, TRUE, INFINITE, FALSE);
 	}
 }

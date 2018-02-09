@@ -19,7 +19,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include "DDCIPCmessage.h"
+#include "DDCIPCMessage.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -807,17 +807,6 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 		CNM(pDreamDesktop, "Failed to create dream desktop");
 		*/
-		struct MessageStruct {
-			HWND dreamHandle;
-			HWND duplicationHandle;
-			DDCIPCmessage ddcMessage;
-
-		};
-
-		MessageStruct *desktopMessage = new MessageStruct();
-
-		COPYDATASTRUCT desktopCDS;
-
 		STARTUPINFO si;
 		PROCESS_INFORMATION pi;
 
@@ -847,17 +836,14 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		}
 
 		HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
-		if (dreamHWND == NULL)
-		{
+		if (dreamHWND == NULL) {
 			MessageBox(dreamHWND, L"Unable to find the Dream window",
 				L"Error", MB_ICONERROR);
 			return r;
 		}
-		desktopMessage->dreamHandle = dreamHWND;
 		
 		HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-		while (desktopHWND == NULL)
-		{
+		while (desktopHWND == NULL)	{
 			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
 		}
 
@@ -866,35 +852,33 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		
 		if (desktopPID == pi.dwProcessId) {
 			DEBUG_LINEOUT("Got DesktopDuplication WindowHandle");
-			desktopMessage->duplicationHandle = desktopHWND;
 		}
 
-		desktopCDS.dwData = (unsigned long)DDCIPCmessage::type::PING;
-		desktopCDS.cbData = sizeof(desktopMessage);
-		desktopCDS.lpData = &desktopMessage;
+		DDCIPCMessage ddcMessage;
+		ddcMessage.SetType(DDCIPCMessage::type::START);
+		COPYDATASTRUCT desktopCDS;
+
+		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.cbData = sizeof(ddcMessage);
+		desktopCDS.lpData = &ddcMessage;
 
 		SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
 		DWORD dwError = GetLastError();
-		if (dwError != NO_ERROR)
-		{
+		if (dwError != NO_ERROR) {
 			MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
 		}
 		else {
-			DEBUG_LINEOUT("Mesage sent");
+			DEBUG_LINEOUT("Message sent");
 		}
+
+		//composite* desktopComposite = m_pDreamOS->AddComposite();
+		//std::shared_ptr<quad> desktopQuad = desktopComposite->AddQuad(4, 3, 1, 1, nullptr, vector(0.0, 1.0f, 0.0).Normal());
+
+		//std::vector<unsigned char> vectorByteBuffer(1920 * 1080 * 4, 0xFF);
+		//std::shared_ptr<texture> desktopTexture = desktopComposite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 1920, 1080, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], 1920 * 1080 * 4);
 
 		// Message loop (attempts to update screen when no other messages to process)
-		MSG msg = { 0 };
-		while (WM_QUIT != msg.message)
-		{
-			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				if (msg.message == WM_COPYDATA) {
-					DEBUG_LINEOUT("got it back");
 
-				}
-			}
-		}
 		// Wait until child process exits.
 		WaitForSingleObject(pi.hProcess, INFINITE);
 

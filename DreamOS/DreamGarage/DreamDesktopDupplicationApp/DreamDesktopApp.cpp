@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
-#include "DDCIPCmessage.h"
+#include "DDCIPCMessage.h"
 #include <windows.h>
 #include <windowsx.h>
 
@@ -53,35 +53,33 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-BOOL OnCopyData(HWND hWnd, HWND hwndFrom, PCOPYDATASTRUCT pCDS) {
+BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
-	struct MessageStruct {
-		HWND dreamHandle;
-		HWND duplicationHandle;
-		DDCIPCmessage ddcMessage;
+	HWND pDreamHandle = (HWND)wParam;
+	HWND duplicationHandle = hWnd;
+	//DDCIPCMessage ddcMessage;
+	PCOPYDATASTRUCT pDataStruct;
 
-	};
-	MessageStruct *desktopMessage = new MessageStruct();
+	pDataStruct = (PCOPYDATASTRUCT)lParam;
 
-	if (pCDS->dwData == (unsigned long)DDCIPCmessage::type::PING) {
-		pCDS->dwData = (unsigned long)DDCIPCmessage::type::ACK;
+	switch (pDataStruct->dwData) {	// Handle based on DDCIPCMessage type
+	case(0UL): {	// type is PING
 
-		desktopMessage = (MessageStruct*)pCDS->lpData;
-		SendMessage(desktopMessage->dreamHandle, WM_COPYDATA, (WPARAM)desktopMessage->duplicationHandle, (LPARAM)(LPVOID)&pCDS);
+		return true;
+	} break;
+
+	default:
+		return false;
 	}
-
-	return true;
 }
 
-INT_PTR CALLBACK DialogProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT __stdcall WndProc(HWND hWnd, unsigned int message, WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
-	{
-		// Handle the WM_COPYDATA message in OnCopyData 
-		HANDLE_MSG(hWnd, WM_COPYDATA, OnCopyData);
+	switch (message) {
+	case WM_COPYDATA: {
+		OnCopyData(hWnd, wParam, lParam);
+	} break;
 
-		// Handle the WM_CLOSE message in OnClose 
-		// HANDLE_MSG(hWnd, WM_CLOSE, OnClose);
 
 	default:
 		return FALSE;
@@ -209,31 +207,6 @@ RESULT DreamDesktopApp::SetVisible(bool fVisible) {
 
 Error:
 	return r;
-}
-
-//
-// Window message processor
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		break;
-	}
-	case WM_SIZE:
-	{
-		// Tell output manager that window size has changed
-		//OutMgr.WindowResize();
-		break;
-	}
-	default:
-		return DefWindowProc(hWnd, message, wParam, lParam);
-	}
-
-	return 0;
 }
 
 //
