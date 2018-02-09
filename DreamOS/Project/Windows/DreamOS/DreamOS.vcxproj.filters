@@ -195,6 +195,12 @@
     <Filter Include="DreamControlView">
       <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamShareView">
+      <UniqueIdentifier>{a5c89bd6-b56b-4917-8ca7-0b81f1e3c36e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamUserControlArea">
+      <UniqueIdentifier>{e7693720-b8fe-424c-9d3b-5d6d93aa1029}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -851,9 +857,6 @@
     <ClCompile Include="..\..\..\DreamAppMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamBrowserMessage.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\LeapHand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -961,6 +964,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
       <Filter>DreamControlView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp">
+      <Filter>DreamShareView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp">
+      <Filter>DreamShareView</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp">
+      <Filter>DreamUserControlArea</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2018,9 +2033,6 @@
     <ClInclude Include="..\..\..\DreamAppMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamBrowserMessage.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
@@ -2098,6 +2110,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
       <Filter>DreamControlView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h">
+      <Filter>DreamShareView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareViewMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h">
+      <Filter>DreamShareView</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h">
+      <Filter>DreamUserControlArea</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

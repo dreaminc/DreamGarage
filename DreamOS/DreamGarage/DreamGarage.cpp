@@ -16,6 +16,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -293,6 +294,8 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	auto pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+
 	// ControlView App
 	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
 	CN(m_pDreamControlView);
@@ -311,7 +314,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 	m_pDreamBrowser->SetDiagonalSize(9.0f);
-	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
 	m_pDreamBrowser->SetVisible(false);
 #endif
@@ -725,7 +728,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	}
 
 	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
-		m_pDreamBrowser->StartReceiving(pPeerConnection);
+		m_pDreamShareView->StartReceiving(pPeerConnection);
 		m_pendingAssetReceiveUserID = -1;
 	}
 
@@ -966,9 +969,9 @@ RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
-	if (m_pDreamBrowser != nullptr) {
+//	if (m_pDreamShareView != nullptr) {
 
-		m_pDreamBrowser->PendReceiving();
+//		m_pDreamShareView->PendReceiving();
 
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
@@ -978,20 +981,20 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 		}
 
 		//m_pDreamBrowser->StartReceiving();
-	}
+//	}
 	return r;
 }
 
 RESULT DreamGarage::OnStopSending() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopSending());
+	CR(m_pDreamShareView->StopSending());
 Error:
 	return r;
 }
 
 RESULT DreamGarage::OnStopReceiving() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopReceiving());
+	CR(m_pDreamShareView->StopReceiving());
 
 	m_pendingAssetReceiveUserID = -1;
 

@@ -77,6 +77,7 @@ class DreamOS :
 	friend class WebRTCTestSuite;
 	friend class SoundTestSuite;
 	friend class SandboxTestSuite;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
