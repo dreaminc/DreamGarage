@@ -23,7 +23,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
-#include "DDCIPCmessage.h"
+#include "DDCIPCMessage.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)

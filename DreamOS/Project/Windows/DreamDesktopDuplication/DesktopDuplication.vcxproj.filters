@@ -9,11 +9,22 @@
     <ClCompile Include="DesktopDuplication.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="D3D11DesktopController.h" />
     <ClInclude Include="D3D11DesktopDuplicationDisplayManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationOutputManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationThreadManager.h" />
+    <ClInclude Include="include\DDCIPCMessage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CommonTypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="DesktopDuplication.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{8ae6d426-dac2-45da-a6f9-89d5f335d831}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
