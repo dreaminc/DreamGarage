@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamDesktopApp;
 class UIStageProgram;
 class UpdateMouthMessage;
 
@@ -76,6 +77,9 @@ public:
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) override;
+
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
@@ -128,6 +132,7 @@ private:
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
 	std::shared_ptr<DreamControlView> m_pDreamControlView;
+	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

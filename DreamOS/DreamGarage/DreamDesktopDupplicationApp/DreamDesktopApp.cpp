@@ -53,40 +53,6 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
-
-	HWND pDreamHandle = (HWND)wParam;
-	HWND duplicationHandle = hWnd;
-	//DDCIPCMessage ddcMessage;
-	PCOPYDATASTRUCT pDataStruct;
-
-	pDataStruct = (PCOPYDATASTRUCT)lParam;
-
-	switch (pDataStruct->dwData) {	// Handle based on DDCIPCMessage type
-	case(0UL): {	// type is PING
-
-		return true;
-	} break;
-
-	default:
-		return false;
-	}
-}
-
-LRESULT __stdcall WndProc(HWND hWnd, unsigned int message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message) {
-	case WM_COPYDATA: {
-		OnCopyData(hWnd, wParam, lParam);
-	} break;
-
-
-	default:
-		return FALSE;
-	}
-	return 0;
-}
-
 RESULT DreamDesktopApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -158,6 +124,13 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 	}
 
 	return R_PASS;
+}
+
+RESULT DreamDesktopApp::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+	RESULT r = R_PASS;
+
+
+	return r;
 }
 
 float DreamDesktopApp::GetHeight() {

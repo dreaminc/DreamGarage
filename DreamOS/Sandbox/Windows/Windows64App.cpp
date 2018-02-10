@@ -9,6 +9,9 @@
 
 #include "./HAL/opengl/OpenGLImp.h"
 
+#include "DreamOS.h"
+#include "DDCIPCMessage.h"
+
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 
@@ -322,6 +325,19 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 	case WM_SIZE: {
 		SetDimensions(LOWORD(lp), HIWORD(lp));
+	} break;
+
+	case WM_COPYDATA: {
+		PCOPYDATASTRUCT pDataStruct;
+
+		pDataStruct = (PCOPYDATASTRUCT)lp;
+		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME && !m_fSentFrame) {
+			bufferSize = pDataStruct->cbData;
+			textureByteBuffer = (unsigned char*)pDataStruct->lpData;
+			memcpy(textureByteBuffer, pDataStruct->lpData, bufferSize);
+			m_pDreamOSHandle->OnDesktopFrame(bufferSize, textureByteBuffer);
+			m_fSentFrame = true;
+		}
 	} break;
 
 	default: {

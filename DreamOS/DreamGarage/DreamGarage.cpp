@@ -16,6 +16,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -303,7 +304,10 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
+	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+
+	m_pDreamDesktop = LaunchDreamApp<DreamDesktopApp>(this);
+	CNM(m_pDreamDesktop, "Failed to create dream desktop");
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
@@ -996,6 +1000,12 @@ RESULT DreamGarage::OnStopReceiving() {
 	m_pendingAssetReceiveUserID = -1;
 
 Error:
+	return r;
+}
+
+RESULT DreamGarage::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+	RESULT r = R_PASS;
+		m_pDreamDesktop->OnDesktopFrame(bufferSize, textureByteBuffer);
 	return r;
 }
 

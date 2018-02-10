@@ -794,99 +794,115 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	double sTestTime = 10000.0;
 
 	struct TestContext {
-		std::shared_ptr<DreamUserApp> pUser = nullptr;	
+		std::shared_ptr<DreamUserApp> pUser = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		/*
+		
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 		SetupDreamAppPipeline();
-		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
-
-		pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
-		CNM(pDreamDesktop, "Failed to create dream desktop");
-		*/
-		STARTUPINFO si;
-		PROCESS_INFORMATION pi;
-
-		ZeroMemory(&si, sizeof(si));
-		si.cb = sizeof(si);
-		ZeroMemory(&pi, sizeof(pi));
-
-		char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
-		wchar_t wlocation[sizeof(location)];
-		mbstowcs(wlocation, location, sizeof(location) + 1);
-		LPWSTR strLPWlocation = wlocation;
-
-		if (!CreateProcess(strLPWlocation,
-			NULL,			// Command line
-			NULL,           // Process handle not inheritable
-			NULL,           // Thread handle not inheritable
-			FALSE,          // Set handle inheritance to FALSE
-			0,              // No creation flags
-			NULL,           // Use parent's environment block
-			NULL,           // Use parent's starting directory 
-			&si,            // Pointer to STARTUPINFO structure
-			&pi)            // Pointer to PROCESS_INFORMATION structure
-			)
 		{
-			DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
-			r = R_FAIL;
-		}
+			/*
+			std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
 
-		HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
-		if (dreamHWND == NULL) {
-			MessageBox(dreamHWND, L"Unable to find the Dream window",
-				L"Error", MB_ICONERROR);
-			return r;
-		}
-		
-		HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-		while (desktopHWND == NULL)	{
+			pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
+			CNM(pDreamDesktop, "Failed to create dream desktop");
+			*/
+
+			auto pComposite = m_pDreamOS->AddComposite();
+			pComposite->InitializeOBB();
+
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			pView->InitializeOBB();
+
+			int pxWidth = 1920;
+			int pxHeight = 1080;
+
+			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+
+			pTestContext->pQuad = pView->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
+			pTestContext->pQuad->SetPosition(0.0f, 2.0f, -2.0f);
+			
+			
+			//*
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			
+			ZeroMemory(&si, sizeof(si));
+			si.cb = sizeof(si);
+			ZeroMemory(&pi, sizeof(pi));
+
+			char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
+			wchar_t wlocation[sizeof(location)];
+			mbstowcs(wlocation, location, sizeof(location) + 1);
+			LPWSTR strLPWlocation = wlocation;
+
+			if (!CreateProcess(strLPWlocation,
+				NULL,			// Command line
+				NULL,           // Process handle not inheritable
+				NULL,           // Thread handle not inheritable
+				FALSE,          // Set handle inheritance to FALSE
+				0,              // No creation flags
+				NULL,           // Use parent's environment block
+				NULL,           // Use parent's starting directory 
+				&si,            // Pointer to STARTUPINFO structure
+				&pi)            // Pointer to PROCESS_INFORMATION structure
+				)
+			{
+				DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
+				r = R_FAIL;
+			}
+
+			HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
+			if (dreamHWND == NULL) {
+				MessageBox(dreamHWND, L"Unable to find the Dream window",
+					L"Error", MB_ICONERROR);
+				return r;
+			}
+
 			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+			while (desktopHWND == NULL) {
+				HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+			}
+
+			DWORD desktopPID;
+			GetWindowThreadProcessId(desktopHWND, &desktopPID);
+
+			if (desktopPID == pi.dwProcessId) {
+				DEBUG_LINEOUT("Got DesktopDuplication WindowHandle");
+			}
+
+			DDCIPCMessage ddcMessage;
+			ddcMessage.SetType(DDCIPCMessage::type::START);
+			COPYDATASTRUCT desktopCDS;
+
+			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+			desktopCDS.cbData = sizeof(ddcMessage);
+			desktopCDS.lpData = &ddcMessage;
+
+			SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
+			DWORD dwError = GetLastError();
+			if (dwError != NO_ERROR) {
+				MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
+			}
+			else {
+				DEBUG_LINEOUT("Message sent");
+			}
+			//*/
+			
+			// Wait until child process exits.
+			//WaitForSingleObject(pi.hProcess, INFINITE);
+
+			// Close process and thread handles. 
+			//CloseHandle(pi.hProcess);
+			//CloseHandle(pi.hThread);
 		}
 
-		DWORD desktopPID;
-		GetWindowThreadProcessId(desktopHWND, &desktopPID);
-		
-		if (desktopPID == pi.dwProcessId) {
-			DEBUG_LINEOUT("Got DesktopDuplication WindowHandle");
-		}
-
-		DDCIPCMessage ddcMessage;
-		ddcMessage.SetType(DDCIPCMessage::type::START);
-		COPYDATASTRUCT desktopCDS;
-
-		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
-		desktopCDS.cbData = sizeof(ddcMessage);
-		desktopCDS.lpData = &ddcMessage;
-
-		SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
-		DWORD dwError = GetLastError();
-		if (dwError != NO_ERROR) {
-			MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
-		}
-		else {
-			DEBUG_LINEOUT("Message sent");
-		}
-
-		//composite* desktopComposite = m_pDreamOS->AddComposite();
-		//std::shared_ptr<quad> desktopQuad = desktopComposite->AddQuad(4, 3, 1, 1, nullptr, vector(0.0, 1.0f, 0.0).Normal());
-
-		//std::vector<unsigned char> vectorByteBuffer(1920 * 1080 * 4, 0xFF);
-		//std::shared_ptr<texture> desktopTexture = desktopComposite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 1920, 1080, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], 1920 * 1080 * 4);
-
-		// Message loop (attempts to update screen when no other messages to process)
-
-		// Wait until child process exits.
-		WaitForSingleObject(pi.hProcess, INFINITE);
-
-		// Close process and thread handles. 
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-
-	//Error:
+	Error:
 		return r;
 	};
 
@@ -898,7 +914,24 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+		int pxWidth = 0;
+		int pxHeight = 0;
+		texture* pTexture;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		CNR(m_pDataBuffer, R_SKIPPED);
+		{if (pxWidth == 0)
+		{
+			pxWidth = 1920;
+			pxHeight = 1080;
 
+			pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &m_pDataBuffer, (int)m_pDataBuffer_n);
+
+			pTestContext->pQuad->SetDiffuseTexture(pTexture);
+			//pTestContext->pQuad->GetTextureDiffuse()->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+		}
+		}
+	Error:
 		return r;
 	};
 

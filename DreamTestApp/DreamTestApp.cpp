@@ -135,6 +135,12 @@ RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamTestApp::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+	RESULT r = R_PASS;
+	m_pTestSuite->OnDesktopFrame(bufferSize, textureByteBuffer);
+	return r;
+}
+
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 	

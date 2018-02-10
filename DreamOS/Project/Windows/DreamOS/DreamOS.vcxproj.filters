@@ -2108,9 +2108,6 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\CommonTypes.h">
-      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

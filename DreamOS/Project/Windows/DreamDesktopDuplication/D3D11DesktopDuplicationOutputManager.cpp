@@ -41,10 +41,12 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	UINT NumDriverTypes = ARRAYSIZE(DriverTypes);
 
 	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+/*
 #ifdef _USE_TEST_APP
 	// If the project is in a debug build, enable the debug layer.
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
+*/
 
 	// Feature levels supported
 	D3D_FEATURE_LEVEL FeatureLevels[] = {

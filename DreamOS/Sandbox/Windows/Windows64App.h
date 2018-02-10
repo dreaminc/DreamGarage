@@ -77,8 +77,12 @@ public:
 	RESULT UnregisterUIThreadCallback();
 
 private:
+	bool m_fSentFrame = false;
 	bool m_fFullscreen;
 	long m_wndStyle;
+
+	unsigned long bufferSize;
+	unsigned char* textureByteBuffer;
 
 	TCHAR* m_pszClassName;
 

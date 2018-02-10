@@ -966,7 +966,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\CommonTypes.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
