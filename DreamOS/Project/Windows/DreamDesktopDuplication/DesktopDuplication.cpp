@@ -382,7 +382,7 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 	} break;
 	case(2UL): {	// type is START
 		g_fStartSending = true;
-		DisplayMsg(L"Start", L"Start", S_OK);
+		//DisplayMsg(L"Start", L"Start", S_OK);
 
 		return true;
 	} break;

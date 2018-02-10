@@ -65,6 +65,8 @@ public:
 
 	//RESULT FadeQuadToBlack();
 
+	RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer);
+
 	float GetWidth();
 	float GetHeight();
 	vector GetNormal();

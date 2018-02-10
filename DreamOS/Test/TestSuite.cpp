@@ -141,6 +141,12 @@ Error:
 	return nullptr;
 }
 
+RESULT TestSuite::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+	m_pDataBuffer_n = bufferSize;
+	m_pDataBuffer = textureByteBuffer;
+	return R_PASS;
+}
+
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, 
 	std::function<RESULT(void*)> fnUpdate, 
 	std::function<RESULT(void*)> fnTest, 
