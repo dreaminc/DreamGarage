@@ -978,7 +978,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleStopPressed(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	DreamShareViewHandle *pShareViewHandle = nullptr;
 	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
@@ -996,7 +996,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pContext) {
+RESULT DreamControlView::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(CanPressButton(pButtonContext), R_SKIPPED);

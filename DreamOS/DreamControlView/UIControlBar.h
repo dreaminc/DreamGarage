@@ -28,8 +28,10 @@ class ControlBarObserver {
 public:
 	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) = 0;
 	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) = 0;
 	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) = 0;
 };
 
@@ -57,12 +59,20 @@ public:
 	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
 	RESULT ForwardPressed(UIButton* pButtonContext, void* pContext);
 	RESULT TogglePressed(UIButton* pButtonContext, void* pContext);
-	RESULT StopPressed(UIButton* pButtonContext, void* pContext);
+	RESULT OpenPressed(UIButton* pButtonContext, void* pContext);
+	RESULT ClosePressed(UIButton* pButtonContext, void* pContext);
+	RESULT SharePressed(UIButton* pButtonContext, void* pContext);
 	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
 
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();
+
+	// for non-default implementations, call these before initialize
+	RESULT SetTotalWidth(float totalWidth);
+	RESULT SetItemSide(float itemSide);
+	RESULT SetURLWidth(float urlWidth);
+	RESULT SetItemSpacing(float itemSpacing);
 
 	std::shared_ptr<text> GetURLText();
 
@@ -79,8 +89,11 @@ public:
 public:
 	const wchar_t *k_wszBack = L"control-view-back.png";
 	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszOpen = L"control-view-open.png";
+	const wchar_t *k_wszClose = L"control-view-close.png";
+	const wchar_t *k_wszShare = L"control-view-share.png";
+	const wchar_t *k_wszStopSharing = L"control-view-stop-sharing.png";
 	const wchar_t *k_wszHide = L"control-view-minimize.png";
-	const wchar_t *k_wszStop = L"control-view-stop-sharing.png";
 	const wchar_t *k_wszShow = L"control-view-maximize.png";
 	const wchar_t *k_wszURL = L"control-view-url.png";
 
@@ -88,16 +101,21 @@ private:
 	std::shared_ptr<UIButton> m_pBackButton;
 	std::shared_ptr<UIButton> m_pForwardButton;
 	std::shared_ptr<UIButton> m_pToggleButton;
-	std::shared_ptr<UIButton> m_pStopButton;
+	std::shared_ptr<UIButton> m_pCloseButton;
+	std::shared_ptr<UIButton> m_pOpenButton;
+	std::shared_ptr<UIButton> m_pShareToggleButton;
 
 	std::shared_ptr<UIButton> m_pURLButton;
 	std::shared_ptr<text> m_pURLText;
 
 	texture *m_pBackTexture;
 	texture *m_pForwardTexture;
-	texture *m_pHideTexture;
-	texture *m_pStopTexture;
 	texture *m_pShowTexture;
+	texture *m_pHideTexture;
+	texture *m_pOpenTexture;
+	texture *m_pCloseTexture;
+	texture *m_pShareTexture;
+	texture *m_pStopSharingTexture;
 	texture *m_pURLTexture;
 
 	float m_totalWidth = TOTAL_WIDTH;

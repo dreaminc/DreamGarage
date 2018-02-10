@@ -133,8 +133,8 @@ private:
 	bool CanPressButton(UIButton* pButtonContext);
 	RESULT SetIsMinimizedFlag(bool fIsMinimized);
 
-	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override;
+	virtual RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override;
 	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override;
 	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override;
 	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;

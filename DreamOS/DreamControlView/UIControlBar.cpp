@@ -9,6 +9,7 @@ UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
 {
 	RESULT r = R_PASS;
 
+	/*
 	CR(Initialize());
 
 	Validate();
@@ -16,7 +17,7 @@ UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
 Error:
 	Invalidate();
 	return;
-
+//*/
 }
 
 UIControlBar::~UIControlBar() {
@@ -32,30 +33,37 @@ RESULT UIControlBar::Initialize() {
 	// create textures 
 	m_pBackTexture = m_pDreamOS->MakeTexture(k_wszBack, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pForwardTexture = m_pDreamOS->MakeTexture(k_wszForward, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pHideTexture = m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pStopTexture = m_pDreamOS->MakeTexture(L"control-view-stop-sharing.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pShowTexture = m_pDreamOS->MakeTexture(L"control-view-maximize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pURLTexture = m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pHideTexture = m_pDreamOS->MakeTexture(k_wszHide, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pShowTexture = m_pDreamOS->MakeTexture(k_wszShow, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pOpenTexture = m_pDreamOS->MakeTexture(k_wszOpen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pCloseTexture = m_pDreamOS->MakeTexture(k_wszClose, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pURLTexture = m_pDreamOS->MakeTexture(k_wszURL, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pShareTexture = m_pDreamOS->MakeTexture(k_wszShare, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pStopSharingTexture = m_pDreamOS->MakeTexture(k_wszStopSharing, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
 
-	//temporarily removed
-	/*
 	m_pBackButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
 
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
-	//*/
 
 	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
 
-	m_pStopButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pStopButton->GetSurface()->SetDiffuseTexture(m_pStopTexture);
+	m_pOpenButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pOpenButton->GetSurface()->SetDiffuseTexture(m_pOpenTexture);
+
+	m_pCloseButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pCloseButton->GetSurface()->SetDiffuseTexture(m_pCloseTexture);
+
+	m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pShareToggleButton->GetSurface()->SetDiffuseTexture(m_pShareTexture);
 
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
+
 
 	for (auto pButton : GetControlButtons()) {
 		CN(pButton);
@@ -69,6 +77,9 @@ RESULT UIControlBar::Initialize() {
 
 	// Register wrapper functions to button events
 	{
+		auto fnOpenCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return OpenPressed(pButtonContext, pContext);
+		};
 		auto fnStopCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return StopPressed(pButtonContext, pContext);
 		};
@@ -86,10 +97,12 @@ RESULT UIControlBar::Initialize() {
 		};
 
 		// update button trigger events to match the observer
-		CR(m_pStopButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
+		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
 		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
-		//CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
-		//CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
+		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
 	}
 
@@ -116,15 +129,31 @@ Error:
 RESULT UIControlBar::TogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
-	CR(m_pObserver->HandleTogglePressed(pButtonContext, pContext));
+	CR(m_pObserver->HandleShowTogglePressed(pButtonContext, pContext));
 Error:
 	return r;
 }
 
-RESULT UIControlBar::StopPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UIControlBar::OpenPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
-	CR(m_pObserver->HandleStopPressed(pButtonContext, pContext));
+	CR(m_pObserver->HandleOpenPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::ClosePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleClosePressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::SharePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleShareTogglePressed(pButtonContext, pContext));
 Error:
 	return r;
 }
@@ -160,22 +189,28 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
-	/*
+	//*
 	point ptBack = point(m_itemSide / 2.0f, 0.0f, 0.0f);
 	m_pBackButton->SetPosition(ptStart + ptBack);
 
 	point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pForwardButton->SetPosition(ptStart + ptForward);
+
+	point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	m_pCloseButton->SetPosition(ptStart + ptClose);
 	//*/
 
 	point ptURL = ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
 	m_pURLButton->SetPosition(ptURL);
 
+	point ptShare = ptURL + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	m_pShareToggleButton->SetPosition(ptShare);
+	
+	point ptOpen = ptShare + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	m_pOpenButton->SetPosition(ptOpen);
+
 	point ptHide = ptStart + point(m_urlWidth + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
 	m_pToggleButton->SetPosition(ptHide);
-
-	point ptStop = ptHide + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pStopButton->SetPosition(ptStop);
 
 //Error:
 	return r;
@@ -236,7 +271,7 @@ std::shared_ptr<UIButton> UIControlBar::GetToggleButton() {
 }
 
 std::shared_ptr<UIButton> UIControlBar::GetStopButton() {
-	return m_pStopButton;
+	return m_pCloseButton;
 }
 
 std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
@@ -244,7 +279,7 @@ std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
 }
 
 std::vector<std::shared_ptr<UIButton>> UIControlBar::GetControlButtons() {
-	return { /*m_pBackButton, m_pForwardButton,*/ m_pToggleButton, m_pStopButton, m_pURLButton };
+	return { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pURLButton };
 }
 
 texture *UIControlBar::GetHideTexture() {
@@ -253,6 +288,26 @@ texture *UIControlBar::GetHideTexture() {
 
 texture *UIControlBar::GetShowTexture() {
 	return m_pShowTexture;
+}
+
+RESULT UIControlBar::SetTotalWidth(float totalWidth) {
+	m_totalWidth = totalWidth;
+	return R_PASS;
+}
+
+RESULT UIControlBar::SetItemSide(float itemSide) {
+	m_itemSide = itemSide;
+	return R_PASS;
+}
+
+RESULT UIControlBar::SetURLWidth(float urlWidth);
+	m_urlWidth = urlWidth;
+	return R_PASS;
+}
+
+RESULT UIControlBar::SetItemSpacing(float itemSpacing);
+	m_itemSpacing = itemSpacing;
+	return R_PASS;
 }
 
 std::shared_ptr<text> UIControlBar::GetURLText() {

@@ -674,6 +674,7 @@ RESULT DreamOS::InitializeDreamUser() {
 	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
 	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set left hand");
 
+
 Error:
 	return r;
 }
