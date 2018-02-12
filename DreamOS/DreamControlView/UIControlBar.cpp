@@ -80,11 +80,14 @@ RESULT UIControlBar::Initialize() {
 		auto fnOpenCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return OpenPressed(pButtonContext, pContext);
 		};
-		auto fnStopCallback = [&](UIButton *pButtonContext, void *pContext) {
-			return StopPressed(pButtonContext, pContext);
+		auto fnCloseCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return ClosePressed(pButtonContext, pContext);
 		};
 		auto fnToggleCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return TogglePressed(pButtonContext, pContext);
+		};
+		auto fnShareCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return SharePressed(pButtonContext, pContext);
 		};
 		auto fnBackCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return BackPressed(pButtonContext, pContext);
@@ -97,12 +100,12 @@ RESULT UIControlBar::Initialize() {
 		};
 
 		// update button trigger events to match the observer
-		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnStopCallback));
+		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
 		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
 		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
 		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
-		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
-		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnShareCallback));
+		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
 	}
 
@@ -300,12 +303,12 @@ RESULT UIControlBar::SetItemSide(float itemSide) {
 	return R_PASS;
 }
 
-RESULT UIControlBar::SetURLWidth(float urlWidth);
+RESULT UIControlBar::SetURLWidth(float urlWidth) {
 	m_urlWidth = urlWidth;
 	return R_PASS;
 }
 
-RESULT UIControlBar::SetItemSpacing(float itemSpacing);
+RESULT UIControlBar::SetItemSpacing(float itemSpacing) {
 	m_itemSpacing = itemSpacing;
 	return R_PASS;
 }

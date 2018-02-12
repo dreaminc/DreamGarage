@@ -12,7 +12,7 @@ class text;
 
 //TODO: some of these values / the way they are used are specific to control view
 #define ITEM_SIDE 0.0625f
-#define URL_WIDTH 0.84375f //0.6875f is the width with forward and back
+#define URL_WIDTH_2 0.84375f //0.6875f is the width with forward and back
 #define ITEM_SPACING 0.015625f
 
 #define ITEM_ACTUATION_DEPTH 0.02f
@@ -121,7 +121,7 @@ private:
 	float m_totalWidth = TOTAL_WIDTH;
 	float m_itemSide = m_totalWidth * ITEM_SIDE;
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;
-	float m_urlWidth = m_totalWidth * URL_WIDTH;
+	float m_urlWidth = m_totalWidth * URL_WIDTH_2;
 	float m_actuationDepth = ITEM_ACTUATION_DEPTH;
 
 	BarType m_barType = BarType::DEFAULT;

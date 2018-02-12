@@ -7,7 +7,8 @@
 
 #include "UI/UIView.h"
 #include "DreamControlView/UIControlBar.h"
-#include "DreamUserControlArea/DreamUserControlArea.h"
+//#include "DreamUserControlArea/DreamUserControlArea.h"
+class DreamUserControlArea;
 
 //All relative to parent app
 #define BUTTON_WIDTH 0.0645
@@ -71,10 +72,10 @@ private:
 	bool m_fIsMinimized = false;
 	bool m_fIsSharing = false;
 
-	bool m_buttonWidth = BUTTON_WIDTH;
-	bool m_buttonHeight = BUTTON_HEIGHT;
-	bool m_urlWidth = URL_WIDTH;
-	bool m_urlHeight = URL_HEIGHT;
+	double m_buttonWidth = BUTTON_WIDTH;
+	double m_buttonHeight = BUTTON_HEIGHT;
+	double m_urlWidth = URL_WIDTH;
+	double m_urlHeight = URL_HEIGHT;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_

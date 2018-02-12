@@ -52,9 +52,7 @@ private:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
-	std::vector<std::shared_ptr<DreamAppBase>> m_pOpenApps;
-	std::map<std::shared_ptr<DreamAppBase>, std::shared_ptr<quad>> m_textureUpdateMap;
-//	std::vector<DreamApp> *m_openApps;
+	std::shared_ptr<DreamControlBar> m_pControlBar;
 
 	float m_spacingSize = SPACING_SIZE;
 	float m_pxWidth = DEFAULT_PX_WIDTH;
