@@ -56,8 +56,8 @@ public:
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override;
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
 
-private:
-	bool CanPressButton(UIButton *pButtonContext);
+	bool CanPressButton(int dirtyIndex);
+	RESULT ClearFlag(int index);
 
 public:
 	RESULT InitializeWithParent(std::shared_ptr<DreamUserControlArea> pParentApp);
@@ -76,6 +76,8 @@ private:
 	double m_buttonHeight = BUTTON_HEIGHT;
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = URL_HEIGHT;
+
+	bool m_fCanPressButton[2];
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_

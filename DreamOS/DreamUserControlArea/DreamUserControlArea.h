@@ -48,6 +48,8 @@ public:
 public:
 	RESULT HandleControlBarEvent(ControlEventType type);
 
+	RESULT CanPressButton(UIButton *pButtonContext);
+
 private:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;

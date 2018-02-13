@@ -2,6 +2,8 @@
 #include "DreamOS.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 
+#include "UI/UIButton.h"
+
 DreamControlBar::DreamControlBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlBar>(pDreamOS)
 {
@@ -43,48 +45,39 @@ DreamControlBar* DreamControlBar::SelfConstruct(DreamOS *pDreamOS, void *pContex
 	return pDreamControlBar;
 }
 
-bool DreamControlBar::CanPressButton(UIButton *pButtonContext) {
+bool DreamControlBar::CanPressButton(int dirtyIndex) {
 	//TODO: get some info from pParentApp, maintain some here
-	/*
+	//*
+	RESULT r = R_PASS;
 	auto pDreamOS = GetDOS();
 
-	auto pInteractionObj = pButtonContext->GetInteractionObject();
-	int dirtyIndex = -1;
-	if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
-		dirtyIndex = 0;
-	}
-	else if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
-		dirtyIndex = 1;
-	}
 	CBR(dirtyIndex != -1, R_SKIPPED);
 
-	CBR(!m_fCanPressButton[dirtyIndex].IsDirty(), R_SKIPPED);
-
-	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
-	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
+	CBR(m_fCanPressButton[dirtyIndex], R_SKIPPED);
 
 	// avoids pressing two control bar buttons at once
-	CR(m_fCanPressButton[0].SetDirty());
-	CR(m_fCanPressButton[1].SetDirty());
-
-	//only allow button presses while keyboard isn't active
-	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-
-	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
-
-	CR(m_pUserHandle->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
+	m_fCanPressButton[0] = false;
+	m_fCanPressButton[1] = false;
 
 	return true;
 Error:
 	return false;
-	//*/
-	return true;
+}
+
+RESULT DreamControlBar::ClearFlag(int index) {
+	RESULT r = R_PASS;
+
+	CBR(index == 0 || index == 1, R_SKIPPED);
+	m_fCanPressButton[index] = true;
+
+Error:
+	return r;
 }
 
 // ControlBarObserver
 RESULT DreamControlBar::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::BACK));
 Error:
 	return R_PASS;
@@ -92,7 +85,7 @@ Error:
 
 RESULT DreamControlBar::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::FORWARD));
 Error:
 	return R_PASS;
@@ -100,7 +93,7 @@ Error:
 
 RESULT DreamControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 
 	if (m_fIsMinimized) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MAXIMIZE));
@@ -117,7 +110,7 @@ Error:
 
 RESULT DreamControlBar::HandleOpenPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::OPEN));
 Error:
 	return R_PASS;
@@ -125,7 +118,7 @@ Error:
 
 RESULT DreamControlBar::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::CLOSE));
 Error:
 	return R_PASS;
@@ -133,7 +126,7 @@ Error:
 
 RESULT DreamControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 
 	if (m_fIsMinimized) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::STOP));
@@ -150,7 +143,7 @@ Error:
 
 RESULT DreamControlBar::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(CanPressButton(pButtonContext));
+	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::URL));
 Error:
 	return R_PASS;

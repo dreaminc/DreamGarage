@@ -31,6 +31,9 @@ public:
 
 public:
 
+	// build out UserControlArea features
+	RESULT AddTestUserControlArea();
+
 	// test out the feel of the first design spec without committing to arch yet
 	RESULT AddTestUserControlAreaLayout();
 

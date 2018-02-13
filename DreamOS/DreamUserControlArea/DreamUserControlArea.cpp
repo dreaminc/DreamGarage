@@ -6,6 +6,8 @@
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
+#include "UI/UIButton.h"
+
 DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserControlArea>(pDreamOS, pContext)
 {
@@ -20,8 +22,6 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	//m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this);
-	//CN(m_pDreamUserApp);
 	m_aspectRatio = ((float)1366 / (float)768);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
@@ -29,6 +29,12 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+
+	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
+	CN(m_pDreamUserApp);
+
+	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
+	CN(m_pControlBar);
 
 Error:
 	return r;
@@ -43,7 +49,40 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	//CR(m_pWebBrowserManager->Update());
 
-//Error:
+	UIMallet* pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+	CNR(pLMallet, R_SKIPPED);
+	UIMallet* pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
+	CNR(pRMallet, R_SKIPPED);	
+
+	for (int i = 0; i < 2; i++)
+	{
+		UIMallet *pMallet;
+		HAND_TYPE type;
+		if (i == 0) {
+			pMallet = pLMallet;
+			type = HAND_TYPE::HAND_LEFT;
+		}
+		else {
+			pMallet = pRMallet;
+			type = HAND_TYPE::HAND_RIGHT;
+		}
+		// Update using mallets, send relevant information to child apps
+		auto pComposite = GetComposite();
+		point ptBoxOrigin = pComposite->GetOrigin(true);
+		point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+		ptSphereOrigin = (point)(inverse(RotationMatrix(pComposite->GetOrientation(true))) * (ptSphereOrigin - pComposite->GetOrigin(true)));
+
+		// clear flags
+		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+			m_pControlBar->ClearFlag(i);
+		}
+
+		// TODO: Update Control View
+
+		
+	}
+
+Error:
 	return r;
 }
 
@@ -208,5 +247,35 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	}
 
+	return r;
+}
+
+RESULT DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
+	RESULT r = R_PASS;
+
+	auto pDreamOS = GetDOS();
+
+	auto pInteractionObj = pButtonContext->GetInteractionObject();
+	int dirtyIndex = -1;
+	if (pInteractionObj == m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
+		dirtyIndex = 0;
+	}
+	else if (pInteractionObj == m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
+		dirtyIndex = 1;
+	}
+
+	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
+	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
+
+	//only allow button presses while keyboard isn't active
+	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
+
+	CBR(m_pControlBar->CanPressButton(dirtyIndex), R_SKIPPED);
+
+//	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
+
+	CR(m_pDreamUserApp->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
+
+Error:
 	return r;
 }
