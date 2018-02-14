@@ -192,27 +192,29 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
+	// could be wrong
+	ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
 	//*
-	point ptBack = point(m_itemSide / 2.0f, 0.0f, 0.0f);
-	m_pBackButton->SetPosition(ptStart + ptBack);
+	point ptBack = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
+	m_pBackButton->SetPosition(ptBack);
 
 	point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pForwardButton->SetPosition(ptStart + ptForward);
+	m_pForwardButton->SetPosition(ptForward);
 
 	point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pCloseButton->SetPosition(ptStart + ptClose);
+	m_pCloseButton->SetPosition(ptClose);
 	//*/
 
-	point ptURL = ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
+	point ptURL = point(0.0f, 0.0f, 0.0f);// ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
 	m_pURLButton->SetPosition(ptURL);
 
-	point ptShare = ptURL + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+	point ptShare = ptURL + point(m_urlWidth / 2.0f + m_itemSide / 2.0f + m_itemSpacing, 0.0f, 0.0f);
 	m_pShareToggleButton->SetPosition(ptShare);
 	
 	point ptOpen = ptShare + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pOpenButton->SetPosition(ptOpen);
 
-	point ptHide = ptStart + point(m_urlWidth + m_itemSpacing + m_itemSide / 2.0f, 0.0f, 0.0f);
+	point ptHide = ptOpen + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pToggleButton->SetPosition(ptHide);
 
 //Error:

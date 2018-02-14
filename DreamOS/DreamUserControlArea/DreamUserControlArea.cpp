@@ -31,10 +31,14 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	CR(m_pWebBrowserManager->Initialize());
 
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-	CN(m_pDreamUserApp);
+	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
-	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
-	CN(m_pControlBar);
+	//CN(m_pDreamUserApp);
+
+
+//	GetComposite()->SetPosition(0.0f, 1.25f, 4.6f);
+	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
 
 Error:
 	return r;
@@ -47,8 +51,14 @@ RESULT DreamUserControlArea::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUserControlArea::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	//CR(m_pWebBrowserManager->Update());
+	if (m_pControlBar == nullptr) {
+		m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
+		CN(m_pControlBar);
+		m_pControlBar->InitializeWithParent(this);
+	}
 
+	//CR(m_pWebBrowserManager->Update());
+	CNR(m_pDreamUserApp, R_SKIPPED);
 	UIMallet* pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);

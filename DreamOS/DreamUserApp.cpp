@@ -211,7 +211,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 		CBR(keyUIDs.size() == 1, R_SKIPPED);
 		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
 
-		CN(m_pKeyboardHandle);
+		//CN(m_pKeyboardHandle);
 	}
 
 
@@ -267,14 +267,14 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 
-	if (m_pMenuHandle == nullptr) {
-		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
-		CB(menuUIDs.size() == 1);
-		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
-	}
-
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
+
+	if (m_pMenuHandle == nullptr) {
+		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
+		CBR(menuUIDs.size() == 1, R_SKIPPED);
+		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
+	}
 
 Error:
 	return r;

@@ -16,10 +16,6 @@ DreamControlBar::~DreamControlBar() {
 
 // DreamApp
 RESULT DreamControlBar::InitializeApp(void *pContext) {
-	return R_PASS;
-}
-
-RESULT DreamControlBar::OnAppDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	m_pView = GetComposite()->AddUIView(GetDOS());
@@ -28,8 +24,16 @@ RESULT DreamControlBar::OnAppDidFinishInitializing(void *pContext) {
 	m_pUIControlBar = m_pView->AddUIControlBar();
 	CN(m_pUIControlBar);
 
+	GetComposite()->SetVisible(true);
+	GetComposite()->SetPosition(0.0f, 0.5f, 4.6f);
+	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+
 Error:
 	return r;
+}
+
+RESULT DreamControlBar::OnAppDidFinishInitializing(void *pContext) {
+	return R_PASS;
 }
 
 RESULT DreamControlBar::Update(void *pContext) {
@@ -149,7 +153,7 @@ Error:
 	return R_PASS;
 }
 
-RESULT DreamControlBar::InitializeWithParent(std::shared_ptr<DreamUserControlArea> pParentApp) {
+RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
 	CN(pParentApp);

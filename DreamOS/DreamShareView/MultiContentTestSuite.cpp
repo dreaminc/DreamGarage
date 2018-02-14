@@ -138,12 +138,12 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 		SetupPipeline();
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 
-		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
-		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
 
 
 	Error:

@@ -14,7 +14,7 @@ class DreamUserControlArea;
 #define BUTTON_WIDTH 0.0645
 #define BUTTON_HEIGHT 0.0645
 #define URL_WIDTH 0.5484
-#define URL_HEIGHT 0.0655
+#define URL_HEIGHT 0.0645
 
 enum class ControlEventType {
 	OPEN,
@@ -60,14 +60,14 @@ public:
 	RESULT ClearFlag(int index);
 
 public:
-	RESULT InitializeWithParent(std::shared_ptr<DreamUserControlArea> pParentApp);
+	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
 private:
 
 	std::shared_ptr<UIView> m_pView = nullptr;
 	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
 
-	std::shared_ptr<DreamUserControlArea> m_pParentApp = nullptr;
+	DreamUserControlArea* m_pParentApp = nullptr;
 
 	bool m_fIsMinimized = false;
 	bool m_fIsSharing = false;
