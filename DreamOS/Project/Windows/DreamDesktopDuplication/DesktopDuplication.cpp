@@ -237,6 +237,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
+		BYTE *pBuffer = nullptr;
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			if (msg.message == OCCLUSION_STATUS_MSG) {
 				// Present may not be occluded now so try again
@@ -289,12 +290,27 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			// We start off in occluded state and we should immediate get a occlusion status window message
 			Occluded = true;
 		}
+
 		else {
 			// Nothing else to do, so try to present to write out to window if not occluded
 			if (!Occluded) {
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded);
+				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer);
+				
 			}
 			
+		}
+
+		if (g_fStartSending && (pBuffer != nullptr)) {
+
+			DDCIPCMessage ddcMessage;
+			ddcMessage.SetType(DDCIPCMessage::type::FRAME);
+			COPYDATASTRUCT desktopCDS;
+
+			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+			desktopCDS.cbData = (938*484*4);
+			desktopCDS.lpData = pBuffer;
+
+			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
 		}
 
 		// Check if for errors
@@ -532,10 +548,11 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 		}
 
 		// Send Frame to Dream
+		/*
 		if (g_fStartSending) {
 			BYTE* textureByteBuffer;
 			textureByteBuffer = CurrentData.MetaData;
-
+			
 			DDCIPCMessage ddcMessage;
 			ddcMessage.SetType(DDCIPCMessage::type::FRAME);
 			COPYDATASTRUCT desktopCDS;
@@ -546,6 +563,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 
 			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
 		}
+		*/
 
 		// Process new frame
 		Ret = DispMgr.ProcessFrame(&CurrentData, SharedSurf, TData->OffsetX, TData->OffsetY, &DesktopDesc);

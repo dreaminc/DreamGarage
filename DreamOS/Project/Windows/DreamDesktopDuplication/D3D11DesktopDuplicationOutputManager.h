@@ -15,12 +15,10 @@ public:
 	D3D11DesktopDuplicationOutputManager();
 	~D3D11DesktopDuplicationOutputManager();
 	DUPL_RETURN InitOutput(HWND Window, INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds);
-	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded);
+	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer);
 	void CleanRefs();
 	HANDLE GetSharedHandle();
 	void WindowResize();
-
-	unsigned char* GetByteTextureBuffer();
 
 private:
 	// Methods
