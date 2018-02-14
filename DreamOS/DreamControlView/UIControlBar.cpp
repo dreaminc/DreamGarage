@@ -192,8 +192,8 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
-	// could be wrong
 	ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
+
 	//*
 	point ptBack = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
 	m_pBackButton->SetPosition(ptBack);

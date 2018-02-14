@@ -138,7 +138,7 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 		SetupPipeline();
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 

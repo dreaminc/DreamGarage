@@ -401,7 +401,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		//TODO: requesting the handles may need to be moved into the switch statements,
 		//		depending on how other applications handle capturing each other
 		
-
+#ifndef _USE_TEST_APP
 		if (m_appStack.empty()) {
 
 			ResetAppComposite();
@@ -424,6 +424,9 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		else {
 			m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
 		}
+#else
+		UpdateCompositeWithHands(m_menuHeight);
+#endif
 
 	} break;
 

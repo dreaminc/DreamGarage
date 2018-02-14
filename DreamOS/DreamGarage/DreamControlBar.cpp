@@ -23,9 +23,10 @@ RESULT DreamControlBar::InitializeApp(void *pContext) {
 
 	m_pUIControlBar = m_pView->AddUIControlBar();
 	CN(m_pUIControlBar);
+	m_pUIControlBar->SetObserver(this);
 
 	GetComposite()->SetVisible(true);
-	GetComposite()->SetPosition(0.0f, 0.5f, 4.6f);
+	//GetComposite()->SetPosition(0.0f, 0.5f, 4.6f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
 
 Error:

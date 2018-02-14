@@ -22,6 +22,9 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
+	point ptOrigin;
+	quaternion qOrigin;
+
 	m_aspectRatio = ((float)1366 / (float)768);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
@@ -33,12 +36,16 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
+	CN(m_pDreamUserApp);
 
-	//CN(m_pDreamUserApp);
+	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
+	CN(m_pControlBar);
+	m_pControlBar->InitializeWithParent(this);
 
-
-//	GetComposite()->SetPosition(0.0f, 1.25f, 4.6f);
-	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
+	//m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
+	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 
 Error:
 	return r;
@@ -51,11 +58,8 @@ RESULT DreamUserControlArea::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUserControlArea::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	if (m_pControlBar == nullptr) {
-		m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
-		CN(m_pControlBar);
-		m_pControlBar->InitializeWithParent(this);
-	}
+	point ptOrigin;
+	quaternion qOrigin;
 
 	//CR(m_pWebBrowserManager->Update());
 	CNR(m_pDreamUserApp, R_SKIPPED);
@@ -63,6 +67,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
+
+	//m_pDreamUserApp->UpdateCompositeWithHands(-0.16f);
+	m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
+	m_pDreamUserApp->GetAppBasisOrientation(qOrigin);
+
+	GetComposite()->SetPosition(ptOrigin);
+	GetComposite()->SetOrientation(qOrigin);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -76,6 +87,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 			pMallet = pRMallet;
 			type = HAND_TYPE::HAND_RIGHT;
 		}
+		pMallet->GetMalletHead()->SetVisible(true);
 		// Update using mallets, send relevant information to child apps
 		auto pComposite = GetComposite();
 		point ptBoxOrigin = pComposite->GetOrigin(true);
@@ -284,7 +296,7 @@ RESULT DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 
 //	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
 
-	CR(m_pDreamUserApp->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
+	CR(m_pDreamUserApp->CreateHapticImpulse(pButtonContext->GetInteractionObject()));
 
 Error:
 	return r;

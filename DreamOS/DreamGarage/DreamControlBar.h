@@ -31,6 +31,7 @@ enum class ControlEventType {
 
 class DreamControlBar : public DreamApp<DreamControlBar>, public ControlBarObserver {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea; // could be temporary, needs to access composite
 
 public:
 	DreamControlBar(DreamOS *pDreamOS, void *pContext = nullptr);
