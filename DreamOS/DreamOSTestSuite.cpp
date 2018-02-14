@@ -796,6 +796,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	struct TestContext {
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
 		std::shared_ptr<quad> pQuad = nullptr;
+		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -805,6 +806,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 		SetupDreamAppPipeline();
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
 		{
 			/*
 			std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
@@ -819,61 +822,54 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			auto pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
 
-			int pxWidth = 1920;
-			int pxHeight = 1080;
-
-			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
-
-			pTestContext->pQuad = pView->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
-			pTestContext->pQuad->SetPosition(0.0f, 2.0f, -2.0f);
-			
+			pTestContext->pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+			pTestContext->pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+			pTestContext->pQuad->FlipUVVertical();
 			
 			//*
 			STARTUPINFO si;
 			PROCESS_INFORMATION pi;
-			
-			ZeroMemory(&si, sizeof(si));
-			si.cb = sizeof(si);
-			ZeroMemory(&pi, sizeof(pi));
 
-			char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
-			wchar_t wlocation[sizeof(location)];
-			mbstowcs(wlocation, location, sizeof(location) + 1);
-			LPWSTR strLPWlocation = wlocation;
+			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+			if (desktopHWND == NULL) {
+				ZeroMemory(&si, sizeof(si));
+				si.cb = sizeof(si);
+				ZeroMemory(&pi, sizeof(pi));
 
-			if (!CreateProcess(strLPWlocation,
-				NULL,			// Command line
-				NULL,           // Process handle not inheritable
-				NULL,           // Thread handle not inheritable
-				FALSE,          // Set handle inheritance to FALSE
-				0,              // No creation flags
-				NULL,           // Use parent's environment block
-				NULL,           // Use parent's starting directory 
-				&si,            // Pointer to STARTUPINFO structure
-				&pi)            // Pointer to PROCESS_INFORMATION structure
-				)
-			{
-				DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
-				r = R_FAIL;
+				char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
+				wchar_t wlocation[sizeof(location)];
+				mbstowcs(wlocation, location, sizeof(location) + 1);
+				LPWSTR strLPWlocation = wlocation;
+
+				if (!CreateProcess(strLPWlocation,
+					NULL,			// Command line
+					NULL,           // Process handle not inheritable
+					NULL,           // Thread handle not inheritable
+					FALSE,          // Set handle inheritance to FALSE
+					0,              // No creation flags
+					NULL,           // Use parent's environment block
+					NULL,           // Use parent's starting directory 
+					&si,            // Pointer to STARTUPINFO structure
+					&pi)            // Pointer to PROCESS_INFORMATION structure
+					)
+				{
+					DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
+					r = R_FAIL;
+				}
+
+				while (desktopHWND == NULL) {
+					desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+				}
 			}
+
+			DWORD desktopPID;
+			GetWindowThreadProcessId(desktopHWND, &desktopPID);
 
 			HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
 			if (dreamHWND == NULL) {
 				MessageBox(dreamHWND, L"Unable to find the Dream window",
 					L"Error", MB_ICONERROR);
 				return r;
-			}
-
-			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-			while (desktopHWND == NULL) {
-				HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-			}
-
-			DWORD desktopPID;
-			GetWindowThreadProcessId(desktopHWND, &desktopPID);
-
-			if (desktopPID == pi.dwProcessId) {
-				DEBUG_LINEOUT("Got DesktopDuplication WindowHandle");
 			}
 
 			DDCIPCMessage ddcMessage;
@@ -918,20 +914,31 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		int pxHeight = 0;
 		texture* pTexture;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
 		CNR(m_pDataBuffer, R_SKIPPED);
-		{if (pxWidth == 0)
+		CN(pTestContext);
+		if(!pTestContext->once)
 		{
-			pxWidth = 1920;
-			pxHeight = 1080;
+			pxWidth = 938;
+			pxHeight = 484;
+			size_t pBuffer_n = pxHeight * pxWidth * 4;
+			unsigned char *pBuffer = (unsigned char*)malloc(pBuffer_n);
+			memcpy(pBuffer, m_pDataBuffer, pBuffer_n);
+			CN(pBuffer);
 
-			pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &m_pDataBuffer, (int)m_pDataBuffer_n);
-
-			pTestContext->pQuad->SetDiffuseTexture(pTexture);
-			//pTestContext->pQuad->GetTextureDiffuse()->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+			//std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+			pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
+			//pTexture->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+			
+			pTestContext->pQuad->SetDiffuseTexture(pTexture);	
+			// pTestContext->once = true;
 		}
+		
+	Error:	
+		if (m_pDataBuffer != nullptr) {
+			delete[] m_pDataBuffer;
+			m_pDataBuffer = nullptr;
+			//memset(&m_pDataBuffer, 0, m_pDataBuffer_n);
 		}
-	Error:
 		return r;
 	};
 

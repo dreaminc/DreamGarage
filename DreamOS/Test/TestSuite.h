@@ -52,7 +52,7 @@ public:
 	std::shared_ptr<TestObject> GetCurrentTest();
 
 public:
-	uint8_t *m_pDataBuffer = nullptr;
+	unsigned char* m_pDataBuffer;
 	size_t m_pDataBuffer_n = 0;
 
 private:

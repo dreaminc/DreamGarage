@@ -349,6 +349,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 	if (FAILED(hr))	{
 		return ProcessFailure(m_pDevice, L"Failed to create vertex buffer in dirty rect processing", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
+
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
 	m_pDeviceContext->IASetVertexBuffers(0, 1, &VertBuf, &Stride, &Offset);

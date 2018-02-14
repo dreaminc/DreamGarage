@@ -242,6 +242,51 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 		return ProcessFailure(nullptr, L"Failed to QI for ID3D11Texture2D from acquired IDXGIResource in D3D11DesktopDuplicationManager", L"Error", hr);
 	}
 
+	/*
+	unsigned char* pTextureBuffer;
+	ID3D11Texture2D *pTextureForDream = nullptr;
+	ID3D11DeviceContext *pDeviceContextForDream;
+	DXGI_OUTDUPL_DESC descDreamOutput;
+	m_DeskDupl->GetDesc(&descDreamOutput);
+
+	pDeviceContextForDream->CopyResource(pTextureForDream, m_AcquiredDesktopImage);
+
+	D3D11_TEXTURE2D_DESC descDream;
+	pTextureForDream->GetDesc(&descDream);
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	UINT subresource = D3D11CalcSubresource(0, 0, 0);	// What is this
+
+	pDeviceContextForDream->Map(pTextureForDream, subresource, D3D11_MAP_READ, 0, &mappedResource);
+
+	BYTE *pBuffer(new BYTE[mappedResource.RowPitch * descDream.Height]);		// hmm
+	UINT bmpRowPitch = descDreamOutput.ModeDesc.Width * 4;
+	BYTE* sptr = reinterpret_cast<BYTE*>(mappedResource.pData);
+	BYTE* dptr = pBuffer + mappedResource.RowPitch * descDream.Height - bmpRowPitch;
+	
+	UINT rowPitch;
+	if (bmpRowPitch < mappedResource.RowPitch) {
+		rowPitch = bmpRowPitch;
+	}
+	else {
+		rowPitch = mappedResource.RowPitch;
+	}
+
+	for (size_t h = 0; h < descDreamOutput.ModeDesc.Height; ++h)
+	{
+		memcpy_s(dptr, bmpRowPitch, sptr, rowPitch);
+		sptr += mappedResource.RowPitch;
+		dptr -= bmpRowPitch;
+	}
+
+	pDeviceContextForDream->Unmap(pTextureForDream, subresource);
+	long captureSize = rowPitch * descDream.Height;
+	pTextureBuffer = new UCHAR[captureSize];
+	pTextureBuffer = (UCHAR*)malloc(captureSize);
+
+	//Copying to UCHAR buffer 
+	memcpy(pTextureBuffer, pBuffer, captureSize);
+	//*/
+
 	// Get metadata
 	// Get buffer from here, pass to onpaint
 	if (FrameInfo.TotalMetadataBufferSize)

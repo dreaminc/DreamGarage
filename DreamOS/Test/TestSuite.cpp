@@ -142,8 +142,10 @@ Error:
 }
 
 RESULT TestSuite::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+	m_pDataBuffer = (unsigned char*)malloc(bufferSize);
 	m_pDataBuffer_n = bufferSize;
-	m_pDataBuffer = textureByteBuffer;
+	memcpy(m_pDataBuffer, textureByteBuffer, bufferSize);
+
 	return R_PASS;
 }
 

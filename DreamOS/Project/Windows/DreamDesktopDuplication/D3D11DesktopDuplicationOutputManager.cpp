@@ -387,7 +387,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 //
 // Present to the application window
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
 	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
 	// sample contains both these aspects into a single application.
@@ -401,6 +401,78 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 	}
 	else if (FAILED(hr)) {
 		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
+	}	
+
+	//*
+	ID3D11Texture2D *pTempTexture = nullptr;
+	D3D11_TEXTURE2D_DESC descTemp;
+
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture));		// 0 is back buffer
+	pTempTexture->GetDesc(&descTemp);
+
+	// Make copy that we can access Data from
+	UINT pxWidth = descTemp.Width;
+	UINT pxHeight = descTemp.Height;
+
+	D3D11_TEXTURE2D_DESC descDream;
+	descDream.Width = pxWidth;
+	descDream.Height = pxHeight;
+	descDream.MipLevels = 1;
+	descDream.ArraySize = 1;
+	descDream.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	descDream.SampleDesc.Count = 1;
+	descDream.SampleDesc.Quality = 0;
+	descDream.Usage = D3D11_USAGE_STAGING;
+	descDream.BindFlags = 0;
+	descDream.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+	descDream.MiscFlags = 0;
+
+	ID3D11Texture2D* pTextureForDream = nullptr;
+	hr = m_pDevice->CreateTexture2D(&descDream, nullptr, &pTextureForDream);
+	if (SUCCEEDED(hr) && pxWidth != 800) {
+		m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
+
+		IDXGISurface *DreamSurface = nullptr;
+		pTextureForDream->QueryInterface(__uuidof(IDXGISurface), (void **)&DreamSurface);
+		pTextureForDream->Release();
+		pTextureForDream = nullptr;
+
+		DXGI_MAPPED_RECT rectSurfaceForDream;
+		hr = DreamSurface->Map(&rectSurfaceForDream, DXGI_MAP_READ);
+		if (FAILED(hr)) {
+			DreamSurface->Release();
+			DreamSurface = nullptr;
+		}
+
+		// Get Data into unsigned char* buffer
+		*pBuffer = (BYTE*)malloc(pxWidth * pxHeight * 4);
+		if (!(*pBuffer)) {
+			return ProcessFailure(nullptr, L"Failed to allocate memory for new buffer for Dream.", L"Error", E_OUTOFMEMORY);
+		}
+		// memcpy(&pBuffer, rectSurfaceForDream.pBits, rectSurfaceForDream.Pitch);
+
+		UINT* pBuffer32 = reinterpret_cast<UINT*>(*pBuffer);
+		UINT* Desktop32 = reinterpret_cast<UINT*>(rectSurfaceForDream.pBits);
+		UINT  DesktopPitchInPixels = rectSurfaceForDream.Pitch / sizeof(UINT);
+		
+		for (INT Row = 0; Row < pxHeight; ++Row) {
+			for (INT Col = 0; Col < pxWidth; ++Col) {
+				UINT temp = (Desktop32[(Row * DesktopPitchInPixels) + Col]);
+				pBuffer32[(Row * pxWidth) + Col] = temp;
+			}
+		}
+			
+		// Done with resource
+		hr = DreamSurface->Unmap();
+		DreamSurface->Release();
+		DreamSurface = nullptr;
+		pTempTexture->Release();
+		pTempTexture = nullptr;
+		//*/
+	}
+	else if (pTempTexture) {
+		pTempTexture->Release();
+		pTempTexture = nullptr;
 	}
 
 	// Got mutex, so draw
@@ -411,7 +483,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 			// Draw mouse into texture
 			Ret = DrawMouse(PointerInfo);
 		}
-	}
+	}	
 
 	// Release keyed mutex
 	hr = m_pKeyMutex->ReleaseSync(0);
@@ -526,7 +598,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 		return ProcessFailure(m_pDevice, L"Failed to create vertex buffer when drawing a frame", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
 	m_pDeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &Offset);
-
+	
 	// Draw textured quad onto render target
 	m_pDeviceContext->Draw(NUMVERTICES, 0);
 
@@ -659,7 +731,6 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 
 				// Set new pixel
 				InitBuffer32[(Row * *PtrWidth) + Col] = (Desktop32[(Row * DesktopPitchInPixels) + Col] & AndMask32) ^ XorMask32;
-
 				// Adjust mask
 				if (Mask == 0x01) {
 					Mask = 0x80;

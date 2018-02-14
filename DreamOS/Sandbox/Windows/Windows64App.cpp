@@ -331,12 +331,12 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		PCOPYDATASTRUCT pDataStruct;
 
 		pDataStruct = (PCOPYDATASTRUCT)lp;
-		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME && !m_fSentFrame) {
+		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
 			bufferSize = pDataStruct->cbData;
 			textureByteBuffer = (unsigned char*)pDataStruct->lpData;
 			memcpy(textureByteBuffer, pDataStruct->lpData, bufferSize);
-			m_pDreamOSHandle->OnDesktopFrame(bufferSize, textureByteBuffer);
-			m_fSentFrame = true;
+			
+			m_pDreamOSHandle->OnDesktopFrame(bufferSize, textureByteBuffer);	
 		}
 	} break;
 
