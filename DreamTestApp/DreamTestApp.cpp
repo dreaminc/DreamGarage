@@ -136,9 +136,9 @@ RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamTestApp::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+RESULT DreamTestApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
 	RESULT r = R_PASS;
-	m_pTestSuite->OnDesktopFrame(bufferSize, textureByteBuffer);
+	m_pTestSuite->OnDesktopFrame(messageSize, pMessageData);
 	return r;
 }
 

@@ -294,10 +294,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		else {
 			// Nothing else to do, so try to present to write out to window if not occluded
 			if (!Occluded) {
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer);
-				
+				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer);	
 			}
-			
 		}
 
 		if (g_fStartSending && (pBuffer != nullptr)) {
@@ -311,6 +309,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			desktopCDS.lpData = pBuffer;
 
 			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+		}
+
+		if (pBuffer != nullptr) {
+			delete[] pBuffer;
+			pBuffer = nullptr;
+			//memset(&m_pDataBuffer, 0, m_pDataBuffer_n);
 		}
 
 		// Check if for errors
@@ -394,6 +398,15 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 
 	switch (pDataStruct->dwData) {	// Handle based on DDCIPCMessage type
 	case(0UL): {	// type is PING
+		DDCIPCMessage ddcMessage;
+		ddcMessage.SetType(DDCIPCMessage::type::ACK);
+		COPYDATASTRUCT desktopCDS;
+
+		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.cbData = sizeof(ddcMessage);
+		desktopCDS.lpData = &ddcMessage;
+
+		SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
 		return true;
 	} break;
 	case(2UL): {	// type is START
@@ -546,24 +559,6 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 			KeyMutex->ReleaseSync(1);
 			break;
 		}
-
-		// Send Frame to Dream
-		/*
-		if (g_fStartSending) {
-			BYTE* textureByteBuffer;
-			textureByteBuffer = CurrentData.MetaData;
-			
-			DDCIPCMessage ddcMessage;
-			ddcMessage.SetType(DDCIPCMessage::type::FRAME);
-			COPYDATASTRUCT desktopCDS;
-
-			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
-			desktopCDS.cbData = sizeof(textureByteBuffer);
-			desktopCDS.lpData = &textureByteBuffer;
-
-			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
-		}
-		*/
 
 		// Process new frame
 		Ret = DispMgr.ProcessFrame(&CurrentData, SharedSurf, TData->OffsetX, TData->OffsetY, &DesktopDesc);

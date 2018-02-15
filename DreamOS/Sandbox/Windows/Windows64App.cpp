@@ -328,16 +328,21 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	} break;
 
 	case WM_COPYDATA: {
-		PCOPYDATASTRUCT pDataStruct;
+		PCOPYDATASTRUCT pDataStruct;	
+		pDataStruct = (PCOPYDATASTRUCT)lp;	
 
-		pDataStruct = (PCOPYDATASTRUCT)lp;
 		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
-			bufferSize = pDataStruct->cbData;
-			textureByteBuffer = (unsigned char*)pDataStruct->lpData;
-			memcpy(textureByteBuffer, pDataStruct->lpData, bufferSize);
+			unsigned long messageSize = pDataStruct->cbData;
+			void* pMessageData;
+			pMessageData = (unsigned char*)malloc(messageSize);
+			memcpy(pMessageData, pDataStruct->lpData, messageSize);
+						
+			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData);
 			
-			m_pDreamOSHandle->OnDesktopFrame(bufferSize, textureByteBuffer);	
+			free(pMessageData);
 		}
+
+		return true;
 	} break;
 
 	default: {

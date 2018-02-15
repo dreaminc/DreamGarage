@@ -82,7 +82,7 @@ public:
 	virtual RESULT OnCloseAsset() override;
 
 	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) override;
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);

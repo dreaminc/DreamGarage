@@ -4,32 +4,24 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/DreamGarage/DreamApp.h
-// The Dream Content view is a rudimentary Dream application 
-// that effectively is a single quad that can load / present 
-// content of various formats 
+// DreamOS/DreamGarage/DesktopDuplicationApp
+// The Desktop duplication app starts and manages
+// the DreamDesktopCapture project, allowing us to
+// duplicate the desktop and receive a texture from
+// directx11 as a byte buffer
 
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
 
-#include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
-
-#include <map>
-#include <vector>
 
 #include "Sense/SenseController.h"
 
 #include "Primitives/TextEntryString.h"
 
-#include "DreamVideoStreamSubscriber.h"
-#include <limits.h>
-
 class quad;
-class sphere;
 class texture;
 
-class EnvironmentAsset;
 class DreamUserHandle;
 class AudioPacket;
 
@@ -65,7 +57,7 @@ public:
 
 	//RESULT FadeQuadToBlack();
 
-	RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer);
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData);
 
 	float GetWidth();
 	float GetHeight();
@@ -78,11 +70,6 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	// Video Streaming stuffs
-	RESULT StopSending();
-	RESULT StartReceiving();
-	RESULT StopReceiving();
-
 	std::shared_ptr<texture> GetScreenTexture();
 private:
 	RESULT SetScreenTexture(texture *pTexture);
@@ -93,14 +80,6 @@ public:
 	//RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	//RESULT UpdateFromPendingVideoFrame();
 
-	struct PendingFrame {
-		bool fPending = false;
-		int pxWidth = 0;
-		int pxHeight = 0;
-		uint8_t *pDataBuffer = nullptr;
-		size_t pDataBuffer_n = 0;
-	} m_pendingFrame;
-
 protected:
 	static DreamDesktopApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -110,36 +89,20 @@ private:
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
-	// Synchronization
-	HANDLE UnexpectedErrorEvent = nullptr;
-	HANDLE ExpectedErrorEvent = nullptr;
-	HANDLE TerminateThreadsEvent = nullptr;
-
-	// Load simple cursor
-	HCURSOR Cursor = nullptr;
-
-	int m_DesktopWidth = 1366;
-	int m_DesktopHeight = 768;
+	int m_pxDesktopWidth = 1920;
+	int m_pxDesktopHeight = 1080;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
 
-	bool m_fStreaming = false;
-	bool m_fReceivingStream = false;
+	bool m_fDesktopDuplicationIsRunning;
 
-	RECT DeskBounds;
-	UINT OutputCount;
-
-	// Message loop (attempts to update screen when no other messages to process)
-	MSG msg = { 0 };
-	bool FirstTime = true;
-	bool Occluded = true;
+	size_t m_pFrameDataBuffer_n = 0;
+	unsigned char* m_pFrameDataBuffer;
 
 	// Window
-	HWND WindowHandle = nullptr;
-
-	int monitorToOutput;
-	
+	HWND m_hwndDreamHandle = nullptr;
+	HWND m_hwndDesktopHandle = nullptr;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

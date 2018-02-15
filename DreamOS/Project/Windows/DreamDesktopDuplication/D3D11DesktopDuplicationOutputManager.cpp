@@ -384,30 +384,12 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	return DUPL_RETURN_SUCCESS;
 }
 
-//
-// Present to the application window
-//
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
-	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
-	// and another application running on a different system that receives the desktop images via a network and display the image. This
-	// sample contains both these aspects into a single application.
-	// This routine is the part of the sample that displays the desktop image onto the display
-
-	// Try and acquire sync on common display buffer
-	HRESULT hr = m_pKeyMutex->AcquireSync(1, 100);
-	if (hr == static_cast<HRESULT>(WAIT_TIMEOUT)) {
-		// Another thread has the keyed mutex so try again later
-		return DUPL_RETURN_SUCCESS;
-	}
-	else if (FAILED(hr)) {
-		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
-	}	
-
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) {
 	//*
 	ID3D11Texture2D *pTempTexture = nullptr;
 	D3D11_TEXTURE2D_DESC descTemp;
 
-	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture));		// 0 is back buffer
+	HRESULT hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture));		// 0 is back buffer
 	pTempTexture->GetDesc(&descTemp);
 
 	// Make copy that we can access Data from
@@ -454,35 +436,62 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 		UINT* pBuffer32 = reinterpret_cast<UINT*>(*pBuffer);
 		UINT* Desktop32 = reinterpret_cast<UINT*>(rectSurfaceForDream.pBits);
 		UINT  DesktopPitchInPixels = rectSurfaceForDream.Pitch / sizeof(UINT);
-		
+
 		for (INT Row = 0; Row < pxHeight; ++Row) {
 			for (INT Col = 0; Col < pxWidth; ++Col) {
 				UINT temp = (Desktop32[(Row * DesktopPitchInPixels) + Col]);
 				pBuffer32[(Row * pxWidth) + Col] = temp;
 			}
 		}
-			
+
 		// Done with resource
 		hr = DreamSurface->Unmap();
 		DreamSurface->Release();
 		DreamSurface = nullptr;
+
 		pTempTexture->Release();
 		pTempTexture = nullptr;
-		//*/
+
 	}
-	else if (pTempTexture) {
+
+	if (pTempTexture != nullptr) {
 		pTempTexture->Release();
 		pTempTexture = nullptr;
 	}
+}
+//*/
+
+//
+// Present to the application window
+//
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
+	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
+	// and another application running on a different system that receives the desktop images via a network and display the image. This
+	// sample contains both these aspects into a single application.
+	// This routine is the part of the sample that displays the desktop image onto the display
+
+	// Try and acquire sync on common display buffer
+	HRESULT hr = m_pKeyMutex->AcquireSync(1, 100);
+	if (hr == static_cast<HRESULT>(WAIT_TIMEOUT)) {
+		// Another thread has the keyed mutex so try again later
+		return DUPL_RETURN_SUCCESS;
+	}
+	else if (FAILED(hr)) {
+		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
+	}	
+
+	CopyToSendToDream(pBuffer);
 
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
+		/*	This Draws the Mouse, disabling for Now
 		if (PointerInfo->Visible) {
 			// Draw mouse into texture
 			Ret = DrawMouse(PointerInfo);
 		}
+		//*/
 	}	
 
 	// Release keyed mutex

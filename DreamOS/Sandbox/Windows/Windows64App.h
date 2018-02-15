@@ -81,9 +81,6 @@ private:
 	bool m_fFullscreen;
 	long m_wndStyle;
 
-	unsigned long bufferSize;
-	unsigned char* textureByteBuffer;
-
 	TCHAR* m_pszClassName;
 
 	int m_pxWidth;
