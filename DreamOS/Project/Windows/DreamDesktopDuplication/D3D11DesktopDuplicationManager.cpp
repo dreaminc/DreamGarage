@@ -4,16 +4,14 @@
 //
 // Constructor sets up references / variables
 //
-D3D11DesktopDuplicationManager::D3D11DesktopDuplicationManager()
-{
+D3D11DesktopDuplicationManager::D3D11DesktopDuplicationManager() {
 	RtlZeroMemory(&m_OutputDesc, sizeof(m_OutputDesc));
 }
 
 //
 // Destructor simply calls CleanRefs to destroy everything
 //
-D3D11DesktopDuplicationManager::~D3D11DesktopDuplicationManager()
-{
+D3D11DesktopDuplicationManager::~D3D11DesktopDuplicationManager() {
 	if (m_pDeskDupl) {
 		m_pDeskDupl->Release();
 		m_pDeskDupl = nullptr;
