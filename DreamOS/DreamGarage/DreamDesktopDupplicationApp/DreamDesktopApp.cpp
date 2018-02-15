@@ -45,8 +45,8 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	STARTUPINFO siDesktopDuplication;
 	PROCESS_INFORMATION piDesktopDuplication;
 
-	HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-	if (desktopHWND == NULL) {
+	m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
+	if (m_hwndDesktopHandle == NULL) {
 		ZeroMemory(&siDesktopDuplication, sizeof(siDesktopDuplication));
 		siDesktopDuplication.cb = sizeof(siDesktopDuplication);
 		ZeroMemory(&piDesktopDuplication, sizeof(piDesktopDuplication));
@@ -57,7 +57,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 		LPWSTR strLPWlocation = wlocation;
 
 		if (!CreateProcess(strLPWlocation,
-			NULL,						// Command line
+			L" -output 0",				// Command line
 			NULL,						// Process handle not inheritable
 			NULL,						// Thread handle not inheritable
 			FALSE,						// Set handle inheritance to FALSE
@@ -72,17 +72,15 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 			r = R_FAIL;
 		}
 
-		while (desktopHWND == NULL) {
-			desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+		while (m_hwndDesktopHandle == NULL) {
+			m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
 		}
 	}
 
-	DWORD desktopPID;
-	GetWindowThreadProcessId(desktopHWND, &desktopPID);
-
-	HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
-	if (dreamHWND == NULL) {
-		MessageBox(dreamHWND, L"Unable to find the Dream window",
+	// TODO: get this from main?
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream");
+	if (m_hwndDreamHandle == NULL) {
+		MessageBox(m_hwndDreamHandle, L"Unable to find the Dream window",
 			L"Error", MB_ICONERROR);
 		return r;
 	}
@@ -246,29 +244,3 @@ Error:
 	return r;
 }
 
-//
-// Displays a message
-//
-void DisplayMsg(_In_ LPCWSTR Str, _In_ LPCWSTR Title, HRESULT hr)
-{
-	if (SUCCEEDED(hr))
-	{
-		MessageBoxW(nullptr, Str, Title, MB_OK);
-		return;
-	}
-
-	const UINT StringLen = (UINT)(wcslen(Str) + sizeof(" with HRESULT 0x########."));
-	wchar_t* OutStr = new wchar_t[StringLen];
-	if (!OutStr)
-	{
-		return;
-	}
-
-	INT LenWritten = swprintf_s(OutStr, StringLen, L"%s with 0x%X.", Str, hr);
-	if (LenWritten != -1)
-	{
-		MessageBoxW(nullptr, OutStr, Title, MB_OK);
-	}
-
-	delete[] OutStr;
-}

@@ -361,7 +361,6 @@ void ShowHelp() {
 //
 bool ProcessCmdline(_Out_ INT* Output) {
 	*Output = -1;
-
 	// __argv and __argc are global vars set by system
 	for (UINT i = 1; i < static_cast<UINT>(__argc); ++i) {
 		if ((strcmp(__argv[i], "-output") == 0) ||
@@ -382,7 +381,8 @@ bool ProcessCmdline(_Out_ INT* Output) {
 			return false;
 		}
 	}
-	*Output = 1;
+
+	//*Output = 0;		// Use for testing, will duplicate only main monitor
 	return true;
 }
 

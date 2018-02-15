@@ -313,18 +313,18 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 
 	// Create space for vertices for the dirty rects if the current space isn't large enough
 	UINT BytesNeeded = sizeof(VERTEX) * NUMVERTICES * DirtyCount;
-	if (BytesNeeded > m_pDirtyVertexBufferAllocSize) {
+	if (BytesNeeded > m_DirtyVertexBufferAllocSize) {
 		if (m_pDirtyVertexBufferAlloc) {
 			delete[] m_pDirtyVertexBufferAlloc;
 		}
 
 		m_pDirtyVertexBufferAlloc = new (std::nothrow) BYTE[BytesNeeded];
 		if (!m_pDirtyVertexBufferAlloc)	{
-			m_pDirtyVertexBufferAllocSize = 0;
+			m_DirtyVertexBufferAllocSize = 0;
 			return ProcessFailure(nullptr, L"Failed to allocate memory for dirty vertex buffer.", L"Error", E_OUTOFMEMORY);
 		}
 
-		m_pDirtyVertexBufferAllocSize = BytesNeeded;
+		m_DirtyVertexBufferAllocSize = BytesNeeded;
 	}
 
 	// Fill them in

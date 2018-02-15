@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3D11DesktopController.h" />
     <ClInclude Include="D3D11DesktopDuplicationDisplayManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationManager.h" />
     <ClInclude Include="D3D11DesktopDuplicationOutputManager.h" />
@@ -29,7 +28,6 @@
     <ClInclude Include="include\DDCIPCMessage.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D3D11DesktopController.cpp" />
     <ClCompile Include="D3D11DesktopDuplicationDisplayManager.cpp" />
     <ClCompile Include="D3D11DesktopDuplicationManager.cpp" />
     <ClCompile Include="D3D11DesktopDuplicationOutputManager.cpp" />

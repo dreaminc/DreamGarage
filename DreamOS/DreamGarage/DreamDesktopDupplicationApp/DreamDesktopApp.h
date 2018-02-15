@@ -40,12 +40,6 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	//virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
-
-	// Set streaming state in both the browser and the user app
-	//RESULT SetStreamingState(bool fStreaming);
-	//bool IsStreaming();
-
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
@@ -73,12 +67,6 @@ public:
 	std::shared_ptr<texture> GetScreenTexture();
 private:
 	RESULT SetScreenTexture(texture *pTexture);
-
-public:
-	// Video Stream Subscriber
-	//virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
-	//RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
-	//RESULT UpdateFromPendingVideoFrame();
 
 protected:
 	static DreamDesktopApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
