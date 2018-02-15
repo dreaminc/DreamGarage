@@ -55,6 +55,8 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestUserControlArea());
+
 	CR(AddTestUserControlAreaLayout());
 
 	CR(AddTestManyBrowsers());
@@ -117,6 +119,66 @@ Error:
 	return r;
 }
 
+RESULT MultiContentTestSuite::AddTestUserControlArea() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+	//	std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+	//	std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+
+		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+
+
+	Error:
+		return r;
+	};
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//pTestContext->pUserControlArea->Update();
+
+		//for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+		//	pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		//}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 	RESULT r = R_PASS;
 
@@ -136,8 +198,8 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		//No HMD
-		//float diagonalSize = 6.0f;
-		float diagonalSize = 0.6f;
+		float diagonalSize = 6.0f;
+		//float diagonalSize = 0.6f;
 
 		float aspectRatio = ((float)1366 / (float)768);
 		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
@@ -169,7 +231,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 
 		SetupPipeline();
 
-		//*
+		/*
 		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
 		pTestContext->pUserControlArea = pControlArea;
 		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
@@ -178,7 +240,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		auto pWebBrowserManager = pTestContext->pUserControlArea->m_pWebBrowserManager;
 		//*/
 
-		/*
+		//*
 		auto pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		pWebBrowserManager->Initialize();
 		//*/
@@ -243,7 +305,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		pMinimizeButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		pMinimizeButton->SetPosition(ptBarRight+ point(5*toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
 
-		//*
+		/*
 		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pControlBackground));
 		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pTabBackground));
 		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pBackButton));
@@ -272,7 +334,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(tabBarWindowWidth, tabBarWindowHeight, 1, 1, nullptr, vNormal));
 				pTestContext->pBrowserQuads[i]->SetPosition(ptTabBarPosition - point(0.0f, ((i - 1)*(tabBarWindowHeight + fakeSpaceSize)), 0.0f));
 			}
-			pControlArea->GetComposite()->AddObject(pTestContext->pBrowserQuads[i]);
+			//pControlArea->GetComposite()->AddObject(pTestContext->pBrowserQuads[i]);
 			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
 			pTestContext->pBrowserQuads[i]->FlipUVVertical();
 		}

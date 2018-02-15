@@ -4,6 +4,7 @@
 #include "RESULT/EHM.h"
 
 #include "DreamApp.h"
+#include "DreamGarage/DreamControlBar.h"
 
 #include <vector>
 #include <map>
@@ -13,6 +14,11 @@ class DreamUserApp;
 class CEFBrowserManager;
 
 class quad;
+
+#define MAIN_DIAGONAL 0.6f
+#define SPACING_SIZE 0.016129f
+#define DEFAULT_PX_WIDTH 1366
+#define DEFAULT_PX_HEIGHT 768
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea> {
 	friend class DreamAppManager;
@@ -32,15 +38,32 @@ public:
 protected:
 	static DreamUserControlArea* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
-//public:
+// Expose size variables
+public:
+	float GetSpacingSize();
+	float GetBaseWidth();
+	float GetBaseHeight();
+
+// For use with DreamControlBar
+public:
+	RESULT HandleControlBarEvent(ControlEventType type);
+
+	RESULT CanPressButton(UIButton *pButtonContext);
 
 private:
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
-	std::vector<std::shared_ptr<DreamAppBase>> m_pOpenApps;
-	std::map<std::shared_ptr<DreamAppBase>, std::shared_ptr<quad>> m_textureUpdateMap;
-//	std::vector<DreamApp> *m_openApps;
+	std::shared_ptr<DreamControlBar> m_pControlBar;
+
+	float m_spacingSize = SPACING_SIZE;
+	float m_pxWidth = DEFAULT_PX_WIDTH;
+	float m_pxHeight = DEFAULT_PX_HEIGHT;
+
+	float m_diagonalSize = MAIN_DIAGONAL;
+	float m_aspectRatio;
+	float m_baseWidth;
+	float m_baseHeight;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_

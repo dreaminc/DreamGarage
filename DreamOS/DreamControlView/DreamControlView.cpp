@@ -132,22 +132,12 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pViewQuad->FlipUVVertical();
 	CR(m_pViewQuad->SetVisible(false));
 
-	m_pControlBar = m_pView->AddUIControlBar();
-	m_pControlBar->SetVisible(false);
-	CN(m_pControlBar);
-	CR(m_pControlBar->SetObserver(this));
-
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
 
 	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
 
-	{
-		float controlBarOffset = m_pControlBar->GetSpacingOffset() - (VIEW_HEIGHT / 2.0f);
-		m_pControlBar->SetPosition(point(0.0f, 0.0f, -controlBarOffset));
-		m_pControlBar->SetOrientation(quaternion::MakeQuaternionWithEuler(-(float)(M_PI) / 2.0f, 0.0f, 0.0f));
-	}
 
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
@@ -202,13 +192,6 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
-
-	auto pText = m_pControlBar->GetURLText();
-	if (pText->CheckAndCleanDirty()) {
-		//auto strText = pText->GetText();
-		//pText->SetText("");
-		pText->SetText(m_strText);
-	}
 
 	if (m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
@@ -442,7 +425,6 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 			if (m_fIsShareURL) {
 				CR(ShowView());
-				m_pControlBar->GetURLText()->SetVisible(true);
 
 				if (m_pKeyboardHandle != nullptr) {
 					CR(HideKeyboard());
@@ -584,7 +566,6 @@ RESULT DreamControlView::SetContentType(std::string strContentType) {
 	m_currentControlBarType = UIControlBar::ControlBarTypeFromString(strContentType);
 
 	//TODO: don't need to do this until different types of control bars are defined
-	//m_pControlBar = UIControlBar::MakeControlBarWithType(m_currentControlBarType,m_pView);
 
 	return R_PASS;
 }
@@ -601,13 +582,8 @@ RESULT DreamControlView::ShowView() {
 		GetDOS()->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
 	}
 
-	//TODO: animation for m_pControlBar
-	m_pControlBar->SetVisible(true);
-	
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
-		//m_pControlBar->GetURLText()->SetText(m_strURL);
-		//m_pControlBar->SetVisible(true);
 		return R_PASS;
 	};
 
@@ -712,7 +688,6 @@ RESULT DreamControlView::HideView() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
-		m_pControlBar->SetVisible(false);
 		return R_PASS;
 	};
 
@@ -744,7 +719,7 @@ RESULT DreamControlView::Hide() {
 
 	CR(HideView());
 
-	SetIsMinimizedFlag(false);
+	//SetIsMinimizedFlag(false);
 
 	CNR(m_pBrowserHandle, R_SKIPPED);
 
@@ -759,7 +734,7 @@ bool DreamControlView::IsVisible() {
 	bool fKeyboardVisible = m_pKeyboardHandle != nullptr;
 
 	//TODO: replace with GetComposite()->IsVisible() if possible
-	bool fViewVisible = m_pViewQuad->IsVisible() || m_pControlBar->IsVisible();
+	bool fViewVisible = m_pViewQuad->IsVisible();
 	
 	// this function is closer to IsAppBeingUsed
 	return fKeyboardVisible || fViewVisible;
@@ -778,14 +753,12 @@ RESULT DreamControlView::SetURLText(std::string strURL) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<text> pURLText;
-	CNR(m_pControlBar, R_SKIPPED);
 
-	pURLText = m_pControlBar->GetURLText();
-	CNR(pURLText, R_SKIPPED);
-	pURLText->SetDirty();
+	//CNR(pURLText, R_SKIPPED);
+	//pURLText->SetDirty();
 	m_strText = strURL;
 
-Error:
+//Error:
 	return r;
 }
 
@@ -925,184 +898,4 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
-}
-
-bool DreamControlView::CanPressButton(UIButton *pButtonContext) {
-	RESULT r = R_PASS;
-
-	auto pDreamOS = GetDOS();
-
-	auto pInteractionObj = pButtonContext->GetInteractionObject();
-	int dirtyIndex = -1;
-	if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
-		dirtyIndex = 0;
-	}
-	else if (pInteractionObj == m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
-		dirtyIndex = 1;
-	}
-	CBR(dirtyIndex != -1, R_SKIPPED);
-
-	CBR(!m_fCanPressButton[dirtyIndex].IsDirty(), R_SKIPPED);
-
-	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pView.get()), R_SKIPPED);
-	CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
-
-	// avoids pressing two control bar buttons at once
-	CR(m_fCanPressButton[0].SetDirty());
-	CR(m_fCanPressButton[1].SetDirty());
-
-	//only allow button presses while keyboard isn't active
-	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-
-	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
-
-	CR(m_pUserHandle->RequestHapticImpulse(pButtonContext->GetInteractionObject()));
-
-	return true;
-Error:
-	return false;
-}
-
-RESULT DreamControlView::SetIsMinimizedFlag(bool fIsMinimized) {
-	RESULT r = R_PASS;
-
-	m_fIsMinimized = fIsMinimized;
-	if (m_fIsMinimized) {
-		CR(m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetShowTexture()));
-	}
-	else {
-		CR(m_pControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pControlBar->GetHideTexture()));
-	}
-
-Error:
-	return r;
-}
-
-RESULT DreamControlView::HandleStopPressed(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-	DreamShareViewHandle *pShareViewHandle = nullptr;
-	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-	CBR(!IsAnimating(), R_SKIPPED);
-	pShareViewHandle->SendStopEvent();
-
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->SendClearFocusStack());
-	CR(Hide());
-
-Error:
-	GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-	return r;
-}
-
-RESULT DreamControlView::HandleTogglePressed(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-	CBR(!IsAnimating(), R_SKIPPED);
-
-	if (m_pViewQuad->IsVisible()) {
-		auto fnStartCallback = [&](void *pContext) {
-			return R_PASS;
-		};
-
-		auto fnEndCallback = [&](void *pContext) {
-			GetViewQuad()->SetVisible(false);
-			SetIsMinimizedFlag(true);
-			m_strURL = "";
-			return R_PASS;
-		};
-
-		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-			m_pViewQuad.get(),
-			m_pViewQuad->GetPosition(),
-			m_pViewQuad->GetOrientation(),
-			vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
-			0.1f,
-			AnimationCurveType::SIGMOID,
-			AnimationFlags(),
-			fnStartCallback,
-			fnEndCallback,
-			this
-		));
-
-	} 
-
-	else {
-		auto fnStartCallback = [&](void *pContext) {
-			GetViewQuad()->SetVisible(true);
-			return R_PASS;
-		};
-
-		auto fnEndCallback = [&](void *pContext) {
-			RESULT r = R_PASS;
-			
-			m_fMouseDown[0] = false;
-			m_fMouseDown[1] = false;
-
-			SetIsMinimizedFlag(false);
-//		Error:
-			return r;
-		};
-
-		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-			m_pViewQuad.get(),
-			m_pViewQuad->GetPosition(),
-			m_pViewQuad->GetOrientation(),
-			vector(m_visibleScale, m_visibleScale, m_visibleScale),
-			0.1f,
-			AnimationCurveType::SIGMOID,
-			AnimationFlags(),
-			fnStartCallback,
-			fnEndCallback,
-			this
-		));
-	}
-	
-
-Error:
-	return r;
-}
-
-RESULT DreamControlView::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-
-	auto pDreamOS = GetDOS();
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-
-	CR(pDreamOS->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
-	CR(pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(pButtonContext->GetInteractionObject()));
-
-	if (m_pKeyboardHandle == nullptr) {
-		CR(ShowKeyboard());
-		CR(m_pKeyboardHandle->ShowTitleView());
-	}
-
-	CR(HideView());
-	m_fIsShareURL = true;
-
-Error:
-	return r;
-}
-
-RESULT DreamControlView::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pBrowserHandle->SendBackEvent());
-
-Error:
-	return r;
-}
-
-RESULT DreamControlView::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pBrowserHandle->SendForwardEvent());
-
-Error:
-	return r;
 }

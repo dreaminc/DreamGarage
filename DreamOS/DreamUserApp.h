@@ -108,6 +108,7 @@ private:
 
 class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -154,7 +155,8 @@ public:
 
 	virtual RESULT ResetAppComposite() override;
 
-protected:
+//protected:
+public:
 
 	RESULT UpdateHand(HAND_TYPE type);
 	RESULT UpdateOverlayTexture(HAND_TYPE type);

@@ -71,8 +71,7 @@ private:
 class DreamControlView : public DreamApp<DreamControlView>, 
 						 public DreamControlViewHandle,
 						 public Subscriber<InteractionObjectEvent>,
-						 public Subscriber<SenseControllerEvent>, 
-						 public ControlBarObserver {
+						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
 
 public:
@@ -127,17 +126,6 @@ private:
 	//	manually checks the objects that could be animating,
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
-
-// ControlBarObserver 
-private:
-	bool CanPressButton(UIButton* pButtonContext);
-	RESULT SetIsMinimizedFlag(bool fIsMinimized);
-
-	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
 
 	virtual RESULT SetURLText(std::string strURL) override;
 

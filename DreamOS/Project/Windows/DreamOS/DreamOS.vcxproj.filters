@@ -977,6 +977,9 @@
     <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp">
       <Filter>DreamUserControlArea</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamControlBar.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2122,6 +2125,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h">
       <Filter>DreamUserControlArea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamControlBar.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
