@@ -5,7 +5,8 @@ using namespace DirectX;
 //
 // Constructor NULLs out all pointers & sets appropriate var vals
 //
-D3D11DesktopDuplicationOutputManager::D3D11DesktopDuplicationOutputManager() {
+D3D11DesktopDuplicationOutputManager::D3D11DesktopDuplicationOutputManager() 
+{
 	// empty
 }
 
@@ -315,9 +316,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	else {
 		DXGI_ADAPTER_DESC pDesc;
 		hr = DxgiAdapter->GetDesc(&pDesc);
-
-		//hr = DxgiAdapter->EnumOutputs(SingleOutput, &DxgiOutput);
-		hr = DxgiAdapter->EnumOutputs(1, &DxgiOutput);
+		hr = DxgiAdapter->EnumOutputs(SingleOutput, &DxgiOutput);
 		if (FAILED(hr)) {
 			DxgiAdapter->Release();
 			DxgiAdapter = nullptr;
@@ -384,7 +383,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	return DUPL_RETURN_SUCCESS;
 }
 
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) {
+HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) {
 	//*
 	ID3D11Texture2D *pTempTexture = nullptr;
 	D3D11_TEXTURE2D_DESC descTemp;
@@ -458,6 +457,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuff
 		pTempTexture->Release();
 		pTempTexture = nullptr;
 	}
+
+	return hr;
 }
 //*/
 

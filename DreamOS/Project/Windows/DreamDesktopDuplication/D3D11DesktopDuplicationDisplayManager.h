@@ -33,7 +33,7 @@ private:
 	ID3D11RenderTargetView* m_pRTV;
 	ID3D11SamplerState* m_pSamplerLinear;
 	BYTE* m_pDirtyVertexBufferAlloc;
-	UINT m_pDirtyVertexBufferAllocSize;
+	UINT m_DirtyVertexBufferAllocSize;
 };
 
 #endif

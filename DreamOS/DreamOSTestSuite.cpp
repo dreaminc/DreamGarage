@@ -854,7 +854,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 				LPWSTR strLPWlocation = wlocation;
 
 				if (!CreateProcess(strLPWlocation,
-					NULL,			// Command line
+					L" /output 1",	// Command line
 					NULL,           // Process handle not inheritable
 					NULL,           // Thread handle not inheritable
 					FALSE,          // Set handle inheritance to FALSE
