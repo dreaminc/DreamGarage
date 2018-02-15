@@ -37,6 +37,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
 	CN(m_pActiveBrowser);
 	CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
+	CR(m_pActiveBrowser->SetURI("www.reddit.com"));
 
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
