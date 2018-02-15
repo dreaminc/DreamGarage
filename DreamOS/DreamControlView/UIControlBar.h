@@ -53,7 +53,6 @@ public:
 	std::shared_ptr<UIButton> GetToggleButton();
 	std::shared_ptr<UIButton> GetStopButton();
 	std::shared_ptr<UIButton> GetURLButton();
-	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
 
 	// Wrappers for executing the observer methods
 	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
@@ -98,25 +97,25 @@ public:
 	const wchar_t *k_wszURL = L"control-view-url.png";
 
 private:
-	std::shared_ptr<UIButton> m_pBackButton;
-	std::shared_ptr<UIButton> m_pForwardButton;
-	std::shared_ptr<UIButton> m_pToggleButton;
-	std::shared_ptr<UIButton> m_pCloseButton;
-	std::shared_ptr<UIButton> m_pOpenButton;
-	std::shared_ptr<UIButton> m_pShareToggleButton;
+	std::shared_ptr<UIButton> m_pBackButton = nullptr;
+	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
+	std::shared_ptr<UIButton> m_pToggleButton = nullptr;
+	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
+	std::shared_ptr<UIButton> m_pShareToggleButton = nullptr;
 
-	std::shared_ptr<UIButton> m_pURLButton;
-	std::shared_ptr<text> m_pURLText;
+	std::shared_ptr<UIButton> m_pURLButton = nullptr;
+	std::shared_ptr<text> m_pURLText = nullptr;
 
-	texture *m_pBackTexture;
-	texture *m_pForwardTexture;
-	texture *m_pShowTexture;
-	texture *m_pHideTexture;
-	texture *m_pOpenTexture;
-	texture *m_pCloseTexture;
-	texture *m_pShareTexture;
-	texture *m_pStopSharingTexture;
-	texture *m_pURLTexture;
+	texture *m_pBackTexture = nullptr;
+	texture *m_pForwardTexture = nullptr;
+	texture *m_pShowTexture = nullptr;
+	texture *m_pHideTexture = nullptr;
+	texture *m_pOpenTexture = nullptr;
+	texture *m_pCloseTexture = nullptr;
+	texture *m_pShareTexture = nullptr;
+	texture *m_pStopSharingTexture = nullptr;
+	texture *m_pURLTexture = nullptr;
 
 	float m_totalWidth = TOTAL_WIDTH;
 	float m_itemSide = m_totalWidth * ITEM_SIDE;

@@ -64,8 +64,7 @@ RESULT UIControlBar::Initialize() {
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
 
-
-	for (auto pButton : GetControlButtons()) {
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pURLButton }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
@@ -281,10 +280,6 @@ std::shared_ptr<UIButton> UIControlBar::GetStopButton() {
 
 std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
 	return m_pURLButton;
-}
-
-std::vector<std::shared_ptr<UIButton>> UIControlBar::GetControlButtons() {
-	return { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pURLButton };
 }
 
 texture *UIControlBar::GetHideTexture() {
