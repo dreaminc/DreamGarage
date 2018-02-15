@@ -31,7 +31,6 @@ public:
 		return S_OK;
 	}
 
-private:
 	__declspec(align(8)) struct MessageBody {
 		DDCIPCMessage::type m_msgType;
 		unsigned char* pDataBuffer;

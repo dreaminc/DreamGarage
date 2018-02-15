@@ -47,7 +47,7 @@ public:
 										void *pContext = nullptr);
 	
 	virtual RESULT AddTests() = 0;
-	RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer);
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData);
 
 	std::shared_ptr<TestObject> GetCurrentTest();
 

@@ -796,6 +796,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	struct TestContext {
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
 		std::shared_ptr<quad> pQuad = nullptr;
+		texture* pTexture = nullptr;
 		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -825,7 +826,18 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			pTestContext->pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
 			pTestContext->pQuad->SetPosition(0.0f, 0.0f, 0.0f);
 			pTestContext->pQuad->FlipUVVertical();
+
+			int pxWidth = 938;
+			int pxHeight = 484;
 			
+			m_pDataBuffer_n = 938*484*4;
+			m_pDataBuffer = (unsigned char*)malloc(m_pDataBuffer_n);
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
+			
+			m_pDataBuffer_n = 0;
+			pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture);
+
 			//*
 			STARTUPINFO si;
 			PROCESS_INFORMATION pi;
@@ -910,35 +922,20 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-		int pxWidth = 0;
-		int pxHeight = 0;
-		texture* pTexture;
+		int pxWidth = 938;
+		int pxHeight = 484;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CNR(m_pDataBuffer, R_SKIPPED);
+		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
 		CN(pTestContext);
 		if(!pTestContext->once)
 		{
-			pxWidth = 938;
-			pxHeight = 484;
-			size_t pBuffer_n = pxHeight * pxWidth * 4;
-			unsigned char *pBuffer = (unsigned char*)malloc(pBuffer_n);
-			memcpy(pBuffer, m_pDataBuffer, pBuffer_n);
-			CN(pBuffer);
-
-			//std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
-			pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
-			//pTexture->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
-			
-			pTestContext->pQuad->SetDiffuseTexture(pTexture);	
+			pTestContext->pTexture->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
 			// pTestContext->once = true;
+			free(m_pDataBuffer);
+			m_pDataBuffer_n = 0;
 		}
 		
 	Error:	
-		if (m_pDataBuffer != nullptr) {
-			delete[] m_pDataBuffer;
-			m_pDataBuffer = nullptr;
-			//memset(&m_pDataBuffer, 0, m_pDataBuffer_n);
-		}
 		return r;
 	};
 

@@ -115,7 +115,7 @@ public:
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
-	virtual RESULT OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) = 0;
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) = 0;
 
 	// EnvironmentObserver
 	// TODO: This should be encapsulated in it's own object

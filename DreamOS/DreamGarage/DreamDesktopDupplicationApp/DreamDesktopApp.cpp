@@ -25,26 +25,67 @@ Error:
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	int pxWidth = m_DesktopWidth;
-	int pxHeight = m_DesktopHeight;
+	int pxWidth = m_pxDesktopWidth;
+	int pxHeight = m_pxDesktopHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
-
-	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	SetAppName("DreamDesktopApp");
 	SetAppDescription("A Shared Desktop View");
 
 	// Set up the quad
-	m_pDesktopQuad = GetComposite()->AddQuad(6, 4, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+	m_pDesktopQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	m_pDesktopQuad->SetPosition(0.0f, 2.0f, -2.0f);
-	//m_pDesktopTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
-	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pFrameDataBuffer, (int)m_pFrameDataBuffer_n));
 
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
-	GetComposite()->SetVisible(true);
+	GetComposite()->SetVisible(true);	
 
-	monitorToOutput = 1;	// assuming we want to duplicate the main desktop for now
+	// Start duplication process
+	STARTUPINFO siDesktopDuplication;
+	PROCESS_INFORMATION piDesktopDuplication;
+
+	HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+	if (desktopHWND == NULL) {
+		ZeroMemory(&siDesktopDuplication, sizeof(siDesktopDuplication));
+		siDesktopDuplication.cb = sizeof(siDesktopDuplication);
+		ZeroMemory(&piDesktopDuplication, sizeof(piDesktopDuplication));
+
+		char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
+		wchar_t wlocation[sizeof(location)];
+		mbstowcs(wlocation, location, sizeof(location) + 1);
+		LPWSTR strLPWlocation = wlocation;
+
+		if (!CreateProcess(strLPWlocation,
+			NULL,						// Command line
+			NULL,						// Process handle not inheritable
+			NULL,						// Thread handle not inheritable
+			FALSE,						// Set handle inheritance to FALSE
+			0,							// No creation flags
+			NULL,						// Use parent's environment block
+			NULL,						// Use parent's starting directory 
+			&siDesktopDuplication,      // Pointer to STARTUPINFO structure
+			&piDesktopDuplication)      // Pointer to PROCESS_INFORMATION structure
+			)
+		{
+			DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
+			r = R_FAIL;
+		}
+
+		while (desktopHWND == NULL) {
+			desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+		}
+	}
+
+	DWORD desktopPID;
+	GetWindowThreadProcessId(desktopHWND, &desktopPID);
+
+	HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
+	if (dreamHWND == NULL) {
+		MessageBox(dreamHWND, L"Unable to find the Dream window",
+			L"Error", MB_ICONERROR);
+		return r;
+	}
 
 	return r;
 }
@@ -56,7 +97,24 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamDesktopApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
+	if (!m_fDesktopDuplicationIsRunning) {
+		DDCIPCMessage ddcMessage;
+		ddcMessage.SetType(DDCIPCMessage::type::START);
+		COPYDATASTRUCT desktopCDS;
 
+		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.cbData = sizeof(ddcMessage);
+		desktopCDS.lpData = &ddcMessage;
+
+		SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
+		DWORD dwError = GetLastError();
+		if (dwError != NO_ERROR) {
+			MessageBox(m_hwndDreamHandle, L"error sending message", L"error", MB_ICONERROR);
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	}
+	
 	// Clean up
 	//CloseHandle(UnexpectedErrorEvent);
 	//CloseHandle(ExpectedErrorEvent);
@@ -83,7 +141,6 @@ RESULT DreamDesktopApp::SetPosition(point ptPosition) {
 
 	return r;
 }
-
 
 RESULT DreamDesktopApp::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
@@ -126,10 +183,17 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 	return R_PASS;
 }
 
-RESULT DreamDesktopApp::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
 	RESULT r = R_PASS;
 
+	m_pFrameDataBuffer_n = messageSize;
+	unsigned char* m_pFrameDataBuffer = (unsigned char*)malloc(m_pFrameDataBuffer_n);
+	m_pFrameDataBuffer = (unsigned char*)pMessageData;
+	CN(m_pFrameDataBuffer);
 
+	m_pDesktopTexture->Update(m_pFrameDataBuffer, GetWidth(), GetHeight(), PIXEL_FORMAT::BGRA);
+
+Error:
 	return r;
 }
 

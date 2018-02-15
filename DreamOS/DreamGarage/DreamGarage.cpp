@@ -1003,9 +1003,9 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
+RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
 	RESULT r = R_PASS;
-		m_pDreamDesktop->OnDesktopFrame(bufferSize, textureByteBuffer);
+		m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData);
 	return r;
 }
 

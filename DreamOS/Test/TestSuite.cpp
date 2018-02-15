@@ -141,10 +141,13 @@ Error:
 	return nullptr;
 }
 
-RESULT TestSuite::OnDesktopFrame(unsigned long bufferSize, unsigned char* textureByteBuffer) {
-	m_pDataBuffer = (unsigned char*)malloc(bufferSize);
-	m_pDataBuffer_n = bufferSize;
-	memcpy(m_pDataBuffer, textureByteBuffer, bufferSize);
+RESULT TestSuite::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+
+	m_pDataBuffer = (unsigned char*)malloc(messageSize);
+	m_pDataBuffer_n = messageSize;
+
+	memcpy(m_pDataBuffer, (unsigned char*)pMessageData, messageSize);
+
 
 	return R_PASS;
 }
