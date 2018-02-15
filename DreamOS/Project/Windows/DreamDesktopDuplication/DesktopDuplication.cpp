@@ -378,7 +378,8 @@ bool ProcessCmdline(_Out_ INT* Output) {
 			continue;
 		}
 		else {
-			return false;
+			//return false;
+			*Output = 0;	// if no command line args, use main monitor
 		}
 	}
 
