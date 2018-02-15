@@ -38,7 +38,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 	CN(m_pDreamUserApp);
 
-	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this);
+	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
 	CN(m_pControlBar);
 	m_pControlBar->InitializeWithParent(this);
 

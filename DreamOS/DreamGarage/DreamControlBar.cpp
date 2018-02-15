@@ -18,6 +18,8 @@ DreamControlBar::~DreamControlBar() {
 RESULT DreamControlBar::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
+	GetDOS()->AddObjectToUIGraph(GetComposite());
+
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	CN(m_pView);
 
