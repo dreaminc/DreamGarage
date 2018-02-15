@@ -3,6 +3,7 @@
 #include "DreamOS.h"
 #include "DreamUserApp.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamControlView/DreamControlView.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
@@ -25,13 +26,17 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	point ptOrigin;
 	quaternion qOrigin;
 
-	m_aspectRatio = ((float)1366 / (float)768);
+	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+
+	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
+	CN(m_pActiveBrowser);
+	CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
 
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
@@ -42,10 +47,16 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	CN(m_pControlBar);
 	m_pControlBar->InitializeWithParent(this);
 
+	m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
+	CN(m_pControlView);
+	m_pControlView->InitializeWithParent(this);
+	m_pControlView->m_pViewQuad->SetVisible(true);
+
 	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 	//m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
+	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 
 Error:
 	return r;
@@ -297,6 +308,77 @@ RESULT DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 //	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
 
 	CR(m_pDreamUserApp->CreateHapticImpulse(pButtonContext->GetInteractionObject()));
+
+Error:
+	return r;
+}
+
+int DreamUserControlArea::GetPXWidth() {
+	return m_pxWidth;
+}
+
+int DreamUserControlArea::GetPXHeight() {
+	return m_pxHeight;
+}
+
+RESULT DreamUserControlArea::SendContactAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveBrowser->ClickBrowser(ptContact, fMouseDown));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SendKeyCharacter(char chkey, bool fKeyDown) {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveBrowser->SendKeyPressed(chkey, fKeyDown));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveBrowser->SendMouseMoveEvent(mousePoint));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveBrowser->ScrollBrowserByDiff(pxXDiff, pxYDiff, scrollPoint));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SetScope(std::string strScope) {
+	RESULT r = R_PASS;
+	
+	CR(m_pActiveBrowser->SetBrowserScope(strScope));
+	
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SetPath(std::string strPath) {
+	RESULT r = R_PASS;
+	
+	CR(m_pActiveBrowser->SetBrowserPath(strPath));
+	
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SendURL(std::string strURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveBrowser->SendURL(strURL));
 
 Error:
 	return r;

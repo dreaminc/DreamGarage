@@ -10,8 +10,11 @@
 #include <map>
 
 class DreamUserApp;
+class DreamControlView;
+class DreamBrowser;
 
 class CEFBrowserManager;
+struct WebBrowserPoint;
 
 class quad;
 
@@ -44,7 +47,22 @@ public:
 	float GetBaseWidth();
 	float GetBaseHeight();
 
-// For use with DreamControlBar
+// DreamControlView
+public:
+	int GetPXWidth();
+	int GetPXHeight();
+
+	RESULT SendContactAtPoint(WebBrowserPoint ptContact, bool fMouseDown);
+	RESULT SendMalletMoveEvent(WebBrowserPoint mousePoint);
+	RESULT SendKeyCharacter(char chkey, bool fKeyDown);
+	RESULT ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint);
+
+	//TODO: Set Scope/Path should be removed once DreamUIBar follows "open" implementation
+	RESULT SetScope(std::string strScope);
+	RESULT SetPath(std::string strPath);
+	RESULT SendURL(std::string strURL);
+
+// DreamControlBar
 public:
 	RESULT HandleControlBarEvent(ControlEventType type);
 
@@ -55,6 +73,15 @@ private:
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
 	std::shared_ptr<DreamControlBar> m_pControlBar;
+	std::shared_ptr<DreamControlView> m_pControlView;
+
+	//TODO: potentially a class Browser and Desktop extend that implements
+	// the control view events, ContactAtPoint, ScrollByDiff, etc.
+	// ControlViewObserver?
+	std::shared_ptr<DreamBrowser> m_pActiveBrowser;
+
+	//TODO: list of objects that relate to the right bar
+	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
 
 	float m_spacingSize = SPACING_SIZE;
 	float m_pxWidth = DEFAULT_PX_WIDTH;

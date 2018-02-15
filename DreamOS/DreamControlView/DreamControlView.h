@@ -11,6 +11,8 @@
 #include "DreamUserApp.h"
 #include "UIControlBar.h"
 
+#include "DreamUserControlArea/DreamUserControlArea.h"
+
 #include "Primitives/Subscriber.h"
 #include <functional>
 #include <stack>
@@ -73,6 +75,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 						 public Subscriber<InteractionObjectEvent>,
 						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -85,6 +88,14 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+protected:
+	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
+public:
+	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	
+// DreamAppHandle
+public:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
 	virtual RESULT SetContentType(std::string strContentType) override;
 
@@ -109,8 +120,6 @@ private:
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 
-protected:
-	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 // Animations
 private:
@@ -145,6 +154,7 @@ public:
 	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
 
 private:
+	
 	std::shared_ptr<UIView> m_pView = nullptr;
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
@@ -156,9 +166,9 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+	DreamUserControlArea *m_pParentApp = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;	
