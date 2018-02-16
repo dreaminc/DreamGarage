@@ -23,12 +23,17 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	point ptOrigin;
-	quaternion qOrigin;
 
 	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+
+	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
+	quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+	point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+	
+	GetComposite()->SetOrientation(qViewQuadOrientation);
+	GetComposite()->SetPosition(ptOrigin);
 
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
@@ -54,10 +59,11 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pControlView->m_pViewQuad->SetVisible(true);
 
 	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
-	//m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+	m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
+
 
 Error:
 	return r;
@@ -81,11 +87,11 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	CNR(pRMallet, R_SKIPPED);	
 
 	//m_pDreamUserApp->UpdateCompositeWithHands(-0.16f);
-	m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
-	m_pDreamUserApp->GetAppBasisOrientation(qOrigin);
+	//m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
+	//m_pDreamUserApp->GetAppBasisOrientation(qOrigin);
 
-	GetComposite()->SetPosition(ptOrigin);
-	GetComposite()->SetOrientation(qOrigin);
+	//GetComposite()->SetPosition(ptOrigin);
+	//GetComposite()->SetOrientation(qOrigin);
 
 	for (int i = 0; i < 2; i++)
 	{

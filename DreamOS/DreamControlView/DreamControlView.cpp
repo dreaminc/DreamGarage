@@ -117,27 +117,10 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_pView = GetComposite()->AddUIView(pDreamOS);
 	CN(m_pView);
 
-	m_pViewQuad = m_pView->AddQuad(VIEW_WIDTH, VIEW_HEIGHT, 1, 1, nullptr);
-	CN(m_pViewQuad);
-
-	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
-
-	m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
-
-	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
-	m_pView->SetOrientation(m_qViewQuadOrientation);
-	m_pView->SetPosition(m_ptVisiblePosition);
-
-	m_pViewQuad->SetMaterialAmbient(0.75f);
-	m_pViewQuad->FlipUVVertical();
-	CR(m_pViewQuad->SetVisible(false));
 
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
-
-	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
-
 
 	m_hiddenScale = 0.2f;
 	m_visibleScale = 1.0f;	// changing this breaks things - change height and width too / instead.
@@ -160,7 +143,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 		CN(m_pOverlayRight);
 	}
 
-	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
@@ -494,8 +476,39 @@ Error:
 }
 
 RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
-	m_pParentApp = pParent;
+	RESULT r = R_PASS;
 
+	m_pParentApp = pParent;
+	auto pDreamOS = GetDOS();
+
+	float width = m_pParentApp->GetBaseWidth();
+	float height = m_pParentApp->GetBaseHeight();
+	
+	m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	CN(m_pViewQuad);
+
+	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+
+	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
+
+	m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+
+	m_pViewQuad->SetMaterialAmbient(0.75f);
+	m_pViewQuad->FlipUVVertical();
+	CR(m_pViewQuad->SetVisible(false));
+
+	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
+
+	m_pViewBackground = m_pView->AddQuad(width * m_borderWidth, width * m_borderHeight);
+	CB(m_pViewBackground);
+	m_pBackgroundTexture = GetDOS()->MakeTexture(L"control-view-main-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
+
+	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
+
+Error:
 	return R_PASS;
 }
 

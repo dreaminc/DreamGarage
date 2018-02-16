@@ -21,15 +21,13 @@
 
 #define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
-#define VIEW_ANGLE 32.0f
-#define VIEW_POS_DEPTH 0.1f	
-#define VIEW_POS_HEIGHT -0.2f
 
 #define TYPING_ANGLE (M_PI / 2.0f)
-
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-
 #define SQUARED_DRAG_THRESHOLD 0.001f;
+
+#define BORDER_WIDTH 1.0323f;
+#define BORDER_HEIGHT 0.594624f;
 
 class quad; 
 class sphere;
@@ -156,8 +154,13 @@ public:
 private:
 	
 	std::shared_ptr<UIView> m_pView = nullptr;
+
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
+
+	std::shared_ptr<quad> m_pViewBackground = nullptr;
+	texture* m_pBackgroundTexture = nullptr;
+
 	texture* m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
@@ -187,6 +190,9 @@ private:
 	dirty m_fCanPressButton[2];
 
 	float m_dragThresholdSquared = SQUARED_DRAG_THRESHOLD;
+
+	float m_borderWidth = BORDER_WIDTH;
+	float m_borderHeight = BORDER_HEIGHT;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

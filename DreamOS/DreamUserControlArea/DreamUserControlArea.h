@@ -22,6 +22,10 @@ class quad;
 #define SPACING_SIZE 0.016129f
 #define DEFAULT_PX_WIDTH 1366
 #define DEFAULT_PX_HEIGHT 768
+
+#define VIEW_ANGLE 32.0f
+#define VIEW_POS_DEPTH 0.1f	
+#define VIEW_POS_HEIGHT -0.2f
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea> {
 	friend class DreamAppManager;
