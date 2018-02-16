@@ -688,6 +688,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamControlBar.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp" />
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
     <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
@@ -963,6 +964,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamControlBar.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />

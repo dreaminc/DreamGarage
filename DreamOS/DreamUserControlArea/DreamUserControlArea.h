@@ -11,6 +11,7 @@
 
 class DreamUserApp;
 class DreamControlView;
+class DreamTabView;
 class DreamBrowser;
 
 class CEFBrowserManager;
@@ -78,6 +79,7 @@ private:
 
 	std::shared_ptr<DreamControlBar> m_pControlBar;
 	std::shared_ptr<DreamControlView> m_pControlView;
+	std::shared_ptr<DreamTabView> m_pDreamTabView;
 
 	//TODO: potentially a class Browser and Desktop extend that implements
 	// the control view events, ContactAtPoint, ScrollByDiff, etc.

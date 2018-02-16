@@ -3,6 +3,7 @@
 #include "DreamOS.h"
 #include "DreamUserApp.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamTabView.h"
 #include "DreamControlView/DreamControlView.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
@@ -58,11 +59,17 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pControlView->InitializeWithParent(this);
 	m_pControlView->m_pViewQuad->SetVisible(true);
 
+	m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
+	CN(m_pDreamTabView);
+	m_pDreamTabView->InitializeWithParent(this);
+	//m_pDreamTabView->
+
 	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 	m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
+	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
 
 Error:
