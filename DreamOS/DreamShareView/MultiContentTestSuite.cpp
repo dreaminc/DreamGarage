@@ -142,6 +142,9 @@ RESULT MultiContentTestSuite::AddTestUserControlArea() {
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 
+//		pControlArea->SendURL("")
+//		pUserControlArea->m_pA
+
 		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
 		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
 

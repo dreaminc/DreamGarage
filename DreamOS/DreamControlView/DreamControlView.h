@@ -11,6 +11,8 @@
 #include "DreamUserApp.h"
 #include "UIControlBar.h"
 
+#include "DreamUserControlArea/DreamUserControlArea.h"
+
 #include "Primitives/Subscriber.h"
 #include <functional>
 #include <stack>
@@ -19,15 +21,13 @@
 
 #define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
-#define VIEW_ANGLE 32.0f
-#define VIEW_POS_DEPTH 0.1f	
-#define VIEW_POS_HEIGHT -0.2f
 
 #define TYPING_ANGLE (M_PI / 2.0f)
-
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-
 #define SQUARED_DRAG_THRESHOLD 0.001f;
+
+#define BORDER_WIDTH 1.0323f;
+#define BORDER_HEIGHT 0.594624f;
 
 class quad; 
 class sphere;
@@ -73,6 +73,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 						 public Subscriber<InteractionObjectEvent>,
 						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -85,6 +86,14 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+protected:
+	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
+public:
+	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	
+// DreamAppHandle
+public:
 	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
 	virtual RESULT SetContentType(std::string strContentType) override;
 
@@ -109,8 +118,6 @@ private:
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 
-protected:
-	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 // Animations
 private:
@@ -145,9 +152,15 @@ public:
 	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
 
 private:
+	
 	std::shared_ptr<UIView> m_pView = nullptr;
+
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
+
+	std::shared_ptr<quad> m_pViewBackground = nullptr;
+	texture* m_pBackgroundTexture = nullptr;
+
 	texture* m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
@@ -156,9 +169,9 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+	DreamUserControlArea *m_pParentApp = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;	
@@ -177,6 +190,9 @@ private:
 	dirty m_fCanPressButton[2];
 
 	float m_dragThresholdSquared = SQUARED_DRAG_THRESHOLD;
+
+	float m_borderWidth = BORDER_WIDTH;
+	float m_borderHeight = BORDER_HEIGHT;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

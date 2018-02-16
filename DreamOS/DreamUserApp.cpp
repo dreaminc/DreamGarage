@@ -252,20 +252,27 @@ RESULT DreamUserApp::Update(void *pContext) {
 	// update user interaction ray
 	auto pCameraNode = GetDOS()->GetCameraNode();
 	CN(pCameraNode);
-
+	
+	/*
 	GetComposite()->SetPosition(pCameraNode->GetPosition());
 
 	qOrientation = (pCameraNode->GetOrientation());
 	qOrientation.Reverse();
 	GetComposite()->SetOrientation(qOrientation);
+	//*/
 
 	if (m_pOrientationRay == nullptr) {
-		m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f);
+		m_pOrientationRay = std::shared_ptr<DimRay>(GetDOS()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f));
 		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
 		m_pOrientationRay->SetVisible(false);
 		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
+	m_pOrientationRay->SetPosition(pCameraNode->GetPosition());
+
+	qOrientation = (pCameraNode->GetOrientation());
+	qOrientation.Reverse();
+	m_pOrientationRay->SetOrientation(qOrientation);
 
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
@@ -711,6 +718,8 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		
 		m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
 		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToMenu));
+		GetComposite()->SetPosition(m_pAppBasis->GetPosition());
+		GetComposite()->SetOrientation(m_pAppBasis->GetOrientation());
 	}
 
 Error:
