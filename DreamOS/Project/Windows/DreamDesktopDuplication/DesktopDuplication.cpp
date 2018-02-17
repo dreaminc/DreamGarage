@@ -1,4 +1,4 @@
-
+#include "RESULT/EHM.h"
 #include <limits.h>
 #include <vector>
 
@@ -454,6 +454,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 // Entry point for new duplication threads
 //
 DWORD WINAPI DDProc(_In_ void* Param) {
+	HRESULT r = S_OK;
 	// Classes
 	D3D11DesktopDuplicationDisplayManager DispMgr;
 	D3D11DesktopDuplicationManager DuplMgr;
@@ -473,7 +474,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 		// We do not have access to the desktop so request a retry
 		SetEvent(TData->ExpectedErrorEvent);
 		Ret = DUPL_RETURN_ERROR_EXPECTED;
-		goto Exit;
+		goto Error;		// awkward goto
 	}
 
 	// Attach desktop to this thread
@@ -483,29 +484,22 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	if (!DesktopAttached) {
 		// We do not have access to the desktop so request a retry
 		Ret = DUPL_RETURN_ERROR_EXPECTED;
-		goto Exit;
+		goto Error;
 	}
 
 	// New display manager
 	DispMgr.InitD3D(&TData->DxRes);
 
 	// Obtain handle to sync shared Surface
-	HRESULT hr = TData->DxRes.Device->OpenSharedResource(TData->TexSharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&SharedSurf));
-	if (FAILED(hr)) {
-		Ret = ProcessFailure(TData->DxRes.Device, L"Opening shared texture failed", L"Error", hr, SystemTransitionsExpectedErrors);
-		goto Exit;
-	}
+	CRM(TData->DxRes.Device->OpenSharedResource(TData->TexSharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&SharedSurf)), "Opening shared texture failed");
 
-	hr = SharedSurf->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&KeyMutex));
-	if (FAILED(hr)) {
-		Ret = ProcessFailure(nullptr, L"Failed to get keyed mutex interface in spawned thread", L"Error", hr);
-		goto Exit;
-	}
+
+	CRM(SharedSurf->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&KeyMutex)), "Failed to get keyed mutex interface in spawned thread");
 
 	// Make duplication manager
 	Ret = DuplMgr.InitDupl(TData->DxRes.Device, TData->Output);
 	if (Ret != DUPL_RETURN_SUCCESS) {
-		goto Exit;
+		goto Error;
 	}
 
 	// Get output description
@@ -537,17 +531,14 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 
 		// We have a new frame so try and process it
 		// Try to acquire keyed mutex in order to access shared surface
-		hr = KeyMutex->AcquireSync(0, 1000);
-		if (hr == static_cast<HRESULT>(WAIT_TIMEOUT)) {
+		r = KeyMutex->AcquireSync(0, 1000);	
+		if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
 			// Can't use shared surface right now, try again later
 			WaitToProcessCurrentFrame = true;
 			continue;
 		}
-		else if (FAILED(hr)) {
-			// Generic unknown failure
-			Ret = ProcessFailure(TData->DxRes.Device, L"Unexpected error acquiring KeyMutex", L"Error", hr, SystemTransitionsExpectedErrors);
-			DuplMgr.DoneWithFrame();
-			break;
+		else {	// check if failed
+			CR(r);
 		}
 
 		// We can now process the current frame
@@ -570,12 +561,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 		}
 
 		// Release acquired keyed mutex
-		hr = KeyMutex->ReleaseSync(1);
-		if (FAILED(hr)) {
-			Ret = ProcessFailure(TData->DxRes.Device, L"Unexpected error releasing the keyed mutex", L"Error", hr, SystemTransitionsExpectedErrors);
-			DuplMgr.DoneWithFrame();
-			break;
-		}
+		CRM(KeyMutex->ReleaseSync(1), "Unexpected error releasing the keyed mutex");
 
 		// Release frame back to desktop duplication
 		Ret = DuplMgr.DoneWithFrame();
@@ -584,7 +570,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 		}
 	}
 
-Exit:
+Error:
 	if (Ret != DUPL_RETURN_SUCCESS) {
 		if (Ret == DUPL_RETURN_ERROR_EXPECTED) {
 			// The system is in a transition state so request the duplication be restarted
@@ -594,6 +580,12 @@ Exit:
 			// Unexpected error so exit the application
 			SetEvent(TData->UnexpectedErrorEvent);
 		}
+	}
+	
+	if (RFAILED()) {
+		// Generic unknown failure
+		Ret = ProcessFailure(TData->DxRes.Device, L"Unexpected error acquiring KeyMutex", L"Error", r, SystemTransitionsExpectedErrors);
+		DuplMgr.DoneWithFrame();
 	}
 
 	if (SharedSurf) {
@@ -605,7 +597,6 @@ Exit:
 		KeyMutex->Release();
 		KeyMutex = nullptr;
 	}
-
 	return 0;
 }
 

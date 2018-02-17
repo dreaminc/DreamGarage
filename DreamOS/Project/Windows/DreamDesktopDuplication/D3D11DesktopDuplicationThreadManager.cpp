@@ -1,11 +1,5 @@
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
-// Copyright (c) Microsoft Corporation. All rights reserved
-
 #include "D3D11DesktopDuplicationThreadManager.h"
+#include "RESULT/EHM.h"
 
 DWORD WINAPI DDProc(_In_ void* Param);
 
@@ -51,42 +45,42 @@ void D3D11DesktopDuplicationThreadManager::Clean() {
 //
 // Clean up DX_RESOURCES
 //
-void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* Data) {
-	if (Data->Device) {
-		Data->Device->Release();
-		Data->Device = nullptr;
+void D3D11DesktopDuplicationThreadManager::CleanDx(_Inout_ DX_RESOURCES* pData) {
+	if (pData->Device) {
+		pData->Device->Release();
+		pData->Device = nullptr;
 	}
 
-	if (Data->Context) {
-		Data->Context->Release();
-		Data->Context = nullptr;
+	if (pData->Context) {
+		pData->Context->Release();
+		pData->Context = nullptr;
 	}
 
-	if (Data->VertexShader) {
-		Data->VertexShader->Release();
-		Data->VertexShader = nullptr;
+	if (pData->VertexShader) {
+		pData->VertexShader->Release();
+		pData->VertexShader = nullptr;
 	}
 
-	if (Data->PixelShader) {
-		Data->PixelShader->Release();
-		Data->PixelShader = nullptr;
+	if (pData->PixelShader) {
+		pData->PixelShader->Release();
+		pData->PixelShader = nullptr;
 	}
 
-	if (Data->InputLayout) {
-		Data->InputLayout->Release();
-		Data->InputLayout = nullptr;
+	if (pData->InputLayout) {
+		pData->InputLayout->Release();
+		pData->InputLayout = nullptr;
 	}
 
-	if (Data->SamplerLinear) {
-		Data->SamplerLinear->Release();
-		Data->SamplerLinear = nullptr;
+	if (pData->SamplerLinear) {
+		pData->SamplerLinear->Release();
+		pData->SamplerLinear = nullptr;
 	}
 }
 
 //
 // Start up threads for DDA
 //
-DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* DesktopDim) {
+DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, UINT OutputCount, HANDLE UnexpectedErrorEvent, HANDLE ExpectedErrorEvent, HANDLE TerminateThreadsEvent, HANDLE SharedHandle, _In_ RECT* pDesktopDim) {
 	m_ThreadCount = OutputCount;
 	m_pThreadHandles = new (std::nothrow) HANDLE[m_ThreadCount];
 	m_pThreadData = new (std::nothrow) THREAD_DATA[m_ThreadCount];
@@ -102,8 +96,8 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, U
 		m_pThreadData[i].TerminateThreadsEvent = TerminateThreadsEvent;
 		m_pThreadData[i].Output = (SingleOutput < 0) ? i : SingleOutput;
 		m_pThreadData[i].TexSharedHandle = SharedHandle;
-		m_pThreadData[i].OffsetX = DesktopDim->left;
-		m_pThreadData[i].OffsetY = DesktopDim->top;
+		m_pThreadData[i].OffsetX = pDesktopDim->left;
+		m_pThreadData[i].OffsetY = pDesktopDim->top;
 		m_pThreadData[i].PtrInfo = &m_PtrInfo;
 
 		RtlZeroMemory(&m_pThreadData[i].DxRes, sizeof(DX_RESOURCES));
@@ -125,8 +119,8 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::Initialize(INT SingleOutput, U
 //
 // Get DX_RESOURCES
 //
-DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCES* Data) {
-	HRESULT hr = S_OK;
+DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCES* pData) {
+	HRESULT r = S_OK;
 
 	// Driver types supported
 	D3D_DRIVER_TYPE DriverTypes[] =	{
@@ -146,48 +140,38 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCE
 	UINT NumFeatureLevels = ARRAYSIZE(FeatureLevels);
 
 	D3D_FEATURE_LEVEL FeatureLevel;
-
-	// Create device
-	for (UINT DriverTypeIndex = 0; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)	{
-		hr = D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, 0, FeatureLevels, NumFeatureLevels,
-			D3D11_SDK_VERSION, &Data->Device, &FeatureLevel, &Data->Context);
-		if (SUCCEEDED(hr)) {
-			// Device creation success, no need to loop anymore
-			break;
-		}
-	}
-	if (FAILED(hr)) {
-		return ProcessFailure(nullptr, L"Failed to create device in InitializeDx", L"Error", hr);
-	}
-
-	// VERTEX shader
 	UINT Size = ARRAYSIZE(g_VS);
-	hr = Data->Device->CreateVertexShader(g_VS, Size, nullptr, &Data->VertexShader);
-	if (FAILED(hr))	{
-		return ProcessFailure(Data->Device, L"Failed to create vertex shader in InitializeDx", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
-
-	// Input layout
-	D3D11_INPUT_ELEMENT_DESC Layout[] =	{
+	D3D11_INPUT_ELEMENT_DESC Layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	UINT NumElements = ARRAYSIZE(Layout);
-	hr = Data->Device->CreateInputLayout(Layout, NumElements, g_VS, Size, &Data->InputLayout);
-	if (FAILED(hr)) {
-		return ProcessFailure(Data->Device, L"Failed to create input layout in InitializeDx", L"Error", hr, SystemTransitionsExpectedErrors);
+	D3D11_SAMPLER_DESC SampDesc;
+
+	// Create device
+	for (UINT DriverTypeIndex = 0; DriverTypeIndex < NumDriverTypes; ++DriverTypeIndex)	{
+		D3D11CreateDevice(nullptr, DriverTypes[DriverTypeIndex], nullptr, 0, FeatureLevels, NumFeatureLevels,
+			D3D11_SDK_VERSION, &pData->Device, &FeatureLevel, &pData->Context);
+		// Device creation success, no need to loop anymore
+		if (pData->Device != nullptr) {
+			break;
+		}
 	}
-	Data->Context->IASetInputLayout(Data->InputLayout);
+	CNM(pData->Device, "Failed to create device in InitializeDx");
+
+	// VERTEX shader	
+	CRM(pData->Device->CreateVertexShader(g_VS, Size, nullptr, &pData->VertexShader), "Failed to create vertex shader in InitializeDx");
+
+	// Input layout
+	CRM(pData->Device->CreateInputLayout(Layout, NumElements, g_VS, Size, &pData->InputLayout), "Failed to create input layout in InitializeDx");
+	
+	pData->Context->IASetInputLayout(pData->InputLayout);
 
 	// Pixel shader
 	Size = ARRAYSIZE(g_PS);
-	hr = Data->Device->CreatePixelShader(g_PS, Size, nullptr, &Data->PixelShader);
-	if (FAILED(hr)) {
-		return ProcessFailure(Data->Device, L"Failed to create pixel shader in InitializeDx", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
+	CRM(pData->Device->CreatePixelShader(g_PS, Size, nullptr, &pData->PixelShader), "Failed to create pixel shader in InitializeDx");
 
 	// Set up sampler
-	D3D11_SAMPLER_DESC SampDesc;
 	RtlZeroMemory(&SampDesc, sizeof(SampDesc));
 	SampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	SampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -196,11 +180,12 @@ DUPL_RETURN D3D11DesktopDuplicationThreadManager::InitializeDx(_Out_ DX_RESOURCE
 	SampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	SampDesc.MinLOD = 0;
 	SampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	hr = Data->Device->CreateSamplerState(&SampDesc, &Data->SamplerLinear);
-	if (FAILED(hr))	{
-		return ProcessFailure(Data->Device, L"Failed to create sampler state in InitializeDx", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
+	CRM(pData->Device->CreateSamplerState(&SampDesc, &pData->SamplerLinear), "Failed to create sampler state in InitializeDx");
 
+Error:
+	if (RFAILED()) {
+		return ProcessFailure(pData->Device, L"Failed to InitializeDx in ThreadManager", L"Error", r, SystemTransitionsExpectedErrors);
+	}
 	return DUPL_RETURN_SUCCESS;
 }
 

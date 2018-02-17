@@ -1,5 +1,5 @@
 #include "D3D11DesktopDuplicationManager.h"
-
+#include "RESULT/EHM.h"
 
 //
 // Constructor sets up references / variables
@@ -37,6 +37,7 @@ D3D11DesktopDuplicationManager::~D3D11DesktopDuplicationManager() {
 // Initialize duplication interfaces
 //
 DUPL_RETURN D3D11DesktopDuplicationManager::InitDupl(_In_ ID3D11Device* pDevice, UINT Output) {
+	HRESULT r = S_OK;
 	m_OutputNumber = Output;
 
 	// Take a reference on the device
@@ -45,52 +46,41 @@ DUPL_RETURN D3D11DesktopDuplicationManager::InitDupl(_In_ ID3D11Device* pDevice,
 
 	// Get DXGI device
 	IDXGIDevice* DxgiDevice = nullptr;
-	HRESULT hr = m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&DxgiDevice));
-	if (FAILED(hr)) {
-		return ProcessFailure(nullptr, L"Failed to QI for DXGI Device", L"Error", hr);
-	}
+	CRM(m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&DxgiDevice)), "Failed to QI for DXGI Device");
 
 	// Get DXGI adapter
 	IDXGIAdapter* DxgiAdapter = nullptr;
-	hr = DxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&DxgiAdapter));
+	CRM(DxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&DxgiAdapter)), "Failed to get parent DXGI Adapter");
 	DxgiDevice->Release();
 	DxgiDevice = nullptr;
-	if (FAILED(hr))	{
-		return ProcessFailure(m_pDevice, L"Failed to get parent DXGI Adapter", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
 
 	// Get output
 	IDXGIOutput* DxgiOutput = nullptr;
-	hr = DxgiAdapter->EnumOutputs(Output, &DxgiOutput);
+	CRM(DxgiAdapter->EnumOutputs(Output, &DxgiOutput), "Failed to get specified output in D3D11DesktopDuplicationManager");
 	DxgiAdapter->Release();
 	DxgiAdapter = nullptr;
-	if (FAILED(hr))	{
-		return ProcessFailure(m_pDevice, L"Failed to get specified output in D3D11DesktopDuplicationManager", L"Error", hr, EnumOutputsExpectedErrors);
-	}
 
 	DxgiOutput->GetDesc(&m_OutputDesc);
 
 	// QI for Output 1
 	IDXGIOutput1* DxgiOutput1 = nullptr;
-	hr = DxgiOutput->QueryInterface(__uuidof(DxgiOutput1), reinterpret_cast<void**>(&DxgiOutput1));
+	CRM(DxgiOutput->QueryInterface(__uuidof(DxgiOutput1), reinterpret_cast<void**>(&DxgiOutput1)), "Failed to QI for DxgiOutput1 in D3D11DesktopDuplicationManager");
 	DxgiOutput->Release();
 	DxgiOutput = nullptr;
-	if (FAILED(hr))	{
-		return ProcessFailure(nullptr, L"Failed to QI for DxgiOutput1 in D3D11DesktopDuplicationManager", L"Error", hr);
-	}
 
 	// Create desktop duplication
-	hr = DxgiOutput1->DuplicateOutput(m_pDevice, &m_pDeskDupl);
+	CRM(DxgiOutput1->DuplicateOutput(m_pDevice, &m_pDeskDupl), "Failed to get duplicate output in D3D11DesktopDuplicationManager");
 	DxgiOutput1->Release();
 	DxgiOutput1 = nullptr;
-	if (FAILED(hr)) {
-		if (hr == DXGI_ERROR_NOT_CURRENTLY_AVAILABLE) {
-			MessageBoxW(nullptr, L"There is already the maximum number of applications using the Desktop Duplication API running, please close one of those applications and then try again.", L"Error", MB_OK);
-			return DUPL_RETURN_ERROR_UNEXPECTED;
-		}
-		return ProcessFailure(m_pDevice, L"Failed to get duplicate output in D3D11DesktopDuplicationManager", L"Error", hr, CreateDuplicationExpectedErrors);
-	}
 
+Error:
+	if (r == DXGI_ERROR_NOT_CURRENTLY_AVAILABLE) {
+		MessageBoxW(nullptr, L"There is already the maximum number of applications using the Desktop Duplication API running, please close one of those applications and then try again.", L"Error", MB_OK);
+		return DUPL_RETURN_ERROR_UNEXPECTED;
+	}
+	if (RFAILED()) {
+		return ProcessFailure(nullptr, L"Failed to Initialize DuplicationManager", L"Error", r);
+	}
 	return DUPL_RETURN_SUCCESS;
 }
 
@@ -149,14 +139,17 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, 
 
 	// Get shape
 	UINT BufferSizeRequired;
-	HRESULT hr = m_pDeskDupl->GetFramePointerShape(FrameInfo->PointerShapeBufferSize, reinterpret_cast<VOID*>(PtrInfo->PtrShapeBuffer), &BufferSizeRequired, &(PtrInfo->ShapeInfo));
-	if (FAILED(hr)) {
+	
+	HRESULT r = S_OK;
+	CR(m_pDeskDupl->GetFramePointerShape(FrameInfo->PointerShapeBufferSize, reinterpret_cast<VOID*>(PtrInfo->PtrShapeBuffer), &BufferSizeRequired, &(PtrInfo->ShapeInfo)));
+
+Error:
+	if (RFAILED()) {
 		delete[] PtrInfo->PtrShapeBuffer;
 		PtrInfo->PtrShapeBuffer = nullptr;
 		PtrInfo->BufferSize = 0;
-		return ProcessFailure(m_pDevice, L"Failed to get frame pointer shape in D3D11DesktopDuplicationManager", L"Error", hr, FrameInfoExpectedErrors);
+		return ProcessFailure(m_pDevice, L"Failed to get frame pointer shape in D3D11DesktopDuplicationManager", L"Error", r, FrameInfoExpectedErrors);
 	}
-
 	return DUPL_RETURN_SUCCESS;
 }
 
@@ -166,20 +159,15 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, 
 //
 _Success_(*Timeout == false && return == DUPL_RETURN_SUCCESS)
 DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Out_ bool* Timeout) {
+	HRESULT r = S_OK;
+
 	IDXGIResource* pDesktopResource = nullptr;
 	DXGI_OUTDUPL_FRAME_INFO FrameInfo;
 
 	// Get new frame
-	HRESULT hr = m_pDeskDupl->AcquireNextFrame(500, &FrameInfo, &pDesktopResource);
-	if (hr == DXGI_ERROR_WAIT_TIMEOUT) {
-		*Timeout = true;
-		return DUPL_RETURN_SUCCESS;
-	}
+	CR(m_pDeskDupl->AcquireNextFrame(500, &FrameInfo, &pDesktopResource));
+	
 	*Timeout = false;
-
-	if (FAILED(hr)) {
-		return ProcessFailure(m_pDevice, L"Failed to acquire next frame in D3D11DesktopDuplicationManager", L"Error", hr, FrameInfoExpectedErrors);
-	}
 
 	// If still holding old frame, destroy it
 	if (m_pAcquiredDesktopImage) {
@@ -188,12 +176,9 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 	}
 
 	// QI for IDXGIResource
-	hr = pDesktopResource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&m_pAcquiredDesktopImage));
+	CRM(pDesktopResource->QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast<void **>(&m_pAcquiredDesktopImage)), "Failed to QI for ID3D11Texture2D from acquired IDXGIResource in D3D11DesktopDuplicationManager");
 	pDesktopResource->Release();
 	pDesktopResource = nullptr;
-	if (FAILED(hr)) {
-		return ProcessFailure(nullptr, L"Failed to QI for ID3D11Texture2D from acquired IDXGIResource in D3D11DesktopDuplicationManager", L"Error", hr);
-	}
 
 	// Get metadata
 	if (FrameInfo.TotalMetadataBufferSize) {
@@ -216,33 +201,34 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 		UINT BufSize = FrameInfo.TotalMetadataBufferSize;
 
 		// Get move rectangles
-		hr = m_pDeskDupl->GetFrameMoveRects(BufSize, reinterpret_cast<DXGI_OUTDUPL_MOVE_RECT*>(m_pMetaDataBuffer), &BufSize);
-		if (FAILED(hr)) {
-			Data->MoveCount = 0;
-			Data->DirtyCount = 0;
-			return ProcessFailure(nullptr, L"Failed to get frame move rects in D3D11DesktopDuplicationManager", L"Error", hr, FrameInfoExpectedErrors);
-		}
+		CRM(m_pDeskDupl->GetFrameMoveRects(BufSize, reinterpret_cast<DXGI_OUTDUPL_MOVE_RECT*>(m_pMetaDataBuffer), &BufSize), "Failed to get frame move rects in D3D11DesktopDuplicationManager");
+
 		Data->MoveCount = BufSize / sizeof(DXGI_OUTDUPL_MOVE_RECT);
 
 		BYTE* DirtyRects = m_pMetaDataBuffer + BufSize;
 		BufSize = FrameInfo.TotalMetadataBufferSize - BufSize;
 
 		// Get dirty rectangles
-		hr = m_pDeskDupl->GetFrameDirtyRects(BufSize, reinterpret_cast<RECT*>(DirtyRects), &BufSize);
-		if (FAILED(hr)) {
-			Data->MoveCount = 0;
-			Data->DirtyCount = 0;
-			return ProcessFailure(nullptr, L"Failed to get frame dirty rects in D3D11DesktopDuplicationManager", L"Error", hr, FrameInfoExpectedErrors);
-		}
+		CRM(m_pDeskDupl->GetFrameDirtyRects(BufSize, reinterpret_cast<RECT*>(DirtyRects), &BufSize), "Failed to get frame dirty rects in D3D11DesktopDuplicationManager");
+
 		Data->DirtyCount = BufSize / sizeof(RECT);
 
 		Data->MetaData = m_pMetaDataBuffer;
-		//		m_pDesktopControllerObserver->OnDataBuffer(m_pMetaDataBuffer);
 	}
 
 	Data->Frame = m_pAcquiredDesktopImage;
 	Data->FrameInfo = FrameInfo;
 
+Error:
+	if (r == DXGI_ERROR_WAIT_TIMEOUT) {
+		*Timeout = true;
+		return DUPL_RETURN_SUCCESS;
+	}
+	if (RFAILED()) {
+		Data->MoveCount = 0;
+		Data->DirtyCount = 0;
+		return ProcessFailure(m_pDevice, L"Failed to acquire next frame in D3D11DesktopDuplicationManager", L"Error", r, FrameInfoExpectedErrors);
+	}
 	return DUPL_RETURN_SUCCESS;
 }
 
@@ -250,16 +236,18 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 // Release frame
 //
 DUPL_RETURN D3D11DesktopDuplicationManager::DoneWithFrame() {
-	HRESULT hr = m_pDeskDupl->ReleaseFrame();
-	if (FAILED(hr)) {
-		return ProcessFailure(m_pDevice, L"Failed to release frame in D3D11DesktopDuplicationManager", L"Error", hr, FrameInfoExpectedErrors);
-	}
+	HRESULT r = S_OK;
 
+	CR(m_pDeskDupl->ReleaseFrame());
+
+Error:
+	if (RFAILED()) {
+		return ProcessFailure(m_pDevice, L"Failed to release frame in D3D11DesktopDuplicationManager", L"Error", r, FrameInfoExpectedErrors);
+	}
 	if (m_pAcquiredDesktopImage) {
 		m_pAcquiredDesktopImage->Release();
 		m_pAcquiredDesktopImage = nullptr;
 	}
-
 	return DUPL_RETURN_SUCCESS;
 }
 
