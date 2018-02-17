@@ -1,4 +1,5 @@
 #include "D3D11DesktopDuplicationDisplayManager.h"
+#include "RESULT/EHM.h"
 using namespace DirectX;
 
 //
@@ -136,6 +137,7 @@ void D3D11DesktopDuplicationDisplayManager::SetMoveRect(_Out_ RECT* SrcRect, _Ou
 // Copy move rectangles
 //
 DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyMove(_Inout_ ID3D11Texture2D* SharedSurf, _In_reads_(MoveCount) DXGI_OUTDUPL_MOVE_RECT* MoveBuffer, UINT MoveCount, INT OffsetX, INT OffsetY, _In_ DXGI_OUTPUT_DESC* DeskDesc, INT TexWidth, INT TexHeight) {
+	HRESULT r = S_OK;
 	D3D11_TEXTURE2D_DESC FullDesc;
 	SharedSurf->GetDesc(&FullDesc);
 
@@ -147,10 +149,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyMove(_Inout_ ID3D11Textur
 		MoveDesc.Height = DeskDesc->DesktopCoordinates.bottom - DeskDesc->DesktopCoordinates.top;
 		MoveDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
 		MoveDesc.MiscFlags = 0;
-		HRESULT hr = m_pDevice->CreateTexture2D(&MoveDesc, nullptr, &m_pMoveSurf);
-		if (FAILED(hr)) {
-			return ProcessFailure(m_pDevice, L"Failed to create staging texture for move rects", L"Error", hr, SystemTransitionsExpectedErrors);
-		}
+		CH(m_pDevice->CreateTexture2D(&MoveDesc, nullptr, &m_pMoveSurf));	
 	}
 
 	for (UINT i = 0; i < MoveCount; ++i) {
@@ -179,6 +178,10 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyMove(_Inout_ ID3D11Textur
 		m_pDeviceContext->CopySubresourceRegion(SharedSurf, 0, DestRect.left + DeskDesc->DesktopCoordinates.left - OffsetX, DestRect.top + DeskDesc->DesktopCoordinates.top - OffsetY, 0, m_pMoveSurf, 0, &Box);
 	}
 
+Error:
+	if (RFAILED()) {
+		return ProcessFailure(m_pDevice, L"Failed to create staging texture for move rects", L"Error", r, SystemTransitionsExpectedErrors);
+	}
 	return DUPL_RETURN_SUCCESS;
 }
 
@@ -274,7 +277,7 @@ void D3D11DesktopDuplicationDisplayManager::SetDirtyVert(_Out_writes_(NUMVERTICE
 // Copies dirty rectangles
 //
 DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2D* SrcSurface, _Inout_ ID3D11Texture2D* SharedSurf, _In_reads_(DirtyCount) RECT* DirtyBuffer, UINT DirtyCount, INT OffsetX, INT OffsetY, _In_ DXGI_OUTPUT_DESC* DeskDesc) {
-	HRESULT hr;
+	HRESULT r = S_OK;
 
 	D3D11_TEXTURE2D_DESC FullDesc;
 	SharedSurf->GetDesc(&FullDesc);
@@ -283,10 +286,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 	SrcSurface->GetDesc(&ThisDesc);
 
 	if (!m_pRTV) {
-		hr = m_pDevice->CreateRenderTargetView(SharedSurf, nullptr, &m_pRTV);
-		if (FAILED(hr)) {
-			return ProcessFailure(m_pDevice, L"Failed to create render target view for dirty rects", L"Error", hr, SystemTransitionsExpectedErrors);
-		}
+		CRM(m_pDevice->CreateRenderTargetView(SharedSurf, nullptr, &m_pRTV), "Failed to create render target view for dirty rects");
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC ShaderDesc;
@@ -297,10 +297,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 
 	// Create new shader resource view
 	ID3D11ShaderResourceView* ShaderResource = nullptr;
-	hr = m_pDevice->CreateShaderResourceView(SrcSurface, &ShaderDesc, &ShaderResource);
-	if (FAILED(hr))	{
-		return ProcessFailure(m_pDevice, L"Failed to create shader resource view for dirty rects", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
+	CRM(m_pDevice->CreateShaderResourceView(SrcSurface, &ShaderDesc, &ShaderResource), "Failed to create shader resource view for dirty rects");
 
 	FLOAT BlendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
 	m_pDeviceContext->OMSetBlendState(nullptr, BlendFactor, 0xFFFFFFFF);
@@ -345,10 +342,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 	InitData.pSysMem = m_pDirtyVertexBufferAlloc;
 
 	ID3D11Buffer* VertBuf = nullptr;
-	hr = m_pDevice->CreateBuffer(&BufferDesc, &InitData, &VertBuf);
-	if (FAILED(hr))	{
-		return ProcessFailure(m_pDevice, L"Failed to create vertex buffer in dirty rect processing", L"Error", hr, SystemTransitionsExpectedErrors);
-	}
+	CRM(m_pDevice->CreateBuffer(&BufferDesc, &InitData, &VertBuf),"Failed to create vertex buffer in dirty rect processing");
 
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
@@ -371,6 +365,10 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 	ShaderResource->Release();
 	ShaderResource = nullptr;
 
+Error:
+	if (FAILED(r)) {
+		return ProcessFailure(m_pDevice, L"Failed in CopyDirty of DisplayManager", L"Error", r, SystemTransitionsExpectedErrors);
+	}
 	return DUPL_RETURN_SUCCESS;
 }
 

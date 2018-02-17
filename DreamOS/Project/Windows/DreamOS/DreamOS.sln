@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamCef", "..\DreamCef\Dre
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLaunch", "..\DreamLaunch\DreamLaunch.csproj", "{72DE702F-CC98-4A96-B158-D6C718C4853F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DesktopDuplication", "..\DreamDesktopDuplication\DesktopDuplication.vcxproj", "{05050918-71E9-AF87-0B3C-6F34D471A55A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamDesktopCapture", "..\DreamDesktopDuplication\DesktopDuplication.vcxproj", "{05050918-71E9-AF87-0B3C-6F34D471A55A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
