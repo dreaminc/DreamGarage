@@ -319,10 +319,10 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 	}
 
 	// Update Mallet Visibility
-	if (!pHand->IsTracked() && pMallet->GetMalletHead()->IsVisible()) { // || m_appStack.empty()?
+	if (!pHand->IsTracked() && pMallet->GetMalletHead()->IsVisible()) {
 		pMallet->Hide();
 	} 
-	else if (pHand->IsTracked() && !m_appStack.empty() && !pMallet->GetMalletHead()->IsVisible()) {
+	else if (pHand->IsTracked() && m_pEventApp != nullptr && !pMallet->GetMalletHead()->IsVisible()) {
 		pMallet->Show();
 	}
 
@@ -339,7 +339,7 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 
 			//UpdateOverlayTexture(type);
 			UpdateOverlayTextures();
-			if (m_appStack.empty()) {
+			if (m_pEventApp == nullptr) {
 				//pHand->SetModelState(hand::ModelState::CONTROLLER);
 				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
 				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
@@ -349,6 +349,38 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 
 Error:
 	return r;
+}
+
+RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
+	RESULT r = R_PASS;
+
+	//CBR(fHasOpenApp != m_fHasOpenApp, R_SKIPPED);
+	m_fHasOpenApp = fHasOpenApp;
+
+	if (m_fHasOpenApp) {
+		m_pLeftMallet->Show();
+		m_pRightMallet->Show();
+
+		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+	}
+	else {
+		m_pLeftMallet->Hide();
+		m_pRightMallet->Hide();
+
+		m_pLeftHand->SetModelState(hand::ModelState::HAND);
+		m_pRightHand->SetModelState(hand::ModelState::HAND);
+	}
+
+	UpdateOverlayTextures();
+
+//Error:
+	return r;
+}
+
+RESULT DreamUserApp::SetEventApp(DreamUserObserver *pEventApp) {
+	m_pEventApp = pEventApp;
+	return R_PASS;
 }
 
 RESULT DreamUserApp::UpdateOverlayTexture(HAND_TYPE type) {
@@ -370,8 +402,8 @@ RESULT DreamUserApp::UpdateOverlayTexture(HAND_TYPE type) {
 	CNR(pHand, R_SKIPPED);
 	CNR(pDefaultTexture, R_SKIPPED);
 
-	if (!m_appStack.empty()) {
-		pOverlayTexture = m_appStack.top()->GetOverlayTexture(type);
+	if (m_pEventApp != nullptr) {
+		pOverlayTexture = m_pEventApp->GetOverlayTexture(type);
 	}
 
 	if (pOverlayTexture != nullptr) {
@@ -437,7 +469,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		if (!m_fCollisionLeft && !m_fCollisionRight) {
 			m_pLeftHand->SetOverlayVisible(false);
 			m_pRightHand->SetOverlayVisible(false);
-			if (m_appStack.empty() && !m_fStreaming) {
+			if (m_pEventApp == nullptr && !m_fStreaming) {
 				m_pLeftHand->SetModelState(hand::ModelState::HAND);
 				m_pRightHand->SetModelState(hand::ModelState::HAND);
 			}
@@ -463,31 +495,12 @@ RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
 RESULT DreamUserApp::PopFocusStack() {
 	RESULT r = R_PASS;
 
-	CBR(m_appStack.empty(), R_SKIPPED);
-
-	auto pLastApp = m_appStack.top();
-	m_appStack.pop();
-	if (m_appStack.size() == 0) {
-		CR(OnFocusStackEmpty(pLastApp));
-	}
-
-Error:
 	return r;
 }
 
 RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 	RESULT r = R_PASS;
 
-	if (m_appStack.empty()) {
-		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-		m_pLeftMallet->Show();
-		m_pRightMallet->Show();
-	}
-
-	m_appStack.push(pObserver);
-
-//Error:
 	return r;
 }
 
@@ -496,9 +509,9 @@ RESULT DreamUserApp::StopSharing() {
 
 	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
-	CBR(!m_appStack.empty(), R_SKIPPED);
+	CBR(m_pEventApp != nullptr, R_SKIPPED);
 
-	if (m_appStack.top() == pDreamControlViewHandle) {
+	if (m_pEventApp == pDreamControlViewHandle) {
 		m_pKeyboardHandle->Hide();
 		CR(ClearFocusStack());
 	}
@@ -513,10 +526,8 @@ Error:
 RESULT DreamUserApp::ClearFocusStack() {
 	RESULT r = R_PASS;
 
-	CBR(!m_appStack.empty(), R_SKIPPED);
-	auto pLastApp = m_appStack.top();
-	m_appStack = std::stack<DreamUserObserver*>();
-	CR(OnFocusStackEmpty(pLastApp));
+	CBR(m_pEventApp != nullptr, R_SKIPPED);
+	CR(OnFocusStackEmpty(m_pEventApp));
 
 Error:
 	return r;
@@ -535,17 +546,6 @@ RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
 		if (!(m_fCollisionLeft || m_fCollisionRight)) {
 			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
 			CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
-		}
-	}
-	// when the user is streaming, alternate between the control view and the menu
-
-	if (m_fStreaming) {
-		auto pApp = pLastApp;
-
-		if (pApp != m_pMenuHandle) {
-			CR(ResetAppComposite());
-			CR(m_pMenuHandle->SendShowRootMenu());
-			CR(PushFocusStack(m_pMenuHandle));
 		}
 	}
 
@@ -692,16 +692,16 @@ Error:
 
 RESULT DreamUserApp::HandleKBEnterEvent() {
 	RESULT r = R_PASS;
-	CBR(!m_appStack.empty(), R_SKIPPED);
-	CR(m_appStack.top()->HandleEvent(UserObserverEventType::KB_ENTER));
+	CNR(m_pEventApp, R_SKIPPED);
+	m_pEventApp->HandleEvent(UserObserverEventType::KB_ENTER);
 Error:
 	return r;
 }
 
 RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
-	CBR(!m_appStack.empty(), R_SKIPPED);
-	CR(m_appStack.top()->HandleEvent(type));
+	CNR(m_pEventApp, R_SKIPPED);
+	m_pEventApp->HandleEvent(type);
 Error:
 	return r;
 }

@@ -49,13 +49,13 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
 	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing
 
-	m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
-	CN(m_pDreamUIBar);
-
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 	CN(m_pDreamUserApp);
+
+	m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
+	CN(m_pDreamUIBar);
 
 	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
 	CN(m_pControlBar);
@@ -64,7 +64,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 	CN(m_pControlView);
 	m_pControlView->InitializeWithParent(this);
-	m_pControlView->m_pViewQuad->SetVisible(true);
+	//m_pControlView->m_pViewQuad->SetVisible(true);
 
 	m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 	CN(m_pDreamTabView);
@@ -78,6 +78,10 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
+	m_pControlBar->GetComposite()->SetVisible(false);
+	m_pDreamTabView->GetComposite()->SetVisible(false);
+
+	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 
 Error:
 	return r;
@@ -372,6 +376,7 @@ Error:
 RESULT DreamUserControlArea::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveBrowser, R_OBJECT_NOT_FOUND);
 	CR(m_pActiveBrowser->ScrollBrowserByDiff(pxXDiff, pxYDiff, scrollPoint));
 
 Error:
@@ -420,35 +425,32 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	return R_PASS;
 }
 
+RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
+	m_pDreamUIBar->SetUIStageProgram(pUIProgramNode);
+	return R_PASS;
+}
+
 RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
 
 	switch (pSubscriberEvent->m_eventType) {
 	case INTERACTION_EVENT_MENU: {
-		if (!m_fHasOpenApp) {
-			if (m_pDreamUIBar != nullptr) {
-				CR(m_pDreamUIBar->ShowRootMenu());
-				// old code from DreamUserApp::Notify
-				/*
+		CNR(m_pDreamUIBar, R_SKIPPED);
+		if (m_pDreamUIBar->IsEmpty()) {
+			CR(m_pDreamUIBar->ShowRootMenu());
+
 			ResetAppComposite();
-			if (m_pMenuHandle != nullptr) {
-				m_pMenuHandle->SendShowRootMenu();
-			}
 
-			m_pLeftMallet->Show();
-			m_pRightMallet->Show();
-
-			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-
-			m_appStack.push(m_pMenuHandle);
-
-			UpdateOverlayTextures();
-			//*/
+			m_pDreamUserApp->SetHasOpenApp(true);
+			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+		}
+		else {
+			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
+			if (m_pDreamUIBar->IsEmpty()) {
+				m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
+				m_pDreamUserApp->SetEventApp(nullptr);
 			}
 		}
-		//TODO: if there are open apps, 
-		//else if ()
 	} break;
 	}
 

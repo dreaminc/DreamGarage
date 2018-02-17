@@ -22,6 +22,8 @@ class EnvironmentAsset;
 
 struct InteractionObjectEvent;
 
+class UIStageProgram;
+
 class quad;
 
 #define MAIN_DIAGONAL 0.6f
@@ -82,6 +84,7 @@ public:
 public:
 	RESULT ResetAppComposite();
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;

@@ -292,24 +292,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 				// if the stack is empty after popping from the path, hide the app
 				CBR(m_pathStack.empty(), R_SKIPPED);
-				CR(m_pUserHandle->SendClearFocusStack());
 				CR(HideApp());
-				//*
-				{
-					// if the user is currently streaming, show the control view
-					bool fStreaming = false;
-					CR(m_pUserHandle->RequestStreamingState(fStreaming));
-					if (fStreaming) {
-					//	CR(ShowControlView(false));
-						CR(ShowControlView());
-					}
-				}
-				//*/
-				//break;
-			}
-
-			else {
-				CR(ShowRootMenu());
 			}
 
 		} break;
@@ -852,6 +835,10 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
 	return R_PASS;
+}
+
+bool DreamUIBar::IsEmpty() {
+	return m_pathStack.empty();
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {

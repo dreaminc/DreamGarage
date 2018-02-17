@@ -139,6 +139,7 @@ public:
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	bool IsEmpty();
 
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

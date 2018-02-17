@@ -155,6 +155,9 @@ public:
 
 	virtual RESULT ResetAppComposite() override;
 
+	RESULT SetHasOpenApp(bool fHasOpenApp);
+	RESULT SetEventApp(DreamUserObserver *pEventApp);
+
 //protected:
 public:
 
@@ -175,10 +178,12 @@ private:
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
 
-	std::stack<DreamUserObserver*> m_appStack;
-
 	// apps position themselves with this when they are presented
 	VirtualObj *m_pAppBasis = nullptr;
+
+	bool m_fHasOpenApp = false;
+	// current app that should receive events from the user
+	DreamUserObserver* m_pEventApp = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 	DreamUIBarHandle *m_pMenuHandle = nullptr;

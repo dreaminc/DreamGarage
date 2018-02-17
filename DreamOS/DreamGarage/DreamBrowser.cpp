@@ -449,12 +449,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	//
 //	GetDOS()->AddObjectToUIGraph(GetComposite());	
 
-	// Set up browser manager
-#ifndef _DEBUG
-	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-	CN(m_pWebBrowserManager);
-	CR(m_pWebBrowserManager->Initialize());
-#endif
 /*
 	// Get loading screen URL
 	pCommandLineManager = CommandLineManager::instance();

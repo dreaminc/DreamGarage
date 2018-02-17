@@ -57,7 +57,7 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 
 	GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
-	GetComposite()->SetVisible(true);
+	//GetComposite()->SetVisible(true);
 
 //Error:
 	return r;
