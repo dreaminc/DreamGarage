@@ -400,43 +400,6 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	switch (mEvent->m_eventType) {
 
-	case INTERACTION_EVENT_MENU: {
-
-		// get app ids
-		auto pDreamOS = GetDOS();
-
-		//TODO: requesting the handles may need to be moved into the switch statements,
-		//		depending on how other applications handle capturing each other
-		
-#ifndef _USE_TEST_APP
-		if (m_appStack.empty()) {
-
-			ResetAppComposite();
-			if (m_pMenuHandle != nullptr) {
-				m_pMenuHandle->SendShowRootMenu();
-			}
-
-			m_pLeftMallet->Show();
-			m_pRightMallet->Show();
-
-			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-
-			m_appStack.push(m_pMenuHandle);
-
-			UpdateOverlayTextures();
-			//currently, the user app always has the menu handle
-			//GetDOS()->ReleaseApp(pMenuHandle, menuUIDs[0], this);
-		}
-		else {
-			m_appStack.top()->HandleEvent(UserObserverEventType::BACK);
-		}
-#else
-		UpdateCompositeWithHands(m_menuHeight);
-#endif
-
-	} break;
-
 	case (ELEMENT_INTERSECT_BEGAN): {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		auto pEventObj = mEvent->m_pEventObject;

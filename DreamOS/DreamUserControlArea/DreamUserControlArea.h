@@ -5,17 +5,22 @@
 
 #include "DreamApp.h"
 #include "DreamGarage/DreamControlBar.h"
+#include "Primitives/Subscriber.h"
 
 #include <vector>
 #include <map>
 
 class DreamUserApp;
 class DreamControlView;
+class DreamUIBar;
 class DreamTabView;
 class DreamBrowser;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
+class EnvironmentAsset;
+
+struct InteractionObjectEvent;
 
 class quad;
 
@@ -28,7 +33,7 @@ class quad;
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
  
-class DreamUserControlArea : public DreamApp<DreamUserControlArea> {
+class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 
@@ -73,10 +78,27 @@ public:
 
 	RESULT CanPressButton(UIButton *pButtonContext);
 
+// DreamGarage compatability (temp?)
+public:
+	RESULT ResetAppComposite();
+	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+
+public:
+	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
+
+// child applications
 private:
+
+	// positioning helper
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
+
+	// Generates browsers
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
+	// App used for opening content
+	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
+
+	// Apps in control area
 	std::shared_ptr<DreamControlBar> m_pControlBar;
 	std::shared_ptr<DreamControlView> m_pControlView;
 	std::shared_ptr<DreamTabView> m_pDreamTabView;
@@ -89,6 +111,12 @@ private:
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
 
+// logic
+private:
+	bool m_fHasOpenApp;
+
+// layout variables
+private:
 	float m_spacingSize = SPACING_SIZE;
 	float m_pxWidth = DEFAULT_PX_WIDTH;
 	float m_pxHeight = DEFAULT_PX_HEIGHT;

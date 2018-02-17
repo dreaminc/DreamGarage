@@ -2,11 +2,15 @@
 
 #include "DreamOS.h"
 #include "DreamUserApp.h"
+#include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamTabView.h"
 #include "DreamControlView/DreamControlView.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "Cloud/Environment/EnvironmentAsset.h"	
+
+#include "InteractionEngine/InteractionObjectEvent.h"
 
 #include "UI/UIButton.h"
 
@@ -43,7 +47,10 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
 	CN(m_pActiveBrowser);
 	CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
-	CR(m_pActiveBrowser->SetURI("www.reddit.com"));
+	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing
+
+	m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
+	CN(m_pDreamUIBar);
 
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
@@ -393,6 +400,57 @@ RESULT DreamUserControlArea::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
 	CR(m_pActiveBrowser->SendURL(strURL));
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::ResetAppComposite() {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamUserApp->ResetAppComposite());
+	CR(m_pDreamUIBar->ResetAppComposite());
+	CR(m_pControlView->ResetAppComposite());
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
+	RESULT r = R_PASS;
+
+	switch (pSubscriberEvent->m_eventType) {
+	case INTERACTION_EVENT_MENU: {
+		if (!m_fHasOpenApp) {
+			if (m_pDreamUIBar != nullptr) {
+				CR(m_pDreamUIBar->ShowRootMenu());
+				// old code from DreamUserApp::Notify
+				/*
+			ResetAppComposite();
+			if (m_pMenuHandle != nullptr) {
+				m_pMenuHandle->SendShowRootMenu();
+			}
+
+			m_pLeftMallet->Show();
+			m_pRightMallet->Show();
+
+			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+
+			m_appStack.push(m_pMenuHandle);
+
+			UpdateOverlayTextures();
+			//*/
+			}
+		}
+		//TODO: if there are open apps, 
+		//else if ()
+	} break;
+	}
 
 Error:
 	return r;

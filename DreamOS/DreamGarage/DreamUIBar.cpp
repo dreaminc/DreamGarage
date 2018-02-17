@@ -12,8 +12,9 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
-#include "DreamControlView/DreamControlView.h"
 
+#include "DreamControlView/DreamControlView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamBrowser.h"
 
 #include "Primitives/font.h"
@@ -845,6 +846,11 @@ DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 
 RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
+	return R_PASS;
+}
+
+RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	m_pParentApp = pParentApp;
 	return R_PASS;
 }
 

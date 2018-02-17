@@ -18,6 +18,7 @@
 #include <stack>
 #include <queue>
 
+class DreamUserControlArea;
 class UIScrollView;
 class UIMallet;
 class UIView;
@@ -137,6 +138,7 @@ public:
 	RESULT Notify(UIEvent *pEvent);
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
+	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -192,6 +194,8 @@ private:
 
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+
+	DreamUserControlArea *m_pParentApp = nullptr;
 };
 
 
