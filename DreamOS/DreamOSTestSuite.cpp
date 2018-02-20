@@ -362,7 +362,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
+				CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(m_strScope, strPath, strTitle), "Failed to share environment asset");
 			}
 
 			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));

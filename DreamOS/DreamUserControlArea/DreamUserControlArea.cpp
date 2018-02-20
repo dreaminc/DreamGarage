@@ -123,7 +123,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 			pMallet = pRMallet;
 			type = HAND_TYPE::HAND_RIGHT;
 		}
-		pMallet->GetMalletHead()->SetVisible(true);
 		// Update using mallets, send relevant information to child apps
 		auto pComposite = GetComposite();
 		point ptBoxOrigin = pComposite->GetOrigin(true);
@@ -422,6 +421,20 @@ Error:
 }
 
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	//TODO: multi-content
+	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+	
+	//TODO: update browser's set environment asset
+	m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	//m_pControlView->SetControlViewTexture(m_pActiveBrowser->GetScreenTexture());
+
+	//m_pControlView->Show();
+	m_pControlView->GetComposite()->SetVisible(true);
+	//m_pControlView->
+	m_pControlBar->GetComposite()->SetVisible(true);
+	m_pDreamTabView->GetComposite()->SetVisible(true);
+
 	return R_PASS;
 }
 

@@ -659,7 +659,7 @@ Error:
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
-	CR(ResetAppComposite());
+	//CR(ResetAppComposite());
 
 	CR(ShowView());
 

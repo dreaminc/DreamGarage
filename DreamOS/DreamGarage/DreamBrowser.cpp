@@ -219,7 +219,7 @@ RESULT DreamBrowser::SendURL(std::string strURL) {
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(m_strScope, m_strPath, strTitle), "Failed to share environment asset");
 
 Error:
 	return r;
@@ -715,18 +715,17 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	
+	/*
 	if (m_pWebBrowserController == nullptr) {
 		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
 		CN(m_pWebBrowserController);
 		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-		/*
 		m_fShowControlView = true;
 
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 		CN(pDreamControlViewHandle);
 		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 		m_pDreamUserHandle->SendPreserveSharingState(false);	
-		*/
 	}
 
 	m_fShowControlView = true;
@@ -735,6 +734,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	CN(pDreamControlViewHandle);
 	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
 	m_pDreamUserHandle->SendPreserveSharingState(false);
+	//*/
 
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
@@ -772,7 +772,8 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
 		
-		LoadRequest(webRequest);
+		//LoadRequest(webRequest);
+		SetURI(strEnvironmentAssetURL);
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 
