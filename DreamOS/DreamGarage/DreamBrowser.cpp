@@ -260,7 +260,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
-	if (!fLoading) {
+	if (!fLoading && pDreamControlViewHandle != nullptr) {
 		m_strCurrentURL = strCurrentURL;
 
 		CR(pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture));
@@ -758,7 +758,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
 		CR(webRequest.SetURL(wstrAssetURL));
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-
+		//*
 		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		CN(pUserControllerProxy);
 
@@ -776,9 +776,10 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		}
 		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
+		//*/
 		
-		LoadRequest(webRequest);
-		//SetURI(strEnvironmentAssetURL);
+		//LoadRequest(webRequest);
+		SetURI(strEnvironmentAssetURL);
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 

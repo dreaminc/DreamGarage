@@ -425,8 +425,8 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
 	
 	//TODO: update browser's set environment asset
-	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
-	m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
+	m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	//m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
 	//m_pControlView->SetControlViewTexture(m_pActiveBrowser->GetScreenTexture());
 
 	//m_pControlView->Show();

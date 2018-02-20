@@ -17,6 +17,8 @@
 #include "Cloud/CloudController.h"
 #include "Cloud/CloudControllerFactory.h"
 #include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/WebRequest.h"
+#include "Core/Utilities.h" 
 
 #include "Sandbox/CommandLineManager.h"
 
@@ -55,11 +57,11 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestManyBrowsers());
 	CR(AddTestUserControlArea());
 
 	CR(AddTestUserControlAreaLayout());
 
-	CR(AddTestManyBrowsers());
 
 	CR(AddTestMultiPeerBrowser());
 
@@ -429,7 +431,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 			"mail.google.com",
 			"facebook.com",
 			//*/
-			"reddit.com"
+			"www.reddit.com"
 		} ;
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
@@ -437,6 +439,14 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
 			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+			/*
+			WebRequest webRequest;
+			std::string strEnvironmentAssetURL = pTestContext->strURIs[i];
+			std::wstring wstrAssetURL = util::StringToWideString("https://" + strEnvironmentAssetURL + "/");
+			CR(webRequest.SetURL(wstrAssetURL));
+			CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+			pTestContext->pDreamBrowsers[i]->LoadRequest(webRequest);
+			//*/
 
 			pTestContext->pBrowserQuads.emplace_back(std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal)));
 			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);

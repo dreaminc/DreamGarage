@@ -229,7 +229,8 @@ RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
 		CN(pCEFRequest);
 
 		pCEFRequest->SetFlags(UR_FLAG_NO_DOWNLOAD_DATA);
-		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
+		auto pCefFrame = m_pCEFBrowser->GetFocusedFrame();
+		pCefFrame->LoadRequest(pCEFRequest);
 	}
 
 Error:
