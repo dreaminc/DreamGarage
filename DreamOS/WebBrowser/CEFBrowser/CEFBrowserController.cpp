@@ -456,7 +456,7 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 
 RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChange");
 
 	CN(m_pWebBrowserControllerObserver);
 	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
@@ -467,7 +467,7 @@ Error:
 
 RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");
 
 	// TODO: Add transition type
 

@@ -258,24 +258,25 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
+	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
-		CN(pDreamControlViewHandle);
-
-		//pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+		CR(pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture));
+		/*
 		if (m_strCurrentURL != "") {
 			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
 		}
-
+		//*/
 	}
 
 Error:
+
 	if (pDreamControlViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
 	}
+
 	return r;
 }
 
@@ -311,12 +312,16 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 
 	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
+		
 	}
 
+	//TODO: should happen with share, not open
+	/*
 	if (pDreamShareViewHandle != nullptr && strCurrentURL != "about:blank") {
 		pDreamShareViewHandle->SendCastTexture(m_pBrowserTexture);
 		pDreamShareViewHandle->SendCastingEvent();
 	}
+	//*/
 
 //Error:
 	if (pDreamControlViewHandle != nullptr) {
@@ -506,7 +511,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
-	//*
+	/*
 	if (m_fShowControlView) {
 		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 
@@ -772,8 +777,8 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
 		
-		//LoadRequest(webRequest);
-		SetURI(strEnvironmentAssetURL);
+		LoadRequest(webRequest);
+		//SetURI(strEnvironmentAssetURL);
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 

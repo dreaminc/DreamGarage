@@ -78,8 +78,8 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
-	m_pControlBar->GetComposite()->SetVisible(false);
-	m_pDreamTabView->GetComposite()->SetVisible(false);
+	//m_pControlBar->GetComposite()->SetVisible(false);
+	//m_pDreamTabView->GetComposite()->SetVisible(false);
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 
@@ -414,7 +414,6 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 
 	CR(m_pDreamUserApp->ResetAppComposite());
 	CR(m_pDreamUIBar->ResetAppComposite());
-	CR(m_pControlView->ResetAppComposite());
 
 Error:
 	return r;
@@ -422,11 +421,12 @@ Error:
 
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	//TODO: multi-content
-	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
 	
 	//TODO: update browser's set environment asset
-	m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
 	//m_pControlView->SetControlViewTexture(m_pActiveBrowser->GetScreenTexture());
 
 	//m_pControlView->Show();
