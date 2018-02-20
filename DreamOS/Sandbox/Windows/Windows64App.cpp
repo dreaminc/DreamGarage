@@ -156,25 +156,25 @@ Error:
 /*
 // TODO: Move this to sandbox
 RESULT Windows64App::InitializeHAL() {
-RESULT r = R_PASS;
+	RESULT r = R_PASS;
 
-// Setup OpenGL and Resize Windows etc
-CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
-CNM(m_pCamera, "HAL depends on camera being set up");
+	// Setup OpenGL and Resize Windows etc
+	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+	CNM(m_pCamera, "HAL depends on camera being set up");
 
-// Create and initialize OpenGL Imp
-// TODO: HAL factory pattern
-m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
-CNM(m_pHALImp, "Failed to create HAL Implementation");
-CVM(m_pHALImp, "HAL Implementation Invalid");
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
 
-CR(m_pHALImp->SetCamera(m_pCamera));
+	CR(m_pHALImp->SetCamera(m_pCamera));
 
-CR(m_pHALImp->InitializeHAL());
-CR(m_pHALImp->InitializeRenderPipeline());
+	CR(m_pHALImp->InitializeHAL());
+	CR(m_pHALImp->InitializeRenderPipeline());
 
 Error:
-return r;
+	return r;
 }
 */
 
