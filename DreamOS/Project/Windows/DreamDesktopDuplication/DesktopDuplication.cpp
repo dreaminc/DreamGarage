@@ -142,13 +142,26 @@ void DynamicWait::Wait() {
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ INT nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-
+	HRESULT r = S_OK;
 	int outputToDuplicate;
 
 	// Synchronization
 	HANDLE UnexpectedErrorEvent = nullptr;
 	HANDLE ExpectedErrorEvent = nullptr;
 	HANDLE TerminateThreadsEvent = nullptr;
+
+	HCURSOR Cursor = nullptr;
+	WNDCLASSEXW Wc;
+	RECT WindowRect = { 0, 0, 800, 600 };
+	D3D11DesktopDuplicationThreadManager ThreadMgr;
+	RECT DeskBounds;
+	UINT OutputCount;
+
+	// Message loop (attempts to update screen when no other messages to process)
+	MSG msg = { 0 };
+	bool FirstTime = true;
+	bool Occluded = true;
+	DynamicWait DynamicWait;
 
 	// Window
 	pWindowHandle = nullptr;
@@ -161,35 +174,21 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	// Event used by the threads to signal an unexpected error and we want to quit the app
 	UnexpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!UnexpectedErrorEvent) {
-		ProcessFailure(nullptr, L"UnexpectedErrorEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
+	CNM(UnexpectedErrorEvent, "UnexpectedErrorEvent creation failed");
 
 	// Event for when a thread encounters an expected error
 	ExpectedErrorEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!ExpectedErrorEvent) {
-		ProcessFailure(nullptr, L"ExpectedErrorEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
+	CNM(ExpectedErrorEvent, "ExpectedErrorEvent creation failed");
 
 	// Event to tell spawned threads to quit
 	TerminateThreadsEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
-	if (!TerminateThreadsEvent) {
-		ProcessFailure(nullptr, L"TerminateThreadsEvent creation failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
+	CNM(TerminateThreadsEvent, "TerminateThreadsEvent creation failed");
 
-	// Load simple cursor
-	HCURSOR Cursor = nullptr;
+	// Load simple cursor	
 	Cursor = LoadCursor(nullptr, IDC_ARROW);
-	if (!Cursor) {
-		ProcessFailure(nullptr, L"Cursor load failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
+	CNM(Cursor, "Cursor load failed"); 
 
 	// Register class
-	WNDCLASSEXW Wc;
 	Wc.cbSize = sizeof(WNDCLASSEXW);
 	Wc.style = CS_HREDRAW | CS_VREDRAW;
 	Wc.lpfnWndProc = WndProc;
@@ -202,38 +201,21 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Wc.lpszMenuName = nullptr;
 	Wc.lpszClassName = L"ddasample";
 	Wc.hIconSm = nullptr;
-	if (!RegisterClassExW(&Wc)) {
-		ProcessFailure(nullptr, L"Window class registration failed", L"Error", E_UNEXPECTED);
-		return 0;
-	}
+	CBM(RegisterClassExW(&Wc), "Window class registration failed");
 
-	// Create window
-	RECT WindowRect = { 0, 0, 800, 600 };
+	// Create window	
 	AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
 	pWindowHandle = CreateWindowW(L"ddasample", L"DreamDesktopDuplication",
 		WS_OVERLAPPEDWINDOW,
 		0, 0,
 		WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top,
 		nullptr, nullptr, hInstance, nullptr);
-	if (!pWindowHandle) {
-		ProcessFailure(nullptr, L"Window creation failed", L"Error", E_FAIL);
-		return 0;
-	}
+	CNM(pWindowHandle, "Window creation failed");
 
 	DestroyCursor(Cursor);
 
 	ShowWindow(pWindowHandle, nCmdShow);
-	UpdateWindow(pWindowHandle);
-	
-	D3D11DesktopDuplicationThreadManager ThreadMgr;
-	RECT DeskBounds;
-	UINT OutputCount;
-
-	// Message loop (attempts to update screen when no other messages to process)
-	MSG msg = { 0 };
-	bool FirstTime = true;
-	bool Occluded = true;
-	DynamicWait DynamicWait;
+	UpdateWindow(pWindowHandle);	
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
@@ -344,7 +326,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		// For a WM_QUIT message we should return the wParam value
 		return static_cast<INT>(msg.wParam);
 	}
-
+Error:
+	ProcessFailure(nullptr, L"Error starting Desktop Duplication process", L"Error", E_FAIL);
 	return 0;
 }
 
