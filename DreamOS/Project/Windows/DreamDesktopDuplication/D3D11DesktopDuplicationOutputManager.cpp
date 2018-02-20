@@ -28,7 +28,7 @@ void D3D11DesktopDuplicationOutputManager::WindowResize() {
 //
 // Initialize all state
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT outputToDuplicate, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds) {
 	HRESULT r = S_OK;
 
 	// Store window handle
@@ -99,17 +99,17 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 		pFactory = nullptr;
 	}
 
-	IDXGIDevice* DxgiDevice = nullptr;
-	CRM(m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&DxgiDevice)), "Failed to QI for DXGI Device");
+	IDXGIDevice* pDxgiDevice = nullptr;
+	CRM(m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&pDxgiDevice)), "Failed to QI for DXGI Device");
 
-	IDXGIAdapter* DxgiAdapter = nullptr;
-	CRM(DxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&DxgiAdapter)), "Failed to get parent DXGI Adapter");
-	DxgiDevice->Release();
-	DxgiDevice = nullptr;
+	IDXGIAdapter* pDxgiAdapter = nullptr;
+	CRM(pDxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&pDxgiAdapter)), "Failed to get parent DXGI Adapter");
+	pDxgiDevice->Release();
+	pDxgiDevice = nullptr;
 
-	CRM(DxgiAdapter->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&m_pFactory)), "Failed to get parent DXGI Factory");
-	DxgiAdapter->Release();
-	DxgiAdapter = nullptr;
+	CRM(pDxgiAdapter->GetParent(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&m_pFactory)), "Failed to get parent DXGI Factory");
+	pDxgiAdapter->Release();
+	pDxgiAdapter = nullptr;
 
 	// Register for occlusion status windows message
 	CRM(m_pFactory->RegisterOcclusionStatusWindow(Window, OCCLUSION_STATUS_MSG, &m_OcclusionCookie), "Failed to register for occlusion message");
@@ -139,7 +139,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT Si
 	CRM(m_pFactory->MakeWindowAssociation(Window, DXGI_MWA_NO_ALT_ENTER), "Failed to make window association");
 
 	// Create shared texture
-	DUPL_RETURN Return = CreateSharedSurf(SingleOutput, OutCount, DeskBounds);
+	DUPL_RETURN Return = CreateSharedSurf(outputToDuplicate, OutCount, DeskBounds);
 	if (Return != DUPL_RETURN_SUCCESS) {
 		return Return;
 	}
@@ -198,18 +198,18 @@ Error:
 //
 // Recreate shared texture
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT outputToDuplicate, _Out_ UINT* pOutCount, _Out_ RECT* pDeskBounds) {
 	HRESULT r = S_OK;
 
 	UINT OutputCount;
-	IDXGIOutput* DxgiOutput = nullptr;
+	IDXGIOutput* pDxgiOutput = nullptr;
 	D3D11_TEXTURE2D_DESC DeskTexD;
 	
 	// Get DXGI resources
-	IDXGIDevice* DxgiDevice = nullptr;
-	IDXGIAdapter* DxgiAdapter = nullptr;
-	CRM(m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&DxgiDevice)), "Failed to QI for DXGI Device");
-	CRM(DxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&DxgiAdapter)), "Failed to get parent DXGI Adapter");
+	IDXGIDevice* pDxgiDevice = nullptr;
+	IDXGIAdapter* pDxgiAdapter = nullptr;
+	CRM(m_pDevice->QueryInterface(__uuidof(IDXGIDevice), reinterpret_cast<void**>(&pDxgiDevice)), "Failed to QI for DXGI Device");
+	CRM(pDxgiDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void**>(&pDxgiAdapter)), "Failed to get parent DXGI Adapter");
 
 
 	// Debugging- list all outputs
@@ -237,28 +237,28 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	//*/
 
 	// Set initial values so that we always catch the right coordinates
-	DeskBounds->left = INT_MAX;
-	DeskBounds->right = INT_MIN;
-	DeskBounds->top = INT_MAX;
-	DeskBounds->bottom = INT_MIN;
+	pDeskBounds->left = INT_MAX;
+	pDeskBounds->right = INT_MIN;
+	pDeskBounds->top = INT_MAX;
+	pDeskBounds->bottom = INT_MIN;
 
 	// Figure out right dimensions for full size desktop texture and # of outputs to duplicate
-	if (SingleOutput < 0) {
+	if (outputToDuplicate < 0) {
 		r = R_PASS;		// This could be better?
 		for (OutputCount = 0; RSUCCESS(); ++OutputCount) {
-			if (DxgiOutput) {
-				DxgiOutput->Release();
-				DxgiOutput = nullptr;
+			if (pDxgiOutput) {
+				pDxgiOutput->Release();
+				pDxgiOutput = nullptr;
 			}
-			r = (DxgiAdapter->EnumOutputs(OutputCount, &DxgiOutput));
-			if (DxgiOutput && (r != DXGI_ERROR_NOT_FOUND)) {
+			r = (pDxgiAdapter->EnumOutputs(OutputCount, &pDxgiOutput));
+			if (pDxgiOutput && (r != DXGI_ERROR_NOT_FOUND)) {
 				DXGI_OUTPUT_DESC DesktopDesc;
-				DxgiOutput->GetDesc(&DesktopDesc);
+				pDxgiOutput->GetDesc(&DesktopDesc);
 
-				DeskBounds->left = XMMin(DesktopDesc.DesktopCoordinates.left, DeskBounds->left);
-				DeskBounds->top = XMMin(DesktopDesc.DesktopCoordinates.top, DeskBounds->top);
-				DeskBounds->right = XMMax(DesktopDesc.DesktopCoordinates.right, DeskBounds->right);
-				DeskBounds->bottom = XMMax(DesktopDesc.DesktopCoordinates.bottom, DeskBounds->bottom);
+				pDeskBounds->left = XMMin(DesktopDesc.DesktopCoordinates.left, pDeskBounds->left);
+				pDeskBounds->top = XMMin(DesktopDesc.DesktopCoordinates.top, pDeskBounds->top);
+				pDeskBounds->right = XMMax(DesktopDesc.DesktopCoordinates.right, pDeskBounds->right);
+				pDeskBounds->bottom = XMMax(DesktopDesc.DesktopCoordinates.bottom, pDeskBounds->bottom);
 			}
 		}
 
@@ -266,18 +266,18 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	}
 	else {
 		DXGI_ADAPTER_DESC pDesc;
-		CR(DxgiAdapter->GetDesc(&pDesc));
-		CRM(DxgiAdapter->EnumOutputs(SingleOutput, &DxgiOutput), "Output specified to be duplicated does not exist");
+		CR(pDxgiAdapter->GetDesc(&pDesc));
+		CRM(pDxgiAdapter->EnumOutputs(outputToDuplicate, &pDxgiOutput), "Output specified to be duplicated does not exist");
 
 		DXGI_OUTPUT_DESC DesktopDesc;
-		DxgiOutput->GetDesc(&DesktopDesc);
-		*DeskBounds = DesktopDesc.DesktopCoordinates;
+		pDxgiOutput->GetDesc(&DesktopDesc);
+		*pDeskBounds = DesktopDesc.DesktopCoordinates;
 
 		OutputCount = 1;
 	}
 
 	// Set passed in output count variable
-	*OutCount = OutputCount;
+	*pOutCount = OutputCount;
 
 	if (OutputCount == 0) {
 		// We could not find any outputs, the system must be in a transition so return expected error
@@ -287,8 +287,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 
 	// Create shared texture for all duplication threads to draw into	
 	RtlZeroMemory(&DeskTexD, sizeof(D3D11_TEXTURE2D_DESC));
-	DeskTexD.Width = DeskBounds->right - DeskBounds->left;
-	DeskTexD.Height = DeskBounds->bottom - DeskBounds->top;
+	DeskTexD.Width = pDeskBounds->right - pDeskBounds->left;
+	DeskTexD.Height = pDeskBounds->bottom - pDeskBounds->top;
 	DeskTexD.MipLevels = 1;
 	DeskTexD.ArraySize = 1;
 	DeskTexD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -304,17 +304,17 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT SingleOut
 	CRM(m_pSharedSurf->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&m_pKeyMutex)), "Failed to query for keyed mutex in D3D11DesktopDuplicationOutputManager");
 
 Error:
-	if (DxgiOutput) {
-		DxgiOutput->Release();
-		DxgiOutput = nullptr;
+	if (pDxgiOutput) {
+		pDxgiOutput->Release();
+		pDxgiOutput = nullptr;
 	}
-	if (DxgiDevice) {
-		DxgiDevice->Release();
-		DxgiDevice = nullptr;
+	if (pDxgiDevice) {
+		pDxgiDevice->Release();
+		pDxgiDevice = nullptr;
 	}
-	if (DxgiAdapter) {
-		DxgiAdapter->Release();
-		DxgiAdapter = nullptr;
+	if (pDxgiAdapter) {
+		pDxgiAdapter->Release();
+		pDxgiAdapter = nullptr;
 	}
 	if (RFAILED()) {
 		if (OutputCount != 1) {
@@ -419,7 +419,7 @@ Error:
 //
 // Present to the application window
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* pPointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
 	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
 	// sample contains both these aspects into a single application.
@@ -436,9 +436,9 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 	/*	This Draws the Mouse, disabling for Now
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
-		if (PointerInfo->Visible) {
+		if (pPointerInfo->Visible) {
 			// Draw mouse into texture
-			Ret = DrawMouse(PointerInfo);
+			Ret = DrawMouse(pPointerInfo);
 		}
 		
 	}	
@@ -476,13 +476,13 @@ HANDLE D3D11DesktopDuplicationOutputManager::GetSharedHandle() {
 
 	HANDLE Hnd = nullptr;
 	// QI IDXGIResource interface to synchronized shared surface.
-	IDXGIResource* DXGIResource = nullptr;
-	CR(m_pSharedSurf->QueryInterface(__uuidof(IDXGIResource), reinterpret_cast<void**>(&DXGIResource)));
+	IDXGIResource* pDXGIResource = nullptr;
+	CR(m_pSharedSurf->QueryInterface(__uuidof(IDXGIResource), reinterpret_cast<void**>(&pDXGIResource)));
 	
 	// Obtain handle to IDXGIResource object.
-	DXGIResource->GetSharedHandle(&Hnd);
-	DXGIResource->Release();
-	DXGIResource = nullptr;
+	pDXGIResource->GetSharedHandle(&Hnd);
+	pDXGIResource->Release();
+	pDXGIResource = nullptr;
 	
 Error:
 	return Hnd;
@@ -494,12 +494,19 @@ Error:
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 	HRESULT r = S_OK;
 
+	// Create new shader resource view
+	ID3D11ShaderResourceView* pShaderResourceView = nullptr;
+	UINT Stride = sizeof(VERTEX);
+	UINT Offset = 0;
+	FLOAT blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+	D3D11_BUFFER_DESC initDataBufferDescription;
+	D3D11_SUBRESOURCE_DATA subresourceInitData;
+	ID3D11Buffer* pVertexBuffer = nullptr;
+
 	// If window was resized, resize swapchain
 	if (m_fNeedsResize) {
 		DUPL_RETURN Ret = ResizeSwapChain();
-		if (Ret != DUPL_RETURN_SUCCESS) {
-			return Ret;
-		}
+		CB(Ret == DUPL_RETURN_SUCCESS);
 		m_fNeedsResize = false;
 	}
 
@@ -513,60 +520,51 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 		{ XMFLOAT3(1.0f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
 	};
 
-	D3D11_TEXTURE2D_DESC FrameDesc;
-	m_pSharedSurf->GetDesc(&FrameDesc);
+	D3D11_TEXTURE2D_DESC textureFrameFromSharedSurfaceDescription;
+	m_pSharedSurf->GetDesc(&textureFrameFromSharedSurfaceDescription);
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC ShaderDesc;
-	ShaderDesc.Format = FrameDesc.Format;
-	ShaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	ShaderDesc.Texture2D.MostDetailedMip = FrameDesc.MipLevels - 1;
-	ShaderDesc.Texture2D.MipLevels = FrameDesc.MipLevels;
-
-	// Create new shader resource view
-	ID3D11ShaderResourceView* ShaderResource = nullptr;
-	UINT Stride = sizeof(VERTEX);
-	UINT Offset = 0;
-	FLOAT blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
-	D3D11_BUFFER_DESC BufferDesc;
-	D3D11_SUBRESOURCE_DATA InitData;
-	ID3D11Buffer* VertexBuffer = nullptr;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDescription;
+	shaderResourceViewDescription.Format = textureFrameFromSharedSurfaceDescription.Format;
+	shaderResourceViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDescription.Texture2D.MostDetailedMip = textureFrameFromSharedSurfaceDescription.MipLevels - 1;
+	shaderResourceViewDescription.Texture2D.MipLevels = textureFrameFromSharedSurfaceDescription.MipLevels;	
 	
-	CRM(m_pDevice->CreateShaderResourceView(m_pSharedSurf, &ShaderDesc, &ShaderResource), "Failed to create shader resource when drawing a frame");
+	CRM(m_pDevice->CreateShaderResourceView(m_pSharedSurf, &shaderResourceViewDescription, &pShaderResourceView), "Failed to create shader resource when drawing a frame");
 	
 	// Set resources	
 	m_pDeviceContext->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRTV, nullptr);
 	m_pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
 	m_pDeviceContext->PSSetShader(m_pPixelShader, nullptr, 0);
-	m_pDeviceContext->PSSetShaderResources(0, 1, &ShaderResource);
+	m_pDeviceContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 	m_pDeviceContext->PSSetSamplers(0, 1, &m_pSamplerLinear);
 	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	RtlZeroMemory(&BufferDesc, sizeof(BufferDesc));
-	BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	BufferDesc.ByteWidth = sizeof(VERTEX) * NUMVERTICES;
-	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BufferDesc.CPUAccessFlags = 0;
+	RtlZeroMemory(&initDataBufferDescription, sizeof(initDataBufferDescription));
+	initDataBufferDescription.Usage = D3D11_USAGE_DEFAULT;
+	initDataBufferDescription.ByteWidth = sizeof(VERTEX) * NUMVERTICES;
+	initDataBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	initDataBufferDescription.CPUAccessFlags = 0;
 	
-	RtlZeroMemory(&InitData, sizeof(InitData));
-	InitData.pSysMem = Vertices;
+	RtlZeroMemory(&subresourceInitData, sizeof(subresourceInitData));
+	subresourceInitData.pSysMem = Vertices;
 
 	// Create vertex buffer
-	CRM(m_pDevice->CreateBuffer(&BufferDesc, &InitData, &VertexBuffer), "Failed to create vertex buffer when drawing a frame");
+	CRM(m_pDevice->CreateBuffer(&initDataBufferDescription, &subresourceInitData, &pVertexBuffer), "Failed to create vertex buffer when drawing a frame");
 
-	m_pDeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &Offset);
+	m_pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
 	
 	// Draw textured quad onto render target
 	m_pDeviceContext->Draw(NUMVERTICES, 0);	
 
 Error:
-	if (ShaderResource) {
-		ShaderResource->Release();
-		ShaderResource = nullptr;
+	if (pShaderResourceView) {
+		pShaderResourceView->Release();
+		pShaderResourceView = nullptr;
 	}
-	if (VertexBuffer) {
-		VertexBuffer->Release();
-		VertexBuffer = nullptr;
+	if (pVertexBuffer) {
+		pVertexBuffer->Release();
+		pVertexBuffer = nullptr;
 	}
 	if (RFAILED()) {
 		return ProcessFailure(m_pDevice, L"Failed to DrawFrame in OutputManager", L"Error", r, SystemTransitionsExpectedErrors);
@@ -577,57 +575,57 @@ Error:
 //
 // Process both masked and monochrome pointers
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _Inout_ PTR_INFO* PtrInfo, _Out_ INT* PtrWidth, _Out_ INT* PtrHeight, _Out_ INT* PtrLeft, _Out_ INT* PtrTop, _Outptr_result_bytebuffer_(*PtrHeight * *PtrWidth * BPP) BYTE** InitBuffer, _Out_ D3D11_BOX* Box) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _Inout_ PTR_INFO* pPtrInfo, _Out_ INT* pPtrWidth, _Out_ INT* pPtrHeight, _Out_ INT* pPtrLeft, _Out_ INT* pPtrTop, _Outptr_result_bytebuffer_(*pPtrHeight * *pPtrWidth * BPP) BYTE** pInitBuffer, _Out_ D3D11_BOX* Box) {
 	HRESULT r = S_OK;
 	// Desktop dimensions
-	D3D11_TEXTURE2D_DESC FullDesc;
-	m_pSharedSurf->GetDesc(&FullDesc);
-	INT DesktopWidth = FullDesc.Width;
-	INT DesktopHeight = FullDesc.Height;
+	D3D11_TEXTURE2D_DESC sharedSurfaceTextureDescription;
+	m_pSharedSurf->GetDesc(&sharedSurfaceTextureDescription);
+	INT DesktopWidth = sharedSurfaceTextureDescription.Width;
+	INT DesktopHeight = sharedSurfaceTextureDescription.Height;
 
 	// Pointer position
-	INT GivenLeft = PtrInfo->Position.x;
-	INT GivenTop = PtrInfo->Position.y;
+	INT GivenLeft = pPtrInfo->Position.x;
+	INT GivenTop = pPtrInfo->Position.y;
 
 	// Vars
 	UINT* InitBuffer32;
 	UINT* Desktop32;
 	UINT  DesktopPitchInPixels;
-	IDXGISurface* CopySurface = nullptr;
-	ID3D11Texture2D* CopyBuffer = nullptr;
+	IDXGISurface* pCopySurface = nullptr;
+	ID3D11Texture2D* pCopyBuffer = nullptr;
 	DXGI_MAPPED_RECT MappedSurface;
 
 	// Figure out if any adjustment is needed for out of bound positions
 	if (GivenLeft < 0) {
-		*PtrWidth = GivenLeft + static_cast<INT>(PtrInfo->ShapeInfo.Width);
+		*pPtrWidth = GivenLeft + static_cast<INT>(pPtrInfo->ShapeInfo.Width);
 	}
-	else if ((GivenLeft + static_cast<INT>(PtrInfo->ShapeInfo.Width)) > DesktopWidth) {
-		*PtrWidth = DesktopWidth - GivenLeft;
+	else if ((GivenLeft + static_cast<INT>(pPtrInfo->ShapeInfo.Width)) > DesktopWidth) {
+		*pPtrWidth = DesktopWidth - GivenLeft;
 	}
 	else {
-		*PtrWidth = static_cast<INT>(PtrInfo->ShapeInfo.Width);
+		*pPtrWidth = static_cast<INT>(pPtrInfo->ShapeInfo.Width);
 	}
 
 	if (IsMono) {
-		PtrInfo->ShapeInfo.Height = PtrInfo->ShapeInfo.Height / 2;
+		pPtrInfo->ShapeInfo.Height = pPtrInfo->ShapeInfo.Height / 2;
 	}
 
 	if (GivenTop < 0) {
-		*PtrHeight = GivenTop + static_cast<INT>(PtrInfo->ShapeInfo.Height);
+		*pPtrHeight = GivenTop + static_cast<INT>(pPtrInfo->ShapeInfo.Height);
 	}
-	else if ((GivenTop + static_cast<INT>(PtrInfo->ShapeInfo.Height)) > DesktopHeight) {
-		*PtrHeight = DesktopHeight - GivenTop;
+	else if ((GivenTop + static_cast<INT>(pPtrInfo->ShapeInfo.Height)) > DesktopHeight) {
+		*pPtrHeight = DesktopHeight - GivenTop;
 	}
 	else {
-		*PtrHeight = static_cast<INT>(PtrInfo->ShapeInfo.Height);
+		*pPtrHeight = static_cast<INT>(pPtrInfo->ShapeInfo.Height);
 	}
 
 	if (IsMono) {
-		PtrInfo->ShapeInfo.Height = PtrInfo->ShapeInfo.Height * 2;
+		pPtrInfo->ShapeInfo.Height = pPtrInfo->ShapeInfo.Height * 2;
 	}
 
-	*PtrLeft = (GivenLeft < 0) ? 0 : GivenLeft;
-	*PtrTop = (GivenTop < 0) ? 0 : GivenTop;
+	*pPtrLeft = (GivenLeft < 0) ? 0 : GivenLeft;
+	*pPtrTop = (GivenTop < 0) ? 0 : GivenTop;
 
 	// What to skip (pixel offset)
 	UINT SkipX = (GivenLeft < 0) ? (-1 * GivenLeft) : (0);
@@ -635,8 +633,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 
 	// Staging buffer/texture
 	D3D11_TEXTURE2D_DESC CopyBufferDesc;
-	CopyBufferDesc.Width = *PtrWidth;
-	CopyBufferDesc.Height = *PtrHeight;
+	CopyBufferDesc.Width = *pPtrWidth;
+	CopyBufferDesc.Height = *pPtrHeight;
 	CopyBufferDesc.MipLevels = 1;
 	CopyBufferDesc.ArraySize = 1;
 	CopyBufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -647,45 +645,45 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 	CopyBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 	CopyBufferDesc.MiscFlags = 0;
 
-	CRM(m_pDevice->CreateTexture2D(&CopyBufferDesc, nullptr, &CopyBuffer), "Failed creating staging texture for pointer");
+	CRM(m_pDevice->CreateTexture2D(&CopyBufferDesc, nullptr, &pCopyBuffer), "Failed creating staging texture for pointer");
 
 	// Copy needed part of desktop image
-	Box->left = *PtrLeft;
-	Box->top = *PtrTop;
-	Box->right = *PtrLeft + *PtrWidth;
-	Box->bottom = *PtrTop + *PtrHeight;
-	m_pDeviceContext->CopySubresourceRegion(CopyBuffer, 0, 0, 0, 0, m_pSharedSurf, 0, Box);
+	Box->left = *pPtrLeft;
+	Box->top = *pPtrTop;
+	Box->right = *pPtrLeft + *pPtrWidth;
+	Box->bottom = *pPtrTop + *pPtrHeight;
+	m_pDeviceContext->CopySubresourceRegion(pCopyBuffer, 0, 0, 0, 0, m_pSharedSurf, 0, Box);
 
 	// QI for IDXGISurface
-	CRM(CopyBuffer->QueryInterface(__uuidof(IDXGISurface), (void **)&CopySurface), "Failed to QI staging texture into IDXGISurface for pointer");
+	CRM(pCopyBuffer->QueryInterface(__uuidof(IDXGISurface), (void **)&pCopySurface), "Failed to QI staging texture into IDXGISurface for pointer");
 
 	// Map pixels	
-	CRM(CopySurface->Map(&MappedSurface, DXGI_MAP_READ), "Failed to map surface for pointer");
+	CRM(pCopySurface->Map(&MappedSurface, DXGI_MAP_READ), "Failed to map surface for pointer");
 
 	// New mouseshape buffer
-	*InitBuffer = new (std::nothrow) BYTE[*PtrWidth * *PtrHeight * BPP];
-	if (!(*InitBuffer)) {
+	*pInitBuffer = new (std::nothrow) BYTE[*pPtrWidth * *pPtrHeight * BPP];
+	if (!(*pInitBuffer)) {
 		return ProcessFailure(nullptr, L"Failed to allocate memory for new mouse shape buffer.", L"Error", E_OUTOFMEMORY);
 	}
 
-	InitBuffer32 = reinterpret_cast<UINT*>(*InitBuffer);
+	InitBuffer32 = reinterpret_cast<UINT*>(*pInitBuffer);
 	Desktop32 = reinterpret_cast<UINT*>(MappedSurface.pBits);
 	DesktopPitchInPixels = MappedSurface.Pitch / sizeof(UINT);
 
 	if (IsMono) {
-		for (int Row = 0; Row < *PtrHeight; ++Row) {
+		for (int Row = 0; Row < *pPtrHeight; ++Row) {
 			// Set mask
 			BYTE Mask = 0x80;
 			Mask = Mask >> (SkipX % 8);
-			for (int Col = 0; Col < *PtrWidth; ++Col) {
+			for (int Col = 0; Col < *pPtrWidth; ++Col) {
 				// Get masks using appropriate offsets
-				BYTE AndMask = PtrInfo->PtrShapeBuffer[((Col + SkipX) / 8) + ((Row + SkipY) * (PtrInfo->ShapeInfo.Pitch))] & Mask;
-				BYTE XorMask = PtrInfo->PtrShapeBuffer[((Col + SkipX) / 8) + ((Row + SkipY + (PtrInfo->ShapeInfo.Height / 2)) * (PtrInfo->ShapeInfo.Pitch))] & Mask;
+				BYTE AndMask = pPtrInfo->PtrShapeBuffer[((Col + SkipX) / 8) + ((Row + SkipY) * (pPtrInfo->ShapeInfo.Pitch))] & Mask;
+				BYTE XorMask = pPtrInfo->PtrShapeBuffer[((Col + SkipX) / 8) + ((Row + SkipY + (pPtrInfo->ShapeInfo.Height / 2)) * (pPtrInfo->ShapeInfo.Pitch))] & Mask;
 				UINT AndMask32 = (AndMask) ? 0xFFFFFFFF : 0xFF000000;
 				UINT XorMask32 = (XorMask) ? 0x00FFFFFF : 0x00000000;
 
 				// Set new pixel
-				InitBuffer32[(Row * *PtrWidth) + Col] = (Desktop32[(Row * DesktopPitchInPixels) + Col] & AndMask32) ^ XorMask32;
+				InitBuffer32[(Row * *pPtrWidth) + Col] = (Desktop32[(Row * DesktopPitchInPixels) + Col] & AndMask32) ^ XorMask32;
 				// Adjust mask
 				if (Mask == 0x01) {
 					Mask = 0x80;
@@ -698,36 +696,36 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 	}
 	
 	else {
-		UINT* Buffer32 = reinterpret_cast<UINT*>(PtrInfo->PtrShapeBuffer);
+		UINT* Buffer32 = reinterpret_cast<UINT*>(pPtrInfo->PtrShapeBuffer);
 
 		// Iterate through pixels
-		for (INT Row = 0; Row < *PtrHeight; ++Row) {
-			for (INT Col = 0; Col < *PtrWidth; ++Col) {
+		for (INT Row = 0; Row < *pPtrHeight; ++Row) {
+			for (INT Col = 0; Col < *pPtrWidth; ++Col) {
 				// Set up mask
-				UINT MaskVal = 0xFF000000 & Buffer32[(Col + SkipX) + ((Row + SkipY) * (PtrInfo->ShapeInfo.Pitch / sizeof(UINT)))];
+				UINT MaskVal = 0xFF000000 & Buffer32[(Col + SkipX) + ((Row + SkipY) * (pPtrInfo->ShapeInfo.Pitch / sizeof(UINT)))];
 				if (MaskVal) {
 					// Mask was 0xFF
-					InitBuffer32[(Row * *PtrWidth) + Col] = (Desktop32[(Row * DesktopPitchInPixels) + Col] ^ Buffer32[(Col + SkipX) + ((Row + SkipY) * (PtrInfo->ShapeInfo.Pitch / sizeof(UINT)))]) | 0xFF000000;
+					InitBuffer32[(Row * *pPtrWidth) + Col] = (Desktop32[(Row * DesktopPitchInPixels) + Col] ^ Buffer32[(Col + SkipX) + ((Row + SkipY) * (pPtrInfo->ShapeInfo.Pitch / sizeof(UINT)))]) | 0xFF000000;
 				}
 				else {
 					// Mask was 0x00
-					InitBuffer32[(Row * *PtrWidth) + Col] = Buffer32[(Col + SkipX) + ((Row + SkipY) * (PtrInfo->ShapeInfo.Pitch / sizeof(UINT)))] | 0xFF000000;
+					InitBuffer32[(Row * *pPtrWidth) + Col] = Buffer32[(Col + SkipX) + ((Row + SkipY) * (pPtrInfo->ShapeInfo.Pitch / sizeof(UINT)))] | 0xFF000000;
 				}
 			}
 		}
 	}
 
 	// Done with resource
-	CRM(CopySurface->Unmap(), "Failed to unmap surface for pointer");
+	CRM(pCopySurface->Unmap(), "Failed to unmap surface for pointer");
 
 Error:
-	if (CopyBuffer) {
-		CopyBuffer->Release();
-		CopyBuffer = nullptr;
+	if (pCopyBuffer) {
+		pCopyBuffer->Release();
+		pCopyBuffer = nullptr;
 	}
-	if (CopySurface) {
-		CopySurface->Release();
-		CopySurface = nullptr;
+	if (pCopySurface) {
+		pCopySurface->Release();
+		pCopySurface = nullptr;
 	}
 	if (RFAILED()) {
 		return ProcessFailure(m_pDevice, L"Failed ProcessingMonoMask in OutputManager", L"Error", r, SystemTransitionsExpectedErrors);
@@ -738,17 +736,17 @@ Error:
 //
 // Draw mouse provided in buffer to backbuffer
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* PtrInfo) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* pPtrInfo) {
 	HRESULT r = S_OK;
 	
 	// Vars to be used
-	ID3D11Texture2D* MouseTex = nullptr;
-	ID3D11ShaderResourceView* ShaderRes = nullptr;
-	ID3D11Buffer* VertexBufferMouse = nullptr;
-	D3D11_SUBRESOURCE_DATA InitData;
-	D3D11_TEXTURE2D_DESC Desc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC SDesc;
-	D3D11_BUFFER_DESC BDesc;
+	ID3D11Texture2D* pMouseTexture = nullptr;
+	ID3D11ShaderResourceView* pShaderResourceView = nullptr;
+	ID3D11Buffer* pVertexBufferMouse = nullptr;
+	D3D11_SUBRESOURCE_DATA subresourceInitData;
+	D3D11_TEXTURE2D_DESC copyTextureDescription;
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDescription;
+	D3D11_BUFFER_DESC bufferDescription;
 	FLOAT BlendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
 	UINT Stride = sizeof(VERTEX);
 	UINT Offset = 0;
@@ -763,10 +761,10 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* PtrIn
 		{ XMFLOAT3(1.0f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
 	};
 
-	D3D11_TEXTURE2D_DESC FullDesc;
-	m_pSharedSurf->GetDesc(&FullDesc);
-	INT DesktopWidth = FullDesc.Width;
-	INT DesktopHeight = FullDesc.Height;
+	D3D11_TEXTURE2D_DESC sharedSurfaceTextureDescription;
+	m_pSharedSurf->GetDesc(&sharedSurfaceTextureDescription);
+	INT DesktopWidth = sharedSurfaceTextureDescription.Width;
+	INT DesktopHeight = sharedSurfaceTextureDescription.Height;
 
 	// Center of desktop dimensions
 	INT CenterX = (DesktopWidth / 2);
@@ -786,40 +784,40 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* PtrIn
 	Box.front = 0;
 	Box.back = 1;
 
-	Desc.MipLevels = 1;
-	Desc.ArraySize = 1;
-	Desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	Desc.SampleDesc.Count = 1;
-	Desc.SampleDesc.Quality = 0;
-	Desc.Usage = D3D11_USAGE_DEFAULT;
-	Desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	Desc.CPUAccessFlags = 0;
-	Desc.MiscFlags = 0;
+	copyTextureDescription.MipLevels = 1;
+	copyTextureDescription.ArraySize = 1;
+	copyTextureDescription.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	copyTextureDescription.SampleDesc.Count = 1;
+	copyTextureDescription.SampleDesc.Quality = 0;
+	copyTextureDescription.Usage = D3D11_USAGE_DEFAULT;
+	copyTextureDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	copyTextureDescription.CPUAccessFlags = 0;
+	copyTextureDescription.MiscFlags = 0;
 
 	// Set shader resource properties
-	SDesc.Format = Desc.Format;
-	SDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	SDesc.Texture2D.MostDetailedMip = Desc.MipLevels - 1;
-	SDesc.Texture2D.MipLevels = Desc.MipLevels;
+	shaderResourceViewDescription.Format = copyTextureDescription.Format;
+	shaderResourceViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDescription.Texture2D.MostDetailedMip = copyTextureDescription.MipLevels - 1;
+	shaderResourceViewDescription.Texture2D.MipLevels = copyTextureDescription.MipLevels;
 
-	switch (PtrInfo->ShapeInfo.Type) {
+	switch (pPtrInfo->ShapeInfo.Type) {
 	case DXGI_OUTDUPL_POINTER_SHAPE_TYPE_COLOR: {
-		PtrLeft = PtrInfo->Position.x;
-		PtrTop = PtrInfo->Position.y;
+		PtrLeft = pPtrInfo->Position.x;
+		PtrTop = pPtrInfo->Position.y;
 
-		PtrWidth = static_cast<INT>(PtrInfo->ShapeInfo.Width);
-		PtrHeight = static_cast<INT>(PtrInfo->ShapeInfo.Height);
+		PtrWidth = static_cast<INT>(pPtrInfo->ShapeInfo.Width);
+		PtrHeight = static_cast<INT>(pPtrInfo->ShapeInfo.Height);
 
 		break;
 	}
 
 	case DXGI_OUTDUPL_POINTER_SHAPE_TYPE_MONOCHROME: {
-		ProcessMonoMask(true, PtrInfo, &PtrWidth, &PtrHeight, &PtrLeft, &PtrTop, &InitBuffer, &Box);
+		ProcessMonoMask(true, pPtrInfo, &PtrWidth, &PtrHeight, &PtrLeft, &PtrTop, &InitBuffer, &Box);
 		break;
 	}
 
 	case DXGI_OUTDUPL_POINTER_SHAPE_TYPE_MASKED_COLOR: {
-		ProcessMonoMask(false, PtrInfo, &PtrWidth, &PtrHeight, &PtrLeft, &PtrTop, &InitBuffer, &Box);
+		ProcessMonoMask(false, pPtrInfo, &PtrWidth, &PtrHeight, &PtrLeft, &PtrTop, &InitBuffer, &Box);
 		break;
 	}
 
@@ -842,39 +840,39 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* PtrIn
 	Vertices[5].Pos.y = -1 * (PtrTop - CenterY) / (FLOAT)CenterY;
 
 	// Set texture properties
-	Desc.Width = PtrWidth;
-	Desc.Height = PtrHeight;
+	copyTextureDescription.Width = PtrWidth;
+	copyTextureDescription.Height = PtrHeight;
 
 	// Set up init data
-	InitData.pSysMem = (PtrInfo->ShapeInfo.Type == DXGI_OUTDUPL_POINTER_SHAPE_TYPE_COLOR) ? PtrInfo->PtrShapeBuffer : InitBuffer;
-	InitData.SysMemPitch = (PtrInfo->ShapeInfo.Type == DXGI_OUTDUPL_POINTER_SHAPE_TYPE_COLOR) ? PtrInfo->ShapeInfo.Pitch : PtrWidth * BPP;
-	InitData.SysMemSlicePitch = 0;
+	subresourceInitData.pSysMem = (pPtrInfo->ShapeInfo.Type == DXGI_OUTDUPL_POINTER_SHAPE_TYPE_COLOR) ? pPtrInfo->PtrShapeBuffer : InitBuffer;
+	subresourceInitData.SysMemPitch = (pPtrInfo->ShapeInfo.Type == DXGI_OUTDUPL_POINTER_SHAPE_TYPE_COLOR) ? pPtrInfo->ShapeInfo.Pitch : PtrWidth * BPP;
+	subresourceInitData.SysMemSlicePitch = 0;
 
 	// Create mouseshape as texture
-	CRM(m_pDevice->CreateTexture2D(&Desc, &InitData, &MouseTex), "Failed to create mouse pointer texture");
+	CRM(m_pDevice->CreateTexture2D(&copyTextureDescription, &subresourceInitData, &pMouseTexture), "Failed to create mouse pointer texture");
 
 	// Create shader resource from texture
-	CRM(m_pDevice->CreateShaderResourceView(MouseTex, &SDesc, &ShaderRes), "Failed to create shader resource from mouse pointer texture");
+	CRM(m_pDevice->CreateShaderResourceView(pMouseTexture, &shaderResourceViewDescription, &pShaderResourceView), "Failed to create shader resource from mouse pointer texture");
 
-	ZeroMemory(&BDesc, sizeof(D3D11_BUFFER_DESC));
-	BDesc.Usage = D3D11_USAGE_DEFAULT;
-	BDesc.ByteWidth = sizeof(VERTEX) * NUMVERTICES;
-	BDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BDesc.CPUAccessFlags = 0;
+	ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+	bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+	bufferDescription.ByteWidth = sizeof(VERTEX) * NUMVERTICES;
+	bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDescription.CPUAccessFlags = 0;
 
-	ZeroMemory(&InitData, sizeof(D3D11_SUBRESOURCE_DATA));
-	InitData.pSysMem = Vertices;
+	ZeroMemory(&subresourceInitData, sizeof(D3D11_SUBRESOURCE_DATA));
+	subresourceInitData.pSysMem = Vertices;
 
 	// Create vertex buffer
-	CRM(m_pDevice->CreateBuffer(&BDesc, &InitData, &VertexBufferMouse), "Failed to create mouse pointer vertex buffer in OutputManager");
+	CRM(m_pDevice->CreateBuffer(&bufferDescription, &subresourceInitData, &pVertexBufferMouse), "Failed to create mouse pointer vertex buffer in OutputManager");
 
 	// Set resources	
-	m_pDeviceContext->IASetVertexBuffers(0, 1, &VertexBufferMouse, &Stride, &Offset);
+	m_pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBufferMouse, &Stride, &Offset);
 	m_pDeviceContext->OMSetBlendState(m_pBlendState, BlendFactor, 0xFFFFFFFF);
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRTV, nullptr);
 	m_pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
 	m_pDeviceContext->PSSetShader(m_pPixelShader, nullptr, 0);
-	m_pDeviceContext->PSSetShaderResources(0, 1, &ShaderRes);
+	m_pDeviceContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 	m_pDeviceContext->PSSetSamplers(0, 1, &m_pSamplerLinear);
 
 	// Draw
@@ -882,17 +880,17 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* PtrIn
 
 Error:
 	// Clean
-	if (VertexBufferMouse) {
-		VertexBufferMouse->Release();
-		VertexBufferMouse = nullptr;
+	if (pVertexBufferMouse) {
+		pVertexBufferMouse->Release();
+		pVertexBufferMouse = nullptr;
 	}
-	if (ShaderRes) {
-		ShaderRes->Release();
-		ShaderRes = nullptr;
+	if (pShaderResourceView) {
+		pShaderResourceView->Release();
+		pShaderResourceView = nullptr;
 	}
-	if (MouseTex) {
-		MouseTex->Release();
-		MouseTex = nullptr;
+	if (pMouseTexture) {
+		pMouseTexture->Release();
+		pMouseTexture = nullptr;
 	}
 	if (InitBuffer)	{
 		delete[] InitBuffer;

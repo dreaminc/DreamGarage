@@ -87,9 +87,9 @@ Error:
 //
 // Retrieves mouse info and write it into PtrInfo
 //
-DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, _In_ DXGI_OUTDUPL_FRAME_INFO* FrameInfo, INT OffsetX, INT OffsetY) {
+DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, _In_ DXGI_OUTDUPL_FRAME_INFO* pFrameInfo, INT OffsetX, INT OffsetY) {
 	// A non-zero mouse update timestamp indicates that there is a mouse position update and optionally a shape change
-	if (FrameInfo->LastMouseUpdateTime.QuadPart == 0) {
+	if (pFrameInfo->LastMouseUpdateTime.QuadPart == 0) {
 		return DUPL_RETURN_SUCCESS;
 	}
 
@@ -98,50 +98,50 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, 
 	// Make sure we don't update pointer position wrongly
 	// If pointer is invisible, make sure we did not get an update from another output that the last time that said pointer
 	// was visible, if so, don't set it to invisible or update.
-	if (!FrameInfo->PointerPosition.Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber)) {
+	if (!pFrameInfo->PointerPosition.Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber)) {
 		UpdatePosition = false;
 	}
 
 	// If two outputs both say they have a visible, only update if new update has newer timestamp
-	if (FrameInfo->PointerPosition.Visible && PtrInfo->Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber) && (PtrInfo->LastTimeStamp.QuadPart > FrameInfo->LastMouseUpdateTime.QuadPart)) {
+	if (pFrameInfo->PointerPosition.Visible && PtrInfo->Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber) && (PtrInfo->LastTimeStamp.QuadPart > pFrameInfo->LastMouseUpdateTime.QuadPart)) {
 		UpdatePosition = false;
 	}
 
 	// Update position
 	if (UpdatePosition) {
-		PtrInfo->Position.x = FrameInfo->PointerPosition.Position.x + m_OutputDesc.DesktopCoordinates.left - OffsetX;
-		PtrInfo->Position.y = FrameInfo->PointerPosition.Position.y + m_OutputDesc.DesktopCoordinates.top - OffsetY;
+		PtrInfo->Position.x = pFrameInfo->PointerPosition.Position.x + m_OutputDesc.DesktopCoordinates.left - OffsetX;
+		PtrInfo->Position.y = pFrameInfo->PointerPosition.Position.y + m_OutputDesc.DesktopCoordinates.top - OffsetY;
 		PtrInfo->WhoUpdatedPositionLast = m_OutputNumber;
-		PtrInfo->LastTimeStamp = FrameInfo->LastMouseUpdateTime;
-		PtrInfo->Visible = FrameInfo->PointerPosition.Visible != 0;
+		PtrInfo->LastTimeStamp = pFrameInfo->LastMouseUpdateTime;
+		PtrInfo->Visible = pFrameInfo->PointerPosition.Visible != 0;
 	}
 
 	// No new shape
-	if (FrameInfo->PointerShapeBufferSize == 0) {
+	if (pFrameInfo->PointerShapeBufferSize == 0) {
 		return DUPL_RETURN_SUCCESS;
 	}
 
 	// Old buffer too small
-	if (FrameInfo->PointerShapeBufferSize > PtrInfo->BufferSize) {
+	if (pFrameInfo->PointerShapeBufferSize > PtrInfo->BufferSize) {
 		if (PtrInfo->PtrShapeBuffer) {
 			delete[] PtrInfo->PtrShapeBuffer;
 			PtrInfo->PtrShapeBuffer = nullptr;
 		}
-		PtrInfo->PtrShapeBuffer = new (std::nothrow) BYTE[FrameInfo->PointerShapeBufferSize];
+		PtrInfo->PtrShapeBuffer = new (std::nothrow) BYTE[pFrameInfo->PointerShapeBufferSize];
 		if (!PtrInfo->PtrShapeBuffer) {
 			PtrInfo->BufferSize = 0;
 			return ProcessFailure(nullptr, L"Failed to allocate memory for pointer shape in D3D11DesktopDuplicationManager", L"Error", E_OUTOFMEMORY);
 		}
 
 		// Update buffer size
-		PtrInfo->BufferSize = FrameInfo->PointerShapeBufferSize;
+		PtrInfo->BufferSize = pFrameInfo->PointerShapeBufferSize;
 	}
 
 	// Get shape
 	UINT BufferSizeRequired;
 	
 	HRESULT r = S_OK;
-	CR(m_pDeskDupl->GetFramePointerShape(FrameInfo->PointerShapeBufferSize, reinterpret_cast<VOID*>(PtrInfo->PtrShapeBuffer), &BufferSizeRequired, &(PtrInfo->ShapeInfo)));
+	CR(m_pDeskDupl->GetFramePointerShape(pFrameInfo->PointerShapeBufferSize, reinterpret_cast<VOID*>(PtrInfo->PtrShapeBuffer), &BufferSizeRequired, &(PtrInfo->ShapeInfo)));
 
 Error:
 	if (RFAILED()) {
@@ -155,10 +155,10 @@ Error:
 
 
 //
-// Get next frame and write it into Data
+// Get next frame and write it into pFrameData
 //
 _Success_(*Timeout == false && return == DUPL_RETURN_SUCCESS)
-DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Out_ bool* Timeout) {
+DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* pFrameData, _Out_ bool* Timeout) {
 	HRESULT r = S_OK;
 
 	IDXGIResource* pDesktopResource = nullptr;
@@ -191,8 +191,8 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 			m_pMetaDataBuffer = new (std::nothrow) BYTE[FrameInfo.TotalMetadataBufferSize];
 			if (!m_pMetaDataBuffer) {
 				m_MetaDataSize = 0;
-				Data->MoveCount = 0;
-				Data->DirtyCount = 0;
+				pFrameData->MoveCount = 0;
+				pFrameData->DirtyCount = 0;
 				return ProcessFailure(nullptr, L"Failed to allocate memory for metadata in D3D11DesktopDuplicationManager", L"Error", E_OUTOFMEMORY);
 			}
 			m_MetaDataSize = FrameInfo.TotalMetadataBufferSize;
@@ -203,21 +203,21 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetFrame(_Out_ FRAME_DATA* Data, _Ou
 		// Get move rectangles
 		CRM(m_pDeskDupl->GetFrameMoveRects(BufSize, reinterpret_cast<DXGI_OUTDUPL_MOVE_RECT*>(m_pMetaDataBuffer), &BufSize), "Failed to get frame move rects in D3D11DesktopDuplicationManager");
 
-		Data->MoveCount = BufSize / sizeof(DXGI_OUTDUPL_MOVE_RECT);
+		pFrameData->MoveCount = BufSize / sizeof(DXGI_OUTDUPL_MOVE_RECT);
 
-		BYTE* DirtyRects = m_pMetaDataBuffer + BufSize;
+		BYTE* pDirtyRects = m_pMetaDataBuffer + BufSize;
 		BufSize = FrameInfo.TotalMetadataBufferSize - BufSize;
 
 		// Get dirty rectangles
-		CRM(m_pDeskDupl->GetFrameDirtyRects(BufSize, reinterpret_cast<RECT*>(DirtyRects), &BufSize), "Failed to get frame dirty rects in D3D11DesktopDuplicationManager");
+		CRM(m_pDeskDupl->GetFrameDirtyRects(BufSize, reinterpret_cast<RECT*>(pDirtyRects), &BufSize), "Failed to get frame dirty rects in D3D11DesktopDuplicationManager");
 
-		Data->DirtyCount = BufSize / sizeof(RECT);
+		pFrameData->DirtyCount = BufSize / sizeof(RECT);
 
-		Data->MetaData = m_pMetaDataBuffer;
+		pFrameData->MetaData = m_pMetaDataBuffer;
 	}
 
-	Data->Frame = m_pAcquiredDesktopImage;
-	Data->FrameInfo = FrameInfo;
+	pFrameData->Frame = m_pAcquiredDesktopImage;
+	pFrameData->FrameInfo = FrameInfo;
 
 Error:
 	if (r == DXGI_ERROR_WAIT_TIMEOUT) {
@@ -225,8 +225,8 @@ Error:
 		return DUPL_RETURN_SUCCESS;
 	}
 	if (RFAILED()) {
-		Data->MoveCount = 0;
-		Data->DirtyCount = 0;
+		pFrameData->MoveCount = 0;
+		pFrameData->DirtyCount = 0;
 		return ProcessFailure(m_pDevice, L"Failed to acquire next frame in D3D11DesktopDuplicationManager", L"Error", r, FrameInfoExpectedErrors);
 	}
 	return DUPL_RETURN_SUCCESS;
@@ -254,6 +254,6 @@ Error:
 //
 // Gets output desc into DescPtr
 //
-void D3D11DesktopDuplicationManager::GetOutputDesc(_Out_ DXGI_OUTPUT_DESC* DescPtr) {
-	*DescPtr = m_OutputDesc;
+void D3D11DesktopDuplicationManager::GetOutputDesc(_Out_ DXGI_OUTPUT_DESC* pOutputDescription) {
+	*pOutputDescription = m_OutputDesc;
 }

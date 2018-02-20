@@ -42,49 +42,41 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	GetComposite()->SetVisible(true);	
 
 	// Start duplication process
-	STARTUPINFO siDesktopDuplication;
-	PROCESS_INFORMATION piDesktopDuplication;
+	STARTUPINFO startupinfoDesktopDuplication;
+	PROCESS_INFORMATION processinfoDesktopDuplication;
 
-	m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
-	if (m_hwndDesktopHandle == NULL) {
-		ZeroMemory(&siDesktopDuplication, sizeof(siDesktopDuplication));
-		siDesktopDuplication.cb = sizeof(siDesktopDuplication);
-		ZeroMemory(&piDesktopDuplication, sizeof(piDesktopDuplication));
+	memset(&startupinfoDesktopDuplication, 0, sizeof(startupinfoDesktopDuplication));
+	startupinfoDesktopDuplication.cb = sizeof(startupinfoDesktopDuplication);
+	memset(&processinfoDesktopDuplication, 0, sizeof(processinfoDesktopDuplication));
 
-		char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
-		wchar_t wlocation[sizeof(location)];
-		mbstowcs(wlocation, location, sizeof(location) + 1);
-		LPWSTR strLPWlocation = wlocation;
+	// TODO: macro with project pre-definition using project name
+	wchar_t *wszLocation = L"DreamDesktopCapture.exe";	
+	LPWSTR lpwstrLocation = wszLocation;
+	bool fCreateDuplicationProcess = false;
 
-		if (!CreateProcess(strLPWlocation,
-			L" -output 0",				// Command line
-			NULL,						// Process handle not inheritable
-			NULL,						// Thread handle not inheritable
-			FALSE,						// Set handle inheritance to FALSE
-			0,							// No creation flags
-			NULL,						// Use parent's environment block
-			NULL,						// Use parent's starting directory 
-			&siDesktopDuplication,      // Pointer to STARTUPINFO structure
-			&piDesktopDuplication)      // Pointer to PROCESS_INFORMATION structure
-			)
-		{
-			DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
-			r = R_FAIL;
-		}
+	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
-		while (m_hwndDesktopHandle == NULL) {
-			m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
-		}
-	}
+	fCreateDuplicationProcess = CreateProcess(lpwstrLocation,
+		L" -output 0",						// Command line
+		nullptr,							// Process handle not inheritable
+		nullptr,							// Thread handle not inheritable
+		false,								// Set handle inheritance to FALSE
+		0,									// No creation flags
+		nullptr,							// Use parent's environment block
+		nullptr,							// Use parent's starting directory 
+		&startupinfoDesktopDuplication,     // Pointer to STARTUPINFO structure
+		&processinfoDesktopDuplication		// Pointer to PROCESS_INFORMATION structure
+	);
 
+	CBM(fCreateDuplicationProcess, "CreateProcess failed (%d)", GetLastError());
+	
 	// TODO: get this from main?
 	m_hwndDreamHandle = FindWindow(NULL, L"Dream");
 	if (m_hwndDreamHandle == NULL) {
-		MessageBox(m_hwndDreamHandle, L"Unable to find the Dream window",
-			L"Error", MB_ICONERROR);
-		return r;
+		CNM(m_hwndDreamHandle, "Unable to find the Dream window");
 	}
 
+Error:
 	return r;
 }
 
@@ -95,7 +87,16 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamDesktopApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	if (!m_fDesktopDuplicationIsRunning) {
+	if (m_hwndDesktopHandle == NULL) {	// duplication process may take a bit to load, so catch it when it's done
+		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
+	}
+	CNR(m_hwndDesktopHandle, R_SKIPPED);	// duplication process isn't ready yet, so skip
+	
+	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	if (msTimeNow - m_msTimeSinceLastSent > m_msTimeDelay && !m_fDesktopDuplicationIsRunning) {
+		m_msTimeSinceLastSent = msTimeNow;
+
 		DDCIPCMessage ddcMessage;
 		ddcMessage.SetType(DDCIPCMessage::type::START);
 		COPYDATASTRUCT desktopCDS;
@@ -106,18 +107,16 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 
 		SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
 		DWORD dwError = GetLastError();
-		if (dwError != NO_ERROR) {
-			MessageBox(m_hwndDreamHandle, L"error sending message", L"error", MB_ICONERROR);
-		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		CBM(dwError == NO_ERROR, "error sending message");
 	}
-	
+
 	// Clean up
 	//CloseHandle(UnexpectedErrorEvent);
 	//CloseHandle(ExpectedErrorEvent);
 	//CloseHandle(TerminateThreadsEvent);
 
+Error:
 	return r;
 }
 

@@ -18,7 +18,7 @@
 
 // Globals
 D3D11DesktopDuplicationOutputManager OutMgr;
-HWND pWindowHandle;
+HWND pWindowHandle;		// These can go to the .h if we want
 HWND g_pDreamHandle;
 bool g_fStartSending = false;
 
@@ -58,7 +58,7 @@ HRESULT EnumOutputsExpectedErrors[] = {
 //
 DWORD WINAPI DDProc(_In_ void* Param);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-bool ProcessCmdline(_Out_ INT* Output);
+bool ProcessCmdline(_Out_ INT* outputToDuplicate);
 void ShowHelp();
 
 //
@@ -143,7 +143,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	int SingleOutput;
+	int outputToDuplicate;
 
 	// Synchronization
 	HANDLE UnexpectedErrorEvent = nullptr;
@@ -153,7 +153,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	// Window
 	pWindowHandle = nullptr;
 
-	bool CmdResult = ProcessCmdline(&SingleOutput);
+	bool CmdResult = ProcessCmdline(&outputToDuplicate);
 	if (!CmdResult) {
 		ShowHelp();
 		return 0;
@@ -275,11 +275,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 
 			// Re-initialize
-			Ret = OutMgr.InitOutput(pWindowHandle, SingleOutput, &OutputCount, &DeskBounds);
+			Ret = OutMgr.InitOutput(pWindowHandle, outputToDuplicate, &OutputCount, &DeskBounds);
 			if (Ret == DUPL_RETURN_SUCCESS) {
 				HANDLE SharedHandle = OutMgr.GetSharedHandle();
 				if (SharedHandle) {
-					Ret = ThreadMgr.Initialize(SingleOutput, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
+					Ret = ThreadMgr.Initialize(outputToDuplicate, OutputCount, UnexpectedErrorEvent, ExpectedErrorEvent, TerminateThreadsEvent, SharedHandle, &DeskBounds);
 				}
 				else {
 					DisplayMsg(L"Failed to get handle of shared surface", L"Error", S_OK);
@@ -305,7 +305,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			COPYDATASTRUCT desktopCDS;
 
 			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
-			desktopCDS.cbData = (938*484*4);
+			desktopCDS.cbData = (938*484*4);	// Not hardcoded, set texture params dynamically and send to dream
 			desktopCDS.lpData = pBuffer;
 
 			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
@@ -359,8 +359,8 @@ void ShowHelp() {
 //
 // Process command line parameters
 //
-bool ProcessCmdline(_Out_ INT* Output) {
-	*Output = -1;
+bool ProcessCmdline(_Out_ INT* outputToDuplicate) {
+	*outputToDuplicate = -1;
 	// __argv and __argc are global vars set by system
 	for (UINT i = 1; i < static_cast<UINT>(__argc); ++i) {
 		if ((strcmp(__argv[i], "-output") == 0) ||
@@ -370,20 +370,20 @@ bool ProcessCmdline(_Out_ INT* Output) {
 			}
 
 			if (strcmp(__argv[i], "all") == 0) {
-				*Output = -1;
+				*outputToDuplicate = -1;
 			}
 			else {
-				*Output = atoi(__argv[i]);
+				*outputToDuplicate = atoi(__argv[i]);
 			}
 			continue;
 		}
 		else {
 			//return false;
-			*Output = 0;	// if no command line args, use main monitor
+			*outputToDuplicate = 0;	// if no command line args, use main monitor
 		}
 	}
 
-	//*Output = 0;		// Use for testing, will duplicate only main monitor
+	//*outputToDuplicate = 0;		// Use for testing, will duplicate only main monitor
 	return true;
 }
 
@@ -460,11 +460,11 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	D3D11DesktopDuplicationManager DuplMgr;
 
 	// D3D objects
-	ID3D11Texture2D* SharedSurf = nullptr;
-	IDXGIKeyedMutex* KeyMutex = nullptr;
+	ID3D11Texture2D* pSharedSurfaceTexture = nullptr;
+	IDXGIKeyedMutex* pKeyMutex = nullptr;
 
 	// Data passed in from thread creation
-	THREAD_DATA* TData = reinterpret_cast<THREAD_DATA*>(Param);
+	THREAD_DATA* pThreadData = reinterpret_cast<THREAD_DATA*>(Param);
 
 	// Get desktop
 	DUPL_RETURN Ret;
@@ -472,7 +472,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	CurrentDesktop = OpenInputDesktop(0, FALSE, GENERIC_ALL);
 	if (!CurrentDesktop) {
 		// We do not have access to the desktop so request a retry
-		SetEvent(TData->ExpectedErrorEvent);
+		SetEvent(pThreadData->ExpectedErrorEvent);
 		Ret = DUPL_RETURN_ERROR_EXPECTED;
 		goto Error;		// awkward goto
 	}
@@ -488,16 +488,16 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	}
 
 	// New display manager
-	DispMgr.InitD3D(&TData->DxRes);
+	DispMgr.InitD3D(&pThreadData->DxRes);
 
 	// Obtain handle to sync shared Surface
-	CRM(TData->DxRes.Device->OpenSharedResource(TData->TexSharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&SharedSurf)), "Opening shared texture failed");
+	CRM(pThreadData->DxRes.Device->OpenSharedResource(pThreadData->TexSharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pSharedSurfaceTexture)), "Opening shared texture failed");
 
 
-	CRM(SharedSurf->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&KeyMutex)), "Failed to get keyed mutex interface in spawned thread");
+	CRM(pSharedSurfaceTexture->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&pKeyMutex)), "Failed to get keyed mutex interface in spawned thread");
 
 	// Make duplication manager
-	Ret = DuplMgr.InitDupl(TData->DxRes.Device, TData->Output);
+	Ret = DuplMgr.InitDupl(pThreadData->DxRes.Device, pThreadData->Output);
 	if (Ret != DUPL_RETURN_SUCCESS) {
 		goto Error;
 	}
@@ -511,7 +511,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	bool WaitToProcessCurrentFrame = false;
 	FRAME_DATA CurrentData;
 
-	while ((WaitForSingleObjectEx(TData->TerminateThreadsEvent, 0, FALSE) == WAIT_TIMEOUT)) {
+	while ((WaitForSingleObjectEx(pThreadData->TerminateThreadsEvent, 0, FALSE) == WAIT_TIMEOUT)) {
 		if (!WaitToProcessCurrentFrame) {
 			// Get new frame from desktop duplication
 			bool TimeOut;
@@ -531,7 +531,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 
 		// We have a new frame so try and process it
 		// Try to acquire keyed mutex in order to access shared surface
-		r = KeyMutex->AcquireSync(0, 1000);	
+		r = pKeyMutex->AcquireSync(0, 1000);	
 		if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
 			// Can't use shared surface right now, try again later
 			WaitToProcessCurrentFrame = true;
@@ -545,23 +545,23 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 		WaitToProcessCurrentFrame = false;
 
 		// Get mouse info
-		Ret = DuplMgr.GetMouse(TData->PtrInfo, &(CurrentData.FrameInfo), TData->OffsetX, TData->OffsetY);
+		Ret = DuplMgr.GetMouse(pThreadData->PtrInfo, &(CurrentData.FrameInfo), pThreadData->OffsetX, pThreadData->OffsetY);
 		if (Ret != DUPL_RETURN_SUCCESS) {
 			DuplMgr.DoneWithFrame();
-			KeyMutex->ReleaseSync(1);
+			pKeyMutex->ReleaseSync(1);
 			break;
 		}
 
 		// Process new frame
-		Ret = DispMgr.ProcessFrame(&CurrentData, SharedSurf, TData->OffsetX, TData->OffsetY, &DesktopDesc);
+		Ret = DispMgr.ProcessFrame(&CurrentData, pSharedSurfaceTexture, pThreadData->OffsetX, pThreadData->OffsetY, &DesktopDesc);
 		if (Ret != DUPL_RETURN_SUCCESS) {
 			DuplMgr.DoneWithFrame();
-			KeyMutex->ReleaseSync(1);
+			pKeyMutex->ReleaseSync(1);
 			break;
 		}
 
 		// Release acquired keyed mutex
-		CRM(KeyMutex->ReleaseSync(1), "Unexpected error releasing the keyed mutex");
+		CRM(pKeyMutex->ReleaseSync(1), "Unexpected error releasing the keyed mutex");
 
 		// Release frame back to desktop duplication
 		Ret = DuplMgr.DoneWithFrame();
@@ -574,39 +574,39 @@ Error:
 	if (Ret != DUPL_RETURN_SUCCESS) {
 		if (Ret == DUPL_RETURN_ERROR_EXPECTED) {
 			// The system is in a transition state so request the duplication be restarted
-			SetEvent(TData->ExpectedErrorEvent);
+			SetEvent(pThreadData->ExpectedErrorEvent);
 		}
 		else {
 			// Unexpected error so exit the application
-			SetEvent(TData->UnexpectedErrorEvent);
+			SetEvent(pThreadData->UnexpectedErrorEvent);
 		}
 	}
 	
 	if (RFAILED()) {
 		// Generic unknown failure
-		Ret = ProcessFailure(TData->DxRes.Device, L"Unexpected error acquiring KeyMutex", L"Error", r, SystemTransitionsExpectedErrors);
+		Ret = ProcessFailure(pThreadData->DxRes.Device, L"Unexpected error acquiring pKeyMutex", L"Error", r, SystemTransitionsExpectedErrors);
 		DuplMgr.DoneWithFrame();
 	}
 
-	if (SharedSurf) {
-		SharedSurf->Release();
-		SharedSurf = nullptr;
+	if (pSharedSurfaceTexture) {
+		pSharedSurfaceTexture->Release();
+		pSharedSurfaceTexture = nullptr;
 	}
 
-	if (KeyMutex) {
-		KeyMutex->Release();
-		KeyMutex = nullptr;
+	if (pKeyMutex) {
+		pKeyMutex->Release();
+		pKeyMutex = nullptr;
 	}
 	return 0;
 }
 
 _Post_satisfies_(return != DUPL_RETURN_SUCCESS)
-DUPL_RETURN ProcessFailure(_In_opt_ ID3D11Device* Device, _In_ LPCWSTR Str, _In_ LPCWSTR Title, HRESULT hr, _In_opt_z_ HRESULT* ExpectedErrors) {
+DUPL_RETURN ProcessFailure(_In_opt_ ID3D11Device* pDevice, _In_ LPCWSTR Str, _In_ LPCWSTR Title, HRESULT hr, _In_opt_z_ HRESULT* ExpectedErrors) {
 	HRESULT TranslatedHr;
 
 	// On an error check if the DX device is lost
-	if (Device) {
-		HRESULT DeviceRemovedReason = Device->GetDeviceRemovedReason();
+	if (pDevice) {
+		HRESULT DeviceRemovedReason = pDevice->GetDeviceRemovedReason();
 
 		switch (DeviceRemovedReason) {
 		case DXGI_ERROR_DEVICE_REMOVED:
@@ -619,13 +619,13 @@ DUPL_RETURN ProcessFailure(_In_opt_ ID3D11Device* Device, _In_ LPCWSTR Str, _In_
 		}
 
 		case S_OK: {
-			// Device is not removed so use original error
+			// pDevice is not removed so use original error
 			TranslatedHr = hr;
 			break;
 		}
 
 		default: {
-			// Device is removed but not a error we want to remap
+			// pDevice is removed but not a error we want to remap
 			TranslatedHr = DeviceRemovedReason;
 		}
 		}
