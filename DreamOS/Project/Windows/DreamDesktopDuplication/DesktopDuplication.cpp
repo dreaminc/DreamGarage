@@ -467,32 +467,22 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	THREAD_DATA* pThreadData = reinterpret_cast<THREAD_DATA*>(Param);
 
 	// Get desktop
-	DUPL_RETURN Ret;
+	DUPL_RETURN Ret = DUPL_RETURN_ERROR_EXPECTED;
 	HDESK CurrentDesktop = nullptr;
 	CurrentDesktop = OpenInputDesktop(0, FALSE, GENERIC_ALL);
-	if (!CurrentDesktop) {
-		// We do not have access to the desktop so request a retry
-		SetEvent(pThreadData->ExpectedErrorEvent);
-		Ret = DUPL_RETURN_ERROR_EXPECTED;
-		goto Error;		// awkward goto
-	}
+	CBR(CurrentDesktop, R_PASS);	// We do not have access to the desktop so request a retry
 
 	// Attach desktop to this thread
 	bool DesktopAttached = SetThreadDesktop(CurrentDesktop) != 0;
 	CloseDesktop(CurrentDesktop);
 	CurrentDesktop = nullptr;
-	if (!DesktopAttached) {
-		// We do not have access to the desktop so request a retry
-		Ret = DUPL_RETURN_ERROR_EXPECTED;
-		goto Error;
-	}
+	CBR(DesktopAttached, R_PASS);	// We do not have access to the desktop so request a retry
 
 	// New display manager
 	DispMgr.InitD3D(&pThreadData->DxRes);
 
 	// Obtain handle to sync shared Surface
 	CRM(pThreadData->DxRes.Device->OpenSharedResource(pThreadData->TexSharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pSharedSurfaceTexture)), "Opening shared texture failed");
-
 
 	CRM(pSharedSurfaceTexture->QueryInterface(__uuidof(IDXGIKeyedMutex), reinterpret_cast<void**>(&pKeyMutex)), "Failed to get keyed mutex interface in spawned thread");
 
