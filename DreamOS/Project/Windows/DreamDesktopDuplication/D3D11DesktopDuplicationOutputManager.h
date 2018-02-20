@@ -14,8 +14,8 @@ class D3D11DesktopDuplicationOutputManager {
 public:
 	D3D11DesktopDuplicationOutputManager();
 	~D3D11DesktopDuplicationOutputManager();
-	DUPL_RETURN InitOutput(HWND Window, INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds);
-	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer);
+	DUPL_RETURN InitOutput(HWND Window, INT outputToDuplicate, _Out_ UINT* OutCount, _Out_ RECT* pDeskBounds);
+	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* pPointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer);
 	HRESULT CopyToSendToDream(BYTE** pBuffer);
 	void CleanRefs();
 	HANDLE GetSharedHandle();
@@ -23,14 +23,14 @@ public:
 
 private:
 	// Methods
-	DUPL_RETURN ProcessMonoMask(bool IsMono, _Inout_ PTR_INFO* PtrInfo, _Out_ INT* PtrWidth, _Out_ INT* PtrHeight, _Out_ INT* PtrLeft, _Out_ INT* PtrTop, _Outptr_result_bytebuffer_(*PtrHeight * *PtrWidth * BPP) BYTE** InitBuffer, _Out_ D3D11_BOX* Box);
+	DUPL_RETURN ProcessMonoMask(bool IsMono, _Inout_ PTR_INFO* pPtrInfo, _Out_ INT* pPtrWidth, _Out_ INT* pPtrHeight, _Out_ INT* pPtrLeft, _Out_ INT* pPtrTop, _Outptr_result_bytebuffer_(*pPtrHeight * *pPtrWidth * BPP) BYTE** pInitBuffer, _Out_ D3D11_BOX* pBox);
 	DUPL_RETURN MakeRTV();
 	void SetViewPort(UINT Width, UINT Height);
 	DUPL_RETURN InitShaders();
 	DUPL_RETURN InitGeometry();
-	DUPL_RETURN CreateSharedSurf(INT SingleOutput, _Out_ UINT* OutCount, _Out_ RECT* DeskBounds);
+	DUPL_RETURN CreateSharedSurf(INT outputToMonitor, _Out_ UINT* pOutCount, _Out_ RECT* pDeskBounds);
 	DUPL_RETURN DrawFrame();
-	DUPL_RETURN DrawMouse(_In_ PTR_INFO* PtrInfo);
+	DUPL_RETURN DrawMouse(_In_ PTR_INFO* pPtrInfo);
 	DUPL_RETURN ResizeSwapChain();
 
 	// Vars

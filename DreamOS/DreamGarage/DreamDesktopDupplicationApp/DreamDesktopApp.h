@@ -83,7 +83,10 @@ private:
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
 
-	bool m_fDesktopDuplicationIsRunning;
+	double m_msTimeSinceLastSent = 0;
+	double m_msTimeDelay = 20;
+
+	bool m_fDesktopDuplicationIsRunning = false;
 
 	size_t m_pFrameDataBuffer_n = 0;
 	unsigned char* m_pFrameDataBuffer;

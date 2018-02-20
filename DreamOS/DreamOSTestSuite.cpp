@@ -733,23 +733,23 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		CN(pTestContext->pUser);
 
 		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
 
-pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-CNM(pDreamBrowser, "Failed to create dream browser");
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
 
-pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-pDreamBrowser->SetDiagonalSize(9.0f);
-pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(9.0f);
+		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 
-pDreamBrowser->SetVisible(false);
+		pDreamBrowser->SetVisible(false);
 
-pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-CN(pDreamUIBar);
-CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+		CN(pDreamUIBar);
+		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
 
-Error:
-return r;
+	Error:
+		return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -793,8 +793,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 	double sTestTime = 10000.0;
 
-	struct TestContext {
-		std::shared_ptr<DreamUserApp> pUser = nullptr;
+	struct TestContext {	
 		std::shared_ptr<quad> pQuad = nullptr;
 		texture* pTexture = nullptr;
 		bool once = false;
@@ -847,20 +846,26 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 				ZeroMemory(&si, sizeof(si));
 				si.cb = sizeof(si);
 				ZeroMemory(&pi, sizeof(pi));
-
-				char location[] = "C:/Users/John/Documents/GitHub/DreamGarage/DreamOS/Project/Windows/DreamOS/x64/Release/DreamDesktopCapture.exe";
-				wchar_t wlocation[sizeof(location)];
-				mbstowcs(wlocation, location, sizeof(location) + 1);
-				LPWSTR strLPWlocation = wlocation;
-
+				
+				PathManager* pPathManager = PathManager::instance();
+				std::wstring wstrDreamPath;
+				pPathManager->GetDreamPath(wstrDreamPath);
+				
+				std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe";
+				std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
+				const wchar_t *wPath = wstrFullpath.c_str();
+				std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
+				vwszLocation.push_back(0);
+				LPWSTR strLPWlocation = vwszLocation.data();
+				
 				if (!CreateProcess(strLPWlocation,
 					L" /output 1",	// Command line
-					NULL,           // Process handle not inheritable
-					NULL,           // Thread handle not inheritable
-					FALSE,          // Set handle inheritance to FALSE
+					nullptr,           // Process handle not inheritable
+					nullptr,           // Thread handle not inheritable
+					false,          // Set handle inheritance to FALSE
 					0,              // No creation flags
-					NULL,           // Use parent's environment block
-					NULL,           // Use parent's starting directory 
+					nullptr,           // Use parent's environment block
+					nullptr,           // Use parent's starting directory 
 					&si,            // Pointer to STARTUPINFO structure
 					&pi)            // Pointer to PROCESS_INFORMATION structure
 					)
