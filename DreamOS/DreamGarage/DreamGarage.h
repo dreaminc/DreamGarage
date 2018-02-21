@@ -84,6 +84,9 @@ public:
 	// Desktop Sharing
 	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
 
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
+
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
