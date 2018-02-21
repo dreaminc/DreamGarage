@@ -222,7 +222,9 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
 	
-
+#ifdef _DEBUG
+	cefSettings.single_process = true;
+#endif
 
 	cefSettings.multi_threaded_message_loop = true;
 

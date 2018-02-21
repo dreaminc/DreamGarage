@@ -554,7 +554,7 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
 	m_pWebBrowserManager = pWebBrowserManager;
 
-	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, "");
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, "about:blank");
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 
@@ -778,8 +778,8 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
 		//*/
 		
-		//LoadRequest(webRequest);
-		SetURI(strEnvironmentAssetURL);
+		LoadRequest(webRequest);
+		//SetURI(strEnvironmentAssetURL);
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 

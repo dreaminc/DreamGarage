@@ -407,6 +407,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		CN(pTestContext->pWebBrowserManager);
 		CR(pTestContext->pWebBrowserManager->Initialize());
+		pTestContext->pWebBrowserManager->Update();
 
 		// starts to break down as the test approaches 20 browsers
 		pTestContext->strURIs = {
@@ -430,8 +431,8 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 			"www.dreamos.com",
 			"mail.google.com",
 			"facebook.com",
-			//*/
 			"www.reddit.com"
+			//*/
 		} ;
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
@@ -439,6 +440,8 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
 			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+		}
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 			/*
 			WebRequest webRequest;
 			std::string strEnvironmentAssetURL = pTestContext->strURIs[i];
@@ -463,6 +466,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
+		//pTestContext->pWebBrowserManager->Update();
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
 		}
