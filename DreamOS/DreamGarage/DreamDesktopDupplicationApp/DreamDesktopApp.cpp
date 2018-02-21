@@ -45,7 +45,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
-	GetComposite()->SetVisible(true);	
+	GetComposite()->SetVisible(true);
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 
@@ -59,7 +59,7 @@ Error:
 
 RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
-	
+
 	// Start duplication process
 	STARTUPINFO startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;
@@ -90,7 +90,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 		false,								// Set handle inheritance to FALSE
 		0,									// No creation flags
 		nullptr,							// Use parent's environment block
-		nullptr,							// Use parent's starting directory 
+		nullptr,							// Use parent's starting directory
 		&startupinfoDesktopDuplication,     // Pointer to STARTUPINFO structure
 		&processinfoDesktopDuplication		// Pointer to PROCESS_INFORMATION structure
 	);
@@ -112,7 +112,7 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
 	}
 	CNR(m_hwndDesktopHandle, R_SKIPPED);	// duplication process isn't ready yet, so skip
-	
+
 	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	if (msTimeNow - m_msTimeSinceLastSent > m_msTimeDelay && !m_fDesktopDuplicationIsRunning) {
@@ -147,7 +147,7 @@ Error:
 
 RESULT DreamDesktopApp::Shutdown(void *pContext) {
 	// TODO: clean up in here
-	
+
 	return R_PASS;
 }
 
@@ -280,4 +280,3 @@ RESULT DreamDesktopApp::SetVisible(bool fVisible) {
 Error:
 	return r;
 }
-

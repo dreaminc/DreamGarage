@@ -101,4 +101,3 @@ private:
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
-

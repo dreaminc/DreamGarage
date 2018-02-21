@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
 class DreamDesktopApp;

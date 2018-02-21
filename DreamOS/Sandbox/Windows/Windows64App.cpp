@@ -329,7 +329,6 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	} break;
 
 	case WM_COPYDATA: {
-
 		PCOPYDATASTRUCT pDataStruct;
 		pDataStruct = (PCOPYDATASTRUCT)lp;
 
