@@ -254,6 +254,19 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnAfterCreated() {
+	RESULT r = R_PASS;
+
+	//m_fCreated = true;
+	//if (m_pPendingEnvironmentAsset != nullptr) {
+		//CR(SetEnvironmentAsset(m_pPendingEnvironmentAsset));
+	//}
+	//m_pPendingEnvironmentAsset = nullptr;
+
+//Error:
+	return r;
+}
+
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
@@ -313,6 +326,14 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	if (pDreamControlViewHandle != nullptr) {
 		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
 		
+	}
+
+	if (strCurrentURL == "about:blank") {
+		m_fCreated = true;
+		if (m_pPendingEnvironmentAsset != nullptr) {
+			SetEnvironmentAsset(m_pPendingEnvironmentAsset);
+			m_pPendingEnvironmentAsset = nullptr;
+		}
 	}
 
 	//TODO: should happen with share, not open
@@ -712,6 +733,21 @@ RESULT DreamBrowser::SetBrowserScope(std::string strScope) {
 
 RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
 	m_strPath = strPath;
+	return R_PASS;
+}
+
+RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	if (m_fCreated) {
+		SetEnvironmentAsset(pEnvironmentAsset);
+	}
+	else {
+		m_pPendingEnvironmentAsset = pEnvironmentAsset;
+
+		if (pEnvironmentAsset != nullptr) {
+			m_strScope = pEnvironmentAsset->GetStorageProviderScope();
+			m_strPath = pEnvironmentAsset->GetPath();
+		}
+	}
 	return R_PASS;
 }
 

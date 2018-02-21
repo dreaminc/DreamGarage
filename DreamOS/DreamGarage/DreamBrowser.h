@@ -92,6 +92,7 @@ public:
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
+	virtual RESULT OnAfterCreated() override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
@@ -120,6 +121,7 @@ public:
 	virtual RESULT SetBrowserScope(std::string strScope);
 	virtual RESULT SetBrowserPath(std::string strPath);
 
+	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	virtual RESULT SetURI(std::string strURI);
 	RESULT LoadRequest(const WebRequest &webRequest);
@@ -167,6 +169,11 @@ private:
 	bool m_fShowControlView = false;
 
 	bool m_fShouldBeginStream = false;
+
+	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset;
+
+	// CEF can call LoadRequest once a URL is loaded
+	bool m_fCanLoadRequest = false;
 
 };
 

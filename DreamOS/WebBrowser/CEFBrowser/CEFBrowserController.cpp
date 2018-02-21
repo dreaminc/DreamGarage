@@ -455,6 +455,16 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
+RESULT CEFBrowserController::OnAfterCreated() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnAfterCreated());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChange");

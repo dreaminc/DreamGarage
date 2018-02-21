@@ -488,7 +488,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				//m_pKeyboardHandle = nullptr;
 
 				//TODO: why does this need to happen
-				CR(UpdateBrowser(strScope, strPath));
+				//CR(UpdateBrowser(strScope, strPath));
 			}
 //*/
 		}

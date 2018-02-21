@@ -226,6 +226,8 @@ RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowse
 
 	m_promiseCEFBrowserController.set_value(pCEFBrowserController);
 
+	m_pCEFAppObserver->OnAfterCreated(pCEFBrowserController->GetCEFBrowser());
+
 Error:
 	return r;
 }

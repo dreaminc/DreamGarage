@@ -44,9 +44,9 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
 
-	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
-	CN(m_pActiveBrowser);
-	CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
+	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
+	//CN(m_pActiveBrowser);
+	//CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
 	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing
 
 	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
@@ -71,6 +71,10 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pDreamTabView->InitializeWithParent(this);
 	//m_pDreamTabView->
 
+	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	//CN(m_pActiveBrowser);
+	//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+
 	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 	m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
@@ -78,8 +82,9 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
-	//m_pControlBar->GetComposite()->SetVisible(false);
-	//m_pDreamTabView->GetComposite()->SetVisible(false);
+	m_pControlBar->GetComposite()->SetVisible(false);
+	m_pDreamTabView->GetComposite()->SetVisible(false);
+	m_pControlView->GetComposite()->SetVisible(false);
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 
@@ -348,6 +353,7 @@ int DreamUserControlArea::GetPXHeight() {
 RESULT DreamUserControlArea::SendContactAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveBrowser, R_SKIPPED);
 	CR(m_pActiveBrowser->ClickBrowser(ptContact, fMouseDown));
 
 Error:
@@ -357,6 +363,7 @@ Error:
 RESULT DreamUserControlArea::SendKeyCharacter(char chkey, bool fKeyDown) {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveBrowser, R_SKIPPED);
 	CR(m_pActiveBrowser->SendKeyPressed(chkey, fKeyDown));
 
 Error:
@@ -366,6 +373,7 @@ Error:
 RESULT DreamUserControlArea::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveBrowser, R_SKIPPED);
 	CR(m_pActiveBrowser->SendMouseMoveEvent(mousePoint));
 
 Error:
@@ -385,6 +393,7 @@ Error:
 RESULT DreamUserControlArea::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pActiveBrowser, R_SKIPPED);
 	CR(m_pActiveBrowser->SetBrowserScope(strScope));
 	
 Error:
@@ -394,6 +403,7 @@ Error:
 RESULT DreamUserControlArea::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	
+	CNR(m_pActiveBrowser, R_SKIPPED);
 	CR(m_pActiveBrowser->SetBrowserPath(strPath));
 	
 Error:
@@ -403,7 +413,15 @@ Error:
 RESULT DreamUserControlArea::SendURL(std::string strURL) {
 	RESULT r = R_PASS;
 
-	CR(m_pActiveBrowser->SendURL(strURL));
+	std::string strTitle = "website";
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, strTitle), "Failed to share environment asset");
+
+	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+	m_pActiveBrowser->SetBrowserPath(strURL);
 
 Error:
 	return r;
@@ -421,11 +439,11 @@ Error:
 
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	//TODO: multi-content
-	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-	//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
 	
-	//TODO: update browser's set environment asset
-	m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	//it is not safe to set the environment asset until after the browser is finished initializing
+	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
+	m_pActiveBrowser->PendEnvironmentAsset(pEnvironmentAsset);
+	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	//m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
 	//m_pControlView->SetControlViewTexture(m_pActiveBrowser->GetScreenTexture());
 
@@ -463,6 +481,9 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
 				m_pDreamUserApp->SetEventApp(nullptr);
 			}
+			m_pControlBar->GetComposite()->SetVisible(false);
+			m_pDreamTabView->GetComposite()->SetVisible(false);
+			m_pControlView->GetComposite()->SetVisible(false);
 		}
 	} break;
 	}
