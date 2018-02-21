@@ -72,7 +72,8 @@ public:
 	//TODO: Set Scope/Path should be removed once DreamUIBar follows "open" implementation
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
-	RESULT SendURL(std::string strURL);
+	RESULT RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle);
+	RESULT SendURL();
 
 // DreamControlBar
 public:
@@ -113,6 +114,10 @@ private:
 
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
+
+	// string saved from KEY_DOWN interaction events
+	// this is used for opening a URL, key presses are sent directly to the active browser
+	std::string m_strURL;
 
 // logic
 private:

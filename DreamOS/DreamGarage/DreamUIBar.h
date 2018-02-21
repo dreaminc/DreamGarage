@@ -94,14 +94,9 @@ public:
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
-	RESULT UpdateBrowser(std::string strScope, std::string strPath);
-
 	// Animations
 	RESULT HideApp();
 	RESULT ShowApp();
-
-	RESULT ShowControlView();
-	RESULT SendURLToBrowser();
 
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 

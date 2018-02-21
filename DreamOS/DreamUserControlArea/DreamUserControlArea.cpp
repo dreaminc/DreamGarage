@@ -56,6 +56,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 
 	m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
+	m_pDreamUIBar->InitializeWithParent(this);
 
 	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
 	CN(m_pControlBar);
@@ -64,12 +65,10 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 	CN(m_pControlView);
 	m_pControlView->InitializeWithParent(this);
-	//m_pControlView->m_pViewQuad->SetVisible(true);
 
 	m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 	CN(m_pDreamTabView);
 	m_pDreamTabView->InitializeWithParent(this);
-	//m_pDreamTabView->
 
 	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	//CN(m_pActiveBrowser);
@@ -78,6 +77,8 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 	m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
+
+	//DreamUserControlArea is a friend of these classes to add the composite
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
@@ -87,6 +88,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_pControlView->GetComposite()->SetVisible(false);
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
+	CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
 Error:
 	return r;
@@ -410,18 +412,33 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SendURL(std::string strURL) {
+RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle) {
 	RESULT r = R_PASS;
 
-	std::string strTitle = "website";
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, strTitle), "Failed to share environment asset");
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SendURL() {
+	RESULT r = R_PASS;
+
+	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strTitle = "website";
+
+	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
-	m_pActiveBrowser->SetBrowserPath(strURL);
+	m_pActiveBrowser->SetBrowserScope(strScope);
+	m_pActiveBrowser->SetBrowserPath(m_strURL);
+
+	// TODO: may not be enough once browser typing is re-enabled
+	m_strURL = "";
 
 Error:
 	return r;
@@ -486,6 +503,40 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pControlView->GetComposite()->SetVisible(false);
 		}
 	} break;
+
+	case INTERACTION_EVENT_KEY_DOWN: {
+		char chkey = (char)(pSubscriberEvent->m_value);
+
+		CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
+
+		//TODO: re-enable typing in the browser
+		/*
+		if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
+			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
+			CBR(chkey != 0, R_SKIPPED);
+			CBR(chkey != SVK_CONTROL, R_SKIPPED);
+			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
+
+			CR(SendKeyCharacter(chkey, true));
+		}
+		else {
+			//*/
+			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
+				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
+			}
+
+			else if (chkey == SVK_BACK) {
+				if (m_strURL.size() > 0) {
+					m_strURL.pop_back();
+				}
+			}
+			
+			else {
+				m_strURL += chkey;
+			}
+		//}
+
+	}
 	}
 
 Error:

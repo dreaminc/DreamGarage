@@ -143,7 +143,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 		CN(m_pOverlayRight);
 	}
 
-	pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
+	//pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
 
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
@@ -329,6 +329,7 @@ Error:
 RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 	RESULT r = R_PASS;
 
+	/*
 	if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
 		char chkey = (char)(pInteractionEvent->m_value);
 
@@ -359,8 +360,8 @@ RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
 			}
 		}
 	}
-
 Error:
+	//*/
 	return r;
 }
 
@@ -515,16 +516,7 @@ Error:
 RESULT DreamControlView::SendURL() {
 	RESULT r = R_PASS;
 
-	if (m_pParentApp != nullptr) {
-		CR(m_pParentApp->SetScope("WebsiteProviderScope.WebsiteProvider"));
-		CR(m_pParentApp->SetPath(""));
-		if (m_strURL != "") {
-			m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
-			CR(m_pParentApp->SendURL(m_strURL));
-		}
-	}
-
-Error:
+//Error:
 	return r;
 }
 

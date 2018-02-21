@@ -329,7 +329,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	}
 
 	if (strCurrentURL == "about:blank") {
-		m_fCreated = true;
+		m_fCanLoadRequest = true;
 		if (m_pPendingEnvironmentAsset != nullptr) {
 			SetEnvironmentAsset(m_pPendingEnvironmentAsset);
 			m_pPendingEnvironmentAsset = nullptr;
@@ -737,7 +737,7 @@ RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
 }
 
 RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
-	if (m_fCreated) {
+	if (m_fCanLoadRequest) {
 		SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
