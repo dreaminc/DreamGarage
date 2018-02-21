@@ -187,9 +187,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	TerminateThreadsEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 	CNM(TerminateThreadsEvent, "TerminateThreadsEvent creation failed");
 
-	// Load simple cursor	
+	// Load simple cursor
 	Cursor = LoadCursor(nullptr, IDC_ARROW);
-	CNM(Cursor, "Cursor load failed"); 
+	CNM(Cursor, "Cursor load failed");
 
 	// Register class
 	Wc.cbSize = sizeof(WNDCLASSEXW);
@@ -206,7 +206,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	Wc.hIconSm = nullptr;
 	CBM(RegisterClassExW(&Wc), "Window class registration failed");
 
-	// Create window	
+	// Create window
 	AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
 	pWindowHandle = CreateWindowW(L"ddasample", L"DreamDesktopDuplication",
 		WS_OVERLAPPEDWINDOW,
@@ -218,12 +218,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	DestroyCursor(Cursor);
 
 	ShowWindow(pWindowHandle, nCmdShow);
-	UpdateWindow(pWindowHandle);	
+	UpdateWindow(pWindowHandle);
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
 		// Data to send to dream
-		BYTE *pBuffer = nullptr;	
+		BYTE *pBuffer = nullptr;
 		UINT pxWidth = 0;
 		UINT pxHeight = 0;
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -282,14 +282,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		else {
 			// Nothing else to do, so try to present to write out to window if not occluded
 			if (!Occluded) {
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);	
+				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);
 			}
 		}
 		//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
 		if (g_fStartSending && (pBuffer != nullptr) && (pBuffer [0] != '\0')) {
 			//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
 			DDCIPCMessage ddcMessage;
-			
+
 			if (pxHeight == texturepxHeight && pxWidth == texturepxWidth) {
 				ddcMessage.m_msgType = DDCIPCMessage::type::FRAME;
 				COPYDATASTRUCT desktopCDS;
@@ -430,7 +430,7 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 		PostQuitMessage(0);
 		return true;
 	} break;
-	
+
 	default:
 		return false;
 	}
@@ -530,7 +530,7 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 
 		// We have a new frame so try and process it
 		// Try to acquire keyed mutex in order to access shared surface
-		r = pKeyMutex->AcquireSync(0, 1000);	
+		r = pKeyMutex->AcquireSync(0, 1000);
 		if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
 			// Can't use shared surface right now, try again later
 			WaitToProcessCurrentFrame = true;
@@ -580,7 +580,7 @@ Error:
 			SetEvent(pThreadData->UnexpectedErrorEvent);
 		}
 	}
-	
+
 	if (RFAILED()) {
 		// Generic unknown failure
 		Ret = ProcessFailure(pThreadData->DxRes.Device, L"Unexpected error acquiring pKeyMutex", L"Error", r, SystemTransitionsExpectedErrors);

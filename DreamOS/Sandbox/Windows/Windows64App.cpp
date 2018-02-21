@@ -9,6 +9,9 @@
 
 #include "./HAL/opengl/OpenGLImp.h"
 
+#include "DreamOS.h"
+#include "DDCIPCMessage.h"
+
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 
@@ -58,7 +61,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	if (!RegisterClassEx(&m_wndclassex)) {
 		MessageBox(nullptr, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);
-		return;	// TODO: Use assert EHM
+		return; // TODO: Use assert EHM
 	}
 
 	// TODO: Improve this
@@ -80,23 +83,23 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CB((m_ThreadID != 0));
 
 	m_hwndWindow = CreateWindow(
-		m_pszClassName,										// lpClassName
-		title.c_str(),									// lpWindowName
-		m_wndStyle | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,		// dwStyle
-		m_posX,												// X
-		m_posY,												// Y
-		m_pxWidth,											// Width
-		m_pxHeight,											// Height
-		nullptr,												// hWndParent
-		nullptr,												// hMenu
-		m_hInstance,										// hInstance
-		this												// lpParam
+		m_pszClassName,                                     // lpClassName
+		title.c_str(),                                  // lpWindowName
+		m_wndStyle | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,     // dwStyle
+		m_posX,                                             // X
+		m_posY,                                             // Y
+		m_pxWidth,                                          // Width
+		m_pxHeight,                                         // Height
+		nullptr,                                                // hWndParent
+		nullptr,                                                // hMenu
+		m_hInstance,                                        // hInstance
+		this                                                // lpParam
 	);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
-//TODO: use this label
-//Success:
+	//TODO: use this label
+	//Success:
 	Validate();
 	return;
 
@@ -179,30 +182,30 @@ RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWin
 	RESULT r = R_PASS;
 
 	switch (sandboxWindowPosition) {
-		case SANDBOX_WINDOW_POSITION::LEFT: {
-			m_posX = 0;
-			m_posY = m_posY;
-		} break;
+	case SANDBOX_WINDOW_POSITION::LEFT: {
+		m_posX = 0;
+		m_posY = m_posY;
+	} break;
 
-		case SANDBOX_WINDOW_POSITION::RIGHT: {
-			m_posX = GetSystemMetrics(SM_CXSCREEN) - m_pxWidth;
-			m_posY = m_posY;
-		} break;
+	case SANDBOX_WINDOW_POSITION::RIGHT: {
+		m_posX = GetSystemMetrics(SM_CXSCREEN) - m_pxWidth;
+		m_posY = m_posY;
+	} break;
 
-		case SANDBOX_WINDOW_POSITION::TOP: {
-			m_posX = m_posX;
-			m_posY = 0;
-		} break;
+	case SANDBOX_WINDOW_POSITION::TOP: {
+		m_posX = m_posX;
+		m_posY = 0;
+	} break;
 
-		case SANDBOX_WINDOW_POSITION::BOTTOM: {
-			m_posX = m_posX;
-			m_posY = GetSystemMetrics(SM_CYSCREEN) - m_pxHeight;
-		} break;
+	case SANDBOX_WINDOW_POSITION::BOTTOM: {
+		m_posX = m_posX;
+		m_posY = GetSystemMetrics(SM_CYSCREEN) - m_pxHeight;
+	} break;
 
-		case SANDBOX_WINDOW_POSITION::CENTER: {
-			m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
-			m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
-		} break;
+	case SANDBOX_WINDOW_POSITION::CENTER: {
+		m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
+		m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
+	} break;
 	}
 
 	CBM(SetWindowPos(m_hwndWindow, HWND_TOP, m_posX, m_posY, 0, 0, (UINT)(SWP_NOSIZE)), "Failed to position window");
@@ -286,6 +289,7 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 		//SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
 		SetWindowLongPtr(hWindow, GWLP_USERDATA, (LONG_PTR)pApp);
 	}
+
 	else {
 		//pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
 		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
@@ -300,32 +304,31 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	RESULT r = R_PASS;
 	switch (msg) {
-		case WM_CREATE: {
-			HDC hDC = GetDC(hWindow);
+	case WM_CREATE: {
+		HDC hDC = GetDC(hWindow);
 
-			if (hDC == nullptr) {
-				DEBUG_LINEOUT("Failed to capture Device Context");
-				//PostQuitMessage(0);
-				Shutdown();
-				return 0L;
-			}
-
-			SetDeviceContext(hDC);
-		} break;
-
-		case WM_DESTROY: {
-			DEBUG_LINEOUT("Windows Sandbox being destroyed");
+		if (hDC == nullptr) {
+			DEBUG_LINEOUT("Failed to capture Device Context");
 			//PostQuitMessage(0);
 			Shutdown();
 			return 0L;
-		} break;
+		}
+
+		SetDeviceContext(hDC);
+	} break;
+
+	case WM_DESTROY: {
+		DEBUG_LINEOUT("Windows Sandbox being destroyed");
+		//PostQuitMessage(0);
+		Shutdown();
+		return 0L;
+	} break;
 
 	case WM_SIZE: {
 		SetDimensions(LOWORD(lp), HIWORD(lp));
 	} break;
 
 	case WM_COPYDATA: {
-
 		PCOPYDATASTRUCT pDataStruct;
 		pDataStruct = (PCOPYDATASTRUCT)lp;
 
@@ -349,9 +352,12 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
 		}
 
-		default: {
-			// Empty stub
-		} break;
+		return true;
+	} break;
+
+	default: {
+		// Empty stub
+	} break;
 	}
 
 Error:
@@ -375,7 +381,7 @@ RESULT Windows64App::UnregisterUIThreadCallback() {
 	CN(m_fnUIThreadCallback);
 	m_fnUIThreadCallback = nullptr;
 
-	Error:
+Error:
 	return r;
 }
 
@@ -487,7 +493,7 @@ RESULT Windows64App::Show() {
 
 	//return (RESULT)(msg.wParam);
 
-//Error:
+	//Error:
 	return r;
 }
 
@@ -498,112 +504,112 @@ inline RESULT Windows64App::SwapDisplayBuffers() {
 		return R_FAIL;
 }
 
-bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {
+bool Windows64App::HandleMouseEvent(const MSG&  windowMessage) {
 	bool fHandled = false;
 
-	LPARAM lp = windowMassage.lParam;
-	WPARAM wp = windowMassage.wParam;
+	LPARAM lp = windowMessage.lParam;
+	WPARAM wp = windowMessage.wParam;
 
-	switch (windowMassage.message) {
-		case WM_LBUTTONUP:
-		case WM_LBUTTONDOWN: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Left mouse button down!");
-			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_LBUTTONUP) ? SENSE_MOUSE_LEFT_BUTTON_UP : SENSE_MOUSE_LEFT_BUTTON_DOWN, xPos, yPos, (int)(wp));
-		} break;
+	switch (windowMessage.message) {
+	case WM_LBUTTONUP:
+	case WM_LBUTTONDOWN: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Left mouse button down!");
+		m_pSenseMouse->UpdateMouseState((windowMessage.message == WM_LBUTTONUP) ? SENSE_MOUSE_LEFT_BUTTON_UP : SENSE_MOUSE_LEFT_BUTTON_DOWN, xPos, yPos, (int)(wp));
+	} break;
 
-		case WM_LBUTTONDBLCLK: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Left mouse button dbl click!");
-			//m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
-		} break;
+	case WM_LBUTTONDBLCLK: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Left mouse button dbl click!");
+		//m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+	} break;
 
-		case WM_RBUTTONUP:
-		case WM_RBUTTONDOWN: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Right mouse button down!");
-			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_RBUTTONUP) ? SENSE_MOUSE_RIGHT_BUTTON_UP : SENSE_MOUSE_RIGHT_BUTTON_DOWN, xPos, yPos, (int)(wp));
-		} break;
+	case WM_RBUTTONUP:
+	case WM_RBUTTONDOWN: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Right mouse button down!");
+		m_pSenseMouse->UpdateMouseState((windowMessage.message == WM_RBUTTONUP) ? SENSE_MOUSE_RIGHT_BUTTON_UP : SENSE_MOUSE_RIGHT_BUTTON_DOWN, xPos, yPos, (int)(wp));
+	} break;
 
-		case WM_RBUTTONDBLCLK: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
+	case WM_RBUTTONDBLCLK: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
 
-			//DEBUG_LINEOUT("Right mouse button dbl click!");
-			// TODO: Add this to the SenseMouse
-		} break;
+		//DEBUG_LINEOUT("Right mouse button dbl click!");
+		// TODO: Add this to the SenseMouse
+	} break;
 
-		case WM_MBUTTONUP:
-		case WM_MBUTTONDOWN: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_MBUTTONUP) ? SENSE_MOUSE_MIDDLE_BUTTON_UP : SENSE_MOUSE_MIDDLE_BUTTON_DOWN, xPos, yPos, (int)(wp));
-		} break;
+	case WM_MBUTTONUP:
+	case WM_MBUTTONDOWN: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Middle mouse button down!");
+		m_pSenseMouse->UpdateMouseState((windowMessage.message == WM_MBUTTONUP) ? SENSE_MOUSE_MIDDLE_BUTTON_UP : SENSE_MOUSE_MIDDLE_BUTTON_DOWN, xPos, yPos, (int)(wp));
+	} break;
 
-		case WM_MBUTTONDBLCLK: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
+	case WM_MBUTTONDBLCLK: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
 
-			//DEBUG_LINEOUT("Middle mouse button dbl click!");
-			// TODO: Add this to the SenseMouse
-		} break;
+		//DEBUG_LINEOUT("Middle mouse button dbl click!");
+		// TODO: Add this to the SenseMouse
+	} break;
 
-		case WM_MOUSEWHEEL: {
-			fHandled = true;
-			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
-			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
-		} break;
+	case WM_MOUSEWHEEL: {
+		fHandled = true;
+		int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Mousewheel %d!", wheel);
+		//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
+		m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
+	} break;
 
-		case WM_MOUSEMOVE: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
-		} break;
+	case WM_MOUSEMOVE: {
+		fHandled = true;
+		int xPos = (lp >> 0) & 0xFFFF;
+		int yPos = (lp >> 16) & 0xFFFF;
+		//DEBUG_LINEOUT("Middle mouse button down!");
+		m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
+	} break;
 	}
 
 	return fHandled;
 }
 
-bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
+bool Windows64App::HandleKeyEvent(const MSG& windowMessage) {
 	bool fHandled = false;
 
-	LPARAM lp = windowMassage.lParam;
-	WPARAM wp = windowMassage.wParam;
+	LPARAM lp = windowMessage.lParam;
+	WPARAM wp = windowMessage.wParam;
 
-	switch (windowMassage.message) {
-		case WM_KEYUP: {
-			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), false);
-		} break;
+	switch (windowMessage.message) {
+	case WM_KEYUP: {
+		fHandled = true;
+		m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMessage.wParam), false);
+	} break;
 
-		case WM_KEYDOWN: {
-			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), true);
-		} break;
+	case WM_KEYDOWN: {
+		fHandled = true;
+		m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMessage.wParam), true);
+	} break;
 
-		case WM_CHAR: {
-			unsigned int lparam = windowMassage.lParam;
-			unsigned char scanCode = (lparam >> 16);
+	case WM_CHAR: {
+		unsigned int lparam = windowMessage.lParam;
+		unsigned char scanCode = (lparam >> 16);
 
-			fHandled = true;
-			m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMassage.wParam, true);
-		} break;
+		fHandled = true;
+		m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMessage.wParam, true);
+	} break;
 	}
 
 	return fHandled;
@@ -632,9 +638,9 @@ RESULT Windows64App::ShutdownSandbox() {
 
 	wglMakeCurrent(nullptr, nullptr);
 
-	PostQuitMessage(0);		// make sure the window will be destroyed
+	PostQuitMessage(0);     // make sure the window will be destroyed
 
-	// If full screen, change back to original res
+							// If full screen, change back to original res
 	if (m_fFullscreen) {
 		RecoverDisplayMode();
 	}

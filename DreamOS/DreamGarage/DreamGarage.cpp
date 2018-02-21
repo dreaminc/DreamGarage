@@ -17,6 +17,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
+#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
