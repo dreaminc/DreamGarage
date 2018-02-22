@@ -794,8 +794,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	double sTestTime = 10000.0;
 
 	struct TestContext {	
-		std::shared_ptr<quad> pQuad = nullptr;
-		texture* pTexture = nullptr;
+		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
 		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -809,13 +808,10 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
+			pTestContext->pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
+			CNM(pTestContext->pDreamDesktop, "Failed to create dream desktop");
+			
 			/*
-			std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
-
-			pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
-			CNM(pDreamDesktop, "Failed to create dream desktop");
-			*/
-
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
@@ -932,12 +928,12 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
 		CN(pTestContext);
-		if(!pTestContext->once)
-		{
-			pTestContext->pTexture->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+		if (!pTestContext->once) {
+			CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, pxHeight, pxWidth));
 			// pTestContext->once = true;
 			free(m_pDataBuffer);
 			m_pDataBuffer_n = 0;
+			//pTestContext->once = true;
 		}
 		
 	Error:	

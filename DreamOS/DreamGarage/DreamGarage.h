@@ -78,7 +78,7 @@ public:
 	virtual RESULT OnStopReceiving() override;
 
 	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
@@ -128,10 +128,10 @@ private:
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
 	
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
-	std::shared_ptr<DreamContentView> m_pDreamContentView;
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
-	std::shared_ptr<DreamControlView> m_pDreamControlView;
+	std::shared_ptr<DreamUIBar> m_pDreamUIBar = nullptr;
+	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 };
 

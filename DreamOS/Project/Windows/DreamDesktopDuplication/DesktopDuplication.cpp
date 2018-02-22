@@ -219,7 +219,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
+		// Data to send to dream
 		BYTE *pBuffer = nullptr;
+		int pxWidth = 0;
+		int pxHeight = 0;
+
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			if (msg.message == OCCLUSION_STATUS_MSG) {
 				// Present may not be occluded now so try again
@@ -280,15 +284,19 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 		}
 
-		if (g_fStartSending && (pBuffer != nullptr)) {
+		if ((pBuffer != nullptr)) {
 
 			DDCIPCMessage ddcMessage;
 			ddcMessage.SetType(DDCIPCMessage::type::FRAME);
-			COPYDATASTRUCT desktopCDS;
+			ddcMessage.m_body.pDataBuffer = pBuffer;
+			ddcMessage.m_body.pxHeight = pxHeight;
+			ddcMessage.m_body.pxWidth = pxWidth;
 
-			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
-			desktopCDS.cbData = (938*484*4);	// Not hardcoded, set texture params dynamically and send to dream
-			desktopCDS.lpData = pBuffer;
+			COPYDATASTRUCT desktopCDS;
+			
+			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessageType();
+			desktopCDS.cbData = (pxHeight * pxWidth * 4);
+			desktopCDS.lpData = &ddcMessage;
 
 			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
 		}
@@ -386,7 +394,7 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 		ddcMessage.SetType(DDCIPCMessage::type::ACK);
 		COPYDATASTRUCT desktopCDS;
 
-		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessageType();
 		desktopCDS.cbData = sizeof(ddcMessage);
 		desktopCDS.lpData = &ddcMessage;
 

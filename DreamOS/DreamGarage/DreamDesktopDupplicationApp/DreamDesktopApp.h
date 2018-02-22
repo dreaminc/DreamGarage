@@ -51,7 +51,7 @@ public:
 
 	//RESULT FadeQuadToBlack();
 
-	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData);
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
 
 	float GetWidth();
 	float GetHeight();
@@ -65,6 +65,10 @@ public:
 	RESULT SetVisible(bool fVisible);
 
 	std::shared_ptr<texture> GetScreenTexture();
+
+	size_t m_frameDataBuffer_n = 0;
+	unsigned char* m_pFrameDataBuffer = nullptr;
+
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
@@ -77,8 +81,8 @@ private:
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
-	int m_pxDesktopWidth = 1920;
-	int m_pxDesktopHeight = 1080;
+	int m_pxDesktopWidth = 938;
+	int m_pxDesktopHeight = 484;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
@@ -87,9 +91,6 @@ private:
 	double m_msTimeDelay = 20;
 
 	bool m_fDesktopDuplicationIsRunning = false;
-
-	size_t m_pFrameDataBuffer_n = 0;
-	unsigned char* m_pFrameDataBuffer;
 
 	// Window
 	HWND m_hwndDreamHandle = nullptr;

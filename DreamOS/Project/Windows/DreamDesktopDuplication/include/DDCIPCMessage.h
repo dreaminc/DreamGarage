@@ -22,7 +22,7 @@ public:
 		INVALID
 	};
 	
-	DDCIPCMessage::type GetMessage() {
+	DDCIPCMessage::type GetMessageType() {
 		return m_body.m_msgType;
 	}
 
@@ -30,11 +30,12 @@ public:
 		m_body.m_msgType = msgType;
 		return S_OK;
 	}
-
-	__declspec(align(8)) struct MessageBody {
+	//__declspec(align(8)) 
+	struct MessageBody {
 		DDCIPCMessage::type m_msgType;
 		unsigned char* pDataBuffer;
-		PIXEL_FORMAT pixelFormat;
+		int pxWidth;
+		int pxHeight;
 	} m_body;
 };
 

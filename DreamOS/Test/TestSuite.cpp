@@ -141,13 +141,14 @@ Error:
 	return nullptr;
 }
 
-RESULT TestSuite::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+RESULT TestSuite::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 
 	m_pDataBuffer = (unsigned char*)malloc(messageSize);
 	m_pDataBuffer_n = messageSize;
-
-	memcpy(m_pDataBuffer, (unsigned char*)pMessageData, messageSize);
-
+	m_pxHeight = pxHeight;
+	m_pxWidth = pxWidth;
+	//memcpy(m_pDataBuffer, (unsigned char*)pMessageData, messageSize);
+	m_pDataBuffer = (unsigned char*)pMessageData;
 
 	return R_PASS;
 }
