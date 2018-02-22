@@ -348,6 +348,9 @@ RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pT
 	if (pContext == m_pActiveBrowser.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
+	else {
+		m_pDreamTabView->UpdateBrowserTexture(std::shared_ptr<DreamBrowser>(pContext));
+	}
 	return R_PASS;
 }
 
@@ -450,6 +453,10 @@ RESULT DreamUserControlArea::SendURL() {
 	std::string strTitle = "website";
 
 	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
+
+	if (m_pActiveBrowser != nullptr) {
+		m_pDreamTabView->AddBrowser(m_pActiveBrowser);
+	}
 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
