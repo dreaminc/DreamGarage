@@ -25,14 +25,6 @@
 
 #include "HAL/UIStageProgram.h"
 
-RESULT DreamUIBarHandle::SendShowRootMenu() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowRootMenu());
-Error:
-	return r;
-}
-
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
@@ -316,7 +308,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 			} 
 			m_pUserHandle->SendPreserveSharingState(true);
-			CR(m_pParentApp->SendURL());
+			if (m_pParentApp != nullptr) {
+				CR(m_pParentApp->SendURL());
+			}
 		} break;
 	}
 

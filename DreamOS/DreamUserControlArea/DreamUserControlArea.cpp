@@ -344,6 +344,25 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
+	if (pContext == m_pActiveBrowser.get()) {
+		m_pControlView->SetViewQuadTexture(pTexture);
+	}
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
+	return R_PASS;
+}
+
+bool DreamUserControlArea::IsContentVisible() {
+	return true;
+}
+
 int DreamUserControlArea::GetPXWidth() {
 	return m_pxWidth;
 }
@@ -434,6 +453,7 @@ RESULT DreamUserControlArea::SendURL() {
 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+	m_pActiveBrowser->InitializeWithParent(this);
 	m_pActiveBrowser->SetBrowserScope(strScope);
 	m_pActiveBrowser->SetBrowserPath(m_strURL);
 

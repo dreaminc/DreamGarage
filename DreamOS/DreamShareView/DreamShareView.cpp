@@ -316,18 +316,9 @@ Error:
 RESULT DreamShareView::StopSending() {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	CR(SetStreamingState(false));
 
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->HideApp();
-		pDreamControlViewHandle->SetControlViewTexture(m_pLoadingTexture);
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-		
-		m_pDreamUserHandle->SendStopSharing();
-	}
+	m_pDreamUserHandle->SendStopSharing();
 
 	ShowLoadingTexture();
 	Hide();
@@ -341,10 +332,6 @@ RESULT DreamShareView::StopSending() {
 	CR(GetComposite()->SetVisible(false));
 
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-
 	return r;
 }
 

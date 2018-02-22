@@ -11,96 +11,6 @@
 //#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
 
-RESULT DreamControlViewHandle::SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture) {
-	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
-	CB(GetAppState());
-
-	return SetViewQuadTexture(pBrowserTexture);
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::SendContentType(std::string strContentType) {
-	RESULT r = R_PASS;	
-	CB(GetAppState());
-
-	return SetContentType(strContentType);
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::ShowApp() {
-	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
-
-	CB(GetAppState());
-	CR(Show());
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::HideApp() {
-	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
-
-	CB(GetAppState());
-	CR(Hide());
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::DismissApp() {
-	RESULT r = R_PASS;	
-
-	CB(GetAppState());
-	CR(Dismiss());
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::SendURLtoBrowser() {
-	RESULT r = R_PASS;
-
-	CB(GetAppState());
-	CR(SendURL());
-
-Error:
-	return r;
-}
-
-RESULT DreamControlViewHandle::SendBrowserScopeAndPath(std::string strScope, std::string strPath) {
-	RESULT r = R_PASS;
-
-	CB(GetAppState());
-	CR(SetBrowserScopeAndPath(strScope, strPath));
-
-Error:
-	return r;
-}
-
-bool DreamControlViewHandle::IsAppVisible() {
-	RESULT r = R_PASS;	// This is just an option, currently Texture is retrieved through Browser Handle
-
-	CB(GetAppState());
-	return IsVisible();
-
-Error:
-	return false;
-}
-
-RESULT DreamControlViewHandle::SendURLText(std::string strURL) {
-	RESULT r = R_PASS;
-
-	CB(GetAppState());
-	CR(SetURLText(strURL));
-
-Error:
-	return r;
-}
-
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
 {
@@ -326,45 +236,6 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::Notify(InteractionObjectEvent *pInteractionEvent) {
-	RESULT r = R_PASS;
-
-	/*
-	if (pInteractionEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN) {
-		char chkey = (char)(pInteractionEvent->m_value);
-
-		CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
-
-		if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
-			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
-			CBR(chkey != 0, R_SKIPPED);
-			CBR(chkey != SVK_CONTROL, R_SKIPPED);
-			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
-
-			CNR(m_pParentApp, R_OBJECT_NOT_FOUND);
-			CR(m_pParentApp->SendKeyCharacter(chkey, true));
-		}
-		else {
-			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
-				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
-			}
-
-			else if (chkey == SVK_BACK) {
-				if (m_strURL.size() > 0) {
-					m_strURL.pop_back();
-				}
-			}
-			
-			else {
-				m_strURL += chkey;
-			}
-		}
-	}
-Error:
-	//*/
-	return r;
-}
-
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 	CBR(IsVisible(), R_SKIPPED);
@@ -453,7 +324,9 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			//TODO: when using the control bar, we know that a website will be shared on enter,
 			// need a way to not have the scope and path hardcoded here
 
-			CR(SendURL());
+			if (m_pParentApp != nullptr) {
+				m_pParentApp->SendURL();
+			}
 
 			//TODO: bypass making a request to help smooth the loading
 			//CR(SendURI());
@@ -488,7 +361,7 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
 	CN(m_pViewQuad);
 
-	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+//	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
 	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
 
@@ -513,25 +386,6 @@ Error:
 	return R_PASS;
 }
 
-RESULT DreamControlView::SendURL() {
-	RESULT r = R_PASS;
-
-//Error:
-	return r;
-}
-
-RESULT DreamControlView::SetBrowserScopeAndPath(std::string strScope, std::string strPath) {
-	RESULT r = R_PASS;
-
-	if (m_pParentApp != nullptr) {
-		CR(m_pParentApp->SetScope(strScope));
-		CR(m_pParentApp->SetPath(strPath));
-	}
-
-Error:
-	return r;
-}
-
 texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
 
@@ -547,10 +401,6 @@ texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
 
 RESULT DreamControlView::Shutdown(void *pContext) {
 	return R_PASS;
-}
-
-DreamAppHandle* DreamControlView::GetAppHandle() {
-	return (DreamControlViewHandle*)(this);
 }
 
 RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {

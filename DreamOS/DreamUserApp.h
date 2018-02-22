@@ -28,7 +28,6 @@ class DimRay;
 class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
-class DreamUIBarHandle;
 class DimObj;
 
 #define MENU_HEIGHT -0.16f
@@ -186,7 +185,6 @@ private:
 	DreamUserObserver* m_pEventApp = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
-	DreamUIBarHandle *m_pMenuHandle = nullptr;
 
 	// reflection of the member 
 	bool m_fStreaming = false;

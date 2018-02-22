@@ -81,6 +81,14 @@ public:
 
 	RESULT CanPressButton(UIButton *pButtonContext);
 
+// DreamBrowser
+public:
+	RESULT UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext);
+	RESULT UpdateControlBarText(std::string& strTitle);
+	//TODO: present keyboard from browser::OnNodeFocusChanged
+	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
+	bool IsContentVisible();
+
 // DreamGarage compatability (temp?)
 public:
 	RESULT ResetAppComposite();

@@ -277,12 +277,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
-	if (m_pMenuHandle == nullptr) {
-		auto menuUIDs = GetDOS()->GetAppUID("DreamUIBar");
-		CBR(menuUIDs.size() == 1, R_SKIPPED);
-		m_pMenuHandle = dynamic_cast<DreamUIBarHandle*>(GetDOS()->CaptureApp(menuUIDs[0], this));
-	}
-
 Error:
 	return r;
 }
@@ -507,19 +501,6 @@ RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
 RESULT DreamUserApp::StopSharing() {
 	RESULT r = R_PASS;
 
-	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-	CBR(m_pEventApp != nullptr, R_SKIPPED);
-
-	if (m_pEventApp == pDreamControlViewHandle) {
-		m_pKeyboardHandle->Hide();
-		CR(ClearFocusStack());
-	}
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 

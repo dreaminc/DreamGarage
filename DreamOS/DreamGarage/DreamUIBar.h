@@ -56,20 +56,8 @@ enum class MenuState {
 	ANIMATING
 };
 
-class DreamUIBarHandle : public DreamAppHandle, public DreamUserObserver {
-public:
-	RESULT SendShowRootMenu();
-
-public:
-	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
-
-private:
-	virtual RESULT ShowRootMenu() = 0;
-};
-
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
-					public DreamUIBarHandle,
+					public DreamUserObserver,
 					public MenuController::observer, 
 					public Subscriber<UIEvent>
 {
@@ -107,9 +95,9 @@ public:
 	RESULT PopPath();
 	RESULT RequestMenu();
 	RESULT ResetAppComposite();
-	virtual RESULT ShowRootMenu() override;
-	virtual RESULT HandleEvent(UserObserverEventType type) override;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) override;
+	RESULT ShowRootMenu();
+	RESULT HandleEvent(UserObserverEventType type);
+	texture *GetOverlayTexture(HAND_TYPE type);
 
 	RESULT RequestIconFile(std::shared_ptr<MenuNode> pMenuNode);
 

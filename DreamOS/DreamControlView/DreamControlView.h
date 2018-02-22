@@ -35,42 +35,9 @@ class UIView;
 class UIMallet;
 class UIButton;
 class texture;
-class DreamBrowserHandle;
-
-class DreamControlViewHandle : public DreamAppHandle, public DreamUserObserver {
-public:
-	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
-	RESULT SendContentType(std::string strContentType);
-	RESULT ShowApp();
-	RESULT HideApp();
-	RESULT DismissApp();
-	RESULT SendURLtoBrowser();
-	RESULT SendBrowserScopeAndPath(std::string strScope, std::string strPath);
-	bool IsAppVisible();
-	RESULT SendURLText(std::string strURL);
-
-public:
-	//User Observer
-	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
-
-	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) = 0;
-
-private:
-	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
-	virtual RESULT SetContentType(std::string strContentType) = 0;
-	virtual RESULT Show() = 0;
-	virtual RESULT Hide() = 0;
-	virtual RESULT Dismiss() = 0;
-	virtual RESULT SendURL() = 0;
-	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) = 0;
-	virtual bool IsVisible() = 0;
-	virtual RESULT SetURLText(std::string strURL) = 0;
-};
 
 class DreamControlView : public DreamApp<DreamControlView>, 
-						 public DreamControlViewHandle,
-						 public Subscriber<InteractionObjectEvent>,
+						 public DreamUserObserver,
 						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
@@ -94,21 +61,16 @@ public:
 	
 // DreamAppHandle
 public:
-	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
-	virtual RESULT SetContentType(std::string strContentType) override;
+	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
+	RESULT SetContentType(std::string strContentType);
 
-	virtual DreamAppHandle* GetAppHandle() override;
-
-	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
 
-	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
+	RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox);
 	virtual RESULT HandleKeyboardDown();
-	virtual RESULT SendURL() override;
-	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) override;
 
 	RESULT ResetAppComposite();
 
@@ -122,19 +84,19 @@ private:
 // Animations
 private:
 
-	virtual RESULT Show() override;
-	virtual RESULT Hide() override;
+	RESULT Show();
+	RESULT Hide();
 	RESULT ShowView();
 	RESULT HideView();
-	virtual RESULT Dismiss() override;
+	RESULT Dismiss();
 
-	virtual bool IsVisible() override;
+	bool IsVisible();
 
 	//	manually checks the objects that could be animating,
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
 
-	virtual RESULT SetURLText(std::string strURL) override;
+	RESULT SetURLText(std::string strURL);
 
 // View Context
 public:

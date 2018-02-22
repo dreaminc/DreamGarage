@@ -37,6 +37,7 @@ class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
 class DreamUserHandle;
+class DreamUserControlArea;
 class AudioPacket;
 
 #include "DreamShareViewMessage.h"
@@ -129,6 +130,7 @@ public:
 	RESULT SetScrollFactor(int scrollFactor);
 
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
+	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 	std::shared_ptr<texture> GetScreenTexture();
 
 protected:
@@ -174,6 +176,8 @@ private:
 
 	// CEF can call LoadRequest once a URL is loaded
 	bool m_fCanLoadRequest = false;
+
+	DreamUserControlArea *m_pParentApp = nullptr;
 
 };
 

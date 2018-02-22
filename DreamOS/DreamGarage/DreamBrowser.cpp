@@ -1,6 +1,7 @@
 #include "DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
@@ -257,39 +258,20 @@ Error:
 RESULT DreamBrowser::OnAfterCreated() {
 	RESULT r = R_PASS;
 
-	//m_fCreated = true;
-	//if (m_pPendingEnvironmentAsset != nullptr) {
-		//CR(SetEnvironmentAsset(m_pPendingEnvironmentAsset));
-	//}
-	//m_pPendingEnvironmentAsset = nullptr;
-
-//Error:
 	return r;
 }
 
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-	if (!fLoading && pDreamControlViewHandle != nullptr) {
+	if (!fLoading && m_pParentApp != nullptr) {
 		m_strCurrentURL = strCurrentURL;
 
-		CR(pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture));
-		/*
-		if (m_strCurrentURL != "") {
-			pDreamControlViewHandle->SendURLText(m_strCurrentURL);
-		}
-		//*/
+		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
 	}
 
 Error:
-
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-
 	return r;
 }
 
@@ -316,16 +298,14 @@ RESULT DreamBrowser::OnLoadStart() {
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
 
 	m_strCurrentURL = strCurrentURL;
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
 	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
-	if (pDreamControlViewHandle != nullptr) {
-		pDreamControlViewHandle->SetControlViewTexture(m_pBrowserTexture);
-		
+	if (m_pParentApp != nullptr) {
+		m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this);
+		m_pParentApp->UpdateControlBarText(m_strCurrentURL);
 	}
 
 	if (strCurrentURL == "about:blank") {
@@ -345,10 +325,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	//*/
 
 //Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-
 	if (pDreamShareViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
 	}
@@ -358,16 +334,12 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	bool fMaskPasswordEnabled = false;
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-
-		if (pDreamControlViewHandle->IsAppVisible()) {
+		if (m_pParentApp != nullptr && m_pParentApp->IsContentVisible()) {
 			std::string strTextField = pDOMNode->GetValue();
 			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
-			CR(pDreamControlViewHandle->HandleKeyboardUp(strTextField, ptTextBox));
+			CR(m_pParentApp->ShowKeyboard(strTextField, ptTextBox));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
@@ -381,23 +353,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		pKeyboardHandle = nullptr;
 	}
 
-	/*
-#ifdef _USE_TEST_APP
-	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		DEBUG_LINEOUT("editable!");
-		m_pPointerCursor->SetVisible(false);
-	}
-	else {
-		DEBUG_LINEOUT("non editable!");
-		m_pPointerCursor->SetVisible(true);
-	}
-#endif
-//*/
-
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
@@ -515,7 +471,6 @@ Error:
 
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
 	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
 
 	if (m_pWebBrowserManager != nullptr) {
@@ -534,14 +489,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 	}
 	/*
 	if (m_fShowControlView) {
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-
-		if (pDreamControlViewHandle != nullptr) {
-			CR(pDreamControlViewHandle->ShowApp());
-			pDreamControlViewHandle->SendContentType(m_strContentType);
-			m_fShowControlView = false;
-		}
-
 		pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
 		if (pDreamShareViewHandle != nullptr) {
@@ -554,9 +501,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 	}
 	//*/
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 
 	if (pDreamShareViewHandle != nullptr) {
 		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
@@ -581,6 +525,11 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 
 Error:
 	return r;
+}
+
+RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	m_pParentApp = pParentApp;
+	return R_PASS;
 }
 
 std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
@@ -754,29 +703,6 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
-	DreamControlViewHandle *pDreamControlViewHandle = nullptr;
-	
-	/*
-	if (m_pWebBrowserController == nullptr) {
-		m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(m_browserWidth, m_browserHeight, pEnvironmentAsset->GetURL());
-		CN(m_pWebBrowserController);
-		CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
-		m_fShowControlView = true;
-
-		pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-		CN(pDreamControlViewHandle);
-		CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-		m_pDreamUserHandle->SendPreserveSharingState(false);	
-	}
-
-	m_fShowControlView = true;
-
-	pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-	CR(m_pDreamUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-	m_pDreamUserHandle->SendPreserveSharingState(false);
-	//*/
-
 	if (pEnvironmentAsset != nullptr) {
 		WebRequest webRequest;
 
@@ -820,9 +746,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	}
 
 Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
