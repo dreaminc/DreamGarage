@@ -46,7 +46,7 @@ public:
 	// the top tab is returned after the remaining tabs shift up 
 	std::shared_ptr<DreamBrowser> RemoveBrowser();
 
-	RESULT SelectTab();
+	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
 
 	RESULT UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser);
 

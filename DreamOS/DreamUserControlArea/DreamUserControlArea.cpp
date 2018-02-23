@@ -315,6 +315,16 @@ Error:
 	return false;
 }
 
+std::shared_ptr<DreamBrowser> DreamUserControlArea::GetActiveBrowser() {
+	return m_pActiveBrowser;
+}
+
+RESULT DreamUserControlArea::SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser) {
+	m_pActiveBrowser = pNewBrowser;
+	m_pControlView->SetViewQuadTexture(m_pActiveBrowser->GetScreenTexture());
+	return R_PASS;
+}
+
 RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
 	if (pContext == m_pActiveBrowser.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);

@@ -84,6 +84,10 @@ RESULT DreamTabView::AddBrowser(std::shared_ptr<DreamBrowser> pBrowser) {
 
 	newTabButton->SetPosition(m_ptMostRecent);
 	newTabButton->GetSurface()->RotateXByDeg(-90.0f);
+	newTabButton->RegisterToInteractionEngine(GetDOS());
+	newTabButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+		std::bind(&DreamTabView::SelectTab, this, std::placeholders::_1, std::placeholders::_2));
+	
 
 	for (auto pButton : m_tabButtons) {
 		pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
@@ -125,7 +129,50 @@ Error:
 	return nullptr;
 }
 
-RESULT DreamTabView::SelectTab() {
+RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
+	RESULT r = R_PASS;
+
+	auto newTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
+	auto pBrowser = m_pParentApp->GetActiveBrowser();
+	auto tabTexture = pBrowser->GetScreenTexture().get();
+	auto pDreamOS = GetDOS();
+
+	newTabButton->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
+	newTabButton->GetSurface()->FlipUVVertical();
+
+	newTabButton->SetPosition(m_ptMostRecent);
+	newTabButton->GetSurface()->RotateXByDeg(-90.0f);
+
+	newTabButton->RegisterToInteractionEngine(GetDOS());
+	newTabButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+		std::bind(&DreamTabView::SelectTab, this, std::placeholders::_1, std::placeholders::_2));
+
+	for (int i = (int)m_tabButtons.size() - 1; i >= 0; i--) {
+		auto pButton = m_tabButtons[i];
+		if (pButton.get() == pButtonContext) {
+
+			m_pView->RemoveChild(pButton);
+			pDreamOS->UnregisterInteractionObject(pButton.get());
+			pDreamOS->RemoveObjectFromInteractionGraph(pButton.get());
+			pDreamOS->RemoveObjectFromUIGraph(pButton.get());
+
+			m_pParentApp->SetActiveBrowser(m_browsers[i]);
+
+			m_appToTabMap.erase(m_browsers[i]);
+			m_tabButtons.erase(m_tabButtons.begin() + i);
+			m_browsers.erase(m_browsers.begin() + i);
+
+			break;
+		} 
+		else {
+			pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+		}
+	}
+
+	m_tabButtons.emplace_back(newTabButton);
+	m_browsers.emplace_back(pBrowser);
+	m_appToTabMap[pBrowser] = newTabButton;
+
 	return R_PASS;
 }
 

@@ -81,6 +81,11 @@ public:
 
 	bool CanPressButton(UIButton *pButtonContext);
 
+// DreamTabView
+public:
+	std::shared_ptr<DreamBrowser> GetActiveBrowser();
+	RESULT SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser);
+
 // DreamBrowser
 public:
 	RESULT UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext);
