@@ -102,11 +102,13 @@ RESULT DreamControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* 
 
 	if (m_fIsMinimized) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MAXIMIZE));
+		m_pUIControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetHideTexture());
 		m_fIsMinimized = false;
 	}
 	else {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MINIMIZE));
 		m_fIsMinimized = true;
+		m_pUIControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShowTexture());
 	}
 
 Error:

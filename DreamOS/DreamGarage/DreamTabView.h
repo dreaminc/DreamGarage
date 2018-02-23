@@ -37,8 +37,17 @@ public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
 public:
+
+	// called when a new piece of content is opened, 
+	// all existing tabs shift down and a new tab is added at the top
 	RESULT AddBrowser(std::shared_ptr<DreamBrowser> pBrowser);
-	RESULT RemoveBrowser(std::shared_ptr<DreamBrowser> pBrowser);
+
+	// called when close is pressed on the control bar,
+	// the top tab is returned after the remaining tabs shift up 
+	std::shared_ptr<DreamBrowser> RemoveBrowser();
+
+	RESULT SelectTab();
+
 	RESULT UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser);
 
 protected:
@@ -53,6 +62,7 @@ private:
 
 	std::shared_ptr<UIView> m_pView;
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
+	std::vector<std::shared_ptr<DreamBrowser>> m_browsers;
 
 private:
 	const wchar_t *k_wszTabBackground = L"control-view-list-background.png";

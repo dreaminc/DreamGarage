@@ -183,24 +183,46 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::BACK: {
 		// Send back event to active browser
-		//CR(m_pBrowserHandle->SendBackEvent());
+		CR(m_pActiveBrowser->HandleBackEvent());
 	} break;
 
 	case ControlEventType::FORWARD: {
-		// Send forward event to active browser
-		//CR(m_pBrowserHandle->SendForwardEvent());
+		CR(m_pActiveBrowser->HandleForwardEvent());
 	} break;
 
 	case ControlEventType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
+		CR(m_pDreamUIBar->ShowRootMenu());
+		m_pControlBar->GetComposite()->SetVisible(false);
+		m_pDreamTabView->GetComposite()->SetVisible(false);
+		m_pControlView->GetComposite()->SetVisible(false);
 	} break;
 
 	case ControlEventType::CLOSE: {
-		// if active browser matches shared browser, send stop event
 		// close active browser
+		m_pActiveBrowser->CloseBrowser();
+		GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pActiveBrowser);
+
 		// replace with top of tab bar
-		// update tab bar
+		m_pActiveBrowser = m_pDreamTabView->RemoveBrowser();
+		if (m_pActiveBrowser != nullptr) {
+			m_pControlView->SetViewQuadTexture(m_pActiveBrowser->GetScreenTexture());
+		}
+		else {
+		//	m_pControlView->SetViewQuadTexture(m_p)
+			m_pControlBar->GetComposite()->SetVisible(false);
+			m_pDreamTabView->GetComposite()->SetVisible(false);
+			m_pControlView->GetComposite()->SetVisible(false);
+			m_fHasOpenApp = false;
+			m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
+			m_pDreamUserApp->SetEventApp(nullptr);
+		}
+
+		// if there are no more pieces of content, hide view
+
+
+		// if active browser matches shared browser, send stop event
 		/*
 		DreamShareViewHandle *pShareViewHandle = nullptr;
 		pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
@@ -219,66 +241,13 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::MAXIMIZE: {
-		// send show events to control view and tab bar
-		/*
-		auto fnStartCallback = [&](void *pContext) {
-			GetViewQuad()->SetVisible(true);
-			return R_PASS;
-		};
-
-		auto fnEndCallback = [&](void *pContext) {
-			RESULT r = R_PASS;
-			
-			m_fMouseDown[0] = false;
-			m_fMouseDown[1] = false;
-
-			SetIsMinimizedFlag(false);
-//		Error:
-			return r;
-		};
-
-		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-			m_pViewQuad.get(),
-			m_pViewQuad->GetPosition(),
-			m_pViewQuad->GetOrientation(),
-			vector(m_visibleScale, m_visibleScale, m_visibleScale),
-			0.1f,
-			AnimationCurveType::SIGMOID,
-			AnimationFlags(),
-			fnStartCallback,
-			fnEndCallback,
-			this
-		));
-		//*/
+		m_pDreamTabView->GetComposite()->SetVisible(true);
+		m_pControlView->GetComposite()->SetVisible(true);
 	} break;
 
 	case ControlEventType::MINIMIZE: {
-		// send hide events to control view and tab bar
-		/*
-		auto fnStartCallback = [&](void *pContext) {
-			return R_PASS;
-		};
-
-		auto fnEndCallback = [&](void *pContext) {
-			GetViewQuad()->SetVisible(false);
-			SetIsMinimizedFlag(true);
-			m_strURL = "";
-			return R_PASS;
-		};
-
-		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-			m_pViewQuad.get(),
-			m_pViewQuad->GetPosition(),
-			m_pViewQuad->GetOrientation(),
-			vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
-			0.1f,
-			AnimationCurveType::SIGMOID,
-			AnimationFlags(),
-			fnStartCallback,
-			fnEndCallback,
-			this
-		));
-		//*/
+		m_pDreamTabView->GetComposite()->SetVisible(false);
+		m_pControlView->GetComposite()->SetVisible(false);
 	} break;
 
 	case ControlEventType::SHARE: {
@@ -290,7 +259,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::URL: {
-		// dismiss everyting(?) and pull up the keyboard
+		// dismiss everything(?) and pull up the keyboard
 		/*
 		auto pDreamOS = GetDOS();
 
@@ -311,10 +280,11 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	}
 
+Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
+bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -340,8 +310,9 @@ RESULT DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 
 	CR(m_pDreamUserApp->CreateHapticImpulse(pButtonContext->GetInteractionObject()));
 
+	return true;
 Error:
-	return r;
+	return false;
 }
 
 RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
@@ -459,7 +430,7 @@ RESULT DreamUserControlArea::SendURL() {
 	}
 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
 	m_pActiveBrowser->InitializeWithParent(this);
 	m_pActiveBrowser->SetBrowserScope(strScope);
 	m_pActiveBrowser->SetBrowserPath(m_strURL);

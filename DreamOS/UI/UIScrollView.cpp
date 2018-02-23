@@ -248,6 +248,7 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 				//CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
 				//CR(m_pDreamOS->RemoveObject(pButton));
+				m_pMenuButtonsContainer->RemoveChild(pButton);
 
 				m_pDreamOS->UnregisterInteractionObject(pButton);
 				m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);

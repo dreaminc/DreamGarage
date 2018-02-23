@@ -79,7 +79,7 @@ public:
 public:
 	RESULT HandleControlBarEvent(ControlEventType type);
 
-	RESULT CanPressButton(UIButton *pButtonContext);
+	bool CanPressButton(UIButton *pButtonContext);
 
 // DreamBrowser
 public:

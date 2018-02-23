@@ -90,13 +90,45 @@ RESULT DreamTabView::AddBrowser(std::shared_ptr<DreamBrowser> pBrowser) {
 	}
 
 	m_tabButtons.emplace_back(newTabButton);
+	m_browsers.emplace_back(pBrowser);
 	m_appToTabMap[pBrowser] = newTabButton;
 
 	return R_PASS;
 }
-RESULT DreamTabView::RemoveBrowser(std::shared_ptr<DreamBrowser> pBrowser) {
+
+std::shared_ptr<DreamBrowser> DreamTabView::RemoveBrowser() {
+	
+	RESULT r = R_PASS;
+	auto pDreamOS = GetDOS();
+
+	CBR(m_tabButtons.size() > 0, R_SKIPPED);
+	{
+		auto pActiveBrowser = m_browsers.back();
+		auto pButtonToRemove = m_tabButtons.back();
+
+		m_appToTabMap.erase(m_browsers.back());
+		m_browsers.pop_back();
+		m_tabButtons.pop_back();
+
+		pButtonToRemove->SetVisible(false);
+		m_pView->RemoveChild(pButtonToRemove);
+		pDreamOS->UnregisterInteractionObject(pButtonToRemove.get());
+		pDreamOS->RemoveObjectFromInteractionGraph(pButtonToRemove.get());
+		pDreamOS->RemoveObjectFromUIGraph(pButtonToRemove.get());
+
+		for (auto pButton : m_tabButtons) {
+			pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+		}
+		return pActiveBrowser;
+	}
+Error:
+	return nullptr;
+}
+
+RESULT DreamTabView::SelectTab() {
 	return R_PASS;
 }
+
 RESULT DreamTabView::UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser) {
 
 	if (m_appToTabMap.count(pBrowser) > 0) {

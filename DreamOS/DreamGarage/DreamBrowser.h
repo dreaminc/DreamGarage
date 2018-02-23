@@ -129,9 +129,11 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
-	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager);
+	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL = "about:blank");
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 	std::shared_ptr<texture> GetScreenTexture();
+
+	RESULT CloseBrowser();
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

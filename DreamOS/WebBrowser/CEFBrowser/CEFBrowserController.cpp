@@ -523,7 +523,9 @@ Error:
 RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	}
 
 Error:
 	return r;

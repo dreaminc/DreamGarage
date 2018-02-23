@@ -26,23 +26,27 @@ DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 }
 
 DreamBrowser::~DreamBrowser(){
+	/*
 	RESULT r = R_PASS;
 
 	CR(Shutdown());
 
 Error:
 	return;
+	//*/
 }
 
 RESULT DreamBrowser::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	/*
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Shutdown());
 		//m_pWebBrowserManager = nullptr;
 	}
+	//*/
 
-Error:
+//Error:
 	return r;
 }
 
@@ -508,7 +512,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager) {
+RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
 	RESULT r = R_PASS;
 
 	int pxWidth = m_browserWidth;
@@ -519,7 +523,7 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
 	m_pWebBrowserManager = pWebBrowserManager;
 
-	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, "about:blank");
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 
@@ -534,6 +538,16 @@ RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
 
 std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
 	return m_pBrowserTexture;
+}
+
+RESULT DreamBrowser::CloseBrowser() {
+	RESULT r = R_PASS;
+
+	CR(m_pWebBrowserController->CloseBrowser());
+	CR(m_pWebBrowserManager->RemoveBrowser(m_pWebBrowserController));
+	
+Error:
+	return r;
 }
 
 // TODO: Only update the rect
