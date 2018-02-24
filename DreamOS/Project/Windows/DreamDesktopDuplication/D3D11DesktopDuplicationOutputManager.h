@@ -15,8 +15,8 @@ public:
 	D3D11DesktopDuplicationOutputManager();
 	~D3D11DesktopDuplicationOutputManager();
 	DUPL_RETURN InitOutput(HWND Window, INT outputToDuplicate, _Out_ UINT* OutCount, _Out_ RECT* pDeskBounds);
-	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* pPointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer);
-	HRESULT CopyToSendToDream(BYTE** pBuffer);
+	DUPL_RETURN UpdateApplicationWindow(_In_ PTR_INFO* pPointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer, UINT &pxWidth, UINT &pxHeight);
+	HRESULT CopyToSendToDream(BYTE** pBuffer, UINT &pxWidth, UINT &pxHeight);
 	void CleanRefs();
 	HANDLE GetSharedHandle();
 	void WindowResize();

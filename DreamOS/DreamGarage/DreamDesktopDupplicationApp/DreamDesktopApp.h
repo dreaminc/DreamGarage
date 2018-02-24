@@ -88,7 +88,7 @@ private:
 	vector m_vNormal;
 
 	double m_msTimeSinceLastSent = 0;
-	double m_msTimeDelay = 20;
+	double m_msTimeDelay = 2000;
 
 	bool m_fDesktopDuplicationIsRunning = false;
 

@@ -112,10 +112,10 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 		m_msTimeSinceLastSent = msTimeNow;
 
 		DDCIPCMessage ddcMessage;
-		ddcMessage.SetType(DDCIPCMessage::type::START);
+		ddcMessage.m_msgType = DDCIPCMessage::type::START;
 		COPYDATASTRUCT desktopCDS;
 
-		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessageType();
+		desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
 		desktopCDS.cbData = sizeof(ddcMessage);
 		desktopCDS.lpData = &ddcMessage;
 
@@ -196,19 +196,21 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 
 RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
-
+	m_fDesktopDuplicationIsRunning = true;
 	m_frameDataBuffer_n = messageSize;
 	m_pFrameDataBuffer = (unsigned char*)malloc(m_frameDataBuffer_n);
 	//m_pFrameDataBuffer = (unsigned char*)pMessageData;
-	memcpy(m_pFrameDataBuffer, (unsigned char*)pMessageData, messageSize);
+	memcpy(m_pFrameDataBuffer, (unsigned char*)pMessageData, m_frameDataBuffer_n);
 
-	CN(m_pFrameDataBuffer);
+	CNR(m_pFrameDataBuffer, R_SKIPPED);
 
-	m_pDesktopTexture->Update(m_pFrameDataBuffer, 938, 484, PIXEL_FORMAT::BGRA);
-	free(m_pFrameDataBuffer);
-	m_frameDataBuffer_n = 0;
+	m_pDesktopTexture->Update(m_pFrameDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
 
 Error:
+	if (m_pFrameDataBuffer != nullptr) {
+		free(m_pFrameDataBuffer);
+	}
+
 	return r;
 }
 

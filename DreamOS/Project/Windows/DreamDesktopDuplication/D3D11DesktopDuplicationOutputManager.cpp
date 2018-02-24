@@ -334,7 +334,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) {
+HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, UINT &pxWidth, UINT &pxHeight) {
 	HRESULT r = S_OK;
 
 	ID3D11Texture2D *pTempTexture = nullptr;
@@ -342,8 +342,8 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) 
 	D3D11_TEXTURE2D_DESC descTemp;
 	D3D11_TEXTURE2D_DESC descDream;
 	IDXGISurface *DreamSurface = nullptr;
-	UINT pxWidth = 0;
-	UINT pxHeight = 0;
+	pxWidth = 0;
+	pxHeight = 0;
 
 	CR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture)));		// 0 is back buffer
 	pTempTexture->GetDesc(&descTemp);
@@ -365,7 +365,7 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) 
 	descDream.MiscFlags = 0;
 
 	CR(m_pDevice->CreateTexture2D(&descDream, nullptr, &pTextureForDream));
-	if (pxWidth != 800) {
+	if (pxWidth > 0) {
 		m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
 
 		pTextureForDream->QueryInterface(__uuidof(IDXGISurface), (void **)&DreamSurface);
@@ -419,7 +419,7 @@ Error:
 //
 // Present to the application window
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer, UINT &pxWidth, UINT &pxHeight) {
 	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
 	// sample contains both these aspects into a single application.
@@ -435,7 +435,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
 
-	CopyToSendToDream(pBuffer);
+	CopyToSendToDream(pBuffer, pxWidth, pxHeight);
 
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
