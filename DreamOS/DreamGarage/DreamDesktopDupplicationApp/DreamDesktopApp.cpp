@@ -44,6 +44,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	// Initialize texture
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
+	//m_frameDataBuffer_n = 0;
 
 	GetComposite()->SetVisible(true);
 
@@ -59,20 +60,6 @@ Error:
 
 RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
-
-	CRM(StartDuplicationProcess(), "Error starting duplication process");
-
-	// TODO: get this from main?
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
-	CNM(m_hwndDreamHandle, "Unable to find the Dream window");
-
-Error:
-	return r;
-}
-
-RESULT DreamDesktopApp::StartDuplicationProcess() {
-	RESULT r = R_PASS;
-
 	// Start duplication process
 	STARTUPINFO startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;
@@ -97,7 +84,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
 	fCreateDuplicationProcess = CreateProcess(lpwstrLocation,
-		L" -output 0",						// Command line
+		L" -output 1",						// Command line
 		nullptr,							// Process handle not inheritable
 		nullptr,							// Thread handle not inheritable
 		false,								// Set handle inheritance to FALSE
