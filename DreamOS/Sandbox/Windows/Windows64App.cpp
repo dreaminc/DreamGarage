@@ -302,6 +302,7 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 }
 
 LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+	RESULT r = R_PASS;
 	switch (msg) {
 	case WM_CREATE: {
 		HDC hDC = GetDC(hWindow);
@@ -328,18 +329,28 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	} break;
 
 	case WM_COPYDATA: {
+
 		PCOPYDATASTRUCT pDataStruct;	
-		pDataStruct = (PCOPYDATASTRUCT)lp;	
+		pDataStruct = (PCOPYDATASTRUCT)lp;
 
 		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
 			unsigned long messageSize = pDataStruct->cbData;
 			void* pMessageData;
 			pMessageData = (unsigned char*)malloc(messageSize);
 			memcpy(pMessageData, pDataStruct->lpData, messageSize);
-						
-			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData);
-			
-			free(pMessageData);
+
+			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData, m_desktoppxHeight, m_desktoppxWidth);
+
+			free(pMessageData);	
+		}
+		else if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::RESIZE) {
+			DDCIPCMessage *pMessageData;
+			pMessageData = (DDCIPCMessage*)(pDataStruct->lpData);
+			CNR(pMessageData, R_SKIPPED);
+
+			m_desktoppxWidth = pMessageData->pxWidth;
+			m_desktoppxHeight = pMessageData->pxHeight;
+			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
 		}
 
 		return true;
@@ -350,6 +361,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	} break;
 	}
 
+Error:
 	// Fall through for all messages for now
 	return DefWindowProc(hWindow, msg, wp, lp);
 }

@@ -334,7 +334,7 @@ Error:
 	return DUPL_RETURN_SUCCESS;
 }
 
-HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) {
+HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, UINT &pxWidth, UINT &pxHeight) {
 	HRESULT r = S_OK;
 
 	ID3D11Texture2D *pTempTexture = nullptr;
@@ -342,12 +342,12 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) 
 	D3D11_TEXTURE2D_DESC descTemp;
 	D3D11_TEXTURE2D_DESC descDream;
 	IDXGISurface *DreamSurface = nullptr;
-	UINT pxWidth = 0;
-	UINT pxHeight = 0;
+	pxWidth = 0;
+	pxHeight = 0;
 
 	CR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture)));		// 0 is back buffer
 	pTempTexture->GetDesc(&descTemp);
-	
+
 	// Make copy that we can access Data from
 	pxWidth = descTemp.Width;
 	pxHeight = descTemp.Height;
@@ -363,11 +363,11 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer) 
 	descDream.BindFlags = 0;
 	descDream.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 	descDream.MiscFlags = 0;
-	
+
 	CR(m_pDevice->CreateTexture2D(&descDream, nullptr, &pTextureForDream));
-	if (pxWidth != 800) {
+	if (pxWidth > 0) {
 		m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
-		
+
 		pTextureForDream->QueryInterface(__uuidof(IDXGISurface), (void **)&DreamSurface);
 		pTextureForDream->Release();
 		pTextureForDream = nullptr;
@@ -419,53 +419,56 @@ Error:
 //
 // Present to the application window
 //
-DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* pPointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer) {
+DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ PTR_INFO* PointerInfo, _Inout_ bool* Occluded, BYTE **pBuffer, UINT &pxWidth, UINT &pxHeight) {
 	// In a typical desktop duplication application there would be an application running on one system collecting the desktop images
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
 	// sample contains both these aspects into a single application.
 	// This routine is the part of the sample that displays the desktop image onto the display
 
 	// Try and acquire sync on common display buffer
-	HRESULT r = S_OK;
-	CRM(m_pKeyMutex->AcquireSync(1, 100), "Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager");
-	
-	CopyToSendToDream(pBuffer);
+	HRESULT hr = m_pKeyMutex->AcquireSync(1, 100);
+	if (hr == static_cast<HRESULT>(WAIT_TIMEOUT)) {
+		// Another thread has the keyed mutex so try again later
+		return DUPL_RETURN_SUCCESS;
+	}
+	else if (FAILED(hr)) {
+		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
+	}
+
+	CopyToSendToDream(pBuffer, pxWidth, pxHeight);
 
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
 	/*	This Draws the Mouse, disabling for Now
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
-		if (pPointerInfo->Visible) {
-			// Draw mouse into texture
-			Ret = DrawMouse(pPointerInfo);
-		}
 		
-	}	
+		if (PointerInfo->Visible) {
+		// Draw mouse into texture
+		Ret = DrawMouse(PointerInfo);
+		}
+	}
 	//*/
 
 	// Release keyed mutex
-	CRM(m_pKeyMutex->ReleaseSync(0), "Failed to Release Keyed mutex in D3D11DesktopDuplicationOutputManager");
+	hr = m_pKeyMutex->ReleaseSync(0);
+	if (FAILED(hr)) {
+		return ProcessFailure(m_pDevice, L"Failed to Release Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
+	}
 
 	// Present to window if all worked
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// Present to window
-		CRM(m_pSwapChain->Present(1, 0), "Failed to present to window");
+		hr = m_pSwapChain->Present(1, 0);
+		if (FAILED(hr)) {
+			return ProcessFailure(m_pDevice, L"Failed to present", L"Error", hr, SystemTransitionsExpectedErrors);
+		}
+		else if (hr == DXGI_STATUS_OCCLUDED) {
+			*Occluded = true;
+		}
 	}
 
-Error:
-	if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
-		// Another thread has the keyed mutex so try again later
-		return DUPL_RETURN_SUCCESS;
-	}
-	if (r == DXGI_STATUS_OCCLUDED) {	// This crashes if the window is occluded, but we need to remove the window anyway
-		*Occluded = true;
-	}
-	else if (RFAILED()) {
-		return ProcessFailure(m_pDevice, L"Failed to UpdateApplicationWindow in OutputManager", L"Error", r, SystemTransitionsExpectedErrors);
-	}
-
-	return DUPL_RETURN_SUCCESS;
+	return Ret;
 }
 
 //
