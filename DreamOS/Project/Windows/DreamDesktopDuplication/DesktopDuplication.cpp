@@ -156,7 +156,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	D3D11DesktopDuplicationThreadManager ThreadMgr;
 	RECT DeskBounds;
 	UINT OutputCount;
-
+	UINT texturepxWidth = 0;
+	UINT texturepxHeight = 0;
+	//UINT texturepxWidth = 0;
+	//UINT texturepxHeight = 0;
 	// Message loop (attempts to update screen when no other messages to process)
 	MSG msg = { 0 };
 	bool FirstTime = true;
@@ -219,7 +222,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
-		BYTE *pBuffer = nullptr;
+		// Data to send to dream
+		BYTE *pBuffer = nullptr;	
+		UINT pxWidth = 0;
+		UINT pxHeight = 0;
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			if (msg.message == OCCLUSION_STATUS_MSG) {
 				// Present may not be occluded now so try again
@@ -276,21 +282,40 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		else {
 			// Nothing else to do, so try to present to write out to window if not occluded
 			if (!Occluded) {
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer);	
+				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);	
 			}
 		}
-
-		if (g_fStartSending && (pBuffer != nullptr)) {
-
+		//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
+		if (g_fStartSending && (pBuffer != nullptr) && (pBuffer [0] != '\0')) {
+			//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
 			DDCIPCMessage ddcMessage;
-			ddcMessage.SetType(DDCIPCMessage::type::FRAME);
-			COPYDATASTRUCT desktopCDS;
+			
+			if (pxHeight == texturepxHeight && pxWidth == texturepxWidth) {
+				ddcMessage.m_msgType = DDCIPCMessage::type::FRAME;
+				COPYDATASTRUCT desktopCDS;
 
-			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
-			desktopCDS.cbData = (938*484*4);	// Not hardcoded, set texture params dynamically and send to dream
-			desktopCDS.lpData = pBuffer;
+				desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
+				desktopCDS.cbData = (pxHeight * pxWidth * 4);
+				desktopCDS.lpData = pBuffer;
 
-			SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+				SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+			}
+
+			else {
+				texturepxWidth = pxWidth;
+				texturepxHeight = pxHeight;
+
+				ddcMessage.pxHeight = pxHeight;
+				ddcMessage.pxWidth = pxWidth;
+
+				COPYDATASTRUCT desktopCDS;
+
+				desktopCDS.dwData = (unsigned long)DDCIPCMessage::type::RESIZE;
+				desktopCDS.cbData = sizeof(DDCIPCMessage);
+				desktopCDS.lpData = &ddcMessage;
+
+				SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+			}
 		}
 
 		if (pBuffer != nullptr) {
@@ -366,7 +391,7 @@ bool ProcessCmdline(_Out_ INT* outputToDuplicate) {
 		}
 	}
 
-	//*outputToDuplicate = 0;		// Use for testing, will duplicate only main monitor
+	*outputToDuplicate = 1;		// Use for testing, will duplicate only main monitor
 	return true;
 }
 
@@ -383,10 +408,10 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 	switch (pDataStruct->dwData) {	// Handle based on DDCIPCMessage type
 	case(0UL): {	// type is PING
 		DDCIPCMessage ddcMessage;
-		ddcMessage.SetType(DDCIPCMessage::type::ACK);
+		ddcMessage.m_msgType = DDCIPCMessage::type::ACK;
 		COPYDATASTRUCT desktopCDS;
 
-		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
 		desktopCDS.cbData = sizeof(ddcMessage);
 		desktopCDS.lpData = &ddcMessage;
 
@@ -395,6 +420,7 @@ BOOL OnCopyData(HWND hWnd, WPARAM wParam, LPARAM lParam) {
 	} break;
 	case(2UL): {	// type is START
 		g_fStartSending = true;
+		//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
 		//DisplayMsg(L"Start", L"Start", S_OK);
 
 		return true;

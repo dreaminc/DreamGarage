@@ -33,11 +33,17 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	SetAppDescription("A Shared Desktop View");
 
 	// Set up the quad
-	m_pDesktopQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	m_pDesktopQuad->SetPosition(0.0f, 2.0f, -2.0f);
-	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pFrameDataBuffer, (int)m_pFrameDataBuffer_n));
+	//m_pDesktopQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+	m_pDesktopQuad = GetComposite()->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+	m_pDesktopQuad->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pDesktopQuad->FlipUVVertical();
 
+	m_frameDataBuffer_n = 938 * 484 * 4;
+	m_pFrameDataBuffer = (unsigned char*)malloc(m_frameDataBuffer_n);
+
+	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pFrameDataBuffer, (int)m_frameDataBuffer_n));
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
+	//m_frameDataBuffer_n = 0;
 
 	GetComposite()->SetVisible(true);	
 
@@ -50,14 +56,22 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	memset(&processinfoDesktopDuplication, 0, sizeof(processinfoDesktopDuplication));
 
 	// TODO: macro with project pre-definition using project name
-	wchar_t *wszLocation = L"DreamDesktopCapture.exe";	
-	LPWSTR lpwstrLocation = wszLocation;
+	PathManager* pPathManager = PathManager::instance();
+	std::wstring wstrDreamPath;
+	pPathManager->GetDreamPath(wstrDreamPath);
+
+	std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe";
+	std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
+	const wchar_t *wPath = wstrFullpath.c_str();
+	std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
+	vwszLocation.push_back(0);
+	LPWSTR lpwstrLocation = vwszLocation.data();
 	bool fCreateDuplicationProcess = false;
 
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
 	fCreateDuplicationProcess = CreateProcess(lpwstrLocation,
-		L" -output 0",						// Command line
+		L" -output 1",						// Command line
 		nullptr,							// Process handle not inheritable
 		nullptr,							// Thread handle not inheritable
 		false,								// Set handle inheritance to FALSE
@@ -71,7 +85,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	CBM(fCreateDuplicationProcess, "CreateProcess failed (%d)", GetLastError());
 	
 	// TODO: get this from main?
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream");
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
 	if (m_hwndDreamHandle == NULL) {
 		CNM(m_hwndDreamHandle, "Unable to find the Dream window");
 	}
@@ -98,17 +112,17 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 		m_msTimeSinceLastSent = msTimeNow;
 
 		DDCIPCMessage ddcMessage;
-		ddcMessage.SetType(DDCIPCMessage::type::START);
+		ddcMessage.m_msgType = DDCIPCMessage::type::START;
 		COPYDATASTRUCT desktopCDS;
 
-		desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+		desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
 		desktopCDS.cbData = sizeof(ddcMessage);
 		desktopCDS.lpData = &ddcMessage;
 
 		SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
 		DWORD dwError = GetLastError();
 
-		CBM(dwError == NO_ERROR, "error sending message");
+		//CBM(dwError == NO_ERROR, "error sending message");	//	Handle this better
 	}
 
 	// Clean up
@@ -180,17 +194,23 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 	return R_PASS;
 }
 
-RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
+	m_fDesktopDuplicationIsRunning = true;
+	m_frameDataBuffer_n = messageSize;
+	m_pFrameDataBuffer = (unsigned char*)malloc(m_frameDataBuffer_n);
+	//m_pFrameDataBuffer = (unsigned char*)pMessageData;
+	memcpy(m_pFrameDataBuffer, (unsigned char*)pMessageData, m_frameDataBuffer_n);
 
-	m_pFrameDataBuffer_n = messageSize;
-	unsigned char* m_pFrameDataBuffer = (unsigned char*)malloc(m_pFrameDataBuffer_n);
-	m_pFrameDataBuffer = (unsigned char*)pMessageData;
-	CN(m_pFrameDataBuffer);
+	CNR(m_pFrameDataBuffer, R_SKIPPED);
 
-	m_pDesktopTexture->Update(m_pFrameDataBuffer, GetWidth(), GetHeight(), PIXEL_FORMAT::BGRA);
+	m_pDesktopTexture->Update(m_pFrameDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
 
 Error:
+	if (m_pFrameDataBuffer != nullptr) {
+		free(m_pFrameDataBuffer);
+	}
+
 	return r;
 }
 
