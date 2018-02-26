@@ -354,6 +354,8 @@ Error:
 RESULT DreamShareView::BeginStream() {
 	RESULT r = R_PASS;
 
+	m_pCastQuad->SetVisible(true);
+
 	if (m_fReceivingStream) {
 		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
 		m_fReceivingStream = false;

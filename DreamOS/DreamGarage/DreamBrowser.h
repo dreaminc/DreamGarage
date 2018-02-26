@@ -132,6 +132,7 @@ public:
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL = "about:blank");
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 	std::shared_ptr<texture> GetScreenTexture();
+	long GetCurrentAssetID();
 
 	RESULT CloseBrowser();
 
@@ -178,6 +179,7 @@ private:
 
 	// CEF can call LoadRequest once a URL is loaded
 	bool m_fCanLoadRequest = false;
+	long m_assetID = -1;
 
 	DreamUserControlArea *m_pParentApp = nullptr;
 

@@ -77,6 +77,8 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnShareAsset() override;
+	virtual RESULT OnCloseAsset() override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);

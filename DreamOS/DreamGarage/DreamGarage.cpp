@@ -294,7 +294,7 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
-	auto pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 	CR(InitializeKeyboard());
@@ -899,21 +899,36 @@ Error:
 RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
-	/*
-	if (m_pDreamContentView != nullptr) {
-		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
-		m_pDreamContentView->SetVisible(true);
-	}
-
-	if (m_pDreamBrowser != nullptr) {
-		//m_pDreamBrowser->SetVisible(true);
-		//m_pDreamBrowser->FadeQuadToBlack();
-		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
-	}
-	//*/
 	if (m_pDreamUserControlArea != nullptr) {
 		CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnCloseAsset() {
+	RESULT r = R_PASS;
+	
+	if (m_pDreamUserControlArea != nullptr) {
+		CR(m_pDreamUserControlArea->CloseActiveAsset());
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnShareAsset() {
+	RESULT r = R_PASS;
+	
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamShareView);
+
+	CR(m_pDreamShareView->SetCastingTexture(m_pDreamUserControlArea->GetActiveBrowser()->GetScreenTexture()));
+	CR(m_pDreamShareView->ShowCastingTexture());
+	CR(m_pDreamShareView->BeginStream());
+	CR(m_pDreamShareView->Show());
+
 Error:
 	return r;
 }

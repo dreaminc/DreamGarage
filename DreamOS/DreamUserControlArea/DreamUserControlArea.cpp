@@ -200,44 +200,12 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::CLOSE: {
-		// close active browser
-		m_pActiveBrowser->CloseBrowser();
-		GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pActiveBrowser);
+		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-		// replace with top of tab bar
-		m_pActiveBrowser = m_pDreamTabView->RemoveBrowser();
-		if (m_pActiveBrowser != nullptr) {
-			m_pControlView->SetViewQuadTexture(m_pActiveBrowser->GetScreenTexture());
-		}
-		else {
-		//	m_pControlView->SetViewQuadTexture(m_p)
-			m_pControlBar->GetComposite()->SetVisible(false);
-			m_pDreamTabView->GetComposite()->SetVisible(false);
-			m_pControlView->GetComposite()->SetVisible(false);
-			m_fHasOpenApp = false;
-			m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
-			m_pDreamUserApp->SetEventApp(nullptr);
-		}
+//		long assetID = m_pActiveBrowser->Get
+		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(m_pActiveBrowser->GetCurrentAssetID()), "Failed to share environment asset");
 
-		// if there are no more pieces of content, hide view
-
-
-		// if active browser matches shared browser, send stop event
-		/*
-		DreamShareViewHandle *pShareViewHandle = nullptr;
-		pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
-		CBR(CanPressButton(pButtonContext), R_SKIPPED);
-		CBR(!IsAnimating(), R_SKIPPED);
-		pShareViewHandle->SendStopEvent();
-
-		CN(m_pUserHandle);
-		CR(m_pUserHandle->SendClearFocusStack());
-		CR(Hide());
-
-	Error:
-		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-		//*/
 	} break;
 
 	case ControlEventType::MAXIMIZE: {
@@ -252,10 +220,16 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::SHARE: {
 		// send share event with active browser
+		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveBrowser->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
 	case ControlEventType::STOP: {
 		// send stop sharing event 
+		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveBrowser->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
 	case ControlEventType::URL: {
@@ -479,6 +453,51 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	m_pDreamTabView->GetComposite()->SetVisible(true);
 
 	return R_PASS;
+}
+
+RESULT DreamUserControlArea::CloseActiveAsset() {
+	RESULT r = R_PASS;
+
+	// close active browser
+
+	m_pActiveBrowser->CloseBrowser();
+	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pActiveBrowser);
+
+	// replace with top of tab bar
+	m_pActiveBrowser = m_pDreamTabView->RemoveBrowser();
+	if (m_pActiveBrowser != nullptr) {
+		m_pControlView->SetViewQuadTexture(m_pActiveBrowser->GetScreenTexture());
+	}
+	else {
+	//	m_pControlView->SetViewQuadTexture(m_p)
+		m_pControlBar->GetComposite()->SetVisible(false);
+		m_pDreamTabView->GetComposite()->SetVisible(false);
+		m_pControlView->GetComposite()->SetVisible(false);
+		m_fHasOpenApp = false;
+		m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
+		m_pDreamUserApp->SetEventApp(nullptr);
+	}
+
+	// if there are no more pieces of content, hide view
+
+
+	// if active browser matches shared browser, send stop event
+	/*
+	DreamShareViewHandle *pShareViewHandle = nullptr;
+	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
+
+	CBR(CanPressButton(pButtonContext), R_SKIPPED);
+	CBR(!IsAnimating(), R_SKIPPED);
+	pShareViewHandle->SendStopEvent();
+
+	CN(m_pUserHandle);
+	CR(m_pUserHandle->SendClearFocusStack());
+	CR(Hide());
+
+Error:
+	GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
+	//*/
+	return r;
 }
 
 RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {

@@ -134,6 +134,14 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnShareAsset() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnCloseAsset() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 

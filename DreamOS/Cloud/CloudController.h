@@ -85,6 +85,8 @@ public:
 		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;
+		virtual RESULT OnCloseAsset() = 0;
+		virtual RESULT OnShareAsset() = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
@@ -172,6 +174,9 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnShareAsset() override;
+	virtual RESULT OnCloseAsset() override;
+
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 

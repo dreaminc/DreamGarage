@@ -100,6 +100,8 @@ public:
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
+	RESULT CloseActiveAsset();
+
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
 

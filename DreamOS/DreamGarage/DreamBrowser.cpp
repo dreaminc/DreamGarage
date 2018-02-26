@@ -302,10 +302,7 @@ RESULT DreamBrowser::OnLoadStart() {
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
-
 	m_strCurrentURL = strCurrentURL;
-	pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
 	if (m_pParentApp != nullptr) {
 		m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this);
@@ -320,18 +317,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		}
 	}
 
-	//TODO: should happen with share, not open
-	/*
-	if (pDreamShareViewHandle != nullptr && strCurrentURL != "about:blank") {
-		pDreamShareViewHandle->SendCastTexture(m_pBrowserTexture);
-		pDreamShareViewHandle->SendCastingEvent();
-	}
-	//*/
-
-//Error:
-	if (pDreamShareViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
-	}
 	return r;
 }
 
@@ -540,6 +525,10 @@ std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
 	return m_pBrowserTexture;
 }
 
+long DreamBrowser::GetCurrentAssetID() {
+	return m_assetID;
+}
+
 RESULT DreamBrowser::CloseBrowser() {
 	RESULT r = R_PASS;
 
@@ -556,6 +545,9 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	RESULT r = R_PASS;
 
 	DreamShareViewHandle *pShareViewHandle = nullptr;
+
+	CNR(m_pParentApp != nullptr, R_SKIPPED);
+
 	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 //	if (m_fReceivingStream == false) {
 	CN(m_pBrowserTexture);
@@ -577,6 +569,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 	}
 	if (pShareViewHandle != nullptr) {
+		CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
 		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
 	}
 	/*
@@ -718,6 +711,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	RESULT r = R_PASS;
 
 	if (pEnvironmentAsset != nullptr) {
+		m_assetID = pEnvironmentAsset->GetAssetID();
 		WebRequest webRequest;
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();

@@ -30,7 +30,9 @@ class EnvironmentControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
-	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") = 0;
+	virtual RESULT RequestCloseAsset(long assetID) = 0;
+	virtual RESULT RequestShareAsset(long assetID) = 0;
+	virtual RESULT RequestStopSharing(long assetID) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -93,9 +95,11 @@ public:
 		
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
-		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopSending() = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopReceiving() = 0;;
+		virtual RESULT OnShareAsset() = 0;
+		virtual RESULT OnCloseAsset() = 0;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
@@ -125,8 +129,11 @@ public:
 	// TODO: Note - Register Controller Observer pattern needs to be fixed here
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
-	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") override;
+	virtual RESULT RequestCloseAsset(long assetID) override;
+	virtual RESULT RequestShareAsset(long assetID) override;
+	virtual RESULT RequestStopSharing(long assetID) override;
 	virtual RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
