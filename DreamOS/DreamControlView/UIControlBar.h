@@ -51,6 +51,7 @@ public:
 	std::shared_ptr<UIButton> GetBackButton();
 	std::shared_ptr<UIButton> GetForwardButton();
 	std::shared_ptr<UIButton> GetToggleButton();
+	std::shared_ptr<UIButton> GetShareButton();
 	std::shared_ptr<UIButton> GetStopButton();
 	std::shared_ptr<UIButton> GetURLButton();
 
@@ -66,6 +67,8 @@ public:
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();
+	texture *GetShareTexture();
+	texture *GetStopTexture();
 
 	// for non-default implementations, call these before initialize
 	RESULT SetTotalWidth(float totalWidth);

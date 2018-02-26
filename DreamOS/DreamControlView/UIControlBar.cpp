@@ -274,6 +274,10 @@ std::shared_ptr<UIButton> UIControlBar::GetToggleButton() {
 	return m_pToggleButton;
 }
 
+std::shared_ptr<UIButton> UIControlBar::GetShareButton() {
+	return m_pShareToggleButton;
+}
+
 std::shared_ptr<UIButton> UIControlBar::GetStopButton() {
 	return m_pCloseButton;
 }
@@ -288,6 +292,14 @@ texture *UIControlBar::GetHideTexture() {
 
 texture *UIControlBar::GetShowTexture() {
 	return m_pShowTexture;
+}
+
+texture *UIControlBar::GetShareTexture() {
+	return m_pShareTexture;
+}
+
+texture *UIControlBar::GetStopTexture() {
+	return m_pStopSharingTexture;
 }
 
 RESULT UIControlBar::SetTotalWidth(float totalWidth) {

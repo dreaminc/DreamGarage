@@ -320,6 +320,7 @@ RESULT DreamShareView::StopSending() {
 
 	m_pDreamUserHandle->SendStopSharing();
 
+	m_pCastTexture = nullptr;
 	ShowLoadingTexture();
 	Hide();
 

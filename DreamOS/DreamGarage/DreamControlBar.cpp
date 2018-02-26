@@ -135,12 +135,14 @@ RESULT DreamControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void 
 	RESULT r = R_PASS;
 	CB(m_pParentApp->CanPressButton(pButtonContext));
 
-	if (m_fIsMinimized) {
+	if (m_fIsSharing) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::STOP));
+		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShareTexture());
 		m_fIsSharing = false;
 	}
 	else {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::SHARE));
+		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetStopTexture());
 		m_fIsSharing = true;
 	}
 

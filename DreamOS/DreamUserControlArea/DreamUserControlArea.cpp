@@ -418,6 +418,8 @@ RESULT DreamUserControlArea::SendURL() {
 	m_pActiveBrowser->InitializeWithParent(this);
 	m_pActiveBrowser->SetBrowserScope(strScope);
 	m_pActiveBrowser->SetBrowserPath(m_strURL);
+	
+
 
 	// TODO: may not be enough once browser typing is re-enabled
 	m_strURL = "";
