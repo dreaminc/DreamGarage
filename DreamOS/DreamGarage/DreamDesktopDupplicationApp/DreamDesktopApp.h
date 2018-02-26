@@ -41,6 +41,14 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	// Control Events
+	RESULT ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY);		// Relative- scroll this far
+
+	RESULT SendKeyPressed(char chkey, bool fkeyDown);
+
+	RESULT SendMouseMoveEvent(int mousePointX, int mousePointY);
+	RESULT ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown);
+
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 

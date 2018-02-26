@@ -22,6 +22,50 @@ Error:
 	return;
 }
 
+RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY) {
+	RESULT r = R_PASS;
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::SendKeyPressed(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
+	RESULT r = R_PASS;
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown) {
+	RESULT r = R_PASS;
+
+	unsigned int numInputs;	// number of structures in pInputs array
+	LPINPUT pInputs;		// array of INPUT structures representing input event
+	int cbSize;				// size in BYTES of an INPUT structure
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	//GetForegroundWindow();
+
+
+	SendInput(numInputs, pInputs, cbSize);	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+Error:
+	return r;
+}
+
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -44,7 +88,6 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	// Initialize texture
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
-	//m_frameDataBuffer_n = 0;
 
 	GetComposite()->SetVisible(true);
 
@@ -84,7 +127,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
 	fCreateDuplicationProcess = CreateProcess(lpwstrLocation,
-		L" -output 1",						// Command line
+		L" -output 0",						// Command line
 		nullptr,							// Process handle not inheritable
 		nullptr,							// Thread handle not inheritable
 		false,								// Set handle inheritance to FALSE
