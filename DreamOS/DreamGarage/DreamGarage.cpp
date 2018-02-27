@@ -983,4 +983,3 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 Error:
 	return r;
 }
-

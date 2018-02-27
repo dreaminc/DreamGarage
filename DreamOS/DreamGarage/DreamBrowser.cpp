@@ -517,7 +517,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
 
-	CN(m_pBrowserTexture);
+	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
 	CR(m_pBrowserTexture->UpdateDimensions(width, height));

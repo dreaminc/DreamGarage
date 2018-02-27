@@ -79,6 +79,20 @@ Error:
 	return r;
 }
 
+RESULT DreamControlBar::SetSharingFlag(bool fIsSharing) {
+	RESULT r = R_PASS;
+	m_fIsSharing = fIsSharing;
+
+	if (m_fIsSharing) {
+		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetStopTexture());
+	}
+	else {
+		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShareTexture());
+	}
+
+	return r;
+}
+
 // ControlBarObserver
 RESULT DreamControlBar::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;

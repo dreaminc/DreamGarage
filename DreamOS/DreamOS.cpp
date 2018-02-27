@@ -1106,3 +1106,11 @@ RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFra
 Error:
 	return r;
 }
+
+std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
+	RESULT r = R_PASS;
+	CN(m_pDreamShareView);
+	return m_pDreamShareView->GetCastingTexture();
+Error:
+	return nullptr;
+}

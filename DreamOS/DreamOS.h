@@ -41,6 +41,7 @@
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
 #include "DreamAppHandle.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -378,6 +379,8 @@ public:
 private:
 	SandboxApp *m_pSandbox;
 
+public:
+	virtual std::shared_ptr<texture> GetSharedContentTexture();
 // System Applications
 private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
@@ -385,6 +388,7 @@ private:
 	// currently used by DreamGarage to dismiss UI when being seated (temporary)
 protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
+	std::shared_ptr<DreamShareView> m_pDreamShareView;
 
 private:
 	version m_versionDreamOS;

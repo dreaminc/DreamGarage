@@ -128,7 +128,6 @@ private:
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
 	
-	std::shared_ptr<DreamShareView> m_pDreamShareView;
 	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea;
 };
 

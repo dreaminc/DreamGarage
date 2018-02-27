@@ -294,8 +294,13 @@ std::shared_ptr<DreamBrowser> DreamUserControlArea::GetActiveBrowser() {
 }
 
 RESULT DreamUserControlArea::SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser) {
+
 	m_pActiveBrowser = pNewBrowser;
 	m_pControlView->SetViewQuadTexture(m_pActiveBrowser->GetScreenTexture());
+
+	bool fIsSharing = (m_pActiveBrowser->GetScreenTexture() == GetDOS()->GetSharedContentTexture());
+	m_pControlBar->SetSharingFlag(fIsSharing);
+
 	return R_PASS;
 }
 
@@ -419,7 +424,8 @@ RESULT DreamUserControlArea::SendURL() {
 	m_pActiveBrowser->SetBrowserScope(strScope);
 	m_pActiveBrowser->SetBrowserPath(m_strURL);
 	
-
+	// new browser can't be the current content
+	m_pControlBar->SetSharingFlag(false);
 
 	// TODO: may not be enough once browser typing is re-enabled
 	m_strURL = "";

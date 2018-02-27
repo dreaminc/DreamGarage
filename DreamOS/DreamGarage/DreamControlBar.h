@@ -60,6 +60,9 @@ public:
 	bool CanPressButton(int dirtyIndex);
 	RESULT ClearFlag(int index);
 
+	// Also updates the button texture
+	RESULT SetSharingFlag(bool fIsSharing);
+
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
