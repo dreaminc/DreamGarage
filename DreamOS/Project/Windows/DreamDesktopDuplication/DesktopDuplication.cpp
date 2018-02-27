@@ -391,7 +391,7 @@ bool ProcessCmdline(_Out_ INT* outputToDuplicate) {
 		}
 	}
 
-	*outputToDuplicate = 1;		// Use for testing, will duplicate only main monitor
+	//*outputToDuplicate = 1;		// Use for testing, will duplicate only main monitor
 	return true;
 }
 

@@ -342,8 +342,6 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 	D3D11_TEXTURE2D_DESC descTemp;
 	D3D11_TEXTURE2D_DESC descDream;
 	IDXGISurface *DreamSurface = nullptr;
-	pxWidth = 0;
-	pxHeight = 0;
 
 	CR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture)));		// 0 is back buffer
 	pTempTexture->GetDesc(&descTemp);
