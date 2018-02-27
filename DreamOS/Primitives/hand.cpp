@@ -199,7 +199,9 @@ RESULT hand::SetVisible(bool fVisible, bool fSetChildren /* = true */) {
 	//Ensure hand is not set to visible while not tracked
 	CR(DimObj::SetVisible(fVisible && m_fTracked, fSetChildren));
 	//Ensure phantom volume is not set to visible
-	m_pPhantomVolume->SetVisible(false);
+	if (m_pPhantomVolume != nullptr) {
+		m_pPhantomVolume->SetVisible(false);
+	}
 
 Error:
 	return r;
