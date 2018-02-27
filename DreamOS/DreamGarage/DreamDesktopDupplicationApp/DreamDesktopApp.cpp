@@ -25,6 +25,12 @@ Error:
 RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY) {
 	RESULT r = R_PASS;
 
+	INPUT inputStruct = new INPUT;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct = new MOUSEINPUT;
+
+
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 Error:
@@ -33,6 +39,10 @@ Error:
 
 RESULT DreamDesktopApp::SendKeyPressed(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
+
+	INPUT inputStruct = new INPUT;
+	inputStruct.type = INPUT_KEYBOARD;
+
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 Error:
@@ -42,6 +52,12 @@ Error:
 RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
 	RESULT r = R_PASS;
 
+	INPUT inputStruct = new INPUT;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct = new MOUSEINPUT;
+
+
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 Error:
@@ -50,6 +66,12 @@ Error:
 
 RESULT DreamDesktopApp::ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown) {
 	RESULT r = R_PASS;
+
+	INPUT inputStruct = new INPUT;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct = new MOUSEINPUT;
+
 
 	unsigned int numInputs;	// number of structures in pInputs array
 	LPINPUT pInputs;		// array of INPUT structures representing input event
