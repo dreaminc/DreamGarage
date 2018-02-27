@@ -78,6 +78,9 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
+
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 

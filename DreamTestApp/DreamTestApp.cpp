@@ -71,7 +71,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	sphere *pSphere = AddSphere(0.5f, 10, 10, color(COLOR_RED));
 	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
-	
+
 	volume *pVolume = AddVolume(0.5f, false);
 	pVolume->MoveTo(-1.5f, 0.5f, 0.0f);
 	pVolume->SetWireframe(true);
@@ -144,7 +144,7 @@ RESULT DreamTestApp::OnDesktopFrame(unsigned long messageSize, void* pMessageDat
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
-	
+
 	switch (kbEvent->KeyCode) {
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
@@ -153,7 +153,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 			}
 		} break;
 	}
-	
+
 	//Error:
 	return r;
 }

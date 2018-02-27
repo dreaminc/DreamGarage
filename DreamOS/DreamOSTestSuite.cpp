@@ -46,8 +46,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamOS());
 
-	CR(AddTestDreamDesktop());
-
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());
@@ -1403,5 +1401,4 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 Error:
 	return r;
-
 }
