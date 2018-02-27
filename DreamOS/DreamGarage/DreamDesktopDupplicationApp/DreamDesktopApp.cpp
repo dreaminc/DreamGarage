@@ -60,6 +60,19 @@ Error:
 RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
 
+	CRM(StartDuplicationProcess(), "Error starting duplication process");
+
+	// TODO: get this from main?
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
+	CNM(m_hwndDreamHandle, "Unable to find the Dream window");
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::StartDuplicationProcess() {
+	RESULT r = R_PASS;
+
 	// Start duplication process
 	STARTUPINFO startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;

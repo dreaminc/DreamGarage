@@ -1226,8 +1226,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	double sTestTime = 10000.0;
 
 	struct TestContext {
-		std::shared_ptr<quad> pQuad = nullptr;
-		texture* pTexture = nullptr;
+		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
 		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -1355,17 +1354,20 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-		int pxWidth = 938;
-		int pxHeight = 484;
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
 		CN(pTestContext);
-		if(!pTestContext->once)
-		{
-			pTestContext->pTexture->Update(m_pDataBuffer, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+		if (!pTestContext->once) {
+			CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
 			// pTestContext->once = true;
-			free(m_pDataBuffer);
-			m_pDataBuffer_n = 0;
+			if (m_pDataBuffer) {
+				free(m_pDataBuffer);
+				m_pDataBuffer = nullptr;
+				m_pDataBuffer_n = 0;
+			}
+
+
+			//pTestContext->once = true;
 		}
 
 	Error:
