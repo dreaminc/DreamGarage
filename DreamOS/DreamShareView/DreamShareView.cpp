@@ -62,6 +62,15 @@ Error:
 	return r;
 }
 
+std::shared_ptr<texture> DreamShareViewHandle::RequestCastTexture() {
+	RESULT r = R_PASS;
+	CB(GetAppState());
+
+	return GetCastingTexture();
+Error:
+	return nullptr;
+}
+
 RESULT DreamShareViewHandle::SendVideoFrame(const void* pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -231,6 +240,10 @@ RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTextur
 
 Error:
 	return r;
+}
+
+std::shared_ptr<texture> DreamShareView::GetCastingTexture() {
+	return m_pCastTexture;
 }
 
 RESULT DreamShareView::Show() {
@@ -495,7 +508,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
 
 	// Update texture dimensions if needed
-	if (m_pCastTexture == nullptr) {
+	if (m_pCastTexture == nullptr || m_pCastTexture == m_pLoadingTexture) {
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
 		m_pCastTexture = GetComposite()->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,

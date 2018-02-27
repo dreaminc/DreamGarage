@@ -282,20 +282,6 @@ Error:
 RESULT DreamBrowser::OnLoadStart() {
 	RESULT r = R_PASS;	
 
-	DreamShareViewHandle *pShareViewHandle = nullptr;
-	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-	//if (m_fShouldBeginStream) {
-		//CR(BeginStream());
-		//pShareViewHandle->RequestBeginStream();
-	//} 
-	//else {
-//		m_fShouldBeginStream = true;
-//	}
-
-//Error:
-	if (pShareViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-	}
 	return r;
 }
 
@@ -460,8 +446,6 @@ Error:
 
 RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
-	DreamShareViewHandle *pDreamShareViewHandle = nullptr;
-
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
 	}
@@ -476,24 +460,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
-	/*
-	if (m_fShowControlView) {
-		pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
-		if (pDreamShareViewHandle != nullptr) {
-			CR(pDreamShareViewHandle->SendShowEvent());
-			CR(pDreamShareViewHandle->SendLoadingEvent());
-		}
-
-		GetComposite()->SetVisible(true);
-
-	}
-	//*/
 Error:
-
-	if (pDreamShareViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamShareViewHandle, this);
-	}
 	return r;
 }
 
@@ -549,27 +516,20 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	CNR(m_pParentApp != nullptr, R_SKIPPED);
 
 	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-//	if (m_fReceivingStream == false) {
+
 	CN(m_pBrowserTexture);
 
-	bool fReceivingStream = false;
-
-	if (pShareViewHandle != nullptr) {
-		pShareViewHandle->RequestIsReceivingStream(fReceivingStream);
+	// Update texture dimensions if needed
+	CR(m_pBrowserTexture->UpdateDimensions(width, height));
+	if (r != R_NOT_HANDLED) {
+		DEBUG_LINEOUT("Changed chrome texture dimensions");
 	}
 
-	if (!fReceivingStream) {
+	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-		// Update texture dimensions if needed
-		CR(m_pBrowserTexture->UpdateDimensions(width, height));
-		if (r != R_NOT_HANDLED) {
-			DEBUG_LINEOUT("Changed chrome texture dimensions");
-		}
-
-		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-	}
 	if (pShareViewHandle != nullptr) {
-		CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
+	//	CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
+		CBR(GetScreenTexture().get() == pShareViewHandle->RequestCastTexture().get(), R_SKIPPED);
 		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
 	}
 	/*

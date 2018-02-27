@@ -30,6 +30,7 @@ public:
 	// idea here is to set the texture being cast here while the 
 	// texture is updated elsewhere
 	RESULT SendCastTexture(std::shared_ptr<texture> pNewCastTexture);
+	std::shared_ptr<texture> RequestCastTexture();
 	RESULT SendVideoFrame(const void* pBuffer, int width, int height);
 	
 	RESULT RequestBeginStream();
@@ -41,6 +42,7 @@ private:
 	virtual RESULT Show() = 0;
 	virtual RESULT Hide() = 0;
 	virtual RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) = 0;
+	virtual std::shared_ptr<texture> GetCastingTexture() = 0;
 	virtual RESULT IsReceivingStream(bool &fReceivingStream) = 0;
 	virtual RESULT BeginStream() = 0;
 	virtual RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height) = 0;
@@ -71,6 +73,7 @@ public:
 	virtual RESULT ShowLoadingTexture() override;
 	virtual RESULT ShowCastingTexture() override;
 	virtual RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) override;
+	virtual std::shared_ptr<texture> GetCastingTexture() override;
 	virtual RESULT Show() override;
 	virtual RESULT Hide() override;
 

@@ -480,25 +480,6 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		m_pDreamUserApp->SetEventApp(nullptr);
 	}
 
-	// if there are no more pieces of content, hide view
-
-
-	// if active browser matches shared browser, send stop event
-	/*
-	DreamShareViewHandle *pShareViewHandle = nullptr;
-	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
-	CBR(CanPressButton(pButtonContext), R_SKIPPED);
-	CBR(!IsAnimating(), R_SKIPPED);
-	pShareViewHandle->SendStopEvent();
-
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->SendClearFocusStack());
-	CR(Hide());
-
-Error:
-	GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-	//*/
 	return r;
 }
 
