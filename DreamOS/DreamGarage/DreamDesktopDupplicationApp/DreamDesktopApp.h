@@ -14,10 +14,11 @@
 #include "DreamAppHandle.h"
 
 #include "InteractionEngine/InteractionObjectEvent.h"
-
 #include "Sense/SenseController.h"
-
 #include "Primitives/TextEntryString.h"
+
+#define DESKTOP_PXWIDTH 1920;
+#define DESKTOP_PXHEIGHT 1080;
 
 class quad;
 class texture;
@@ -48,6 +49,8 @@ public:
 	RESULT SetDiagonalSize(float diagonalSize);
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
+	RESULT StartDuplicationProcess();
+	RESULT SendStartDesktopDuplicationIPCMessage();
 
 	//RESULT FadeQuadToBlack();
 
@@ -81,8 +84,8 @@ private:
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
-	int m_pxDesktopWidth = 938;
-	int m_pxDesktopHeight = 484;
+	int m_pxDesktopWidth = DESKTOP_PXWIDTH;
+	int m_pxDesktopHeight = DESKTOP_PXHEIGHT;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
