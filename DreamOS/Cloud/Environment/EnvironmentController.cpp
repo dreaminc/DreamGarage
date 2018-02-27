@@ -469,7 +469,7 @@ RESULT EnvironmentController::RequestCloseAsset(long assetID) {
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_asset.close"));
 
-	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_STOP_SHARING));
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_CLOSE));
 
 Error:
 	return r;
@@ -490,7 +490,7 @@ RESULT EnvironmentController::RequestShareAsset(long assetID) {
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_asset.share"));
 
-	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_STOP_SHARING));
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_SHARE));
 
 Error:
 	return r;
