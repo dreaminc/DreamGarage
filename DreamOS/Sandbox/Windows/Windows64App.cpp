@@ -125,7 +125,7 @@ RESULT Windows64App::InitializeMouse() {
 	m_pSenseMouse = new Win64Mouse(this);
 	CNM(m_pSenseMouse, "Failed to allocate mouse");
 
-	// Initialize Mouse 
+	// Initialize Mouse
 	// Remove mouse capture.
 	// This effects the window responsiveness to drag, resize and focus event.
 	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
@@ -216,7 +216,7 @@ RESULT Windows64App::InitializeCloudController() {
 
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
-	
+
 	// TODO: Remove this code
 	//CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
 
@@ -289,7 +289,7 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 	else {
 		//pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
 		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
-		if (!pApp) 
+		if (!pApp)
 			return DefWindowProc(hWindow, msg, wp, lp);
 	}
 
@@ -298,6 +298,7 @@ LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WP
 }
 
 LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+	RESULT r = R_PASS;
 	switch (msg) {
 		case WM_CREATE: {
 			HDC hDC = GetDC(hWindow);
@@ -319,15 +320,41 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			return 0L;
 		} break;
 
-		case WM_SIZE: {
-			SetDimensions(LOWORD(lp), HIWORD(lp));
-		} break;
+	case WM_SIZE: {
+		SetDimensions(LOWORD(lp), HIWORD(lp));
+	} break;
+
+	case WM_COPYDATA: {
+
+		PCOPYDATASTRUCT pDataStruct;
+		pDataStruct = (PCOPYDATASTRUCT)lp;
+
+		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
+			unsigned long messageSize = pDataStruct->cbData;
+			void* pMessageData;
+			pMessageData = (unsigned char*)malloc(messageSize);
+			memcpy(pMessageData, pDataStruct->lpData, messageSize);
+
+			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData, m_desktoppxHeight, m_desktoppxWidth);
+
+			free(pMessageData);
+		}
+		else if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::RESIZE) {
+			DDCIPCMessage *pMessageData;
+			pMessageData = (DDCIPCMessage*)(pDataStruct->lpData);
+			CNR(pMessageData, R_SKIPPED);
+
+			m_desktoppxWidth = pMessageData->pxWidth;
+			m_desktoppxHeight = pMessageData->pxHeight;
+			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
+		}
 
 		default: {
 			// Empty stub
 		} break;
 	}
 
+Error:
 	// Fall through for all messages for now
 	return DefWindowProc(hWindow, msg, wp, lp);
 }
@@ -414,7 +441,7 @@ RESULT Windows64App::HandleMessages() {
 	RESULT r = R_PASS;
 
 	MSG msg;
-	
+
 	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
 		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
 			HandleMouseEvent(msg);
@@ -446,7 +473,7 @@ RESULT Windows64App::Show() {
 
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
-	
+
 	// TODO: Move this into it's own function
 	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
 		TRUE,       // manual-reset event
@@ -457,7 +484,7 @@ RESULT Windows64App::Show() {
 	DOSLOG(INFO, "[Windows64App] signaling splash to close %v", (fResult ? "OK" : "FAIL"));
 
 	CloseHandle(hCloseSplashScreenEvent);
-	
+
 	//return (RESULT)(msg.wParam);
 
 //Error:
@@ -575,10 +602,10 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 			unsigned char scanCode = (lparam >> 16);
 
 			fHandled = true;
-			m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMassage.wParam, true);			
+			m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMassage.wParam, true);
 		} break;
 	}
-	
+
 	return fHandled;
 }
 
@@ -623,5 +650,3 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	return r;
 }
-
-

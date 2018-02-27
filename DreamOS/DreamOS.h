@@ -10,7 +10,7 @@
 // client rather than a DreamOS app which will later be rolled out such that applications
 // can be run within a client, making a transition to treating Dream as true operating system.
 // In the short term, however, DreamOS will run in the context of an application on a given platform
-// such as Android or Windows. 
+// such as Android or Windows.
 
 #include "Primitives//Types/UID.h"
 #include "Primitives/valid.h"
@@ -55,8 +55,8 @@ class PeerHandshakeMessage;
 
 #include "DreamVideoStreamSubscriber.h"
 
-class DreamOS : 
-	public Subscriber<CollisionObjectEvent>, 
+class DreamOS :
+	public Subscriber<CollisionObjectEvent>,
 	public valid,
 	public CloudController::PeerConnectionObserver,
 	public CloudController::EnvironmentObserver,
@@ -116,6 +116,8 @@ public:
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) = 0;
 
 	// EnvironmentObserver
 	// TODO: This should be encapsulated in it's own object
@@ -183,7 +185,7 @@ protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
 
-	// TODO: This is here temporarily, should be replaced by proper sandbox 
+	// TODO: This is here temporarily, should be replaced by proper sandbox
 	// related functionality
 	HALImp* GetHALImp();
 
@@ -283,7 +285,7 @@ public:
 	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 
 	std::shared_ptr<font> MakeFont(std::wstring wstrFontFileName, bool fDistanceMap = false);
-	
+
 	volume *MakeVolume(double side, bool fTriangleBased = true);
 	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);
 
@@ -338,7 +340,7 @@ protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
 
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
-	
+
 public:
 	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -355,7 +357,7 @@ protected:
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
-	// Dream App Messaging 
+	// Dream App Messaging
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
 	// IO
