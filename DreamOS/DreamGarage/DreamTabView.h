@@ -60,7 +60,7 @@ private:
 
 	std::map<std::shared_ptr<DreamBrowser>, std::shared_ptr<UIButton>> m_appToTabMap;
 
-	std::shared_ptr<UIView> m_pView;
+	std::shared_ptr<UIView> m_pView = nullptr;
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
 	std::vector<std::shared_ptr<DreamBrowser>> m_browsers;
 
