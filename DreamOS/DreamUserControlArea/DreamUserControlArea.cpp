@@ -90,6 +90,9 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 	CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
+	m_fCanPressButton[0] = false;
+	m_fCanPressButton[1] = false;
+
 Error:
 	return r;
 }
@@ -138,7 +141,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// clear flags
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-			m_pControlBar->ClearFlag(i);
+		//	m_pControlBar->ClearMalletFlag(i);
+			m_fCanPressButton[i] = true;
 		}
 
 		// TODO: Update Control View
@@ -278,7 +282,13 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	//only allow button presses while keyboard isn't active
 	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 
-	CBR(m_pControlBar->CanPressButton(dirtyIndex), R_SKIPPED);
+	CBR(dirtyIndex != -1, R_SKIPPED);
+
+	CBR(m_fCanPressButton[dirtyIndex], R_SKIPPED);
+
+	// avoids pressing two control bar buttons at once
+	m_fCanPressButton[0] = false;
+	m_fCanPressButton[1] = false;
 
 //	CBR(m_pControlBar->IsVisible(), R_SKIPPED);
 

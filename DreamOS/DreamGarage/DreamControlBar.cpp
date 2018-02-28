@@ -54,6 +54,7 @@ bool DreamControlBar::CanPressButton(int dirtyIndex) {
 	//TODO: get some info from pParentApp, maintain some here
 	//*
 	RESULT r = R_PASS;
+	/*
 	auto pDreamOS = GetDOS();
 
 	CBR(dirtyIndex != -1, R_SKIPPED);
@@ -63,13 +64,12 @@ bool DreamControlBar::CanPressButton(int dirtyIndex) {
 	// avoids pressing two control bar buttons at once
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
+	//*/
 
 	return true;
-Error:
-	return false;
 }
 
-RESULT DreamControlBar::ClearFlag(int index) {
+RESULT DreamControlBar::ClearMalletFlag(int index) {
 	RESULT r = R_PASS;
 
 	CBR(index == 0 || index == 1, R_SKIPPED);

@@ -58,7 +58,7 @@ public:
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
 
 	bool CanPressButton(int dirtyIndex);
-	RESULT ClearFlag(int index);
+	RESULT ClearMalletFlag(int index);
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);

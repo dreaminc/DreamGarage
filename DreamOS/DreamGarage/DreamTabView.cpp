@@ -27,6 +27,9 @@ RESULT DreamTabView::InitializeApp(void *pContext) {
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetComposite()->AddUIView(GetDOS());
 
+	m_fCanPressButton[0] = true;
+	m_fCanPressButton[1] = true;
+
 	return R_PASS;
 }
 
@@ -132,19 +135,23 @@ Error:
 RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
-	auto newTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
+	std::shared_ptr<UIButton> pNewTabButton = nullptr;
 	auto pBrowser = m_pParentApp->GetActiveBrowser();
 	auto tabTexture = pBrowser->GetScreenTexture().get();
 	auto pDreamOS = GetDOS();
 
-	newTabButton->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
-	newTabButton->GetSurface()->FlipUVVertical();
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
-	newTabButton->SetPosition(m_ptMostRecent);
-	newTabButton->GetSurface()->RotateXByDeg(-90.0f);
+	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
 
-	newTabButton->RegisterToInteractionEngine(GetDOS());
-	newTabButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+	pNewTabButton->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
+	pNewTabButton->GetSurface()->FlipUVVertical();
+
+	pNewTabButton->SetPosition(m_ptMostRecent);
+	pNewTabButton->GetSurface()->RotateXByDeg(-90.0f);
+
+	pNewTabButton->RegisterToInteractionEngine(GetDOS());
+	pNewTabButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 		std::bind(&DreamTabView::SelectTab, this, std::placeholders::_1, std::placeholders::_2));
 
 	for (int i = (int)m_tabButtons.size() - 1; i >= 0; i--) {
@@ -169,11 +176,12 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 		}
 	}
 
-	m_tabButtons.emplace_back(newTabButton);
+	m_tabButtons.emplace_back(pNewTabButton);
 	m_browsers.emplace_back(pBrowser);
-	m_appToTabMap[pBrowser] = newTabButton;
+	m_appToTabMap[pBrowser] = pNewTabButton;
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamTabView::UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser) {
@@ -182,5 +190,13 @@ RESULT DreamTabView::UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser
 		m_appToTabMap[pBrowser]->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
 	}
 
+	return R_PASS;
+}
+
+bool DreamTabView::CanPressButton(int dirtyIndex) {
+	return false;
+}
+
+RESULT DreamTabView::ClearMalletFlag(int index) {
 	return R_PASS;
 }

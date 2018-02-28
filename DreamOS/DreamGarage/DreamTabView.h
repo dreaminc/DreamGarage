@@ -36,6 +36,9 @@ public:
 
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
+protected:
+	static DreamTabView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
 public:
 
 	// called when a new piece of content is opened, 
@@ -50,8 +53,9 @@ public:
 
 	RESULT UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser);
 
-protected:
-	static DreamTabView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+public:
+	bool CanPressButton(int dirtyIndex);
+	RESULT ClearMalletFlag(int index);
 
 private:
 	DreamUserControlArea* m_pParentApp = nullptr;
@@ -74,6 +78,8 @@ private:
 	float m_tabHeight = TAB_HEIGHT;
 
 	point m_ptMostRecent;
+
+	bool m_fCanPressButton[2];
 };
 
 #endif // ! DREAM_TAB_VIEW_H_
