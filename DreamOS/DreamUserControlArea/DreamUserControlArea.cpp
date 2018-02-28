@@ -400,23 +400,11 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
-Error:
-	return r;
-}
-
-RESULT DreamUserControlArea::SendURL() {
-	RESULT r = R_PASS;
-
-	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
-	std::string strTitle = "website";
-
-	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
-
 	if (m_pActiveBrowser != nullptr) {
 		m_pDreamTabView->AddBrowser(m_pActiveBrowser);
 	}
+
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
@@ -429,6 +417,21 @@ RESULT DreamUserControlArea::SendURL() {
 
 	// TODO: may not be enough once browser typing is re-enabled
 	m_strURL = "";
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SendURL() {
+	RESULT r = R_PASS;
+
+	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strTitle = "website";
+
+
+	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
+
+
 
 Error:
 	return r;
