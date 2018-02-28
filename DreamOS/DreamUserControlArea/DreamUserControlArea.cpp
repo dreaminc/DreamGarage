@@ -141,7 +141,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// clear flags
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-		//	m_pControlBar->ClearMalletFlag(i);
 			m_fCanPressButton[i] = true;
 		}
 
