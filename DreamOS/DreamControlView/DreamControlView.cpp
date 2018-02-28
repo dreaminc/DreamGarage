@@ -64,9 +64,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_fMalletDirty[0] = dirty();
 	m_fMalletDirty[1] = dirty();
 
-	m_fCanPressButton[0] = dirty();
-	m_fCanPressButton[1] = dirty();
-
 	m_ptLastEvent.x = -1;
 	m_ptLastEvent.y = -1;
 
@@ -125,9 +122,8 @@ RESULT DreamControlView::Update(void *pContext) {
 		}
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
-		bool fControlBarDirty = m_fCanPressButton[i].IsDirty();
 
-		UpdateWithMallet(pMallet, fMalletDirty, fControlBarDirty, m_fMouseDown[i], type);
+		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -135,20 +131,13 @@ RESULT DreamControlView::Update(void *pContext) {
 		else {
 			m_fMalletDirty[i].CheckAndCleanDirty();
 		}
-
-		if (fControlBarDirty) {
-			m_fCanPressButton[i].SetDirty();
-		}
-		else {
-			m_fCanPressButton[i].CheckAndCleanDirty();
-		}
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fControlBarDirty, bool &fMouseDown, HAND_TYPE handType) {
+RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
@@ -170,7 +159,6 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
 			fMalletDirty = false;
-			fControlBarDirty = false;
 
 			if (fMouseDown) {
 				fMouseDown = false;

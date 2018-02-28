@@ -138,6 +138,8 @@ private:
 private:
 	bool m_fHasOpenApp;
 
+	bool m_fCanPressButton[2];
+
 // layout variables
 private:
 	float m_spacingSize = SPACING_SIZE;

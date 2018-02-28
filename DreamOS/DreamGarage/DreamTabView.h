@@ -36,6 +36,9 @@ public:
 
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
+protected:
+	static DreamTabView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
 public:
 
 	// called when a new piece of content is opened, 
@@ -49,9 +52,6 @@ public:
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
 
 	RESULT UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser);
-
-protected:
-	static DreamTabView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	DreamUserControlArea* m_pParentApp = nullptr;
