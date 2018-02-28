@@ -22,6 +22,73 @@ Error:
 	return;
 }
 
+RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY) {
+	RESULT r = R_PASS;
+
+	INPUT* inputStruct = new INPUT();
+	inputStruct->type = INPUT_MOUSE;
+
+	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
+	mouseInputStruct->dwFlags = MOUSEEVENTF_WHEEL;
+	mouseInputStruct->mouseData = 120 * scrollPointX;
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::SendKeyPressed(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+
+	INPUT* inputStruct = new INPUT();
+	inputStruct->type = INPUT_KEYBOARD;
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
+	RESULT r = R_PASS;
+
+	INPUT* inputStruct = new INPUT;
+	inputStruct->type = INPUT_MOUSE;
+
+	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
+
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown) {
+	RESULT r = R_PASS;
+
+	INPUT* inputStruct = new INPUT;
+	inputStruct->type = INPUT_MOUSE;
+
+	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
+
+
+	unsigned int numInputs;	// number of structures in pInputs array
+	LPINPUT pInputs;		// array of INPUT structures representing input event
+	int cbSize;				// size in BYTES of an INPUT structure
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	//GetForegroundWindow();
+
+
+	SendInput(numInputs, pInputs, cbSize);	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+Error:
+	return r;
+}
+
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
