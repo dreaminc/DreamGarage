@@ -16,6 +16,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -293,64 +294,13 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
-	// ControlView App
-	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this, false);
-	CN(m_pDreamControlView);
+	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 
-	// UIKeyboard App
-	CRM(InitializeKeyboard(), "Failed to initialize Keyboard");
-	CRM(InitializeDreamUser(), "Failed to initialize User App");
-
-	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
-	CN(m_pDreamUIBar);
-	CR(m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));	
-
-#ifndef _DEBUG
-	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
-	CNM(m_pDreamBrowser, "Failed to create dream browser");
-
-	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-	m_pDreamBrowser->SetDiagonalSize(9.0f);
-	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-
-	m_pDreamBrowser->SetVisible(false);
-#endif
-
-	//*
-//*/
-	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
-
-	//TODO: collisions doesn't follow properly
-	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
-	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, 0.0f));
-	//*/
-	/*
-	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
-	CNM(m_pDreamContentView, "Failed to create dream content view");
-
-	m_pDreamContentView->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
-
-	m_pDreamContentView->SetVisible(false);
-	m_pDreamContentView->SetFitTextureAspectRatio(true);
-	//*/
-
-	//CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
-
-
-	{
-		//AllocateAndAssignUserModelFromPool(pDreamPeer.get());
-
-		//g_pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this);
-		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
-		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
-
-
-		//auto pDreamPeerApp = CreateNewPeer(nullptr);
-		//g_pDreamPeerApp = CreateNewPeer(nullptr);
-		//AllocateAndAssignUserModelFromPool(g_pDreamPeerApp.get());
-		//g_pDreamPeerApp->SetPosition(point(0.0f, -2.0f, 1.0f));
-
-	}
+	// what used to be in this function is now in DreamUserControlArea::InitializeApp
+	CR(InitializeKeyboard());
+	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
+	CN(m_pDreamUserControlArea);
+	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 Error:
 	return r;
@@ -577,10 +527,9 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
+	//TODO: use the DremaUserControlArea
 	if (m_fShouldUpdateAppComposites) {
-		m_pDreamUser->ResetAppComposite();
-		m_pDreamUIBar->ResetAppComposite();
-		m_pDreamControlView->ResetAppComposite();
+		m_pDreamUserControlArea->ResetAppComposite();
 
 		m_fShouldUpdateAppComposites = false;
 	}
@@ -601,9 +550,10 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 
 	rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 
-	if (m_pDreamBrowser != nullptr) {
-		ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
-	}
+	//TODO: fuck this
+	//if (m_pDreamBrowser != nullptr) {
+	//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
+//	}
 
 	float ptX = -1.0f * m_seatPositioningRadius * std::sin(rotationAngle * M_PI / 180.0f);
 	float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
@@ -725,7 +675,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	}
 
 	if (pPeerConnection->GetPeerUserID() == m_pendingAssetReceiveUserID) {
-		m_pDreamBrowser->StartReceiving(pPeerConnection);
+		m_pDreamShareView->StartReceiving(pPeerConnection);
 		m_pendingAssetReceiveUserID = -1;
 	}
 
@@ -949,26 +899,45 @@ Error:
 RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
-	/*
-	if (m_pDreamContentView != nullptr) {
-		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
-		m_pDreamContentView->SetVisible(true);
+	if (m_pDreamUserControlArea != nullptr) {
+		CR(m_pDreamUserControlArea->AddEnvironmentAsset(pEnvironmentAsset));
 	}
 
-	//*/
-	if (m_pDreamBrowser != nullptr) {
-		//m_pDreamBrowser->SetVisible(true);
-		//m_pDreamBrowser->FadeQuadToBlack();
-		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnCloseAsset() {
+	RESULT r = R_PASS;
+	
+	if (m_pDreamUserControlArea != nullptr) {
+		CR(m_pDreamUserControlArea->CloseActiveAsset());
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnShareAsset() {
+	RESULT r = R_PASS;
+	
+	CN(m_pDreamUserControlArea);
+	CN(m_pDreamShareView);
+
+	CR(m_pDreamShareView->SetCastingTexture(m_pDreamUserControlArea->GetActiveBrowser()->GetScreenTexture()));
+	CR(m_pDreamShareView->ShowCastingTexture());
+	CR(m_pDreamShareView->BeginStream());
+	CR(m_pDreamShareView->Show());
+
+Error:
 	return r;
 }
 
 RESULT DreamGarage::OnReceiveAsset(long userID) {
 	RESULT r = R_PASS;
-	if (m_pDreamBrowser != nullptr) {
+	if (m_pDreamShareView != nullptr) {
 
-		m_pDreamBrowser->PendReceiving();
+		m_pDreamShareView->PendReceiving();
 
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
@@ -984,14 +953,14 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 
 RESULT DreamGarage::OnStopSending() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopSending());
+	CR(m_pDreamShareView->StopSending());
 Error:
 	return r;
 }
 
 RESULT DreamGarage::OnStopReceiving() {
 	RESULT r = R_PASS;
-	CR(m_pDreamBrowser->StopReceiving());
+	CR(m_pDreamShareView->StopReceiving());
 
 	m_pendingAssetReceiveUserID = -1;
 
@@ -1014,4 +983,3 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 Error:
 	return r;
 }
-

@@ -12,8 +12,9 @@
 #include "UI/UIMenuItem.h"
 #include "UI/UIScrollView.h"
 #include "UI/UIMallet.h"
-#include "DreamControlView/DreamControlView.h"
 
+#include "DreamControlView/DreamControlView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamBrowser.h"
 
 #include "Primitives/font.h"
@@ -23,14 +24,6 @@
 #include "Cloud/HTTP/HTTPController.h"
 
 #include "HAL/UIStageProgram.h"
-
-RESULT DreamUIBarHandle::SendShowRootMenu() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowRootMenu());
-Error:
-	return r;
-}
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
@@ -291,24 +284,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 
 				// if the stack is empty after popping from the path, hide the app
 				CBR(m_pathStack.empty(), R_SKIPPED);
-				CR(m_pUserHandle->SendClearFocusStack());
 				CR(HideApp());
-				//*
-				{
-					// if the user is currently streaming, show the control view
-					bool fStreaming = false;
-					CR(m_pUserHandle->RequestStreamingState(fStreaming));
-					if (fStreaming) {
-					//	CR(ShowControlView(false));
-						CR(ShowControlView());
-					}
-				}
-				//*/
-				//break;
-			}
-
-			else {
-				CR(ShowRootMenu());
 			}
 
 		} break;
@@ -331,9 +307,10 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			//CR(ShowControlView(true));
 			m_pUserHandle->SendPreserveSharingState(true);
-			CR(SendURLToBrowser());
+			if (m_pParentApp != nullptr) {
+				CR(m_pParentApp->SendURL());
+			}
 		} break;
 	}
 
@@ -341,40 +318,6 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 Error:
 	return r;
 }
-
-RESULT DreamUIBar::SendURLToBrowser() {
-	RESULT r = R_PASS;
-
-	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-	CR(pDreamControlViewHandle->SendURLtoBrowser());
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-	return r;
-}
-
-RESULT DreamUIBar::ShowControlView() {
-
-	RESULT r = R_PASS;
-
-	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-	CN(m_pUserHandle);
-	if (!pDreamControlViewHandle->IsAppVisible()) {
-		CR(pDreamControlViewHandle->ShowApp());
-		CR(m_pUserHandle->SendPushFocusStack(pDreamControlViewHandle));
-	}
-
-Error:
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
-	return r;
-}
-
 
 texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
@@ -472,20 +415,16 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				m_pathStack.push(pTempMenuNode);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
-				m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+				if (m_pParentApp != nullptr) {
+					CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
+				}
 
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
-				CR(UpdateBrowser(strScope, strPath));
-
-//				CR(ShowControlView(false));
-				CR(ShowControlView());
 			}
 //*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -499,43 +438,12 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CN(m_pKeyboardHandle);
 				CR(m_pKeyboardHandle->Show());
 
-				//Release keyboard is called when Hide would be called
-				//CR(m_pUserHandle->SendReleaseKeyboard());
-				//m_pKeyboardHandle = nullptr;
-
-				//TODO: why does this need to happen
-				CR(UpdateBrowser(strScope, strPath));
 			}
 //*/
 		}
 	}
 
 Error:
-	return r;
-}
-
-RESULT DreamUIBar::UpdateBrowser(std::string strScope, std::string strPath) {
-	RESULT r = R_PASS;
-
-	auto pDreamControlViewHandle = dynamic_cast<DreamControlViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamControlView", this));
-	CN(pDreamControlViewHandle);
-	CR(pDreamControlViewHandle->SendBrowserScopeAndPath(strScope, strPath));
-
-	/*
-	auto pBrowserHandle = dynamic_cast<DreamBrowserHandle*>(GetDOS()->RequestCaptureAppUnique("DreamBrowser", this));
-	CN(pBrowserHandle);
-	pBrowserHandle->SetScope(strScope);
-	pBrowserHandle->SetPath(strPath);
-	//*/
-Error:
-	/*
-	if (pBrowserHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pBrowserHandle, this);
-	}
-	//*/
-	if (pDreamControlViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pDreamControlViewHandle, this);
-	}
 	return r;
 }
 
@@ -846,6 +754,15 @@ DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
+}
+
+RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	m_pParentApp = pParentApp;
+	return R_PASS;
+}
+
+bool DreamUIBar::IsEmpty() {
+	return m_pathStack.empty();
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {

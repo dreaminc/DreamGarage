@@ -30,6 +30,8 @@ public:
 
 	std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int width, int height, const std::string& strURL);
 	std::shared_ptr<WebBrowserController> GetBrowser(const std::string& strID);
+	
+	RESULT RemoveBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController);
 
 protected:
 	RESULT ClearAllBrowserControllers();

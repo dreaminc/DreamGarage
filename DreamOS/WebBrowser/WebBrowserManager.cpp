@@ -114,6 +114,11 @@ std::shared_ptr<WebBrowserController> WebBrowserManager::GetBrowser(const std::s
 	return nullptr;
 }
 
+RESULT WebBrowserManager::RemoveBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController) {
+	m_webBrowserControllers.remove(pWebBrowserController);
+	return R_PASS;
+}
+
 /*
 void CEFBrowserManager::SetKeyFocus(const std::string& id) {
 	m_browserInKeyFocus = GetBrowser(id);

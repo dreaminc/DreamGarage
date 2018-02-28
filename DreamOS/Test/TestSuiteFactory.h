@@ -17,6 +17,7 @@ public:
 		UIVIEW,
 		CLOUD,
 		WEBRTC,
+		MULTICONTENT,
 		HAL,
 		MATH,
 		ANIMATION,

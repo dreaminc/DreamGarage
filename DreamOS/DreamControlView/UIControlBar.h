@@ -12,7 +12,7 @@ class text;
 
 //TODO: some of these values / the way they are used are specific to control view
 #define ITEM_SIDE 0.0625f
-#define URL_WIDTH 0.84375f //0.6875f is the width with forward and back
+#define URL_WIDTH_2 0.84375f //0.6875f is the width with forward and back
 #define ITEM_SPACING 0.015625f
 
 #define ITEM_ACTUATION_DEPTH 0.02f
@@ -28,8 +28,10 @@ class ControlBarObserver {
 public:
 	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) = 0;
 	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) = 0;
 	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) = 0;
 };
 
@@ -49,20 +51,30 @@ public:
 	std::shared_ptr<UIButton> GetBackButton();
 	std::shared_ptr<UIButton> GetForwardButton();
 	std::shared_ptr<UIButton> GetToggleButton();
+	std::shared_ptr<UIButton> GetShareButton();
 	std::shared_ptr<UIButton> GetStopButton();
 	std::shared_ptr<UIButton> GetURLButton();
-	std::vector<std::shared_ptr<UIButton>> GetControlButtons();
 
 	// Wrappers for executing the observer methods
 	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
 	RESULT ForwardPressed(UIButton* pButtonContext, void* pContext);
 	RESULT TogglePressed(UIButton* pButtonContext, void* pContext);
-	RESULT StopPressed(UIButton* pButtonContext, void* pContext);
+	RESULT OpenPressed(UIButton* pButtonContext, void* pContext);
+	RESULT ClosePressed(UIButton* pButtonContext, void* pContext);
+	RESULT SharePressed(UIButton* pButtonContext, void* pContext);
 	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
 
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();
+	texture *GetShareTexture();
+	texture *GetStopTexture();
+
+	// for non-default implementations, call these before initialize
+	RESULT SetTotalWidth(float totalWidth);
+	RESULT SetItemSide(float itemSide);
+	RESULT SetURLWidth(float urlWidth);
+	RESULT SetItemSpacing(float itemSpacing);
 
 	std::shared_ptr<text> GetURLText();
 
@@ -79,31 +91,39 @@ public:
 public:
 	const wchar_t *k_wszBack = L"control-view-back.png";
 	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszOpen = L"control-view-open.png";
+	const wchar_t *k_wszClose = L"control-view-close.png";
+	const wchar_t *k_wszShare = L"control-view-share.png";
+	const wchar_t *k_wszStopSharing = L"control-view-stop-sharing.png";
 	const wchar_t *k_wszHide = L"control-view-minimize.png";
-	const wchar_t *k_wszStop = L"control-view-stop-sharing.png";
 	const wchar_t *k_wszShow = L"control-view-maximize.png";
 	const wchar_t *k_wszURL = L"control-view-url.png";
 
 private:
-	std::shared_ptr<UIButton> m_pBackButton;
-	std::shared_ptr<UIButton> m_pForwardButton;
-	std::shared_ptr<UIButton> m_pToggleButton;
-	std::shared_ptr<UIButton> m_pStopButton;
+	std::shared_ptr<UIButton> m_pBackButton = nullptr;
+	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
+	std::shared_ptr<UIButton> m_pToggleButton = nullptr;
+	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
+	std::shared_ptr<UIButton> m_pShareToggleButton = nullptr;
 
-	std::shared_ptr<UIButton> m_pURLButton;
-	std::shared_ptr<text> m_pURLText;
+	std::shared_ptr<UIButton> m_pURLButton = nullptr;
+	std::shared_ptr<text> m_pURLText = nullptr;
 
-	texture *m_pBackTexture;
-	texture *m_pForwardTexture;
-	texture *m_pHideTexture;
-	texture *m_pStopTexture;
-	texture *m_pShowTexture;
-	texture *m_pURLTexture;
+	texture *m_pBackTexture = nullptr;
+	texture *m_pForwardTexture = nullptr;
+	texture *m_pShowTexture = nullptr;
+	texture *m_pHideTexture = nullptr;
+	texture *m_pOpenTexture = nullptr;
+	texture *m_pCloseTexture = nullptr;
+	texture *m_pShareTexture = nullptr;
+	texture *m_pStopSharingTexture = nullptr;
+	texture *m_pURLTexture = nullptr;
 
 	float m_totalWidth = TOTAL_WIDTH;
 	float m_itemSide = m_totalWidth * ITEM_SIDE;
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;
-	float m_urlWidth = m_totalWidth * URL_WIDTH;
+	float m_urlWidth = m_totalWidth * URL_WIDTH_2;
 	float m_actuationDepth = ITEM_ACTUATION_DEPTH;
 
 	BarType m_barType = BarType::DEFAULT;

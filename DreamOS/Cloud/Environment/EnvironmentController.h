@@ -29,8 +29,10 @@ class EnvironmentAsset;
 class EnvironmentControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
-	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
-	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") = 0;
+	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
+	virtual RESULT RequestCloseAsset(long assetID) = 0;
+	virtual RESULT RequestShareAsset(long assetID) = 0;
+	virtual RESULT RequestStopSharing(long assetID) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -64,6 +66,8 @@ public:
 		// Assets
 		ENVIRONMENT_ASSET_SHARE,
 		ENVIRONMENT_STOP_SHARING,
+		ENVIRONMENT_ASSET_OPEN,
+		ENVIRONMENT_ASSET_CLOSE,
 
 		INVALID
 	};
@@ -90,10 +94,12 @@ public:
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
 		
 		virtual long GetUserID() = 0;
-		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
-		virtual RESULT OnReceiveAsset(long userID) = 0;
+		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
 		virtual RESULT OnStopSending() = 0;
+		virtual RESULT OnReceiveAsset(long userID) = 0;
 		virtual RESULT OnStopReceiving() = 0;;
+		virtual RESULT OnShareAsset() = 0;
+		virtual RESULT OnCloseAsset() = 0;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
@@ -122,8 +128,12 @@ public:
 	// EnvironmentControllerProxy
 	// TODO: Note - Register Controller Observer pattern needs to be fixed here
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
-	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
-	virtual RESULT RequestStopSharing(long assetID, std::string strStorageProviderScope = "", std::string strPath = "") override;
+	virtual RESULT RequestOpenAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
+	virtual RESULT RequestCloseAsset(long assetID) override;
+	virtual RESULT RequestShareAsset(long assetID) override;
+	virtual RESULT RequestStopSharing(long assetID) override;
+	virtual RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnSendAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);

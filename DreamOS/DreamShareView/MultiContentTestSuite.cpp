@@ -1,0 +1,908 @@
+#include "MultiContentTestSuite.h"
+#include "DreamOS.h"
+
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+#include "HAL/opengl/OGLProgram.h"
+
+#include "DreamShareView/DreamShareView.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamGarage/Dream2DMouseApp.h"
+#include "DreamGarage/DreamBrowser.h"
+
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "WebBrowser/WebBrowserController.h"
+
+#include "Cloud/CloudController.h"
+#include "Cloud/CloudControllerFactory.h"
+#include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/WebRequest.h"
+#include "Core/Utilities.h" 
+
+#include "Sandbox/CommandLineManager.h"
+
+MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
+	m_pDreamOS(pDreamOS)
+{
+	// empty
+	RESULT r = R_PASS;
+	CR(Initialize());
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
+MultiContentTestSuite::~MultiContentTestSuite() {
+	// empty
+}
+
+RESULT MultiContentTestSuite::Initialize() {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamOS);
+
+	m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
+	CN(m_pTestTextureUser1);
+	CN(m_pTestTextureUser2);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTests() {
+	RESULT r = R_PASS;
+
+	CR(AddTestManyBrowsers());
+	CR(AddTestUserControlArea());
+
+	CR(AddTestUserControlAreaLayout());
+
+
+	CR(AddTestMultiPeerBrowser());
+
+	CR(AddTestMultiPeerBasic());
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::SetupPipeline() {
+	RESULT r = R_PASS;
+
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestUserControlArea() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+	//	std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+	//	std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+
+//		pControlArea->SendURL("")
+//		pUserControlArea->m_pA
+
+		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+
+
+	Error:
+		return r;
+	};
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//pTestContext->pUserControlArea->Update();
+
+		//for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+		//	pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		//}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	} *pTestContext = new TestContext();
+	
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//No HMD
+		float diagonalSize = 6.0f;
+		//float diagonalSize = 0.6f;
+
+		float aspectRatio = ((float)1366 / (float)768);
+		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+		float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
+
+		//TODO: move these values to the proper app
+		// test values based off of castWidth
+		float borderWidth =	1.0323f * castWidth;
+		float borderHeight = (0.594624) * castWidth; // 0.6237f
+		
+		float toolbarButtonWidth = 0.0645f * castWidth;
+		float toolbarButtonHeight = 0.0645f * castWidth;
+
+		float toolbarURLWidth = 0.5484f * castWidth;
+		float toolbarURLHeight = 0.0655f * castWidth;
+
+		float tabBarBorderWidth = 0.2962f * castWidth;
+		float tabBarBorderHeight = 0.675269f * castWidth;
+
+		float tabBarWindowWidth = 0.2640f * castWidth;
+		float tabBarWindowHeight = 0.148387f * castWidth;
+
+		float spaceSize = 0.016129 * castWidth;
+		float fakeSpaceSize = 0.0164875 * castWidth;
+
+		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+
+		point ptOrigin = point(0.0f, 0.0f, 0.0f);
+
+		SetupPipeline();
+
+		/*
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+
+		auto pWebBrowserManager = pTestContext->pUserControlArea->m_pWebBrowserManager;
+		//*/
+
+		//*
+		auto pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		pWebBrowserManager->Initialize();
+		//*/
+		// starts to break down as the test approaches 20 browsers
+		pTestContext->strURIs = {
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.livelovely.com",
+			"www.twitch.tv"
+		} ;
+
+		// Control View background
+		auto pControlBackground = m_pDreamOS->MakeQuad(borderWidth, borderHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pControlBackground);
+		pControlBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-main-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pControlBackground->SetPosition(point(0.0f, 0.0f, -0.0005f));
+
+		//TODO: move to Tabs app
+		auto pTabBackground = m_pDreamOS->MakeQuad(tabBarBorderWidth, tabBarBorderHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pTabBackground);
+		pTabBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-list-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTabBackground->SetPosition(point(borderWidth / 2.0f + spaceSize + tabBarBorderWidth / 2.0f, (borderHeight - tabBarBorderHeight) / 2, -0.0005f));
+
+		//TODO: make control bar app
+		point ptBarLeft = point(-borderWidth / 2.0f, -borderHeight / 2.0f - spaceSize - (toolbarButtonHeight / 2.0f), 0.0f);
+		auto pBackButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pBackButton);
+		pBackButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-back.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pBackButton->SetPosition(ptBarLeft + point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
+
+		auto pForwardButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pForwardButton);
+		pForwardButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-forward.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pForwardButton->SetPosition(ptBarLeft + point(3 * toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
+
+		auto pCloseButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pCloseButton);
+		pCloseButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-close.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pCloseButton->SetPosition(ptBarLeft + point(5 * toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
+		
+		auto pURLButton = m_pDreamOS->MakeQuad(toolbarURLWidth, toolbarURLHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pURLButton);
+		pURLButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		point ptURL = point(0.0f, ptBarLeft.y(), 0.0f);
+		pURLButton->SetPosition(ptURL);
+
+		point ptBarRight = ptURL + point(toolbarURLWidth / 2.0f + spaceSize, 0.0f, 0.0f);
+
+		auto pShareButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pShareButton);
+		pShareButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pShareButton->SetPosition(ptBarRight+ point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
+
+		auto pOpenButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pOpenButton);
+		pOpenButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pOpenButton->SetPosition(ptBarRight + point(3*toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
+
+		auto pMinimizeButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
+		m_pDreamOS->AddObjectToUIGraph(pMinimizeButton);
+		pMinimizeButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pMinimizeButton->SetPosition(ptBarRight+ point(5*toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
+
+		/*
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pControlBackground));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pTabBackground));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pBackButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pForwardButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pCloseButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pURLButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pShareButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pOpenButton));
+		pControlArea->GetComposite()->AddObject(std::shared_ptr<quad>(pMinimizeButton));
+		//*/
+
+
+		point ptTabBarPosition = point(pTabBackground->GetPosition().x(), castHeight / 2.0f - tabBarWindowHeight / 2.0f, 0.0f);
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+
+			if (i == 0) {
+				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal));
+				pTestContext->pBrowserQuads[i]->SetPosition(ptOrigin);
+			}
+			else {
+				pTestContext->pBrowserQuads.emplace_back(m_pDreamOS->AddQuad(tabBarWindowWidth, tabBarWindowHeight, 1, 1, nullptr, vNormal));
+				pTestContext->pBrowserQuads[i]->SetPosition(ptTabBarPosition - point(0.0f, ((i - 1)*(tabBarWindowHeight + fakeSpaceSize)), 0.0f));
+			}
+			//pControlArea->GetComposite()->AddObject(pTestContext->pBrowserQuads[i]);
+			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
+			pTestContext->pBrowserQuads[i]->FlipUVVertical();
+		}
+
+//	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//pTestContext->pUserControlArea->Update();
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestManyBrowsers() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::vector<std::shared_ptr<quad>> pBrowserQuads;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		float diagonalSize = 2.0f;
+		float aspectRatio = ((float)1366 / (float)768);
+		float castWidth = std::sqrt(((aspectRatio * aspectRatio) * (diagonalSize * diagonalSize)) / (1.0f + (aspectRatio * aspectRatio)));
+		float castHeight = std::sqrt((diagonalSize * diagonalSize) / (1.0f + (aspectRatio * aspectRatio)));
+
+		vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
+		CR(SetupPipeline());
+
+		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->pWebBrowserManager);
+		CR(pTestContext->pWebBrowserManager->Initialize());
+		pTestContext->pWebBrowserManager->Update();
+
+		// starts to break down as the test approaches 20 browsers
+		pTestContext->strURIs = {
+			"www.twitch.tv",
+			"www.youtube.com",
+			"www.google.com",
+			"www.trello.com",
+			"www.slack.com",
+			"www.cnn.com",
+			"www.nyt.com",
+			"www.fivethirtyeight.com",
+			"www.washingtonpost.com",
+			"www.spotify.com",
+			"www.amazon.com",
+			/*
+			"www.bandcamp.com",
+			"www.messenger.com",
+			"www.theindependentsf.com",
+			"www.thechapelsf.com",
+			"www.bottomofthehill.com",
+			"www.dreamos.com",
+			"mail.google.com",
+			"facebook.com",
+			"www.reddit.com"
+			//*/
+		} ;
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+		}
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			/*
+			WebRequest webRequest;
+			std::string strEnvironmentAssetURL = pTestContext->strURIs[i];
+			std::wstring wstrAssetURL = util::StringToWideString("https://" + strEnvironmentAssetURL + "/");
+			CR(webRequest.SetURL(wstrAssetURL));
+			CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+			pTestContext->pDreamBrowsers[i]->LoadRequest(webRequest);
+			//*/
+
+			pTestContext->pBrowserQuads.emplace_back(std::shared_ptr<quad>(m_pDreamOS->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal)));
+			pTestContext->pBrowserQuads[i]->SetMaterialAmbient(0.90f);
+			pTestContext->pBrowserQuads[i]->FlipUVVertical();
+			pTestContext->pBrowserQuads[i]->SetPosition(point(((i%5)*castWidth * 1.05f)-4.0f, 2.0f - ((i/5)*castHeight * 1.05f), 0.0f));
+
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//pTestContext->pWebBrowserManager->Update();
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+		}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public CloudController::PeerConnectionObserver {
+
+		CloudController *pCloudController = nullptr;
+
+		// PeerConnectionObserver
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnNewPeerConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnNewSocketConnection(int seatPosition) {
+			DEVENV_LINEOUT("OnNewSocketConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+			DEVENV_LINEOUT("OnPeerConnectionClosed");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+			DEVENV_LINEOUT("OnDataMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+			DEVENV_LINEOUT("OnDataStringMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			//DEVENV_LINEOUT(L"OnAudioData");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnDataChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnAudioChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame");
+
+			return R_NOT_HANDLED;
+		}
+
+	} *pTestContext = new TestContext();
+
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+
+		CR(SetupPipeline());
+
+		m_pTestQuad = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)));
+		m_pDreamOS->AddObjectToInteractionGraph(m_pTestQuad.get());
+
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_MOVED, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_ENDED, this);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
+		m_pDreamShareView->Show();
+
+		m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		//m_pDreamShareView->ShowCast
+
+		// Command Line Manager
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		/*
+		// Cloud Controller
+		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(m_pDreamOS->GetCloudController()->Initialize(), "Failed to initialize cloud controller");
+
+		CRM(m_pDreamOS->GetCloudController()->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+		//*/
+
+		// Log in 
+		{
+			// TODO: This way to start the cloud controller thread is not great
+			std::string strUsername = "test";
+			m_strID =  pCommandLineManager->GetParameterValue("testval");
+			strUsername += m_strID;
+			strUsername += "@dreamos.com";
+
+			long environmentID = 170;
+			std::string strPassword = "nightmare";
+
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", strPassword));
+
+			CRM(m_pDreamOS->GetCloudController()->Start(strUsername, strPassword, environmentID), "Failed to log in");
+
+			if (m_strID == "1") {
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				m_pTestTexture = m_pTestTextureUser1;
+			}
+			else if (m_strID == "2") {
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				m_pTestTexture = m_pTestTextureUser2;
+			}
+
+			m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+			m_pDreamShareView->ShowCastingTexture();
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public CloudController::PeerConnectionObserver {
+
+		CloudController *pCloudController = nullptr;
+
+		// PeerConnectionObserver
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnNewPeerConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnNewSocketConnection(int seatPosition) {
+			DEVENV_LINEOUT("OnNewSocketConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+			DEVENV_LINEOUT("OnPeerConnectionClosed");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+			DEVENV_LINEOUT("OnDataMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+			DEVENV_LINEOUT("OnDataStringMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			//DEVENV_LINEOUT(L"OnAudioData");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnDataChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnAudioChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			//DEVENV_LINEOUT(L"OnVideoFrame");
+
+			return R_NOT_HANDLED;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+
+		CR(SetupPipeline());
+
+		m_pTestQuad = std::shared_ptr<quad>(m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)));
+		m_pDreamOS->AddObjectToInteractionGraph(m_pTestQuad.get());
+
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), INTERACTION_EVENT_SELECT_DOWN, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_MOVED, this);
+		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_ENDED, this);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
+		m_pDreamShareView->Show();
+
+		m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+
+		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		//m_pDreamShareView->ShowCast
+
+		// Command Line Manager
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		/*
+		// Cloud Controller
+		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(m_pDreamOS->GetCloudController()->Initialize(), "Failed to initialize cloud controller");
+
+		CRM(m_pDreamOS->GetCloudController()->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+		//*/
+
+		// Log in 
+		{
+			// TODO: This way to start the cloud controller thread is not great
+			std::string strUsername = "test";
+			m_strID =  pCommandLineManager->GetParameterValue("testval");
+			strUsername += m_strID;
+			strUsername += "@dreamos.com";
+
+			long environmentID = 170;
+			std::string strPassword = "nightmare";
+
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", strPassword));
+
+			CRM(m_pDreamOS->GetCloudController()->Start(strUsername, strPassword, environmentID), "Failed to log in");
+
+			if (m_strID == "1") {
+				m_strURL = "https://www.youtube.com/watch?v=5vZ4lCKv1ik";
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = m_pTestTextureUser1;
+			}
+			else if (m_strID == "2") {
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = m_pTestTextureUser2;
+				m_strURL = "https://www.youtube.com/watch?v=8ulEMXUNyRo";
+			}
+
+			//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+			//m_pDreamShareView->ShowCastingTexture();
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	//auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+	if (pEvent->m_pObject == m_pTestQuad.get() || m_fTestQuadActive) {
+		switch (pEvent->m_eventType) {
+			case ELEMENT_INTERSECT_BEGAN: {
+				m_fTestQuadActive = true;
+			} break;
+
+			case ELEMENT_INTERSECT_ENDED: {
+				m_fTestQuadActive = false;
+			} break;
+
+			case INTERACTION_EVENT_SELECT_DOWN: {
+				if (!m_pDreamShareView->IsStreaming()) {
+					if (m_pDreamShareView->m_fReceivingStream) {
+						CR(m_pDreamOS->UnregisterVideoStreamSubscriber(m_pDreamShareView.get()));
+					}
+					m_pDreamShareView->m_fReceivingStream = false;
+					/*
+					if (m_strID == "1") {
+						m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+						m_pTestTexture = m_pTestTextureUser1;
+					}
+					else if (m_strID == "2") {
+						m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+						m_pTestTexture = m_pTestTextureUser2;
+					}
+					//*/
+					m_pDreamBrowser->SetURI(m_strURL);
+					m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+					m_pDreamShareView->ShowCastingTexture();
+
+					m_pDreamShareView->SetStreamingState(false);
+					CR(m_pDreamShareView->BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+					m_pDreamShareView->SetStreamingState(true);
+				}
+
+			} break;
+
+		}
+	}
+Error:
+	return r;
+}

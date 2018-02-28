@@ -70,6 +70,7 @@ public:
 
 	// WebBrowser Controller Render Handling
 	RESULT OnGetViewRect(CefRect &cefRect);
+	RESULT OnAfterCreated();
 	RESULT OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height);
 	RESULT OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer);
 	RESULT OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL);

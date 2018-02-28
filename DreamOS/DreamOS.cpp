@@ -672,7 +672,8 @@ RESULT DreamOS::InitializeDreamUser() {
 	CNM(m_pDreamUser, "Failed to launch dream user app");
 
 	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set left hand");
+	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
+
 
 Error:
 	return r;
@@ -1104,4 +1105,12 @@ RESULT DreamOS::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFra
 
 Error:
 	return r;
+}
+
+std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
+	RESULT r = R_PASS;
+	CN(m_pDreamShareView);
+	return m_pDreamShareView->GetCastingTexture();
+Error:
+	return nullptr;
 }

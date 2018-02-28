@@ -386,6 +386,28 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnShareAsset() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnShareAsset());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnCloseAsset() {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnCloseAsset());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnStopReceiving() {
 	RESULT r = R_PASS;
 

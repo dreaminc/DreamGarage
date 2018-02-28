@@ -59,6 +59,18 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnAfterCreated());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: GetViewRect");
@@ -222,7 +234,6 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
 	
-
 #ifdef _DEBUG
 	cefSettings.single_process = true;
 #endif

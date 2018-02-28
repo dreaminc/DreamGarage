@@ -41,6 +41,7 @@
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
 #include "DreamAppHandle.h"
+#include "DreamShareView/DreamShareView.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -77,6 +78,7 @@ class DreamOS :
 	friend class WebRTCTestSuite;
 	friend class SoundTestSuite;
 	friend class SandboxTestSuite;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamVideoStreamSubscriber* m_pVideoStreamSubscriber = nullptr;
@@ -130,6 +132,14 @@ public:
 	}
 
 	virtual RESULT OnStopReceiving() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnShareAsset() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnCloseAsset() override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -369,6 +379,8 @@ public:
 private:
 	SandboxApp *m_pSandbox;
 
+public:
+	virtual std::shared_ptr<texture> GetSharedContentTexture();
 // System Applications
 private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard;
@@ -376,6 +388,7 @@ private:
 	// currently used by DreamGarage to dismiss UI when being seated (temporary)
 protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
+	std::shared_ptr<DreamShareView> m_pDreamShareView;
 
 private:
 	version m_versionDreamOS;

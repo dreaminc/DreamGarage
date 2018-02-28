@@ -229,7 +229,8 @@ RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
 		CN(pCEFRequest);
 
 		pCEFRequest->SetFlags(UR_FLAG_NO_DOWNLOAD_DATA);
-		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
+		auto pCefFrame = m_pCEFBrowser->GetFocusedFrame();
+		pCefFrame->LoadRequest(pCEFRequest);
 	}
 
 Error:
@@ -454,9 +455,19 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
+RESULT CEFBrowserController::OnAfterCreated() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnAfterCreated());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChange");
 
 	CN(m_pWebBrowserControllerObserver);
 	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward, strCurrentURL));
@@ -467,7 +478,7 @@ Error:
 
 RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
 	RESULT r = R_PASS;
-	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");
 
 	// TODO: Add transition type
 
@@ -512,7 +523,9 @@ Error:
 RESULT CEFBrowserController::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->GetResourceHandlerType(resourceHandlerType, strCEFURL));
+	}
 
 Error:
 	return r;

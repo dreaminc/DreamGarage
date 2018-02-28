@@ -18,6 +18,7 @@
 #include <stack>
 #include <queue>
 
+class DreamUserControlArea;
 class UIScrollView;
 class UIMallet;
 class UIView;
@@ -55,20 +56,8 @@ enum class MenuState {
 	ANIMATING
 };
 
-class DreamUIBarHandle : public DreamAppHandle, public DreamUserObserver {
-public:
-	RESULT SendShowRootMenu();
-
-public:
-	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
-
-private:
-	virtual RESULT ShowRootMenu() = 0;
-};
-
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
-					public DreamUIBarHandle,
+					public DreamUserObserver,
 					public MenuController::observer, 
 					public Subscriber<UIEvent>
 {
@@ -93,14 +82,9 @@ public:
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
-	RESULT UpdateBrowser(std::string strScope, std::string strPath);
-
 	// Animations
 	RESULT HideApp();
 	RESULT ShowApp();
-
-	RESULT ShowControlView();
-	RESULT SendURLToBrowser();
 
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
@@ -111,9 +95,9 @@ public:
 	RESULT PopPath();
 	RESULT RequestMenu();
 	RESULT ResetAppComposite();
-	virtual RESULT ShowRootMenu() override;
-	virtual RESULT HandleEvent(UserObserverEventType type) override;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) override;
+	RESULT ShowRootMenu();
+	RESULT HandleEvent(UserObserverEventType type);
+	texture *GetOverlayTexture(HAND_TYPE type);
 
 	RESULT RequestIconFile(std::shared_ptr<MenuNode> pMenuNode);
 
@@ -137,6 +121,8 @@ public:
 	RESULT Notify(UIEvent *pEvent);
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
+	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	bool IsEmpty();
 
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -192,6 +178,8 @@ private:
 
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+
+	DreamUserControlArea *m_pParentApp = nullptr;
 };
 
 

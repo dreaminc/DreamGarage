@@ -16,6 +16,8 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamUserControlArea;
+class DreamShareView;
 class UIStageProgram;
 class UpdateMouthMessage;
 
@@ -75,6 +77,8 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
+	virtual RESULT OnShareAsset() override;
+	virtual RESULT OnCloseAsset() override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
@@ -124,10 +128,7 @@ private:
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
 	
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
-	std::shared_ptr<DreamContentView> m_pDreamContentView;
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
-	std::shared_ptr<DreamControlView> m_pDreamControlView;
+	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea;
 };
 
 #endif	// DREAM_GARAGE_H_

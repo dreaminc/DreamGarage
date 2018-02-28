@@ -292,7 +292,7 @@ RESULT CloudTestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 			auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 			CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-			CRM(pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 		}
 	}
 

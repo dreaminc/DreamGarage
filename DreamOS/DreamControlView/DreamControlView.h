@@ -11,6 +11,8 @@
 #include "DreamUserApp.h"
 #include "UIControlBar.h"
 
+#include "DreamUserControlArea/DreamUserControlArea.h"
+
 #include "Primitives/Subscriber.h"
 #include <functional>
 #include <stack>
@@ -19,15 +21,13 @@
 
 #define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
-#define VIEW_ANGLE 32.0f
-#define VIEW_POS_DEPTH 0.1f	
-#define VIEW_POS_HEIGHT -0.2f
 
 #define TYPING_ANGLE (M_PI / 2.0f)
-
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
-
 #define SQUARED_DRAG_THRESHOLD 0.001f;
+
+#define BORDER_WIDTH 1.0323f;
+#define BORDER_HEIGHT 0.594624f;
 
 class quad; 
 class sphere;
@@ -35,45 +35,12 @@ class UIView;
 class UIMallet;
 class UIButton;
 class texture;
-class DreamBrowserHandle;
-
-class DreamControlViewHandle : public DreamAppHandle, public DreamUserObserver {
-public:
-	RESULT SetControlViewTexture(std::shared_ptr<texture> pBrowserTexture);
-	RESULT SendContentType(std::string strContentType);
-	RESULT ShowApp();
-	RESULT HideApp();
-	RESULT DismissApp();
-	RESULT SendURLtoBrowser();
-	RESULT SendBrowserScopeAndPath(std::string strScope, std::string strPath);
-	bool IsAppVisible();
-	RESULT SendURLText(std::string strURL);
-
-public:
-	//User Observer
-	virtual RESULT HandleEvent(UserObserverEventType type) = 0;
-	virtual texture *GetOverlayTexture(HAND_TYPE type) = 0;
-
-	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) = 0;
-
-private:
-	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) = 0;
-	virtual RESULT SetContentType(std::string strContentType) = 0;
-	virtual RESULT Show() = 0;
-	virtual RESULT Hide() = 0;
-	virtual RESULT Dismiss() = 0;
-	virtual RESULT SendURL() = 0;
-	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) = 0;
-	virtual bool IsVisible() = 0;
-	virtual RESULT SetURLText(std::string strURL) = 0;
-};
 
 class DreamControlView : public DreamApp<DreamControlView>, 
-						 public DreamControlViewHandle,
-						 public Subscriber<InteractionObjectEvent>,
-						 public Subscriber<SenseControllerEvent>, 
-						 public ControlBarObserver {
+						 public DreamUserObserver,
+						 public Subscriber<SenseControllerEvent> {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -86,21 +53,24 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) override;
-	virtual RESULT SetContentType(std::string strContentType) override;
+protected:
+	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	virtual DreamAppHandle* GetAppHandle() override;
+public:
+	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	
+// DreamAppHandle
+public:
+	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
+	RESULT SetContentType(std::string strContentType);
 
-	virtual RESULT Notify(InteractionObjectEvent *pInteractionEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
 
-	virtual RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox) override;
+	RESULT HandleKeyboardUp(std::string strTextField, point ptTextBox);
 	virtual RESULT HandleKeyboardDown();
-	virtual RESULT SendURL() override;
-	virtual RESULT SetBrowserScopeAndPath(std::string strScope, std::string strPath) override;
 
 	RESULT ResetAppComposite();
 
@@ -110,36 +80,23 @@ private:
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 
-protected:
-	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 // Animations
 private:
 
-	virtual RESULT Show() override;
-	virtual RESULT Hide() override;
+	RESULT Show();
+	RESULT Hide();
 	RESULT ShowView();
 	RESULT HideView();
-	virtual RESULT Dismiss() override;
+	RESULT Dismiss();
 
-	virtual bool IsVisible() override;
+	bool IsVisible();
 
 	//	manually checks the objects that could be animating,
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
 
-// ControlBarObserver 
-private:
-	bool CanPressButton(UIButton* pButtonContext);
-	RESULT SetIsMinimizedFlag(bool fIsMinimized);
-
-	virtual RESULT HandleStopPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleTogglePressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override;
-	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
-
-	virtual RESULT SetURLText(std::string strURL) override;
+	RESULT SetURLText(std::string strURL);
 
 // View Context
 public:
@@ -157,9 +114,15 @@ public:
 	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
 
 private:
+	
 	std::shared_ptr<UIView> m_pView = nullptr;
+
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
+
+	std::shared_ptr<quad> m_pViewBackground = nullptr;
+	texture* m_pBackgroundTexture = nullptr;
+
 	texture* m_pLoadingScreenTexture = nullptr;
 	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
@@ -168,9 +131,9 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamBrowserHandle* m_pBrowserHandle = nullptr;
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
+	DreamUserControlArea *m_pParentApp = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;	
@@ -189,6 +152,9 @@ private:
 	dirty m_fCanPressButton[2];
 
 	float m_dragThresholdSquared = SQUARED_DRAG_THRESHOLD;
+
+	float m_borderWidth = BORDER_WIDTH;
+	float m_borderHeight = BORDER_HEIGHT;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

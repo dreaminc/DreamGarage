@@ -28,7 +28,6 @@ class DimRay;
 class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
-class DreamUIBarHandle;
 class DimObj;
 
 #define MENU_HEIGHT -0.16f
@@ -108,6 +107,7 @@ private:
 
 class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -154,7 +154,11 @@ public:
 
 	virtual RESULT ResetAppComposite() override;
 
-protected:
+	RESULT SetHasOpenApp(bool fHasOpenApp);
+	RESULT SetEventApp(DreamUserObserver *pEventApp);
+
+//protected:
+public:
 
 	RESULT UpdateHand(HAND_TYPE type);
 	RESULT UpdateOverlayTexture(HAND_TYPE type);
@@ -173,13 +177,14 @@ private:
 	UIMallet* m_pLeftMallet = nullptr;
 	UIMallet* m_pRightMallet = nullptr;
 
-	std::stack<DreamUserObserver*> m_appStack;
-
 	// apps position themselves with this when they are presented
 	VirtualObj *m_pAppBasis = nullptr;
 
+	bool m_fHasOpenApp = false;
+	// current app that should receive events from the user
+	DreamUserObserver* m_pEventApp = nullptr;
+
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
-	DreamUIBarHandle *m_pMenuHandle = nullptr;
 
 	// reflection of the member 
 	bool m_fStreaming = false;
