@@ -50,35 +50,6 @@ DreamControlBar* DreamControlBar::SelfConstruct(DreamOS *pDreamOS, void *pContex
 	return pDreamControlBar;
 }
 
-bool DreamControlBar::CanPressButton(int dirtyIndex) {
-	//TODO: get some info from pParentApp, maintain some here
-	//*
-	RESULT r = R_PASS;
-	/*
-	auto pDreamOS = GetDOS();
-
-	CBR(dirtyIndex != -1, R_SKIPPED);
-
-	CBR(m_fCanPressButton[dirtyIndex], R_SKIPPED);
-
-	// avoids pressing two control bar buttons at once
-	m_fCanPressButton[0] = false;
-	m_fCanPressButton[1] = false;
-	//*/
-
-	return true;
-}
-
-RESULT DreamControlBar::ClearMalletFlag(int index) {
-	RESULT r = R_PASS;
-
-	CBR(index == 0 || index == 1, R_SKIPPED);
-	m_fCanPressButton[index] = true;
-
-Error:
-	return r;
-}
-
 RESULT DreamControlBar::SetSharingFlag(bool fIsSharing) {
 	RESULT r = R_PASS;
 	m_fIsSharing = fIsSharing;

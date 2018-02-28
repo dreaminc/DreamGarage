@@ -27,9 +27,6 @@ RESULT DreamTabView::InitializeApp(void *pContext) {
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetComposite()->AddUIView(GetDOS());
 
-	m_fCanPressButton[0] = true;
-	m_fCanPressButton[1] = true;
-
 	return R_PASS;
 }
 
@@ -190,13 +187,5 @@ RESULT DreamTabView::UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser
 		m_appToTabMap[pBrowser]->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
 	}
 
-	return R_PASS;
-}
-
-bool DreamTabView::CanPressButton(int dirtyIndex) {
-	return false;
-}
-
-RESULT DreamTabView::ClearMalletFlag(int index) {
 	return R_PASS;
 }

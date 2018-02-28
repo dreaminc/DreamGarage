@@ -57,9 +57,6 @@ public:
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override;
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
 
-	bool CanPressButton(int dirtyIndex);
-	RESULT ClearMalletFlag(int index);
-
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);
 
@@ -80,8 +77,6 @@ private:
 	double m_buttonHeight = BUTTON_HEIGHT;
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = URL_HEIGHT;
-
-	bool m_fCanPressButton[2];
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_
