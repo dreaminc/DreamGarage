@@ -133,7 +133,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
+RESULT DreamBrowser::ScrollContentByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -220,7 +220,7 @@ RESULT DreamBrowser::SendURL(std::string strURL) {
 //	SetVisible(true);
 
 	std::string strTitle = "website";
-	SetBrowserPath(strURL);
+	SetPath(strURL);
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
@@ -242,7 +242,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ClickBrowser(WebBrowserPoint ptContact, bool fMouseDown) {
+RESULT DreamBrowser::ClickContent(WebBrowserPoint ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
@@ -496,7 +496,7 @@ long DreamBrowser::GetCurrentAssetID() {
 	return m_assetID;
 }
 
-RESULT DreamBrowser::CloseBrowser() {
+RESULT DreamBrowser::CloseContent() {
 	RESULT r = R_PASS;
 
 	CR(m_pWebBrowserController->CloseBrowser());
@@ -642,12 +642,12 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SetBrowserScope(std::string strScope) {
+RESULT DreamBrowser::SetScope(std::string strScope) {
 	m_strScope = strScope;
 	return R_PASS;
 }
 
-RESULT DreamBrowser::SetBrowserPath(std::string strPath) {
+RESULT DreamBrowser::SetPath(std::string strPath) {
 	m_strPath = strPath;
 	return R_PASS;
 }

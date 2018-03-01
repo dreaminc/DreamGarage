@@ -27,6 +27,8 @@
 
 #include "DreamVideoStreamSubscriber.h"
 
+#include "DreamUserControlArea/DreamContent.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -44,6 +46,7 @@ class AudioPacket;
 
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
+	public DreamContent,
 	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
@@ -65,9 +68,10 @@ public:
 	RESULT ScrollBrowserToX(int pxXScroll);
 	RESULT ScrollBrowserToY(int pyYScroll);
 
-	RESULT ScrollBrowserByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint);		// Relative- scroll this far
 	RESULT ScrollBrowserXByDiff(int pxXDiff);
 	RESULT ScrollBrowserYByDiff(int pxYDiff);
+
+	virtual RESULT ScrollContentByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) override;		// Relative- scroll this far
 
 	int GetScrollX();		// use to get position scrolled to
 	int GetScrollY();
@@ -78,11 +82,11 @@ public:
 	int GetPageHeight();	// get page context
 	int GetPageWidth();
 
-	RESULT SendKeyPressed(char chkey, bool fkeyDown);
+	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) override;
 	RESULT SendURL(std::string strURL);
 
-	RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint);
-	RESULT ClickBrowser(WebBrowserPoint ptDiff, bool fMouseDown);
+	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) override;
+	virtual RESULT ClickContent(WebBrowserPoint ptDiff, bool fMouseDown) override;
 
 	RESULT BroadcastDreamBrowserMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
 
@@ -119,8 +123,8 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	virtual RESULT SetBrowserScope(std::string strScope);
-	virtual RESULT SetBrowserPath(std::string strPath);
+	virtual RESULT SetScope(std::string strScope) override;
+	virtual RESULT SetPath(std::string strPath) override;
 
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
@@ -131,10 +135,10 @@ public:
 
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL = "about:blank");
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
-	std::shared_ptr<texture> GetScreenTexture();
+	virtual std::shared_ptr<texture> GetScreenTexture();
 	long GetCurrentAssetID();
 
-	RESULT CloseBrowser();
+	virtual RESULT CloseContent() override;
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

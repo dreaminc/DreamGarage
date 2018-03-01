@@ -347,7 +347,7 @@ RESULT DreamUserControlArea::SendContactAtPoint(WebBrowserPoint ptContact, bool 
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveBrowser, R_SKIPPED);
-	CR(m_pActiveBrowser->ClickBrowser(ptContact, fMouseDown));
+	CR(m_pActiveBrowser->ClickContent(ptContact, fMouseDown));
 
 Error:
 	return r;
@@ -377,7 +377,7 @@ RESULT DreamUserControlArea::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPo
 	RESULT r = R_PASS;
 
 	CNR(m_pActiveBrowser, R_OBJECT_NOT_FOUND);
-	CR(m_pActiveBrowser->ScrollBrowserByDiff(pxXDiff, pxYDiff, scrollPoint));
+	CR(m_pActiveBrowser->ScrollContentByDiff(pxXDiff, pxYDiff, scrollPoint));
 
 Error:
 	return r;
@@ -387,7 +387,7 @@ RESULT DreamUserControlArea::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pActiveBrowser, R_SKIPPED);
-	CR(m_pActiveBrowser->SetBrowserScope(strScope));
+	CR(m_pActiveBrowser->SetScope(strScope));
 	
 Error:
 	return r;
@@ -397,7 +397,7 @@ RESULT DreamUserControlArea::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pActiveBrowser, R_SKIPPED);
-	CR(m_pActiveBrowser->SetBrowserPath(strPath));
+	CR(m_pActiveBrowser->SetPath(strPath));
 	
 Error:
 	return r;
@@ -418,8 +418,8 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 	m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
 	m_pActiveBrowser->InitializeWithParent(this);
-	m_pActiveBrowser->SetBrowserScope(strScope);
-	m_pActiveBrowser->SetBrowserPath(m_strURL);
+	m_pActiveBrowser->SetScope(strScope);
+	m_pActiveBrowser->SetPath(m_strURL);
 	
 	// new browser can't be the current content
 	m_pControlBar->SetSharingFlag(false);
@@ -480,7 +480,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 
 	// close active browser
 
-	m_pActiveBrowser->CloseBrowser();
+	m_pActiveBrowser->CloseContent();
 	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pActiveBrowser);
 
 	// replace with top of tab bar

@@ -2135,6 +2135,9 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamUserControlArea\DreamContent.h">
+      <Filter>DreamUserControlArea</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

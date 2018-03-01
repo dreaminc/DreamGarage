@@ -15,6 +15,7 @@ class DreamControlView;
 class DreamUIBar;
 class DreamTabView;
 class DreamBrowser;
+class DreamContent;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
