@@ -22,7 +22,7 @@ Error:
 	return;
 }
 
-RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY) {
+RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 
 	INPUT inputStruct;
@@ -32,7 +32,7 @@ RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scr
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
-	mouseInputStruct.mouseData = 120 * scrollPointX;
+	mouseInputStruct.mouseData = 120 * (int)scrollPoint.x();
 
 	inputStruct.mi = mouseInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
@@ -41,7 +41,7 @@ Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::SendKeyPressed(char chKey, bool fkeyDown) {
+RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
 
 	INPUT inputStruct;
@@ -66,7 +66,7 @@ Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
+RESULT DreamDesktopApp::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
 	INPUT inputStruct;
@@ -75,6 +75,7 @@ RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
 	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
+	mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE;
 
 	inputStruct.mi = mouseInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
@@ -83,7 +84,7 @@ Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown) {
+RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	INPUT inputStruct;
@@ -203,18 +204,18 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	if (msTimeNow - m_msTimeSinceLastSent > m_msTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
-		CR(SendStartDesktopDuplicationIPCMessage());
+		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::SendStartDesktopDuplicationIPCMessage() {
+RESULT DreamDesktopApp::SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msgType) {
 	RESULT r = R_PASS;
 
 	DDCIPCMessage ddcMessage;
-	ddcMessage.m_msgType = DDCIPCMessage::type::START;
+	ddcMessage.m_msgType = msgType;
 	COPYDATASTRUCT desktopCDS;
 
 	desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
@@ -295,16 +296,12 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 	RESULT r = R_PASS;
 	m_fDesktopDuplicationIsRunning = true;
 	m_frameDataBuffer_n = messageSize;
-	//m_pFrameDataBuffer = (unsigned char*)malloc(m_frameDataBuffer_n);
-	//m_pFrameDataBuffer = (unsigned char*)pMessageData;
-	//memcpy(m_pFrameDataBuffer, (unsigned char*)pMessageData, m_frameDataBuffer_n);
 
-	//CNR(m_pFrameDataBuffer, R_SKIPPED);
 	CNR(pMessageData, R_SKIPPED);
 	if (m_pxDesktopHeight != pxHeight || m_pxDesktopWidth != pxWidth) {
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
-		m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight);
+		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
@@ -349,6 +346,33 @@ RESULT DreamDesktopApp::UpdateViewQuad() {
 	CR(m_pDesktopQuad->SetDirty());
 
 	CR(m_pDesktopQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<texture> DreamDesktopApp::GetSourceTexture() {
+	return m_pDesktopTexture;
+}
+
+RESULT DreamDesktopApp::SetScope(std::string strScope) {
+	m_strScope = strScope;
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::SetPath(std::string strPath) {
+	m_strPath = strPath;
+	return R_PASS;
+}
+
+long DreamDesktopApp::GetCurrentAssetID() {
+	return m_assetID;
+}
+
+RESULT DreamDesktopApp::CloseSource() {
+	RESULT r = R_PASS;
+
+	CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP));
 
 Error:
 	return r;
