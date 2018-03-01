@@ -303,18 +303,13 @@ Error:
 	return false;
 }
 
-std::shared_ptr<DreamBrowser> DreamUserControlArea::GetActiveBrowser() {
-	RESULT r = R_PASS;
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
-	CNR(pBrowser, R_SKIPPED);
-	return pBrowser;
-Error:
-	return nullptr;
+std::shared_ptr<DreamContent> DreamUserControlArea::GetActiveContent() {
+	return m_pActiveContent;
 }
 
-RESULT DreamUserControlArea::SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser) {
+RESULT DreamUserControlArea::SetActiveContent(std::shared_ptr<DreamContent> pNewContent) {
 
-	m_pActiveContent = pNewBrowser;
+	m_pActiveContent = pNewContent;
 	m_pControlView->SetViewQuadTexture(m_pActiveContent->GetScreenTexture());
 
 	bool fIsSharing = (m_pActiveContent->GetScreenTexture() == GetDOS()->GetSharedContentTexture());
@@ -328,7 +323,7 @@ RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pT
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		m_pDreamTabView->UpdateBrowserTexture(std::shared_ptr<DreamBrowser>(pContext));
+		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContent>(pContext));
 	}
 	return R_PASS;
 }
@@ -421,9 +416,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 	if (m_pActiveContent != nullptr) {
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
-		CNR(pBrowser, R_SKIPPED);
-		m_pDreamTabView->AddBrowser(pBrowser);
+		m_pDreamTabView->AddContent(m_pActiveContent);
 	}
 
 	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
@@ -513,7 +506,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 	}
 
 	// replace with top of tab bar
-	m_pActiveContent = m_pDreamTabView->RemoveBrowser();
+	m_pActiveContent = m_pDreamTabView->RemoveContent();
 	if (m_pActiveContent != nullptr) {
 		m_pControlView->SetViewQuadTexture(m_pActiveContent->GetScreenTexture());
 	}

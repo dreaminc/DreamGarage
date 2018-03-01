@@ -84,8 +84,8 @@ public:
 
 // DreamTabView
 public:
-	std::shared_ptr<DreamBrowser> GetActiveBrowser();
-	RESULT SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser);
+	std::shared_ptr<DreamContent> GetActiveContent();
+	RESULT SetActiveContent(std::shared_ptr<DreamContent> pNewContent);
 
 // DreamBrowser
 public:
