@@ -1,7 +1,7 @@
 #include "DreamTabView.h"
 
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamGarage/DreamBrowser.h"
+#include "DreamUserControlArea/DreamContentSource.h"
 
 #include "UI/UIButton.h"
 #include "Primitives/quad.h"
@@ -74,12 +74,12 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	return r;
 }
 
-RESULT DreamTabView::AddBrowser(std::shared_ptr<DreamBrowser> pBrowser) {
+RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	RESULT r = R_PASS;
 
 	auto newTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
-	auto tabTexture = pBrowser->GetScreenTexture().get();
-	newTabButton->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
+	auto tabTexture = pContent->GetSourceTexture().get();
+	newTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	newTabButton->GetSurface()->FlipUVVertical();
 
 	newTabButton->SetPosition(m_ptMostRecent);
@@ -94,24 +94,24 @@ RESULT DreamTabView::AddBrowser(std::shared_ptr<DreamBrowser> pBrowser) {
 	}
 
 	m_tabButtons.emplace_back(newTabButton);
-	m_browsers.emplace_back(pBrowser);
-	m_appToTabMap[pBrowser] = newTabButton;
+	m_sources.emplace_back(pContent);
+	m_appToTabMap[pContent] = newTabButton;
 
 	return R_PASS;
 }
 
-std::shared_ptr<DreamBrowser> DreamTabView::RemoveBrowser() {
+std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 	
 	RESULT r = R_PASS;
 	auto pDreamOS = GetDOS();
 
 	CBR(m_tabButtons.size() > 0, R_SKIPPED);
 	{
-		auto pActiveBrowser = m_browsers.back();
+		auto pActiveContent = m_sources.back();
 		auto pButtonToRemove = m_tabButtons.back();
 
-		m_appToTabMap.erase(m_browsers.back());
-		m_browsers.pop_back();
+		m_appToTabMap.erase(m_sources.back());
+		m_sources.pop_back();
 		m_tabButtons.pop_back();
 
 		pButtonToRemove->SetVisible(false);
@@ -123,7 +123,7 @@ std::shared_ptr<DreamBrowser> DreamTabView::RemoveBrowser() {
 		for (auto pButton : m_tabButtons) {
 			pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 		}
-		return pActiveBrowser;
+		return pActiveContent;
 	}
 Error:
 	return nullptr;
@@ -133,15 +133,15 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIButton> pNewTabButton = nullptr;
-	auto pBrowser = m_pParentApp->GetActiveBrowser();
-	auto tabTexture = pBrowser->GetScreenTexture().get();
+	auto pContent = m_pParentApp->GetActiveSource();
+	auto tabTexture = pContent->GetSourceTexture().get();
 	auto pDreamOS = GetDOS();
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
 
-	pNewTabButton->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
+	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
 
 	pNewTabButton->SetPosition(m_ptMostRecent);
@@ -160,11 +160,11 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			pDreamOS->RemoveObjectFromInteractionGraph(pButton.get());
 			pDreamOS->RemoveObjectFromUIGraph(pButton.get());
 
-			m_pParentApp->SetActiveBrowser(m_browsers[i]);
+			m_pParentApp->SetActiveSource(m_sources[i]);
 
-			m_appToTabMap.erase(m_browsers[i]);
+			m_appToTabMap.erase(m_sources[i]);
 			m_tabButtons.erase(m_tabButtons.begin() + i);
-			m_browsers.erase(m_browsers.begin() + i);
+			m_sources.erase(m_sources.begin() + i);
 
 			break;
 		} 
@@ -174,17 +174,17 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	}
 
 	m_tabButtons.emplace_back(pNewTabButton);
-	m_browsers.emplace_back(pBrowser);
-	m_appToTabMap[pBrowser] = pNewTabButton;
+	m_sources.emplace_back(pContent);
+	m_appToTabMap[pContent] = pNewTabButton;
 
 Error:
 	return r;
 }
 
-RESULT DreamTabView::UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser) {
+RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent) {
 
-	if (m_appToTabMap.count(pBrowser) > 0) {
-		m_appToTabMap[pBrowser]->GetSurface()->SetDiffuseTexture(pBrowser->GetScreenTexture().get());
+	if (m_appToTabMap.count(pContent) > 0) {
+		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	}
 
 	return R_PASS;

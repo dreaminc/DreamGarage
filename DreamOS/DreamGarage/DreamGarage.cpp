@@ -924,7 +924,7 @@ RESULT DreamGarage::OnShareAsset() {
 	CN(m_pDreamUserControlArea);
 	CN(m_pDreamShareView);
 
-	CR(m_pDreamShareView->SetCastingTexture(m_pDreamUserControlArea->GetActiveBrowser()->GetScreenTexture()));
+	CR(m_pDreamShareView->SetCastingTexture(m_pDreamUserControlArea->GetActiveSource()->GetSourceTexture()));
 	CR(m_pDreamShareView->ShowCastingTexture());
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());

@@ -5,6 +5,7 @@
 #include "DreamOS.h"
 
 class DreamUserControlArea;
+class DreamContentSource;
 class DreamBrowser;
 
 class UIButton;
@@ -43,26 +44,26 @@ public:
 
 	// called when a new piece of content is opened, 
 	// all existing tabs shift down and a new tab is added at the top
-	RESULT AddBrowser(std::shared_ptr<DreamBrowser> pBrowser);
+	RESULT AddContent(std::shared_ptr<DreamContentSource> pContent);
 
 	// called when close is pressed on the control bar,
 	// the top tab is returned after the remaining tabs shift up 
-	std::shared_ptr<DreamBrowser> RemoveBrowser();
+	std::shared_ptr<DreamContentSource> RemoveContent();
 
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
 
-	RESULT UpdateBrowserTexture(std::shared_ptr<DreamBrowser> pBrowser);
+	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
 private:
 	DreamUserControlArea* m_pParentApp = nullptr;
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
 
-	std::map<std::shared_ptr<DreamBrowser>, std::shared_ptr<UIButton>> m_appToTabMap;
+	std::map<std::shared_ptr<DreamContentSource>, std::shared_ptr<UIButton>> m_appToTabMap;
 
 	std::shared_ptr<UIView> m_pView = nullptr;
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
-	std::vector<std::shared_ptr<DreamBrowser>> m_browsers;
+	std::vector<std::shared_ptr<DreamContentSource>> m_sources;
 
 private:
 	const wchar_t *k_wszTabBackground = L"control-view-list-background.png";

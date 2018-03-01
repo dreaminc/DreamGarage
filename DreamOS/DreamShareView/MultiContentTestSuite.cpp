@@ -355,7 +355,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		//pTestContext->pUserControlArea->Update();
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture().get());
 		}
 		return R_PASS;
 	};
@@ -468,7 +468,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		//pTestContext->pWebBrowserManager->Update();
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetScreenTexture().get());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture().get());
 		}
 		return R_PASS;
 	};

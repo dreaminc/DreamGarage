@@ -15,6 +15,7 @@ class DreamControlView;
 class DreamUIBar;
 class DreamTabView;
 class DreamBrowser;
+class DreamContentSource;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
@@ -64,10 +65,10 @@ public:
 	int GetPXWidth();
 	int GetPXHeight();
 
-	RESULT SendContactAtPoint(WebBrowserPoint ptContact, bool fMouseDown);
-	RESULT SendMalletMoveEvent(WebBrowserPoint mousePoint);
-	RESULT SendKeyCharacter(char chkey, bool fKeyDown);
-	RESULT ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint);
+	RESULT OnClick(point ptContact, bool fMouseDown);
+	RESULT OnMouseMove(point mousePoint);
+	RESULT OnKeyPress(char chkey, bool fKeyDown);
+	RESULT OnScroll(float pxXDiff, float pxYDiff, point scrollPoint);
 
 	//TODO: Set Scope/Path should be removed once DreamUIBar follows "open" implementation
 	RESULT SetScope(std::string strScope);
@@ -83,8 +84,8 @@ public:
 
 // DreamTabView
 public:
-	std::shared_ptr<DreamBrowser> GetActiveBrowser();
-	RESULT SetActiveBrowser(std::shared_ptr<DreamBrowser> pNewBrowser);
+	std::shared_ptr<DreamContentSource> GetActiveSource();
+	RESULT SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent);
 
 // DreamBrowser
 public:
@@ -125,7 +126,7 @@ private:
 	//TODO: potentially a class Browser and Desktop extend that implements
 	// the control view events, ContactAtPoint, ScrollByDiff, etc.
 	// ControlViewObserver?
-	std::shared_ptr<DreamBrowser> m_pActiveBrowser;
+	std::shared_ptr<DreamContentSource> m_pActiveSource;
 
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;

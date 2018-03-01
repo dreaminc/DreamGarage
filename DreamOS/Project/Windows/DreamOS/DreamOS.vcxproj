@@ -991,6 +991,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h" />
     <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
+    <ClInclude Include="..\..\..\DreamUserControlArea\DreamContentSource.h" />
     <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
