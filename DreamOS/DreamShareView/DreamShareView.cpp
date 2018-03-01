@@ -221,6 +221,7 @@ Error:
 
 RESULT DreamShareView::PendReceiving() {
 	RESULT r = R_PASS;
+	ShowCastingTexture();
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
 
