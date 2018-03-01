@@ -1052,165 +1052,172 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
 
 			pTestContext->pDreamShareView = pDreamShareView;
-			auto fnTest = [&](void *pContext) {
-				return R_PASS;
-			};
-
-			// Update Code
-			auto fnUpdate = [&](void *pContext) {
-				auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
-				auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
-
-				//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-
-				double diff = msNow - pTestContext->m_msStart;
-				int mod = ((int)diff / 500) % 2;
-
-				if (mod == 0) {
-					pTestContext->pDreamShareView->ShowLoadingTexture();
-				}
-				else {
-					pTestContext->pDreamShareView->SendCastingEvent();
-				}
-
-				//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);
-				return R_PASS;
-			};
-
-			// Reset Code
-			auto fnReset = [&](void *pContext) {
-				RESULT r = R_PASS;
-
-				// Will reset the sandbox as needed between tests
-				CN(m_pDreamOS);
-				CR(m_pDreamOS->RemoveAllObjects());
-
-			Error:
-				return r;
-			}
-			pUITest->SetTestName("Local Shared Content View Test");
-			pUITest->SetTestDescription("Basic test of shared content view working locally");
-			pUITest->SetTestDuration(sTestTime);
-			pUITest->SetTestRepeats(nRepeats);
-
-		Error:
-			return r;
 		}
 
-		RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
-			RESULT r = R_PASS;
+	Error:
+		return r;
+	};
 
-			double sTestTime = 6000.0f;
-			int nRepeats = 1;
-			auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-			double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
 
-			struct TestTimingContext {
-				double m_msStart;
-				std::shared_ptr<DreamShareView> pDreamShareView;
-			};
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
 
-			TestTimingContext *pTestContext = new TestTimingContext();
-			pTestContext->m_msStart = msNow;
+		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
 
-			auto fnInitialize = [&](void *pContext) {
-				RESULT r = R_PASS;
-
-				std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-				std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
-
-				std::string strURL = "http://www.youtube.com";
-
-				//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
-				//std::string strURL = "http://ncu.rcnpv.com.tw/Uploads/20131231103232738561744.pdf";
-
-				CN(m_pDreamOS);
-
-				CR(SetupDreamAppPipeline());
-				{
-					std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
-
-					auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
-					pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
-					pDreamShareView->Show();
-
-					auto pCastTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-					pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
-
-					pTestContext->pDreamShareView = pDreamShareView;
-
-					// Create the Shared View App
-					pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-					CNM(pDreamBrowser, "Failed to create dream browser");
-
-					// Set up the view
-					//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-					pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-					pDreamBrowser->SetDiagonalSize(10.0f);
-					pDreamBrowser->SetPosition(point(4.0f, 0.0f, 0.0f));
-				}
-
-				pDreamBrowser->SetURI(strURL);
-
-			Error:
-				return r;
-			};
-
-			// Test Code (this evaluates the test upon completion)
-			auto fnTest = [&](void *pContext) {
-				return R_PASS;
-			};
-
-			// Update Code
-			auto fnUpdate = [&](void *pContext) {
-				auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
-				auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
-
-				//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-
-				double diff = msNow - pTestContext->m_msStart;
-				int mod = ((int)diff / 500) % 2;
-		/*
-				if (mod == 0) {
-					pTestContext->pDreamShareView->ShowLoadingTexture();
-				}
-				else {
-					pTestContext->pDreamShareView->ShowCastingTexture();
-				}
-				//*/
-
-				//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);
-				return R_PASS;
-			};
-
-			// Reset Code
-			auto fnReset = [&](void *pContext) {
-				RESULT r = R_PASS;
-
-				// Will reset the sandbox as needed between tests
-				CN(m_pDreamOS);
-				CR(m_pDreamOS->RemoveAllObjects());
-
-			Error:
-				return r;
-			};
-
-			auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
-			CN(pUITest);
-
-			pUITest->SetTestName("Local Shared Content View Test");
-			pUITest->SetTestDescription("Basic test of shared content view working locally");
-			pUITest->SetTestDuration(sTestTime);
-			pUITest->SetTestRepeats(nRepeats);
-
-		Error:
-			return r;
+		double diff = msNow - pTestContext->m_msStart;
+		int mod = ((int)diff / 500) % 2;
+		if (mod == 0) {
+			pTestContext->pDreamShareView->ShowLoadingTexture();
 		}
+		else {
+			pTestContext->pDreamShareView->SendCastingEvent();
+		}
+
+		//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);
+		return R_PASS;
+	};
+
+		// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
+
+RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+	struct TestTimingContext {
+		double m_msStart;
+		std::shared_ptr<DreamShareView> pDreamShareView;
+	};
+
+	TestTimingContext *pTestContext = new TestTimingContext();
+	pTestContext->m_msStart = msNow;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
+
+		std::string strURL = "http://www.youtube.com";
+
+		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
+		//std::string strURL = "http://ncu.rcnpv.com.tw/Uploads/20131231103232738561744.pdf";
+
+		CN(m_pDreamOS);
+
+		CR(SetupDreamAppPipeline());
+		{
+			std::shared_ptr<DreamShareView> pDreamShareView = nullptr;
+
+			auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
+			pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
+			pDreamShareView->Show();
+
+			auto pCastTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
+
+			pTestContext->pDreamShareView = pDreamShareView;
+
+			// Create the Shared View App
+			pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			CNM(pDreamBrowser, "Failed to create dream browser");
+
+			// Set up the view
+			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			pDreamBrowser->SetDiagonalSize(10.0f);
+			pDreamBrowser->SetPosition(point(4.0f, 0.0f, 0.0f));
+		}
+
+		pDreamBrowser->SetURI(strURL);
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
+		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
+
+		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
+
+		double diff = msNow - pTestContext->m_msStart;
+		int mod = ((int)diff / 500) % 2;
+		/*
+		if (mod == 0) {
+			pTestContext->pDreamShareView->ShowLoadingTexture();
+		}
+		else {
+			pTestContext->pDreamShareView->ShowCastingTexture();
+		}
+		//*/
+
+		//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+	
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 
 RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	RESULT r = R_PASS;
