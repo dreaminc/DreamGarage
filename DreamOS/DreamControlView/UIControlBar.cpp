@@ -64,7 +64,9 @@ RESULT UIControlBar::Initialize() {
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
 
-	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pURLButton }) {
+	// register all of the buttons (except for the URL button) for the selection event
+	// URL button has become less useful with the addition of the open button
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 

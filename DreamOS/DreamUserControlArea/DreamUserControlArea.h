@@ -60,6 +60,11 @@ public:
 	float GetBaseWidth();
 	float GetBaseHeight();
 
+// Animations
+public:
+	RESULT Show();
+	RESULT Hide();
+
 // DreamControlView
 public:
 	int GetPXWidth();
@@ -74,7 +79,8 @@ public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
 	RESULT RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle);
-	RESULT SendURL();
+	RESULT CreateBrowserSource();
+	RESULT SetActiveBrowserURI();
 
 // DreamControlBar
 public:

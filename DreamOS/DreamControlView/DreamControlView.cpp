@@ -313,7 +313,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			// need a way to not have the scope and path hardcoded here
 
 			if (m_pParentApp != nullptr) {
-				m_pParentApp->SendURL();
+				CR(m_pParentApp->SetActiveBrowserURI());
 			}
 
 			//TODO: bypass making a request to help smooth the loading
