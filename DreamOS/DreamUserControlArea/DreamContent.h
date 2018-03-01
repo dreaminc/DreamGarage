@@ -10,6 +10,7 @@ class texture;
 
 class DreamContent {
 
+public:
 	virtual RESULT ClickContent(WebBrowserPoint ptDiff, bool fMouseDown) = 0;
 	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) = 0;
 	virtual RESULT ScrollContentByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) = 0;
@@ -20,6 +21,7 @@ class DreamContent {
 
 	virtual RESULT SetScope(std::string strScope) = 0;
 	virtual RESULT SetPath(std::string strPath) = 0;
+	virtual long GetCurrentAssetID() = 0;
 
 	virtual RESULT CloseContent() = 0;
 

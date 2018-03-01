@@ -126,7 +126,7 @@ private:
 	//TODO: potentially a class Browser and Desktop extend that implements
 	// the control view events, ContactAtPoint, ScrollByDiff, etc.
 	// ControlViewObserver?
-	std::shared_ptr<DreamBrowser> m_pActiveBrowser;
+	std::shared_ptr<DreamContent> m_pActiveContent;
 
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
