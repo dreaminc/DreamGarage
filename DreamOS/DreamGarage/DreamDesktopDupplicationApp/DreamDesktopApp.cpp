@@ -25,14 +25,17 @@ Error:
 RESULT DreamDesktopApp::ScrollMouseWheelByDiff(int pxXDiff, int pxYDiff, int scrollPointX, int scrollPointY) {
 	RESULT r = R_PASS;
 
-	INPUT* inputStruct = new INPUT();
-	inputStruct->type = INPUT_MOUSE;
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
 
-	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
-	mouseInputStruct->dwFlags = MOUSEEVENTF_WHEEL;
-	mouseInputStruct->mouseData = 120 * scrollPointX;
-
+	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
+	mouseInputStruct.mouseData = 120 * scrollPointX;
+
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
 
 Error:
 	return r;
@@ -41,10 +44,23 @@ Error:
 RESULT DreamDesktopApp::SendKeyPressed(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
 
-	INPUT* inputStruct = new INPUT();
-	inputStruct->type = INPUT_KEYBOARD;
+	INPUT inputStruct;
+	inputStruct.type = INPUT_KEYBOARD;
 
+	KEYBDINPUT keyboardInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	// Set up generic keyboard event
+	keyboardInputStruct.wScan = 0;
+	keyboardInputStruct.dwExtraInfo = 0;
+	keyboardInputStruct.wVk = chKey;		// Should be getting VK code from Sensekeyboard anyway
+	keyboardInputStruct.dwFlags = 0;		// 0 for key press
+
+	inputStruct.ki = keyboardInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+	keyboardInputStruct.dwFlags = KEYEVENTF_KEYUP;	// key up for key release
+	SendInput(1, &inputStruct, sizeof(INPUT));
 
 Error:
 	return r;
@@ -53,13 +69,15 @@ Error:
 RESULT DreamDesktopApp::SendMouseMoveEvent(int mousePointX, int mousePointY) {
 	RESULT r = R_PASS;
 
-	INPUT* inputStruct = new INPUT;
-	inputStruct->type = INPUT_MOUSE;
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
 
-	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
-
-
+	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
 
 Error:
 	return r;
@@ -68,23 +86,24 @@ Error:
 RESULT DreamDesktopApp::ClickDesktop(int ptDiffX, int ptDiffY, bool fMouseDown) {
 	RESULT r = R_PASS;
 
-	INPUT* inputStruct = new INPUT;
-	inputStruct->type = INPUT_MOUSE;
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
 
-	MOUSEINPUT* mouseInputStruct = new MOUSEINPUT;
-
-
-	unsigned int numInputs;	// number of structures in pInputs array
-	LPINPUT pInputs;		// array of INPUT structures representing input event
-	int cbSize;				// size in BYTES of an INPUT structure
-
+	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
-	//GetForegroundWindow();
-
-
-	SendInput(numInputs, pInputs, cbSize);	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
-
+	if (fMouseDown) {
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_LEFTUP;
+	}
+	else {
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_LEFTDOWN;
+	}
+	
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+												// number of structures in pInputs array
+												// array of INPUT structures representing input event
+												// size in BYTES of an INPUT structure
 Error:
 	return r;
 }
@@ -113,19 +132,6 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
 	GetComposite()->SetVisible(true);
-
-	CRM(StartDuplicationProcess(), "Error starting duplication process");
-
-	// TODO: get this from main?
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
-	CNM(m_hwndDreamHandle, "Unable to find the Dream window");
-
-Error:
-	return r;
-}
-
-RESULT DreamDesktopApp::StartDuplicationProcess() {
-	RESULT r = R_PASS;
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 
