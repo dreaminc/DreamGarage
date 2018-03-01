@@ -1,5 +1,5 @@
 #include "DreamUserControlArea.h"
-#include "DreamContent.h"
+#include "DreamContentSource.h"
 
 #include "DreamOS.h"
 #include "DreamUserApp.h"
@@ -187,13 +187,13 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::BACK: {
 		// Send back event to active browser
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
+		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		CNR(pBrowser, R_SKIPPED);
 		CR(pBrowser->HandleBackEvent());
 	} break;
 
 	case ControlEventType::FORWARD: {
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
+		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		CNR(pBrowser, R_SKIPPED);
 		CR(pBrowser->HandleForwardEvent());
 	} break;
@@ -212,7 +212,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 //		long assetID = m_pActiveBrowser->Get
-		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(m_pActiveContent->GetCurrentAssetID()), "Failed to share environment asset");
+		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 
 	} break;
 
@@ -230,14 +230,14 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		// send share event with active browser
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveContent->GetCurrentAssetID()), "Failed to share environment asset");
+		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
 	case ControlEventType::STOP: {
 		// send stop sharing event 
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveContent->GetCurrentAssetID()), "Failed to share environment asset");
+		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
 	case ControlEventType::URL: {
@@ -303,27 +303,27 @@ Error:
 	return false;
 }
 
-std::shared_ptr<DreamContent> DreamUserControlArea::GetActiveContent() {
-	return m_pActiveContent;
+std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveSource() {
+	return m_pActiveSource;
 }
 
-RESULT DreamUserControlArea::SetActiveContent(std::shared_ptr<DreamContent> pNewContent) {
+RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent) {
 
-	m_pActiveContent = pNewContent;
-	m_pControlView->SetViewQuadTexture(m_pActiveContent->GetScreenTexture());
+	m_pActiveSource = pNewContent;
+	m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
-	bool fIsSharing = (m_pActiveContent->GetScreenTexture() == GetDOS()->GetSharedContentTexture());
+	bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
 	m_pControlBar->SetSharingFlag(fIsSharing);
 
 	return R_PASS;
 }
 
 RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
-	if (pContext == m_pActiveContent.get()) {
+	if (pContext == m_pActiveSource.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContent>(pContext));
+		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
 	}
 	return R_PASS;
 }
@@ -348,41 +348,41 @@ int DreamUserControlArea::GetPXHeight() {
 	return m_pxHeight;
 }
 
-RESULT DreamUserControlArea::SendContactAtPoint(WebBrowserPoint ptContact, bool fMouseDown) {
+RESULT DreamUserControlArea::OnClick(point ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
-	CNR(m_pActiveContent, R_SKIPPED);
-	CR(m_pActiveContent->ClickContent(ptContact, fMouseDown));
+	CNR(m_pActiveSource, R_SKIPPED);
+	CR(m_pActiveSource->OnClick(ptContact, fMouseDown));
 
 Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SendKeyCharacter(char chkey, bool fKeyDown) {
+RESULT DreamUserControlArea::OnKeyPress(char chkey, bool fKeyDown) {
 	RESULT r = R_PASS;
 
-	CNR(m_pActiveContent, R_SKIPPED);
-	CR(m_pActiveContent->SendKeyPressed(chkey, fKeyDown));
+	CNR(m_pActiveSource, R_SKIPPED);
+	CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 
 Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SendMalletMoveEvent(WebBrowserPoint mousePoint) {
+RESULT DreamUserControlArea::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
-	CNR(m_pActiveContent, R_SKIPPED);
-	CR(m_pActiveContent->SendMouseMoveEvent(mousePoint));
+	CNR(m_pActiveSource, R_SKIPPED);
+	CR(m_pActiveSource->OnMouseMove(mousePoint));
 
 Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ScrollByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
+RESULT DreamUserControlArea::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 
-	CNR(m_pActiveContent, R_OBJECT_NOT_FOUND);
-	CR(m_pActiveContent->ScrollContentByDiff(pxXDiff, pxYDiff, scrollPoint));
+	CNR(m_pActiveSource, R_OBJECT_NOT_FOUND);
+	CR(m_pActiveSource->OnScroll(pxXDiff, pxYDiff, scrollPoint));
 
 Error:
 	return r;
@@ -391,8 +391,8 @@ Error:
 RESULT DreamUserControlArea::SetScope(std::string strScope) {
 	RESULT r = R_PASS;
 	
-	CNR(m_pActiveContent, R_SKIPPED);
-	CR(m_pActiveContent->SetScope(strScope));
+	CNR(m_pActiveSource, R_SKIPPED);
+	CR(m_pActiveSource->SetScope(strScope));
 	
 Error:
 	return r;
@@ -401,8 +401,8 @@ Error:
 RESULT DreamUserControlArea::SetPath(std::string strPath) {
 	RESULT r = R_PASS;
 	
-	CNR(m_pActiveContent, R_SKIPPED);
-	CR(m_pActiveContent->SetPath(strPath));
+	CNR(m_pActiveSource, R_SKIPPED);
+	CR(m_pActiveSource->SetPath(strPath));
 	
 Error:
 	return r;
@@ -415,8 +415,8 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
-	if (m_pActiveContent != nullptr) {
-		m_pDreamTabView->AddContent(m_pActiveContent);
+	if (m_pActiveSource != nullptr) {
+		m_pDreamTabView->AddContent(m_pActiveSource);
 	}
 
 	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
@@ -427,7 +427,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	pBrowser->SetScope(strScope);
 	pBrowser->SetPath(m_strURL);
 
-	m_pActiveContent = pBrowser;
+	m_pActiveSource = pBrowser;
 	
 	// new browser can't be the current content
 	m_pControlBar->SetSharingFlag(false);
@@ -469,7 +469,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	
 	//it is not safe to set the environment asset until after the browser is finished initializing
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {
 		pBrowser->PendEnvironmentAsset(pEnvironmentAsset);
 	}
@@ -495,9 +495,9 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 
 	// close active browser
 
-	m_pActiveContent->CloseContent();
+	m_pActiveSource->CloseSource();
 
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveContent);
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {
 		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
 	}
@@ -506,9 +506,9 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 	}
 
 	// replace with top of tab bar
-	m_pActiveContent = m_pDreamTabView->RemoveContent();
-	if (m_pActiveContent != nullptr) {
-		m_pControlView->SetViewQuadTexture(m_pActiveContent->GetScreenTexture());
+	m_pActiveSource = m_pDreamTabView->RemoveContent();
+	if (m_pActiveSource != nullptr) {
+		m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 	}
 	else {
 	//	m_pControlView->SetViewQuadTexture(m_p)

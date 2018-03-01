@@ -133,18 +133,22 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::ScrollContentByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) {
+RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 	RESULT r = R_PASS;
 	
 	CNR(m_pWebBrowserController, R_SKIPPED);
 
+	WebBrowserPoint ptWebContact;
+	ptWebContact.x = (int)(scrollPoint.x());
+	ptWebContact.y = (int)(scrollPoint.y());
+
 	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt = scrollPoint;
+	mouseEvent.pt = ptWebContact;
 
-	m_pxXPosition += pxXDiff;
-	m_pxYPosition += pxYDiff;
+	m_pxXPosition += (int)pxXDiff;
+	m_pxYPosition += (int)pxYDiff;
 
-	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, pxXDiff, pxYDiff));
+	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, (int)pxXDiff, (int)pxYDiff));
 
 Error:
 	return r;
@@ -206,7 +210,7 @@ int DreamBrowser::GetBrowserWidth() {
 	return m_browserWidth;
 }
 
-RESULT DreamBrowser::SendKeyPressed(char chKey, bool fkeyDown) {
+RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
@@ -230,26 +234,30 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SendMouseMoveEvent(WebBrowserPoint mousePoint) {
+RESULT DreamBrowser::OnMouseMove(point mousePoint) {
 	RESULT r = R_PASS;
 
 	WebBrowserMouseEvent mouseEvent;
-	mouseEvent.pt.x = mousePoint.x;
-	mouseEvent.pt.y = mousePoint.y;
+	mouseEvent.pt.x = (int)mousePoint.x();
+	mouseEvent.pt.y = (int)mousePoint.y();
 
 	CR(m_pWebBrowserController->SendMouseMove(mouseEvent));
 Error:
 	return r;
 }
 
-RESULT DreamBrowser::ClickContent(WebBrowserPoint ptContact, bool fMouseDown) {
+RESULT DreamBrowser::OnClick(point ptContact, bool fMouseDown) {
 	RESULT r = R_PASS;
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	WebBrowserMouseEvent mouseEvent;
 
-	mouseEvent.pt = ptContact;
-	m_lastWebBrowserPoint = ptContact;
+	WebBrowserPoint ptWebContact;
+	ptWebContact.x = (int)(ptContact.x());
+	ptWebContact.y = (int)(ptContact.y());
+
+	mouseEvent.pt = ptWebContact;
+	m_lastWebBrowserPoint = ptWebContact;
 
 	mouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
 	
@@ -488,7 +496,7 @@ RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	return R_PASS;
 }
 
-std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
+std::shared_ptr<texture> DreamBrowser::GetSourceTexture() {
 	return m_pBrowserTexture;
 }
 
@@ -496,7 +504,7 @@ long DreamBrowser::GetCurrentAssetID() {
 	return m_assetID;
 }
 
-RESULT DreamBrowser::CloseContent() {
+RESULT DreamBrowser::CloseSource() {
 	RESULT r = R_PASS;
 
 	CR(m_pWebBrowserController->CloseBrowser());
@@ -529,7 +537,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	if (pShareViewHandle != nullptr) {
 	//	CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
-		CBR(GetScreenTexture().get() == pShareViewHandle->RequestCastTexture().get(), R_SKIPPED);
+		CBR(GetSourceTexture().get() == pShareViewHandle->RequestCastTexture().get(), R_SKIPPED);
 		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
 	}
 	/*

@@ -165,7 +165,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				//WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
 				if (m_pParentApp != nullptr) {
-					CR(m_pParentApp->SendContactAtPoint(ptContact, fMouseDown));
+					CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
 				}
 			}
 
@@ -185,7 +185,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->SendMalletMoveEvent(ptContact));
+				CR(m_pParentApp->OnMouseMove(point(ptContact.x, ptContact.y, 0.0f)));
 			}
 			//m_ptClick = ptSphereOrigin;
 		}
@@ -215,7 +215,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 			}
 
-			CR(m_pParentApp->SendContactAtPoint(ptContact, fMouseDown));
+			CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
 			m_ptLastEvent = ptContact;
 		}
 	}
@@ -244,13 +244,13 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 
 		if (ptScroll.x < m_pParentApp->GetPXWidth() && ptScroll.x > 0 &&
 			ptScroll.y < m_pParentApp->GetPXHeight() && ptScroll.y > 0) {
-			CR(m_pParentApp->ScrollByDiff(pxXDiff, pxYDiff, ptScroll));
+			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
 		}
 		else {
 			WebBrowserPoint middleOfBrowser;
 			middleOfBrowser.x = m_pParentApp->GetPXWidth() / 2;
 			middleOfBrowser.y = m_pParentApp->GetPXHeight() / 2;
-			CR(m_pParentApp->ScrollByDiff(pxXDiff, pxYDiff, middleOfBrowser));
+			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(middleOfBrowser.x, middleOfBrowser.y, 0.0f)));
 		}
 
 	} break;
@@ -321,7 +321,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		}
 		else {
 			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->SendKeyCharacter(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
+				CR(m_pParentApp->OnKeyPress(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
 			}
 
 			CR(HandleKeyboardDown());
@@ -631,8 +631,8 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	WebBrowserPoint ptUnFocusText;	// will fire if user closes keyboard and then wants
 	ptUnFocusText.x = -1;				// to go back into the same textbox
 	ptUnFocusText.y = -1;
-	CR(m_pParentApp->SendContactAtPoint(ptUnFocusText, false));
-	CR(m_pParentApp->SendContactAtPoint(ptUnFocusText, true));
+	CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), false));
+	CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), true));
 	m_ptLastEvent = ptUnFocusText;
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(

@@ -27,7 +27,7 @@
 
 #include "DreamVideoStreamSubscriber.h"
 
-#include "DreamUserControlArea/DreamContent.h"
+#include "DreamUserControlArea/DreamContentSource.h"
 
 #define DEFAULT_SCROLL_FACTOR 5
 
@@ -46,7 +46,7 @@ class AudioPacket;
 
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
-	public DreamContent,
+	public DreamContentSource,
 	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
@@ -71,7 +71,7 @@ public:
 	RESULT ScrollBrowserXByDiff(int pxXDiff);
 	RESULT ScrollBrowserYByDiff(int pxYDiff);
 
-	virtual RESULT ScrollContentByDiff(int pxXDiff, int pxYDiff, WebBrowserPoint scrollPoint) override;		// Relative- scroll this far
+	virtual RESULT OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) override;		// Relative- scroll this far
 
 	int GetScrollX();		// use to get position scrolled to
 	int GetScrollY();
@@ -82,11 +82,11 @@ public:
 	int GetPageHeight();	// get page context
 	int GetPageWidth();
 
-	virtual RESULT SendKeyPressed(char chkey, bool fkeyDown) override;
+	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
 	RESULT SendURL(std::string strURL);
 
-	virtual RESULT SendMouseMoveEvent(WebBrowserPoint mousePoint) override;
-	virtual RESULT ClickContent(WebBrowserPoint ptDiff, bool fMouseDown) override;
+	virtual RESULT OnMouseMove(point mousePoint) override;
+	virtual RESULT OnClick(point ptDiff, bool fMouseDown) override;
 
 	RESULT BroadcastDreamBrowserMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
 
@@ -136,10 +136,10 @@ public:
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL = "about:blank");
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
-	virtual std::shared_ptr<texture> GetScreenTexture() override;
+	virtual std::shared_ptr<texture> GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;
 
-	virtual RESULT CloseContent() override;
+	virtual RESULT CloseSource() override;
 
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

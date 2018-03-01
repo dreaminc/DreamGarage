@@ -1,7 +1,7 @@
 #include "DreamTabView.h"
 
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamUserControlArea/DreamContent.h"
+#include "DreamUserControlArea/DreamContentSource.h"
 
 #include "UI/UIButton.h"
 #include "Primitives/quad.h"
@@ -74,12 +74,12 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	return r;
 }
 
-RESULT DreamTabView::AddContent(std::shared_ptr<DreamContent> pContent) {
+RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	RESULT r = R_PASS;
 
 	auto newTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
-	auto tabTexture = pContent->GetScreenTexture().get();
-	newTabButton->GetSurface()->SetDiffuseTexture(pContent->GetScreenTexture().get());
+	auto tabTexture = pContent->GetSourceTexture().get();
+	newTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	newTabButton->GetSurface()->FlipUVVertical();
 
 	newTabButton->SetPosition(m_ptMostRecent);
@@ -94,24 +94,24 @@ RESULT DreamTabView::AddContent(std::shared_ptr<DreamContent> pContent) {
 	}
 
 	m_tabButtons.emplace_back(newTabButton);
-	m_contents.emplace_back(pContent);
+	m_sources.emplace_back(pContent);
 	m_appToTabMap[pContent] = newTabButton;
 
 	return R_PASS;
 }
 
-std::shared_ptr<DreamContent> DreamTabView::RemoveContent() {
+std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 	
 	RESULT r = R_PASS;
 	auto pDreamOS = GetDOS();
 
 	CBR(m_tabButtons.size() > 0, R_SKIPPED);
 	{
-		auto pActiveContent = m_contents.back();
+		auto pActiveContent = m_sources.back();
 		auto pButtonToRemove = m_tabButtons.back();
 
-		m_appToTabMap.erase(m_contents.back());
-		m_contents.pop_back();
+		m_appToTabMap.erase(m_sources.back());
+		m_sources.pop_back();
 		m_tabButtons.pop_back();
 
 		pButtonToRemove->SetVisible(false);
@@ -133,15 +133,15 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIButton> pNewTabButton = nullptr;
-	auto pContent = m_pParentApp->GetActiveContent();
-	auto tabTexture = pContent->GetScreenTexture().get();
+	auto pContent = m_pParentApp->GetActiveSource();
+	auto tabTexture = pContent->GetSourceTexture().get();
 	auto pDreamOS = GetDOS();
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
 
-	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetScreenTexture().get());
+	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
 
 	pNewTabButton->SetPosition(m_ptMostRecent);
@@ -160,11 +160,11 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			pDreamOS->RemoveObjectFromInteractionGraph(pButton.get());
 			pDreamOS->RemoveObjectFromUIGraph(pButton.get());
 
-			m_pParentApp->SetActiveContent(m_contents[i]);
+			m_pParentApp->SetActiveSource(m_sources[i]);
 
-			m_appToTabMap.erase(m_contents[i]);
+			m_appToTabMap.erase(m_sources[i]);
 			m_tabButtons.erase(m_tabButtons.begin() + i);
-			m_contents.erase(m_contents.begin() + i);
+			m_sources.erase(m_sources.begin() + i);
 
 			break;
 		} 
@@ -174,17 +174,17 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	}
 
 	m_tabButtons.emplace_back(pNewTabButton);
-	m_contents.emplace_back(pContent);
+	m_sources.emplace_back(pContent);
 	m_appToTabMap[pContent] = pNewTabButton;
 
 Error:
 	return r;
 }
 
-RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContent> pContent) {
+RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent) {
 
 	if (m_appToTabMap.count(pContent) > 0) {
-		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetScreenTexture().get());
+		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	}
 
 	return R_PASS;
