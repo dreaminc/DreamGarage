@@ -531,6 +531,15 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::OnReceiveAsset() {
+	RESULT r = R_PASS;
+	
+	// new browser can't be the current content
+	m_pControlBar->SetSharingFlag(false);
+
+	return r;
+}
+
 RESULT DreamUserControlArea::CloseActiveAsset() {
 	RESULT r = R_PASS;
 

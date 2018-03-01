@@ -939,6 +939,8 @@ RESULT DreamGarage::OnReceiveAsset(long userID) {
 
 		m_pDreamShareView->PendReceiving();
 
+		m_pDreamUserControlArea->OnReceiveAsset();
+
 		// if not connected yet, save the userID and start receiving during
 		// OnNewPeerConnection; otherwise this user should receive the dream message
 		// to start receiving

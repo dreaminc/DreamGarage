@@ -108,6 +108,7 @@ public:
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 	RESULT CloseActiveAsset();
+	RESULT OnReceiveAsset();
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
