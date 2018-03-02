@@ -1369,7 +1369,6 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 				m_pDataBuffer_n = 0;
 			}
 
-
 			//pTestContext->once = true;
 		}
 

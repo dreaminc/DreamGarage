@@ -145,9 +145,10 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 
-	// TODO: get this from main?
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
-	CNM(m_hwndDreamHandle, "Unable to find the Dream window");
+	// TODO: get this from Windows64App?
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream TestingRelease");		// This is really bad, need better way to get window handle
+	//CNM(m_hwndDreamHandle, "Unable to find the Dream window");
+	CNR(m_hwndDreamHandle, R_SKIPPED);									// but this will stop the crash at least
 
 Error:
 	return r;

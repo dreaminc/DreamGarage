@@ -351,17 +351,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			m_desktoppxHeight = pMessageData->pxHeight;
 			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
 		}
-		else if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::RESIZE) {
-			DDCIPCMessage *pMessageData;
-			pMessageData = (DDCIPCMessage*)(pDataStruct->lpData);
-			CNR(pMessageData, R_SKIPPED);
-
-			m_desktoppxWidth = pMessageData->pxWidth;
-			m_desktoppxHeight = pMessageData->pxHeight;
-			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
-		}
-
-		return true;
+	return true;
 	} break;
 
 	default: {
