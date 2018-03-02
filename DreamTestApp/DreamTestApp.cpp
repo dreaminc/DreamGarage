@@ -50,9 +50,10 @@ RESULT DreamTestApp::LoadScene() {
 	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::HAL, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UIVIEW, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::OS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::ANIMATION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SANDBOX, this);
@@ -133,6 +134,12 @@ Error:
 
 RESULT DreamTestApp::OnNewSocketConnection(int seatPosition) {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamTestApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+	RESULT r = R_PASS;
+	m_pTestSuite->OnDesktopFrame(messageSize, pMessageData);
+	return r;
 }
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {

@@ -141,6 +141,17 @@ Error:
 	return nullptr;
 }
 
+RESULT TestSuite::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+
+	m_pDataBuffer = (unsigned char*)malloc(messageSize);
+	m_pDataBuffer_n = messageSize;
+
+	memcpy(m_pDataBuffer, (unsigned char*)pMessageData, messageSize);
+
+
+	return R_PASS;
+}
+
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, 
 	std::function<RESULT(void*)> fnUpdate, 
 	std::function<RESULT(void*)> fnTest, 

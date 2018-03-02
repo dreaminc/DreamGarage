@@ -37,6 +37,7 @@ public:
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestDreamBrowser();
 	RESULT AddTestDreamOS();
+	RESULT AddTestDreamDesktop();
 
 	// Capturing Apps
 	RESULT AddTestCaptureApp();

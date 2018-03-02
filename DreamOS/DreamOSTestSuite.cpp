@@ -13,12 +13,17 @@
 #include "DreamGarage\DreamUIBar.h"
 #include "DreamControlView\DreamControlView.h"
 #include "DreamShareView\DreamShareView.h"
+#include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
 
 #include <chrono>
+
+#include <windows.h>
+#include <windowsx.h>
+#include "DDCIPCMessage.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -32,18 +37,20 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	
+
+	CR(AddTestDreamDesktop());
+
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());
-	
+
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamShareView());
 
 	CR(AddTestDreamOS());
 
-	CR(AddTestUserApp());	
+	CR(AddTestUserApp());
 
 	CR(AddTestCaptureApp());
 
@@ -90,12 +97,12 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	
+
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));	
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	//TODO: Matrix node
 	//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
@@ -104,7 +111,7 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-	
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
@@ -180,9 +187,9 @@ WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptInt
 /*
 	ptIntersectionContact.w() = 1.0f;
 
-	// First apply transforms to the ptIntersectionContact 
+	// First apply transforms to the ptIntersectionContact
 	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
-	
+
 	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
 
 	float width = GetWidth();
@@ -311,7 +318,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 			WebBrowserMouseEvent webBrowserMouseEvent;
 
 			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			
+
 			int deltaX = 0;
 			int deltaY = pEvent->m_value * m_scrollFactor;
 
@@ -335,7 +342,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 				SetStreamingState(false);
 
-				// TODO: May not be needed, if not streaming no video is actually being transmitted 
+				// TODO: May not be needed, if not streaming no video is actually being transmitted
 				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
 				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
@@ -352,7 +359,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
-			
+
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 
@@ -369,7 +376,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 		} break;
 	}
-	
+
 #ifdef _USE_TEST_APP
 	// First point of contact
 	if (fUpdateMouse) {
@@ -382,7 +389,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
-#endif 
+#endif
 //*/
 
 	CR(r);
@@ -682,7 +689,7 @@ RESULT DreamOSTestSuite::AddTestCaptureApp() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		
+
 		//CN(m_pDreamOS);
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
@@ -745,7 +752,7 @@ RESULT DreamOSTestSuite::AddTestCaptureApp() {
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
 
-		// TODO: Kill apps as needed 
+		// TODO: Kill apps as needed
 
 	Error:
 		return r;
@@ -816,11 +823,11 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		for (int i = 0; i < 1; i++) {
 			pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
 			CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
-			
+
 			auto pUserModel = m_pDreamOS->MakeUser();
 			CN(pUserModel);
 			pTestContext->m_pPeers[i]->AssignUserModel(pUserModel);
-		
+
 			pTestContext->m_pPeers[i]->SetPosition(point(-1.0f + (i * 1.0f), 0.0f, 2.0f));
 			pTestContext->m_pPeers[i]->RotateByDeg(0.0f, 45.0f, 0.0f);
 		}
@@ -886,7 +893,7 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
 
-		// TODO: Kill apps as needed 
+		// TODO: Kill apps as needed
 
 	Error:
 		return r;
@@ -927,7 +934,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
-	
+
 		CR(SetupDreamAppPipeline());
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
@@ -982,7 +989,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-	
+
 		return r;
 	};
 
@@ -1045,7 +1052,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pTestContext->pDreamShareView = pDreamShareView;
 		}
 
-	Error:
+	//Error:
 		return r;
 	};
 
@@ -1062,7 +1069,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
 
 		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-		
+
 		double diff = msNow - pTestContext->m_msStart;
 		int mod = ((int)diff / 500) % 2;
 
@@ -1173,7 +1180,7 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
 
 		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-		
+
 		double diff = msNow - pTestContext->m_msStart;
 		int mod = ((int)diff / 500) % 2;
 /*
