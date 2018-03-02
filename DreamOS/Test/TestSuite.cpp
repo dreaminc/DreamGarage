@@ -24,7 +24,7 @@ Error:
 	return r;
 }
 
-// This will run tests per the update loop, for the given duration 
+// This will run tests per the update loop, for the given duration
 // zero duration indicates no duration
 
 RESULT TestSuite::UpdateAndRunTests(void *pContext) {
@@ -64,7 +64,7 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 			case TestObject::state::COMPLETE: {
 				// Reset and load next test
 				CR(pTest->ResetTest());
-				
+
 				// Repeat the number of repeats as needed - otherwise increment test
 				if (pTest->CurrentRepetition() < pTest->Repetitions()) {
 					CR(pTest->InitializeTest(pContext));
@@ -80,7 +80,7 @@ Error:
 	return r;
 }
 
-// This will run all tests consecutively 
+// This will run all tests consecutively
 RESULT TestSuite::RunTests() {
 	RESULT r = R_PASS;
 
@@ -141,17 +141,30 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, 
-	std::function<RESULT(void*)> fnUpdate, 
-	std::function<RESULT(void*)> fnTest, 
-	void *pContext) 
+RESULT TestSuite::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+	CBR(m_pDataBuffer_n == 0, R_SKIPPED);
+	m_pDataBuffer = (unsigned char*)malloc(messageSize);
+	m_pDataBuffer_n = messageSize;
+	m_pxHeight = pxHeight;
+	m_pxWidth = pxWidth;
+	memcpy(m_pDataBuffer, (unsigned char*)pMessageData, messageSize);
+
+Error:
+	return R_PASS;
+}
+
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
+	std::function<RESULT(void*)> fnUpdate,
+	std::function<RESULT(void*)> fnTest,
+	void *pContext)
 {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, pContext);
 	CNM(pNewTest, "Failed to allocate new test");
 	m_tests.push_back(pNewTest);
-	
+
 	return pNewTest;
 
 Error:

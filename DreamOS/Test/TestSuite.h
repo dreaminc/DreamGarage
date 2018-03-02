@@ -31,24 +31,31 @@ public:
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
-									    std::function<RESULT(void*)> fnTest, 
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+									    std::function<RESULT(void*)> fnTest,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
-										std::function<RESULT(void*)> fnUpdate, 
-										std::function<RESULT(void*)> fnTest, 
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+										std::function<RESULT(void*)> fnUpdate,
+										std::function<RESULT(void*)> fnTest,
 										void *pContext = nullptr);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
-										std::function<RESULT(void*)> fnUpdate, 
-										std::function<RESULT(void*)> fnTest, 
-										std::function<RESULT(void*)> fnReset, 
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize,
+										std::function<RESULT(void*)> fnUpdate,
+										std::function<RESULT(void*)> fnTest,
+										std::function<RESULT(void*)> fnReset,
 										void *pContext = nullptr);
-	
+
 	virtual RESULT AddTests() = 0;
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
 
 	std::shared_ptr<TestObject> GetCurrentTest();
+
+public:
+	unsigned char* m_pDataBuffer = nullptr;
+	size_t m_pDataBuffer_n = 0;
+	int m_pxWidth = 0;
+	int m_pxHeight = 0;
 
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;

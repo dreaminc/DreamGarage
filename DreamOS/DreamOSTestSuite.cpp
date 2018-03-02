@@ -12,6 +12,7 @@
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
 #include "DreamControlView\DreamControlView.h"
+#include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
 
 #include "DreamGarage\DreamBrowser.h"
@@ -19,6 +20,10 @@
 #include "WebBrowser\WebBrowserController.h"
 
 #include <chrono>
+
+#include <windows.h>
+#include <windowsx.h>
+#include "DDCIPCMessage.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -32,18 +37,22 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	
+
+	CR(AddTestDreamDesktop());
+
+	CR(AddTestDreamOS());
+
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());
-	
+
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamShareView());
 
 	CR(AddTestDreamOS());
 
-	CR(AddTestUserApp());	
+	CR(AddTestUserApp());
 
 	CR(AddTestCaptureApp());
 
@@ -90,12 +99,12 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-	
+
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));	
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	//TODO: Matrix node
 	//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
@@ -104,7 +113,7 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-	
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
@@ -180,9 +189,9 @@ WebBrowserPoint DreamOSTestSuite::GetRelativeBrowserPointFromContact(point ptInt
 /*
 	ptIntersectionContact.w() = 1.0f;
 
-	// First apply transforms to the ptIntersectionContact 
+	// First apply transforms to the ptIntersectionContact
 	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
-	
+
 	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
 
 	float width = GetWidth();
@@ -311,7 +320,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 			WebBrowserMouseEvent webBrowserMouseEvent;
 
 			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
-			
+
 			int deltaX = 0;
 			int deltaY = pEvent->m_value * m_scrollFactor;
 
@@ -335,7 +344,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 				SetStreamingState(false);
 
-				// TODO: May not be needed, if not streaming no video is actually being transmitted 
+				// TODO: May not be needed, if not streaming no video is actually being transmitted
 				// so unless we want to set up a WebRTC re-negotiation this is not needed anymore
 				//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
@@ -352,7 +361,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
-			
+
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 
@@ -369,7 +378,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 
 		} break;
 	}
-	
+
 #ifdef _USE_TEST_APP
 	// First point of contact
 	if (fUpdateMouse) {
@@ -382,7 +391,7 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
-#endif 
+#endif
 //*/
 
 	CR(r);
@@ -682,7 +691,7 @@ RESULT DreamOSTestSuite::AddTestCaptureApp() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		
+
 		//CN(m_pDreamOS);
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
@@ -745,7 +754,7 @@ RESULT DreamOSTestSuite::AddTestCaptureApp() {
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
 
-		// TODO: Kill apps as needed 
+		// TODO: Kill apps as needed
 
 	Error:
 		return r;
@@ -816,11 +825,11 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		for (int i = 0; i < 1; i++) {
 			pTestContext->m_pPeers[i] = m_pDreamOS->LaunchDreamApp<DreamPeerApp>(this);
 			CNM(pTestContext->m_pPeers[i], "Failed to create dream peer app");
-			
+
 			auto pUserModel = m_pDreamOS->MakeUser();
 			CN(pUserModel);
 			pTestContext->m_pPeers[i]->AssignUserModel(pUserModel);
-		
+
 			pTestContext->m_pPeers[i]->SetPosition(point(-1.0f + (i * 1.0f), 0.0f, 2.0f));
 			pTestContext->m_pPeers[i]->RotateByDeg(0.0f, 45.0f, 0.0f);
 		}
@@ -886,7 +895,7 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
 
-		// TODO: Kill apps as needed 
+		// TODO: Kill apps as needed
 
 	Error:
 		return r;
@@ -927,7 +936,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
-	
+
 		CR(SetupDreamAppPipeline());
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
@@ -982,7 +991,7 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-	
+
 		return r;
 	};
 
@@ -1049,7 +1058,6 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 		return r;
 	};
 
-	// Test Code (this evaluates the test upon completion)
 	auto fnTest = [&](void *pContext) {
 		return R_PASS;
 	};
@@ -1058,14 +1066,12 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 	auto fnUpdate = [&](void *pContext) {
 		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
 		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
 
 		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-		
+
 		double diff = msNow - pTestContext->m_msStart;
 		int mod = ((int)diff / 500) % 2;
-
 		if (mod == 0) {
 			pTestContext->pDreamShareView->ShowLoadingTexture();
 		}
@@ -1077,10 +1083,9 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 		return R_PASS;
 	};
 
-	// Reset Code
+		// Reset Code
 	auto fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
-
 		// Will reset the sandbox as needed between tests
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
@@ -1173,10 +1178,10 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 		auto pTestContext = reinterpret_cast<TestTimingContext*>(pContext);
 
 		//auto pDreamShareViewHandle = dynamic_cast<DreamShareViewHandle*>(m_pDreamOS->RequestCaptureAppUnique("DreamShareView", this));
-		
+
 		double diff = msNow - pTestContext->m_msStart;
 		int mod = ((int)diff / 500) % 2;
-/*
+		/*
 		if (mod == 0) {
 			pTestContext->pDreamShareView->ShowLoadingTexture();
 		}
@@ -1196,7 +1201,7 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 		// Will reset the sandbox as needed between tests
 		CN(m_pDreamOS);
 		CR(m_pDreamOS->RemoveAllObjects());
-
+	
 	Error:
 		return r;
 	};
@@ -1211,4 +1216,190 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 
 Error:
 	return r;
+}
+
+
+RESULT DreamOSTestSuite::AddTestDreamDesktop() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	struct TestContext {
+		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
+		std::shared_ptr<DreamUserControlArea> pDreamUserControlArea = nullptr;
+		bool once = false;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		SetupDreamAppPipeline();
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		{
+			std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+			pTestContext->pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
+			CNM(pTestContext->pDreamDesktop, "Failed to create dream desktop");
+
+			pTestContext->pDreamUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			pTestContext->pDreamUserControlArea->AddEnvironmentAsset(pEnvAsset);
+			pTestContext->pDreamUserControlArea->SetActiveSource(pTestContext->pDreamDesktop);	
+			pTestContext->pDreamUserControlArea->GetComposite()->SetPosition(m_pDreamOS->GetCameraPosition() + point(0.0f, 1.5f, -.3f));
+			
+			/*
+			auto pComposite = m_pDreamOS->AddComposite();
+			pComposite->InitializeOBB();
+
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			pView->InitializeOBB();
+
+			pTestContext->pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+			pTestContext->pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+			pTestContext->pQuad->FlipUVVertical();
+
+			int pxWidth = 938;
+			int pxHeight = 484;
+
+			m_pDataBuffer_n = 938*484*4;
+			m_pDataBuffer = (unsigned char*)malloc(m_pDataBuffer_n);
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
+
+			m_pDataBuffer_n = 0;
+			pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture);
+
+			//*
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+
+			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+			if (desktopHWND == NULL) {
+				ZeroMemory(&si, sizeof(si));
+				si.cb = sizeof(si);
+				ZeroMemory(&pi, sizeof(pi));
+
+				PathManager* pPathManager = PathManager::instance();
+				std::wstring wstrDreamPath;
+				pPathManager->GetDreamPath(wstrDreamPath);
+
+				std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe";
+				std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
+				const wchar_t *wPath = wstrFullpath.c_str();
+				std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
+				vwszLocation.push_back(0);
+				LPWSTR strLPWlocation = vwszLocation.data();
+
+				if (!CreateProcess(strLPWlocation,
+					L" /output 1",	// Command line
+					nullptr,           // Process handle not inheritable
+					nullptr,           // Thread handle not inheritable
+					false,          // Set handle inheritance to FALSE
+					0,              // No creation flags
+					nullptr,           // Use parent's environment block
+					nullptr,           // Use parent's starting directory
+					&si,            // Pointer to STARTUPINFO structure
+					&pi)            // Pointer to PROCESS_INFORMATION structure
+					)
+				{
+					DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
+					r = R_FAIL;
+				}
+
+				while (desktopHWND == NULL) {
+					desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
+				}
+			}
+
+			DWORD desktopPID;
+			GetWindowThreadProcessId(desktopHWND, &desktopPID);
+
+			HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
+			if (dreamHWND == NULL) {
+				MessageBox(dreamHWND, L"Unable to find the Dream window",
+					L"Error", MB_ICONERROR);
+				return r;
+			}
+
+			DDCIPCMessage ddcMessage;
+			ddcMessage.SetType(DDCIPCMessage::type::START);
+			COPYDATASTRUCT desktopCDS;
+
+			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+			desktopCDS.cbData = sizeof(ddcMessage);
+			desktopCDS.lpData = &ddcMessage;
+
+			SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
+			DWORD dwError = GetLastError();
+			if (dwError != NO_ERROR) {
+				MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
+			}
+			else {
+				DEBUG_LINEOUT("Message sent");
+			}
+			//*/
+
+			// Wait until child process exits.
+			//WaitForSingleObject(pi.hProcess, INFINITE);
+
+			// Close process and thread handles.
+			//CloseHandle(pi.hProcess);
+			//CloseHandle(pi.hThread);
+		}
+
+	Error:
+		return r;
+	};	// Test Code (this evaluates the test upon completion)
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
+		CN(pTestContext);
+		if (!pTestContext->once) {
+			CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
+			// pTestContext->once = true;
+			if (m_pDataBuffer) {
+				free(m_pDataBuffer);
+				m_pDataBuffer = nullptr;
+				m_pDataBuffer_n = 0;
+			}
+
+
+			//pTestContext->once = true;
+		}
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+	pUITest->SetTestName("Local Dream Desktop Test");
+	pUITest->SetTestDescription("Dream Desktop working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+
 }
