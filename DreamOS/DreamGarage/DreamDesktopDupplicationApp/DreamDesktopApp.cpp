@@ -103,10 +103,10 @@ RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
 	mouseInputStruct.dy = ptDiff.y() * (_UI16_MAX / m_pxDesktopHeight);
 
 	if (fMouseDown) {
-		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN;
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_MOVE;
 	}
 	else {
-		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP;
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP | MOUSEEVENTF_MOVE;
 	}
 	
 	inputStruct.mi = mouseInputStruct;
