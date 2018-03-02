@@ -77,6 +77,7 @@ public:
 	RESULT UnregisterUIThreadCallback();
 
 private:
+	bool m_fSentFrame = false;
 	bool m_fFullscreen;
 	long m_wndStyle;
 

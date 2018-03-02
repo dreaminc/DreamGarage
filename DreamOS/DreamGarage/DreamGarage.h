@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
 class UIStageProgram;
@@ -136,7 +137,7 @@ private:
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
-	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea;
+	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

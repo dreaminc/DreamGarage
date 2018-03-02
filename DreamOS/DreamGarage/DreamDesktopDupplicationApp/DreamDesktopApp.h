@@ -12,6 +12,9 @@
 
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
+#include "DreamUserControlArea/DreamContentSource.h"
+
+#include "DDCIPCMessage.h"
 
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "Sense/SenseController.h"
@@ -27,7 +30,8 @@ class DreamUserHandle;
 class AudioPacket;
 
 class DreamDesktopApp :
-	public DreamApp<DreamDesktopApp>
+	public DreamApp<DreamDesktopApp>,
+	public DreamContentSource
 {
 	friend class DreamAppManager;
 
@@ -41,8 +45,24 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	// Control Events
+	virtual RESULT OnClick(point ptDiff, bool fMouseDown) override;
+	virtual RESULT OnMouseMove(point mousePoint) override;
+	virtual RESULT OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) override;
+
+	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
+
+	virtual std::shared_ptr<texture> GetSourceTexture() override;
+
+	virtual RESULT SetScope(std::string strScope) override;
+	virtual RESULT SetPath(std::string strPath) override;
+	virtual long GetCurrentAssetID() override;
+
+	virtual RESULT CloseSource() override;
+
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
+	RESULT UpdateViewQuad();
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
@@ -50,7 +70,7 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 	RESULT StartDuplicationProcess();
-	RESULT SendStartDesktopDuplicationIPCMessage();
+	RESULT SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msgType);
 
 	//RESULT FadeQuadToBlack();
 
@@ -60,20 +80,14 @@ public:
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
-//	virtual float GetAspectRatio() override;
-
-	RESULT UpdateViewQuad();
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
-
-	std::shared_ptr<texture> GetScreenTexture();
 
 	size_t m_frameDataBuffer_n = 0;
 	unsigned char* m_pFrameDataBuffer = nullptr;
 
 private:
-	RESULT SetScreenTexture(texture *pTexture);
 
 protected:
 	static DreamDesktopApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -90,6 +104,10 @@ private:
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
 
+	long m_assetID = -1;
+	std::string m_strPath;
+	std::string m_strScope;
+
 	double m_msTimeSinceLastSent = 0;
 	double m_msTimeDelay = 2000;
 
@@ -101,4 +119,3 @@ private:
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
-

@@ -22,6 +22,102 @@ Error:
 	return;
 }
 
+RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
+	RESULT r = R_PASS;
+
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct;
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	mouseInputStruct.dx = scrollPoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = scrollPoint.y() * (_UI16_MAX / m_pxDesktopHeight);
+
+	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
+	mouseInputStruct.mouseData = 120 * pxYDiff;
+
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
+	RESULT r = R_PASS;
+
+	INPUT inputStruct;
+	inputStruct.type = INPUT_KEYBOARD;
+
+	KEYBDINPUT keyboardInputStruct;
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	// Set up generic keyboard event
+	keyboardInputStruct.wScan = 0;
+	keyboardInputStruct.dwExtraInfo = 0;
+	keyboardInputStruct.wVk = chKey;		// Should be getting VK code from Sensekeyboard anyway
+	keyboardInputStruct.dwFlags = 0;		// 0 for key press
+
+	inputStruct.ki = keyboardInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+	keyboardInputStruct.dwFlags = KEYEVENTF_KEYUP;	// key up for key release
+	SendInput(1, &inputStruct, sizeof(INPUT));
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::OnMouseMove(point mousePoint) {
+	RESULT r = R_PASS;
+
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct;
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	mouseInputStruct.dx = mousePoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = mousePoint.y() * (_UI16_MAX / m_pxDesktopHeight);
+
+	mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
+
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+
+Error:
+	return r;
+}
+
+RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
+	RESULT r = R_PASS;
+
+	INPUT inputStruct;
+	inputStruct.type = INPUT_MOUSE;
+
+	MOUSEINPUT mouseInputStruct;
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	mouseInputStruct.dx = ptDiff.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = ptDiff.y() * (_UI16_MAX / m_pxDesktopHeight);
+
+	if (fMouseDown) {
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_MOVE;
+	}
+	else {
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP | MOUSEEVENTF_MOVE;
+	}
+	
+	inputStruct.mi = mouseInputStruct;
+	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
+												// number of structures in pInputs array
+												// array of INPUT structures representing input event
+												// size in BYTES of an INPUT structure
+Error:
+	return r;
+}
+
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -45,7 +141,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
 	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
-	GetComposite()->SetVisible(true);	
+	GetComposite()->SetVisible(true);
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 
@@ -59,7 +155,7 @@ Error:
 
 RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
-	
+
 	// Start duplication process
 	STARTUPINFO startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;
@@ -90,7 +186,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 		false,								// Set handle inheritance to FALSE
 		0,									// No creation flags
 		nullptr,							// Use parent's environment block
-		nullptr,							// Use parent's starting directory 
+		nullptr,							// Use parent's starting directory
 		&startupinfoDesktopDuplication,     // Pointer to STARTUPINFO structure
 		&processinfoDesktopDuplication		// Pointer to PROCESS_INFORMATION structure
 	);
@@ -112,23 +208,23 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
 	}
 	CNR(m_hwndDesktopHandle, R_SKIPPED);	// duplication process isn't ready yet, so skip
-	
+
 	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	if (msTimeNow - m_msTimeSinceLastSent > m_msTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
-		CR(SendStartDesktopDuplicationIPCMessage());
+		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
 	}
 
 Error:
 	return r;
 }
 
-RESULT DreamDesktopApp::SendStartDesktopDuplicationIPCMessage() {
+RESULT DreamDesktopApp::SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msgType) {
 	RESULT r = R_PASS;
 
 	DDCIPCMessage ddcMessage;
-	ddcMessage.m_msgType = DDCIPCMessage::type::START;
+	ddcMessage.m_msgType = msgType;
 	COPYDATASTRUCT desktopCDS;
 
 	desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
@@ -147,7 +243,7 @@ Error:
 
 RESULT DreamDesktopApp::Shutdown(void *pContext) {
 	// TODO: clean up in here
-	
+
 	return R_PASS;
 }
 
@@ -209,16 +305,12 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 	RESULT r = R_PASS;
 	m_fDesktopDuplicationIsRunning = true;
 	m_frameDataBuffer_n = messageSize;
-	//m_pFrameDataBuffer = (unsigned char*)malloc(m_frameDataBuffer_n);
-	//m_pFrameDataBuffer = (unsigned char*)pMessageData;
-	//memcpy(m_pFrameDataBuffer, (unsigned char*)pMessageData, m_frameDataBuffer_n);
 
-	//CNR(m_pFrameDataBuffer, R_SKIPPED);
 	CNR(pMessageData, R_SKIPPED);
 	if (m_pxDesktopHeight != pxHeight || m_pxDesktopWidth != pxWidth) {
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
-		m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight);
+		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
@@ -268,6 +360,33 @@ Error:
 	return r;
 }
 
+std::shared_ptr<texture> DreamDesktopApp::GetSourceTexture() {
+	return m_pDesktopTexture;
+}
+
+RESULT DreamDesktopApp::SetScope(std::string strScope) {
+	m_strScope = strScope;
+	return R_PASS;
+}
+
+RESULT DreamDesktopApp::SetPath(std::string strPath) {
+	m_strPath = strPath;
+	return R_PASS;
+}
+
+long DreamDesktopApp::GetCurrentAssetID() {
+	return m_assetID;
+}
+
+RESULT DreamDesktopApp::CloseSource() {
+	RESULT r = R_PASS;
+
+	CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP));
+
+Error:
+	return r;
+}
+
 bool DreamDesktopApp::IsVisible() {
 	return m_pDesktopQuad->IsVisible();
 }
@@ -280,4 +399,3 @@ RESULT DreamDesktopApp::SetVisible(bool fVisible) {
 Error:
 	return r;
 }
-
