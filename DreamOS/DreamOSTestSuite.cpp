@@ -1354,10 +1354,6 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		return r;
 	};	// Test Code (this evaluates the test upon completion)
 
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -1396,41 +1392,6 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	// Test Code (this evaluates the test upon completion)
 	auto fnTest = [&](void *pContext) {
 		return R_PASS;
-	};
-
-	// Update Code
-	auto fnUpdate = [&](void *pContext) {
-		RESULT r = R_PASS;
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
-		CN(pTestContext);
-		if (!pTestContext->once) {
-			CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
-			// pTestContext->once = true;
-			if (m_pDataBuffer) {
-				free(m_pDataBuffer);
-				m_pDataBuffer = nullptr;
-				m_pDataBuffer_n = 0;
-			}
-
-
-			//pTestContext->once = true;
-		}
-
-	Error:
-		return r;
-	};
-
-	// Reset Code
-	auto fnReset = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		// Will reset the sandbox as needed between tests
-		CN(m_pDreamOS);
-		CR(m_pDreamOS->RemoveAllObjects());
-
-	Error:
-		return r;
 	};
 
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);

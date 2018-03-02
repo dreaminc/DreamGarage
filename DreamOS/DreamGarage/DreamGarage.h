@@ -85,12 +85,6 @@ public:
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
-	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
-
-	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
-
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
