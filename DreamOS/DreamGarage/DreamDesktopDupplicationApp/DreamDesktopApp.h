@@ -14,10 +14,11 @@
 #include "DreamAppHandle.h"
 
 #include "InteractionEngine/InteractionObjectEvent.h"
-
 #include "Sense/SenseController.h"
-
 #include "Primitives/TextEntryString.h"
+
+#define DESKTOP_PXWIDTH 1920;
+#define DESKTOP_PXHEIGHT 1080;
 
 class quad;
 class texture;
@@ -48,10 +49,12 @@ public:
 	RESULT SetDiagonalSize(float diagonalSize);
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
+	RESULT StartDuplicationProcess();
+	RESULT SendStartDesktopDuplicationIPCMessage();
 
 	//RESULT FadeQuadToBlack();
 
-	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData);
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
 
 	float GetWidth();
 	float GetHeight();
@@ -65,6 +68,10 @@ public:
 	RESULT SetVisible(bool fVisible);
 
 	std::shared_ptr<texture> GetScreenTexture();
+
+	size_t m_frameDataBuffer_n = 0;
+	unsigned char* m_pFrameDataBuffer = nullptr;
+
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
@@ -77,19 +84,16 @@ private:
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
-	int m_pxDesktopWidth = 1920;
-	int m_pxDesktopHeight = 1080;
+	int m_pxDesktopWidth = DESKTOP_PXWIDTH;
+	int m_pxDesktopHeight = DESKTOP_PXHEIGHT;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
 
 	double m_msTimeSinceLastSent = 0;
-	double m_msTimeDelay = 20;
+	double m_msTimeDelay = 2000;
 
 	bool m_fDesktopDuplicationIsRunning = false;
-
-	size_t m_pFrameDataBuffer_n = 0;
-	unsigned char* m_pFrameDataBuffer;
 
 	// Window
 	HWND m_hwndDreamHandle = nullptr;

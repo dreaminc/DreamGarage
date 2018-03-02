@@ -10,19 +10,11 @@ public:
 		START,
 		STOP,
 		FRAME,
-		INVALID
-	};
-
-	enum class PIXEL_FORMAT {
-		Unspecified, // this will generate an RGB/RGBA based on the number of channels - 1 to 1 with color.h
-		RGB,
-		RGBA,
-		BGR,
-		BGRA,
+		RESIZE,
 		INVALID
 	};
 	
-	DDCIPCMessage::type GetMessage() {
+	/*DDCIPCMessage::type GetMessageType() {
 		return m_body.m_msgType;
 	}
 
@@ -30,12 +22,18 @@ public:
 		m_body.m_msgType = msgType;
 		return S_OK;
 	}
-
 	__declspec(align(8)) struct MessageBody {
 		DDCIPCMessage::type m_msgType;
-		unsigned char* pDataBuffer;
-		PIXEL_FORMAT pixelFormat;
-	} m_body;
+		unsigned int pxWidth;
+		unsigned int pxHeight;
+		unsigned char pDataBuffer[829440];
+	} m_body;*/
+	
+	DDCIPCMessage::type m_msgType;
+	unsigned int pxWidth;
+	unsigned int pxHeight;
+	unsigned char* pDataBuffer;
+	
 };
 
 #endif
