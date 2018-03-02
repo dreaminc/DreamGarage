@@ -437,7 +437,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
-	/*	This Draws the Mouse, disabling for Now
+	//*	This Draws the Mouse, disabling for Now
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
 

@@ -1226,6 +1226,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 	struct TestContext {
 		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
+		std::shared_ptr<DreamUserControlArea> pDreamUserControlArea = nullptr;
 		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -1239,9 +1240,15 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
+			std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 			pTestContext->pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 			CNM(pTestContext->pDreamDesktop, "Failed to create dream desktop");
 
+			pTestContext->pDreamUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			pTestContext->pDreamUserControlArea->AddEnvironmentAsset(pEnvAsset);
+			pTestContext->pDreamUserControlArea->SetActiveSource(pTestContext->pDreamDesktop);	
+			pTestContext->pDreamUserControlArea->GetComposite()->SetPosition(m_pDreamOS->GetCameraPosition() + point(0.0f, 1.5f, -.3f));
+			
 			/*
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
