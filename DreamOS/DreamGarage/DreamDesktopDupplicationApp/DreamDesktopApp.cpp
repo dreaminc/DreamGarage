@@ -31,8 +31,11 @@ RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint
 	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
+	mouseInputStruct.dx = scrollPoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = scrollPoint.y() * (_UI16_MAX / m_pxDesktopHeight);
+
 	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
-	mouseInputStruct.mouseData = 120 * (int)scrollPoint.x();
+	mouseInputStruct.mouseData = 120 * pxYDiff;
 
 	inputStruct.mi = mouseInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
@@ -75,7 +78,10 @@ RESULT DreamDesktopApp::OnMouseMove(point mousePoint) {
 	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
-	mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE;
+	mouseInputStruct.dx = mousePoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = mousePoint.y() * (_UI16_MAX / m_pxDesktopHeight);
+
+	mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
 
 	inputStruct.mi = mouseInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
@@ -93,11 +99,14 @@ RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
 	MOUSEINPUT mouseInputStruct;
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
+	mouseInputStruct.dx = ptDiff.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
+	mouseInputStruct.dy = ptDiff.y() * (_UI16_MAX / m_pxDesktopHeight);
+
 	if (fMouseDown) {
-		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_LEFTUP;
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTDOWN;
 	}
 	else {
-		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE & MOUSEEVENTF_LEFTDOWN;
+		mouseInputStruct.dwFlags = MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_LEFTUP;
 	}
 	
 	inputStruct.mi = mouseInputStruct;
