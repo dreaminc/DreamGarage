@@ -971,8 +971,8 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
-	return m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData);
+RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	return m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
 }
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
