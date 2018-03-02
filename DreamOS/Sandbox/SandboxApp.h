@@ -134,6 +134,8 @@ public:
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
+
+	RESULT SendDesktopDataFrame();
 	
 	// HAL
 	virtual RESULT InitializeHAL();

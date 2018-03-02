@@ -17,6 +17,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
+#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -123,7 +124,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	// save interface for UI apps
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-	
+
 	/*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
@@ -164,7 +165,7 @@ RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer)
 
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == nullptr) {
-			
+
 			//userModelPair.second->SetVisible(false);
 			CR(pDreamPeer->AssignUserModel(userModelPair.second));
 
@@ -224,7 +225,7 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	CR(SetupUserModelPool());
-	
+
 	AddSkybox();
 
 	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
@@ -243,7 +244,7 @@ RESULT DreamGarage::LoadScene() {
 	pModel->SetScale(sceneScale);
 	//pModel->SetEulerOrientation(vSceneEulerOrientation);
 	//pModel->SetVisible(false);
-		
+
 	model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
 	pRiver->SetPosition(ptSceneOffset);
 	pRiver->SetScale(sceneScale);
@@ -274,7 +275,7 @@ RESULT DreamGarage::LoadScene() {
 		pOGLObj->SetOGLProgramPostCallback(
 			[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff post
-			
+
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(false);
@@ -420,9 +421,9 @@ Error:
 class SwitchHeadMessage : public Message {
 public:
 	SwitchHeadMessage(long senderUserID, long receiverUserID) :
-		Message(senderUserID, 
-				receiverUserID, 
-				(Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1), 
+		Message(senderUserID,
+				receiverUserID,
+				(Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1),
 				sizeof(SwitchHeadMessage))
 	{
 		// empty
@@ -442,22 +443,22 @@ Error:
 */
 
 // Head update time
-#define UPDATE_HEAD_COUNT_THROTTLE 90	
+#define UPDATE_HEAD_COUNT_THROTTLE 90
 #define UPDATE_HEAD_COUNT_MS ((1000.0f) / UPDATE_HEAD_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system_clock::now();
 
 // Hands update time
-#define UPDATE_HAND_COUNT_THROTTLE 90	
+#define UPDATE_HAND_COUNT_THROTTLE 90
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
 // Mouth update time
-#define UPDATE_MOUTH_COUNT_THROTTLE 90	
+#define UPDATE_MOUTH_COUNT_THROTTLE 90
 #define UPDATE_MOUTH_COUNT_MS ((1000.0f) / UPDATE_MOUTH_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastMouthUpdateTime = std::chrono::system_clock::now();
 
-// Hands update time	
-#define CHECK_PEER_APP_STATE_INTERVAL_MS (3000.0f) 
+// Hands update time
+#define CHECK_PEER_APP_STATE_INTERVAL_MS (3000.0f)
 std::chrono::system_clock::time_point g_lastPeerStateCheckTime = std::chrono::system_clock::now();
 
 // For testing
@@ -465,7 +466,7 @@ std::chrono::system_clock::time_point g_lastDebugUpdate = std::chrono::system_cl
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
-	
+
 	//m_browsers.Update();
 
 	// TODO: Move this into DreamApp arch
@@ -502,7 +503,7 @@ RESULT DreamGarage::Update(void) {
 		g_lastMouthUpdateTime = timeNow;
 	}
 	//*/
-	
+
 	/*
 	// For testing
 	if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - g_lastDebugUpdate).count() > 10) {
@@ -577,7 +578,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 	CB((seatingPosition < m_seatLookup.size()));
 	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
-	
+
 	if (!pCamera->HasHMD()) {
 		pCamera->RotateYByDeg(angleRotation);
 		pCamera->SetPosition(ptSeatPosition);
@@ -759,7 +760,7 @@ user* DreamGarage::ActivateUser(long userId) {
 	return m_peerUsers[userId];
 	*/
 
-	// TODO: 
+	// TODO:
 
 	return nullptr;
 }
@@ -782,7 +783,7 @@ RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, Upd
 	RESULT r = R_PASS;
 
 	/*
-	// This will set visible 
+	// This will set visible
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	user* pUser = ActivateUser(senderUserID);
 
@@ -909,7 +910,7 @@ Error:
 
 RESULT DreamGarage::OnCloseAsset() {
 	RESULT r = R_PASS;
-	
+
 	if (m_pDreamUserControlArea != nullptr) {
 		CR(m_pDreamUserControlArea->CloseActiveAsset());
 	}
@@ -920,7 +921,7 @@ Error:
 
 RESULT DreamGarage::OnShareAsset() {
 	RESULT r = R_PASS;
-	
+
 	CN(m_pDreamUserControlArea);
 	CN(m_pDreamShareView);
 
@@ -966,6 +967,10 @@ RESULT DreamGarage::OnStopReceiving() {
 
 Error:
 	return r;
+}
+
+RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData) {
+	return m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData);
 }
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
