@@ -35,6 +35,7 @@ RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint
 	mouseInputStruct.dy = scrollPoint.y() * (_UI16_MAX / m_pxDesktopHeight);
 
 	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
+	// TODO: consistent scroll speed with browser scroll
 	mouseInputStruct.mouseData = 120 * pxYDiff;
 
 	inputStruct.mi = mouseInputStruct;
@@ -130,25 +131,27 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	SetAppName("DreamDesktopApp");
 	SetAppDescription("A Shared Desktop View");
 
-	// TODO: quad is in shareview/control area, just need texture
-	// Set up the quad
-	//m_pDesktopQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
-	m_pDesktopQuad = GetComposite()->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());	// these are all temp, just until merge with controlview/shareview
-	m_pDesktopQuad->SetPosition(0.0f, 0.0f, 0.0f);
-	m_pDesktopQuad->FlipUVVertical();
-
 	// Initialize texture
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
-	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
 
 	GetComposite()->SetVisible(true);
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 
-	// TODO: get this from Windows64App?
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream TestingRelease");		// This is really bad, need better way to get window handle
+	// TODO: get this from Windows64App or pre-compile header
+#ifdef _USE_TEST_APP
+#ifdef _DEBUG
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
+#else
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream TestingRelease");
+#endif
+#endif
+#ifndef _USE_TEST_APP
+	m_hwndDreamHandle = FindWindow(NULL, L"Dream Release");
+#endif
+
 	//CNM(m_hwndDreamHandle, "Unable to find the Dream window");
-	CNR(m_hwndDreamHandle, R_SKIPPED);									// but this will stop the crash at least
+	CNR(m_hwndDreamHandle, R_SKIPPED);	
 
 Error:
 	return r;
