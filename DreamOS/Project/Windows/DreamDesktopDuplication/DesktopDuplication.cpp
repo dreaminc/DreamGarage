@@ -217,7 +217,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	DestroyCursor(Cursor);
 
-	ShowWindow(pWindowHandle, nCmdShow);
+	//ShowWindow(pWindowHandle, nCmdShow);
 	UpdateWindow(pWindowHandle);
 
 	while (WM_QUIT != msg.message) {
