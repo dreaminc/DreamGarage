@@ -128,7 +128,7 @@ RESULT Windows64App::InitializeMouse() {
 	m_pSenseMouse = new Win64Mouse(this);
 	CNM(m_pSenseMouse, "Failed to allocate mouse");
 
-	// Initialize Mouse 
+	// Initialize Mouse
 	// Remove mouse capture.
 	// This effects the window responsiveness to drag, resize and focus event.
 	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
@@ -329,8 +329,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	} break;
 
 	case WM_COPYDATA: {
-
-		PCOPYDATASTRUCT pDataStruct;	
+		PCOPYDATASTRUCT pDataStruct;
 		pDataStruct = (PCOPYDATASTRUCT)lp;
 
 		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
@@ -341,7 +340,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData, m_desktoppxHeight, m_desktoppxWidth);
 
-			free(pMessageData);	
+			free(pMessageData);
 		}
 		else if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::RESIZE) {
 			DDCIPCMessage *pMessageData;
@@ -352,8 +351,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			m_desktoppxHeight = pMessageData->pxHeight;
 			m_pDesktopFrameData_n = m_pxWidth * m_pxHeight * 4;
 		}
-
-		return true;
+	return true;
 	} break;
 
 	default: {
@@ -657,5 +655,3 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	return r;
 }
-
-

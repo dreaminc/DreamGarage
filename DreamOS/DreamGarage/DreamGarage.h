@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
 class DreamDesktopApp;
@@ -78,14 +79,11 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
-	virtual RESULT OnShareAsset() override;
-	virtual RESULT OnCloseAsset() override;
-
-	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData) override;
 
 	// Desktop Sharing
 	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
+	virtual RESULT OnShareAsset() override;
+	virtual RESULT OnCloseAsset() override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
