@@ -15,42 +15,8 @@
 class quad;
 class texture;
 
-class DreamShareViewHandle : public DreamAppHandle {
-public:
-	// switch between loading screen and casted texture
-	RESULT SendLoadingEvent();
-	RESULT SendCastingEvent();
-	RESULT SendStopEvent();
-
-	RESULT SendShowEvent();
-	RESULT SendHideEvent();
-
-	RESULT RequestIsReceivingStream(bool &fReceivingStream);
-
-	// idea here is to set the texture being cast here while the 
-	// texture is updated elsewhere
-	RESULT SendCastTexture(std::shared_ptr<texture> pNewCastTexture);
-	std::shared_ptr<texture> RequestCastTexture();
-	RESULT SendVideoFrame(const void* pBuffer, int width, int height);
-	
-	RESULT RequestBeginStream();
-
-private:
-	virtual RESULT ShowLoadingTexture() = 0;
-	virtual RESULT ShowCastingTexture() = 0;
-	virtual RESULT HandleStopEvent() = 0;
-	virtual RESULT Show() = 0;
-	virtual RESULT Hide() = 0;
-	virtual RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) = 0;
-	virtual std::shared_ptr<texture> GetCastingTexture() = 0;
-	virtual RESULT IsReceivingStream(bool &fReceivingStream) = 0;
-	virtual RESULT BeginStream() = 0;
-	virtual RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height) = 0;
-};
-
 class DreamShareView :
 	public DreamApp<DreamShareView>,
-	public DreamShareViewHandle,
 	public DreamVideoStreamSubscriber
 {
 	friend class DreamAppManager;
@@ -67,15 +33,13 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
-	virtual DreamAppHandle *GetAppHandle() override;
-
 	// Handle Interface
-	virtual RESULT ShowLoadingTexture() override;
-	virtual RESULT ShowCastingTexture() override;
-	virtual RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) override;
-	virtual std::shared_ptr<texture> GetCastingTexture() override;
-	virtual RESULT Show() override;
-	virtual RESULT Hide() override;
+	RESULT ShowLoadingTexture();
+	RESULT ShowCastingTexture();
+	RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture);
+	std::shared_ptr<texture> GetCastingTexture();
+	RESULT Show();
+	RESULT Hide();
 
 	// Casting/Sharing
 	RESULT StartReceiving(PeerConnection *pPeerConnection);

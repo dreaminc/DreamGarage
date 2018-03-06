@@ -519,12 +519,7 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	DreamShareViewHandle *pShareViewHandle = nullptr;
-
 	CNR(m_pParentApp != nullptr, R_SKIPPED);
-
-	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
@@ -535,22 +530,12 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-	if (pShareViewHandle != nullptr) {
-	//	CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
-		CBR(GetSourceTexture().get() == pShareViewHandle->RequestCastTexture().get(), R_SKIPPED);
-		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
-	}
-	/*
-	if (IsStreaming()) {
-		CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
-	}
-	//*/
-//	}
+	// when the browser gets a paint event, it checks if its texture is currently shared
+	// if so, it tells the shared view to broadcast a frame
+	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 Error:
-	if (pShareViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-	}
 	return r;
 }
 

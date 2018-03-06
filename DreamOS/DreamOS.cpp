@@ -1114,3 +1114,11 @@ std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
 Error:
 	return nullptr;
 }
+
+RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+	CN(m_pDreamShareView);
+	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
+Error:
+	return r;
+}
