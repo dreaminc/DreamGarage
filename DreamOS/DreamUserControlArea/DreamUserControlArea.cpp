@@ -180,6 +180,27 @@ float DreamUserControlArea::GetSpacingSize() {
 	return m_spacingSize;
 }
 
+RESULT DreamUserControlArea::Show() {
+	RESULT r = R_PASS;
+
+	//TODO: animations
+	m_pControlView->GetComposite()->SetVisible(true);
+	m_pDreamTabView->GetComposite()->SetVisible(true);
+	m_pControlBar->GetComposite()->SetVisible(true);
+
+	return r;
+}
+
+RESULT DreamUserControlArea::Hide() {
+	RESULT r = R_PASS;
+
+	m_pControlView->GetComposite()->SetVisible(false);
+	m_pDreamTabView->GetComposite()->SetVisible(false);
+	m_pControlBar->GetComposite()->SetVisible(false);
+
+	return r;
+}
+
 RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	RESULT r = R_PASS;
 
@@ -202,9 +223,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
 		CR(m_pDreamUIBar->ShowRootMenu());
-		m_pControlBar->GetComposite()->SetVisible(false);
-		m_pDreamTabView->GetComposite()->SetVisible(false);
-		m_pControlView->GetComposite()->SetVisible(false);
+		CR(Hide());
 	} break;
 
 	case ControlEventType::CLOSE: {
@@ -217,13 +236,13 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::MAXIMIZE: {
-		m_pDreamTabView->GetComposite()->SetVisible(true);
-		m_pControlView->GetComposite()->SetVisible(true);
+		CR(Show());
 	} break;
 
 	case ControlEventType::MINIMIZE: {
-		m_pDreamTabView->GetComposite()->SetVisible(false);
-		m_pControlView->GetComposite()->SetVisible(false);
+		//TODO: change this with animations, control bar needs to still be visible here
+		CR(Hide());
+		m_pControlBar->GetComposite()->SetVisible(true);
 	} break;
 
 	case ControlEventType::SHARE: {
@@ -242,11 +261,11 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::URL: {
 		// dismiss everything(?) and pull up the keyboard
+		Hide();
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		m_pControlView->ShowKeyboard();
+		m_pControlView->m_fIsShareURL = true;
 		/*
-		auto pDreamOS = GetDOS();
-
-		CBR(CanPressButton(pButtonContext), R_SKIPPED);
-
 		CR(pDreamOS->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
 		CR(pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(pButtonContext->GetInteractionObject()));
 
@@ -439,7 +458,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::SendURL() {
+RESULT DreamUserControlArea::CreateBrowserSource() {
 	RESULT r = R_PASS;
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
@@ -449,6 +468,27 @@ RESULT DreamUserControlArea::SendURL() {
 	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
 
 
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::SetActiveBrowserURI() {
+	RESULT r = R_PASS;
+
+	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strTitle = "website";
+
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
+	CNR(pBrowser, R_SKIPPED);
+
+	CR(Show());
+
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, m_strURL, strTitle), "Failed to share environment asset");
+
+	m_strURL = "";
 
 Error:
 	return r;
@@ -465,10 +505,13 @@ Error:
 }
 
 RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+	
 	//TODO: multi-content
 	
 	//it is not safe to set the environment asset until after the browser is finished initializing
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
+	m_fHasOpenApp = true;
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {
 		pBrowser->PendEnvironmentAsset(pEnvironmentAsset);
@@ -481,13 +524,10 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	//m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
 	//m_pControlView->SetControlViewTexture(m_pActiveBrowser->GetScreenTexture());
 
-	//m_pControlView->Show();
-	m_pControlView->GetComposite()->SetVisible(true);
-	//m_pControlView->
-	m_pControlBar->GetComposite()->SetVisible(true);
-	m_pDreamTabView->GetComposite()->SetVisible(true);
+	CR(Show());
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::CloseActiveAsset() {
@@ -539,18 +579,25 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 
 			ResetAppComposite();
 
-			m_pDreamUserApp->SetHasOpenApp(true);
-			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			if (m_fHasOpenApp) {
+				Hide();
+			}
+			else {
+				m_pDreamUserApp->SetHasOpenApp(true);
+				m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			}
 		}
 		else {
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
 			if (m_pDreamUIBar->IsEmpty()) {
-				m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
-				m_pDreamUserApp->SetEventApp(nullptr);
+				if (m_fHasOpenApp) {
+					Show();
+				}
+				else {
+					m_pDreamUserApp->SetHasOpenApp(false);
+					m_pDreamUserApp->SetEventApp(nullptr);
+				}
 			}
-			m_pControlBar->GetComposite()->SetVisible(false);
-			m_pDreamTabView->GetComposite()->SetVisible(false);
-			m_pControlView->GetComposite()->SetVisible(false);
 		}
 	} break;
 

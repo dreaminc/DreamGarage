@@ -308,8 +308,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 			} 
 			m_pUserHandle->SendPreserveSharingState(true);
+			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->SendURL());
+				CR(m_pParentApp->CreateBrowserSource());
 			}
 		} break;
 	}

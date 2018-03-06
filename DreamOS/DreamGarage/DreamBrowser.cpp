@@ -218,7 +218,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::SendURL(std::string strURL) {
+RESULT DreamBrowser::CreateBrowserSource(std::string strURL) {
 	RESULT r = R_PASS;
 
 //	SetVisible(true);

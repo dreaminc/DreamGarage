@@ -83,7 +83,7 @@ public:
 	int GetPageWidth();
 
 	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
-	RESULT SendURL(std::string strURL);
+	RESULT CreateBrowserSource(std::string strURL);
 
 	virtual RESULT OnMouseMove(point mousePoint) override;
 	virtual RESULT OnClick(point ptDiff, bool fMouseDown) override;
