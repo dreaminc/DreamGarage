@@ -13,7 +13,7 @@ public:
 		RESIZE,
 		INVALID
 	};
-	
+
 	/*DDCIPCMessage::type GetMessageType() {
 		return m_body.m_msgType;
 	}
@@ -28,12 +28,12 @@ public:
 		unsigned int pxHeight;
 		unsigned char pDataBuffer[829440];
 	} m_body;*/
-	
+
 	DDCIPCMessage::type m_msgType;
 	unsigned int pxWidth;
 	unsigned int pxHeight;
 	unsigned char* pDataBuffer;
-	
+
 };
 
 #endif

@@ -195,6 +195,9 @@
     <Filter Include="DreamControlView">
       <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamGarage\DreamDesktopDuplicationApp">
+      <UniqueIdentifier>{e098da6a-702b-4db9-be71-1c0068c6a747}</UniqueIdentifier>
+    </Filter>
     <Filter Include="DreamShareView">
       <UniqueIdentifier>{a5c89bd6-b56b-4917-8ca7-0b81f1e3c36e}</UniqueIdentifier>
     </Filter>
@@ -991,6 +994,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp">
+      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2143,6 +2149,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>      
+    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
+      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamUserControlArea\DreamContentSource.h">
       <Filter>DreamUserControlArea</Filter>

@@ -6,7 +6,7 @@ using namespace DirectX;
 //
 // Constructor NULLs out all pointers & sets appropriate var vals
 //
-D3D11DesktopDuplicationOutputManager::D3D11DesktopDuplicationOutputManager() 
+D3D11DesktopDuplicationOutputManager::D3D11DesktopDuplicationOutputManager()
 {
 	// empty
 }
@@ -204,7 +204,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT outputToD
 	UINT OutputCount;
 	IDXGIOutput* pDxgiOutput = nullptr;
 	D3D11_TEXTURE2D_DESC DeskTexD;
-	
+
 	// Get DXGI resources
 	IDXGIDevice* pDxgiDevice = nullptr;
 	IDXGIAdapter* pDxgiAdapter = nullptr;
@@ -285,7 +285,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT outputToD
 		return DUPL_RETURN_ERROR_EXPECTED;
 	}
 
-	// Create shared texture for all duplication threads to draw into	
+	// Create shared texture for all duplication threads to draw into
 	RtlZeroMemory(&DeskTexD, sizeof(D3D11_TEXTURE2D_DESC));
 	DeskTexD.Width = pDeskBounds->right - pDeskBounds->left;
 	DeskTexD.Height = pDeskBounds->bottom - pDeskBounds->top;
@@ -437,10 +437,10 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
-	/*	This Draws the Mouse, disabling for Now
+	//*	This Draws the Mouse, disabling for Now
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
-		
+
 		if (PointerInfo->Visible) {
 		// Draw mouse into texture
 		Ret = DrawMouse(PointerInfo);
@@ -479,12 +479,12 @@ HANDLE D3D11DesktopDuplicationOutputManager::GetSharedHandle() {
 	// QI IDXGIResource interface to synchronized shared surface.
 	IDXGIResource* pDXGIResource = nullptr;
 	CR(m_pSharedSurf->QueryInterface(__uuidof(IDXGIResource), reinterpret_cast<void**>(&pDXGIResource)));
-	
+
 	// Obtain handle to IDXGIResource object.
 	pDXGIResource->GetSharedHandle(&Hnd);
 	pDXGIResource->Release();
 	pDXGIResource = nullptr;
-	
+
 Error:
 	return Hnd;
 }
@@ -528,11 +528,11 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 	shaderResourceViewDescription.Format = textureFrameFromSharedSurfaceDescription.Format;
 	shaderResourceViewDescription.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDescription.Texture2D.MostDetailedMip = textureFrameFromSharedSurfaceDescription.MipLevels - 1;
-	shaderResourceViewDescription.Texture2D.MipLevels = textureFrameFromSharedSurfaceDescription.MipLevels;	
-	
+	shaderResourceViewDescription.Texture2D.MipLevels = textureFrameFromSharedSurfaceDescription.MipLevels;
+
 	CRM(m_pDevice->CreateShaderResourceView(m_pSharedSurf, &shaderResourceViewDescription, &pShaderResourceView), "Failed to create shader resource when drawing a frame");
-	
-	// Set resources	
+
+	// Set resources
 	m_pDeviceContext->OMSetBlendState(nullptr, blendFactor, 0xffffffff);
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRTV, nullptr);
 	m_pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
@@ -546,7 +546,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 	initDataBufferDescription.ByteWidth = sizeof(VERTEX) * NUMVERTICES;
 	initDataBufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	initDataBufferDescription.CPUAccessFlags = 0;
-	
+
 	RtlZeroMemory(&subresourceInitData, sizeof(subresourceInitData));
 	subresourceInitData.pSysMem = Vertices;
 
@@ -554,9 +554,9 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 	CRM(m_pDevice->CreateBuffer(&initDataBufferDescription, &subresourceInitData, &pVertexBuffer), "Failed to create vertex buffer when drawing a frame");
 
 	m_pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &Stride, &Offset);
-	
+
 	// Draw textured quad onto render target
-	m_pDeviceContext->Draw(NUMVERTICES, 0);	
+	m_pDeviceContext->Draw(NUMVERTICES, 0);
 
 Error:
 	if (pShaderResourceView) {
@@ -658,7 +658,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 	// QI for IDXGISurface
 	CRM(pCopyBuffer->QueryInterface(__uuidof(IDXGISurface), (void **)&pCopySurface), "Failed to QI staging texture into IDXGISurface for pointer");
 
-	// Map pixels	
+	// Map pixels
 	CRM(pCopySurface->Map(&MappedSurface, DXGI_MAP_READ), "Failed to map surface for pointer");
 
 	// New mouseshape buffer
@@ -695,7 +695,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ProcessMonoMask(bool IsMono, _
 			}
 		}
 	}
-	
+
 	else {
 		UINT* Buffer32 = reinterpret_cast<UINT*>(pPtrInfo->PtrShapeBuffer);
 
@@ -739,7 +739,7 @@ Error:
 //
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* pPtrInfo) {
 	HRESULT r = S_OK;
-	
+
 	// Vars to be used
 	ID3D11Texture2D* pMouseTexture = nullptr;
 	ID3D11ShaderResourceView* pShaderResourceView = nullptr;
@@ -867,7 +867,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* pPtrI
 	// Create vertex buffer
 	CRM(m_pDevice->CreateBuffer(&bufferDescription, &subresourceInitData, &pVertexBufferMouse), "Failed to create mouse pointer vertex buffer in OutputManager");
 
-	// Set resources	
+	// Set resources
 	m_pDeviceContext->IASetVertexBuffers(0, 1, &pVertexBufferMouse, &Stride, &Offset);
 	m_pDeviceContext->OMSetBlendState(m_pBlendState, BlendFactor, 0xFFFFFFFF);
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRTV, nullptr);
@@ -938,7 +938,7 @@ Error:
 //
 DUPL_RETURN D3D11DesktopDuplicationOutputManager::MakeRTV() {
 	HRESULT r = S_OK;
-	
+
 	// Get backbuffer
 	ID3D11Texture2D* BackBuffer = nullptr;
 	CRM(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer)), "Failed to get backbuffer for making render target view in D3D11DesktopDuplicationOutputManager");

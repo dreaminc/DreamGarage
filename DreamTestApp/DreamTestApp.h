@@ -14,8 +14,8 @@
 
 class TestSuite;
 
-class DreamTestApp : 
-	public DreamOS, 
+class DreamTestApp :
+	public DreamOS,
 	public Subscriber<SenseKeyboardEvent>
 {
 public:

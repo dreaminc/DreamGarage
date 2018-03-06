@@ -39,6 +39,7 @@ class quad;
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
+	friend class DreamOSTestSuite;
 
 public:
 	DreamUserControlArea(DreamOS *pDreamOS, void *pContext = nullptr);
