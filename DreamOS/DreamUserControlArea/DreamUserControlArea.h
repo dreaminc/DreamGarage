@@ -147,6 +147,8 @@ private:
 
 	bool m_fCanPressButton[2];
 
+	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
+
 // layout variables
 private:
 	float m_spacingSize = SPACING_SIZE;

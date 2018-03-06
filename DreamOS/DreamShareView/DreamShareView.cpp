@@ -179,10 +179,6 @@ Error:
 	return r;
 }
 
-DreamAppHandle* DreamShareView::GetAppHandle() {
-	return (DreamShareViewHandle*)(this);
-}
-
 RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 

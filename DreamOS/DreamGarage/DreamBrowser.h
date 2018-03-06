@@ -138,6 +138,7 @@ public:
 
 	virtual std::shared_ptr<texture> GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;
+	RESULT SetCurrentAssetID(long assetID);
 
 	virtual RESULT CloseSource() override;
 

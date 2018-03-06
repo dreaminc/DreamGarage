@@ -46,18 +46,18 @@ public:
 	RESULT PendReceiving();
 	RESULT StopReceiving();
 	RESULT StopSending();
-	virtual RESULT IsReceivingStream(bool &fReceivingStream) override;
-	virtual RESULT HandleStopEvent() override;
+	RESULT IsReceivingStream(bool &fReceivingStream);
+	RESULT HandleStopEvent();
 
 	// App Messaging
-	virtual RESULT DreamShareView::BeginStream() override;
+	RESULT BeginStream();
 	RESULT BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
 
 	// Video Stream Subscriber
-	virtual RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height) override;
+	RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height);
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();

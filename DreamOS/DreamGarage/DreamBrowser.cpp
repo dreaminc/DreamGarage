@@ -434,6 +434,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
+	m_pBrowserTexture = m_pLoadingScreenTexture;
 
 	// Set up mouse / hand cursor model
 	///*
@@ -502,6 +503,11 @@ std::shared_ptr<texture> DreamBrowser::GetSourceTexture() {
 
 long DreamBrowser::GetCurrentAssetID() {
 	return m_assetID;
+}
+
+RESULT DreamBrowser::SetCurrentAssetID(long assetID) {
+	m_assetID = assetID;
+	return R_PASS;
 }
 
 RESULT DreamBrowser::CloseSource() {
