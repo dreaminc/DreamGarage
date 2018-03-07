@@ -150,14 +150,14 @@ RESULT DreamShareView::ShowCastingTexture() {
 RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) {
 	RESULT r = R_PASS;
 
-	if (pNewCastTexture == nullptr) {
-		CR(ShowLoadingTexture());
-	}
+	//if (pNewCastTexture == nullptr) {
+	//	CR(ShowLoadingTexture());
+	//}
 	//else { // if (!m_fReceivingStream) {
 	m_pCastTexture = pNewCastTexture;
 	//}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -186,6 +186,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	//	m_pDreamUserHandle->SendPreserveSharingState(false);
 
 	ShowCastingTexture();
+	m_pCastQuad->SetVisible(true);
 
 	// Switch to input
 	if (IsStreaming()) {
