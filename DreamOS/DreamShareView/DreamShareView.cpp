@@ -424,8 +424,12 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
 
 	// Update texture dimensions if needed
-	if (m_pCastTexture == nullptr || m_pCastTexture == m_pLoadingTexture) {
+	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
+	if ((int)m_pendingFrame.pDataBuffer_n != castBufferSize) {
+		m_pendingFrame.pxHeight = m_castpxHeight;
+		m_pendingFrame.pxWidth = m_castpxWidth;
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
+		/*
 		m_pCastTexture = GetComposite()->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
 			m_pendingFrame.pxWidth,
@@ -434,16 +438,16 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			4,
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
+		*/
+		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+		if (r != R_NOT_HANDLED) {
+			DEBUG_LINEOUT("Changed texture dimensions");
+		}
 	}
 	else {
 		if (m_pCastQuad->GetTextureDiffuse() != m_pCastTexture.get()) {
 			m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
 		}
-		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
-		if (r != R_NOT_HANDLED) {
-			DEBUG_LINEOUT("Changed texture dimensions");
-		}
-
 		CRM(m_pCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 	}
 
