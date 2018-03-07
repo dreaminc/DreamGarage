@@ -1115,6 +1115,13 @@ Error:
 	return nullptr;
 }
 
+RESULT DreamOS::SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture) {
+	if (m_pDreamShareView != nullptr) {
+		m_pDreamShareView->SetCastingTexture(pSharedTexture);
+	}
+	return R_PASS;
+}
+
 RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 	CN(m_pDreamShareView);

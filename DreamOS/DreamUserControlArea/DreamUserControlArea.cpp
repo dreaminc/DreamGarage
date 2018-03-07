@@ -94,8 +94,6 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
 
-	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-
 Error:
 	return r;
 }
@@ -249,6 +247,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::SHARE: {
 		// send share event with active browser
+		GetDOS()->SetSharedContentTexture(m_pActiveSource->GetSourceTexture());
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
@@ -341,12 +340,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 
 RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
 	if (pContext == m_pActiveSource.get()) {
-		if (pTexture != nullptr) {
-			m_pControlView->SetViewQuadTexture(pTexture);
-		}
-		else {
-			m_pControlView->SetViewQuadTexture(m_pLoadingScreenTexture);
-		}
+		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
 		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
@@ -448,8 +442,19 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 	pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
+	pBrowser->InitializeWithParent(this);
+	pBrowser->SetScope(strScope);
+	pBrowser->SetPath(m_strURL);
+
 	m_pActiveSource = pBrowser;
 	
+	// new browser can't be the current content
+	m_pControlBar->SetSharingFlag(false);
+
+	// TODO: may not be enough once browser typing is re-enabled
+	m_strURL = "";
+
 Error:
 	return r;
 }
@@ -510,20 +515,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	m_fHasOpenApp = true;
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {
-		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
-		pBrowser->InitializeWithParent(this);
-		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
-		//pBrowser->SetScope(pEnvironmentAsset->GetStorageProviderScope());
-		//pBrowser->SetPath(pEnvironmentAsset->GetPath());
-		//pBrowser->SetCurrentAssetID(pEnvironmentAsset->GetAssetID());
-
-		// new browser can't be the current content
-		m_pControlBar->SetSharingFlag(false);
-
-		// TODO: may not be enough once browser typing is re-enabled
-		m_strURL = "";
-
-//		pBrowser->PendEnvironmentAsset(pEnvironmentAsset);
+		pBrowser->PendEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
 		// TODO: desktop setup
