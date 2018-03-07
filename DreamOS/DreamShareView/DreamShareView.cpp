@@ -153,9 +153,9 @@ RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTextur
 	if (pNewCastTexture == nullptr) {
 		CR(ShowLoadingTexture());
 	}
-	else { // if (!m_fReceivingStream) {
-		m_pCastTexture = pNewCastTexture;
-	}
+	//else { // if (!m_fReceivingStream) {
+	m_pCastTexture = pNewCastTexture;
+	//}
 
 Error:
 	return r;
@@ -435,6 +435,9 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			(int)m_pendingFrame.pDataBuffer_n);
 	}
 	else {
+		if (m_pCastQuad->GetTextureDiffuse() != m_pCastTexture.get()) {
+			m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
+		}
 		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");
