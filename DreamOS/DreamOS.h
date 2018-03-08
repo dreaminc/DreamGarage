@@ -381,6 +381,8 @@ private:
 
 public:
 	virtual std::shared_ptr<texture> GetSharedContentTexture();
+	virtual RESULT SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture);
+	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 // System Applications
 private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard;

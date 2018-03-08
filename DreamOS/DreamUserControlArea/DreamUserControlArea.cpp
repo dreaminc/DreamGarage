@@ -247,6 +247,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::SHARE: {
 		// send share event with active browser
+		GetDOS()->SetSharedContentTexture(m_pActiveSource->GetSourceTexture());
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
@@ -527,6 +528,15 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	CR(Show());
 
 Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::OnReceiveAsset() {
+	RESULT r = R_PASS;
+	
+	// new browser can't be the current content
+	m_pControlBar->SetSharingFlag(false);
+
 	return r;
 }
 

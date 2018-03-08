@@ -434,6 +434,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
+	//m_pBrowserTexture = m_pLoadingScreenTexture;
+	
 
 	// Set up mouse / hand cursor model
 	///*
@@ -504,6 +506,11 @@ long DreamBrowser::GetCurrentAssetID() {
 	return m_assetID;
 }
 
+RESULT DreamBrowser::SetCurrentAssetID(long assetID) {
+	m_assetID = assetID;
+	return R_PASS;
+}
+
 RESULT DreamBrowser::CloseSource() {
 	RESULT r = R_PASS;
 
@@ -519,12 +526,7 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	DreamShareViewHandle *pShareViewHandle = nullptr;
-
 	CNR(m_pParentApp != nullptr, R_SKIPPED);
-
-	pShareViewHandle = dynamic_cast<DreamShareViewHandle*>(GetDOS()->RequestCaptureAppUnique("DreamShareView", this));
-
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
@@ -535,22 +537,12 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-	if (pShareViewHandle != nullptr) {
-	//	CBR(this == m_pParentApp->GetActiveBrowser().get(), R_SKIPPED);
-		CBR(GetSourceTexture().get() == pShareViewHandle->RequestCastTexture().get(), R_SKIPPED);
-		pShareViewHandle->SendVideoFrame(pBuffer, width, height);
-	}
-	/*
-	if (IsStreaming()) {
-		CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
-	}
-	//*/
-//	}
+	// when the browser gets a paint event, it checks if its texture is currently shared
+	// if so, it tells the shared view to broadcast a frame
+	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 Error:
-	if (pShareViewHandle != nullptr) {
-		GetDOS()->RequestReleaseAppUnique(pShareViewHandle, this);
-	}
 	return r;
 }
 

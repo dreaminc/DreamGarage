@@ -1070,7 +1070,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pTestContext->pDreamShareView->ShowLoadingTexture();
 		}
 		else {
-			pTestContext->pDreamShareView->SendCastingEvent();
+			pTestContext->pDreamShareView->ShowCastingTexture();
 		}
 
 		//m_pDreamOS->RequestReleaseAppUnique(pDreamShareViewHandle, this);

@@ -6,87 +6,6 @@
 #include "DreamShareViewMessage.h"
 #include "DreamControlView/DreamControlView.h"
 
-RESULT DreamShareViewHandle::SendCastingEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowCastingTexture());
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::SendLoadingEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowLoadingTexture());
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::SendStopEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HandleStopEvent());
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::SendShowEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(Show());
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::SendHideEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(Hide());
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::RequestIsReceivingStream(bool &fReceivingStream) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(IsReceivingStream(fReceivingStream));
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::SendCastTexture(std::shared_ptr<texture> pNewCastTexture) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetCastingTexture(pNewCastTexture));
-Error:
-	return r;
-}
-
-std::shared_ptr<texture> DreamShareViewHandle::RequestCastTexture() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-
-	return GetCastingTexture();
-Error:
-	return nullptr;
-}
-
-RESULT DreamShareViewHandle::SendVideoFrame(const void* pBuffer, int width, int height) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(BroadcastVideoFrame(pBuffer, width, height));
-Error:
-	return r;
-}
-
-RESULT DreamShareViewHandle::RequestBeginStream() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(BeginStream());
-Error:
-	return r;
-}
-
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
 {
@@ -231,14 +150,14 @@ RESULT DreamShareView::ShowCastingTexture() {
 RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) {
 	RESULT r = R_PASS;
 
-	if (pNewCastTexture == nullptr) {
-		CR(ShowLoadingTexture());
-	}
-	else { // if (!m_fReceivingStream) {
-		m_pCastTexture = pNewCastTexture;
-	}
+	//if (pNewCastTexture == nullptr) {
+	//	CR(ShowLoadingTexture());
+	//}
+	//else { // if (!m_fReceivingStream) {
+	m_pCastTexture = pNewCastTexture;
+	//}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -260,10 +179,6 @@ Error:
 	return r;
 }
 
-DreamAppHandle* DreamShareView::GetAppHandle() {
-	return (DreamShareViewHandle*)(this);
-}
-
 RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -271,6 +186,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	//	m_pDreamUserHandle->SendPreserveSharingState(false);
 
 	ShowCastingTexture();
+	m_pCastQuad->SetVisible(true);
 
 	// Switch to input
 	if (IsStreaming()) {
@@ -305,6 +221,7 @@ Error:
 
 RESULT DreamShareView::PendReceiving() {
 	RESULT r = R_PASS;
+	ShowCastingTexture();
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
 
@@ -508,8 +425,12 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
 
 	// Update texture dimensions if needed
-	if (m_pCastTexture == nullptr || m_pCastTexture == m_pLoadingTexture) {
+	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
+	if ((int)m_pendingFrame.pDataBuffer_n != castBufferSize) {
+		m_pendingFrame.pxHeight = m_castpxHeight;
+		m_pendingFrame.pxWidth = m_castpxWidth;
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
+		/*
 		m_pCastTexture = GetComposite()->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
 			m_pendingFrame.pxWidth,
@@ -518,13 +439,16 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			4,
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
-	}
-	else {
+		*/
 		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");
 		}
-
+	}
+	else {
+		if (m_pCastQuad->GetTextureDiffuse() != m_pCastTexture.get()) {
+			m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
+		}
 		CRM(m_pCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 	}
 

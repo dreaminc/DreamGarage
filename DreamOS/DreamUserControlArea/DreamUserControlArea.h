@@ -108,6 +108,7 @@ public:
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 	RESULT CloseActiveAsset();
+	RESULT OnReceiveAsset();
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
@@ -146,6 +147,8 @@ private:
 	bool m_fHasOpenApp;
 
 	bool m_fCanPressButton[2];
+
+	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 
 // layout variables
 private:
