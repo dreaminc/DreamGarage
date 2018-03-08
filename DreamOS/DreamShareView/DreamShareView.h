@@ -74,7 +74,7 @@ protected:
 	static DreamShareView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768-red.png";
+	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
 
 private:
 	// Quad related members

@@ -105,7 +105,7 @@ public:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 public:
-	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768-red.png";
+	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
 
 	//TODO: potentially move these into user app or dream app
 	const wchar_t *k_wszOculusOverlayLeft = L"left-controller-overlay-active.png";
