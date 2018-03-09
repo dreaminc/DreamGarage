@@ -351,12 +351,7 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
-	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
-
-	//m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
 	m_ptVisiblePosition = point(0.0f, 0.0f, 0.0f);
-
-	//m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f);
 
 	m_pViewQuad->SetMaterialAmbient(0.75f);
@@ -673,10 +668,9 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	float viewHeight = m_pViewQuad->GetHeight();
 	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetPXHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
-	textBoxYOffset -= 0.25 * viewHeight;
+	textBoxYOffset -= 0.25 * viewHeight; // shift closer to text box
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
-	float angle = 58.0f * (float)M_PI / 180.0f;
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
 	if (m_pKeyboardHandle == nullptr) {
