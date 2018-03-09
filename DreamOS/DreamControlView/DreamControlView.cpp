@@ -353,9 +353,11 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
 
-	m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+	//m_ptVisiblePosition = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+	m_ptVisiblePosition = point(0.0f, 0.0f, 0.0f);
 
-	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+	//m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f);
 
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 	m_pViewQuad->FlipUVVertical();
@@ -669,10 +671,13 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	}
 	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
-	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetPXHeight() / VIEW_HEIGHT);	// scaled with ControlViewQuad dimensions
-	ptTypingOffset = point(0.0f, -VIEW_HEIGHT / 2.0f, -0.05f);	// so that it'll appear past the keyboard quad
+	float viewHeight = m_pViewQuad->GetHeight();
+	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetPXHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
+	textBoxYOffset -= 0.25 * viewHeight;
+	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
-	ptTypingPosition = ptTypingOffset + point(0.0f, textBoxYOffset, 0.0f);
+	float angle = 58.0f * (float)M_PI / 180.0f;
+	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
@@ -692,6 +697,10 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 Error:
 	return r;
+}
+
+point DreamControlView::GetLastEvent() {
+	return point(m_ptLastEvent.x, m_ptLastEvent.y, 0.0f);
 }
 
 WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {

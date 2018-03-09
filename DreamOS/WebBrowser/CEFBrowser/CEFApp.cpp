@@ -159,6 +159,10 @@ void CEFApp::OnFocusedNodeChanged(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<C
 
 		cefProcessMessageArguments->SetBool(3, pCEFDOMNode->IsEditable());
 
+		//TODO: should also use the height and y coordinate of this field
+		// to properly set the position of the screen during OnNodeFocusChanged
+		//pCEFDOMNode->GetElementBounds();
+
 		int cefDOMNodeType = pCEFDOMNode->GetType();
 		cefProcessMessageArguments->SetInt(4, cefDOMNodeType);
 	}
