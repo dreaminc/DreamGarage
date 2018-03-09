@@ -223,6 +223,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
 		CR(m_pDreamUIBar->ShowRootMenu());
+		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 		CR(Hide());
 	} break;
 
@@ -353,7 +354,25 @@ RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
 }
 
 RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	m_fKeyboardUp = true;
+	//CR(m_pDreamUserApp->GetKeyboard()->Show());
+	point ptLastEvent = m_pControlView->GetLastEvent();
+	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
+		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) {
+		OnClick(ptLastEvent, false);
+		OnClick(ptLastEvent, true);
+	}
+	else {
+		// TODO: this should probably be moved into the menu kb_enter
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
+		CR(m_pControlBar->GetComposite()->SetVisible(false));
+	}
+
+Error:
+	return r;
 }
 
 bool DreamUserControlArea::IsContentVisible() {
@@ -495,6 +514,20 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::HideWebsiteTyping() {
+	RESULT r = R_PASS;
+
+	if (m_fKeyboardUp) {
+		CR(m_pDreamUserApp->GetKeyboard()->Hide());
+		CR(m_pControlView->HandleKeyboardDown());
+		m_fKeyboardUp = false;
+		CR(Show());
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::ResetAppComposite() {
 	RESULT r = R_PASS;
 
@@ -584,8 +617,13 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	switch (pSubscriberEvent->m_eventType) {
 	case INTERACTION_EVENT_MENU: {
 		CNR(m_pDreamUIBar, R_SKIPPED);
-		if (m_pDreamUIBar->IsEmpty()) {
+
+		if (m_fKeyboardUp) {
+			HideWebsiteTyping();
+		}
+		else if (m_pDreamUIBar->IsEmpty()) {
 			CR(m_pDreamUIBar->ShowRootMenu());
+			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 
 			ResetAppComposite();
 
@@ -594,7 +632,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			}
 			else {
 				m_pDreamUserApp->SetHasOpenApp(true);
-				m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			}
 		}
 		else {
@@ -617,14 +654,14 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
 
 		//TODO: re-enable typing in the browser
-		/*
-		if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
+		//*
+		if (m_fKeyboardUp) {
 			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
 			CBR(chkey != 0, R_SKIPPED);
 			CBR(chkey != SVK_CONTROL, R_SKIPPED);
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
-			CR(SendKeyCharacter(chkey, true));
+			CR(m_pActiveSource->OnKeyPress(chkey, true));
 		}
 		else {
 			//*/
@@ -641,7 +678,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			else {
 				m_strURL += chkey;
 			}
-		//}
+		}
 
 	}
 	}

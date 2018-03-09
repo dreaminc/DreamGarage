@@ -297,9 +297,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
-	CR(InitializeKeyboard());
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
 	CN(m_pDreamUserControlArea);
+	CR(InitializeKeyboard());
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 Error:

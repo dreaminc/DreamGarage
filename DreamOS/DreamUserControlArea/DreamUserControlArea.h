@@ -81,6 +81,7 @@ public:
 	RESULT RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle);
 	RESULT CreateBrowserSource();
 	RESULT SetActiveBrowserURI();
+	RESULT HideWebsiteTyping();
 
 // DreamControlBar
 public:
@@ -149,6 +150,8 @@ private:
 	bool m_fCanPressButton[2];
 
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
+
+	bool m_fKeyboardUp = false;
 
 // layout variables
 private:

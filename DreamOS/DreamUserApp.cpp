@@ -206,13 +206,6 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	}
 
-	{
-		auto keyUIDs = pDreamOS->GetAppUID("UIKeyboard");
-		CBR(keyUIDs.size() == 1, R_SKIPPED);
-		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(pDreamOS->CaptureApp(keyUIDs[0], this));
-
-		//CN(m_pKeyboardHandle);
-	}
 
 
 Error:
@@ -252,6 +245,14 @@ RESULT DreamUserApp::Update(void *pContext) {
 	// update user interaction ray
 	auto pCameraNode = GetDOS()->GetCameraNode();
 	CN(pCameraNode);
+
+	if (m_pKeyboardHandle == nullptr) {
+		auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
+		CBR(keyUIDs.size() == 1, R_SKIPPED);
+		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
+
+		//CN(m_pKeyboardHandle);
+	}
 	
 	/*
 	GetComposite()->SetPosition(pCameraNode->GetPosition());

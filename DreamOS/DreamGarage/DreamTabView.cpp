@@ -138,6 +138,7 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	auto pDreamOS = GetDOS();
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(m_pParentApp->HideWebsiteTyping());
 
 	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
 
