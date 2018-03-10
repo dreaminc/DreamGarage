@@ -59,12 +59,13 @@ RESULT hand::Initialize(HAND_TYPE type) {
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
 
-#else
 	// This is the "hitbox" for the controller overlay 
 	m_pPhantomVolume = MakeVolume(m_volumeWidth, m_volumeHeight, m_volumeDepth);	
 	CN(m_pPhantomVolume);
 	m_pPhantomVolume->SetVisible(false);
 	AddObject(m_pPhantomVolume);
+
+#else
 
 	//m_pModel = AddComposite();
 	//m_pModel->AddVolume(0.02f);
