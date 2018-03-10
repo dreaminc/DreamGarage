@@ -137,7 +137,10 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	auto tabTexture = pContent->GetSourceTexture().get();
 	auto pDreamOS = GetDOS();
 
-	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	if (!m_fForceContentFocus) {
+		CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	}
+	m_fForceContentFocus = false;
 
 	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
 
@@ -179,6 +182,14 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 
 Error:
 	return r;
+}
+
+RESULT DreamTabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent) {
+	if (m_appToTabMap.count(pContent) > 0) {
+		m_fForceContentFocus = true;
+		SelectTab(m_appToTabMap[pContent].get(), nullptr);
+	}
+	return R_PASS;
 }
 
 RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent) {

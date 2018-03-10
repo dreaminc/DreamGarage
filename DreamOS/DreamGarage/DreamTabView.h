@@ -51,6 +51,7 @@ public:
 	std::shared_ptr<DreamContentSource> RemoveContent();
 
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
+	RESULT SelectByContent(std::shared_ptr<DreamContentSource> pContent);
 
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
@@ -73,6 +74,8 @@ private:
 	float m_borderHeight = TAB_BORDER_HEIGHT;
 	float m_tabWidth = TAB_WIDTH;
 	float m_tabHeight = TAB_HEIGHT;
+
+	bool m_fForceContentFocus = false;
 
 	point m_ptMostRecent;
 };

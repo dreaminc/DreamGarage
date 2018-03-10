@@ -972,7 +972,13 @@ Error:
 }
 
 RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
-	return m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
+	RESULT r = R_PASS;
+	CN(m_pDreamUserControlArea);
+	
+	m_pDreamUserControlArea->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
+	
+Error:
+	return r;
 }
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {

@@ -24,7 +24,9 @@ public:
 	virtual long GetCurrentAssetID() = 0;
 
 	virtual RESULT CloseSource() = 0;
-
+	
+	virtual int GetPXWidth() = 0;
+	virtual int GetPXHeight() = 0;
 };
 
 #endif // ! DREAM_CONTENT_SOURCE_H_
