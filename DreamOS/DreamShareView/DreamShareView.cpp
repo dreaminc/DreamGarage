@@ -427,8 +427,8 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	// Update texture dimensions if needed
 	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
 	if ((int)m_pendingFrame.pDataBuffer_n != castBufferSize) {
-		m_pendingFrame.pxHeight = m_castpxHeight;
-		m_pendingFrame.pxWidth = m_castpxWidth;
+		m_castpxHeight = m_pendingFrame.pxHeight;
+		m_castpxWidth = m_pendingFrame.pxWidth;
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
 		/*
 		m_pCastTexture = GetComposite()->MakeTexture(

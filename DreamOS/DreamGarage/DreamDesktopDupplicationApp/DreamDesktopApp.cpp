@@ -341,10 +341,12 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);
 
 Error:
+	/*
 	if (m_pFrameDataBuffer != nullptr) {
 		free(m_pFrameDataBuffer);
 		m_pFrameDataBuffer = nullptr;
 	}
+	//*/
 
 	return r;
 }
