@@ -11,6 +11,8 @@
 
 #include "Primitives/matrix/RotationMatrix.h"
 
+class OGLSkybox;
+
 class OGLProgramSkyboxScatter : public OGLProgram {
 public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp);
@@ -35,6 +37,8 @@ private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 	OGLFramebuffer* m_pOGLFramebuffer = nullptr;
+
+	OGLSkybox *m_pSkybox = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

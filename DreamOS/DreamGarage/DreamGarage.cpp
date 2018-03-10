@@ -103,7 +103,6 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 	// Connect output as pass-thru to internal blend program
@@ -225,8 +224,6 @@ RESULT DreamGarage::LoadScene() {
 
 	CR(SetupUserModelPool());
 	
-	AddSkybox();
-
 	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight->EnableShadows();
 

@@ -8,6 +8,7 @@
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
+#include "OGLSkybox.h"
 
 OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglskyboxscatter")
@@ -31,6 +32,9 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_intViewWidth")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_intViewHeight")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_vecSunDirection")));
+
+	m_pSkybox = new OGLSkybox(m_pParentImp);
+	CN(m_pSkybox);
 
 	// Framebuffer Output
 	/*
@@ -65,7 +69,6 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 	//TODO: CR(MakeInput("lights"));
 
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs
@@ -82,19 +85,6 @@ Error:
 RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
-
-	std::vector<light*> *pLights = nullptr;
-	pObjectStore->GetLights(pLights);
-
-	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
-
-	skybox *pSkybox = nullptr;
-	CR(pObjectStore->GetSkybox(pSkybox));
-
-	if (pSkybox == nullptr)
-		return r;
-
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
@@ -102,13 +92,10 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 		m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
 	}
 
-	SetLights(pLights);
-
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
-	//RenderObjectStore(m_pSceneGraph);
-	CR(RenderObject(pSkybox));
+	CR(RenderObject(m_pSkybox));
 
 	UnbindFramebuffer();
 
