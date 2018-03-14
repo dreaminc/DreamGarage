@@ -25,9 +25,10 @@
 
 class quad;
 class texture;
-
+class DreamUserControlArea;
 class DreamUserHandle;
 class AudioPacket;
+class EnvironmentAsset;
 
 class DreamDesktopApp :
 	public DreamApp<DreamDesktopApp>,
@@ -58,6 +59,9 @@ public:
 	virtual RESULT SetPath(std::string strPath) override;
 	virtual long GetCurrentAssetID() override;
 
+	virtual int GetPXHeight() override;
+	virtual int GetPXWidth() override;
+
 	virtual RESULT CloseSource() override;
 
 	// InteractionObjectEvent
@@ -72,9 +76,12 @@ public:
 	RESULT StartDuplicationProcess();
 	RESULT SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msgType);
 
+	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	//RESULT FadeQuadToBlack();
 
 	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
+
+	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
 	float GetWidth();
 	float GetHeight();
@@ -112,6 +119,7 @@ private:
 	double m_msTimeDelay = 2000;
 
 	bool m_fDesktopDuplicationIsRunning = false;
+	DreamUserControlArea *m_pParentApp = nullptr;
 
 	// Window
 	HWND m_hwndDreamHandle = nullptr;

@@ -435,9 +435,16 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 				//m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
-				m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
-				CN(m_pKeyboardHandle);
-				CR(m_pKeyboardHandle->Show());
+				if (strTitle == "Desktop") {
+					if (m_pParentApp != nullptr) {
+						CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
+					}
+				}
+				else if (strTitle == "Website") {
+					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+					CN(m_pKeyboardHandle);
+					CR(m_pKeyboardHandle->Show());
+				}
 
 			}
 //*/

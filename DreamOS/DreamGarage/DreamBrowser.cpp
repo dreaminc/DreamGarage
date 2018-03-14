@@ -622,6 +622,14 @@ float DreamBrowser::GetWidth() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
+int DreamBrowser::GetPXWidth() {
+	return m_browserWidth;
+}
+
+int DreamBrowser::GetPXHeight() {
+	return m_browserHeight;
+}
+
 vector DreamBrowser::GetNormal() {
 	return m_vNormal;
 }

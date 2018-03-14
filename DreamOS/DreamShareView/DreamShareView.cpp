@@ -427,10 +427,10 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	// Update texture dimensions if needed
 	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
 	if ((int)m_pendingFrame.pDataBuffer_n != castBufferSize) {
-		m_pendingFrame.pxHeight = m_castpxHeight;
-		m_pendingFrame.pxWidth = m_castpxWidth;
+		m_castpxHeight = m_pendingFrame.pxHeight;
+		m_castpxWidth = m_pendingFrame.pxWidth;
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
-		/*
+		//*
 		m_pCastTexture = GetComposite()->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
 			m_pendingFrame.pxWidth,
@@ -439,7 +439,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			4,
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
-		*/
+		//*/
 		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");

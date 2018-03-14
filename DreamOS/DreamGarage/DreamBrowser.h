@@ -126,6 +126,9 @@ public:
 	virtual RESULT SetScope(std::string strScope) override;
 	virtual RESULT SetPath(std::string strPath) override;
 
+	virtual int GetPXHeight() override;
+	virtual int GetPXWidth() override;
+
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	virtual RESULT SetURI(std::string strURI);
