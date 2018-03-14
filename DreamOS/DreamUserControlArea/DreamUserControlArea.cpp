@@ -30,7 +30,6 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-
 	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
@@ -457,7 +456,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 	if (m_pActiveSource != nullptr) {													// If content is already open
-		if (strTitle == "Desktop" && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
+		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
 			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
 			}	
@@ -468,7 +467,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		
 	}
 
-	if (strTitle == "Desktop" && m_pDreamDesktop == nullptr) {
+	if (strTitle == m_strDesktopTitle && m_pDreamDesktop == nullptr) {
 		m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
 		m_pDreamDesktop->InitializeWithParent(this);
 		m_pActiveSource = m_pDreamDesktop;
@@ -476,7 +475,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		m_pControlBar->SetSharingFlag(false);
 	}
 
-	else if (strTitle == "website") {
+	else if (strTitle == m_strWebsiteTitle) {
 		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
 		
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
@@ -502,7 +501,7 @@ RESULT DreamUserControlArea::CreateBrowserSource() {
 	RESULT r = R_PASS;
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
-	std::string strTitle = "website";
+	std::string strTitle = m_strWebsiteTitle;
 
 
 	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
@@ -517,7 +516,7 @@ RESULT DreamUserControlArea::SetActiveBrowserURI() {
 	RESULT r = R_PASS;
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
-	std::string strTitle = "website";
+	std::string strTitle = m_strWebsiteTitle;
 
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	CNR(pBrowser, R_SKIPPED);

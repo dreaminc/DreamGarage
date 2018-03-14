@@ -32,14 +32,10 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 				}
 			}
 
-			if (//jsonMenuNode.find("external_request/url") != jsonMenuNode.end() &&
-				jsonMenuNode["/external_request/url"_json_pointer].is_string()) {
-
+			if (jsonMenuNode["/external_request/url"_json_pointer].is_string())
 				m_strURL = jsonMenuNode["/external_request/url"_json_pointer].get<std::string>();
-			}
-			if (//jsonMenuNode.find("external_request/headers") != jsonMenuNode.end() &&
-				jsonMenuNode["/external_request/headers"_json_pointer].is_object()) {
-
+			
+			if (jsonMenuNode["/external_request/headers"_json_pointer].is_object()) {
 				auto j = jsonMenuNode["/external_request/headers"_json_pointer].get<std::multimap<std::string, nlohmann::json>>();
 				for (const auto it : j) {
 					if (it.second.is_string()) {

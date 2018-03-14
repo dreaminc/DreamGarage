@@ -165,7 +165,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	// Just a catch-all in cases where shutdown didn't happen 
 	//*
 	m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
-	if (m_hwndDesktopHandle != NULL) {
+	if (m_hwndDesktopHandle != nullptr) {
 		TerminateProcess(m_hwndDesktopHandle, 0);
 	}
 	//*/

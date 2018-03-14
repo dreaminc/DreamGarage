@@ -36,6 +36,8 @@ class quad;
 #define VIEW_ANGLE 32.0f
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
+#define TITLEDESKTOP "Desktop"
+#define TITLEWEBSITE "website"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
@@ -169,6 +171,9 @@ private:
 	float m_baseHeight;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
+
+	std::string m_strDesktopTitle = TITLEDESKTOP;
+	std::string m_strWebsiteTitle = TITLEWEBSITE;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_

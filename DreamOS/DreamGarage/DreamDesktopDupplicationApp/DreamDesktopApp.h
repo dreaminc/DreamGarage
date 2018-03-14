@@ -20,8 +20,8 @@
 #include "Sense/SenseController.h"
 #include "Primitives/TextEntryString.h"
 
-#define DESKTOP_PXWIDTH 3840;
-#define DESKTOP_PXHEIGHT 2160;
+#define DESKTOP_PXWIDTH 1920;
+#define DESKTOP_PXHEIGHT 1080;
 
 class quad;
 class texture;
