@@ -31,6 +31,7 @@ RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint
 	inputStruct.type = INPUT_MOUSE;
 
 	MOUSEINPUT mouseInputStruct;
+	CBR(m_fDesktopDuplicationIsRunning, R_SKIPPED);
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	mouseInputStruct.dx = scrollPoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
@@ -54,6 +55,7 @@ RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
 	inputStruct.type = INPUT_KEYBOARD;
 
 	KEYBDINPUT keyboardInputStruct;
+	CBR(m_fDesktopDuplicationIsRunning, R_SKIPPED);
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	// Set up generic keyboard event
@@ -79,6 +81,7 @@ RESULT DreamDesktopApp::OnMouseMove(point mousePoint) {
 	inputStruct.type = INPUT_MOUSE;
 
 	MOUSEINPUT mouseInputStruct;
+	CBR(m_fDesktopDuplicationIsRunning, R_SKIPPED);
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	mouseInputStruct.dx = mousePoint.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
@@ -100,6 +103,7 @@ RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
 	inputStruct.type = INPUT_MOUSE;
 
 	MOUSEINPUT mouseInputStruct;
+	CBR(m_fDesktopDuplicationIsRunning, R_SKIPPED);
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	mouseInputStruct.dx = ptDiff.x() * (_UI16_MAX / m_pxDesktopWidth);		// Windows desktop is mapped to a 65535 x 65535 
@@ -250,7 +254,6 @@ RESULT DreamDesktopApp::SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msg
 	DWORD dwError = GetLastError();
 
 	CBR(dwError == ERROR_SUCCESS, R_SKIPPED);
-	m_fDesktopDuplicationIsRunning = true;
 
 Error:
 	return r;
