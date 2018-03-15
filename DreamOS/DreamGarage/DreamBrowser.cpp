@@ -614,19 +614,19 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	return R_PASS;
 }
 
-float DreamBrowser::GetHeight() {
+float DreamBrowser::GetHeightFromAspectDiagonal() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-float DreamBrowser::GetWidth() {
+float DreamBrowser::GetWidthFromAspectDiagonal() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-int DreamBrowser::GetPXWidth() {
+int DreamBrowser::GetWidth() {
 	return m_browserWidth;
 }
 
-int DreamBrowser::GetPXHeight() {
+int DreamBrowser::GetHeight() {
 	return m_browserHeight;
 }
 

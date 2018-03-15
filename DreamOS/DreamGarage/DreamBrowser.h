@@ -115,8 +115,8 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
-	float GetWidth();
-	float GetHeight();
+	float GetWidthFromAspectDiagonal();
+	float GetHeightFromAspectDiagonal();
 	vector GetNormal();
 	point GetOrigin();
 
@@ -126,8 +126,8 @@ public:
 	virtual RESULT SetScope(std::string strScope) override;
 	virtual RESULT SetPath(std::string strPath) override;
 
-	virtual int GetPXHeight() override;
-	virtual int GetPXWidth() override;
+	virtual int GetHeight() override;
+	virtual int GetWidth() override;
 
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);

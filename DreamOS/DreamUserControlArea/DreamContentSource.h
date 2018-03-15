@@ -25,8 +25,8 @@ public:
 
 	virtual RESULT CloseSource() = 0;
 	
-	virtual int GetPXWidth() = 0;
-	virtual int GetPXHeight() = 0;
+	virtual int GetWidth() = 0;
+	virtual int GetHeight() = 0;
 };
 
 #endif // ! DREAM_CONTENT_SOURCE_H_

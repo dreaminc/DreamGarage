@@ -71,8 +71,8 @@ public:
 
 // DreamControlView
 public:
-	int GetPXWidth();
-	int GetPXHeight();
+	int GetWidth();
+	int GetHeight();
 
 	RESULT OnClick(point ptContact, bool fMouseDown);
 	RESULT OnMouseMove(point mousePoint);

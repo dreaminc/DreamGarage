@@ -93,22 +93,22 @@ DUPL_RETURN D3D11DesktopDuplicationManager::GetMouse(_Inout_ PTR_INFO* PtrInfo, 
 		return DUPL_RETURN_SUCCESS;
 	}
 
-	bool UpdatePosition = true;
+	bool fUpdatePosition = true;
 
 	// Make sure we don't update pointer position wrongly
 	// If pointer is invisible, make sure we did not get an update from another output that the last time that said pointer
 	// was visible, if so, don't set it to invisible or update.
 	if (!pFrameInfo->PointerPosition.Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber)) {
-		UpdatePosition = false;
+		fUpdatePosition = false;
 	}
 
 	// If two outputs both say they have a visible, only update if new update has newer timestamp
 	if (pFrameInfo->PointerPosition.Visible && PtrInfo->Visible && (PtrInfo->WhoUpdatedPositionLast != m_OutputNumber) && (PtrInfo->LastTimeStamp.QuadPart > pFrameInfo->LastMouseUpdateTime.QuadPart)) {
-		UpdatePosition = false;
+		fUpdatePosition = false;
 	}
 
 	// Update position
-	if (UpdatePosition) {
+	if (fUpdatePosition) {
 		PtrInfo->Position.x = pFrameInfo->PointerPosition.Position.x + m_OutputDesc.DesktopCoordinates.left - OffsetX;
 		PtrInfo->Position.y = pFrameInfo->PointerPosition.Position.y + m_OutputDesc.DesktopCoordinates.top - OffsetY;
 		PtrInfo->WhoUpdatedPositionLast = m_OutputNumber;

@@ -399,12 +399,12 @@ Error:
 	return r;
 }
 
-int DreamUserControlArea::GetPXWidth() {
-	return m_pActiveSource->GetPXWidth();
+int DreamUserControlArea::GetWidth() {
+	return m_pActiveSource->GetWidth();
 }
 
-int DreamUserControlArea::GetPXHeight() {
-	return m_pActiveSource->GetPXHeight();
+int DreamUserControlArea::GetHeight() {
+	return m_pActiveSource->GetHeight();
 }
 
 RESULT DreamUserControlArea::OnClick(point ptContact, bool fMouseDown) {

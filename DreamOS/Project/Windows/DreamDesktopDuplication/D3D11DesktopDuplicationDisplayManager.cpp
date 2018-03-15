@@ -1,6 +1,5 @@
 #include "D3D11DesktopDuplicationDisplayManager.h"
 #include "RESULT/EHM.h"
-using namespace DirectX;
 
 //
 // Constructor
@@ -85,9 +84,8 @@ void D3D11DesktopDuplicationDisplayManager::SetMoveRect(_Out_ RECT* pSrcRect, _O
 		pSrcRect->right = pMoveRect->SourcePoint.x + pMoveRect->DestinationRect.right - pMoveRect->DestinationRect.left;
 		pSrcRect->bottom = pMoveRect->SourcePoint.y + pMoveRect->DestinationRect.bottom - pMoveRect->DestinationRect.top;
 
-		*pDestRect = pMoveRect->DestinationRect;
-		break;
-	}
+		*pDestRect = pMoveRect->DestinationRect;	
+	} break;
 	case DXGI_MODE_ROTATION_ROTATE90: {
 		pSrcRect->left = textureHeight - (pMoveRect->SourcePoint.y + pMoveRect->DestinationRect.bottom - pMoveRect->DestinationRect.top);
 		pSrcRect->top = pMoveRect->SourcePoint.x;
@@ -98,8 +96,7 @@ void D3D11DesktopDuplicationDisplayManager::SetMoveRect(_Out_ RECT* pSrcRect, _O
 		pDestRect->top = pMoveRect->DestinationRect.left;
 		pDestRect->right = textureHeight - pMoveRect->DestinationRect.top;
 		pDestRect->bottom = pMoveRect->DestinationRect.right;
-		break;
-	}
+	} break;
 	case DXGI_MODE_ROTATION_ROTATE180: {
 		pSrcRect->left = textureWidth - (pMoveRect->SourcePoint.x + pMoveRect->DestinationRect.right - pMoveRect->DestinationRect.left);
 		pSrcRect->top = textureHeight - (pMoveRect->SourcePoint.y + pMoveRect->DestinationRect.bottom - pMoveRect->DestinationRect.top);
@@ -110,8 +107,7 @@ void D3D11DesktopDuplicationDisplayManager::SetMoveRect(_Out_ RECT* pSrcRect, _O
 		pDestRect->top = textureHeight - pMoveRect->DestinationRect.bottom;
 		pDestRect->right = textureWidth - pMoveRect->DestinationRect.left;
 		pDestRect->bottom = textureHeight - pMoveRect->DestinationRect.top;
-		break;
-	}
+	} break;
 	case DXGI_MODE_ROTATION_ROTATE270: {
 		pSrcRect->left = pMoveRect->SourcePoint.x;
 		pSrcRect->top = textureWidth - (pMoveRect->SourcePoint.x + pMoveRect->DestinationRect.right - pMoveRect->DestinationRect.left);
@@ -122,8 +118,7 @@ void D3D11DesktopDuplicationDisplayManager::SetMoveRect(_Out_ RECT* pSrcRect, _O
 		pDestRect->top = textureWidth - pMoveRect->DestinationRect.right;
 		pDestRect->right = pMoveRect->DestinationRect.bottom;
 		pDestRect->bottom = textureWidth - pMoveRect->DestinationRect.left;
-		break;
-	}
+	} break;
 	default: {
 		RtlZeroMemory(pDestRect, sizeof(RECT));
 		RtlZeroMemory(pSrcRect, sizeof(RECT));
@@ -208,61 +203,57 @@ void D3D11DesktopDuplicationDisplayManager::SetDirtyVert(_Out_writes_(NUMVERTICE
 		DestDirty.right = Width - pDirtyRect->top;
 		DestDirty.bottom = pDirtyRect->right;
 
-		pVertices[0].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[1].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[2].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[5].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		break;
-	}
+		pVertices[0].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[1].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[2].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[5].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+	} break;
 	case DXGI_MODE_ROTATION_ROTATE180: {
 		DestDirty.left = Width - pDirtyRect->right;
 		DestDirty.top = Height - pDirtyRect->bottom;
 		DestDirty.right = Width - pDirtyRect->left;
 		DestDirty.bottom = Height - pDirtyRect->top;
 
-		pVertices[0].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[1].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[2].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[5].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		break;
-	}
+		pVertices[0].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[1].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[2].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[5].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+	} break;
 	case DXGI_MODE_ROTATION_ROTATE270: {
 		DestDirty.left = pDirtyRect->top;
 		DestDirty.top = Height - pDirtyRect->right;
 		DestDirty.right = pDirtyRect->bottom;
 		DestDirty.bottom = Height - pDirtyRect->left;
 
-		pVertices[0].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[1].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[2].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[5].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		break;
-	}
+		pVertices[0].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[1].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[2].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[5].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+	} break;
 	default:
 		assert(false); // drop through
 	case DXGI_MODE_ROTATION_UNSPECIFIED:
 	case DXGI_MODE_ROTATION_IDENTITY: {
-		pVertices[0].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[1].TexCoord = XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[2].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		pVertices[5].TexCoord = XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
-		break;
-	}
+		pVertices[0].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[1].TexCoord = DirectX::XMFLOAT2(pDirtyRect->left / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[2].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->bottom / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+		pVertices[5].TexCoord = DirectX::XMFLOAT2(pDirtyRect->right / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Width), pDirtyRect->top / static_cast<FLOAT>(pSourceSurfaceTextureDescription->Height));
+	} break;
 	}
 
 	// Set positions
-	pVertices[0].Pos = XMFLOAT3((DestDirty.left + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
+	pVertices[0].Pos = DirectX::XMFLOAT3((DestDirty.left + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
 		-1 * (DestDirty.bottom + pDesktopOutputDescription->DesktopCoordinates.top - OffsetY - CenterY) / static_cast<FLOAT>(CenterY),
 		0.0f);
-	pVertices[1].Pos = XMFLOAT3((DestDirty.left + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
+	pVertices[1].Pos = DirectX::XMFLOAT3((DestDirty.left + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
 		-1 * (DestDirty.top + pDesktopOutputDescription->DesktopCoordinates.top - OffsetY - CenterY) / static_cast<FLOAT>(CenterY),
 		0.0f);
-	pVertices[2].Pos = XMFLOAT3((DestDirty.right + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
+	pVertices[2].Pos = DirectX::XMFLOAT3((DestDirty.right + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
 		-1 * (DestDirty.bottom + pDesktopOutputDescription->DesktopCoordinates.top - OffsetY - CenterY) / static_cast<FLOAT>(CenterY),
 		0.0f);
 	pVertices[3].Pos = pVertices[2].Pos;
 	pVertices[4].Pos = pVertices[1].Pos;
-	pVertices[5].Pos = XMFLOAT3((DestDirty.right + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
+	pVertices[5].Pos = DirectX::XMFLOAT3((DestDirty.right + pDesktopOutputDescription->DesktopCoordinates.left - OffsetX - CenterX) / static_cast<FLOAT>(CenterX),
 		-1 * (DestDirty.top + pDesktopOutputDescription->DesktopCoordinates.top - OffsetY - CenterY) / static_cast<FLOAT>(CenterY),
 		0.0f);
 
@@ -284,7 +275,7 @@ DUPL_RETURN D3D11DesktopDuplicationDisplayManager::CopyDirty(_In_ ID3D11Texture2
 	D3D11_TEXTURE2D_DESC sourceSurfaceTextureDescription;
 	pSrcSurfaceTexture->GetDesc(&sourceSurfaceTextureDescription);
 
-	if (!m_pRTV) {
+	if (m_pRTV == nullptr) {
 		CRM(m_pDevice->CreateRenderTargetView(pSharedSurfTexture, nullptr, &m_pRTV), "Failed to create render target view for dirty rects");
 	}
 

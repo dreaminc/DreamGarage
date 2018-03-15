@@ -218,7 +218,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	DestroyCursor(Cursor);
 
 	//ShowWindow(pWindowHandle, nCmdShow);
-	UpdateWindow(pWindowHandle);
+	//UpdateWindow(pWindowHandle);
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
@@ -443,16 +443,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	switch (message) {
 	case WM_DESTROY: {
 		PostQuitMessage(0);
-		break;
-	}
+	} break;
+	case WM_CLOSE: {
+		PostQuitMessage(0);
+	} break;
 	case WM_SIZE: {
 		// Tell output manager that window size has changed
 		OutMgr.WindowResize();
-		break;
-	}
+	} break;
 	case WM_COPYDATA: {
 		OnCopyData(hWnd, wParam, lParam);
-	}
+	} break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
@@ -614,14 +615,12 @@ DUPL_RETURN ProcessFailure(_In_opt_ ID3D11Device* pDevice, _In_ LPCWSTR Str, _In
 			// Our device has been stopped due to an external event on the GPU so map them all to
 			// device removed and continue processing the condition
 			TranslatedHr = DXGI_ERROR_DEVICE_REMOVED;
-			break;
-		}
+		} break;
 
 		case S_OK: {
 			// pDevice is not removed so use original error
 			TranslatedHr = hr;
-			break;
-		}
+		} break;
 
 		default: {
 			// pDevice is removed but not a error we want to remap

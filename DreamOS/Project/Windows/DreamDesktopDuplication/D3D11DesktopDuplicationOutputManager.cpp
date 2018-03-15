@@ -1,7 +1,6 @@
 #include "D3D11DesktopDuplicationOutputManager.h"
 #include <vector>
 #include "RESULT/EHM.h"
-using namespace DirectX;
 
 //
 // Constructor NULLs out all pointers & sets appropriate var vals
@@ -255,10 +254,10 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::CreateSharedSurf(INT outputToD
 				DXGI_OUTPUT_DESC DesktopDesc;
 				pDxgiOutput->GetDesc(&DesktopDesc);
 
-				pDeskBounds->left = XMMin(DesktopDesc.DesktopCoordinates.left, pDeskBounds->left);
-				pDeskBounds->top = XMMin(DesktopDesc.DesktopCoordinates.top, pDeskBounds->top);
-				pDeskBounds->right = XMMax(DesktopDesc.DesktopCoordinates.right, pDeskBounds->right);
-				pDeskBounds->bottom = XMMax(DesktopDesc.DesktopCoordinates.bottom, pDeskBounds->bottom);
+				pDeskBounds->left = DirectX::XMMin(DesktopDesc.DesktopCoordinates.left, pDeskBounds->left);
+				pDeskBounds->top = DirectX::XMMin(DesktopDesc.DesktopCoordinates.top, pDeskBounds->top);
+				pDeskBounds->right = DirectX::XMMax(DesktopDesc.DesktopCoordinates.right, pDeskBounds->right);
+				pDeskBounds->bottom = DirectX::XMMax(DesktopDesc.DesktopCoordinates.bottom, pDeskBounds->bottom);
 			}
 		}
 
@@ -513,12 +512,12 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawFrame() {
 
 	// Vertices for drawing whole texture
 	VERTEX Vertices[NUMVERTICES] = {
-		{ XMFLOAT3(-1.0f, -1.0f, 0), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, -1.0f, 0), DirectX::XMFLOAT2(0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 0), DirectX::XMFLOAT2(0.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, 0), DirectX::XMFLOAT2(1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, 0), DirectX::XMFLOAT2(1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 0), DirectX::XMFLOAT2(0.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(1.0f, 1.0f, 0), DirectX::XMFLOAT2(1.0f, 0.0f) },
 	};
 
 	D3D11_TEXTURE2D_DESC textureFrameFromSharedSurfaceDescription;
@@ -754,12 +753,12 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::DrawMouse(_In_ PTR_INFO* pPtrI
 
 	// Position will be changed based on mouse position
 	VERTEX Vertices[NUMVERTICES] = {
-		{ XMFLOAT3(-1.0f, -1.0f, 0), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.0f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(-1.0f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.0f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, -1.0f, 0), DirectX::XMFLOAT2(0.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 0), DirectX::XMFLOAT2(0.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, 0), DirectX::XMFLOAT2(1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(1.0f, -1.0f, 0), DirectX::XMFLOAT2(1.0f, 1.0f) },
+		{ DirectX::XMFLOAT3(-1.0f, 1.0f, 0), DirectX::XMFLOAT2(0.0f, 0.0f) },
+		{ DirectX::XMFLOAT3(1.0f, 1.0f, 0), DirectX::XMFLOAT2(1.0f, 0.0f) },
 	};
 
 	D3D11_TEXTURE2D_DESC sharedSurfaceTextureDescription;

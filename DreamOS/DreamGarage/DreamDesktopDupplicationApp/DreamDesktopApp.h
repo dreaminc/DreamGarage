@@ -23,6 +23,8 @@
 #define DESKTOP_PXWIDTH 1920;
 #define DESKTOP_PXHEIGHT 1080;
 
+#define WSTRDREAMCAPTURELOCATION L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe"
+
 class quad;
 class texture;
 class DreamUserControlArea;
@@ -59,8 +61,8 @@ public:
 	virtual RESULT SetPath(std::string strPath) override;
 	virtual long GetCurrentAssetID() override;
 
-	virtual int GetPXHeight() override;
-	virtual int GetPXWidth() override;
+	virtual int GetHeight() override;
+	virtual int GetWidth() override;
 
 	virtual RESULT CloseSource() override;
 
@@ -83,8 +85,8 @@ public:
 
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
-	float GetWidth();
-	float GetHeight();
+	float GetWidthFromAspectDiagonal();
+	float GetHeightFromAspectDiagonal();
 	vector GetNormal();
 	point GetOrigin();
 

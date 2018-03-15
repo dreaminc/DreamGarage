@@ -187,7 +187,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	std::wstring wstrDreamPath;
 	pPathManager->GetDreamPath(wstrDreamPath);
 
-	std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe";
+	std::wstring wstrPathfromDreamPath = WSTRDREAMCAPTURELOCATION;
 	std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
 	const wchar_t *wPath = wstrFullpath.c_str();
 	std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
@@ -249,8 +249,16 @@ RESULT DreamDesktopApp::SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msg
 	desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
 	desktopCDS.cbData = sizeof(ddcMessage);
 	desktopCDS.lpData = &ddcMessage;
-
-	SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
+	
+	if (msgType == DDCIPCMessage::type::STOP) {
+		//SendMessageCallback(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS, nullptr, 0);
+		//SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
+		PostMessage(m_hwndDesktopHandle, WM_CLOSE, 0, 0);
+	}
+	else {
+		SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
+	}
+	
 	DWORD dwError = GetLastError();
 
 	CBR(dwError == ERROR_SUCCESS, R_SKIPPED);
@@ -265,8 +273,7 @@ RESULT DreamDesktopApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pE
 }
 
 RESULT DreamDesktopApp::Shutdown(void *pContext) {
-	// TODO: clean up in here
-	SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP);
+	// TODO: clean up in here	
 
 	return R_PASS;
 }
@@ -359,12 +366,20 @@ RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	return R_PASS;
 }
 
-float DreamDesktopApp::GetHeight() {
+float DreamDesktopApp::GetHeightFromAspectDiagonal() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
-float DreamDesktopApp::GetWidth() {
+float DreamDesktopApp::GetWidthFromAspectDiagonal() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+int DreamDesktopApp::GetHeight() {
+	return m_pxDesktopHeight;
+}
+
+int DreamDesktopApp::GetWidth() {
+	return m_pxDesktopWidth;
 }
 
 vector DreamDesktopApp::GetNormal() {
@@ -411,14 +426,6 @@ RESULT DreamDesktopApp::SetPath(std::string strPath) {
 
 long DreamDesktopApp::GetCurrentAssetID() {
 	return m_assetID;
-}
-
-int DreamDesktopApp::GetPXHeight() {
-	return m_pxDesktopHeight;
-}
-
-int DreamDesktopApp::GetPXWidth() {
-	return m_pxDesktopWidth;
 }
 
 RESULT DreamDesktopApp::CloseSource() {
