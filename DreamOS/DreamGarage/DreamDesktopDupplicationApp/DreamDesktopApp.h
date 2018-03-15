@@ -126,6 +126,7 @@ private:
 	// Window
 	HWND m_hwndDreamHandle = nullptr;
 	HWND m_hwndDesktopHandle = nullptr;
+	HANDLE m_dreamJobHandle = nullptr;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

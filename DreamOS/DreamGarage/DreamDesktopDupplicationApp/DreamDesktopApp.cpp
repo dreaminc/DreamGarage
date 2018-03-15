@@ -166,14 +166,6 @@ Error:
 RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
 
-	// Just a catch-all in cases where shutdown didn't happen 
-	//*
-	m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
-	if (m_hwndDesktopHandle != nullptr) {
-		TerminateProcess(m_hwndDesktopHandle, 0);
-	}
-	//*/
-
 	// Start duplication process
 	STARTUPINFO startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;
@@ -194,6 +186,14 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	vwszLocation.push_back(0);
 	LPWSTR lpwstrLocation = vwszLocation.data();
 	bool fCreatedDuplicationProcess = false;
+	
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobELI = { 0 };	// In case we want to add memory limits, and can track peak usage
+	jobELI.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+	m_dreamJobHandle = CreateJobObject(nullptr, L"DreamJob");
+	CNM(m_dreamJobHandle, "Failed to create job object");
+
+	SetInformationJobObject(m_dreamJobHandle, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
 
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
@@ -210,6 +210,8 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	);
 
 	CBM(fCreatedDuplicationProcess, "CreateProcess failed (%d)", GetLastError());
+
+	AssignProcessToJobObject(m_dreamJobHandle, processinfoDesktopDuplication.hProcess);
 
 Error:
 	return r;
