@@ -45,7 +45,6 @@ RESULT DreamControlBar::Update(void *pContext) {
 	if (m_fUpdateTitle) {
 		m_pUIControlBar->GetURLText()->SetText(m_strUpdateTitle);
 		m_pUIControlBar->GetURLText()->SetDirty();
-		//m_strUpdateTitle = "";
 		m_fUpdateTitle = false;
 	}
 

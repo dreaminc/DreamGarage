@@ -180,7 +180,6 @@ private:
 	std::string m_strScope;
 	std::string m_strPath;
 	std::string m_strContentType;
-	//std::string m_strURL
 
 	long m_currentEnvironmentAssetID = 0;
 	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;

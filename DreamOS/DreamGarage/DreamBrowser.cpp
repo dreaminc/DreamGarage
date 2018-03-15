@@ -637,7 +637,6 @@ int DreamBrowser::GetHeight() {
 }
 
 std::string DreamBrowser::GetTitle() {
-//	return
 	return m_strCurrentURL;
 }
 
