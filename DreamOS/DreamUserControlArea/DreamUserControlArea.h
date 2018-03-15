@@ -192,19 +192,14 @@ private:
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
-<<<<<<< Updated upstream
-	std::string m_strDesktopTitle = TITLEDESKTOP;
-	std::string m_strWebsiteTitle = TITLEWEBSITE;
-
 	float m_animationDuration = ANIMATION_DURATION_SECONDS;
 	float m_animationScale = ANIMATION_SCALE;
 
 	// certainly temporary
 	bool m_fIsAnimating = false;
-=======
+
 	std::string m_strDesktopTitle = TITLE_DESKTOP;
 	std::string m_strWebsiteTitle = TITLE_WEBSITE;
->>>>>>> Stashed changes
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_
