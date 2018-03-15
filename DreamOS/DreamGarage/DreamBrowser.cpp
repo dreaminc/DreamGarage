@@ -280,7 +280,10 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 		m_strCurrentURL = strCurrentURL;
 
 		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		}
 	}
 
 Error:
@@ -299,8 +302,10 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pParentApp != nullptr) {
-		m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this);
-		m_pParentApp->UpdateControlBarText(m_strCurrentURL);
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		}
 	}
 
 	if (strCurrentURL == "about:blank") {
@@ -311,6 +316,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 		}
 	}
 
+Error:
 	return r;
 }
 
@@ -628,6 +634,10 @@ int DreamBrowser::GetWidth() {
 
 int DreamBrowser::GetHeight() {
 	return m_browserHeight;
+}
+
+std::string DreamBrowser::GetTitle() {
+	return m_strCurrentURL;
 }
 
 vector DreamBrowser::GetNormal() {

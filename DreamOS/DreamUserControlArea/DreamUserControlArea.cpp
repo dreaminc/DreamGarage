@@ -373,6 +373,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
+	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
@@ -438,7 +439,12 @@ RESULT DreamUserControlArea::UpdateTextureForDesktop(std::shared_ptr<texture> pT
 }
 
 RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CR(m_pControlBar->SetTitleText(strTitle));
+
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
@@ -556,6 +562,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	if (m_pActiveSource != nullptr) {													// If content is already open
 		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
 			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview
+				SetIsAnimating(false);
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
 			}	
 		}
@@ -570,6 +577,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
 			m_pDreamDesktop->InitializeWithParent(this);
 			m_pActiveSource = m_pDreamDesktop;
+			m_pControlBar->SetTitleText(m_pDreamDesktop->GetTitle());
 			// new desktop can't be the current content
 			m_pControlBar->SetSharingFlag(false);
 		}
@@ -588,6 +596,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		pBrowser->SetPath(m_strURL);
 
 		m_pActiveSource = pBrowser;
+		m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// new browser can't be the current content
 		m_pControlBar->SetSharingFlag(false);
@@ -728,6 +737,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		//m_pControlView->GetViewQuad()->SetVisible(false);
 		// replace with top of tab bar
 		if (m_pActiveSource != nullptr) {
+			m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
 			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 			CR(ShowControlView());
 		}

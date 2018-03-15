@@ -384,6 +384,11 @@ int DreamDesktopApp::GetWidth() {
 	return m_pxDesktopWidth;
 }
 
+std::string DreamDesktopApp::GetTitle() {
+	//TODO: temporary until app focus is known
+	return "Windows Desktop";
+}
+
 vector DreamDesktopApp::GetNormal() {
 	return m_vNormal;
 }

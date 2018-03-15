@@ -59,6 +59,7 @@ public:
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);
+	RESULT SetTitleText(std::string& strTitle);
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
@@ -78,6 +79,9 @@ private:
 
 	bool m_fIsMinimized = false;
 	bool m_fIsSharing = false;
+
+	bool m_fUpdateTitle = false;
+	std::string m_strUpdateTitle = "";
 
 	double m_buttonWidth = BUTTON_WIDTH;
 	double m_buttonHeight = BUTTON_HEIGHT;
