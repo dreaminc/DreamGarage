@@ -37,11 +37,11 @@ class quad;
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
 
-#define TITLEDESKTOP "Desktop"
-#define TITLEWEBSITE "website"
-
 #define ANIMATION_DURATION_SECONDS 0.175f
 #define ANIMATION_SCALE 0.1f
+
+#define TITLE_DESKTOP "Desktop"
+#define TITLE_WEBSITE "website"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
@@ -192,14 +192,14 @@ private:
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
-	std::string m_strDesktopTitle = TITLEDESKTOP;
-	std::string m_strWebsiteTitle = TITLEWEBSITE;
-
 	float m_animationDuration = ANIMATION_DURATION_SECONDS;
 	float m_animationScale = ANIMATION_SCALE;
 
 	// certainly temporary
 	bool m_fIsAnimating = false;
+
+	std::string m_strDesktopTitle = TITLE_DESKTOP;
+	std::string m_strWebsiteTitle = TITLE_WEBSITE;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_
