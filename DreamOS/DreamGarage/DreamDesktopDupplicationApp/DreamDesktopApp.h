@@ -63,6 +63,7 @@ public:
 
 	virtual int GetHeight() override;
 	virtual int GetWidth() override;
+	virtual std::string GetTitle() override;
 
 	virtual RESULT CloseSource() override;
 

@@ -27,6 +27,8 @@ public:
 	
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
+
+	virtual std::string GetTitle() = 0;
 };
 
 #endif // ! DREAM_CONTENT_SOURCE_H_

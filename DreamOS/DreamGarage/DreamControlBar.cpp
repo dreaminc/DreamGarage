@@ -41,6 +41,14 @@ RESULT DreamControlBar::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamControlBar::Update(void *pContext) {
+
+	if (m_fUpdateTitle) {
+		m_pUIControlBar->GetURLText()->SetText(m_strUpdateTitle);
+		m_pUIControlBar->GetURLText()->SetDirty();
+		//m_strUpdateTitle = "";
+		m_fUpdateTitle = false;
+	}
+
 	return R_PASS;
 }
 
@@ -63,6 +71,15 @@ RESULT DreamControlBar::SetSharingFlag(bool fIsSharing) {
 	else {
 		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShareTexture());
 	}
+
+	return r;
+}
+
+RESULT DreamControlBar::SetTitleText(std::string& strTitle) {
+	RESULT r = R_PASS;
+
+	m_fUpdateTitle = true;
+	m_strUpdateTitle = strTitle;
 
 	return r;
 }

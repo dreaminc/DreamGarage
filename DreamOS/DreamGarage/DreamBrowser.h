@@ -129,6 +129,8 @@ public:
 	virtual int GetHeight() override;
 	virtual int GetWidth() override;
 
+	virtual std::string GetTitle() override;
+
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	virtual RESULT SetURI(std::string strURI);
@@ -178,6 +180,8 @@ private:
 	std::string m_strScope;
 	std::string m_strPath;
 	std::string m_strContentType;
+	//std::string m_strURL
+
 	long m_currentEnvironmentAssetID = 0;
 	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
 	bool m_fShowControlView = false;
