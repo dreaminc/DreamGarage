@@ -102,18 +102,20 @@ std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	RESULT r = R_PASS;
 
-	auto newTabButton = CreateTab();
+	auto pNewTabButton = CreateTab();
+	CN(pNewTabButton);
 
 	for (auto pButton : m_tabButtons) {
 		//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 		TranslateTabDown(pButton.get());
 	}
 
-	m_tabButtons.emplace_back(newTabButton);
+	m_tabButtons.emplace_back(pNewTabButton);
 	m_sources.emplace_back(pContent);
-	m_appToTabMap[pContent] = newTabButton;
+	m_appToTabMap[pContent] = pNewTabButton;
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
@@ -130,7 +132,7 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 		m_sources.pop_back();
 		m_tabButtons.pop_back();
 
-		m_tabPendingRemoval = pButtonToRemove;
+		m_pTabPendingRemoval = pButtonToRemove;
 		HideTab(pButtonToRemove.get());
 		//m_pView->RemoveChild(pButtonToRemove);
 		pDreamOS->UnregisterInteractionObject(pButtonToRemove.get());
@@ -169,7 +171,7 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 		if (pButton.get() == pButtonContext) {
 
 //			m_pView->RemoveChild(pButton);
-			m_tabPendingRemoval = pButton;
+			m_pTabPendingRemoval = pButton;
 			HideTab(pButton.get());
 
 			pDreamOS->UnregisterInteractionObject(pButton.get());
@@ -272,10 +274,10 @@ RESULT DreamTabView::HideTab(UIButton *pTabButton) {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		if (m_tabPendingRemoval != nullptr) {
-			m_tabPendingRemoval->SetVisible(false);
-			m_pView->RemoveChild(m_tabPendingRemoval);
-			m_tabPendingRemoval = nullptr;
+		if (m_pTabPendingRemoval != nullptr) {
+			m_pTabPendingRemoval->SetVisible(false);
+			m_pView->RemoveChild(m_pTabPendingRemoval);
+			m_pTabPendingRemoval = nullptr;
 		}
 
 		return r;

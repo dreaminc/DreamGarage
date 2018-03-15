@@ -81,7 +81,7 @@ private:
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
 	std::vector<std::shared_ptr<DreamContentSource>> m_sources;
 
-	std::shared_ptr<UIButton> m_tabPendingRemoval = nullptr;
+	std::shared_ptr<UIButton> m_pTabPendingRemoval = nullptr;
 
 private:
 	const wchar_t *k_wszTabBackground = L"control-view-list-background.png";

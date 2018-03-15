@@ -245,14 +245,18 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::MAXIMIZE: {
-		CR(Show());
+		//CR(Show());
+		m_pControlView->Show();
+		m_pDreamTabView->Show();
 	} break;
 
 	case ControlEventType::MINIMIZE: {
 		//TODO: change this with animations, control bar needs to still be visible here
-		CR(Hide());
+		//CR(Hide());
+		m_pControlView->Hide();
+		m_pDreamTabView->Hide();
 		//m_pControlBar->GetComposite()->SetVisible(true);
-		m_pControlBar->Hide();
+		//m_pControlBar->Hide();
 	} break;
 
 	case ControlEventType::SHARE: {
@@ -728,6 +732,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 			m_fHasOpenApp = false;
 			m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
 			m_pDreamUserApp->SetEventApp(nullptr);
+			SetIsAnimating(false);
 		}
 
 	Error:
