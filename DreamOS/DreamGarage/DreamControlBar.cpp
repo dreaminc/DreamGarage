@@ -4,6 +4,9 @@
 
 #include "UI/UIButton.h"
 
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
+
 DreamControlBar::DreamControlBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlBar>(pDreamOS)
 {
@@ -163,6 +166,49 @@ RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 
 	GetComposite()->SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2*spacingSize + buttonWidth / 2.0f);
 	GetComposite()->RotateXByDeg(-90.0f);
+
+Error:
+	return r;
+}
+
+RESULT DreamControlBar::Show() {
+	RESULT r = R_PASS;
+
+	GetComposite()->SetVisible(true);
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
+		m_pParentApp->GetAnimationDuration(),
+		AnimationCurveType::SIGMOID,
+		AnimationFlags::AnimationFlags()
+	));
+
+Error:
+	return r;
+}
+
+RESULT DreamControlBar::Hide() {
+	RESULT r = R_PASS;
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		GetComposite()->SetVisible(false);
+
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
+		m_pParentApp->GetAnimationDuration(),
+		AnimationCurveType::SIGMOID,
+		AnimationFlags::AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
 
 Error:
 	return r;

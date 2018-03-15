@@ -487,8 +487,18 @@ RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
 	//CR(ResetAppComposite());
-
+	GetComposite()->SetVisible(true);
+//	m_pViewQuad->SetVisible(true);
 	CR(ShowView());
+
+//	m_pViewBackground->SetVisible(true);
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pViewBackground.get(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
+		m_pParentApp->GetAnimationDuration(),
+		AnimationCurveType::SIGMOID,
+		AnimationFlags::AnimationFlags()
+	));
 
 Error:
 	return r;
@@ -518,6 +528,7 @@ RESULT DreamControlView::HideView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
+	//	GetComposite()->SetVisible(false);
 		m_strURL = "";
 		return R_PASS;
 	};
@@ -542,7 +553,25 @@ Error:
 RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pViewBackground->SetVisible(false);
+
+		return r;
+	};
+
 	CR(HideView());
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pViewBackground.get(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
+		m_pParentApp->GetAnimationDuration(),
+		AnimationCurveType::SIGMOID,
+		AnimationFlags::AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
 
 	//SetIsMinimizedFlag(false);
 

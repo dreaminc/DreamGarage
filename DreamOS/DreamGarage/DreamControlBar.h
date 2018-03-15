@@ -63,6 +63,12 @@ public:
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
+
+// Animations
+public:
+	RESULT Show();
+	RESULT Hide();
+
 private:
 
 	std::shared_ptr<UIView> m_pView = nullptr;
