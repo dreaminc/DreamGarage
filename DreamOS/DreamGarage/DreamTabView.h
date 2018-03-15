@@ -56,6 +56,21 @@ public:
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
 private:
+	std::shared_ptr<UIButton> CreateTab();
+
+// Animations
+public:
+	RESULT Hide();
+	RESULT Show();
+
+private:
+	RESULT HideTab(UIButton *pTabButton);
+	RESULT ShowTab(UIButton *pTabButton);
+
+	RESULT TranslateTabDown(UIButton *pTabButton);
+	RESULT TranslateTabUp(UIButton *pTabButton);
+	
+private:
 	DreamUserControlArea* m_pParentApp = nullptr;
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
@@ -65,6 +80,8 @@ private:
 	std::shared_ptr<UIView> m_pView = nullptr;
 	std::vector<std::shared_ptr<UIButton>> m_tabButtons;
 	std::vector<std::shared_ptr<DreamContentSource>> m_sources;
+
+	std::shared_ptr<UIButton> m_pTabPendingRemoval = nullptr;
 
 private:
 	const wchar_t *k_wszTabBackground = L"control-view-list-background.png";
@@ -78,6 +95,9 @@ private:
 	bool m_fForceContentFocus = false;
 
 	point m_ptMostRecent;
+
+	// TODO: could be bugs based on this
+	bool m_fIsAnimating = false;
 };
 
 #endif // ! DREAM_TAB_VIEW_H_

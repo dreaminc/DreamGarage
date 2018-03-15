@@ -13,6 +13,8 @@
 #include "Cloud/Environment/EnvironmentAsset.h"	
 
 #include "InteractionEngine/InteractionObjectEvent.h"
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
 
 #include "UI/UIButton.h"
 
@@ -184,9 +186,12 @@ RESULT DreamUserControlArea::Show() {
 	RESULT r = R_PASS;
 
 	//TODO: animations
-	m_pControlView->GetComposite()->SetVisible(true);
-	m_pDreamTabView->GetComposite()->SetVisible(true);
-	m_pControlBar->GetComposite()->SetVisible(true);
+	//m_pControlView->GetComposite()->SetVisible(true);
+	m_pControlView->Show();
+	//m_pDreamTabView->GetComposite()->SetVisible(true);
+	m_pDreamTabView->Show();
+	//m_pControlBar->GetComposite()->SetVisible(true);
+	m_pControlBar->Show();
 
 	return r;
 }
@@ -194,9 +199,12 @@ RESULT DreamUserControlArea::Show() {
 RESULT DreamUserControlArea::Hide() {
 	RESULT r = R_PASS;
 
-	m_pControlView->GetComposite()->SetVisible(false);
-	m_pDreamTabView->GetComposite()->SetVisible(false);
-	m_pControlBar->GetComposite()->SetVisible(false);
+	//m_pControlView->GetComposite()->SetVisible(false);
+	m_pControlView->Hide();
+	//m_pDreamTabView->GetComposite()->SetVisible(false);
+	m_pDreamTabView->Hide();
+	//m_pControlBar->GetComposite()->SetVisible(false);
+	m_pControlBar->Hide();
 
 	return r;
 }
@@ -237,13 +245,18 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	} break;
 
 	case ControlEventType::MAXIMIZE: {
-		CR(Show());
+		//CR(Show());
+		m_pControlView->Show();
+		m_pDreamTabView->Show();
 	} break;
 
 	case ControlEventType::MINIMIZE: {
 		//TODO: change this with animations, control bar needs to still be visible here
-		CR(Hide());
-		m_pControlBar->GetComposite()->SetVisible(true);
+		//CR(Hide());
+		m_pControlView->Hide();
+		m_pDreamTabView->Hide();
+		//m_pControlBar->GetComposite()->SetVisible(true);
+		//m_pControlBar->Hide();
 	} break;
 
 	case ControlEventType::SHARE: {
@@ -307,6 +320,7 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	//only allow button presses while keyboard isn't active
 	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 
+	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(dirtyIndex != -1, R_SKIPPED);
 
 	CBR(m_fCanPressButton[dirtyIndex], R_SKIPPED);
@@ -328,15 +342,79 @@ std::shared_ptr<DreamContentSource> DreamUserControlArea::GetActiveSource() {
 	return m_pActiveSource;
 }
 
+RESULT DreamUserControlArea::ShowControlView() {
+	RESULT r = R_PASS;
+
+	auto pView = m_pControlView->GetViewQuad();
+
+	auto fnEndCallback = [&](void *pContext) {
+		SetIsAnimating(false);
+		return R_PASS;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		pView.get(),
+		pView->GetPosition(),
+		pView->GetOrientation(),
+		1.0f,
+		m_animationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource> pNewContent) {
+	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
-	bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
-	m_pControlBar->SetSharingFlag(fIsSharing);
+	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
-	return R_PASS;
+	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+	//m_pControlBar->SetSharingFlag(fIsSharing);
+
+	auto pView = m_pControlView->GetViewQuad();
+	SetIsAnimating(true);
+
+	// close active browser
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pView = m_pControlView->GetViewQuad();
+
+		// replace with top of tab bar
+		m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
+		bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+		m_pControlBar->SetSharingFlag(fIsSharing);
+		
+		CR(ShowControlView());
+
+	Error:
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		pView.get(),
+		pView->GetPosition(),
+		pView->GetOrientation(),
+		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
+		m_animationScale,
+		m_animationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
@@ -379,6 +457,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
 		CR(m_pControlBar->GetComposite()->SetVisible(false));
+		CR(m_pControlBar->Hide());
 	}
 
 Error:
@@ -612,10 +691,8 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 	return r;
 }
 
-RESULT DreamUserControlArea::CloseActiveAsset() {
+RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
-
-	// close active browser
 
 	m_pActiveSource->CloseSource();
 	
@@ -628,26 +705,81 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
 	}
 
-	// replace with top of tab bar
-	m_pActiveSource = m_pDreamTabView->RemoveContent();
-	if (m_pActiveSource != nullptr) {
-		m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
-	}
-	else {
-	//	m_pControlView->SetViewQuadTexture(m_p)
-		m_pControlBar->GetComposite()->SetVisible(false);
-		m_pDreamTabView->GetComposite()->SetVisible(false);
-		m_pControlView->GetComposite()->SetVisible(false);
-		m_fHasOpenApp = false;
-		m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
-		m_pDreamUserApp->SetEventApp(nullptr);
-	}
+	return r;
+}
 
+RESULT DreamUserControlArea::CloseActiveAsset() {
+	RESULT r = R_PASS;
+
+	// close active browser
+	SetIsAnimating(true);
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pView = m_pControlView->GetViewQuad();
+		CR(ShutdownSource());
+		m_pActiveSource = m_pDreamTabView->RemoveContent();
+		//m_pControlView->GetViewQuad()->SetVisible(false);
+		// replace with top of tab bar
+		if (m_pActiveSource != nullptr) {
+			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
+			CR(ShowControlView());
+		}
+		else {
+			m_pControlView->GetViewQuad()->SetVisible(false);
+			Hide();
+			m_fHasOpenApp = false;
+			m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
+			m_pDreamUserApp->SetEventApp(nullptr);
+			SetIsAnimating(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	auto pView = m_pControlView->GetViewQuad();
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		pView.get(),
+		pView->GetPosition(),
+		pView->GetOrientation(),
+		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
+		m_animationScale,
+		m_animationDuration,
+		AnimationCurveType::SIGMOID,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
+	//m_pControlView->HideView();
+
+
+Error:
 	return r;
 }
 
 RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
 	m_pDreamUIBar->SetUIStageProgram(pUIProgramNode);
+	return R_PASS;
+}
+
+float DreamUserControlArea::GetAnimationDuration() {
+	return m_animationDuration;
+}
+
+float DreamUserControlArea::GetAnimationScale() {
+	return m_animationScale;
+}
+
+bool DreamUserControlArea::IsAnimating() {
+	return m_fIsAnimating;
+}
+
+RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
+	m_fIsAnimating = fIsAnimating;
 	return R_PASS;
 }
 

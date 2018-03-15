@@ -36,8 +36,12 @@ class quad;
 #define VIEW_ANGLE 32.0f
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
+
 #define TITLEDESKTOP "Desktop"
 #define TITLEWEBSITE "website"
+
+#define ANIMATION_DURATION_SECONDS 0.175f
+#define ANIMATION_SCALE 0.1f
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
@@ -117,8 +121,21 @@ public:
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
+	RESULT ShutdownSource();
 	RESULT CloseActiveAsset();
 	RESULT OnReceiveAsset();
+
+// Animations
+public:
+	float GetAnimationDuration();
+	float GetAnimationScale();
+
+	// should be changed once there is a flexible implementation of animation canceling
+	bool IsAnimating();
+	RESULT SetIsAnimating(bool fIsAnimating);
+
+private:
+	RESULT ShowControlView();
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
@@ -177,6 +194,12 @@ private:
 
 	std::string m_strDesktopTitle = TITLEDESKTOP;
 	std::string m_strWebsiteTitle = TITLEWEBSITE;
+
+	float m_animationDuration = ANIMATION_DURATION_SECONDS;
+	float m_animationScale = ANIMATION_SCALE;
+
+	// certainly temporary
+	bool m_fIsAnimating = false;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_
