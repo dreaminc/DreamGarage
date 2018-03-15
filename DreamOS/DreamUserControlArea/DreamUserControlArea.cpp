@@ -565,15 +565,20 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		
 	}
 
-	if (strTitle == m_strDesktopTitle && m_pDreamDesktop == nullptr) {
-		m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
-		m_pDreamDesktop->InitializeWithParent(this);
-		m_pActiveSource = m_pDreamDesktop;
-		// new desktop can't be the current content
-		m_pControlBar->SetSharingFlag(false);
+	if (strTitle == m_strDesktopTitle) {
+		if (m_pDreamDesktop == nullptr) {
+			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
+			m_pDreamDesktop->InitializeWithParent(this);
+			m_pActiveSource = m_pDreamDesktop;
+			// new desktop can't be the current content
+			m_pControlBar->SetSharingFlag(false);
+		}
+		else {
+			//empty
+		}
 	}
 
-	else if (strTitle == m_strWebsiteTitle) {
+	else {
 		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
 		
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);

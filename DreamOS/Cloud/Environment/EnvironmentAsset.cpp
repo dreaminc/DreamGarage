@@ -19,8 +19,7 @@ EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode.find("external_request") != jsonMenuNode.end()) {
 		auto check = jsonMenuNode.at("external_request");
 		if (!check.is_null()) {
-			if (jsonMenuNode.find("external_request/resource_handler") != jsonMenuNode.end() &&
-				jsonMenuNode["/external_request/resource_handler"_json_pointer].is_string()) {
+			if (jsonMenuNode["/external_request/resource_handler"_json_pointer].is_string()) {
 
 				std::string strResourceHandlerType = jsonMenuNode["/external_request/resource_handler"_json_pointer].get<std::string>();
 				if (strResourceHandlerType == "ResourceHandler.Dream") {
