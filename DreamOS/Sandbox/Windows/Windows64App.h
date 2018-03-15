@@ -65,13 +65,13 @@ private:
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
 	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
-	bool	HandleMouseEvent(const MSG&	windowMassage);
+	bool HandleMouseEvent(const MSG&	windowMassage);
 	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
-	bool	HandleKeyEvent(const MSG&	windowMassage);
+	bool HandleKeyEvent(const MSG&	windowMassage);
 
 public:
 	HDC GetDeviceContext();
-	HWND GetWindowHandle();
+	virtual HWND GetWindowHandle() override;
 
 	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
 	RESULT UnregisterUIThreadCallback();
