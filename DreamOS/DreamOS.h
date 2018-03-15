@@ -105,6 +105,7 @@ public:
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
 	HMD *GetHMD();
+	HWND GetDreamHWND();
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;

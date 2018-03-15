@@ -143,20 +143,8 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	GetComposite()->SetVisible(true);
 
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
-
-	// TODO: get this from Windows64App or pre-compile header
-#ifdef _USE_TEST_APP
-#ifdef _DEBUG
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream Testing");
-#else
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream TestingRelease");
-#endif
-#endif
-#ifndef _USE_TEST_APP
-	m_hwndDreamHandle = FindWindow(NULL, L"Dream Release");
-#endif
-
-	//CNM(m_hwndDreamHandle, "Unable to find the Dream window");
+	m_hwndDreamHandle = GetDOS()->GetDreamHWND();
+	
 	CNR(m_hwndDreamHandle, R_SKIPPED);	
 
 Error:

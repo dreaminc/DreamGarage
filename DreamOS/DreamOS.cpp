@@ -564,6 +564,10 @@ HMD *DreamOS::GetHMD() {
 	return m_pSandbox->m_pHMD;
 }
 
+HWND DreamOS::GetDreamHWND() {
+	return m_pSandbox->GetWindowHandle();
+}
+
 RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }
