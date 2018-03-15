@@ -810,7 +810,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		pComposite->SetPosition(pDreamBrowser->GetOrigin());
 		m_pTestQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f));
 		CN(m_pTestQuad);
-		m_pTestQuad->translateX(pDreamBrowser->GetWidth() + 0.5f + 0.1f);
+		m_pTestQuad->translateX(pDreamBrowser->GetWidthFromAspectDiagonal() + 0.5f + 0.1f);
 
 		m_pPointerCursor = pComposite->AddModel(L"\\mouse-cursor\\mouse-cursor.obj");
 		CN(m_pPointerCursor);

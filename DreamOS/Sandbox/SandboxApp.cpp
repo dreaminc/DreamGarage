@@ -10,6 +10,7 @@
 
 #include "DreamAppManager.h"
 #include "DreamAppMessage.h"
+#include "DreamOS.h"
 
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"

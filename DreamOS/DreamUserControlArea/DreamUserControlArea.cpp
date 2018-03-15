@@ -7,6 +7,7 @@
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamTabView.h"
 #include "DreamControlView/DreamControlView.h"
+#include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 #include "Cloud/Environment/EnvironmentAsset.h"	
@@ -28,7 +29,6 @@ DreamUserControlArea::~DreamUserControlArea()
 
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
-
 
 	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
@@ -349,6 +349,16 @@ RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pT
 	return R_PASS;
 }
 
+RESULT DreamUserControlArea::UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext) {
+	if (pContext == m_pActiveSource.get()) {
+		m_pControlView->SetViewQuadTexture(pTexture);
+	}
+	else {
+		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
+	}
+	return R_PASS;
+}
+
 RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
 	return R_PASS;
 }
@@ -379,12 +389,22 @@ bool DreamUserControlArea::IsContentVisible() {
 	return true;
 }
 
-int DreamUserControlArea::GetPXWidth() {
-	return m_pxWidth;
+RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+
+	CNR(m_pDreamDesktop, R_SKIPPED);
+	m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
+
+Error:
+	return r;
 }
 
-int DreamUserControlArea::GetPXHeight() {
-	return m_pxHeight;
+int DreamUserControlArea::GetWidth() {
+	return m_pActiveSource->GetWidth();
+}
+
+int DreamUserControlArea::GetHeight() {
+	return m_pActiveSource->GetHeight();
 }
 
 RESULT DreamUserControlArea::OnClick(point ptContact, bool fMouseDown) {
@@ -450,29 +470,47 @@ Error:
 RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<DreamBrowser> pBrowser = nullptr;
-	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
-	if (m_pActiveSource != nullptr) {
-		m_pDreamTabView->AddContent(m_pActiveSource);
+	if (m_pActiveSource != nullptr) {													// If content is already open
+		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
+			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview
+				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
+			}	
+		}
+		else {
+			m_pDreamTabView->AddContent(m_pActiveSource);
+		}
+		
 	}
 
-	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+	if (strTitle == m_strDesktopTitle && m_pDreamDesktop == nullptr) {
+		m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
+		m_pDreamDesktop->InitializeWithParent(this);
+		m_pActiveSource = m_pDreamDesktop;
+		// new desktop can't be the current content
+		m_pControlBar->SetSharingFlag(false);
+	}
 
-	pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-	pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
-	pBrowser->InitializeWithParent(this);
-	pBrowser->SetScope(strScope);
-	pBrowser->SetPath(m_strURL);
+	else if (strTitle == m_strWebsiteTitle) {
+		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
+		
+		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
+		pBrowser->InitializeWithParent(this);
+		pBrowser->SetScope(strScope);
+		pBrowser->SetPath(m_strURL);
 
-	m_pActiveSource = pBrowser;
-	
-	// new browser can't be the current content
-	m_pControlBar->SetSharingFlag(false);
+		m_pActiveSource = pBrowser;
 
-	// TODO: may not be enough once browser typing is re-enabled
-	m_strURL = "";
+		// new browser can't be the current content
+		m_pControlBar->SetSharingFlag(false);
+
+		// TODO: may not be enough once browser typing is re-enabled
+		m_strURL = "";
+	}
 
 Error:
 	return r;
@@ -482,7 +520,7 @@ RESULT DreamUserControlArea::CreateBrowserSource() {
 	RESULT r = R_PASS;
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
-	std::string strTitle = "website";
+	std::string strTitle = m_strWebsiteTitle;
 
 
 	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
@@ -497,7 +535,7 @@ RESULT DreamUserControlArea::SetActiveBrowserURI() {
 	RESULT r = R_PASS;
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
-	std::string strTitle = "website";
+	std::string strTitle = m_strWebsiteTitle;
 
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	CNR(pBrowser, R_SKIPPED);
@@ -552,6 +590,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	}
 	else {
 		// TODO: desktop setup
+		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 
 	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
@@ -579,13 +618,14 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 	// close active browser
 
 	m_pActiveSource->CloseSource();
-
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-	if (pBrowser != nullptr) {
-		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
+	
+	if (m_pDreamDesktop == m_pActiveSource) {
+		GetDOS()->ShutdownDreamApp<DreamDesktopApp>(m_pDreamDesktop);
+		m_pDreamDesktop = nullptr;
 	}
-	else {
-		// TODO: desktop shutdown
+	else {	
+		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
+		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
 	}
 
 	// replace with top of tab bar

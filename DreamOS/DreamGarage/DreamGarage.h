@@ -16,15 +16,17 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
+class DreamDesktopApp;
 class UIStageProgram;
 class UpdateMouthMessage;
 
 #define MAX_PEERS 8
 
-class DreamGarage : public DreamOS, 
-				    public Subscriber<SenseKeyboardEvent>, 
+class DreamGarage : public DreamOS,
+				    public Subscriber<SenseKeyboardEvent>,
 					public Subscriber<SenseTypingEvent>
 {
 public:
@@ -77,6 +79,9 @@ public:
 	virtual RESULT OnReceiveAsset(long userID) override;
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
+
+	// Desktop Sharing
+	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
@@ -86,7 +91,7 @@ public:
 	RESULT HandleMouthUpdateMessage(PeerConnection* pPeerConnection, UpdateMouthMessage *pUpdateMouthMessage);
 	RESULT HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
 
-	// 
+	//
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
@@ -127,8 +132,13 @@ private:
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
-	
-	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea;
+
+	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
+	std::shared_ptr<DreamUIBar> m_pDreamUIBar = nullptr;
+	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
+	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

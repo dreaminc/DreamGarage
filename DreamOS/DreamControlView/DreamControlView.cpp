@@ -194,8 +194,8 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 
-			float browserWidth = m_pParentApp->GetPXWidth();
-			float browserHeight = m_pParentApp->GetPXHeight();
+			float browserWidth = m_pParentApp->GetWidth();
+			float browserHeight = m_pParentApp->GetHeight();
 
 			bool fNotInBrowserQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
 				ptContact.y > browserHeight || ptContact.y < 0;
@@ -242,14 +242,14 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 
 		CNR(m_pParentApp, R_OBJECT_NOT_FOUND);
 
-		if (ptScroll.x < m_pParentApp->GetPXWidth() && ptScroll.x > 0 &&
-			ptScroll.y < m_pParentApp->GetPXHeight() && ptScroll.y > 0) {
+		if (ptScroll.x < m_pParentApp->GetWidth() && ptScroll.x > 0 &&
+			ptScroll.y < m_pParentApp->GetHeight() && ptScroll.y > 0) {
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
 		}
 		else {
 			WebBrowserPoint middleOfBrowser;
-			middleOfBrowser.x = m_pParentApp->GetPXWidth() / 2;
-			middleOfBrowser.y = m_pParentApp->GetPXHeight() / 2;
+			middleOfBrowser.x = m_pParentApp->GetWidth() / 2;
+			middleOfBrowser.y = m_pParentApp->GetHeight() / 2;
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(middleOfBrowser.x, middleOfBrowser.y, 0.0f)));
 		}
 
@@ -662,12 +662,12 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	// TODO: get textbox location from node, for now just defaulting to the middle
 	if (ptTextBox.y() == -1) {
-		ptTextBox.y() = m_pParentApp->GetPXHeight() / 2.0f;
+		ptTextBox.y() = m_pParentApp->GetHeight() / 2.0f;
 	}
 	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
 	float viewHeight = m_pViewQuad->GetHeight();
-	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetPXHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
+	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
 	textBoxYOffset -= 0.25 * viewHeight; // shift closer to text box
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
@@ -717,8 +717,8 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
 	
-	ptRelative.x = posX * m_pParentApp->GetPXWidth();
-	ptRelative.y = posY * m_pParentApp->GetPXHeight();
+	ptRelative.x = posX * m_pParentApp->GetWidth();
+	ptRelative.y = posY * m_pParentApp->GetHeight();
 
 	return ptRelative;
 }

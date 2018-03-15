@@ -16,6 +16,7 @@ class DreamUIBar;
 class DreamTabView;
 class DreamBrowser;
 class DreamContentSource;
+class DreamDesktopApp;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
@@ -35,10 +36,13 @@ class quad;
 #define VIEW_ANGLE 32.0f
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
+#define TITLEDESKTOP "Desktop"
+#define TITLEWEBSITE "website"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
+	friend class DreamOSTestSuite;
 
 public:
 	DreamUserControlArea(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -67,8 +71,8 @@ public:
 
 // DreamControlView
 public:
-	int GetPXWidth();
-	int GetPXHeight();
+	int GetWidth();
+	int GetHeight();
 
 	RESULT OnClick(point ptContact, bool fMouseDown);
 	RESULT OnMouseMove(point mousePoint);
@@ -97,10 +101,15 @@ public:
 // DreamBrowser
 public:
 	RESULT UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext);
+	RESULT UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext);
 	RESULT UpdateControlBarText(std::string& strTitle);
 	//TODO: present keyboard from browser::OnNodeFocusChanged
 	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
 	bool IsContentVisible();
+
+// Dream Desktop
+public:
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
 
 // DreamGarage compatability (temp?)
 public:
@@ -163,6 +172,11 @@ private:
 	float m_aspectRatio;
 	float m_baseWidth;
 	float m_baseHeight;
+
+	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
+
+	std::string m_strDesktopTitle = TITLEDESKTOP;
+	std::string m_strWebsiteTitle = TITLEWEBSITE;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_
