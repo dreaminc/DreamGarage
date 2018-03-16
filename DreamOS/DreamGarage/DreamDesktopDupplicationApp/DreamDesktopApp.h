@@ -23,7 +23,11 @@
 #define DESKTOP_PXWIDTH 1920;
 #define DESKTOP_PXHEIGHT 1080;
 
+#ifdef PRODUCTION_BUILD
+#define WSTRDREAMCAPTURELOCATION L"DreamDesktopCapture.exe"
+#else
 #define WSTRDREAMCAPTURELOCATION L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe"
+#endif
 
 class quad;
 class texture;
