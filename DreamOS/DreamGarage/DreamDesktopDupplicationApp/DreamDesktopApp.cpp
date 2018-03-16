@@ -162,9 +162,6 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	startupinfoDesktopDuplication.cb = sizeof(startupinfoDesktopDuplication);
 	memset(&processinfoDesktopDuplication, 0, sizeof(processinfoDesktopDuplication));
 
-#ifdef PRODUCTION_BUILD
-	LPWSTR lpwstrlocation = WSTRDREAMCAPTURELOCATION;
-#else
 	// TODO: macro with project pre-definition using project name
 	PathManager* pPathManager = PathManager::instance();
 	std::wstring wstrDreamPath;
@@ -176,7 +173,6 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
 	vwszLocation.push_back(0);
 	LPWSTR lpwstrLocation = vwszLocation.data();
-#endif
 
 	bool fCreatedDuplicationProcess = false;
 	
