@@ -776,9 +776,6 @@
     <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIScrollView.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\material.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -991,6 +988,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIFlatScrollView.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1799,9 +1802,6 @@
     <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIScrollView.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h">
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
@@ -2152,6 +2152,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UISpatialScrollView.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIScrollView.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIFlatScrollView.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

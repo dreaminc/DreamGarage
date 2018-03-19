@@ -12,7 +12,8 @@
 #include "Primitives/composite.h"
 
 class UIButton;
-class UIScrollView;
+class UISpatialScrollView;
+class UIFlatScrollView;
 class UIMenuItem;
 class UIControlBar;
 class DreamOS;
@@ -42,8 +43,11 @@ public:
 	std::shared_ptr<UIControlBar> MakeUIControlBar();
 	std::shared_ptr<UIControlBar> AddUIControlBar();
 
-	std::shared_ptr<UIScrollView> MakeUIScrollView();
-	std::shared_ptr<UIScrollView> AddUIScrollView();
+	std::shared_ptr<UISpatialScrollView> MakeUISpatialScrollView();
+	std::shared_ptr<UISpatialScrollView> AddUISpatialScrollView();
+
+	std::shared_ptr<UIFlatScrollView> MakeUIFlatScrollView();
+	std::shared_ptr<UIFlatScrollView> AddUIFlatScrollView();
 
 	RESULT Notify(InteractionObjectEvent *pEvent);
 

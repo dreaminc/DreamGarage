@@ -150,8 +150,22 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 			m_fCanPressButton[i] = true;
 		}
 
-		// TODO: Update Control View
+		// Update DreamTabView
+		float tabViewWidth = m_pDreamTabView->GetBorderWidth();
+		float tabViewHeight = m_pDreamTabView->GetBorderHeight();
 
+		point ptDreamTabView = m_pDreamTabView->GetComposite()->GetPosition();
+
+		bool fWidth = ( ptSphereOrigin.x() > ptDreamTabView.x() - tabViewWidth / 2.0f  &&
+						ptSphereOrigin.x() < ptDreamTabView.x() + tabViewWidth / 2.0f);
+
+		bool fHeight = (ptSphereOrigin.z() > ptDreamTabView.z() - tabViewHeight / 2.0f &&
+						ptSphereOrigin.z() < ptDreamTabView.z() + tabViewHeight / 2.0f);
+
+		bool fMalletInTabView = fWidth && fHeight;
+
+		m_pDreamTabView->SetScrollFlag(fMalletInTabView, i);
+		
 	}
 
 Error:

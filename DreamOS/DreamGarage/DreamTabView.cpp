@@ -3,6 +3,7 @@
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamUserControlArea/DreamContentSource.h"
 
+#include "UI/UIFlatScrollView.h"
 #include "UI/UIButton.h"
 #include "Primitives/quad.h"
 
@@ -29,6 +30,7 @@ RESULT DreamTabView::InitializeApp(void *pContext) {
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetComposite()->AddUIView(GetDOS());
+	m_pScrollView = m_pView->AddUIFlatScrollView();
 
 	return R_PASS;
 }
@@ -38,7 +40,12 @@ RESULT DreamTabView::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamTabView::Update(void *pContext) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CR(m_pScrollView->Update());
+
+Error:
+	return r;
 }
 
 RESULT DreamTabView::Shutdown(void *pContext) {
@@ -77,6 +84,19 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	return r;
 }
 
+float DreamTabView::GetBorderWidth() {
+	return m_borderWidth;
+}
+
+float DreamTabView::GetBorderHeight() {
+	return m_borderHeight;
+}
+
+RESULT DreamTabView::SetScrollFlag(bool fCanScroll, int index) {
+	m_pScrollView->SetScrollFlag(fCanScroll, index);
+	return R_PASS;
+}
+
 std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 	RESULT r = R_PASS;
 	std::shared_ptr<UIButton> pNewTabButton = nullptr;
@@ -84,7 +104,7 @@ std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 	auto pContent = m_pParentApp->GetActiveSource();
 	auto pDreamOS = GetDOS();
 
-	pNewTabButton = m_pView->AddUIButton(m_tabWidth, m_tabHeight);
+	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
 
 	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
@@ -106,6 +126,7 @@ RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	CN(pNewTabButton);
 
 	for (auto pButton : m_tabButtons) {
+//	for (auto pButton : m_pScrollView->GetTabButtons()) {
 		//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 		TranslateTabDown(pButton.get());
 	}

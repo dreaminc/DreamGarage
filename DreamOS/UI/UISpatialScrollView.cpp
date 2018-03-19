@@ -1,4 +1,4 @@
-#include "UIScrollView.h"
+#include "UISpatialScrollView.h"
 #include "UIButton.h"
 #include "UIMenuItem.h"
 
@@ -12,7 +12,7 @@
 
 #include <chrono>
 
-UIScrollView::UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
+UISpatialScrollView::UISpatialScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
 UIView(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
@@ -26,12 +26,12 @@ Error:
 	return;
 }
 
-UIScrollView::~UIScrollView() 
+UISpatialScrollView::~UISpatialScrollView() 
 {
 
 }
 
-RESULT UIScrollView::Initialize() {
+RESULT UISpatialScrollView::Initialize() {
 	RESULT r = R_PASS;
 
 //	m_pDreamOS->AddObjectToUIGraph(this);
@@ -110,7 +110,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::Update() {
+RESULT UISpatialScrollView::Update() {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<VirtualObj>> pChildren;
@@ -202,7 +202,7 @@ Error:
 }
 
 // mostly borrowed from UIBar right now, current default values make sense with ray selection
-RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> pButton) {
+RESULT UISpatialScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> pButton) {
 	RESULT r = R_PASS;
 
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -index;
@@ -226,7 +226,7 @@ RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> p
 	return r;
 }
 
-RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons) {
+RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons) {
 	RESULT r = R_PASS;
 
 	CN(m_pDreamOS);
@@ -295,7 +295,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
+RESULT UISpatialScrollView::HideAllButtons(UIButton* pPushButton) {
 	RESULT r = R_PASS;
 
 	m_fScrollButtonVisible = false;
@@ -321,7 +321,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::ShowTitle() {
+RESULT UISpatialScrollView::ShowTitle() {
 	RESULT r = R_PASS;
 
 	m_pTitleQuad->SetVisible(true);
@@ -332,7 +332,7 @@ RESULT UIScrollView::ShowTitle() {
 	return r;
 }
 
-RESULT UIScrollView::Snap() {
+RESULT UISpatialScrollView::Snap() {
 	RESULT r = R_PASS;
 	
 	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
@@ -381,7 +381,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::Show() {
+RESULT UISpatialScrollView::Show() {
 	RESULT r = R_PASS;
 
 	m_pTitleView->SetVisible(true, false);
@@ -391,7 +391,7 @@ RESULT UIScrollView::Show() {
 }
 
 //needed because these objects may be in different scene graphs
-RESULT UIScrollView::Hide() {
+RESULT UISpatialScrollView::Hide() {
 	RESULT r = R_PASS;
 
 	m_pTitleView->SetVisible(false, false);
@@ -402,7 +402,7 @@ RESULT UIScrollView::Hide() {
 	return r;
 }
 
-RESULT UIScrollView::HideObject(DimObj* pObject) {
+RESULT UISpatialScrollView::HideObject(DimObj* pObject) {
 	RESULT r = R_PASS;
 
 	auto fnEndCallback = [&](void *pContext) {
@@ -427,7 +427,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::ShowObject(DimObj* pObject, color showColor /* = color(1.0f, 1.0f, 1.0f, 1.0f) */) {
+RESULT UISpatialScrollView::ShowObject(DimObj* pObject, color showColor /* = color(1.0f, 1.0f, 1.0f, 1.0f) */) {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -452,7 +452,7 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::HideAndPushButton(UIButton* pButton) {
+RESULT UISpatialScrollView::HideAndPushButton(UIButton* pButton) {
 	RESULT r = R_PASS;
 
 	auto fnEndCallback = [&](void *pContext) {
@@ -482,16 +482,16 @@ Error:
 	return r;
 }
 
-ScrollState UIScrollView::GetState() {
+ScrollState UISpatialScrollView::GetState() {
 	return m_menuState;
 }
 
-RESULT UIScrollView::SetScrollVisible(bool fVisible) {
+RESULT UISpatialScrollView::SetScrollVisible(bool fVisible) {
 	m_fScrollButtonVisible = fVisible;
 	return R_PASS;
 }
 
-bool UIScrollView::IsCapturable(UIButton *pButton) {
+bool UISpatialScrollView::IsCapturable(UIButton *pButton) {
 
 	if (!m_fScrollButtonVisible) {
 		return false;
@@ -514,19 +514,19 @@ bool UIScrollView::IsCapturable(UIButton *pButton) {
 	return true;
 }
 
-std::shared_ptr<quad> UIScrollView::GetTitleQuad() {
+std::shared_ptr<quad> UISpatialScrollView::GetTitleQuad() {
 	return m_pTitleQuad;
 }
 
-std::shared_ptr<text> UIScrollView::GetTitleText() {
+std::shared_ptr<text> UISpatialScrollView::GetTitleText() {
 	return m_pTitleText;
 }
 
-std::shared_ptr<UIView> UIScrollView::GetMenuItemsView() {
+std::shared_ptr<UIView> UISpatialScrollView::GetMenuItemsView() {
 	return m_pMenuButtonsContainer;
 }
 
-RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
+RESULT UISpatialScrollView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {

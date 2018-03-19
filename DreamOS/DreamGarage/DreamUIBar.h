@@ -19,7 +19,7 @@
 #include <queue>
 
 class DreamUserControlArea;
-class UIScrollView;
+class UISpatialScrollView;
 class UIMallet;
 class UIView;
 
@@ -130,7 +130,7 @@ protected:
 private:
 
 	std::shared_ptr<UIView> m_pView; // not used for anything yet, but would be used for other UI elements
-	std::shared_ptr<UIScrollView> m_pScrollView;
+	std::shared_ptr<UISpatialScrollView> m_pScrollView;
 
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;

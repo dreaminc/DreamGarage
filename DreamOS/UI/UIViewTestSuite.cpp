@@ -7,7 +7,7 @@
 
 #include "UIView.h"
 #include "UIButton.h"
-#include "UIScrollView.h"
+#include "UISpatialScrollView.h"
 #include "UIMallet.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
@@ -215,7 +215,7 @@ RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
 	CR(AddTestDreamUIBar());
-	//CR(AddTestUIScrollView());
+	//CR(AddTestUISpatialScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
@@ -528,7 +528,7 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::AddTestUIScrollView() {
+RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10000.0;
@@ -536,7 +536,7 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 	struct TestContext {
 		composite* pComposite = nullptr;
 		std::shared_ptr<UIView> pView = nullptr;
-		std::shared_ptr<UIScrollView> pScrollView = nullptr;
+		std::shared_ptr<UISpatialScrollView> pScrollView = nullptr;
 		std::vector<std::shared_ptr<UIButton>> pButtons = {};
 		UIMallet* pLeftMallet = nullptr;
 		UIMallet* pRightMallet = nullptr;
@@ -569,7 +569,7 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		pView = pComposite->AddUIView(m_pDreamOS);
 		pView->InitializeOBB();
 
-		pScrollView = pView->AddUIScrollView();
+		pScrollView = pView->AddUISpatialScrollView();
 
 		for (int i = 0; i < numButtons; i++) {
 			pButtons.emplace_back(pView->MakeUIButton()); // ScrollView adds them
@@ -949,7 +949,7 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 			pComposite->InitializeOBB();
 			std::shared_ptr<UIView> pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
-			std::shared_ptr<UIScrollView> pScrollView = pView->AddUIScrollView();
+			std::shared_ptr<UISpatialScrollView> pScrollView = pView->AddUISpatialScrollView();
 			std::vector<std::shared_ptr<UIButton>> pButtons = {};
 			for (int i = 0; i < 4; i++) {	
 				pButtons.emplace_back(pView->MakeUIButton());
