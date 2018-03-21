@@ -31,6 +31,7 @@ RESULT DreamTabView::InitializeApp(void *pContext) {
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	m_pScrollView = m_pView->AddUIFlatScrollView();
+	//m_pScrollView = m_pView->MakeUIFlatScrollView();
 
 	return R_PASS;
 }
@@ -42,7 +43,12 @@ RESULT DreamTabView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamTabView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pScrollView->Update());
+	if (m_pScrollView != nullptr) {
+		CR(m_pScrollView->Update());
+	}
+	//if (m_pScrollView->GetCurrentTexture() != nullptr) {
+	//	m_pRenderQuad->SetDiffuseTexture(m_pScrollView->GetCurrentTexture());
+	//}
 
 Error:
 	return r;
@@ -73,6 +79,7 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_tabHeight *= baseWidth;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
+	//m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 	m_pBackgroundTexture = GetDOS()->MakeTexture(k_wszTabBackground, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 	m_pBackgroundQuad->SetPosition(point(0.0f, -0.0005f, 0.0f));
@@ -105,6 +112,8 @@ std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 	auto pDreamOS = GetDOS();
 
 	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
+	//pNewTabButton = m_pScrollView->MakeUIButton(m_tabWidth, m_tabHeight);
+	//m_pScrollView->AddObject(pNewTabButton);
 
 	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
@@ -126,8 +135,6 @@ RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	CN(pNewTabButton);
 
 	for (auto pButton : m_tabButtons) {
-//	for (auto pButton : m_pScrollView->GetTabButtons()) {
-		//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 		TranslateTabDown(pButton.get());
 	}
 

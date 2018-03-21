@@ -81,6 +81,7 @@ private:
 	DreamUserControlArea* m_pParentApp = nullptr;
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
+	std::shared_ptr<quad> m_pRenderQuad = nullptr;
 
 	std::map<std::shared_ptr<DreamContentSource>, std::shared_ptr<UIButton>> m_appToTabMap;
 

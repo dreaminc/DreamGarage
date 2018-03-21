@@ -1,4 +1,5 @@
 #include "UIFlatScrollView.h"
+#include "Primitives/Framebuffer.h"
 #include "DreamOS.h"
 
 UIFlatScrollView::UIFlatScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
@@ -25,12 +26,24 @@ RESULT UIFlatScrollView::Update() {
 	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 10000000.0f));
 
 	SetPosition(GetPosition() + ptDiff);
+
+	/*
+	if (m_pRenderContext == nullptr) {
+		m_pRenderContext = MakeFlatContext();
+	}
+	m_pRenderContext->RenderToTexture();
+	m_pCurrentTexture = m_pRenderContext->GetFramebuffer()->GetColorTexture();
+	//*/
 		
 	return r;
 }
 
 std::vector<std::shared_ptr<UIButton>> UIFlatScrollView::GetTabButtons() {
 	return m_pTabButtons;
+}
+
+texture *UIFlatScrollView::GetCurrentTexture() {
+	return m_pCurrentTexture;
 }
 
 RESULT UIFlatScrollView::SetScrollFlag(bool fCanScroll, int index) {
@@ -41,6 +54,15 @@ RESULT UIFlatScrollView::SetScrollFlag(bool fCanScroll, int index) {
 	}
 
 	return R_PASS;
+}
+
+RESULT UIFlatScrollView::AddObject(std::shared_ptr<DimObj> pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pRenderContext->AddObject(pObject));
+
+Error:
+	return r;
 }
 
 RESULT UIFlatScrollView::Notify(SenseControllerEvent *pEvent) {
