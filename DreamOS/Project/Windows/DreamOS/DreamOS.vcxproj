@@ -741,6 +741,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
@@ -1077,6 +1078,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.h" />
@@ -1402,6 +1404,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert" />
     <None Include="..\..\..\Makefile" />

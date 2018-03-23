@@ -13,6 +13,7 @@ class DreamOS;
 
 class UIFlatScrollView : public UIView, public UIScrollView//, public Subscriber<SenseControllerEvent>
 {
+	friend class MultiContentTestSuite;
 public:
 	UIFlatScrollView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIFlatScrollView();
@@ -26,8 +27,10 @@ public:
 
 	RESULT SetScrollFlag(bool fCanScroll, int index);
 
-	//TODO: make this architecture
-	RESULT AddObject(std::shared_ptr<DimObj> pObject);
+	RESULT SetBounds(float width, float height);
+
+	std::shared_ptr<FlatContext> GetRenderContext();
+	RESULT SetRenderQuad(std::shared_ptr<quad> pRenderQuad);
 
 public:
 	RESULT Notify(SenseControllerEvent *pEvent);
@@ -37,6 +40,9 @@ private:
 	std::vector<std::shared_ptr<UIButton>> m_pTabButtons;
 
 	std::shared_ptr<FlatContext> m_pRenderContext = nullptr;
+
+	std::shared_ptr<quad> m_pRenderQuad = nullptr;
+
 	texture *m_pCurrentTexture = nullptr;
 
 	bool m_fCanScrollFlag[2];

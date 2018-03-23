@@ -82,6 +82,8 @@ public:
 	RESULT FlipUVVertical();
 	RESULT FlipUVHorizontal();
 
+	RESULT SetUVValues(float top, float left, float bottom, float right);
+
 	vector GetNormal();
 	
 	type EvaluatePoints(point a, point b, point c);

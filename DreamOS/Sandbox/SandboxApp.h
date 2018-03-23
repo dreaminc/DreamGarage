@@ -182,8 +182,11 @@ public:
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT AddObjectToFlatScrollGraph(VirtualObj *pObject);
+
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromFlatScrollGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
@@ -400,6 +403,7 @@ protected:
 	ObjectStoreNode *m_pSceneGraph = nullptr;
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
 	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
+	ObjectStoreNode *m_pUIFlatScrollSceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;

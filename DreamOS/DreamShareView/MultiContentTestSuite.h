@@ -47,6 +47,9 @@ public:
 	// multiple browsers
 	RESULT AddTestManyBrowsers();
 
+	// flat context with dream tab view
+	RESULT AddTestDreamTabView();
+
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 

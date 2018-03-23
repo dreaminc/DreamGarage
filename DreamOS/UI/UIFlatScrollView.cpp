@@ -18,6 +18,7 @@ UIFlatScrollView::~UIFlatScrollView()
 RESULT UIFlatScrollView::Update() {
 	RESULT r = R_PASS;
 
+	/*
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	msNow /= 1000.0;
@@ -26,13 +27,13 @@ RESULT UIFlatScrollView::Update() {
 	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 10000000.0f));
 
 	SetPosition(GetPosition() + ptDiff);
+	//*/
 
-	/*
-	if (m_pRenderContext == nullptr) {
-		m_pRenderContext = MakeFlatContext();
+	//*
+	if (m_pRenderContext != nullptr && m_pRenderQuad != nullptr) {
+		m_pRenderContext->RenderToQuad(m_pRenderQuad.get(), 0.0f, 0.0f);
+		//m_pCurrentTexture = m_pRenderContext->GetFramebuffer()->GetColorTexture();
 	}
-	m_pRenderContext->RenderToTexture();
-	m_pCurrentTexture = m_pRenderContext->GetFramebuffer()->GetColorTexture();
 	//*/
 		
 	return r;
@@ -56,13 +57,31 @@ RESULT UIFlatScrollView::SetScrollFlag(bool fCanScroll, int index) {
 	return R_PASS;
 }
 
-RESULT UIFlatScrollView::AddObject(std::shared_ptr<DimObj> pObject) {
+RESULT UIFlatScrollView::SetBounds(float width, float height) {
 	RESULT r = R_PASS;
 
-	CR(m_pRenderContext->AddObject(pObject));
+	CN(m_pRenderContext);
+	m_pRenderContext->SetIsAbsolute(true);
+	m_pRenderContext->SetAbsoluteBounds(width, height);
 
 Error:
 	return r;
+}
+
+std::shared_ptr<FlatContext> UIFlatScrollView::GetRenderContext() {
+	return m_pRenderContext;
+}
+
+RESULT UIFlatScrollView::SetRenderQuad(std::shared_ptr<quad> pRenderQuad) {
+	m_pRenderQuad = pRenderQuad;
+	if (m_pRenderContext == nullptr) {
+		m_pRenderContext = MakeFlatContext();
+		//m_pRenderContext->SetScaleToFit(false);
+		//m_pRenderContext->AddObject(this);
+		m_pRenderContext->SetIsAbsolute(true);
+		m_pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
+	}
+	return R_PASS;
 }
 
 RESULT UIFlatScrollView::Notify(SenseControllerEvent *pEvent) {

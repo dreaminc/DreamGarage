@@ -235,8 +235,11 @@ public:
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
+	RESULT AddObjectToFlatScrollGraph(VirtualObj *pObject);
+
 	RESULT RemoveObjectFromUIGraph(VirtualObj *pObject);
 	RESULT RemoveObjectFromUIClippingGraph(VirtualObj *pObject);
+	RESULT RemoveObjectFromFlatScrollGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();

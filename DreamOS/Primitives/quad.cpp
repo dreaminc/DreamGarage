@@ -298,6 +298,27 @@ Error:
 	return r;
 }
 
+RESULT quad::SetUVValues(float top, float left, float bottom, float right) {
+	RESULT r = R_PASS;
+
+	int vertCount = 0;
+
+	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
+		uv_precision uValue = left + (i * (right - left) / m_numHorizontalDivisions);
+
+		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+			uv_precision vValue = top + (j * (bottom - top) / m_numVerticalDivisions);
+
+			m_pVertices[vertCount++].SetUV(uValue, vValue);
+		}
+	}
+
+	CR(SetDirty());
+
+Error:
+	return r;
+}
+
 vector quad::GetNormal() {
 	return m_vNormal;
 }

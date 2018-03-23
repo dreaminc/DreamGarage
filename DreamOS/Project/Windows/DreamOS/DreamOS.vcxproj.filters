@@ -995,6 +995,9 @@
     <ClCompile Include="..\..\..\UI\UIFlatScrollView.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2162,6 +2165,9 @@
     <ClInclude Include="..\..\..\UI\UIFlatScrollView.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2350,6 +2356,12 @@
     </None>
     <None Include="..\..\..\DreamOS.tpp">
       <Filter>DreamOS</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
