@@ -348,8 +348,8 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 	Box.back = 1;
 
 	CR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture)));		// 0 is back buffer
-	//pTempTexture->GetDesc(&descTemp);
-	m_pSharedSurf->GetDesc(&descTemp);
+	pTempTexture->GetDesc(&descTemp);
+	//m_pSharedSurf->GetDesc(&descTemp);
 
 	// Make copy that we can access Data from
 	pxWidth = descTemp.Width;
@@ -367,8 +367,8 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 	descDream.MipLevels = 1;
 	descDream.ArraySize = 1;
 	descDream.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	descDream.SampleDesc.Count = 1;
-	descDream.SampleDesc.Quality = 0;
+	descDream.SampleDesc.Count = descTemp.SampleDesc.Count;
+	descDream.SampleDesc.Quality = descTemp.SampleDesc.Quality;
 	descDream.Usage = D3D11_USAGE_STAGING;
 	descDream.BindFlags = 0;
 	descDream.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -378,12 +378,7 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 	CR(m_pDevice->CreateTexture2D(&descTemp, nullptr, &pResolvedTexture))
 
 	if (pxWidth > 0) {
-		//m_pDeviceContext->ResolveSubresource(pResolvedTexture, 0, pTempTexture, 0, descTemp.Format);
-		//m_pDeviceContext->CopyResource(pTextureForDream, pResolvedTexture);
-
-		m_pDeviceContext->CopySubresourceRegion(pTextureForDream, 0, 0, 0, 0, m_pSharedSurf, 0, &Box);
-		
-		//m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
+		m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
 		//m_pDeviceContext->CopyResource(pTextureForDream, m_pSharedSurf);
 
 		pTextureForDream->QueryInterface(__uuidof(IDXGISurface), (void **)&DreamSurface);
@@ -453,8 +448,6 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 		return ProcessFailure(m_pDevice, L"Failed to acquire Keyed mutex in D3D11DesktopDuplicationOutputManager", L"Error", hr, SystemTransitionsExpectedErrors);
 	}
 
-	CopyToSendToDream(pBuffer, pxWidth, pxHeight);
-
 	// Got mutex, so draw
 	DUPL_RETURN Ret = DrawFrame();
 	//*	This Draws the Mouse, disabling for Now
@@ -467,6 +460,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 		}
 	}
 	//*/
+
+	CopyToSendToDream(pBuffer, pxWidth, pxHeight);
 
 	// Release keyed mutex
 	hr = m_pKeyMutex->ReleaseSync(0);
