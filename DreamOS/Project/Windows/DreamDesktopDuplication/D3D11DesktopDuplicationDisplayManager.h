@@ -24,16 +24,16 @@ private:
 	void SetMoveRect(_Out_ RECT* SrcRect, _Out_ RECT* DestRect, _In_ DXGI_OUTPUT_DESC* DeskDesc, _In_ DXGI_OUTDUPL_MOVE_RECT* MoveRect, INT TexWidth, INT TexHeight);
 
 	// variables
-	ID3D11Device* m_pDevice;
-	ID3D11DeviceContext* m_pDeviceContext;
-	ID3D11Texture2D* m_pMoveSurf;
-	ID3D11VertexShader* m_pVertexShader;
-	ID3D11PixelShader* m_pPixelShader;
-	ID3D11InputLayout* m_pInputLayout;
-	ID3D11RenderTargetView* m_pRTV;
-	ID3D11SamplerState* m_pSamplerLinear;
-	BYTE* m_pDirtyVertexBufferAlloc;
-	UINT m_DirtyVertexBufferAllocSize;
+	ID3D11Device* m_pDevice = nullptr;
+	ID3D11DeviceContext* m_pDeviceContext = nullptr;
+	ID3D11Texture2D* m_pMoveSurf = nullptr;
+	ID3D11VertexShader* m_pVertexShader = nullptr;
+	ID3D11PixelShader* m_pPixelShader = nullptr;
+	ID3D11InputLayout* m_pInputLayout = nullptr;
+	ID3D11RenderTargetView* m_pRTV = nullptr;
+	ID3D11SamplerState* m_pSamplerLinear = nullptr;
+	BYTE* m_pDirtyVertexBufferAlloc = nullptr;
+	UINT m_DirtyVertexBufferAllocSize = 0;
 };
 
 #endif
