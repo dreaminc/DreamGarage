@@ -338,16 +338,29 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 
 	ID3D11Texture2D *pTempTexture = nullptr;
 	ID3D11Texture2D* pTextureForDream = nullptr;
+	ID3D11Texture2D* pResolvedTexture = nullptr;
 	D3D11_TEXTURE2D_DESC descTemp;
 	D3D11_TEXTURE2D_DESC descDream;
 	IDXGISurface *DreamSurface = nullptr;
+	
+	D3D11_BOX Box;
+	Box.front = 0;
+	Box.back = 1;
 
 	CR(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&pTempTexture)));		// 0 is back buffer
-	pTempTexture->GetDesc(&descTemp);
+	//pTempTexture->GetDesc(&descTemp);
+	m_pSharedSurf->GetDesc(&descTemp);
 
 	// Make copy that we can access Data from
 	pxWidth = descTemp.Width;
 	pxHeight = descTemp.Height;
+	
+	Box.left = 0;
+	Box.top = 0;
+	Box.right = pxWidth;
+	Box.bottom = pxHeight;
+
+	RtlZeroMemory(&descDream, sizeof(D3D11_TEXTURE2D_DESC));
 
 	descDream.Width = pxWidth;
 	descDream.Height = pxHeight;
@@ -362,8 +375,16 @@ HRESULT D3D11DesktopDuplicationOutputManager::CopyToSendToDream(BYTE** pBuffer, 
 	descDream.MiscFlags = 0;
 
 	CR(m_pDevice->CreateTexture2D(&descDream, nullptr, &pTextureForDream));
+	CR(m_pDevice->CreateTexture2D(&descTemp, nullptr, &pResolvedTexture))
+
 	if (pxWidth > 0) {
-		m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
+		//m_pDeviceContext->ResolveSubresource(pResolvedTexture, 0, pTempTexture, 0, descTemp.Format);
+		//m_pDeviceContext->CopyResource(pTextureForDream, pResolvedTexture);
+
+		m_pDeviceContext->CopySubresourceRegion(pTextureForDream, 0, 0, 0, 0, m_pSharedSurf, 0, &Box);
+		
+		//m_pDeviceContext->CopyResource(pTextureForDream, pTempTexture);
+		//m_pDeviceContext->CopyResource(pTextureForDream, m_pSharedSurf);
 
 		pTextureForDream->QueryInterface(__uuidof(IDXGISurface), (void **)&DreamSurface);
 		pTextureForDream->Release();

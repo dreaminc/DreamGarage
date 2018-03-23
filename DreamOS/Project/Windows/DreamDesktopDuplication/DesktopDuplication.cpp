@@ -217,8 +217,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	DestroyCursor(Cursor);
 
-	//ShowWindow(pWindowHandle, nCmdShow);
-	//UpdateWindow(pWindowHandle);
+	ShowWindow(pWindowHandle, nCmdShow);
+	UpdateWindow(pWindowHandle);
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
@@ -286,7 +286,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 		}
 		//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
-		if (g_fStartSending && (pBuffer != nullptr) && (pBuffer [0] != '\0')) {
+		if (g_fStartSending && (pBuffer != nullptr) /*&& (pBuffer [0] != '\0')*/) {
 			//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
 			DDCIPCMessage ddcMessage;
 
@@ -391,7 +391,7 @@ bool ProcessCmdline(_Out_ INT* outputToDuplicate) {
 		}
 	}
 
-	//*outputToDuplicate = 1;		// Use for testing, will duplicate only main monitor
+	*outputToDuplicate = 0;		// Use for testing, will duplicate only main monitor
 	return true;
 }
 

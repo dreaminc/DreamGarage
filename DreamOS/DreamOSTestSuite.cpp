@@ -1228,6 +1228,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	struct TestContext {
 		std::shared_ptr<DreamDesktopApp> pDreamDesktop = nullptr;
 		std::shared_ptr<DreamUserControlArea> pDreamUserControlArea = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
+		texture* pTexture = nullptr;
 		bool once = false;
 	};
 	TestContext *pTestContext = new TestContext();
@@ -1241,16 +1243,16 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
-			std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+			//std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 			pTestContext->pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 			CNM(pTestContext->pDreamDesktop, "Failed to create dream desktop");
 
-			pTestContext->pDreamUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
-			pTestContext->pDreamUserControlArea->AddEnvironmentAsset(pEnvAsset);
-			pTestContext->pDreamUserControlArea->SetActiveSource(pTestContext->pDreamDesktop);	
-			pTestContext->pDreamUserControlArea->GetComposite()->SetPosition(m_pDreamOS->GetCameraPosition() + point(0.0f, 1.5f, -.3f));
+			//pTestContext->pDreamUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			//pTestContext->pDreamUserControlArea->AddEnvironmentAsset(pEnvAsset);
+			//pTestContext->pDreamUserControlArea->SetActiveSource(pTestContext->pDreamDesktop);	
+			//pTestContext->pDreamUserControlArea->GetComposite()->SetPosition(m_pDreamOS->GetCameraPosition() + point(0.0f, 1.5f, -.3f));
 			
-			/*
+			
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
@@ -1261,10 +1263,10 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			pTestContext->pQuad->SetPosition(0.0f, 0.0f, 0.0f);
 			pTestContext->pQuad->FlipUVVertical();
 
-			int pxWidth = 938;
-			int pxHeight = 484;
+			int pxWidth = 1920;
+			int pxHeight = 1080;
 
-			m_pDataBuffer_n = 938*484*4;
+			m_pDataBuffer_n = pxHeight*pxWidth*4;
 			m_pDataBuffer = (unsigned char*)malloc(m_pDataBuffer_n);
 
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
@@ -1272,7 +1274,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			m_pDataBuffer_n = 0;
 			pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture);
 
-			//*
+			/*
 			STARTUPINFO si;
 			PROCESS_INFORMATION pi;
 
@@ -1286,7 +1288,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 				std::wstring wstrDreamPath;
 				pPathManager->GetDreamPath(wstrDreamPath);
 
-				std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Release\\DreamDesktopCapture.exe";
+				std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Testing\\DreamDesktopCapture.exe";
 				std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
 				const wchar_t *wPath = wstrFullpath.c_str();
 				std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
@@ -1325,10 +1327,10 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			}
 
 			DDCIPCMessage ddcMessage;
-			ddcMessage.SetType(DDCIPCMessage::type::START);
+			ddcMessage.m_msgType = DDCIPCMessage::type::START;
 			COPYDATASTRUCT desktopCDS;
 
-			desktopCDS.dwData = (unsigned long)ddcMessage.GetMessage();
+			desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
 			desktopCDS.cbData = sizeof(ddcMessage);
 			desktopCDS.lpData = &ddcMessage;
 
@@ -1361,7 +1363,8 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
 		CN(pTestContext);
 		if (!pTestContext->once) {
-			CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
+			//CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
+			pTestContext->pTexture->Update(m_pDataBuffer, m_pxWidth, m_pxHeight, PIXEL_FORMAT::BGRA);
 			// pTestContext->once = true;
 			if (m_pDataBuffer) {
 				free(m_pDataBuffer);
