@@ -162,17 +162,20 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	startupinfoDesktopDuplication.cb = sizeof(startupinfoDesktopDuplication);
 	memset(&processinfoDesktopDuplication, 0, sizeof(processinfoDesktopDuplication));
 
-	// TODO: macro with project pre-definition using project name
-	PathManager* pPathManager = PathManager::instance();
-	std::wstring wstrDreamPath;
-	pPathManager->GetDreamPath(wstrDreamPath);
+	wchar_t pszFilePath[MAX_PATH];
+	GetModuleFileName(NULL, pszFilePath, sizeof(pszFilePath));	// Gets path to .exe, including exe name
+	std::wstring wstrFilePath = std::wstring(pszFilePath);
 
-	std::wstring wstrPathfromDreamPath = WSTRDREAMCAPTURELOCATION;
-	std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
-	const wchar_t *wPath = wstrFullpath.c_str();
+	size_t nIndex = wstrFilePath.find_last_of(L"\\");			// Finds index of .exe name, since path will look like "..\\DreamExample.exe"
+	wstrFilePath.erase(wstrFilePath.begin() + nIndex, wstrFilePath.end());	// erases .exe name from the path
+
+	std::wstring wstrFullpath = wstrFilePath + WSTRDREAMCAPTURELOCATION;	// adds DreamDesktopCapture.exe to the path
+
+	const wchar_t *wPath = wstrFullpath.c_str();	// convert wstring to LPWSTR
 	std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
 	vwszLocation.push_back(0);
 	LPWSTR lpwstrLocation = vwszLocation.data();
+
 	bool fCreatedDuplicationProcess = false;
 	
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobELI = { 0 };	// In case we want to add memory limits, and can track peak usage
@@ -185,8 +188,10 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
+	LPTSTR szCmdline = L" -output 0";
+
 	fCreatedDuplicationProcess = CreateProcess(lpwstrLocation,
-		L" -output 0",						// Command line
+		szCmdline,						// Command line
 		nullptr,							// Process handle not inheritable
 		nullptr,							// Thread handle not inheritable
 		false,								// Set handle inheritance to FALSE
