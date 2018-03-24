@@ -40,6 +40,7 @@ RESULT UIControlBar::Initialize() {
 	m_pURLTexture = m_pDreamOS->MakeTexture(k_wszURL, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pShareTexture = m_pDreamOS->MakeTexture(k_wszShare, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pStopSharingTexture = m_pDreamOS->MakeTexture(k_wszStopSharing, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pKeyboardTexture = m_pDreamOS->MakeTexture(k_wszKeyboard, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
 
@@ -48,6 +49,9 @@ RESULT UIControlBar::Initialize() {
 
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+
+	m_pKeyboardButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pKeyboardButton->GetSurface()->SetDiffuseTexture(m_pKeyboardTexture);
 
 	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
@@ -66,7 +70,7 @@ RESULT UIControlBar::Initialize() {
 
 	// register all of the buttons (except for the URL button) for the selection event
 	// URL button has become less useful with the addition of the open button
-	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
@@ -99,6 +103,9 @@ RESULT UIControlBar::Initialize() {
 		auto fnURLCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return URLPressed(pButtonContext, pContext);
 		};
+		auto fnKeyboardCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return KeyboardPressed(pButtonContext, pContext);
+		};
 
 		// update button trigger events to match the observer
 		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
@@ -108,6 +115,7 @@ RESULT UIControlBar::Initialize() {
 		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnShareCallback));
 		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
+		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
 	}
 
 Error:
@@ -126,6 +134,14 @@ RESULT UIControlBar::ForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
 	CR(m_pObserver->HandleForwardPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::KeyboardPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleKeyboardPressed(pButtonContext, pContext));
 Error:
 	return r;
 }
@@ -272,6 +288,10 @@ std::shared_ptr<UIButton> UIControlBar::GetForwardButton() {
 	return m_pForwardButton;
 }
 
+std::shared_ptr<UIButton> UIControlBar::GetKeyboardButton() {
+	return m_pKeyboardButton;
+}
+
 std::shared_ptr<UIButton> UIControlBar::GetToggleButton() {
 	return m_pToggleButton;
 }
@@ -338,6 +358,9 @@ BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType
 	//TODO: use static map
 	if (strContentType == "ContentControlType.Website") {
 		return BarType::BROWSER;
+	}
+	else if (strContentType == "ContentControlType.Desktop") {
+		return BarType::DESKTOP;
 	}
 	else if (strContentType == "") {
 		return BarType::DEFAULT;

@@ -20,6 +20,7 @@ class text;
 enum class BarType {
 	DEFAULT,
 	BROWSER,
+	DESKTOP,
 	INVALID
 };
 
@@ -33,6 +34,7 @@ public:
 	virtual RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) = 0;
 	virtual RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) = 0;
 	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) = 0;
 };
 
 class UIControlBar : public UIView {
@@ -54,6 +56,7 @@ public:
 	std::shared_ptr<UIButton> GetShareButton();
 	std::shared_ptr<UIButton> GetStopButton();
 	std::shared_ptr<UIButton> GetURLButton();
+	std::shared_ptr<UIButton> GetKeyboardButton();
 
 	// Wrappers for executing the observer methods
 	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
@@ -63,6 +66,7 @@ public:
 	RESULT ClosePressed(UIButton* pButtonContext, void* pContext);
 	RESULT SharePressed(UIButton* pButtonContext, void* pContext);
 	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
+	RESULT KeyboardPressed(UIButton* pButtonContext, void* pContext);
 
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
@@ -98,6 +102,7 @@ public:
 	const wchar_t *k_wszHide = L"control-view-minimize.png";
 	const wchar_t *k_wszShow = L"control-view-maximize.png";
 	const wchar_t *k_wszURL = L"control-view-url.png";
+	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
 
 private:
 	std::shared_ptr<UIButton> m_pBackButton = nullptr;
@@ -106,12 +111,14 @@ private:
 	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
 	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
 	std::shared_ptr<UIButton> m_pShareToggleButton = nullptr;
+	std::shared_ptr<UIButton> m_pKeyboardButton = nullptr;
 
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
 	std::shared_ptr<text> m_pURLText = nullptr;
 
 	texture *m_pBackTexture = nullptr;
 	texture *m_pForwardTexture = nullptr;
+	texture *m_pKeyboardTexture = nullptr;
 	texture *m_pShowTexture = nullptr;
 	texture *m_pHideTexture = nullptr;
 	texture *m_pOpenTexture = nullptr;
