@@ -1,6 +1,7 @@
 #include "UIControlBar.h"
 #include "DreamOS.h"
 #include "UI/UIButton.h"
+#include "DreamUserControlArea/DreamContentSource.h"
 #include "Primitives/text.h"
 #include "Primitives/font.h"
 
@@ -50,7 +51,7 @@ RESULT UIControlBar::Initialize() {
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
 
-	m_pKeyboardButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pKeyboardButton = AddUIButton((2.0f * m_itemSide + m_itemSpacing), m_itemSide);
 	m_pKeyboardButton->GetSurface()->SetDiffuseTexture(m_pKeyboardTexture);
 
 	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
@@ -76,6 +77,23 @@ RESULT UIControlBar::Initialize() {
 
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
+	}
+
+	// Set-up text for url/title
+	{
+		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
+		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+
+		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
+			"",
+			m_urlWidth - m_itemSpacing,
+			m_itemSide - (2.0f*m_itemSpacing),
+			textFlags));
+
+		m_pURLText->RotateXByDeg(90.0f);
+		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+		m_pURLButton->AddObject(m_pURLText);
 	}
 
 	CR(UpdateButtonsWithType(m_barType));
@@ -191,21 +209,6 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 	m_barType = type;
 
-	auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
-	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
-
-	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
-		"", 
-		m_urlWidth - m_itemSpacing, 
-		m_itemSide - (2.0f*m_itemSpacing), 
-		textFlags));
-
-	m_pURLText->RotateXByDeg(90.0f);
-	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-	m_pURLButton->AddObject(m_pURLText);
-
-
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
@@ -220,6 +223,9 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 	point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pCloseButton->SetPosition(ptClose);
+
+	point ptKeyboard = ptStart + point(m_itemSide + (m_itemSpacing / 2.0), 0.0f, 0.0f);
+	m_pKeyboardButton->SetPosition(ptKeyboard);
 	//*/
 
 	point ptURL = point(0.0f, 0.0f, 0.0f);// ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
@@ -234,6 +240,24 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	point ptHide = ptOpen + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pToggleButton->SetPosition(ptHide);
 
+	if (m_barType == BarType::BROWSER) {
+		m_pKeyboardButton->SetVisible(false);
+		m_pBackButton->SetVisible(true);
+		m_pForwardButton->SetVisible(true);
+
+		m_pBackButton->RegisterToInteractionEngine(m_pDreamOS);
+		m_pForwardButton->RegisterToInteractionEngine(m_pDreamOS);
+		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pKeyboardButton->GetInteractionObject());
+	}
+	else if (m_barType == BarType::DESKTOP) {
+		m_pKeyboardButton->SetVisible(true);
+		m_pBackButton->SetVisible(false);
+		m_pForwardButton->SetVisible(false);
+		
+		m_pKeyboardButton->RegisterToInteractionEngine(m_pDreamOS);
+		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pBackButton->GetInteractionObject());
+		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pForwardButton->GetInteractionObject());
+	}
 //Error:
 	return r;
 }
@@ -248,6 +272,7 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	quaternion qSurface;
 	quaternion qRotation;
 	CNR(pButtonContext, R_SKIPPED);
+	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 	pSurface = pButtonContext->GetSurface();
 
 	//vector for captured object movement
@@ -356,13 +381,13 @@ RESULT UIControlBar::SetObserver(ControlBarObserver *pObserver) {
 BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType) {
 
 	//TODO: use static map
-	if (strContentType == "ContentControlType.Website") {
+	if (strContentType == CONTENT_TYPE_BROWSER) {
 		return BarType::BROWSER;
 	}
-	else if (strContentType == "ContentControlType.Desktop") {
+	else if (strContentType == CONTENT_TYPE_DESKTOP) {
 		return BarType::DESKTOP;
 	}
-	else if (strContentType == "") {
+	else if (strContentType == CONTENT_TYPE_DEFAULT) {
 		return BarType::DEFAULT;
 	}
 	else {

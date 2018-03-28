@@ -212,6 +212,10 @@ int DreamBrowser::GetBrowserWidth() {
 
 RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
+	CBR(chKey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
+	CBR(chKey != 0, R_SKIPPED);
+	CBR(chKey != SVK_CONTROL, R_SKIPPED);
+
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
 Error:
@@ -638,6 +642,10 @@ int DreamBrowser::GetHeight() {
 
 std::string DreamBrowser::GetTitle() {
 	return m_strCurrentURL;
+}
+
+std::string DreamBrowser::GetContentType() {
+	return m_strContentType;
 }
 
 vector DreamBrowser::GetNormal() {

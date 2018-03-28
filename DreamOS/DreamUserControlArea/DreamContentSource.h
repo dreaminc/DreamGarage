@@ -5,6 +5,10 @@
 
 #include <memory>
 
+#define CONTENT_TYPE_BROWSER "ContentControlType.Website"
+#define CONTENT_TYPE_DESKTOP "ContentControlType.Desktop"
+#define CONTENT_TYPE_DEFAULT ""	// conforms with the string UIControlBar is expecting
+
 class texture;
 class point;
 
@@ -29,6 +33,7 @@ public:
 	virtual int GetHeight() = 0;
 
 	virtual std::string GetTitle() = 0;
+	virtual std::string GetContentType() = 0;
 };
 
 #endif // ! DREAM_CONTENT_SOURCE_H_

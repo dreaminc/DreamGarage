@@ -162,6 +162,14 @@ Error:
 	return R_PASS;
 }
 
+RESULT DreamControlBar::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::KEYBOARD));
+Error:
+	return R_PASS;
+}
+
 RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
@@ -187,10 +195,16 @@ Error:
 	return r;
 }
 
+RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
+	m_barType = m_pUIControlBar->ControlBarTypeFromString(strContentType);
+	return (m_pUIControlBar->UpdateButtonsWithType(m_barType));
+}
+
 RESULT DreamControlBar::Show() {
 	RESULT r = R_PASS;
 
 	GetComposite()->SetVisible(true);
+	m_pUIControlBar->UpdateButtonsWithType(m_barType);
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		GetComposite(),

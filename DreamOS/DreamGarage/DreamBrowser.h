@@ -123,6 +123,7 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
+	// DreamContentSource
 	virtual RESULT SetScope(std::string strScope) override;
 	virtual RESULT SetPath(std::string strPath) override;
 
@@ -130,6 +131,7 @@ public:
 	virtual int GetWidth() override;
 
 	virtual std::string GetTitle() override;
+	virtual std::string GetContentType() override;
 
 	RESULT PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
