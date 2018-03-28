@@ -86,7 +86,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
-	m_pControlBar->GetComposite()->SetVisible(false);
+	m_pControlBar->Hide();
 	m_pDreamTabView->GetComposite()->SetVisible(false);
 	m_pControlView->GetComposite()->SetVisible(false);
 
@@ -292,8 +292,12 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CR(HideView());
 		m_fIsShareURL = true;
 		//*/
-	}
+	} break;
 
+	case ControlEventType::KEYBOARD: {
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		ShowKeyboard("", point(0, (DEFAULT_PX_HEIGHT / 2), 0));
+	}
 	}
 
 Error:
@@ -318,8 +322,7 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
 
 	//only allow button presses while keyboard isn't active
-	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-
+	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);	
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(dirtyIndex != -1, R_SKIPPED);
 
@@ -374,7 +377,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 
 	m_pActiveSource = pNewContent;
 	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
-
+	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
 	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
@@ -453,7 +456,14 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 	m_fKeyboardUp = true;
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());
 	point ptLastEvent = m_pControlView->GetLastEvent();
-	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
+	
+	if (m_pActiveSource == m_pDreamDesktop){
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
+		CR(m_pControlBar->Hide());
+	}
+
+	else if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
 		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) {
 		OnClick(ptLastEvent, false);
 		OnClick(ptLastEvent, true);
@@ -462,7 +472,6 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
-		CR(m_pControlBar->GetComposite()->SetVisible(false));
 		CR(m_pControlBar->Hide());
 	}
 
@@ -615,10 +624,7 @@ RESULT DreamUserControlArea::CreateBrowserSource() {
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
 	std::string strTitle = m_strWebsiteTitle;
 
-
 	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
-
-
 
 Error:
 	return r;
@@ -692,6 +698,8 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 	CR(Show());
 
+	m_pControlBar->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
+
 Error:
 	return r;
 }
@@ -738,6 +746,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		// replace with top of tab bar
 		if (m_pActiveSource != nullptr) {
 			m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+			m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 			CR(ShowControlView());
 		}
@@ -843,9 +852,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		//TODO: re-enable typing in the browser
 		//*
 		if (m_fKeyboardUp) {
-			CBR(chkey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
-			CBR(chkey != 0, R_SKIPPED);
-			CBR(chkey != SVK_CONTROL, R_SKIPPED);
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
 			CR(m_pActiveSource->OnKeyPress(chkey, true));

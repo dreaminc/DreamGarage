@@ -30,7 +30,7 @@ RESULT DreamControlBar::InitializeApp(void *pContext) {
 	CN(m_pUIControlBar);
 	m_pUIControlBar->SetObserver(this);
 
-	//GetComposite()->SetVisible(true);
+	GetComposite()->SetVisible(true);
 
 Error:
 	return r;
@@ -162,6 +162,14 @@ Error:
 	return R_PASS;
 }
 
+RESULT DreamControlBar::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::KEYBOARD));
+Error:
+	return R_PASS;
+}
+
 RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 
@@ -187,13 +195,18 @@ Error:
 	return r;
 }
 
+RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
+	m_barType = m_pUIControlBar->ControlBarTypeFromString(strContentType);
+	return (m_pUIControlBar->UpdateButtonsWithType(m_barType));
+}
+
 RESULT DreamControlBar::Show() {
 	RESULT r = R_PASS;
 
-	GetComposite()->SetVisible(true);
+	m_pUIControlBar->SetVisible(true, false);	
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
+		m_pUIControlBar.get(),
 		color(1.0f, 1.0f, 1.0f, 1.0f),
 		m_pParentApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
@@ -210,13 +223,13 @@ RESULT DreamControlBar::Hide() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		GetComposite()->SetVisible(false);
+		m_pUIControlBar->SetVisible(false, false);
 
 		return r;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
+		m_pUIControlBar.get(),
 		color(1.0f, 1.0f, 1.0f, 0.0f),
 		m_pParentApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,

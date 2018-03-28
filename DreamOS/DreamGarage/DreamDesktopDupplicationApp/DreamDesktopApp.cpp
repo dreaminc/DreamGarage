@@ -59,16 +59,16 @@ RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	// Set up generic keyboard event
-	keyboardInputStruct.wScan = 0;
+	keyboardInputStruct.wScan = chKey;
 	keyboardInputStruct.dwExtraInfo = 0;
-	keyboardInputStruct.wVk = chKey;		// Should be getting VK code from Sensekeyboard anyway
-	keyboardInputStruct.dwFlags = 0;		// 0 for key press
+	keyboardInputStruct.wVk = 0;		// Should be getting VK code from Sensekeyboard anyway
+	keyboardInputStruct.dwFlags = KEYEVENTF_UNICODE;		// 0 for key press
 
 	inputStruct.ki = keyboardInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
 
-	keyboardInputStruct.dwFlags = KEYEVENTF_KEYUP;	// key up for key release
-	SendInput(1, &inputStruct, sizeof(INPUT));
+	keyboardInputStruct.dwFlags |= KEYEVENTF_KEYUP;	// key up for key release
+	//SendInput(1, &inputStruct, sizeof(INPUT));
 
 Error:
 	return r;
@@ -264,6 +264,7 @@ Error:
 
 RESULT DreamDesktopApp::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	m_assetID = pEnvironmentAsset->GetAssetID();
+	m_strContentType = pEnvironmentAsset->GetContentType();
 	return R_PASS;
 }
 
@@ -380,6 +381,10 @@ int DreamDesktopApp::GetWidth() {
 std::string DreamDesktopApp::GetTitle() {
 	//TODO: temporary until app focus is known
 	return "Windows Desktop";
+}
+
+std::string DreamDesktopApp::GetContentType() {
+	return m_strContentType;
 }
 
 vector DreamDesktopApp::GetNormal() {

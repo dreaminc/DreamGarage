@@ -1,6 +1,7 @@
 #include "UIControlBar.h"
 #include "DreamOS.h"
 #include "UI/UIButton.h"
+#include "DreamUserControlArea/DreamContentSource.h"
 #include "Primitives/text.h"
 #include "Primitives/font.h"
 
@@ -40,6 +41,7 @@ RESULT UIControlBar::Initialize() {
 	m_pURLTexture = m_pDreamOS->MakeTexture(k_wszURL, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pShareTexture = m_pDreamOS->MakeTexture(k_wszShare, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pStopSharingTexture = m_pDreamOS->MakeTexture(k_wszStopSharing, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pKeyboardTexture = m_pDreamOS->MakeTexture(k_wszKeyboard, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
 
@@ -48,6 +50,9 @@ RESULT UIControlBar::Initialize() {
 
 	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+
+	m_pKeyboardButton = AddUIButton((2.0f * m_itemSide + m_itemSpacing), m_itemSide);
+	m_pKeyboardButton->GetSurface()->SetDiffuseTexture(m_pKeyboardTexture);
 
 	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
@@ -66,12 +71,29 @@ RESULT UIControlBar::Initialize() {
 
 	// register all of the buttons (except for the URL button) for the selection event
 	// URL button has become less useful with the addition of the open button
-	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
+	}
+
+	// Set-up text for url/title
+	{
+		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
+		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+
+		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
+			"",
+			m_urlWidth - m_itemSpacing,
+			m_itemSide - (2.0f*m_itemSpacing),
+			textFlags));
+
+		m_pURLText->RotateXByDeg(90.0f);
+		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+		m_pURLButton->AddObject(m_pURLText);
 	}
 
 	CR(UpdateButtonsWithType(m_barType));
@@ -99,6 +121,9 @@ RESULT UIControlBar::Initialize() {
 		auto fnURLCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return URLPressed(pButtonContext, pContext);
 		};
+		auto fnKeyboardCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return KeyboardPressed(pButtonContext, pContext);
+		};
 
 		// update button trigger events to match the observer
 		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
@@ -108,6 +133,7 @@ RESULT UIControlBar::Initialize() {
 		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnShareCallback));
 		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
+		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
 	}
 
 Error:
@@ -126,6 +152,14 @@ RESULT UIControlBar::ForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
 	CR(m_pObserver->HandleForwardPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::KeyboardPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleKeyboardPressed(pButtonContext, pContext));
 Error:
 	return r;
 }
@@ -175,21 +209,6 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 	m_barType = type;
 
-	auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
-	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
-
-	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont, 
-		"", 
-		m_urlWidth - m_itemSpacing, 
-		m_itemSide - (2.0f*m_itemSpacing), 
-		textFlags));
-
-	m_pURLText->RotateXByDeg(90.0f);
-	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-	m_pURLButton->AddObject(m_pURLText);
-
-
 	// set buttons positions based on spec
 	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
@@ -204,6 +223,9 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 	point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pCloseButton->SetPosition(ptClose);
+
+	point ptKeyboard = ptStart + point(m_itemSide + (m_itemSpacing / 2.0), 0.0f, 0.0f);
+	m_pKeyboardButton->SetPosition(ptKeyboard);
 	//*/
 
 	point ptURL = point(0.0f, 0.0f, 0.0f);// ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
@@ -218,6 +240,16 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	point ptHide = ptOpen + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 	m_pToggleButton->SetPosition(ptHide);
 
+	if (m_barType == BarType::BROWSER) {
+		m_pKeyboardButton->SetVisible(false);
+		m_pBackButton->SetVisible(true);
+		m_pForwardButton->SetVisible(true);	
+	}
+	else if (m_barType == BarType::DESKTOP) {
+		m_pKeyboardButton->SetVisible(true);
+		m_pBackButton->SetVisible(false);
+		m_pForwardButton->SetVisible(false);
+	}
 //Error:
 	return r;
 }
@@ -231,7 +263,9 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	vector vRotation;
 	quaternion qSurface;
 	quaternion qRotation;
+	CBR(IsVisible(), R_SKIPPED);
 	CNR(pButtonContext, R_SKIPPED);
+	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 	pSurface = pButtonContext->GetSurface();
 
 	//vector for captured object movement
@@ -270,6 +304,10 @@ std::shared_ptr<UIButton> UIControlBar::GetBackButton() {
 
 std::shared_ptr<UIButton> UIControlBar::GetForwardButton() {
 	return m_pForwardButton;
+}
+
+std::shared_ptr<UIButton> UIControlBar::GetKeyboardButton() {
+	return m_pKeyboardButton;
 }
 
 std::shared_ptr<UIButton> UIControlBar::GetToggleButton() {
@@ -336,31 +374,16 @@ RESULT UIControlBar::SetObserver(ControlBarObserver *pObserver) {
 BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType) {
 
 	//TODO: use static map
-	if (strContentType == "ContentControlType.Website") {
+	if (strContentType == CONTENT_TYPE_BROWSER) {
 		return BarType::BROWSER;
 	}
-	else if (strContentType == "") {
+	else if (strContentType == CONTENT_TYPE_DESKTOP) {
+		return BarType::DESKTOP;
+	}
+	else if (strContentType == CONTENT_TYPE_DEFAULT) {
 		return BarType::DEFAULT;
 	}
 	else {
 		return BarType::INVALID;
 	}
-}
-
-std::shared_ptr<UIControlBar> UIControlBar::MakeControlBarWithType(BarType type, std::shared_ptr<UIView> pViewContext) {
-
-	switch (type) {
-
-	case BarType::BROWSER:
-	case BarType::DEFAULT: {
-		return pViewContext->MakeUIControlBar();
-	}
-
-	case BarType::INVALID: {
-		return nullptr;
-	}
-
-	}
-
-	return nullptr;
 }

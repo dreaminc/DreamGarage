@@ -26,6 +26,7 @@ enum class ControlEventType {
 	MAXIMIZE,
 	MINIMIZE,
 	URL,
+	KEYBOARD,
 	INVALID
 };
 
@@ -56,10 +57,12 @@ public:
 	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override;
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override;
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);
 	RESULT SetTitleText(std::string& strTitle);
+	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
@@ -82,6 +85,7 @@ private:
 
 	bool m_fUpdateTitle = false;
 	std::string m_strUpdateTitle = "";
+	BarType m_barType = BarType::DEFAULT;
 
 	double m_buttonWidth = BUTTON_WIDTH;
 	double m_buttonHeight = BUTTON_HEIGHT;

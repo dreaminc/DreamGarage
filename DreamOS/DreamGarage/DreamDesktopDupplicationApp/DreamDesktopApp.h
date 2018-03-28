@@ -64,6 +64,7 @@ public:
 	virtual int GetHeight() override;
 	virtual int GetWidth() override;
 	virtual std::string GetTitle() override;
+	virtual std::string GetContentType() override;
 
 	virtual RESULT CloseSource() override;
 
@@ -117,9 +118,12 @@ private:
 	long m_assetID = -1;
 	std::string m_strPath;
 	std::string m_strScope;
+	std::string m_strContentType;
 
 	double m_msTimeSinceLastSent = 0;
 	double m_msTimeDelay = 2000;
+
+	bool m_fShiftKey = false;
 
 	bool m_fDesktopDuplicationIsRunning = false;
 	DreamUserControlArea *m_pParentApp = nullptr;

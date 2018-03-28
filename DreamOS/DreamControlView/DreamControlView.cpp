@@ -657,8 +657,10 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	WebBrowserPoint ptUnFocusText;	// will fire if user closes keyboard and then wants
 	ptUnFocusText.x = -1;				// to go back into the same textbox
 	ptUnFocusText.y = -1;
-	CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), false));
-	CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), true));
+	if (m_pParentApp->GetActiveSource().get()->GetContentType() == CONTENT_TYPE_BROWSER) {
+		CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), false));
+		CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), true));
+	}
 	m_ptLastEvent = ptUnFocusText;
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -687,7 +689,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-	CBR(m_ptLastEvent.x != -1 || m_ptLastEvent.y != -1, R_SKIPPED);
+	CBR(ptTextBox.x() != -1 || ptTextBox.y() != -1, R_SKIPPED);
 
 	// TODO: get textbox location from node, for now just defaulting to the middle
 	if (ptTextBox.y() == -1) {
