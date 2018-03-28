@@ -121,9 +121,8 @@ std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 	auto pContent = m_pParentApp->GetActiveSource();
 	auto pDreamOS = GetDOS();
 
-	//pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
-	pNewTabButton = m_pScrollView->MakeUIButton(m_tabWidth, m_tabHeight);
-	m_pScrollView->AddObject(pNewTabButton);
+	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
+	//m_pScrollView->AddObject(pNewTabButton);
 
 	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
@@ -145,8 +144,8 @@ RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	CN(pNewTabButton);
 
 	for (auto pButton : m_tabButtons) {
-		pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
-		//TranslateTabDown(pButton.get());
+		//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+		TranslateTabDown(pButton.get());
 	}
 
 	m_tabButtons.emplace_back(pNewTabButton);
@@ -179,8 +178,8 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 		pDreamOS->RemoveObjectFromUIGraph(pButtonToRemove.get());
 
 		for (auto pButton : m_tabButtons) {
-			pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
-			//TranslateTabUp(pButton.get());
+		//	pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+			TranslateTabUp(pButton.get());
 		}
 		return pActiveContent;
 	}
@@ -226,8 +225,8 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			break;
 		} 
 		else {
-			pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
-			//TranslateTabDown(pButton.get());
+			//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+			TranslateTabDown(pButton.get());
 		}
 	}
 
@@ -364,10 +363,10 @@ RESULT DreamTabView::TranslateTabDown(UIButton *pTabButton) {
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		pTabButton,
-		pTabButton->GetPosition() + ptDisplacement,
-		pTabButton->GetOrientation(),
-		pTabButton->GetScale(),
+		pTabButton->GetSurface().get(),
+		pTabButton->GetSurface()->GetPosition() + ptDisplacement,
+		pTabButton->GetSurface()->GetOrientation(),
+		pTabButton->GetSurface()->GetScale(),
 		m_pParentApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
@@ -383,6 +382,16 @@ RESULT DreamTabView::TranslateTabUp(UIButton *pTabButton) {
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		pTabButton->GetSurface().get(),
+		pTabButton->GetSurface()->GetPosition() - ptDisplacement,
+		pTabButton->GetSurface()->GetOrientation(),
+		pTabButton->GetSurface()->GetScale(),
+		m_pParentApp->GetAnimationDuration(),
+		AnimationCurveType::SIGMOID,
+		AnimationFlags::AnimationFlags()
+	));
+	/*
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pTabButton,
 		pTabButton->GetPosition() - ptDisplacement,
 		pTabButton->GetOrientation(),
@@ -391,6 +400,7 @@ RESULT DreamTabView::TranslateTabUp(UIButton *pTabButton) {
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
+	//*/
 
 Error:
 	return r;

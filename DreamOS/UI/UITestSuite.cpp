@@ -16,6 +16,7 @@
 #include "UI/UIKeyboard.h"
 #include "UI/UIEvent.h"
 #include "UI/UIView.h"
+#include "UI/UIButton.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -253,6 +254,30 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 			//pFlatContext->InitializeOBB();
 			pFlatContext->InitializeBoundingQuad();
 
+//			auto pComposite = m_pDreamOS->MakeComposite();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			auto pButton = pView->AddUIButton();
+			pButton->GetSurface()->SetVertexColor(COLOR_YELLOW);
+			pButton->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+			m_pDreamOS->AddObject(pButton.get());
+			//pButton->RotateXByDeg(180.0f);
+			//pFlatContext->AddObject(pButton);
+			auto pSphere = m_pDreamOS->MakeSphere(0.5f, 10, 10);
+			pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+			pFlatContext->AddObject(std::shared_ptr<sphere>(pSphere));
+
+			//auto pComposite2 = m_pDreamOS->AddComposite();
+			auto pComposite2 = m_pDreamOS->MakeComposite();
+			//pComposite2->RotateXByDeg(90.0f);
+			auto pCQuad = pComposite2->AddQuad(0.5f, 0.5f);
+			//pCQuad->SetPosition(point(-1.0f, 0.0f, -1.0f));
+			pComposite2->SetPosition(point(-1.0f, 0.0f, -1.0f));
+
+//			pFlatContext->AddObject(std::shared_ptr<composite>(pComposite2));
+			pFlatContext->AddChild(std::shared_ptr<composite>(pComposite2));
+
 			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_BLUE);
@@ -267,6 +292,7 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 				AnimationFlags::AnimationFlags()
 			);
 
+			/*
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 0.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_GREEN);
@@ -280,14 +306,17 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 				AnimationCurveType::LINEAR,
 				AnimationFlags::AnimationFlags()
 			);
+			//*/
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -1.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_RED);
 
+			/*
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -2.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_YELLOW);
+			//*/
 
 			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -3.0f));
 			CN(pQuad);

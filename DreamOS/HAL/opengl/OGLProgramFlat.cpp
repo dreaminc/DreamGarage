@@ -140,12 +140,14 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 
 RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 
-	auto matModel = pDimObj->VirtualObj::GetModelMatrix();
+	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
+	// could do with a flag in DimObj
 	/*
 	text *pText = dynamic_cast<text*>(pDimObj);
 	if (pText != nullptr) {
+		/*
 		float buffer = pText->GetFont()->GetBuffer();
 		float gamma = pText->GetFont()->GetGamma();
 
@@ -153,11 +155,14 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 		m_pUniformGamma->SetUniformFloat(&gamma);
 
 		//m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
+		//matModel = pDimObj->VirtualObj::GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(pDimObj->VirtualObj::GetModelMatrix());
 	}
 	else {
 		//m_pUniformfDistanceMap->SetUniform(true);
+		m_pUniformModelMatrix->SetUniform(pDimObj->GetModelMatrix());
 	}
-	*/
+	//*/
 
 	return R_PASS;
 }
