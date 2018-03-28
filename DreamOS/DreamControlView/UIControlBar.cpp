@@ -263,7 +263,7 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	vector vRotation;
 	quaternion qSurface;
 	quaternion qRotation;
-	CBR(this->IsVisible(), R_SKIPPED);
+	CBR(IsVisible(), R_SKIPPED);
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 	pSurface = pButtonContext->GetSurface();
