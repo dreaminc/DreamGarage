@@ -86,8 +86,6 @@ public:
 
 	static BarType ControlBarTypeFromString(const std::string& strContentType);
 
-	static std::shared_ptr<UIControlBar> MakeControlBarWithType(BarType type, std::shared_ptr<UIView> pViewContext);
-
 // common behavior
 public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);

@@ -86,7 +86,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 
-	m_pControlBar->GetComposite()->SetVisible(false);
+	m_pControlBar->Hide();
 	m_pDreamTabView->GetComposite()->SetVisible(false);
 	m_pControlView->GetComposite()->SetVisible(false);
 
@@ -460,7 +460,6 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 	if (m_pActiveSource == m_pDreamDesktop){
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
-		CR(m_pControlBar->GetComposite()->SetVisible(false));
 		CR(m_pControlBar->Hide());
 	}
 
@@ -473,7 +472,6 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
-		CR(m_pControlBar->GetComposite()->SetVisible(false));
 		CR(m_pControlBar->Hide());
 	}
 
@@ -748,6 +746,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		// replace with top of tab bar
 		if (m_pActiveSource != nullptr) {
 			m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+			m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 			CR(ShowControlView());
 		}

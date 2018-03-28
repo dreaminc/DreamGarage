@@ -243,20 +243,12 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	if (m_barType == BarType::BROWSER) {
 		m_pKeyboardButton->SetVisible(false);
 		m_pBackButton->SetVisible(true);
-		m_pForwardButton->SetVisible(true);
-
-		m_pBackButton->RegisterToInteractionEngine(m_pDreamOS);
-		m_pForwardButton->RegisterToInteractionEngine(m_pDreamOS);
-		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pKeyboardButton->GetInteractionObject());
+		m_pForwardButton->SetVisible(true);	
 	}
 	else if (m_barType == BarType::DESKTOP) {
 		m_pKeyboardButton->SetVisible(true);
 		m_pBackButton->SetVisible(false);
 		m_pForwardButton->SetVisible(false);
-		
-		m_pKeyboardButton->RegisterToInteractionEngine(m_pDreamOS);
-		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pBackButton->GetInteractionObject());
-		m_pDreamOS->RemoveObjectFromInteractionGraph(m_pForwardButton->GetInteractionObject());
 	}
 //Error:
 	return r;
@@ -271,6 +263,7 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	vector vRotation;
 	quaternion qSurface;
 	quaternion qRotation;
+	CBR(this->IsVisible(), R_SKIPPED);
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 	pSurface = pButtonContext->GetSurface();
@@ -393,22 +386,4 @@ BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType
 	else {
 		return BarType::INVALID;
 	}
-}
-
-std::shared_ptr<UIControlBar> UIControlBar::MakeControlBarWithType(BarType type, std::shared_ptr<UIView> pViewContext) {
-
-	switch (type) {
-
-	case BarType::BROWSER:
-	case BarType::DEFAULT: {
-		return pViewContext->MakeUIControlBar();
-	}
-
-	case BarType::INVALID: {
-		return nullptr;
-	}
-
-	}
-
-	return nullptr;
 }
