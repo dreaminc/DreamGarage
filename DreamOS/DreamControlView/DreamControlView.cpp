@@ -150,7 +150,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 			fMalletDirty = false;
 		}
 		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
-			CR(HandleKeyboardDown());
+			CR(m_pParentApp->HideWebsiteTyping());
 			fMalletDirty = true;
 		}
 	}
