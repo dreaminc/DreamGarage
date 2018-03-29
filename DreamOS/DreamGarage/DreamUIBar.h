@@ -168,6 +168,8 @@ private:
 	float m_projectionFarPlane = PROJECTION_FAR;
 	float m_projectionAngle = PROJECTION_ANGLE;
 
+	bool m_fWaitingForMenuResponse = false;
+
 	MenuState m_menuState = MenuState::NONE;
 
 	UIStageProgram *m_pUIStageProgram = nullptr;

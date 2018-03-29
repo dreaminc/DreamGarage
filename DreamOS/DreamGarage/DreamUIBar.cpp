@@ -344,6 +344,7 @@ RESULT DreamUIBar::RequestMenu() {
 	CR(RequestIconFile(pNode));
 
 	m_pathStack.pop();
+	m_fWaitingForMenuResponse = true;
 	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 
 Error:
@@ -710,11 +711,16 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
+	if (m_fWaitingForMenuResponse) {
+		m_fWaitingForMenuResponse = false;
+	}
 
 	if (pMenuNode->NumSubMenuNodes() > 0) {
 
 		m_pMenuNode = pMenuNode;
-		if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
+		if (m_pathStack.empty()) {
+			m_pathStack.push(m_pMenuNode);
+		}
 		m_pMenuNode->SetDirty();
 
 		auto strHeaders = GetStringHeaders();
@@ -770,7 +776,11 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 }
 
 bool DreamUIBar::IsEmpty() {
-	return m_pathStack.empty();
+	bool fEmpty = false;
+	if (m_pathStack.empty() && !m_fWaitingForMenuResponse) {
+		fEmpty = true;
+	}
+	return fEmpty;
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {
