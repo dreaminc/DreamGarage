@@ -780,9 +780,6 @@ bool DreamUIBar::IsEmpty() {
 	if (m_pathStack.empty() && !m_fWaitingForMenuResponse) {
 		fEmpty = true;
 	}
-	else {
-		fEmpty = false;
-	}
 	return fEmpty;
 }
 
