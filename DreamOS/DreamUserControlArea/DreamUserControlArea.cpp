@@ -324,6 +324,7 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	//only allow button presses while keyboard isn't active
 	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);	
 	CBR(!IsAnimating(), R_SKIPPED);
+	
 	CBR(dirtyIndex != -1, R_SKIPPED);
 
 	CBR(m_fCanPressButton[dirtyIndex], R_SKIPPED);
@@ -376,46 +377,57 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());	
 	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
 	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
 	//m_pControlBar->SetSharingFlag(fIsSharing);
-
 	auto pView = m_pControlView->GetViewQuad();
 	SetIsAnimating(true);
 
-	// close active browser
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		auto pView = m_pControlView->GetViewQuad();
-
-		// replace with top of tab bar
+	// Probably not how we want to solve, but it does work
+	if (m_pActiveSource == m_pDreamDesktop) {
 		m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 		bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
 		m_pControlBar->SetSharingFlag(fIsSharing);
-		
 		CR(ShowControlView());
+		SetIsAnimating(false);
+	}
+	//
 
-	Error:
-		return r;
-	};
+	else {
+		// close active browser
+		auto fnEndCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		pView.get(),
-		pView->GetPosition(),
-		pView->GetOrientation(),
-		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
-		m_animationScale,
-		m_animationDuration,
-		AnimationCurveType::SIGMOID,
-		AnimationFlags(),
-		nullptr,
-		fnEndCallback,
-		this
-	));
+			auto pView = m_pControlView->GetViewQuad();
+
+			// replace with top of tab bar
+			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
+			bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+			m_pControlBar->SetSharingFlag(fIsSharing);
+
+			CR(ShowControlView());
+
+		Error:
+			return r;
+		};
+
+		CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+			pView.get(),
+			pView->GetPosition(),
+			pView->GetOrientation(),
+			//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
+			m_animationScale,
+			m_animationDuration,
+			AnimationCurveType::SIGMOID,
+			AnimationFlags(),
+			nullptr,
+			fnEndCallback,
+			this
+		));
+	}
 
 Error:
 	return r;
@@ -432,13 +444,16 @@ RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pT
 }
 
 RESULT DreamUserControlArea::UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext) {
-	if (pContext == m_pActiveSource.get()) {
+	RESULT r = R_PASS;
+	CNR(pTexture, R_SKIPPED);
+	if (m_pActiveSource->GetContentType() == CONTENT_TYPE_DESKTOP) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
 		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
 	}
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
@@ -566,14 +581,13 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-	CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 	if (m_pActiveSource != nullptr) {													// If content is already open
-		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
-			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview
-				SetIsAnimating(false);
-				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
-			}	
+		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {				// and we're trying to share the desktop when it's already open
+			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview (not controlview)
+				UIMallet* pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+				m_pDreamTabView->SelectByContent(m_pDreamDesktop, pLMallet);						// pull desktop out of tabview		
+			}
 		}
 		else {
 			m_pDreamTabView->AddContent(m_pActiveSource);
@@ -583,6 +597,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 
 	if (strTitle == m_strDesktopTitle) {
 		if (m_pDreamDesktop == nullptr) {
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
 			m_pDreamDesktop->InitializeWithParent(this);
 			m_pActiveSource = m_pDreamDesktop;
@@ -590,12 +605,14 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			// new desktop can't be the current content
 			m_pControlBar->SetSharingFlag(false);
 		}
-		else {
-			//empty
+		else if (m_pDreamDesktop == m_pActiveSource) {
+			Show();
 		}
 	}
 
 	else {
+		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
 		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
 		
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
