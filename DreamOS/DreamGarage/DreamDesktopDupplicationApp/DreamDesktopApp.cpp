@@ -400,7 +400,7 @@ std::string DreamDesktopApp::GetTitle() {
 	std::string strTitle = util::WideStringToString(wstrTitle);
 	
 	// Can only be one parent (child cannot also be an owner) - https://msdn.microsoft.com/en-us/library/windows/desktop/ms632599%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396#foreground
-	if (strTitle == "") {	// If foreground is blank check for parent
+	if (strTitle == "") {	// If foreground is blank, it may be a popup window, so check for parent
 		HWND hwndParentWindow = GetWindow(hwndForegroundWindow, GW_OWNER);
 		if (hwndParentWindow == nullptr) { // If parent is null then it's desktop... probably
 			strTitle = "Windows Desktop";
