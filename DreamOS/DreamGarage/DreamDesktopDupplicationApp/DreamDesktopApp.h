@@ -119,9 +119,11 @@ private:
 	std::string m_strPath;
 	std::string m_strScope;
 	std::string m_strContentType;
+	std::string m_strTitle = "Windows Desktop";
 
 	double m_msTimeSinceLastSent = 0;
-	double m_msTimeDelay = 2000;
+	double m_msMessageTimeDelay = 2000;
+	double m_msTitleTimeDelay = 100;
 
 	bool m_fShiftKey = false;
 
