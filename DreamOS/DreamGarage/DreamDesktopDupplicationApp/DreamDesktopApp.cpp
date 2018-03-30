@@ -121,6 +121,7 @@ RESULT DreamDesktopApp::OnClick(point ptDiff, bool fMouseDown) {
 												// number of structures in pInputs array
 												// array of INPUT structures representing input event
 												// size in BYTES of an INPUT structure
+
 Error:
 	return r;
 }
@@ -224,9 +225,20 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 
 	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-	if (msTimeNow - m_msTimeSinceLastSent > m_msTimeDelay && !m_fDesktopDuplicationIsRunning) {
+	if (msTimeNow - m_msTimeSinceLastSent > m_msMessageTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
 		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
+	}
+
+	// Once duplication process is running, we want to grab the title of the foreground window for title
+	// This method solves for when the user alt-tabs using their actual keyboard, since we don't have that event
+	if (m_fDesktopDuplicationIsRunning && msTimeNow - m_msTimeSinceLastSent > m_msTitleTimeDelay) {
+		m_msTimeSinceLastSent = msTimeNow;
+		std::string strTitle = GetTitle();
+		if (m_strTitle != strTitle) {
+			m_strTitle = strTitle;
+			m_pParentApp->UpdateControlBarText(m_strTitle);
+		}
 	}
 
 Error:
@@ -379,8 +391,28 @@ int DreamDesktopApp::GetWidth() {
 }
 
 std::string DreamDesktopApp::GetTitle() {
-	//TODO: temporary until app focus is known
-	return "Windows Desktop";
+	HWND hwndForegroundWindow = GetForegroundWindow();
+	wchar_t pszTitle[256];
+
+	GetWindowText(hwndForegroundWindow, pszTitle, sizeof(pszTitle));
+	
+	std::wstring wstrTitle = std::wstring(pszTitle);
+	std::string strTitle = util::WideStringToString(wstrTitle);
+	
+	// Can only be one parent (child cannot also be an owner) - https://msdn.microsoft.com/en-us/library/windows/desktop/ms632599%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396#foreground
+	if (strTitle == "") {	// If foreground is blank check for parent
+		HWND hwndParentWindow = GetWindow(hwndForegroundWindow, GW_OWNER);
+		if (hwndParentWindow == nullptr) { // If parent is null then it's desktop... probably
+			strTitle = "Windows Desktop";
+		}
+		else {
+			GetWindowText(hwndParentWindow, pszTitle, sizeof(pszTitle));
+			wstrTitle = std::wstring(pszTitle);
+			strTitle = util::WideStringToString(wstrTitle);
+		}
+	}
+
+	return strTitle;
 }
 
 std::string DreamDesktopApp::GetContentType() {
