@@ -352,6 +352,7 @@ RESULT DreamUserControlArea::ShowControlView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		SetIsAnimating(false);
+		Show();
 		return R_PASS;
 	};
 
@@ -566,14 +567,16 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 
 	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-	CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 	if (m_pActiveSource != nullptr) {													// If content is already open
 		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
-			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview
+			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
 				SetIsAnimating(false);
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
-			}	
+			}
+			else {
+				Show();
+			}
 		}
 		else {
 			m_pDreamTabView->AddContent(m_pActiveSource);
@@ -583,6 +586,8 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 
 	if (strTitle == m_strDesktopTitle) {
 		if (m_pDreamDesktop == nullptr) {
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
 			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
 			m_pDreamDesktop->InitializeWithParent(this);
 			m_pActiveSource = m_pDreamDesktop;
@@ -590,14 +595,12 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			// new desktop can't be the current content
 			m_pControlBar->SetSharingFlag(false);
 		}
-		else {
-			//empty
-		}
 	}
 
 	else {
 		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
-		
+		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
 		pBrowser->InitializeWithParent(this);
