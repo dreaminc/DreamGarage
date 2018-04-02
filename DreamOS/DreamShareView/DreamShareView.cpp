@@ -250,7 +250,13 @@ RESULT DreamShareView::StopSending() {
 
 	m_pDreamUserHandle->SendStopSharing();
 
-	m_pCastTexture = nullptr;
+	{	// Set to black instead of nullptr, we could make this a static texture too, back to using loading screen maybe
+		int channels = 4;
+		int pxSize = m_castpxWidth * m_castpxHeight * channels;
+		std::vector<unsigned char> vectorByteBuffer(pxSize, 0xFF);
+		m_pCastTexture->Update(&vectorByteBuffer[0], m_castpxWidth, m_castpxHeight, PIXEL_FORMAT::BGRA);
+	}
+
 	ShowLoadingTexture();
 	Hide();
 

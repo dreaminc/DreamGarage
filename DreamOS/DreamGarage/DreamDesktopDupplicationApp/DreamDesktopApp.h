@@ -121,7 +121,7 @@ private:
 	std::string m_strContentType;
 	std::string m_strTitle = "Windows Desktop";
 
-	double m_msTimeSinceLastSent = 0;
+	double m_msTimeSinceLastSent = 1.0;
 	double m_msMessageTimeDelay = 2000;
 	double m_msTitleTimeDelay = 100;
 

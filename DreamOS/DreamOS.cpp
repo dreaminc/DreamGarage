@@ -1128,7 +1128,7 @@ RESULT DreamOS::SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture)
 
 RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
-	CN(m_pDreamShareView);
+	CNR(m_pDreamShareView, R_SKIPPED);
 	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
 Error:
 	return r;

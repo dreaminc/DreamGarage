@@ -128,26 +128,14 @@ Error:
 
 RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
-
-	int pxWidth = m_pxDesktopWidth;
-	int pxHeight = m_pxDesktopHeight;
-	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
-
-	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
-
+	
 	SetAppName("DreamDesktopApp");
 	SetAppDescription("A Shared Desktop View");
-
-	// Initialize texture
-	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
-
-	GetComposite()->SetVisible(true);
-
-	CRM(StartDuplicationProcess(), "Error starting duplication process");
+	
+	CR(GetComposite()->SetVisible(true));
+	
 	m_hwndDreamHandle = GetDOS()->GetDreamHWND();
 	
-	CNR(m_hwndDreamHandle, R_SKIPPED);	
-
 Error:
 	return r;
 }
@@ -217,6 +205,19 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamDesktopApp::Update(void *pContext) {
 	RESULT r = R_PASS;
+	
+	if (m_pDesktopTexture == nullptr) {
+		int pxWidth = m_pxDesktopWidth;
+		int pxHeight = m_pxDesktopHeight;
+		m_aspectRatio = ((float)pxWidth / (float)pxHeight);
+
+		std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+		// Initialize texture
+		m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
+		
+		// Once texture is initialized we can start duplication process
+		CRM(StartDuplicationProcess(), "Error starting duplication process");
+	}
 
 	if (m_hwndDesktopHandle == NULL) {	// duplication process may take a bit to load, so catch it when it's done
 		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
@@ -237,6 +238,7 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 		std::string strTitle = GetTitle();
 		if (m_strTitle != strTitle) {
 			m_strTitle = strTitle;
+			CNR(m_pParentApp, R_SKIPPED);
 			m_pParentApp->UpdateControlBarText(m_strTitle);
 		}
 	}
@@ -352,11 +354,14 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
 		m_pParentApp->UpdateTextureForDesktop(m_pDesktopTexture, this);
 	}
+	else {
+		CR(m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA));
 
-	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+		CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+		CBR(m_pDesktopTexture.get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);
+		GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);
+	}
 
 Error:
 	/*

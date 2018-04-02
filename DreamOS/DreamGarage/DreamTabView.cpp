@@ -157,10 +157,11 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 	auto tabTexture = pContent->GetSourceTexture().get();
 	auto pDreamOS = GetDOS();
 
-	if (!m_fForceContentFocus) {
-		CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	if (m_fUsesMallet) {
+		//CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	}
-	m_fForceContentFocus = false;
+	m_fUsesMallet = true;	// reset the flag
+
 	CR(m_pParentApp->HideWebsiteTyping());
 
 	pNewTabButton = CreateTab();
@@ -200,10 +201,14 @@ Error:
 	return r;
 }
 
-RESULT DreamTabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent) {
+RESULT DreamTabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent, UIMallet *pLMallet) {
 	if (m_appToTabMap.count(pContent) > 0) {
-		m_fForceContentFocus = true;
-		SelectTab(m_appToTabMap[pContent].get(), nullptr);
+		UIEvent *pEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_appToTabMap[pContent].get(), pLMallet->GetMalletHead(), point(0.0, 0.0, 0.0));
+		m_appToTabMap[pContent].get()->Notify(pEvent);
+		m_fUsesMallet = false;
+		
+		//m_fUsesMallet = false;
+		//SelectTab(m_appToTabMap[pContent].get(), this);
 	}
 	return R_PASS;
 }
