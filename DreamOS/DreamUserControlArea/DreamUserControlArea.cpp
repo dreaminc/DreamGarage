@@ -352,7 +352,6 @@ RESULT DreamUserControlArea::ShowControlView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		SetIsAnimating(false);
-		Show();
 		return R_PASS;
 	};
 
@@ -398,7 +397,13 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
 		m_pControlBar->SetSharingFlag(fIsSharing);
 		
-		CR(ShowControlView());
+		if (m_pActiveSource->GetContentType() == CONTENT_TYPE_DESKTOP) {
+			SetIsAnimating(false);
+			Show();
+		}
+		else {
+			CR(ShowControlView());
+		}
 
 	Error:
 		return r;
