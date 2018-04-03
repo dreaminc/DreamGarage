@@ -397,7 +397,8 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
 		m_pControlBar->SetSharingFlag(fIsSharing);
 		
-		if (m_pActiveSource->GetContentType() == CONTENT_TYPE_DESKTOP) {
+		if (m_fFromMenu) {	// if we opened desktop through menu for not the first time
+			m_fFromMenu = false;
 			SetIsAnimating(false);
 			Show();
 		}
@@ -577,6 +578,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
 			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
 				SetIsAnimating(false);
+				m_fFromMenu = true;
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
 			}
 			else {

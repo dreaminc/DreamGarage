@@ -242,3 +242,7 @@ RESULT DreamControlBar::Hide() {
 Error:
 	return r;
 }
+
+bool DreamControlBar::IsVisible() {
+	return m_pUIControlBar->IsVisible();
+}

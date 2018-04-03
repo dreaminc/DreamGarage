@@ -92,7 +92,7 @@ private:
 	float m_tabWidth = TAB_WIDTH;
 	float m_tabHeight = TAB_HEIGHT;
 
-	bool m_fForceContentFocus = false;
+	bool m_fForceContentFocus = true;
 
 	point m_ptMostRecent;
 
