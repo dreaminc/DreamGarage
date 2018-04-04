@@ -172,7 +172,7 @@ private:
 // logic
 private:
 	bool m_fHasOpenApp;
-
+	bool m_fFromMenu = false;
 	bool m_fCanPressButton[2];
 
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;

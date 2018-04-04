@@ -72,6 +72,7 @@ public:
 public:
 	RESULT Show();
 	RESULT Hide();
+	bool IsVisible();
 
 private:
 

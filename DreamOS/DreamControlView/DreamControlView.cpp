@@ -410,10 +410,11 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 
 RESULT DreamControlView::ShowView() {
 	RESULT r = R_PASS;
-
+	/* This screws with animations too much, taking it out for now
 	if (GetDOS()->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get())) {
 		GetDOS()->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
 	}
+	//*/
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
@@ -448,6 +449,7 @@ RESULT DreamControlView::ShowView() {
 		return r;
 	};
 
+	// This flag is never set anymore?
 	CBR(!m_fIsMinimized, R_SKIPPED);
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
