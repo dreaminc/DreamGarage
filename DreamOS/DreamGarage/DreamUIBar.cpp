@@ -55,13 +55,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pFont = pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 
 	SetAppName("DreamUIBar");
-	SetAppDescription("User Interface");
-	
-	// Makes sense for UIBar to always have a user run with it for now
-	auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
-	
-	CB(userUIDs.size() == 1);
-	m_userUID = userUIDs[0];
+	SetAppDescription("User Interface");	
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
@@ -101,25 +95,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
-
-	m_pCloudController = pDreamOS->GetCloudController();
-	if (m_pCloudController != nullptr) {
-
-		m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
-		//CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
-		if (m_pMenuControllerProxy != nullptr) {
-			CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
-		}
-
-		m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-		//CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
-
-		m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
-	}
-
-	m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-	CN(m_pUserHandle);
 
 Error:
 	return r;
@@ -220,7 +195,7 @@ RESULT DreamUIBar::ResetAppComposite() {
 	point ptOrigin;
 	quaternion qOrigin;
 	vector vCameraToMenu;
-
+	CNR(m_pUIStageProgram, R_SKIPPED);
 	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
 	
@@ -499,6 +474,35 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Copy into temp vector
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
 	m_downloadQueue.clear();
+
+	// Makes sense for UIBar to always have a user run with it for now
+	if(m_pUserHandle == nullptr) {
+		auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
+
+		CB(userUIDs.size() == 1);
+		m_userUID = userUIDs[0];
+
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle)
+	}
+
+	if (m_pCloudController == nullptr) {
+		m_pCloudController = pDreamOS->GetCloudController();
+		if (m_pCloudController != nullptr) {
+
+			m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+			//CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
+			if (m_pMenuControllerProxy != nullptr) {
+				CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+			}
+
+			m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+			//CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
+
+			m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+			//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
+		}
+	}
 
 	CR(m_pScrollView->Update());
 

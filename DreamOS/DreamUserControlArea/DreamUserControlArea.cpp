@@ -50,48 +50,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
 	//CN(m_pActiveBrowser);
 	//CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
-	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing
-
-	m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-	WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
-	CN(m_pDreamUserApp);
-
-	m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
-	CN(m_pDreamUIBar);
-	m_pDreamUIBar->InitializeWithParent(this);
-
-	m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
-	CN(m_pControlBar);
-	m_pControlBar->InitializeWithParent(this);
-
-	m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
-	CN(m_pControlView);
-	m_pControlView->InitializeWithParent(this);
-
-	m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
-	CN(m_pDreamTabView);
-	m_pDreamTabView->InitializeWithParent(this);
-
-	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-	//CN(m_pActiveBrowser);
-	//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
-
-	// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
-	m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
-	//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
-
-	//DreamUserControlArea is a friend of these classes to add the composite
-	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
-	GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
-	GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
-
-	m_pControlBar->Hide();
-	m_pDreamTabView->GetComposite()->SetVisible(false);
-	m_pControlView->GetComposite()->SetVisible(false);
-
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
-	CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
+	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing	
 
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
@@ -109,6 +68,50 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	point ptOrigin;
 	quaternion qOrigin;
+
+	if (m_pDreamUserApp == nullptr) {
+		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
+		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
+		CN(m_pDreamUserApp);
+
+		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
+		CN(m_pDreamUIBar);
+		m_pDreamUIBar->InitializeWithParent(this);
+		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
+
+		m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
+		CN(m_pControlBar);
+		m_pControlBar->InitializeWithParent(this);
+
+		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
+		CN(m_pControlView);
+		m_pControlView->InitializeWithParent(this);
+
+		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
+		CN(m_pDreamTabView);
+		m_pDreamTabView->InitializeWithParent(this);
+
+		//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		//CN(m_pActiveBrowser);
+		//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
+
+		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
+		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+		//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
+
+		//DreamUserControlArea is a friend of these classes to add the composite
+		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
+		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
+		GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
+
+		m_pControlBar->Hide();
+		m_pDreamTabView->GetComposite()->SetVisible(false);
+		m_pControlView->GetComposite()->SetVisible(false);
+
+		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
+		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
+	}
 
 	//CR(m_pWebBrowserManager->Update());
 	CNR(m_pDreamUserApp, R_SKIPPED);
@@ -149,7 +152,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// TODO: Update Control View
 
-		
 	}
 
 Error:
@@ -786,7 +788,7 @@ Error:
 }
 
 RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
-	m_pDreamUIBar->SetUIStageProgram(pUIProgramNode);
+	m_pUIStageProgram = pUIProgramNode;
 	return R_PASS;
 }
 
