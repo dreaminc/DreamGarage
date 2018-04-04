@@ -158,7 +158,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		pTestContext->pViewContext = pComposite->AddUIView(m_pDreamOS);
 		pTestContext->pFlatScrollView = pTestContext->pViewContext->MakeUIFlatScrollView();
 		//pTestContext->pFlatScrollView->RotateXByDeg(90.0f);
-		pTestContext->pFlatScrollView->SetRenderQuad(pTestContext->pRenderQuad);
+		pTestContext->pFlatScrollView->SetRenderQuad(pTestContext->pRenderQuad, nullptr); // deprec
 
 		auto pTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 

@@ -29,9 +29,10 @@ Error:
 RESULT DreamTabView::InitializeApp(void *pContext) {
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
-	m_pView = GetComposite()->AddUIView(GetDOS());
-	//m_pScrollView = m_pView->AddUIFlatScrollView();
+	m_pView = GetDOS()->AddComposite()->AddUIView(GetDOS());
+	//m_pView = GetComposite()->AddUIView(GetDOS());
 	m_pScrollView = m_pView->MakeUIFlatScrollView();
+	//m_pScrollView = m_pView->MakeUIFlatScrollView();
 
 	return R_PASS;
 }
@@ -44,7 +45,19 @@ RESULT DreamTabView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	if (m_pScrollView != nullptr) {
+		//m_pScrollView->GetRenderContext()->SetVisible(true, false);
 		CR(m_pScrollView->Update());
+		//m_pScrollView->GetRenderContext()->SetVisible(false, false);
+		point ptOrigin = GetComposite()->GetPosition(true);
+		quaternion qOrigin = GetComposite()->GetOrientation(true);
+		//m_pScrollView->GetRenderContext()->SetPosition(point(0.1f, 0.0f, 0.0f));
+		//m_pScrollView->GetRenderContext()->SetPosition(point(ptOrigin.x(), ptOrigin.y(), ptOrigin.z()));// +point(0.1f, 0.0f, 0.0f));
+		//m_pScrollView->GetRenderContext()->SetPosition(point(ptOrigin.x(), ptOrigin.y() , ptOrigin.z()));// +point(0.1f, 0.0f, 0.0f));
+		m_pScrollView->GetRenderContext()->SetPosition(ptOrigin);
+		//m_pScrollView->GetRenderContext()->RotateYByDeg(30.0f);
+		//m_pScrollView->GetRenderContext()->SetOrientation(quaternion::MakeQuaternionWithEuler((float)(M_PI)/6.0f, 0.0f, 0.0f));
+		//m_pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler((float)(M_PI)/6.0f, 0.0f, 0.0f));
+		m_pScrollView->GetRenderContext()->SetOrientation(qOrigin);
 	}
 	//if (m_pScrollView->GetCurrentTexture() != nullptr) {
 	//	m_pRenderQuad->SetDiffuseTexture(m_pScrollView->GetCurrentTexture());
@@ -82,16 +95,42 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_tabHeight *= baseWidth;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
+	//m_pRenderQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(10, 10));
+	//m_pRenderQuad = GetComposite()->AddQuad(10, 10);
 	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 
 	// wack
-	m_pScrollView->SetRenderQuad(m_pRenderQuad);
+	//auto pRenderContext = GetComposite()->AddFlatContext();
+	//auto pRenderContext = GetComposite()->MakeFlatContext();
+	auto pRenderContext = GetDOS()->AddComposite()->AddFlatContext();
+
+	//m_pRenderContext->SetScaleToFit(false);
+	//m_pRenderContext->AddObject(this);
+	//m_pRenderContext->SetPosition(0.0f, 3.0f, 5.0f);
+	pRenderContext->SetIsAbsolute(true);
+	pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
+
+	m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
+	auto testQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight()));
 	m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
+	//m_pScrollView->GetRenderContext()->AddObject(testQuad);
 	m_pBackgroundTexture = GetDOS()->MakeTexture(k_wszTabBackground, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 	m_pBackgroundQuad->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
-	GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
+	point ptPosition = point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f);
+	//GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
+	GetComposite()->SetPosition(ptPosition);
+	//pRenderContext->SetPosition(ptOrigin);
+	//pRenderContext->SetOrientation(qOrigin);
+//	pRenderContext->SetPosition(GetComposite()->GetPosition(true));
+//	pRenderContext->SetOrientation(GetComposite()->GetOrientation(true));
+	//m_pScrollView->SetPosition(GetComposite()->GetPosition(true));
+	//m_pScrollView->SetOrientation(GetComposite()->GetOrientation(true));
+	//m_pView->
+	//m_pRenderQuad->SetPosition(ptOrigin);
+
+	//m_pScrollView->GetRenderContext()->SetPosition(ptPosition);
 
 	m_ptMostRecent = point(0.0f, 0.0f, (-borderHeight / 2.0f) + (m_tabHeight / 2.0f) + (itemSpacing / 2.0f));
 

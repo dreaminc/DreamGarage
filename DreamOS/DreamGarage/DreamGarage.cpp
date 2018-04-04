@@ -218,7 +218,7 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = false;
+	halconf.fRenderReferenceGeometry = true;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -239,6 +239,7 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 #ifndef _DEBUG
+	/*
 	model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
 	pModel->SetPosition(ptSceneOffset);
 	pModel->SetScale(sceneScale);
@@ -284,6 +285,7 @@ RESULT DreamGarage::LoadScene() {
 			}
 		);
 	}
+	//*/
 #endif
 
 Error:

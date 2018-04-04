@@ -30,7 +30,7 @@ public:
 	RESULT SetBounds(float width, float height);
 
 	std::shared_ptr<FlatContext> GetRenderContext();
-	RESULT SetRenderQuad(std::shared_ptr<quad> pRenderQuad);
+	RESULT SetRenderQuad(std::shared_ptr<quad> pRenderQuad, std::shared_ptr<FlatContext> pFlatContext);
 
 public:
 	RESULT Notify(SenseControllerEvent *pEvent);

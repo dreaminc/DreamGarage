@@ -194,6 +194,20 @@ float FlatContext::GetBottom(bool fAbsolute) {
 	return boundingBottom;
 }
 
+bool FlatContext::UseVirtualModelMatrix() {
+	return m_fVirtualModelMatrix;
+}
+//*
+matrix<virtual_precision, 4, 4> FlatContext::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	//return matrix<virtual_precision, 4, 4>::identity();
+	//return Matrix4::identity();
+	//auto mat = matrix<virtual_precision, 4, 4>();
+	auto mat = VirtualObj::GetModelMatrix() * childMat;
+	//mat.identity();
+	return mat;
+}
+//*/
+
 RESULT FlatContext::RenderToQuad(quad::CurveType curveType) {
 	return RenderToQuad(GetWidth(), GetHeight(), 0.0f, 0.0f, curveType);
 }

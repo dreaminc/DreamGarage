@@ -50,6 +50,9 @@ public:
 	RESULT SetBounds(float width, float height);
 
 	RESULT SetIsAbsolute(float fAbsolute);
+	bool UseVirtualModelMatrix();
+
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 
 public:
 	framebuffer* GetFramebuffer();
@@ -63,6 +66,9 @@ protected:
 
 	float m_width;
 	float m_height;
+
+	//hack used for text rendering, skips DimObj::GetModelMatrix() in OGLProgramFlat
+	bool m_fVirtualModelMatrix = false;
 
 	float m_xOffset;
 	float m_yOffset;

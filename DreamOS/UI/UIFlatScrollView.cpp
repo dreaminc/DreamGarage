@@ -18,7 +18,8 @@ UIFlatScrollView::~UIFlatScrollView()
 RESULT UIFlatScrollView::Update() {
 	RESULT r = R_PASS;
 
-	/*
+	SetVisible(true);
+	//*
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	msNow /= 1000.0;
@@ -27,6 +28,7 @@ RESULT UIFlatScrollView::Update() {
 	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 10000000.0f));
 
 	SetPosition(GetPosition() + ptDiff);
+	//GetRenderContext()->SetPosition(GetPosition() + ptDiff);
 	//*/
 
 	//*
@@ -35,6 +37,7 @@ RESULT UIFlatScrollView::Update() {
 		//m_pCurrentTexture = m_pRenderContext->GetFramebuffer()->GetColorTexture();
 	}
 	//*/
+	//SetVisible(false);
 		
 	return r;
 }
@@ -72,15 +75,22 @@ std::shared_ptr<FlatContext> UIFlatScrollView::GetRenderContext() {
 	return m_pRenderContext;
 }
 
-RESULT UIFlatScrollView::SetRenderQuad(std::shared_ptr<quad> pRenderQuad) {
+RESULT UIFlatScrollView::SetRenderQuad(std::shared_ptr<quad> pRenderQuad, std::shared_ptr<FlatContext> pFlatContext) {
 	m_pRenderQuad = pRenderQuad;
+	m_pRenderContext = pFlatContext;
+	/*
 	if (m_pRenderContext == nullptr) {
-		m_pRenderContext = MakeFlatContext();
+		m_pRenderContext = m_pDreamOS->MakeComposite()->MakeFlatContext();
 		//m_pRenderContext->SetScaleToFit(false);
 		//m_pRenderContext->AddObject(this);
+		//m_pRenderContext->SetPosition(0.0f, 3.0f, 5.0f);
 		m_pRenderContext->SetIsAbsolute(true);
 		m_pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
 	}
+	//*/
+	//m_pRenderContext->SetIsAbsolute(true);
+	//m_pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
+
 	return R_PASS;
 }
 

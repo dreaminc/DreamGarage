@@ -139,6 +139,7 @@ RESULT HALImp::RenderToTexture(FlatContext* pFlatContext) {
 	CN(pFlatProgram);
 	
 	pFlatProgram->SetFlatFramebuffer(pFlatContext->GetFramebuffer());
+	pFlatProgram->SetFlatContext(pFlatContext);
 	pFlatProgram->RenderFlatContext(pFlatContext);
 
 Error:

@@ -96,17 +96,54 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 		float top = pFlatContext->GetTop(false);
 		float bottom = pFlatContext->GetBottom(false);
 
-		float nearPlane = -1.0f;
-		float farPlane = 1.0f;
+		float nearPlane = -1000.0f;
+		float farPlane = 1000.0f;
 
 		// TODO: Why the negative one?
-		auto matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
+		//matrix<float, 4,4> matP = ProjectionMatrix::MakeOrtho(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
+		matrix<float, 4,4> matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
+		//matrix<float, 4,4> matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top, bottom, nearPlane, farPlane);
+		//auto matFlatContextMM = pFlatContext->GetModelMatrix();
+		//auto qOrientation = pFlatContext->GetOrientation(false);
+		//qOrientation.Reverse();
+		//float tempX = qOrientation.x();
+		//qOrientation.x() = qOrientation.z();
+		//qOrientation.z() = tempX;
+
+		//matrix<virtual_precision, 4, 4> matRotation = inverse(matFlatContextMM);
+		//matrix<virtual_precision, 4, 4> matRotation = inverse(RotationMatrix(qOrientation));
+		//matrix<virtual_precision, 4, 4> tempXRow;
+/*
+		tempXRow.element(0, 0) = matRotation.element(0, 0);
+		tempXRow.element(0, 1) = matRotation.element(0, 1);
+		tempXRow.element(0, 2) = matRotation.element(0, 2);
+
+		matRotation.element(0, 0) = matRotation.element(1, 0);
+		matRotation.element(0, 1) = matRotation.element(1, 1);
+		matRotation.element(0, 2) = matRotation.element(1, 2);
+
+		matRotation.element(1, 0) = tempXRow.element(0, 0);
+		matRotation.element(1, 1) = tempXRow.element(0, 1);
+		matRotation.element(1, 2) = tempXRow.element(0, 2);
+		//*/
+
+		//matRotation[0] = tempZRow;
+		//float tempX = matRotation[0]
+		//auto matRotation = pFlatContext->GetOrientationMatrix();
+		//matP = matRotation * matP;
+	//	matP = matP * matRotation;
+		//if (!m_pFlatContext->UseVirtualModelMatrix()) {
+		//	matP = matFlatContextMM * matP;
+		//}
 
 		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 
+		//if (pFlatContext->HasChildren()) {
+		//	CR(RenderChildren(pFlatContext));
+		//}
 		CR(RenderObject(pFlatContext));
 	}
 
@@ -139,9 +176,21 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
-
-	auto matModel = pDimObj->GetModelMatrix();
-	m_pUniformModelMatrix->SetUniform(matModel);
+	if (m_pFlatContext->UseVirtualModelMatrix()) { 
+		auto matModel = pDimObj->VirtualObj::GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+	else {
+//		auto matModel = pDimObj->VirtualObj::GetModelMatrix();
+		//auto matModel = pDimObj->GetFlatModelMatrix();
+		auto matModel = pDimObj->GetFlatModelMatrix();
+		//auto matModel = (TranslationMatrix(pDimObj->VirtualObj::GetOrigin()) * ScalingMatrix(pDimObj->VirtualObj::GetScale()));
+		//auto matModel = (TranslationMatrix(pDimObj->GetOrigin()) * RotationMatrix(pDimObj->VirtualObj::GetOrientation()) * ScalingMatrix(pDimObj->GetScale()));
+		//auto matModel = (TranslationMatrix(pDimObj->VirtualObj::GetOrigin()) * RotationMatrix(pDimObj->GetOrientation()) * ScalingMatrix(pDimObj->VirtualObj::GetScale()));
+		//auto matModel = pDimObj->VirtualObj::GetModelMatrix() * m_pFlatContext->VirtualObj::GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
+		//pDimObj->GetRelativeModelMatrix();
+	}
 
 	// could do with a flag in DimObj
 	/*

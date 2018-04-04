@@ -39,6 +39,8 @@ public:
 	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT Initialize();
 
+	RESULT AddTestFlatCollisions();
+
 	RESULT AddTestCaptureObject();
 
 	RESULT AddTestObjectBasedEvents();
