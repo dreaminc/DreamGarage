@@ -33,6 +33,7 @@ public:
 
 	RESULT AddTestEnvironmentShader();
 
+	// Objects
 	RESULT AddTestModelInstancing();
 	RESULT AddTestText();
 	RESULT AddTestModel();
@@ -40,6 +41,7 @@ public:
 	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
 	RESULT AddTestUIShaderStage();
+	RESULT AddTestFlatContextNesting();
 
 	RESULT TestNestedOBB();
 

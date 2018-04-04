@@ -24,6 +24,7 @@
 #include "OGLSphere.h"
 #include "OGLCylinder.h"
 #include "OGLComposite.h"
+#include "OGLFlatContext.h"
 #include "OGLModel.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
@@ -370,7 +371,7 @@ Error:
 FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
 	RESULT r = R_PASS;
 
-	FlatContext *pFlatContext = new FlatContext(this);
+	FlatContext *pFlatContext = new OGLFlatContext(this);
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, pxFBWidth, pxFBHeight, fbChannels);
 	CN(pOGLFramebuffer);
 

@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestFlatContextNesting());
+
 	CR(TestNestedOBB());
 
 	CR(AddTestText());
@@ -585,6 +587,103 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 	pNewTest->SetTestName("Environment Shader");
 	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestFlatContextNesting() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		composite *pComposite = nullptr;
+		FlatContext *pFlatContext = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		CR(SetupSkyboxPipeline("minimal"));
+
+		float spacing = 0.5f;
+		float side = 0.25f;
+
+		// Objects 
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			pTestContext->pFlatContext = m_pDreamOS->AddFlatContext();
+			CN(pTestContext->pFlatContext);
+
+			auto pQuad = pTestContext->pFlatContext->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(-spacing, 0.0f, -spacing);
+			pQuad->SetMaterialColors(color(COLOR_RED));
+
+			pQuad = pTestContext->pFlatContext->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(spacing, 0.0f, -spacing);
+			pQuad->SetMaterialColors(color(COLOR_BLUE));
+			
+			pQuad = pTestContext->pFlatContext->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(-spacing, 0.0f, spacing);
+			pQuad->SetMaterialColors(color(COLOR_GREEN));
+			
+			pQuad = pTestContext->pFlatContext->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(spacing, 0.0f, spacing);
+			pQuad->SetMaterialColors(color(COLOR_YELLOW));
+
+			pTestContext->pFlatContext->SetPosition(0.0f, -2.0f, 0.0f);
+			
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->pComposite->RotateYByDeg(0.035f);
+		//pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

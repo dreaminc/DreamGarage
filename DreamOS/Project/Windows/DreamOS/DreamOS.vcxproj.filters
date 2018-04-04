@@ -995,7 +995,7 @@
     <ClCompile Include="..\..\..\UI\UIFlatScrollView.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.cpp">
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFlatContext.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2165,7 +2165,7 @@
     <ClInclude Include="..\..\..\UI\UIFlatScrollView.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlatScroll.h">
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFlatContext.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
