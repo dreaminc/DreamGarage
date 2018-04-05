@@ -101,13 +101,10 @@ RESULT DreamAppManager::Update() {
 		while (m_pendingAppQueue.size() > 0) {
 			std::shared_ptr<DreamAppBase> pPendingApp = m_pendingAppQueue.front();
 			CN(pPendingApp);
+
 			m_pendingAppQueue.pop();
-			
-			// Push to priority queue
-			//m_appPriorityQueue.push_front(pDreamApp);
 			m_appPriorityQueue.push(pPendingApp);
 
-			//TODO: may want to use get() at a different level, keeping the map with shared_ptrs
 			m_appRegistry[pPendingApp->GetAppUID()] = pPendingApp.get();
 		}
 	}
