@@ -907,16 +907,16 @@ matrix<virtual_precision, 4, 4> DimObj::GetTranslationMatrix(matrix<virtual_prec
 }
 
 matrix<virtual_precision, 4, 4> DimObj::GetFlatModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
-	if (m_pParent != nullptr) {// && dynamic_cast<FlatContext*>(m_pParent) == nullptr) {
-		auto pFlat = dynamic_cast<FlatContext*>(m_pParent);
-		if (pFlat != nullptr) {
-			//return pFlat->FlatContext::GetModelMatrix(childMat);
+	if (m_pParent != nullptr) {
+		
+		auto pFlatContextParent = dynamic_cast<FlatContext*>(m_pParent);
+		
+		if (pFlatContextParent != nullptr) {
 			return VirtualObj::GetModelMatrix(childMat);
-			//return childMat;
 		}
 		else {
 			auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
-			return m_pParent->GetModelMatrix(modelMatrix);
+			return m_pParent->DimObj::GetFlatModelMatrix(modelMatrix);
 		}
 	}
 	else {

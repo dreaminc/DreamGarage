@@ -604,7 +604,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		std::shared_ptr<quad> pInnerQuads[4] = { nullptr, nullptr, nullptr, nullptr };
 		composite *pComposite = nullptr;
 		FlatContext *pFlatContext = nullptr;
-		
+		std::shared_ptr<composite> pInnerComposite = nullptr;
 		quad *pRenderQuad = nullptr;
 	} *pTestContext = new TestContext();
 
@@ -632,25 +632,29 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 			pTestContext->pFlatContext->SetIsAbsolute(true);
 			pTestContext->pFlatContext->SetAbsoluteBounds(2.0f, 2.0f);
 
-			auto pQuad = pTestContext->pInnerQuads[0] = pTestContext->pFlatContext->AddQuad(side, side);
+			pTestContext->pInnerComposite = pTestContext->pFlatContext->AddComposite();
+			CN(pTestContext->pInnerComposite);
+			pTestContext->pInnerComposite->InitializeOBB();
+
+			auto pQuad = pTestContext->pInnerQuads[0] = pTestContext->pInnerComposite->AddQuad(side, side);
 			CN(pQuad);
 			pQuad->SetPosition(-spacing, 0.0f, -spacing);
 			pQuad->SetMaterialColors(color(COLOR_RED));
 			pQuad->SetVertexColor(color(COLOR_RED));
 
-			pQuad = pTestContext->pInnerQuads[1] = pTestContext->pFlatContext->AddQuad(side, side);
+			pQuad = pTestContext->pInnerQuads[1] = pTestContext->pInnerComposite->AddQuad(side, side);
 			CN(pQuad);
 			pQuad->SetPosition(spacing, 0.0f, -spacing);
 			pQuad->SetMaterialColors(color(COLOR_BLUE));
 			pQuad->SetVertexColor(color(COLOR_BLUE));
 			
-			pQuad = pTestContext->pInnerQuads[2] = pTestContext->pFlatContext->AddQuad(side, side);
+			pQuad = pTestContext->pInnerQuads[2] = pTestContext->pInnerComposite->AddQuad(side, side);
 			CN(pQuad);
 			pQuad->SetPosition(-spacing, 0.0f, spacing);
 			pQuad->SetMaterialColors(color(COLOR_GREEN));
 			pQuad->SetVertexColor(color(COLOR_GREEN));
 			
-			pQuad = pTestContext->pInnerQuads[3] = pTestContext->pFlatContext->AddQuad(side, side);
+			pQuad = pTestContext->pInnerQuads[3] = pTestContext->pInnerComposite->AddQuad(side, side);
 			CN(pQuad);
 			pQuad->SetPosition(spacing, 0.0f, spacing);
 			pQuad->SetMaterialColors(color(COLOR_YELLOW));
@@ -658,6 +662,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 
 			pTestContext->pFlatContext->SetPosition(0.0f, -2.0f, 0.0f);
 			//pTestContext->pFlatContext->translateX(0.25f);
+			//pTestContext->pInnerComposite->translateX(0.25f);
 
 			pTestContext->pRenderQuad = m_pDreamOS->AddQuad(2.0f, 2.0f);
 			CN(pTestContext->pRenderQuad);
@@ -692,10 +697,18 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		pTestContext->pInnerQuads[1]->RotateYByDeg(0.05f);
 		pTestContext->pInnerQuads[2]->RotateZByDeg(0.05f);
 
+		//pTestContext->pInnerComposite->translateX(0.001f);
+		//pTestContext->pInnerComposite->translateY(0.001f);
+		//pTestContext->pInnerComposite->translateZ(0.001f);
+
+		//pTestContext->pInnerComposite->RotateXByDeg(0.01f);
+		//pTestContext->pInnerComposite->RotateYByDeg(0.01f);
+		//pTestContext->pInnerComposite->RotateZByDeg(0.01f);
+		
 		pTestContext->pFlatContext->translateX(0.001f);
 		pTestContext->pFlatContext->translateY(0.001f);
 		pTestContext->pFlatContext->translateZ(0.001f);
-
+		
 		pTestContext->pFlatContext->RotateXByDeg(0.01f);
 		pTestContext->pFlatContext->RotateYByDeg(0.01f);
 		pTestContext->pFlatContext->RotateZByDeg(0.01f);
