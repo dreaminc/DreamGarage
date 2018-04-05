@@ -603,7 +603,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 	struct TestContext {
 		std::shared_ptr<quad> pInnerQuads[4] = { nullptr, nullptr, nullptr, nullptr };
 		composite *pComposite = nullptr;
-		FlatContext *pFlatContext = nullptr;
+		std::shared_ptr<FlatContext> pFlatContext = nullptr;
 		std::shared_ptr<composite> pInnerComposite = nullptr;
 		quad *pRenderQuad = nullptr;
 	} *pTestContext = new TestContext();
@@ -627,7 +627,11 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		CN(pTestContext);
 
 		{
-			pTestContext->pFlatContext = m_pDreamOS->AddFlatContext();
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+
+			pTestContext->pFlatContext = pTestContext->pComposite->AddFlatContext();
 			CN(pTestContext->pFlatContext);
 			pTestContext->pFlatContext->SetIsAbsolute(true);
 			pTestContext->pFlatContext->SetAbsoluteBounds(2.0f, 2.0f);
@@ -693,6 +697,14 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 
 		CR(pTestContext->pFlatContext->RenderToQuad(pTestContext->pRenderQuad, 0, 0));
 
+		//pTestContext->pComposite->translateX(0.001f);
+		//pTestContext->pComposite->translateY(0.001f);
+		//pTestContext->pComposite->translateZ(0.001f);
+		//
+		//pTestContext->pComposite->RotateXByDeg(0.01f);
+		//pTestContext->pComposite->RotateYByDeg(0.01f);
+		//pTestContext->pComposite->RotateZByDeg(0.01f);
+		
 		pTestContext->pInnerQuads[0]->RotateXByDeg(0.05f);
 		pTestContext->pInnerQuads[1]->RotateYByDeg(0.05f);
 		pTestContext->pInnerQuads[2]->RotateZByDeg(0.05f);
