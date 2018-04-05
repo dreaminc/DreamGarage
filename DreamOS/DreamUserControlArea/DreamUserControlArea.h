@@ -195,6 +195,8 @@ private:
 	float m_animationDuration = ANIMATION_DURATION_SECONDS;
 	float m_animationScale = ANIMATION_SCALE;
 
+	UIStageProgram *m_pUIStageProgram = nullptr;
+
 	// certainly temporary
 	bool m_fIsAnimating = false;
 

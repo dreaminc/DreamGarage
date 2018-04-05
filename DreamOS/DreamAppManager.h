@@ -72,13 +72,15 @@ public:
 		CR(pDreamApp->SetPriority(DEFAULT_APP_PRIORITY));
 		CR(pDreamApp->ResetTimeRun());
 
+		m_pendingAppQueue.push(pDreamApp);
+		/*
 		// Push to priority queue
 		//m_appPriorityQueue.push_front(pDreamApp);
 		m_appPriorityQueue.push(pDreamApp);
 
 		//TODO: may want to use get() at a different level, keeping the map with shared_ptrs
 		m_appRegistry[pDreamApp->GetAppUID()] = pDreamApp.get();
-
+		//*/
 		// Success::
 		return pDreamApp;
 
@@ -120,6 +122,7 @@ private:
 private:
 	std::deque<std::shared_ptr<DreamAppBase>> m_appQueueAlreadyRun;
 	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
+	std::queue<std::shared_ptr<DreamAppBase>> m_pendingAppQueue;
 
 	std::map<UID, std::vector<std::pair<DreamAppHandle*, DreamAppBase*>>> m_appHandleRegistry;
 	std::map<UID, DreamAppBase*> m_appRegistry;

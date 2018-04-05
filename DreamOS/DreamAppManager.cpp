@@ -97,6 +97,18 @@ RESULT DreamAppManager::Update() {
 
 	std::shared_ptr<DreamAppBase> pDreamApp = nullptr;
 
+	if (!m_pendingAppQueue.empty()) {
+		while (m_pendingAppQueue.size() > 0) {
+			std::shared_ptr<DreamAppBase> pPendingApp = m_pendingAppQueue.front();
+			CN(pPendingApp);
+
+			m_pendingAppQueue.pop();
+			m_appPriorityQueue.push(pPendingApp);
+
+			m_appRegistry[pPendingApp->GetAppUID()] = pPendingApp.get();
+		}
+	}
+
 	CBR((!m_appPriorityQueue.empty()), R_QUEUE_EMPTY);
 
 	{
