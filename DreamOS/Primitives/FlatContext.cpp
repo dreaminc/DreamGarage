@@ -164,32 +164,38 @@ float FlatContext::GetHeight() {
 // TODO: This is not general and will not work if the text is rotated at all
 float FlatContext::GetLeft(bool fAbsolute) {
 	float boundingLeft = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft(fAbsolute);
+	
 	if (m_fAbsolute) {
-		boundingLeft = GetPosition().x() - FlatContext::GetWidth() / 2;
+		boundingLeft = -1.0f * (FlatContext::GetWidth() / 2.0f);
 	}
+	
 	return boundingLeft;
 }
 
 float FlatContext::GetRight(bool fAbsolute) {
 	float boundingRight = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight(fAbsolute);
+	
 	if (m_fAbsolute) {
-		boundingRight = GetPosition().x() + FlatContext::GetWidth() / 2;
+		boundingRight = FlatContext::GetWidth() / 2.0f;
 	}
+
 	return boundingRight;
 }
 
 float FlatContext::GetTop(bool fAbsolute) {
 	float boundingTop = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop(fAbsolute);
+
 	if (m_fAbsolute) {
-		boundingTop = GetPosition().z() + FlatContext::GetHeight() / 2;
+		boundingTop = FlatContext::GetHeight() / 2.0f;
 	}
+	
 	return boundingTop;
 }
 
 float FlatContext::GetBottom(bool fAbsolute) {
 	float boundingBottom = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
 	if (m_fAbsolute) {
-		boundingBottom = GetPosition().z() - FlatContext::GetHeight() / 2;
+		boundingBottom = -1.0f * (FlatContext::GetHeight() / 2.0f);
 	}
 	return boundingBottom;
 }
