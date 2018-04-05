@@ -45,23 +45,12 @@ RESULT DreamTabView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
 	if (m_pScrollView != nullptr) {
-		//m_pScrollView->GetRenderContext()->SetVisible(true, false);
 		CR(m_pScrollView->Update());
-		//m_pScrollView->GetRenderContext()->SetVisible(false, false);
 		point ptOrigin = GetComposite()->GetPosition(true);
 		quaternion qOrigin = GetComposite()->GetOrientation(true);
-		//m_pScrollView->GetRenderContext()->SetPosition(point(0.1f, 0.0f, 0.0f));
-		//m_pScrollView->GetRenderContext()->SetPosition(point(ptOrigin.x(), ptOrigin.y(), ptOrigin.z()));// +point(0.1f, 0.0f, 0.0f));
-		//m_pScrollView->GetRenderContext()->SetPosition(point(ptOrigin.x(), ptOrigin.y() , ptOrigin.z()));// +point(0.1f, 0.0f, 0.0f));
 		m_pScrollView->GetRenderContext()->SetPosition(ptOrigin);
-		//m_pScrollView->GetRenderContext()->RotateYByDeg(30.0f);
-		//m_pScrollView->GetRenderContext()->SetOrientation(quaternion::MakeQuaternionWithEuler((float)(M_PI)/6.0f, 0.0f, 0.0f));
-		//m_pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler((float)(M_PI)/6.0f, 0.0f, 0.0f));
 		m_pScrollView->GetRenderContext()->SetOrientation(qOrigin);
 	}
-	//if (m_pScrollView->GetCurrentTexture() != nullptr) {
-	//	m_pRenderQuad->SetDiffuseTexture(m_pScrollView->GetCurrentTexture());
-	//}
 
 Error:
 	return r;
@@ -95,42 +84,30 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_tabHeight *= baseWidth;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
-	//m_pRenderQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(10, 10));
-	//m_pRenderQuad = GetComposite()->AddQuad(10, 10);
 	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 
-	// wack
-	//auto pRenderContext = GetComposite()->AddFlatContext();
-	//auto pRenderContext = GetComposite()->MakeFlatContext();
-	auto pRenderContext = GetDOS()->AddComposite()->AddFlatContext();
+	//auto pRenderContext = GetDOS()->AddComposite()->MakeFlatContext();
+	auto pCompositeContainer = GetComposite()->AddComposite();
 
-	//m_pRenderContext->SetScaleToFit(false);
-	//m_pRenderContext->AddObject(this);
-	//m_pRenderContext->SetPosition(0.0f, 3.0f, 5.0f);
+	// make sure that the flat context isn't rendered through environment shader
+	//pCompositeContainer->SetVisible(false);
+
+	//auto pRenderContext = pCompositeContainer->AddFlatContext();
+	auto pRenderContext = GetComposite()->MakeFlatContext();
 	pRenderContext->SetIsAbsolute(true);
 	pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
 
 	m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
 	auto testQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight()));
+
+	//unclear how the object structure should work here, should UIFlatScrollView be a FlatContext?
 	m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
-	//m_pScrollView->GetRenderContext()->AddObject(testQuad);
+
 	m_pBackgroundTexture = GetDOS()->MakeTexture(k_wszTabBackground, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 	m_pBackgroundQuad->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
-	point ptPosition = point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f);
-	//GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
-	GetComposite()->SetPosition(ptPosition);
-	//pRenderContext->SetPosition(ptOrigin);
-	//pRenderContext->SetOrientation(qOrigin);
-//	pRenderContext->SetPosition(GetComposite()->GetPosition(true));
-//	pRenderContext->SetOrientation(GetComposite()->GetOrientation(true));
-	//m_pScrollView->SetPosition(GetComposite()->GetPosition(true));
-	//m_pScrollView->SetOrientation(GetComposite()->GetOrientation(true));
-	//m_pView->
-	//m_pRenderQuad->SetPosition(ptOrigin);
-
-	//m_pScrollView->GetRenderContext()->SetPosition(ptPosition);
+	GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
 
 	m_ptMostRecent = point(0.0f, 0.0f, (-borderHeight / 2.0f) + (m_tabHeight / 2.0f) + (itemSpacing / 2.0f));
 
@@ -161,7 +138,6 @@ std::shared_ptr<UIButton> DreamTabView::CreateTab() {
 	auto pDreamOS = GetDOS();
 
 	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
-	//m_pScrollView->AddObject(pNewTabButton);
 
 	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
 	pNewTabButton->GetSurface()->FlipUVVertical();
@@ -212,6 +188,7 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 		m_pTabPendingRemoval = pButtonToRemove;
 		HideTab(pButtonToRemove.get());
 		//m_pView->RemoveChild(pButtonToRemove);
+		m_pScrollView->RemoveChild(pButtonToRemove);
 		pDreamOS->UnregisterInteractionObject(pButtonToRemove.get());
 		pDreamOS->RemoveObjectFromInteractionGraph(pButtonToRemove.get());
 		pDreamOS->RemoveObjectFromUIGraph(pButtonToRemove.get());
@@ -248,6 +225,7 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 		if (pButton.get() == pButtonContext) {
 
 //			m_pView->RemoveChild(pButton);
+			m_pScrollView->RemoveChild(pButton);
 			m_pTabPendingRemoval = pButton;
 			HideTab(pButton.get());
 
@@ -402,10 +380,10 @@ RESULT DreamTabView::TranslateTabDown(UIButton *pTabButton) {
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		pTabButton->GetSurface().get(),
-		pTabButton->GetSurface()->GetPosition() + ptDisplacement,
-		pTabButton->GetSurface()->GetOrientation(),
-		pTabButton->GetSurface()->GetScale(),
+		pTabButton,
+		pTabButton->GetPosition() + ptDisplacement,
+		pTabButton->GetOrientation(),
+		pTabButton->GetScale(),
 		m_pParentApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
@@ -420,6 +398,7 @@ RESULT DreamTabView::TranslateTabUp(UIButton *pTabButton) {
 
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
 
+	/*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pTabButton->GetSurface().get(),
 		pTabButton->GetSurface()->GetPosition() - ptDisplacement,
@@ -429,7 +408,8 @@ RESULT DreamTabView::TranslateTabUp(UIButton *pTabButton) {
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
-	/*
+	//*/
+	//*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pTabButton,
 		pTabButton->GetPosition() - ptDisplacement,

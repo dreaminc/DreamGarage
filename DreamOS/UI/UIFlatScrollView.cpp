@@ -25,7 +25,7 @@ RESULT UIFlatScrollView::Update() {
 	msNow /= 1000.0;
 	double tDiff = (msNow - m_frameMs) * (90.0);
 
-	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 10000000.0f));
+	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 1000000.0f));
 
 	SetPosition(GetPosition() + ptDiff);
 	//GetRenderContext()->SetPosition(GetPosition() + ptDiff);

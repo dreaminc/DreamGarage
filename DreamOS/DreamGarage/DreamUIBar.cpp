@@ -196,8 +196,10 @@ RESULT DreamUIBar::ResetAppComposite() {
 	quaternion qOrigin;
 	vector vCameraToMenu;
 	CNR(m_pUIStageProgram, R_SKIPPED);
-	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	if (m_pUserHandle != nullptr) {
+		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	}
 	
 	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);
