@@ -604,6 +604,7 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		std::shared_ptr<quad> pInnerQuads[4] = { nullptr, nullptr, nullptr, nullptr };
 		composite *pComposite = nullptr;
 		FlatContext *pFlatContext = nullptr;
+		
 		quad *pRenderQuad = nullptr;
 	} *pTestContext = new TestContext();
 
@@ -694,6 +695,10 @@ RESULT HALTestSuite::AddTestFlatContextNesting() {
 		pTestContext->pFlatContext->translateX(0.001f);
 		pTestContext->pFlatContext->translateY(0.001f);
 		pTestContext->pFlatContext->translateZ(0.001f);
+
+		pTestContext->pFlatContext->RotateXByDeg(0.01f);
+		pTestContext->pFlatContext->RotateYByDeg(0.01f);
+		pTestContext->pFlatContext->RotateZByDeg(0.01f);
 
 	Error:
 		return r;
