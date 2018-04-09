@@ -62,6 +62,8 @@ public:
 
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
+//	std::vector<std::shared_ptr<UIButton>> GetTabButtons();
+
 private:
 	std::shared_ptr<UIButton> CreateTab();
 
@@ -74,8 +76,8 @@ private:
 	RESULT HideTab(UIButton *pTabButton);
 	RESULT ShowTab(UIButton *pTabButton);
 
-	RESULT TranslateTabDown(UIButton *pTabButton);
-	RESULT TranslateTabUp(UIButton *pTabButton);
+	RESULT TranslateTabDown(DimObj *pTabButton);
+	RESULT TranslateTabUp(DimObj *pTabButton);
 	
 private:
 	DreamUserControlArea* m_pParentApp = nullptr;

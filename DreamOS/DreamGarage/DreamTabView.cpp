@@ -30,9 +30,7 @@ RESULT DreamTabView::InitializeApp(void *pContext) {
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetDOS()->AddComposite()->AddUIView(GetDOS());
-	//m_pView = GetComposite()->AddUIView(GetDOS());
 	m_pScrollView = m_pView->MakeUIFlatScrollView();
-	//m_pScrollView = m_pView->MakeUIFlatScrollView();
 
 	return R_PASS;
 }
@@ -81,10 +79,11 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	// ties this app to the control area's size
 	m_tabWidth *= baseWidth;
-	m_tabHeight *= baseWidth;
+	m_tabHeight *= baseWidth * 1.01f;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
+	//m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight - itemSpacing);
 
 	//auto pRenderContext = GetDOS()->AddComposite()->MakeFlatContext();
 	auto pCompositeContainer = GetComposite()->AddComposite();
@@ -98,6 +97,9 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
 
 	m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
+	m_pScrollView->SetScrollSnapDistance(m_tabHeight + itemSpacing / 2.0f);
+	m_pScrollView->SetTabWidth(m_tabWidth);
+	m_pScrollView->SetTabHeight(m_tabHeight);
 	auto testQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight()));
 
 	//unclear how the object structure should work here, should UIFlatScrollView be a FlatContext?
@@ -187,8 +189,6 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 
 		m_pTabPendingRemoval = pButtonToRemove;
 		HideTab(pButtonToRemove.get());
-		//m_pView->RemoveChild(pButtonToRemove);
-		m_pScrollView->RemoveChild(pButtonToRemove);
 		pDreamOS->UnregisterInteractionObject(pButtonToRemove.get());
 		pDreamOS->RemoveObjectFromInteractionGraph(pButtonToRemove.get());
 		pDreamOS->RemoveObjectFromUIGraph(pButtonToRemove.get());
@@ -197,6 +197,7 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 		//	pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 			TranslateTabUp(pButton.get());
 		}
+		//if ()
 		return pActiveContent;
 	}
 Error:
@@ -331,7 +332,8 @@ RESULT DreamTabView::HideTab(UIButton *pTabButton) {
 
 		if (m_pTabPendingRemoval != nullptr) {
 			m_pTabPendingRemoval->SetVisible(false);
-			m_pView->RemoveChild(m_pTabPendingRemoval);
+			//m_pView->RemoveChild(m_pTabPendingRemoval);
+			m_pScrollView->RemoveChild(m_pTabPendingRemoval);
 			m_pTabPendingRemoval = nullptr;
 		}
 
@@ -374,7 +376,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTabView::TranslateTabDown(UIButton *pTabButton) {
+RESULT DreamTabView::TranslateTabDown(DimObj *pTabButton) {
 	RESULT r = R_PASS;
 
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
@@ -393,7 +395,7 @@ Error:
 	return r;
 }
 
-RESULT DreamTabView::TranslateTabUp(UIButton *pTabButton) {
+RESULT DreamTabView::TranslateTabUp(DimObj *pTabButton) {
 	RESULT r = R_PASS;
 
 	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
