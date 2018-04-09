@@ -28,11 +28,16 @@ Error:
 // DreamApp Interface
 RESULT DreamTabView::InitializeApp(void *pContext) {
 
+	RESULT r = R_PASS;
+
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 	m_pView = GetDOS()->AddComposite()->AddUIView(GetDOS());
+	CN(m_pView);
 	m_pScrollView = m_pView->MakeUIFlatScrollView();
+	CN(m_pScrollView);
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamTabView::OnAppDidFinishInitializing(void *pContext) {
@@ -82,30 +87,28 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_tabHeight *= baseWidth * 1.01f;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
+	CN(m_pBackgroundQuad);
 	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
-	//m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight - itemSpacing);
+	CN(m_pRenderQuad);
 
-	//auto pRenderContext = GetDOS()->AddComposite()->MakeFlatContext();
-	auto pCompositeContainer = GetComposite()->AddComposite();
+	{
+		auto pRenderContext = GetComposite()->MakeFlatContext();
+		CN(pRenderContext);
+		pRenderContext->SetIsAbsolute(true);
+		pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
 
-	// make sure that the flat context isn't rendered through environment shader
-	//pCompositeContainer->SetVisible(false);
+		m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
+		m_pScrollView->SetScrollSnapDistance(m_tabHeight + itemSpacing / 2.0f);
+		m_pScrollView->SetTabWidth(m_tabWidth);
+		m_pScrollView->SetTabHeight(m_tabHeight);
 
-	//auto pRenderContext = pCompositeContainer->AddFlatContext();
-	auto pRenderContext = GetComposite()->MakeFlatContext();
-	pRenderContext->SetIsAbsolute(true);
-	pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
-
-	m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
-	m_pScrollView->SetScrollSnapDistance(m_tabHeight + itemSpacing / 2.0f);
-	m_pScrollView->SetTabWidth(m_tabWidth);
-	m_pScrollView->SetTabHeight(m_tabHeight);
-	auto testQuad = std::shared_ptr<quad>(GetDOS()->AddQuad(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight()));
-
-	//unclear how the object structure should work here, should UIFlatScrollView be a FlatContext?
-	m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
+		//unclear how the object structure should work here, should UIFlatScrollView be a FlatContext?
+		m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
+	}
 
 	m_pBackgroundTexture = GetDOS()->MakeTexture(k_wszTabBackground, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	CN(m_pBackgroundTexture);
+
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 	m_pBackgroundQuad->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
@@ -197,7 +200,6 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 		//	pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
 			TranslateTabUp(pButton.get());
 		}
-		//if ()
 		return pActiveContent;
 	}
 Error:

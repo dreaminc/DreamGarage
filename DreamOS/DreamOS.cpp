@@ -1017,20 +1017,12 @@ RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
 }
 
-RESULT DreamOS::AddObjectToFlatScrollGraph(VirtualObj *pObject) {
-	return m_pSandbox->AddObjectToFlatScrollGraph(pObject);
-}
-
 RESULT DreamOS::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIGraph(pObject);
 }
 
 RESULT DreamOS::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pSandbox->RemoveObjectFromUIClippingGraph(pObject);
-}
-
-RESULT DreamOS::RemoveObjectFromFlatScrollGraph(VirtualObj *pObject) {
-	return m_pSandbox->RemoveObjectFromFlatScrollGraph(pObject);
 }
 
 // Cloud Controller

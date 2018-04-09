@@ -812,25 +812,12 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddObjectToFlatScrollGraph(VirtualObj *pObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pUIFlatScrollSceneGraph->PushObject(pObject));
-
-Error:
-	return r;
-}
-
 RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pUISceneGraph->RemoveObject(pObject);
 }	   
 	   
 RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pUIClippingSceneGraph->RemoveObject(pObject);
-}
-
-RESULT SandboxApp::RemoveObjectFromFlatScrollGraph(VirtualObj *pObject) {
-	return m_pUIFlatScrollSceneGraph->RemoveObject(pObject);
 }
 
 /*
