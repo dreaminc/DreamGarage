@@ -281,13 +281,11 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading && m_pParentApp != nullptr) {
-		m_strCurrentURL = strCurrentURL;
-
-		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		if (m_strCurrentURL != strCurrentURL) {
+			m_strCurrentURL = strCurrentURL;
+			m_fURLChanged = true;
 		}
+		CR(r);
 	}
 
 Error:
@@ -306,16 +304,13 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pParentApp != nullptr) {
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
-		}
+		m_fLoadEnded = true;
 	}
 
 	if (strCurrentURL == "about:blank") {
 		m_fCanLoadRequest = true;
 		if (m_pPendingEnvironmentAsset != nullptr) {
-			SetEnvironmentAsset(m_pPendingEnvironmentAsset);
+			CR(SetEnvironmentAsset(m_pPendingEnvironmentAsset));
 			m_pPendingEnvironmentAsset = nullptr;
 		}
 	}
@@ -477,9 +472,26 @@ RESULT DreamBrowser::Update(void *pContext) {
 		auto pDreamOS = GetDOS();
 		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
 		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
-		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
+		CBR(userAppIDs.size() == 1, R_SKIPPED);
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
+	
+	if (m_fLoadEnded) {
+		m_fLoadEnded = false;
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		}
+	}
+	if (m_fURLChanged) {
+		m_fURLChanged = false;
+		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		}
+	}
+
+
 Error:
 	return r;
 }
@@ -549,6 +561,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	// when the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
+	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 

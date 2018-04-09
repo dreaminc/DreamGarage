@@ -141,12 +141,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	// Initialize texture
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
 
-	GetComposite()->SetVisible(true);
-
-	CRM(StartDuplicationProcess(), "Error starting duplication process");
-	m_hwndDreamHandle = GetDOS()->GetDreamHWND();
-	
-	CNR(m_hwndDreamHandle, R_SKIPPED);	
+	CR(GetComposite()->SetVisible(true));
 
 Error:
 	return r;
@@ -218,7 +213,11 @@ RESULT DreamDesktopApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamDesktopApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	if (m_hwndDesktopHandle == NULL) {	// duplication process may take a bit to load, so catch it when it's done
+	m_hwndDreamHandle = GetDOS()->GetDreamHWND();
+
+	CNR(m_hwndDreamHandle, R_SKIPPED);
+
+	if (m_hwndDesktopHandle == nullptr) {	// duplication process may take a bit to load, so catch it when it's done
 		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
 	}
 	CNR(m_hwndDesktopHandle, R_SKIPPED);	// duplication process isn't ready yet, so skip
@@ -370,8 +369,13 @@ Error:
 }
 
 RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	RESULT r = R_PASS;
+	
 	m_pParentApp = pParentApp;
-	return R_PASS;
+	CRM(StartDuplicationProcess(), "Error starting duplication process");
+	
+Error:
+	return r;
 }
 
 float DreamDesktopApp::GetHeightFromAspectDiagonal() {

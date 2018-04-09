@@ -193,6 +193,9 @@ private:
 
 	// CEF can call LoadRequest once a URL is loaded
 	bool m_fCanLoadRequest = false;
+	bool m_fLoadEnded = false;
+	bool m_fURLChanged = false;
+
 	long m_assetID = -1;
 
 	DreamUserControlArea *m_pParentApp = nullptr;

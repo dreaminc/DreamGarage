@@ -612,8 +612,8 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
-			m_pDreamDesktop->InitializeWithParent(this);
 			m_pActiveSource = m_pDreamDesktop;
+			m_pDreamDesktop->InitializeWithParent(this);
 			m_pControlBar->SetTitleText(m_pDreamDesktop->GetTitle());
 			// new desktop can't be the current content
 			m_pControlBar->SetSharingFlag(false);
@@ -625,12 +625,13 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		m_pActiveSource = pBrowser;
+
 		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
 		pBrowser->InitializeWithParent(this);
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
 
-		m_pActiveSource = pBrowser;
 		m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// new browser can't be the current content
