@@ -221,14 +221,6 @@ RESULT FlatContext::RenderToQuad(quad::CurveType curveType) {
 RESULT FlatContext::RenderToQuad(quad* pRenderQuad, float xOffset, float yOffset) {
 	RESULT r = R_PASS;
 
-	float tempWidth = FlatContext::GetWidth();
-	float tempHeight = FlatContext::GetHeight();
-	if (m_fAbsolute) {
-		//SetBounds(m_width, m_height);
-		m_xOffset = xOffset;
-		m_yOffset = yOffset;
-	}
-
 	CR(RenderToTexture());
 
 	{
@@ -253,9 +245,6 @@ RESULT FlatContext::RenderToQuad(quad* pRenderQuad, float xOffset, float yOffset
 	CR(pRenderQuad->SetDiffuseTexture(GetFramebuffer()->GetColorTexture()));
 
 Error:
-	if (m_fAbsolute) {
-		//SetBounds(tempWidth, tempHeight);
-	}
 	return r;
 }
 

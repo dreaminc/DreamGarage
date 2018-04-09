@@ -83,13 +83,6 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL minimal texture Program");
 		} break;
 
-		case OGLPROGRAM_FLAT_SCROLL: {
-			pOGLProgram = new OGLProgramUIStage(pParentImp);
-			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"uiflatscroll.vert", L"uiflatscroll.frag", versionOGL),
-				"Failed to initialize OGL flat scrolling Program");
-		} break;
-		
 		case OGLPROGRAM_SKYBOX: {
 			pOGLProgram = new OGLProgramSkybox(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");

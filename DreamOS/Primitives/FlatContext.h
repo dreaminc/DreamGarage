@@ -70,9 +70,6 @@ protected:
 	//hack used for text rendering, skips DimObj::GetModelMatrix() in OGLProgramFlat
 	bool m_fVirtualModelMatrix = false;
 
-	float m_xOffset;
-	float m_yOffset;
-
 	std::shared_ptr<quad> m_pQuad = nullptr;
 };
 
