@@ -10,6 +10,7 @@
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamTabView.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -131,43 +132,23 @@ Error:
 	return r;
 }
 
-<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 RESULT MultiContentTestSuite::AddTestDreamTabView() {
-=======
-
-RESULT MultiContentTestSuite::AddTestActiveSource() {
->>>>>>> Makings of a test
 	RESULT r = R_PASS;
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
 	struct TestContext {
-<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 		std::shared_ptr<UIView> pViewContext;
 		std::shared_ptr<UIFlatScrollView> pFlatScrollView;
 		std::shared_ptr<quad> pRenderQuad;
 		std::shared_ptr<UIButton> pTestButton = nullptr;
 	} *pTestContext = new TestContext();
-	
-=======
-		std::vector<std::string> strURIs;
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
-		std::shared_ptr<DreamBrowser> pBrowser1;
-		std::shared_ptr <DreamBrowser> pBrowser2;
-		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
-		double msTimeSinceLastSent = 0.0;
-		double msTimeDelay = 500.0;
-		bool fSwitch = false;
-	} *pTestContext = new TestContext();
 
->>>>>>> Makings of a test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		SetupPipeline();
-
-<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		auto pComposite = m_pDreamOS->AddComposite();
@@ -175,7 +156,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		pTestContext->pRenderQuad = std::shared_ptr<quad>(m_pDreamOS->MakeQuad(5.0f, 5.0f));
 		m_pDreamOS->AddObjectToUIGraph(pTestContext->pRenderQuad.get());
 		pTestContext->pRenderQuad->RotateXByDeg(90.0f);
-		
+
 		pTestContext->pViewContext = pComposite->AddUIView(m_pDreamOS);
 		pTestContext->pFlatScrollView = pTestContext->pViewContext->MakeUIFlatScrollView();
 		//pTestContext->pFlatScrollView->RotateXByDeg(90.0f);
@@ -192,8 +173,8 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		//pTestButton->SetVisible(true);
 
 		auto pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 0.0f));
-//		pTestContext->pFlatScrollView->AddObject(pQuad);
-		//pQuad->SetVisible(true);
+		//		pTestContext->pFlatScrollView->AddObject(pQuad);
+				//pQuad->SetVisible(true);
 		CN(pQuad);
 		//pQuad->SetVertexColor(COLOR_RED);
 		pQuad->SetDiffuseTexture(pTexture);
@@ -201,15 +182,15 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		//pQuad = MakeQuad
 		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -1.0f));
 		CN(pQuad);
-//		pQuad->SetVertexColor(COLOR_GREEN);
+		//		pQuad->SetVertexColor(COLOR_GREEN);
 
-		/*
-		pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
-		pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
-		CN(pQuad);
-		pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//*/
-		//*
+				/*
+				pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
+				pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
+				CN(pQuad);
+				pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//*/
+				//*
 		pTestButton->SetPosition(point(-0.5f, 0.0f, 0.0f));
 		//pTestContext->pTestButton->RotateXByDeg(-90.0f);
 		//pTestContext->pTestButton->GetSurface()->SetPosition(point(-0.5f, 0.0f, 0.0f));
@@ -220,7 +201,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
 		CN(pQuad);
-//		pQuad->SetVertexColor(COLOR_WHITE);
+		//		pQuad->SetVertexColor(COLOR_WHITE);
 
 		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 			pQuad.get(),
@@ -242,7 +223,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 		//pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pQuad);
 
-		
+
 		pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pTestContext->pFlatScrollView);
 
 		/*
@@ -276,7 +257,61 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 			);
 		}
 		//*/
-=======
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pFlatScrollView->Update();
+
+		return R_PASS;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestActiveSource() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamBrowser> pBrowser1;
+		std::shared_ptr <DreamBrowser> pBrowser2;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+		double msTimeSinceLastSent = 0.0;
+		double msTimeDelay = 3000.0;
+		bool fSwitch = false;
+		bool fFirst = true;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
 		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -297,38 +332,33 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
 		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
-		pControlArea->GetComposite()->SetVisible(true);
->>>>>>> Makings of a test
 
 	Error:
 		return r;
 	};
-<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 
 	auto fnUpdate = [&](void *pContext) {
-
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-		pTestContext->pFlatScrollView->Update();
-=======
-	auto fnUpdate = [&](void *pContext) {
-
-		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-		if (msTimeNow - pTestContext->msTimeSinceLastSent > pTestContext->msTimeDelay) {
-			pTestContext->msTimeSinceLastSent = msTimeNow;
-			if (pTestContext->fSwitch) {
-				pTestContext->fSwitch = false;
-				pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			}
-			else {
-				pTestContext->fSwitch = true;
-				pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser2);
+		if (pTestContext->fFirst) {
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+		}
+		else {
+			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			if (msTimeNow - pTestContext->msTimeSinceLastSent > pTestContext->msTimeDelay) {
+				pTestContext->msTimeSinceLastSent = msTimeNow;
+				if (pTestContext->fSwitch) {
+					pTestContext->fSwitch = false;
+					pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser1);
+				}
+				else {
+					pTestContext->fSwitch = true;
+					pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser2);
+				}
 			}
 		}
->>>>>>> Makings of a test
-
 		return R_PASS;
 	};
 	auto fnTest = [&](void *pContext) {
@@ -341,21 +371,12 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
-	pNewTest->SetTestName("Multi-browser");
-	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
-
-Error:	
-=======
 	pNewTest->SetTestName("Multi Content Active Source");
 	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
->>>>>>> Makings of a test
 	return r;
 }
 
