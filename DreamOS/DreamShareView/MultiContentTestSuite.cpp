@@ -63,12 +63,14 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestActiveSource());
+
 	CR(AddTestDreamTabView());
 	CR(AddTestUserControlAreaLayout());
 
 	CR(AddTestManyBrowsers());
-	CR(AddTestUserControlArea());
 
+	CR(AddTestUserControlArea());
 
 
 	CR(AddTestMultiPeerBrowser());
@@ -129,24 +131,43 @@ Error:
 	return r;
 }
 
+<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 RESULT MultiContentTestSuite::AddTestDreamTabView() {
+=======
+
+RESULT MultiContentTestSuite::AddTestActiveSource() {
+>>>>>>> Makings of a test
 	RESULT r = R_PASS;
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
 	struct TestContext {
+<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 		std::shared_ptr<UIView> pViewContext;
 		std::shared_ptr<UIFlatScrollView> pFlatScrollView;
 		std::shared_ptr<quad> pRenderQuad;
 		std::shared_ptr<UIButton> pTestButton = nullptr;
 	} *pTestContext = new TestContext();
 	
+=======
+		std::vector<std::string> strURIs;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamBrowser> pBrowser1;
+		std::shared_ptr <DreamBrowser> pBrowser2;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+		double msTimeSinceLastSent = 0.0;
+		double msTimeDelay = 5000.0;
+		bool fSwitch = false;
+	} *pTestContext = new TestContext();
+
+>>>>>>> Makings of a test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		SetupPipeline();
 
+<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		auto pComposite = m_pDreamOS->AddComposite();
@@ -255,16 +276,64 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 			);
 		}
 		//*/
+=======
+		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+		
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());
+		/*
+		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->pWebBrowserManager);
+		CR(pTestContext->pWebBrowserManager->Initialize());
+		pTestContext->pWebBrowserManager->Update();	
+		*/
+
+		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+		pTestContext->pBrowser1->SetURI("www.twitch.tv");
+
+		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+		pTestContext->pBrowser2->SetURI("www.nyt.com");
+
+		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+		pControlArea->m_fFromMenu = true;
+		pControlArea->GetComposite()->SetVisible(true);
+>>>>>>> Makings of a test
 
 	Error:
 		return r;
 	};
+<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 
 	auto fnUpdate = [&](void *pContext) {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		pTestContext->pFlatScrollView->Update();
+=======
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - pTestContext->msTimeSinceLastSent > pTestContext->msTimeDelay) {
+			pTestContext->msTimeSinceLastSent = msTimeNow;
+			if (pTestContext->fSwitch) {
+				pTestContext->fSwitch = false;
+				pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			}
+			else {
+				pTestContext->fSwitch = true;
+				pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser2);
+			}
+		}
+>>>>>>> Makings of a test
 
 		return R_PASS;
 	};
@@ -278,12 +347,21 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
+<<<<<<< e75a0fecb9fc6489412348690413b707a040b3ad
 	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
 Error:	
+=======
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+>>>>>>> Makings of a test
 	return r;
 }
 
