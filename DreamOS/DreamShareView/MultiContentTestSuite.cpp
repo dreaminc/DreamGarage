@@ -157,7 +157,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		std::shared_ptr <DreamBrowser> pBrowser2;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 		double msTimeSinceLastSent = 0.0;
-		double msTimeDelay = 5000.0;
+		double msTimeDelay = 500.0;
 		bool fSwitch = false;
 	} *pTestContext = new TestContext();
 
@@ -284,24 +284,18 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
-		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());
-		/*
-		pTestContext->pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-		CN(pTestContext->pWebBrowserManager);
-		CR(pTestContext->pWebBrowserManager->Initialize());
-		pTestContext->pWebBrowserManager->Update();	
-		*/
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser1->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		pTestContext->pBrowser1->SetURI("www.twitch.tv");
 
 		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser2->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
 		pTestContext->pBrowser2->SetURI("www.nyt.com");
 
 		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
-		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * -(float)M_PI / 180.0f, 0.0f, 0.0f)));
+		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
 		pControlArea->GetComposite()->SetVisible(true);
 >>>>>>> Makings of a test
