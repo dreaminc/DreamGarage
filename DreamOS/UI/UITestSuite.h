@@ -59,6 +59,7 @@ public:
 	RESULT AddTestUIMenuItem();
 	RESULT AddTestFont();
 	RESULT AddTestFlatContextCompositionQuads();
+	//RESULT AddTestFlatContext();
 
 	virtual RESULT AddTests() override;
 

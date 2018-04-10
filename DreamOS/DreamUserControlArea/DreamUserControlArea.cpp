@@ -17,6 +17,7 @@
 #include "InteractionEngine/AnimationItem.h"
 
 #include "UI/UIButton.h"
+#include "UI/UIFlatScrollView.h"
 
 DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserControlArea>(pDreamOS, pContext)
@@ -50,7 +51,6 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
 	//CN(m_pActiveBrowser);
 	//CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
-	//CR(m_pActiveBrowser->SetURI("www.reddit.com")); // for testing	
 
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
@@ -150,8 +150,22 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 			m_fCanPressButton[i] = true;
 		}
 
-		// TODO: Update Control View
+		// Update DreamTabView
+		float tabViewWidth = m_pDreamTabView->GetBorderWidth();
+		float tabViewHeight = m_pDreamTabView->GetBorderHeight();
 
+		point ptDreamTabView = m_pDreamTabView->GetComposite()->GetPosition();
+
+		bool fWidth = ( ptSphereOrigin.x() > ptDreamTabView.x() - tabViewWidth / 2.0f  &&
+						ptSphereOrigin.x() < ptDreamTabView.x() + tabViewWidth / 2.0f);
+
+		bool fHeight = (ptSphereOrigin.z() > ptDreamTabView.z() - tabViewHeight / 2.0f &&
+						ptSphereOrigin.z() < ptDreamTabView.z() + tabViewHeight / 2.0f);
+
+		bool fMalletInTabView = fWidth && fHeight;
+
+		m_pDreamTabView->SetScrollFlag(fMalletInTabView, i);
+		
 	}
 
 Error:
@@ -680,8 +694,17 @@ Error:
 RESULT DreamUserControlArea::ResetAppComposite() {
 	RESULT r = R_PASS;
 
+	/*
+	auto pRenderContext = m_pDreamTabView->m_pScrollView->GetRenderContext();
+	point ptOrigin = m_pDreamTabView->GetComposite()->GetPosition(true);
+	quaternion qOrigin = m_pDreamTabView->GetComposite()->GetOrientation(true);
+	pRenderContext->SetPosition(ptOrigin);
+	pRenderContext->SetOrientation(qOrigin);
+	//*/
+
 	CR(m_pDreamUserApp->ResetAppComposite());
 	CR(m_pDreamUIBar->ResetAppComposite());
+
 
 Error:
 	return r;

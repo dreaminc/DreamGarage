@@ -112,37 +112,140 @@ RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 	return R_PASS;
 }
 
+bool FlatContext::IsScaleToFit() {
+	return m_fScaleToFit;
+}
+
+RESULT FlatContext::SetScaleToFit(bool fScaleToFit) {
+	RESULT r = R_PASS;
+
+	m_fScaleToFit = fScaleToFit;
+
+//Error:
+	return r;
+}
+
+RESULT FlatContext::SetIsAbsolute(float fAbsolute) {
+	RESULT r = R_PASS;
+	
+	m_fAbsolute = fAbsolute;
+	return r;
+}
+
+RESULT FlatContext::SetAbsoluteBounds(float width, float height) {
+	m_width = width;
+	m_height = height;
+	return R_PASS;
+}
+
 RESULT FlatContext::SetBounds(float width, float height) {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->SetBounds(width, height);
+	RESULT r = R_PASS;
+
+	CR(std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->SetBounds(width, height));
+
+Error:
+	return r;
 }
 
 float FlatContext::GetWidth() {
+	if (m_fAbsolute) {
+		return m_width;
+	}
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetWidth();
 }
 
 float FlatContext::GetHeight() {
+	if (m_fAbsolute) {
+		return m_height;
+	}
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetHeight();
 }
 
 // TODO: This is not general and will not work if the text is rotated at all
 float FlatContext::GetLeft(bool fAbsolute) {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft(fAbsolute);
+	float boundingLeft = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft(fAbsolute);
+	
+	if (m_fAbsolute) {
+		boundingLeft = -1.0f * (FlatContext::GetWidth() / 2.0f);
+	}
+	
+	return boundingLeft;
 }
 
 float FlatContext::GetRight(bool fAbsolute) {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight(fAbsolute);
+	float boundingRight = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight(fAbsolute);
+	
+	if (m_fAbsolute) {
+		boundingRight = FlatContext::GetWidth() / 2.0f;
+	}
+
+	return boundingRight;
 }
 
 float FlatContext::GetTop(bool fAbsolute) {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop(fAbsolute);
+	float boundingTop = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop(fAbsolute);
+
+	if (m_fAbsolute) {
+		boundingTop = FlatContext::GetHeight() / 2.0f;
+	}
+	
+	return boundingTop;
 }
 
 float FlatContext::GetBottom(bool fAbsolute) {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
+	float boundingBottom = std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
+	if (m_fAbsolute) {
+		boundingBottom = -1.0f * (FlatContext::GetHeight() / 2.0f);
+	}
+	return boundingBottom;
 }
+
+bool FlatContext::UseVirtualModelMatrix() {
+	return m_fVirtualModelMatrix;
+}
+//*
+matrix<virtual_precision, 4, 4> FlatContext::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	//return matrix<virtual_precision, 4, 4>::identity();
+	//return Matrix4::identity();
+	//auto mat = matrix<virtual_precision, 4, 4>();
+	auto mat = VirtualObj::GetModelMatrix() * childMat;
+	//mat.identity();
+	return mat;
+}
+//*/
 
 RESULT FlatContext::RenderToQuad(quad::CurveType curveType) {
 	return RenderToQuad(GetWidth(), GetHeight(), 0.0f, 0.0f, curveType);
+}
+
+RESULT FlatContext::RenderToQuad(quad* pRenderQuad, float xOffset, float yOffset) {
+	RESULT r = R_PASS;
+
+	CR(RenderToTexture());
+
+	{
+		// We map the uvCoordinates per the height/width of the text object 
+		// vs the bounding area
+		float contextWidth = FlatContext::GetWidth();
+		float contextHeight = FlatContext::GetHeight();
+
+		float width = pRenderQuad->GetWidth();
+		float height = pRenderQuad->GetHeight();
+
+		float uvLeft = xOffset / contextWidth;
+		float uvRight = (width + xOffset) / contextWidth;
+
+		float uvTop = yOffset / contextHeight;
+		float uvBottom = (height + yOffset) / contextHeight;
+
+		pRenderQuad->SetUVValues(uvTop, uvLeft, uvBottom, uvRight);
+		pRenderQuad->FlipUVVertical();
+	}
+
+	CR(pRenderQuad->SetDiffuseTexture(GetFramebuffer()->GetColorTexture()));
+
+Error:
+	return r;
 }
 
 RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType) {

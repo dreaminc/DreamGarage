@@ -565,6 +565,8 @@ RESULT text::SetText(const std::string& strText) {
 	// Clear out kids
 	CR(ClearChildren());
 
+	m_fVirtualModelMatrix = true;
+
 	m_strText = strText;
 
 	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());

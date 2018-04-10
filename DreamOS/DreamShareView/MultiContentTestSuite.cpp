@@ -20,7 +20,13 @@
 #include "Cloud/WebRequest.h"
 #include "Core/Utilities.h" 
 
+#include "UI/UIFlatScrollView.h"
+#include "UI/UIButton.h"
+
 #include "Sandbox/CommandLineManager.h"
+
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
 
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -57,10 +63,12 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamTabView());
+	CR(AddTestUserControlAreaLayout());
+
 	CR(AddTestManyBrowsers());
 	CR(AddTestUserControlArea());
 
-	CR(AddTestUserControlAreaLayout());
 
 
 	CR(AddTestMultiPeerBrowser());
@@ -118,6 +126,164 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pHAL->ReleaseCurrentContext());
 
 Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestDreamTabView() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::shared_ptr<UIView> pViewContext;
+		std::shared_ptr<UIFlatScrollView> pFlatScrollView;
+		std::shared_ptr<quad> pRenderQuad;
+		std::shared_ptr<UIButton> pTestButton = nullptr;
+	} *pTestContext = new TestContext();
+	
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		auto pComposite = m_pDreamOS->AddComposite();
+
+		pTestContext->pRenderQuad = std::shared_ptr<quad>(m_pDreamOS->MakeQuad(5.0f, 5.0f));
+		m_pDreamOS->AddObjectToUIGraph(pTestContext->pRenderQuad.get());
+		pTestContext->pRenderQuad->RotateXByDeg(90.0f);
+		
+		pTestContext->pViewContext = pComposite->AddUIView(m_pDreamOS);
+		pTestContext->pFlatScrollView = pTestContext->pViewContext->MakeUIFlatScrollView();
+		//pTestContext->pFlatScrollView->RotateXByDeg(90.0f);
+		pTestContext->pFlatScrollView->SetRenderQuad(pTestContext->pRenderQuad, nullptr); // deprec
+
+		auto pTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+		auto pScrollContext = pTestContext->pFlatScrollView;// ->GetRenderContext();
+
+		auto pTestButton = pTestContext->pFlatScrollView->AddUIButton(0.5f, 0.5f);
+		//pTestContext->pTestButton = pTestContext->pFlatScrollView->AddUIButton(0.5f, 0.5f);
+		//pTestContext->pTestButton = pTestContext->pFlatScrollView->MakeUIButton(0.5f, 0.5f);
+		//m_pDreamOS->AddObjectToUIGraph(pTestContext->pTestButton.get());
+		//pTestButton->SetVisible(true);
+
+		auto pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 0.0f));
+//		pTestContext->pFlatScrollView->AddObject(pQuad);
+		//pQuad->SetVisible(true);
+		CN(pQuad);
+		//pQuad->SetVertexColor(COLOR_RED);
+		pQuad->SetDiffuseTexture(pTexture);
+		//*
+		//pQuad = MakeQuad
+		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -1.0f));
+		CN(pQuad);
+//		pQuad->SetVertexColor(COLOR_GREEN);
+
+		/*
+		pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
+		pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
+		CN(pQuad);
+		pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//*/
+		//*
+		pTestButton->SetPosition(point(-0.5f, 0.0f, 0.0f));
+		//pTestContext->pTestButton->RotateXByDeg(-90.0f);
+		//pTestContext->pTestButton->GetSurface()->SetPosition(point(-0.5f, 0.0f, 0.0f));
+		pTestButton->GetSurface()->RotateXByDeg(-90.0f);
+		//CN(pButton);
+		pTestButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-close.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//*/
+
+		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
+		CN(pQuad);
+//		pQuad->SetVertexColor(COLOR_WHITE);
+
+		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+			pQuad.get(),
+			pQuad->GetPosition() + point(0.0f, 0.0f, 2.0f),
+			pQuad->GetOrientation(),
+			pQuad->GetScale(),
+			1.5,
+			AnimationCurveType::LINEAR,
+			AnimationFlags::AnimationFlags()
+		);
+
+		pTestContext->pFlatScrollView->SetVisible(true);
+
+		auto pTestQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		pTestQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pTestQuad->RotateXByDeg(90.0f);
+		pTestQuad->SetDiffuseTexture(pTexture);
+		pTestQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
+		//pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pQuad);
+
+		
+		pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pTestContext->pFlatScrollView);
+
+		/*
+		{
+			auto pFlat = pTestContext->pFlatScrollView->GetRenderContext();
+			//auto pFlat = pTestContext->pFlatScrollView;
+			m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+				pFlat.get(),
+				pFlat->GetPosition() + point(0.0f, 0.0f, 2.0f),
+				pFlat->GetOrientation(),
+				pFlat->GetScale(),
+				2.0,
+				AnimationCurveType::LINEAR,
+				AnimationFlags::AnimationFlags()
+			);
+		}
+		//*/
+
+		//*
+		{
+			auto pButton = pTestButton;
+
+			m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+				pButton.get(),
+				pButton->GetPosition() + point(-1.0f, 0.0f, 0.0f),
+				pButton->GetOrientation(),
+				pButton->GetScale(),
+				2.0,
+				AnimationCurveType::LINEAR,
+				AnimationFlags::AnimationFlags()
+			);
+		}
+		//*/
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pFlatScrollView->Update();
+
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi-browser");
+	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:	
 	return r;
 }
 

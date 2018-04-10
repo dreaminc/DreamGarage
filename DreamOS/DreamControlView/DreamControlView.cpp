@@ -246,12 +246,14 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 			ptScroll.y < m_pParentApp->GetHeight() && ptScroll.y > 0) {
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
 		}
+		/*
 		else {
 			WebBrowserPoint middleOfBrowser;
 			middleOfBrowser.x = m_pParentApp->GetWidth() / 2;
 			middleOfBrowser.y = m_pParentApp->GetHeight() / 2;
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(middleOfBrowser.x, middleOfBrowser.y, 0.0f)));
 		}
+		//*/
 
 	} break;
 	}

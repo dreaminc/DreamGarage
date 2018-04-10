@@ -722,6 +722,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLComposite.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLCylinder.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFlatContext.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLHand.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
@@ -893,12 +894,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
     <ClCompile Include="..\..\..\UI\UIButton.cpp" />
     <ClCompile Include="..\..\..\UI\UIEvent.cpp" />
+    <ClCompile Include="..\..\..\UI\UIFlatScrollView.cpp" />
     <ClCompile Include="..\..\..\UI\UIKey.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboard.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp" />
     <ClCompile Include="..\..\..\UI\UIMallet.cpp" />
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp" />
-    <ClCompile Include="..\..\..\UI\UIScrollView.cpp" />
+    <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp" />
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\UI\UIView.cpp" />
     <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp" />
@@ -1055,6 +1057,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFlatContext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h" />
@@ -1275,12 +1278,14 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="..\..\..\UI\UIButton.h" />
     <ClInclude Include="..\..\..\UI\UIEvent.h" />
+    <ClInclude Include="..\..\..\UI\UIFlatScrollView.h" />
     <ClInclude Include="..\..\..\UI\UIKey.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboard.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h" />
     <ClInclude Include="..\..\..\UI\UIMallet.h" />
     <ClInclude Include="..\..\..\UI\UIMenuItem.h" />
     <ClInclude Include="..\..\..\UI\UIScrollView.h" />
+    <ClInclude Include="..\..\..\UI\UISpatialScrollView.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="..\..\..\UI\UIView.h" />
     <ClInclude Include="..\..\..\UI\UIViewTestSuite.h" />
@@ -1399,6 +1404,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert" />
     <None Include="..\..\..\Makefile" />

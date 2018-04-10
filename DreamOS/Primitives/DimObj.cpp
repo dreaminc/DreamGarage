@@ -7,6 +7,9 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+//#include "FlatContext.h"
+#include "Primitives/FlatContext.h"
+
 DimObj::DimObj() :
 	VirtualObj(),	// velocity, origin
 	m_pVertices(nullptr),
@@ -900,6 +903,24 @@ matrix<virtual_precision, 4, 4> DimObj::GetTranslationMatrix(matrix<virtual_prec
 	}
 	else {
 		return VirtualObj::GetTranslationMatrix(childMat);
+	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetFlatModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		
+		auto pFlatContextParent = dynamic_cast<FlatContext*>(m_pParent);
+		
+		if (pFlatContextParent != nullptr) {
+			return VirtualObj::GetModelMatrix(childMat);
+		}
+		else {
+			auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
+			return m_pParent->DimObj::GetFlatModelMatrix(modelMatrix);
+		}
+	}
+	else {
+		return VirtualObj::GetModelMatrix(childMat);
 	}
 }
 

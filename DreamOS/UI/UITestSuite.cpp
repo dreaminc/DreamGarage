@@ -4,6 +4,8 @@
 #include "DreamGarage/DreamUIBar.h"
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
+#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
 
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamBrowser.h"
@@ -14,6 +16,7 @@
 #include "UI/UIKeyboard.h"
 #include "UI/UIEvent.h"
 #include "UI/UIView.h"
+#include "UI/UIButton.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -54,6 +57,8 @@ UITestSuite::~UITestSuite() {
 
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestFlatContextCompositionQuads());
 	
 	CR(AddTestFont());
 
@@ -66,10 +71,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestUIMenuItem());
 
 	CR(AddTestUIView());
-
-	CR(AddTestFlatContextCompositionQuads());
-
-	CR(AddTestFlatContextCompositionQuads());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
 
@@ -218,6 +219,11 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		std::shared_ptr<FlatContext> pFlatContext;
+		quad *pRenderQuad;
+	} *pTestContext = new TestContext();
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
@@ -230,38 +236,122 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
+			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 			///*
 			//auto pFlatContext = m_pDreamOS->AddFlatContext();
-			auto pFlatContext = m_pDreamOS->AddComposite();
+			auto pComposite = m_pDreamOS->MakeComposite();
+			auto pFlatContext = pComposite->AddFlatContext();
+			pTestContext->pFlatContext = pFlatContext;
+			//auto pFlatContext = pComposite->MakeFlatContext();
 			CN(pFlatContext);
+
+			auto pRenderQuad = m_pDreamOS->AddQuad(6.0f, 5.0f);
+			pTestContext->pRenderQuad = pRenderQuad;
+
+			pFlatContext->SetIsAbsolute(true);
+			pFlatContext->SetAbsoluteBounds(pRenderQuad->GetWidth(), pRenderQuad->GetHeight());
 			
 			//pFlatContext->InitializeOBB();
 			pFlatContext->InitializeBoundingQuad();
 
-			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 1.0f));
+//			auto pComposite = m_pDreamOS->MakeComposite();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			auto pButton = pView->AddUIButton();
+			pButton->GetSurface()->SetVertexColor(COLOR_YELLOW);
+			pButton->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+			m_pDreamOS->AddObject(pButton.get());
+			//pButton->RotateXByDeg(180.0f);
+			//pFlatContext->AddObject(pButton);
+			auto pSphere = m_pDreamOS->MakeSphere(0.5f, 10, 10);
+			pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+			pFlatContext->AddObject(std::shared_ptr<sphere>(pSphere));
+
+			//auto pComposite2 = m_pDreamOS->AddComposite();
+			auto pComposite2 = m_pDreamOS->MakeComposite();
+			//pComposite2->RotateXByDeg(90.0f);
+			auto pCQuad = pComposite2->AddQuad(0.5f, 0.5f);
+			//pCQuad->SetPosition(point(-1.0f, 0.0f, -1.0f));
+			pComposite2->SetPosition(point(-1.0f, 0.0f, -1.0f));
+
+//			pFlatContext->AddObject(std::shared_ptr<composite>(pComposite2));
+			pFlatContext->AddChild(std::shared_ptr<composite>(pComposite2));
+
+			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_BLUE);
 
-			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, -1.0f));
+			m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+				pQuad.get(),
+				pQuad->GetPosition() + point(0.0f, 0.0f, 2.0f),
+				pQuad->GetOrientation(),
+				pQuad->GetScale(),
+				2.0,
+				AnimationCurveType::LINEAR,
+				AnimationFlags::AnimationFlags()
+			);
+
+			/*
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 0.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_GREEN);
 
-			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, 1.0f));
+			m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+				pQuad.get(),
+				pQuad->GetPosition(),
+				pQuad->GetOrientation(),
+				pQuad->GetScale() * 2.0f ,
+				2.0,
+				AnimationCurveType::LINEAR,
+				AnimationFlags::AnimationFlags()
+			);
+			//*/
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -1.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_RED);
 
-			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, -1.0f));
+			/*
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -2.0f));
 			CN(pQuad);
 			pQuad->SetVertexColor(COLOR_YELLOW);
+			//*/
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -3.0f));
+			CN(pQuad);
+			pQuad->SetVertexColor(COLOR_WHITE);
+
+			m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+				pQuad.get(),
+				pQuad->GetPosition() - point(0.0f, 0.0f, 2.0f),
+				pQuad->GetOrientation(),
+				pQuad->GetScale(),
+				2.0,
+				AnimationCurveType::LINEAR,
+				AnimationFlags::AnimationFlags()
+			);
+
+			//pFlatContext->SetBounds(0.5f, 2.0f);
+			//pFlatContext->GetOff
 
 			pFlatContext->RotateXByDeg(90.0f);
 			//*/
 
-			/*
-			auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-			pQuad->RotateXByDeg(90.0f);
-			pQuad->SetColor(COLOR_BLUE);
-			*/
+//			pFlatContext->RenderToTexture();
+
+			auto pTexture = pFlatContext->GetFramebuffer()->GetColorTexture();
+			//*
+			//auto pRenderQuad = m_pDreamOS->AddQuad(2.0f, 2.0f);
+			pRenderQuad->RotateXByDeg(90.0f);
+
+//			pFlatContext->SetIsAbsolute(false);
+			//pFlatContext->SetBounds(pRenderQuad->GetWidth(), pRenderQuad->GetHeight());
+			pFlatContext->RenderToQuad(pRenderQuad, 0.0f, 0.0f);
+			//pRenderQuad->SetDiffuseTexture(pTexture);
+			//pQuad->SetColor(COLOR_BLUE);
+
+			//*/
 
 		}
 
@@ -279,6 +369,9 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 		RESULT r = R_PASS;
 
 		CR(r);
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pFlatContext->RenderToQuad(pTestContext->pRenderQuad, 0.0f, 0.0f);
 
 	Error:
 		return r;
@@ -296,7 +389,7 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
 	pUITest->SetTestName("Flat Context Composition Test");

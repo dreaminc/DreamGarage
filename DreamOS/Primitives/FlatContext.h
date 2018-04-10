@@ -31,6 +31,8 @@ public:
 	// TODO: This clobbers the rest of thing, might want to move text to quad and 
 	// have a flat context internally or something like that
 	RESULT RenderToQuad(quad::CurveType curveType = quad::CurveType::FLAT);
+	RESULT RenderToQuad(quad* pRenderQuad, float xOffset, float yOffset);
+
 	RESULT RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType);
 
 	float GetWidth();
@@ -41,11 +43,16 @@ public:
 	float GetBottom(bool fAbsolute = true);
 
 	// Move flags up to Flatcontext?
-	virtual bool IsScaleToFit() {
-		return false;
-	}
+	virtual bool IsScaleToFit();
+	virtual RESULT SetScaleToFit(bool fScaleToFit);
 
+	RESULT SetAbsoluteBounds(float width, float height);
 	RESULT SetBounds(float width, float height);
+
+	RESULT SetIsAbsolute(float fAbsolute);
+	bool UseVirtualModelMatrix();
+
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 
 public:
 	framebuffer* GetFramebuffer();
@@ -53,6 +60,15 @@ public:
 
 protected:
 	framebuffer* m_pFramebuffer = nullptr;
+
+	bool m_fScaleToFit = false;
+	bool m_fAbsolute = false;
+
+	float m_width;
+	float m_height;
+
+	//hack used for text rendering, skips DimObj::GetModelMatrix() in OGLProgramFlat
+	bool m_fVirtualModelMatrix = false;
 
 	std::shared_ptr<quad> m_pQuad = nullptr;
 };

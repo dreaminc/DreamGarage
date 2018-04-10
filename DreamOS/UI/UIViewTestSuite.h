@@ -33,7 +33,7 @@ public:
 	RESULT AddTestUIView();
 	RESULT AddTestUIButton();
 	RESULT AddTestUIButtons();
-	RESULT AddTestUIScrollView();
+	RESULT AddTestUISpatialScrollView();
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestKeyboardAngle();
 	RESULT AddTestCurvedTitle();

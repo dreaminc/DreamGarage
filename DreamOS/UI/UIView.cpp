@@ -2,7 +2,8 @@
 #include "Primitives/ray.h"
 #include "UIButton.h"
 #include "UIMenuItem.h"
-#include "UIScrollView.h"
+#include "UISpatialScrollView.h"
+#include "UIFlatScrollView.h"
 #include "DreamControlView/UIControlBar.h"
 
 #include "DreamOS.h"
@@ -134,16 +135,32 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIScrollView> UIView::MakeUIScrollView() {
-	std::shared_ptr<UIScrollView> pScrollView(new UIScrollView(m_pHALImp, m_pDreamOS));
+std::shared_ptr<UISpatialScrollView> UIView::MakeUISpatialScrollView() {
+	std::shared_ptr<UISpatialScrollView> pScrollView(new UISpatialScrollView(m_pHALImp, m_pDreamOS));
 
 	return pScrollView;
 }
 
-std::shared_ptr<UIScrollView> UIView::AddUIScrollView() {
+std::shared_ptr<UISpatialScrollView> UIView::AddUISpatialScrollView() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIScrollView> pScrollView = MakeUIScrollView();
+	std::shared_ptr<UISpatialScrollView> pScrollView = MakeUISpatialScrollView();
+	CR(AddObject(pScrollView));
+	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIFlatScrollView> UIView::MakeUIFlatScrollView() {
+	std::shared_ptr<UIFlatScrollView> pScrollView(new UIFlatScrollView(m_pHALImp, m_pDreamOS));
+
+	return pScrollView;
+}
+
+std::shared_ptr<UIFlatScrollView> UIView::AddUIFlatScrollView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIFlatScrollView> pScrollView = MakeUIFlatScrollView();
 	CR(AddObject(pScrollView));
 	return pScrollView;
 Error:

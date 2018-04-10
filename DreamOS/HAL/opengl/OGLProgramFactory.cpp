@@ -82,7 +82,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CRM(pOGLProgram->OGLInitialize(L"uistage.vert", L"uistage.frag", versionOGL),
 				"Failed to initialize OGL minimal texture Program");
 		} break;
-		
+
 		case OGLPROGRAM_SKYBOX: {
 			pOGLProgram = new OGLProgramSkybox(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");

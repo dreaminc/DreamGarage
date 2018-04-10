@@ -10,7 +10,7 @@
 #include "UI/UIKeyboard.h"
 #include "UI/UIButton.h"
 #include "UI/UIMenuItem.h"
-#include "UI/UIScrollView.h"
+#include "UI/UISpatialScrollView.h"
 #include "UI/UIMallet.h"
 
 #include "DreamControlView/DreamControlView.h"
@@ -84,12 +84,12 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(GetComposite()->InitializeOBB());
 	CR(GetDOS()->AddObjectToInteractionGraph(GetComposite()));
 
-	// Initialize UIScrollView
+	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pView);
 
-	m_pScrollView = m_pView->AddUIScrollView();
+	m_pScrollView = m_pView->AddUISpatialScrollView();
 	//m_pScrollView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pScrollView);
 
@@ -196,8 +196,10 @@ RESULT DreamUIBar::ResetAppComposite() {
 	quaternion qOrigin;
 	vector vCameraToMenu;
 	CNR(m_pUIStageProgram, R_SKIPPED);
-	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	if (m_pUserHandle != nullptr) {
+		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	}
 	
 	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);

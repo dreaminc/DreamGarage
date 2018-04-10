@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestFlatContextNesting());
+
 	CR(TestNestedOBB());
 
 	CR(AddTestText());
@@ -585,6 +587,159 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 	pNewTest->SetTestName("Environment Shader");
 	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestFlatContextNesting() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::shared_ptr<quad> pInnerQuads[4] = { nullptr, nullptr, nullptr, nullptr };
+		composite *pComposite = nullptr;
+		std::shared_ptr<FlatContext> pFlatContext = nullptr;
+		std::shared_ptr<composite> pInnerComposite = nullptr;
+		quad *pRenderQuad = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		CR(SetupSkyboxPipeline("environment"));
+
+		float spacing = 0.5f;
+		float side = 0.25f;
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		// Objects 
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+
+			pTestContext->pFlatContext = pTestContext->pComposite->AddFlatContext();
+			CN(pTestContext->pFlatContext);
+			pTestContext->pFlatContext->SetIsAbsolute(true);
+			pTestContext->pFlatContext->SetAbsoluteBounds(2.0f, 2.0f);
+
+			pTestContext->pInnerComposite = pTestContext->pFlatContext->AddComposite();
+			CN(pTestContext->pInnerComposite);
+			pTestContext->pInnerComposite->InitializeOBB();
+
+			auto pQuad = pTestContext->pInnerQuads[0] = pTestContext->pInnerComposite->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(-spacing, 0.0f, -spacing);
+			pQuad->SetMaterialColors(color(COLOR_RED));
+			pQuad->SetVertexColor(color(COLOR_RED));
+
+			pQuad = pTestContext->pInnerQuads[1] = pTestContext->pInnerComposite->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(spacing, 0.0f, -spacing);
+			pQuad->SetMaterialColors(color(COLOR_BLUE));
+			pQuad->SetVertexColor(color(COLOR_BLUE));
+			
+			pQuad = pTestContext->pInnerQuads[2] = pTestContext->pInnerComposite->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(-spacing, 0.0f, spacing);
+			pQuad->SetMaterialColors(color(COLOR_GREEN));
+			pQuad->SetVertexColor(color(COLOR_GREEN));
+			
+			pQuad = pTestContext->pInnerQuads[3] = pTestContext->pInnerComposite->AddQuad(side, side);
+			CN(pQuad);
+			pQuad->SetPosition(spacing, 0.0f, spacing);
+			pQuad->SetMaterialColors(color(COLOR_YELLOW));
+			pQuad->SetVertexColor(color(COLOR_YELLOW));
+
+			pTestContext->pFlatContext->SetPosition(0.0f, -2.0f, 0.0f);
+			//pTestContext->pFlatContext->translateX(0.25f);
+			//pTestContext->pInnerComposite->translateX(0.25f);
+
+			pTestContext->pRenderQuad = m_pDreamOS->AddQuad(2.0f, 2.0f);
+			CN(pTestContext->pRenderQuad);
+			pTestContext->pRenderQuad->RotateXByDeg(90.0f);
+
+
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->pComposite->RotateYByDeg(0.035f);
+		//pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+
+		CR(pTestContext->pFlatContext->RenderToQuad(pTestContext->pRenderQuad, 0, 0));
+
+		//pTestContext->pComposite->translateX(0.001f);
+		//pTestContext->pComposite->translateY(0.001f);
+		//pTestContext->pComposite->translateZ(0.001f);
+		//
+		//pTestContext->pComposite->RotateXByDeg(0.01f);
+		//pTestContext->pComposite->RotateYByDeg(0.01f);
+		//pTestContext->pComposite->RotateZByDeg(0.01f);
+		
+		pTestContext->pInnerQuads[0]->RotateXByDeg(0.05f);
+		pTestContext->pInnerQuads[1]->RotateYByDeg(0.05f);
+		pTestContext->pInnerQuads[2]->RotateZByDeg(0.05f);
+
+		//pTestContext->pInnerComposite->translateX(0.001f);
+		//pTestContext->pInnerComposite->translateY(0.001f);
+		//pTestContext->pInnerComposite->translateZ(0.001f);
+
+		//pTestContext->pInnerComposite->RotateXByDeg(0.01f);
+		//pTestContext->pInnerComposite->RotateYByDeg(0.01f);
+		//pTestContext->pInnerComposite->RotateZByDeg(0.01f);
+		
+		pTestContext->pFlatContext->translateX(0.001f);
+		pTestContext->pFlatContext->translateY(0.001f);
+		pTestContext->pFlatContext->translateZ(0.001f);
+		
+		pTestContext->pFlatContext->RotateXByDeg(0.01f);
+		pTestContext->pFlatContext->RotateYByDeg(0.01f);
+		pTestContext->pFlatContext->RotateZByDeg(0.01f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
