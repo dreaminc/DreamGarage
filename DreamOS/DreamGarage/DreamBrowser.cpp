@@ -548,7 +548,7 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	CNR(m_pParentApp != nullptr, R_SKIPPED);
+	//CNR(m_pParentApp != nullptr, R_SKIPPED);
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
