@@ -246,7 +246,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
-		CR(m_pDreamUIBar->ShowRootMenu());
+		CR(m_pDreamUIBar->ShowRootMenu(false));
 		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 		CR(Hide());
 	} break;
