@@ -219,7 +219,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowRootMenu() {
+RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	RESULT r = R_PASS;
 
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
@@ -234,8 +234,9 @@ RESULT DreamUIBar::ShowRootMenu() {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
-
-	CR(ResetAppComposite());
+	if (fResetComposite) {
+		CR(ResetAppComposite());
+	}
 
 Error:
 	return r;

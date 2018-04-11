@@ -95,7 +95,7 @@ public:
 	RESULT PopPath();
 	RESULT RequestMenu();
 	RESULT ResetAppComposite();
-	RESULT ShowRootMenu();
+	RESULT ShowRootMenu(bool fResetComposite = true);
 	RESULT HandleEvent(UserObserverEventType type);
 	texture *GetOverlayTexture(HAND_TYPE type);
 
