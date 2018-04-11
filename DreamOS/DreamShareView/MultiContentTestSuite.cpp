@@ -358,7 +358,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 				auto pButton = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons[0];
 				pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
 				pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
-				//*
+				/*
 				if (pTestContext->fSwitch) {
 					pTestContext->fSwitch = false;
 					//pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser1);

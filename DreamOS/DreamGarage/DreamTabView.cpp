@@ -61,7 +61,7 @@ RESULT DreamTabView::Update(void *pContext) {
 	}
 
 	if (m_pTabPendingRemoval != nullptr && m_fAllowObjectRemoval) {
-		m_pView->RemoveChild(m_pTabPendingRemoval);
+		m_pScrollView->RemoveChild(m_pTabPendingRemoval);
 		m_pTabPendingRemoval = nullptr;
 		m_fAllowObjectRemoval = false;
 	}
@@ -250,8 +250,6 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 		auto pButton = m_tabButtons[i];
 		if (pButton.get() == pButtonContext) {
 
-//			m_pView->RemoveChild(pButton);
-			m_pScrollView->RemoveChild(pButton);
 			m_pTabPendingRemoval = pButton;
 			HideTab(pButton.get());
 
@@ -264,8 +262,6 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			m_appToTabMap.erase(m_sources[i]);
 			m_tabButtons.erase(m_tabButtons.begin() + i);
 			m_sources.erase(m_sources.begin() + i);
-
-//			m_pView->RemoveChild(pButton.get());
 
 			break;
 		} 
@@ -359,8 +355,6 @@ RESULT DreamTabView::HideTab(UIButton *pTabButton) {
 
 		if (m_pTabPendingRemoval != nullptr) {
 			m_pTabPendingRemoval->SetVisible(false);
-		//	m_pView->RemoveChild(m_pTabPendingRemoval);
-		//	m_pTabPendingRemoval = nullptr;
 			m_fAllowObjectRemoval = true;
 		}
 
