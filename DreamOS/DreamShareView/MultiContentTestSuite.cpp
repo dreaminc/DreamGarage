@@ -301,8 +301,8 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		std::shared_ptr<DreamBrowser> pBrowser1;
 		std::shared_ptr <DreamBrowser> pBrowser2;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
-		double msTimeSinceLastSent = 0.0;
-		double msTimeDelay = 3000.0;
+		double msLastSent = 0.0;
+		double msTimeDelay = 500.0;
 		bool fSwitch = false;
 		bool fFirst = true;
 	} *pTestContext = new TestContext();
@@ -333,6 +333,10 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
 
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		pTestContext->msLastSent = msTimeNow;
+
 	Error:
 		return r;
 	};
@@ -343,20 +347,29 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		if (pTestContext->fFirst) {
 			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
 			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			pTestContext->fFirst = false;
 		}
 		else {
 			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-			if (msTimeNow - pTestContext->msTimeSinceLastSent > pTestContext->msTimeDelay) {
-				pTestContext->msTimeSinceLastSent = msTimeNow;
+			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+				pTestContext->msTimeDelay = 500.0f;
+				pTestContext->msLastSent = msTimeNow;
+				auto pButton = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons[0];
+				pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
+				pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
+				//*
 				if (pTestContext->fSwitch) {
 					pTestContext->fSwitch = false;
-					pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser1);
+					//pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser1);
+					auto pButton = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons[0];
+					pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
 				}
 				else {
 					pTestContext->fSwitch = true;
 					pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser2);
 				}
+				//*/
 			}
 		}
 		return R_PASS;

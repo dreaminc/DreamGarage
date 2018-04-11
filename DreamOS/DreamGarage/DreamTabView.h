@@ -25,6 +25,7 @@ class DreamTabView : public DreamApp<DreamTabView>
 {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamTabView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -57,6 +58,7 @@ public:
 	// the top tab is returned after the remaining tabs shift up 
 	std::shared_ptr<DreamContentSource> RemoveContent();
 
+	RESULT PendSelectTab(UIButton *pButtonContext, void *pContext);
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
 	RESULT SelectByContent(std::shared_ptr<DreamContentSource> pContent);
 
@@ -65,7 +67,7 @@ public:
 //	std::vector<std::shared_ptr<UIButton>> GetTabButtons();
 
 private:
-	std::shared_ptr<UIButton> CreateTab();
+	std::shared_ptr<UIButton> CreateTab(std::shared_ptr<DreamContentSource> pContent);
 
 // Animations
 public:
@@ -113,6 +115,9 @@ private:
 
 	// TODO: could be bugs based on this
 	bool m_fIsAnimating = false;
+
+	std::queue<std::pair<UIButton*, void *>> m_pendingSelectTabQueue;
+	bool m_fAllowObjectRemoval = false;
 };
 
 #endif // ! DREAM_TAB_VIEW_H_
