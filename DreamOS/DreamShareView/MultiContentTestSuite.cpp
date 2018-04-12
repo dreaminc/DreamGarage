@@ -300,9 +300,10 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		std::shared_ptr<DreamUserControlArea> pUserControlArea;
 		std::shared_ptr<DreamBrowser> pBrowser1;
 		std::shared_ptr <DreamBrowser> pBrowser2;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
 		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
 		double msLastSent = 0.0;
-		double msTimeDelay = 500.0;
+		double msTimeDelay = 5000.0;
 		bool fSwitch = false;
 		bool fFirst = true;
 	} *pTestContext = new TestContext();
@@ -333,9 +334,26 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
 
+		pTestContext->strURIs = {
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.livelovely.com",
+			"www.twitch.tv"
+		} ;
+
 		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 		pTestContext->msLastSent = msTimeNow;
+
+		//*
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+		}
+		//*/
 
 	Error:
 		return r;
@@ -346,7 +364,12 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 		if (pTestContext->fFirst) {
 			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			//pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			//*
+			for (auto pBrowser : pTestContext->pDreamBrowsers) {
+				pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
+			}
+			//*/
 			pTestContext->fFirst = false;
 		}
 		else {
@@ -355,21 +378,42 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
 				pTestContext->msTimeDelay = 500.0f;
 				pTestContext->msLastSent = msTimeNow;
-				auto pButton = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons[0];
-				pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
-				pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
-				/*
-				if (pTestContext->fSwitch) {
-					pTestContext->fSwitch = false;
-					//pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser1);
-					auto pButton = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons[0];
-					pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
+				int randAction = std::rand() % 10;
+
+				if (randAction <= 7) {
+					// select random tab
+					DEBUG_LINEOUT("SELECT");
+					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
+					if (tabButtons.size() > 0) {
+						int randIndex = std::rand() % tabButtons.size();
+						auto pButton = tabButtons[randIndex];
+
+						pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
+						pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
+					}
+
 				}
-				else {
-					pTestContext->fSwitch = true;
-					pTestContext->pUserControlArea->m_pDreamTabView->SelectByContent(pTestContext->pBrowser2);
+				else if (randAction == 9) {
+					DEBUG_LINEOUT("OPEN");
+					int randIndex = std::rand() % pTestContext->strURIs.size();
+
+					auto pNewBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+					pNewBrowser->InitializeWithBrowserManager(pTestContext->pUserControlArea->m_pWebBrowserManager, pTestContext->strURIs[randIndex]);
+					pNewBrowser->SetURI(pTestContext->strURIs[randIndex]);
+					pNewBrowser->InitializeWithParent(pTestContext->pUserControlArea.get());
+					pTestContext->pDreamBrowsers.emplace_back(pNewBrowser);
+					pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pNewBrowser);
+						
 				}
-				//*/
+
+				else if (randAction == 8) {
+					DEBUG_LINEOUT("CLOSE");
+					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
+					if (tabButtons.size() > 0) {
+						pTestContext->pUserControlArea->CloseActiveAsset();
+					}
+				}
+
 			}
 		}
 		return R_PASS;
