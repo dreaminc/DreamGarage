@@ -31,6 +31,9 @@ public:
 
 public:
 
+	// test active source switching
+	RESULT AddTestActiveSource();
+
 	// build out UserControlArea features
 	RESULT AddTestUserControlArea();
 

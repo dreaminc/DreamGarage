@@ -10,6 +10,7 @@
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamTabView.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -63,12 +64,14 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestActiveSource());
+
 	CR(AddTestDreamTabView());
 	CR(AddTestUserControlAreaLayout());
 
 	CR(AddTestManyBrowsers());
-	CR(AddTestUserControlArea());
 
+	CR(AddTestUserControlArea());
 
 
 	CR(AddTestMultiPeerBrowser());
@@ -141,12 +144,11 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		std::shared_ptr<quad> pRenderQuad;
 		std::shared_ptr<UIButton> pTestButton = nullptr;
 	} *pTestContext = new TestContext();
-	
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		SetupPipeline();
-
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		auto pComposite = m_pDreamOS->AddComposite();
@@ -154,7 +156,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		pTestContext->pRenderQuad = std::shared_ptr<quad>(m_pDreamOS->MakeQuad(5.0f, 5.0f));
 		m_pDreamOS->AddObjectToUIGraph(pTestContext->pRenderQuad.get());
 		pTestContext->pRenderQuad->RotateXByDeg(90.0f);
-		
+
 		pTestContext->pViewContext = pComposite->AddUIView(m_pDreamOS);
 		pTestContext->pFlatScrollView = pTestContext->pViewContext->MakeUIFlatScrollView();
 		//pTestContext->pFlatScrollView->RotateXByDeg(90.0f);
@@ -171,8 +173,8 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		//pTestButton->SetVisible(true);
 
 		auto pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 0.0f));
-//		pTestContext->pFlatScrollView->AddObject(pQuad);
-		//pQuad->SetVisible(true);
+		//		pTestContext->pFlatScrollView->AddObject(pQuad);
+				//pQuad->SetVisible(true);
 		CN(pQuad);
 		//pQuad->SetVertexColor(COLOR_RED);
 		pQuad->SetDiffuseTexture(pTexture);
@@ -180,15 +182,15 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		//pQuad = MakeQuad
 		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, -1.0f));
 		CN(pQuad);
-//		pQuad->SetVertexColor(COLOR_GREEN);
+		//		pQuad->SetVertexColor(COLOR_GREEN);
 
-		/*
-		pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
-		pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
-		CN(pQuad);
-		pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//*/
-		//*
+				/*
+				pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
+				pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
+				CN(pQuad);
+				pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//*/
+				//*
 		pTestButton->SetPosition(point(-0.5f, 0.0f, 0.0f));
 		//pTestContext->pTestButton->RotateXByDeg(-90.0f);
 		//pTestContext->pTestButton->GetSurface()->SetPosition(point(-0.5f, 0.0f, 0.0f));
@@ -199,7 +201,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
 		CN(pQuad);
-//		pQuad->SetVertexColor(COLOR_WHITE);
+		//		pQuad->SetVertexColor(COLOR_WHITE);
 
 		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 			pQuad.get(),
@@ -221,7 +223,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 		//pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pQuad);
 
-		
+
 		pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pTestContext->pFlatScrollView);
 
 		/*
@@ -255,7 +257,6 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 			);
 		}
 		//*/
-
 	Error:
 		return r;
 	};
@@ -268,6 +269,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 		return R_PASS;
 	};
+
 	auto fnTest = [&](void *pContext) {
 		return R_PASS;
 	};
@@ -283,7 +285,159 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
-Error:	
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestActiveSource() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamBrowser> pBrowser1;
+		std::shared_ptr <DreamBrowser> pBrowser2;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+		double msLastSent = 0.0;
+		double msTimeDelay = 5000.0;
+		bool fSwitch = false;
+		bool fFirst = true;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+		
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+
+		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
+		pTestContext->pBrowser1->SetURI("www.twitch.tv");
+
+		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
+		pTestContext->pBrowser2->SetURI("www.nyt.com");
+
+		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
+		pControlArea->m_fFromMenu = true;
+
+		pTestContext->strURIs = {
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.livelovely.com",
+			"www.twitch.tv"
+		} ;
+
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		pTestContext->msLastSent = msTimeNow;
+
+		//*
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+		}
+		//*/
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext->fFirst) {
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			//pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			//*
+			for (auto pBrowser : pTestContext->pDreamBrowsers) {
+				pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
+			}
+			//*/
+			pTestContext->fFirst = false;
+		}
+		else {
+			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+				pTestContext->msTimeDelay = 500.0f;
+				pTestContext->msLastSent = msTimeNow;
+				int randAction = std::rand() % 10;
+
+				if (randAction <= 7) {
+					// select random tab
+					DEBUG_LINEOUT("SELECT");
+					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
+					if (tabButtons.size() > 0) {
+						int randIndex = std::rand() % tabButtons.size();
+						auto pButton = tabButtons[randIndex];
+
+						pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
+						pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
+					}
+
+				}
+				//*
+				else if (randAction == 9) {
+					DEBUG_LINEOUT("OPEN");
+					int randIndex = std::rand() % pTestContext->strURIs.size();
+
+					auto pNewBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+					pNewBrowser->InitializeWithBrowserManager(pTestContext->pUserControlArea->m_pWebBrowserManager, pTestContext->strURIs[randIndex]);
+					pNewBrowser->SetURI(pTestContext->strURIs[randIndex]);
+					pNewBrowser->InitializeWithParent(pTestContext->pUserControlArea.get());
+					pTestContext->pDreamBrowsers.emplace_back(pNewBrowser);
+					pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pNewBrowser);
+						
+				}
+				//*/
+
+				//*
+				else if (randAction == 8) {
+					DEBUG_LINEOUT("CLOSE");
+					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
+					if (tabButtons.size() > 0) {
+						pTestContext->pUserControlArea->CloseActiveAsset();
+					}
+				}
+				//*/
+
+			}
+		}
+		return R_PASS;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
 	return r;
 }
 

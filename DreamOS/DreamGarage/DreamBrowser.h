@@ -149,6 +149,10 @@ public:
 
 	virtual RESULT CloseSource() override;
 
+	RESULT PendUpdateObjectTextures();
+	bool ShouldUpdateObjectTextures();
+	RESULT UpdateObjectTextures();
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -193,6 +197,8 @@ private:
 
 	// CEF can call LoadRequest once a URL is loaded
 	bool m_fCanLoadRequest = false;
+	bool m_fUpdateObjectTextures = false;
+
 	long m_assetID = -1;
 
 	DreamUserControlArea *m_pParentApp = nullptr;
