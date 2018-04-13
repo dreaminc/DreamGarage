@@ -326,7 +326,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 				CR(m_pParentApp->OnKeyPress(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
 			}
 
-			CR(HandleKeyboardDown());
+			CR(m_pParentApp->HideWebsiteTyping());
 
 		}	
 
