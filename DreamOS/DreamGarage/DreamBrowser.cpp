@@ -283,9 +283,8 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	if (!fLoading && m_pParentApp != nullptr) {
 		if (m_strCurrentURL != strCurrentURL) {
 			m_strCurrentURL = strCurrentURL;
-			m_fURLChanged = true;
+			CR(PendUpdateObjectTextures());
 		}
-		CR(r);
 	}
 
 Error:
@@ -304,7 +303,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pParentApp != nullptr) {
-		m_fLoadEnded = true;
+		CR(PendUpdateObjectTextures());
 	}
 
 	if (strCurrentURL == "about:blank") {
@@ -468,6 +467,10 @@ RESULT DreamBrowser::Update(void *pContext) {
 		SetVisible(false);
 	}
 
+	if (ShouldUpdateObjectTextures()) {
+		CR(UpdateObjectTextures());
+	}
+
 	if (m_pDreamUserHandle == nullptr) {
 		auto pDreamOS = GetDOS();
 		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
@@ -476,27 +479,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
 	
-	if (m_fLoadEnded) {
-		m_fLoadEnded = false;
-		//*
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
-		}
-		//*/
-	}
-	if (m_fURLChanged) {
-		m_fURLChanged = false;
-		//*
-		//CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
-			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
-		}
-		//*/
-	}
-
-
 Error:
 	return r;
 }
@@ -544,6 +526,29 @@ RESULT DreamBrowser::CloseSource() {
 	CR(m_pWebBrowserController->CloseBrowser());
 	CR(m_pWebBrowserManager->RemoveBrowser(m_pWebBrowserController));
 	
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::PendUpdateObjectTextures() {
+	m_fUpdateObjectTextures = true;
+	return R_PASS;
+}
+
+bool DreamBrowser::ShouldUpdateObjectTextures() {
+	return m_fUpdateObjectTextures;
+}
+
+RESULT DreamBrowser::UpdateObjectTextures() {
+	RESULT r = R_PASS;
+
+	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+	}
+
+	m_fUpdateObjectTextures = false;
+
 Error:
 	return r;
 }
