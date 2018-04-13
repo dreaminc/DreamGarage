@@ -111,6 +111,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
+
+		CR(GetDOS()->InitializeKeyboard());
 	}
 
 	//CR(m_pWebBrowserManager->Update());

@@ -297,13 +297,14 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
-	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
-
+	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
 	CN(m_pDreamUserControlArea);
-	CR(InitializeKeyboard());
+
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
+
+	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 
 Error:
 	return r;
