@@ -62,6 +62,11 @@ RESULT DreamTabView::Update(void *pContext) {
 
 	if (m_pTabPendingRemoval != nullptr && m_fAllowObjectRemoval) {
 		m_pScrollView->RemoveChild(m_pTabPendingRemoval);
+
+		GetDOS()->UnregisterInteractionObject(m_pTabPendingRemoval.get());
+		GetDOS()->RemoveObjectFromInteractionGraph(m_pTabPendingRemoval.get());
+		GetDOS()->RemoveObjectFromUIGraph(m_pTabPendingRemoval.get());
+
 		m_pTabPendingRemoval = nullptr;
 		m_fAllowObjectRemoval = false;
 	}
@@ -203,9 +208,6 @@ std::shared_ptr<DreamContentSource> DreamTabView::RemoveContent() {
 
 		m_pTabPendingRemoval = pButtonToRemove;
 		HideTab(pButtonToRemove.get());
-		pDreamOS->UnregisterInteractionObject(pButtonToRemove.get());
-		pDreamOS->RemoveObjectFromInteractionGraph(pButtonToRemove.get());
-		pDreamOS->RemoveObjectFromUIGraph(pButtonToRemove.get());
 
 		for (auto pButton : m_tabButtons) {
 		//	pButton->SetPosition(pButton->GetPosition() - point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
@@ -253,10 +255,6 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			m_pTabPendingRemoval = pButton;
 			HideTab(pButton.get());
 
-			pDreamOS->UnregisterInteractionObject(pButton.get());
-			pDreamOS->RemoveObjectFromInteractionGraph(pButton.get());
-			pDreamOS->RemoveObjectFromUIGraph(pButton.get());
-
 			m_pParentApp->SetActiveSource(m_sources[i]);
 
 			m_appToTabMap.erase(m_sources[i]);
@@ -282,7 +280,8 @@ Error:
 RESULT DreamTabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent) {
 	if (m_appToTabMap.count(pContent) > 0) {
 		m_fForceContentFocus = true;
-		SelectTab(m_appToTabMap[pContent].get(), nullptr);
+		PendSelectTab(m_appToTabMap[pContent].get(), nullptr);
+		//SelectTab(m_appToTabMap[pContent].get(), nullptr);
 	}
 	return R_PASS;
 }

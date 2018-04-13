@@ -393,6 +393,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					}
 
 				}
+				//*
 				else if (randAction == 9) {
 					DEBUG_LINEOUT("OPEN");
 					int randIndex = std::rand() % pTestContext->strURIs.size();
@@ -405,7 +406,9 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pNewBrowser);
 						
 				}
+				//*/
 
+				//*
 				else if (randAction == 8) {
 					DEBUG_LINEOUT("CLOSE");
 					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
@@ -413,6 +416,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 						pTestContext->pUserControlArea->CloseActiveAsset();
 					}
 				}
+				//*/
 
 			}
 		}

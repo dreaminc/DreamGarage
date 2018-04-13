@@ -478,17 +478,22 @@ RESULT DreamBrowser::Update(void *pContext) {
 	
 	if (m_fLoadEnded) {
 		m_fLoadEnded = false;
+		//*
 		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
 			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
 			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
 		}
+		//*/
 	}
 	if (m_fURLChanged) {
 		m_fURLChanged = false;
-		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+		//*
+		//CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
 		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
 			CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
 		}
+		//*/
 	}
 
 
