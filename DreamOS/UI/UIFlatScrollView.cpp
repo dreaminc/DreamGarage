@@ -31,7 +31,7 @@ RESULT UIFlatScrollView::Update() {
 	msNow /= 1000.0;
 	double tDiff = (msNow - m_frameMs) * (90.0);
 
-	point ptDiff = point(0.0f, 0.0f, -(m_velocity * (float)(tDiff) / 2.0f));
+	point ptDiff = point(0.0f, 0.0f, (m_velocity * (float)(tDiff) / 2.0f));
 
 	if (HasChildren()) {
 		auto pChildren = GetChildren();
@@ -69,7 +69,7 @@ texture *UIFlatScrollView::GetCurrentTexture() {
 RESULT UIFlatScrollView::SetScrollFlag(bool fCanScroll, int index) {
 	m_fCanScrollFlag[index] = fCanScroll;
 
-	if (fCanScroll == false) {
+	if (!m_fCanScrollFlag[0] && !m_fCanScrollFlag[1]) {
 		m_velocity = 0.0f;
 	}
 

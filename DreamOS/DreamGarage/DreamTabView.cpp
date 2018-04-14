@@ -104,7 +104,7 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 	CN(m_pBackgroundQuad);
-	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
+	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight - itemSpacing);
 	CN(m_pRenderQuad);
 
 	{
@@ -131,8 +131,6 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
 
 	m_ptMostRecent = point(0.0f, 0.0f, (-borderHeight / 2.0f) + (m_tabHeight / 2.0f) + (itemSpacing / 2.0f));
-
-	CR(m_pScrollView->SetBounds(borderWidth, borderHeight));
 
 Error:
 	return r;
