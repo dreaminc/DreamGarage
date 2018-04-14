@@ -338,6 +338,9 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 			"www.nyt.com",
 			"www.dreamos.com",
 			"en.wikipedia.org/wiki/Tropical_house",
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
 			"www.livelovely.com",
 			"www.twitch.tv"
 		} ;
@@ -393,7 +396,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					}
 
 				}
-				//*
+				/*
 				else if (randAction == 9) {
 					DEBUG_LINEOUT("OPEN");
 					int randIndex = std::rand() % pTestContext->strURIs.size();
@@ -408,7 +411,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 				}
 				//*/
 
-				//*
+				/*
 				else if (randAction == 8) {
 					DEBUG_LINEOUT("CLOSE");
 					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
