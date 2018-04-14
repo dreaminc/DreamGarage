@@ -140,7 +140,7 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
-	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL = "about:blank");
+	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
 	virtual std::shared_ptr<texture> GetSourceTexture() override;

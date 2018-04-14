@@ -648,7 +648,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
 			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
-			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pWebBrowserManager, "about:blank");
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 
 			if (i == 0) {
@@ -758,7 +758,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
 			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
-			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager);
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pTestContext->pWebBrowserManager, "about:blank");
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 		}
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {

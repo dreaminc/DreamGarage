@@ -438,8 +438,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(L"client-loading-1366-768.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(m_pLoadingScreenTexture);
-	//m_pBrowserTexture = m_pLoadingScreenTexture;
-	
+	m_pBrowserTexture = m_pLoadingScreenTexture;
 
 	// Set up mouse / hand cursor model
 	///*
@@ -504,6 +503,7 @@ Error:
 
 RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
+	m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this);
 	return R_PASS;
 }
 
