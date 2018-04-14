@@ -148,6 +148,10 @@ RESULT hand::SetModelState(ModelState modelState) {
 	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pMesh);
 	m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pOverlayQuad.get());
 	//*/
+	
+	if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pModel.get())) {
+		m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pModel.get());
+	}
 
 	switch (m_modelState) {
 	case ModelState::HAND: {

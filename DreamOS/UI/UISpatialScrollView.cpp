@@ -254,6 +254,10 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 
 				m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
 
+				if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(pButton)) {
+					m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pButton);
+				}
+
 				m_pMenuButtonsContainer->RemoveChild(pButton);
 
 				//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton->GetSurface().get());
