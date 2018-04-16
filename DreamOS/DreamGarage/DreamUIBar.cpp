@@ -248,6 +248,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 	switch (type) {
 		case UserObserverEventType::BACK: {
 		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+			CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(m_pKeyboardHandle->Hide());
 				CR(m_pUserHandle->SendReleaseKeyboard());
@@ -386,6 +387,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 			CR(RequestIconFile(pSubMenuNode));
 
+			m_fWaitingForMenuResponse = true;
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
@@ -423,6 +425,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 					CN(m_pKeyboardHandle);
 					CR(m_pKeyboardHandle->Show());
+					ClearMenuWaitingFlag();
 				}
 
 			}
@@ -619,6 +622,11 @@ RESULT DreamUIBar::ClearMenuState(void* pContext) {
 	RESULT r = R_PASS;
 	m_menuState = MenuState::NONE;
 	return r;
+}
+
+RESULT DreamUIBar::ClearMenuWaitingFlag() {
+	m_fWaitingForMenuResponse = false;
+	return R_PASS;
 }
 
 RESULT DreamUIBar::HideApp() {

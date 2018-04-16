@@ -203,6 +203,7 @@ float DreamUserControlArea::GetSpacingSize() {
 RESULT DreamUserControlArea::Show() {
 	RESULT r = R_PASS;
 
+	m_pDreamUIBar->ClearMenuWaitingFlag();
 	//TODO: animations
 	//m_pControlView->GetComposite()->SetVisible(true);
 	m_pControlView->Show();
