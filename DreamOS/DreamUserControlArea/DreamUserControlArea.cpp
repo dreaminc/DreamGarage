@@ -633,9 +633,13 @@ RESULT DreamUserControlArea::CreateBrowserSource() {
 
 	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
 	std::string strTitle = m_strWebsiteTitle;
-
-	CR(RequestOpenAsset(strScope, m_strURL, strTitle));
-
+	if (m_strURL == "") {
+		CR(m_pDreamUIBar->ShowRootMenu(false));
+		m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+	}
+	else {
+		CR(RequestOpenAsset(strScope, m_strURL, strTitle));
+	}
 Error:
 	return r;
 }
