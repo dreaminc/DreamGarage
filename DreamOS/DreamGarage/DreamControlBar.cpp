@@ -106,8 +106,7 @@ RESULT DreamControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* 
 
 	if (m_fIsMinimized) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MAXIMIZE));
-		m_pUIControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetHideTexture());
-		m_fIsMinimized = false;
+		CR(ClearMinimizedState());
 	}
 	else {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MINIMIZE));
@@ -200,10 +199,17 @@ RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentTy
 	return (m_pUIControlBar->UpdateButtonsWithType(m_barType));
 }
 
+RESULT DreamControlBar::ClearMinimizedState() {
+	m_pUIControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetHideTexture());
+	m_fIsMinimized = false;
+	return R_PASS;
+}
+
 RESULT DreamControlBar::Show() {
 	RESULT r = R_PASS;
 
 	m_pUIControlBar->SetVisible(true, false);	
+	CR(ClearMinimizedState());
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pUIControlBar.get(),

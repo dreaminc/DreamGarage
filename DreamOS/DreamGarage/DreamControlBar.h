@@ -64,6 +64,8 @@ public:
 	RESULT SetTitleText(std::string& strTitle);
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 
+	RESULT ClearMinimizedState();
+
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
