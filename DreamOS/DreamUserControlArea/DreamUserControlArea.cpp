@@ -394,8 +394,8 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	//m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
-	//m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
 	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
@@ -446,17 +446,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
-	if (pContext == m_pActiveSource.get()) {
-		m_pControlView->SetViewQuadTexture(pTexture);
-	}
-	else {
-		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
-	}
-	return R_PASS;
-}
-
-RESULT DreamUserControlArea::UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) {
 	if (pContext == m_pActiveSource.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
@@ -629,18 +619,9 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		m_pActiveSource = pBrowser;
 
-		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager); // , m_strURL);
 		pBrowser->InitializeWithParent(this);
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
-
-		m_pControlBar->SetTitleText(pBrowser->GetTitle());
-
-		// new browser can't be the current content
-		m_pControlBar->SetSharingFlag(false);
-
-		// TODO: may not be enough once browser typing is re-enabled
-		m_strURL = "";
 	}
 
 Error:
@@ -722,8 +703,18 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
 	m_fHasOpenApp = true;
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-	if (pBrowser != nullptr) {
-		pBrowser->PendEnvironmentAsset(pEnvironmentAsset);
+	if (pBrowser != nullptr) {	
+		
+		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
+		m_pControlBar->SetTitleText(pBrowser->GetTitle());
+
+		// new browser can't be the current content
+		m_pControlBar->SetSharingFlag(false);
+
+		// TODO: may not be enough once browser typing is re-enabled
+		m_strURL = "";
+
+		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
 		// TODO: desktop setup
