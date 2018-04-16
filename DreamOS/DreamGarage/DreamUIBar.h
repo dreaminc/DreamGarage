@@ -107,6 +107,7 @@ public:
 
 	RESULT SetMenuStateAnimated(void *pContext);
 	RESULT ClearMenuState(void* pContext);
+	RESULT ClearMenuWaitingFlag();
 
 	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
 
