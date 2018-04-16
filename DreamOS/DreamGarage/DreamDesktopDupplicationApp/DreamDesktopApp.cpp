@@ -349,7 +349,7 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
 		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
-		m_pParentApp->UpdateTextureForDesktop(m_pDesktopTexture, this);
+		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture, this);
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);

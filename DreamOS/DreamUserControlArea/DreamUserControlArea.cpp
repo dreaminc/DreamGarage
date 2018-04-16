@@ -446,17 +446,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext) {
-	if (pContext == m_pActiveSource.get()) {
-		m_pControlView->SetViewQuadTexture(pTexture);
-	}
-	else {
-		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
-	}
-	return R_PASS;
-}
-
-RESULT DreamUserControlArea::UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) {
 	if (pContext == m_pActiveSource.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}

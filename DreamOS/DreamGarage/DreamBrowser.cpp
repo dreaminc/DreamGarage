@@ -503,7 +503,7 @@ Error:
 
 RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
-	m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this);
+	PendUpdateObjectTextures();
 	return R_PASS;
 }
 
@@ -543,7 +543,7 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-		CR(m_pParentApp->UpdateTextureForBrowser(m_pBrowserTexture, this));
+		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
 		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
 	}
 

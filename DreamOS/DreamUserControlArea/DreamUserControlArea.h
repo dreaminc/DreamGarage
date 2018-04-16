@@ -104,8 +104,7 @@ public:
 
 // DreamBrowser
 public:
-	RESULT UpdateTextureForBrowser(std::shared_ptr<texture> pTexture, DreamBrowser* pContext);
-	RESULT UpdateTextureForDesktop(std::shared_ptr<texture> pTexture, DreamDesktopApp* pContext);
+	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext);
 	RESULT UpdateControlBarText(std::string& strTitle);
 	//TODO: present keyboard from browser::OnNodeFocusChanged
 	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
