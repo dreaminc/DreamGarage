@@ -1297,6 +1297,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFStringVisitor.h" />
     <ClInclude Include="..\..\..\WebBrowser\DOMDocument.h" />
     <ClInclude Include="..\..\..\WebBrowser\DOMNode.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h" />

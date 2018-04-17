@@ -281,10 +281,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading && m_pParentApp != nullptr) {
-		if (m_strCurrentURL != strCurrentURL) {
-			m_strCurrentURL = strCurrentURL;
-			CR(PendUpdateObjectTextures());
-		}
+		CR(PendUpdateObjectTextures());
 	}
 
 Error:
@@ -300,18 +297,8 @@ RESULT DreamBrowser::OnLoadStart() {
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	m_strCurrentURL = strCurrentURL;
-
 	if (m_pParentApp != nullptr) {
 		CR(PendUpdateObjectTextures());
-	}
-
-	if (strCurrentURL == "about:blank") {
-		m_fCanLoadRequest = true;
-		if (m_pPendingEnvironmentAsset != nullptr) {
-			CR(SetEnvironmentAsset(m_pPendingEnvironmentAsset));
-			m_pPendingEnvironmentAsset = nullptr;
-		}
 	}
 
 Error:
@@ -339,6 +326,9 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		m_pDreamUserHandle->SendReleaseKeyboard();
 		pKeyboardHandle = nullptr;
 	}
+
+	pDOMNode->GetElementTagName();
+	pDOMNode->GetName();
 
 Error:
 	return r;
@@ -544,7 +534,7 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 
 	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
 		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -663,8 +653,13 @@ int DreamBrowser::GetHeight() {
 	return m_browserHeight;
 }
 
+RESULT DreamBrowser::SetTitle(std::string strTitle) {
+	m_strCurrentTitle = strTitle;
+	return R_PASS;
+}
+
 std::string DreamBrowser::GetTitle() {
-	return m_strCurrentURL;
+	return m_strCurrentTitle;
 }
 
 std::string DreamBrowser::GetContentType() {

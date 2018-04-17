@@ -2168,6 +2168,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLFlatContext.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFStringVisitor.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

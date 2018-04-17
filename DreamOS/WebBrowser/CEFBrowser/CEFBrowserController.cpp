@@ -20,6 +20,7 @@
 #include "Cloud/WebRequestPostDataElement.h"
 
 #include "CEFDOMNode.h"
+#include "CEFStringVisitor.h"
 
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
@@ -492,7 +493,12 @@ Error:
 RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
-	
+
+	if (pCEFFrame->IsMain()) {
+		CefRefPtr<CEFStringVisitor> cefstrVisitor = CefRefPtr<CEFStringVisitor>(new CEFStringVisitor());
+		cefstrVisitor->SetBrowserControllerObserver(m_pWebBrowserControllerObserver);
+		pCEFFrame->GetSource(cefstrVisitor);
+	}
 	std::string strCurrentURL = pCEFFrame->GetURL();
 
 	CN(m_pWebBrowserControllerObserver);

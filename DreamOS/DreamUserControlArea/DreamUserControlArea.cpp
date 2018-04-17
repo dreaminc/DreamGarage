@@ -315,7 +315,8 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		ShowKeyboard("", point(0, (DEFAULT_PX_HEIGHT / 2), 0));
+		float yValue = DEFAULT_PX_HEIGHT + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
+		ShowKeyboard("", point(0.0f, yValue, 0.0f));
 	}
 	}
 
