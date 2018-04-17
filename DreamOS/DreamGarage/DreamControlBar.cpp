@@ -205,6 +205,15 @@ RESULT DreamControlBar::ClearMinimizedState() {
 	return R_PASS;
 }
 
+RESULT DreamControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+
+	CR(m_pUIControlBar->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
+
+Error:
+	return r;
+}
+
 RESULT DreamControlBar::Show() {
 	RESULT r = R_PASS;
 

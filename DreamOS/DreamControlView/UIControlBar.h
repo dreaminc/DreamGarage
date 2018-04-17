@@ -46,6 +46,7 @@ public:
 
 	//TODO: currently different control bar layouts are not used
 	RESULT UpdateButtonsWithType(BarType type);
+	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 	float GetSpacingOffset();
 
@@ -92,7 +93,9 @@ public:
 
 public:
 	const wchar_t *k_wszBack = L"control-view-back.png";
+	const wchar_t *k_wszBackDisabled = L"browser-control-back-disabled.png";
 	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszForwardDisabled = L"browser-control-forward-disabled.png";
 	const wchar_t *k_wszOpen = L"control-view-open.png";
 	const wchar_t *k_wszClose = L"control-view-close.png";
 	const wchar_t *k_wszShare = L"control-view-share.png";
@@ -116,6 +119,8 @@ private:
 
 	texture *m_pBackTexture = nullptr;
 	texture *m_pForwardTexture = nullptr;
+	texture *m_pBackDisabledTexture = nullptr;
+	texture *m_pForwardDisabledTexture = nullptr;
 	texture *m_pKeyboardTexture = nullptr;
 	texture *m_pShowTexture = nullptr;
 	texture *m_pHideTexture = nullptr;

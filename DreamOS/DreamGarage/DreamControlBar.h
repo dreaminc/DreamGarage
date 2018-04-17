@@ -65,6 +65,7 @@ public:
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 
 	RESULT ClearMinimizedState();
+	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);

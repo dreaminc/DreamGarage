@@ -106,6 +106,7 @@ public:
 public:
 	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext);
 	RESULT UpdateControlBarText(std::string& strTitle);
+	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward);
 	//TODO: present keyboard from browser::OnNodeFocusChanged
 	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
 	bool IsContentVisible();
