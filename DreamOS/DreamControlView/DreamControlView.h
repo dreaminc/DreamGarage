@@ -140,6 +140,7 @@ private:
 	UID m_userUID;	
 
 	bool m_fMouseDown[2];
+	bool m_fMouseDrag = false;
 	point m_ptClick;
 
 	// true while the keyboard is shown for sharing a new URL
