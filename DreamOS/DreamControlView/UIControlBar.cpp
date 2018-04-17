@@ -34,6 +34,8 @@ RESULT UIControlBar::Initialize() {
 	// create textures 
 	m_pBackTexture = m_pDreamOS->MakeTexture(k_wszBack, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pForwardTexture = m_pDreamOS->MakeTexture(k_wszForward, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackDisabledTexture = m_pDreamOS->MakeTexture(k_wszBackDisabled, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pForwardDisabledTexture = m_pDreamOS->MakeTexture(k_wszForwardDisabled, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pHideTexture = m_pDreamOS->MakeTexture(k_wszHide, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pShowTexture = m_pDreamOS->MakeTexture(k_wszShow, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pOpenTexture = m_pDreamOS->MakeTexture(k_wszOpen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -254,6 +256,26 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	return r;
 }
 
+RESULT UIControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+
+	if (fCanGoBack) {
+		m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
+	}
+	else {
+		m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackDisabledTexture);
+	}
+
+	if (fCanGoForward) {
+		m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+	}
+	else {
+		m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardDisabledTexture);
+	}
+
+	return r;
+}
+
 RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
@@ -266,6 +288,11 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	CBR(IsVisible(), R_SKIPPED);
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
+
+	//TODO: this only works if these textures are used for no other purpose
+	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pBackDisabledTexture &&
+		pButtonContext->GetSurface()->GetTextureDiffuse() != m_pForwardDisabledTexture, R_SKIPPED);
+
 	pSurface = pButtonContext->GetSurface();
 
 	//vector for captured object movement

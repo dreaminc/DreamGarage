@@ -457,6 +457,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 	}
 
 	if (ShouldUpdateObjectTextures()) {
+		if (m_pWebBrowserController != nullptr) {
+			CR(UpdateNavigationFlags());
+		}
 		CR(UpdateObjectTextures());
 	}
 
@@ -537,6 +540,20 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	}
 
 	m_fUpdateObjectTextures = false;
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::UpdateNavigationFlags() {
+	RESULT r = R_PASS;
+
+	bool fCanGoBack = m_pWebBrowserController->CanGoBack();
+	bool fCanGoForward = m_pWebBrowserController->CanGoForward();
+
+	if (m_pParentApp != nullptr) {
+		CR(m_pParentApp->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+	}
 
 Error:
 	return r;

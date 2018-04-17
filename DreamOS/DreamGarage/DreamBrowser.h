@@ -154,6 +154,8 @@ public:
 	bool ShouldUpdateObjectTextures();
 	RESULT UpdateObjectTextures();
 
+	RESULT UpdateNavigationFlags();
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 

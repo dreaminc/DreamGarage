@@ -467,6 +467,15 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+
+	CR(m_pControlBar->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
+	
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
 	RESULT r = R_PASS;
 
