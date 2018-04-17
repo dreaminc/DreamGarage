@@ -624,6 +624,10 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		pBrowser->InitializeWithParent(this);
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
+
+		if (strTitle != "website") {
+			UpdateControlBarText(strTitle);
+		}
 	}
 
 Error:
@@ -712,7 +716,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	if (pBrowser != nullptr) {	
 		
 		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
-		m_pControlBar->SetTitleText(pBrowser->GetTitle());
+		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// new browser can't be the current content
 		m_pControlBar->SetSharingFlag(false);

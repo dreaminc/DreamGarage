@@ -281,7 +281,10 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading && m_pParentApp != nullptr) {
-		CR(PendUpdateObjectTextures());
+		if (m_strCurrentTitle == "") {
+			m_strCurrentTitle = strCurrentURL;
+			CR(PendUpdateObjectTextures());	
+		}
 	}
 
 Error:
@@ -296,7 +299,10 @@ RESULT DreamBrowser::OnLoadStart() {
 
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
-
+	
+	if (m_strCurrentTitle == "") {
+		m_strCurrentTitle = strCurrentURL;
+	}
 	if (m_pParentApp != nullptr) {
 		CR(PendUpdateObjectTextures());
 	}
@@ -326,9 +332,6 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 		m_pDreamUserHandle->SendReleaseKeyboard();
 		pKeyboardHandle = nullptr;
 	}
-
-	pDOMNode->GetElementTagName();
-	pDOMNode->GetName();
 
 Error:
 	return r;
@@ -655,9 +658,12 @@ int DreamBrowser::GetHeight() {
 
 RESULT DreamBrowser::SetTitle(std::string strTitle) {
 	RESULT r = R_PASS;
-	m_strCurrentTitle = strTitle;
-	CNR(m_pParentApp, R_SKIPPED);
-	CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
+	if (strTitle != "") {
+		m_strCurrentTitle = strTitle;
+		CNR(m_pParentApp, R_SKIPPED);
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
+	}
+
 Error:
 	return r;
 }
