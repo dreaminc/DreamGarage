@@ -281,9 +281,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading && m_pParentApp != nullptr) {
-		if (m_strCurrentTitle == "") {
-			m_strCurrentTitle = strCurrentURL;
-		}
+		m_strCurrentURL = strCurrentURL;
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -300,9 +298,8 @@ RESULT DreamBrowser::OnLoadStart() {
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 	
-	if (m_strCurrentTitle == "") {
-		m_strCurrentTitle = strCurrentURL;
-	}
+	m_strCurrentURL = strCurrentURL;
+
 	if (m_pParentApp != nullptr) {
 		CR(PendUpdateObjectTextures());
 	}
@@ -536,8 +533,7 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
+		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));	
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -658,18 +654,27 @@ int DreamBrowser::GetHeight() {
 
 RESULT DreamBrowser::SetTitle(std::string strTitle) {
 	RESULT r = R_PASS;
+	CNR(m_pParentApp, R_SKIPPED);
 	if (strTitle != "") {
 		m_strCurrentTitle = strTitle;
-		CNR(m_pParentApp, R_SKIPPED);
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
+		CR(m_pParentApp->UpdateControlBarText(strTitle));
 	}
-
+	else {
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+	}
 Error:
 	return r;
 }
 
 std::string DreamBrowser::GetTitle() {
-	return m_strCurrentTitle;
+	std::string strValidTitle;
+	if (m_strCurrentTitle == "") {
+		strValidTitle = m_strCurrentURL;
+	}
+	else {
+		strValidTitle = m_strCurrentTitle;
+	}
+	return strValidTitle;
 }
 
 std::string DreamBrowser::GetContentType() {

@@ -181,6 +181,7 @@ private:
 
 	int m_pageDepth = 0; // hack to avoid the loading page on back
 	std::string m_strCurrentTitle;
+	std::string m_strCurrentURL;
 
 	TextEntryString m_strEntered;
 	
