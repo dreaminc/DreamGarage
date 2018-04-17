@@ -165,7 +165,13 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 				//WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
 				if (m_pParentApp != nullptr) {
-					CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
+					if (m_fMouseDrag) {
+						m_fMouseDrag = false;
+						CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
+					}
+					else {
+						CR(m_pParentApp->OnClick(point(m_ptLastEvent.x, m_ptLastEvent.y, 0.0f), fMouseDown));
+					}
 				}
 			}
 
@@ -185,6 +191,7 @@ RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty,
 		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
 			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
 			if (m_pParentApp != nullptr) {
+				m_fMouseDrag = true;
 				CR(m_pParentApp->OnMouseMove(point(ptContact.x, ptContact.y, 0.0f)));
 			}
 			//m_ptClick = ptSphereOrigin;
