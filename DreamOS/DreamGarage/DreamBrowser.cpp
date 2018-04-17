@@ -654,8 +654,12 @@ int DreamBrowser::GetHeight() {
 }
 
 RESULT DreamBrowser::SetTitle(std::string strTitle) {
+	RESULT r = R_PASS;
 	m_strCurrentTitle = strTitle;
-	return R_PASS;
+	CNR(m_pParentApp, R_SKIPPED);
+	CR(m_pParentApp->UpdateControlBarText(m_strCurrentTitle));
+Error:
+	return r;
 }
 
 std::string DreamBrowser::GetTitle() {
