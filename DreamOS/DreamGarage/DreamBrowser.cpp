@@ -283,8 +283,8 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	if (!fLoading && m_pParentApp != nullptr) {
 		if (m_strCurrentTitle == "") {
 			m_strCurrentTitle = strCurrentURL;
-			CR(PendUpdateObjectTextures());	
 		}
+		CR(PendUpdateObjectTextures());
 	}
 
 Error:
