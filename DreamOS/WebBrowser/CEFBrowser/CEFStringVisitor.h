@@ -2,7 +2,6 @@
 #define CEF_STRING_VISITOR_H
 
 #include "RESULT/EHM.h"
-#include "CEFStringVisitor.h"
 #include <regex>
 #include "include\cef_string_visitor.h"
 
