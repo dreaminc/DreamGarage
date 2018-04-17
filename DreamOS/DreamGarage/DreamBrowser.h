@@ -102,6 +102,7 @@ public:
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
+	virtual RESULT SetTitle(std::string strTitle) override;
 
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 
@@ -179,6 +180,7 @@ private:
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	int m_pageDepth = 0; // hack to avoid the loading page on back
+	std::string m_strCurrentTitle;
 	std::string m_strCurrentURL;
 
 	TextEntryString m_strEntered;

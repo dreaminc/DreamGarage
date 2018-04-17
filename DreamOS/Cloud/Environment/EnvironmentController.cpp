@@ -444,6 +444,8 @@ RESULT EnvironmentController::RequestOpenAsset(std::string strStorageProviderSco
 	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
 	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
 
+	jsonPayload["environment_asset"]["title"] = strTitle;
+
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("environment_asset.open"));

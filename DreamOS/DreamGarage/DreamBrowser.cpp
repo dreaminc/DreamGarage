@@ -281,10 +281,8 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	RESULT r = R_PASS;
 
 	if (!fLoading && m_pParentApp != nullptr) {
-		if (m_strCurrentURL != strCurrentURL) {
-			m_strCurrentURL = strCurrentURL;
-			CR(PendUpdateObjectTextures());
-		}
+		m_strCurrentURL = strCurrentURL;
+		CR(PendUpdateObjectTextures());
 	}
 
 Error:
@@ -299,19 +297,11 @@ RESULT DreamBrowser::OnLoadStart() {
 
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	RESULT r = R_PASS;
-
+	
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pParentApp != nullptr) {
 		CR(PendUpdateObjectTextures());
-	}
-
-	if (strCurrentURL == "about:blank") {
-		m_fCanLoadRequest = true;
-		if (m_pPendingEnvironmentAsset != nullptr) {
-			CR(SetEnvironmentAsset(m_pPendingEnvironmentAsset));
-			m_pPendingEnvironmentAsset = nullptr;
-		}
 	}
 
 Error:
@@ -543,8 +533,7 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));	
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -663,8 +652,29 @@ int DreamBrowser::GetHeight() {
 	return m_browserHeight;
 }
 
+RESULT DreamBrowser::SetTitle(std::string strTitle) {
+	RESULT r = R_PASS;
+	CNR(m_pParentApp, R_SKIPPED);
+	if (strTitle != "") {
+		m_strCurrentTitle = strTitle;
+		CR(m_pParentApp->UpdateControlBarText(strTitle));
+	}
+	else {
+		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+	}
+Error:
+	return r;
+}
+
 std::string DreamBrowser::GetTitle() {
-	return m_strCurrentURL;
+	std::string strValidTitle;
+	if (m_strCurrentTitle == "") {
+		strValidTitle = m_strCurrentURL;
+	}
+	else {
+		strValidTitle = m_strCurrentTitle;
+	}
+	return strValidTitle;
 }
 
 std::string DreamBrowser::GetContentType() {
