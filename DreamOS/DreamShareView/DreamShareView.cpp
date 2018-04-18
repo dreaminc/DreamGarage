@@ -45,7 +45,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pCastQuad->FlipUVVertical();
 	CR(m_pCastQuad->SetVisible(false));
 
-	m_pCastTexture = GetComposite()->MakeTexture(
+	m_pVideoCastTexture = GetComposite()->MakeTexture(
 		texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
 		m_castpxWidth, 
 		m_castpxHeight, 
@@ -53,7 +53,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		channels, 
 		&vectorByteBuffer[0], 
 		pxSize);	
-	CN(m_pCastTexture);
+	CN(m_pVideoCastTexture);
 
 	m_pLoadingTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CN(m_pLoadingTexture);
@@ -431,7 +431,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 		m_castpxWidth = m_pendingFrame.pxWidth;
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
 		//*
-		m_pCastTexture = GetComposite()->MakeTexture(
+		m_pVideoCastTexture = GetComposite()->MakeTexture(
 			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
 			m_pendingFrame.pxWidth,
 			m_pendingFrame.pxHeight,
@@ -440,16 +440,16 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
 		//*/
-		CR(m_pCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+		CR(m_pVideoCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");
 		}
 	}
 	else {
-		if (m_pCastQuad->GetTextureDiffuse() != m_pCastTexture.get()) {
-			m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
+		if (m_pCastQuad->GetTextureDiffuse() != m_pVideoCastTexture.get()) {
+			m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 		}
-		CRM(m_pCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
+		CRM(m_pVideoCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 	}
 
 Error:
