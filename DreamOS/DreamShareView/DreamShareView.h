@@ -80,6 +80,7 @@ private:
 	// Quad related members
 	std::shared_ptr<quad> m_pCastQuad = nullptr;
 	std::shared_ptr<texture> m_pCastTexture = nullptr;
+	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
 
 	int m_castpxWidth = PX_WIDTH;
