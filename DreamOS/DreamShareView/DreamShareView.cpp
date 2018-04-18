@@ -222,6 +222,7 @@ Error:
 RESULT DreamShareView::PendReceiving() {
 	RESULT r = R_PASS;
 	ShowCastingTexture();
+	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
 
