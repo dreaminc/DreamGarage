@@ -315,7 +315,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		float yValue = DEFAULT_PX_HEIGHT + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
+		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
 		ShowKeyboard("", point(0.0f, yValue, 0.0f));
 	}
 	}
@@ -479,18 +479,12 @@ Error:
 RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
 	RESULT r = R_PASS;
 
-	m_fKeyboardUp = true;
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());
 	point ptLastEvent = m_pControlView->GetLastEvent();
 	
-	if (m_pActiveSource == m_pDreamDesktop){
-		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
-		CR(m_pControlBar->Hide());
-	}
-
-	else if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
-		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) {
+	if (((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
+		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) &&
+		m_pActiveSource != m_pDreamDesktop) {
 		OnClick(ptLastEvent, false);
 		OnClick(ptLastEvent, true);
 	}
@@ -499,6 +493,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
 		CR(m_pControlBar->Hide());
+		m_fKeyboardUp = true;
 	}
 
 Error:
@@ -684,10 +679,12 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 	RESULT r = R_PASS;
 
 	if (m_fKeyboardUp) {
-		CR(m_pDreamUserApp->GetKeyboard()->Hide());
-		CR(m_pControlView->HandleKeyboardDown());
+	//	CR(m_pDreamUserApp->GetKeyboard()->Hide());
 		m_fKeyboardUp = false;
-		CR(Show());
+		CR(m_pControlView->HandleKeyboardDown());
+		//CR(Show());
+		//m_pControlView->Show();
+		m_pControlBar->Show();
 	}
 
 Error:
