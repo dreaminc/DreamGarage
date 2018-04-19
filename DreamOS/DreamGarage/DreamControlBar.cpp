@@ -196,12 +196,22 @@ Error:
 }
 
 RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
+	RESULT r = R_PASS;
+
 	m_barType = m_pUIControlBar->ControlBarTypeFromString(strContentType);
-	if (m_pParentApp != nullptr && m_barType == BarType::BROWSER) {
-		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
-		pBrowser->UpdateNavigationFlags();
+	CR(m_pUIControlBar->UpdateButtonsWithType(m_barType));
+
+	if (m_pParentApp != nullptr) {
+		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+		CR(SetSharingFlag(fIsSharing));
+		if (m_barType == BarType::BROWSER) {
+			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
+			CR(pBrowser->UpdateNavigationFlags());
+		}
 	}
-	return (m_pUIControlBar->UpdateButtonsWithType(m_barType));
+
+Error:
+	return r;
 }
 
 RESULT DreamControlBar::ClearMinimizedState() {

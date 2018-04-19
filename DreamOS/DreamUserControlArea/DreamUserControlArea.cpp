@@ -415,8 +415,6 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 
 		// replace with top of tab bar
 		m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
-		bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
-		m_pControlBar->SetSharingFlag(fIsSharing);
 		
 		if (m_fFromMenu) {	// if we opened desktop through menu for not the first time
 			m_fFromMenu = false;
@@ -724,9 +722,6 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		
 		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
-
-		// new browser can't be the current content
-		m_pControlBar->SetSharingFlag(false);
 
 		// TODO: may not be enough once browser typing is re-enabled
 		m_strURL = "";
