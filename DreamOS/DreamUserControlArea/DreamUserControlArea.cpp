@@ -398,6 +398,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	m_pActiveSource = pNewContent;
 	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
 	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
 	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
