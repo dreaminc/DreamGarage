@@ -1,6 +1,7 @@
 #include "DreamControlBar.h"
 #include "DreamOS.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamGarage/DreamBrowser.h"
 
 #include "UI/UIButton.h"
 
@@ -196,6 +197,10 @@ Error:
 
 RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
 	m_barType = m_pUIControlBar->ControlBarTypeFromString(strContentType);
+	if (m_pParentApp != nullptr && m_barType == BarType::BROWSER) {
+		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
+		pBrowser->UpdateNavigationFlags();
+	}
 	return (m_pUIControlBar->UpdateButtonsWithType(m_barType));
 }
 
