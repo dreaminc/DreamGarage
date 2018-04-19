@@ -709,7 +709,8 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
 	float viewHeight = m_pViewQuad->GetHeight();
-	textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
+	//textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
+	textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight);
 	textBoxYOffset -= 0.25 * viewHeight; // shift closer to text box
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
