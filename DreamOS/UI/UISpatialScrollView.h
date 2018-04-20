@@ -6,6 +6,8 @@
 #include "Sense/SenseController.h"
 #include "UI/UIScrollView.h"
 
+#include <queue>
+
 class UIButton;
 class DreamOS;
 class text;
@@ -51,7 +53,7 @@ public:
 
 // default behaviors
 public:
-	RESULT HideObject(DimObj* pObject);
+	RESULT HideObject(DimObj* pObject, bool fDeleteObject = false);
 	RESULT ShowObject(DimObj* pObject, color showColor = color(1.0f, 1.0f, 1.0f, 1.0f));
 	RESULT HideAndPushButton(UIButton* pButton);
 	// pass optional pushButton to have an additional moving back animation
@@ -109,6 +111,8 @@ private:
 //	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
+
+	std::queue<DimObj*> m_pendingObjectRemovalQueue;
 };
 
 #endif // ! UI_SPATIAL_SCROLL_VIEW_H_

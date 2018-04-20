@@ -187,21 +187,31 @@ RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
 RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
-	auto matModel = pDimObj->GetModelMatrix();
-	m_pUniformModelMatrix->SetUniform(matModel);
+	// Critical path -
+	// DimObj should be a quad, shader may break otherwise
+	// not using EHM to check
 
-	//TODO: shader likely breaks when pDimObj is not a quad
-	auto pQuad = dynamic_cast<quad*>(pDimObj);
-	if (pQuad != nullptr) {
-		DimObj* pParent = pQuad->GetParent();
+	DimObj* pParent = pDimObj->GetParent();
+	if (pParent != nullptr) {
+		auto matModelParent = pParent->GetModelMatrix();
 		if (pParent != nullptr) {
-			CR(m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true)));
-			CR(m_pUniformParentModelMatrix->SetUniform(pParent->GetModelMatrix()));
+			m_pUniformQuadCenter->SetUniform(pParent->GetOrigin(true));
+			m_pUniformParentModelMatrix->SetUniform(matModelParent);
 		}
+
+		auto matModelChild = pDimObj->VirtualObj::GetModelMatrix();
+		auto matModel = matModelParent * matModelChild;
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+	else {
+		//auto pParentModel = pParent->GetModelMatrix();
+		auto matModel = pDimObj->GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
 	}
 
 
-Error:
+
+//Error:
 	return r;
 }
 
