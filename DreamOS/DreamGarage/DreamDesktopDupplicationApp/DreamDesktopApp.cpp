@@ -39,7 +39,7 @@ RESULT DreamDesktopApp::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint
 
 	mouseInputStruct.dwFlags = MOUSEEVENTF_WHEEL;
 	// TODO: consistent scroll speed with browser scroll
-	mouseInputStruct.mouseData = 120 * pxYDiff;
+	mouseInputStruct.mouseData = pxYDiff;
 
 	inputStruct.mi = mouseInputStruct;
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
