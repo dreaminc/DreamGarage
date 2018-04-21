@@ -195,7 +195,22 @@ RESULT UISpatialScrollView::Update() {
 
 	m_frameMs = msNow;
 
-	
+	while (!m_pendingObjectRemovalQueue.empty()) {
+		auto pButton = m_pendingObjectRemovalQueue.front();
+		m_pendingObjectRemovalQueue.pop();
+
+		m_pDreamOS->UnregisterInteractionObject(pButton);
+		m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
+
+		m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
+
+		if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(pButton)) {
+			m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pButton);
+		}
+
+		m_pMenuButtonsContainer->RemoveChild(pButton);
+
+	}
 
 Error:
 	return r; 
@@ -308,7 +323,8 @@ RESULT UISpatialScrollView::HideAllButtons(UIButton* pPushButton) {
 		auto pObj = dynamic_cast<UIButton*>(pButton.get());
 		
 		if (pObj != nullptr) {
-			CR(HideObject(pObj));
+			// delete menu buttons after they are hidden
+			CR(HideObject(pObj, true));
 		}
 
 		//else {
@@ -406,16 +422,33 @@ RESULT UISpatialScrollView::Hide() {
 	return r;
 }
 
-RESULT UISpatialScrollView::HideObject(DimObj* pObject) {
+RESULT UISpatialScrollView::HideObject(DimObj* pObject, bool fDeleteObject) {
 	RESULT r = R_PASS;
 
-	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
+	std::function<RESULT(void*)> fnEndCallback = nullptr;
 
-		DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
-		pObj->SetVisible(false);
-		return R_PASS;
-	};
+	if (fDeleteObject) {
+		fnEndCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
+
+			DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
+			pObj->SetVisible(false);
+
+			// remove object in the next update after the animation is complete
+			m_pendingObjectRemovalQueue.push(pObj);
+
+			return R_PASS;
+		};
+	}
+	else {
+		fnEndCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
+
+			DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
+			pObj->SetVisible(false);
+			return R_PASS;
+		};
+	}
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObject,
