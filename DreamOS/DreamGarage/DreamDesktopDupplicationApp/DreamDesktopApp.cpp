@@ -59,16 +59,26 @@ RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	// Set up generic keyboard event
+	//*
 	keyboardInputStruct.wScan = chKey;
 	keyboardInputStruct.dwExtraInfo = 0;
 	keyboardInputStruct.wVk = 0;		// Should be getting VK code from Sensekeyboard anyway
 	keyboardInputStruct.dwFlags = KEYEVENTF_UNICODE;		// 0 for key press
+	//*/
+
+	if (chKey == SVK_RETURN || chKey == SVK_BACK) {
+		keyboardInputStruct.wScan = 0;
+		keyboardInputStruct.dwExtraInfo = 0;
+		keyboardInputStruct.wVk = chKey;
+		keyboardInputStruct.dwFlags = 0;
+	}
 
 	inputStruct.ki = keyboardInputStruct;
+
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
 
 	keyboardInputStruct.dwFlags |= KEYEVENTF_KEYUP;	// key up for key release
-	//SendInput(1, &inputStruct, sizeof(INPUT));
+	SendInput(1, &inputStruct, sizeof(INPUT));
 
 Error:
 	return r;
