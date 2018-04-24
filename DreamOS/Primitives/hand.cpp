@@ -231,6 +231,10 @@ RESULT hand::SetOverlayVisible(bool fVisible) {
 	return r;
 }
 
+bool hand::IsOverlayVisible() {
+	return m_fOverlayVisible;
+}
+
 RESULT hand::SetOverlayTexture(texture *pOverlayTexture) {
 	RESULT r = R_PASS;
 

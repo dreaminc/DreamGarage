@@ -90,6 +90,7 @@ public:
 	RESULT SetModelState(ModelState modelState);
 	ModelState GetModelState();
 	RESULT SetOverlayVisible(bool fVisible);
+	bool IsOverlayVisible();
 	RESULT SetOverlayTexture(texture *pOverlayTexture);
 	std::shared_ptr<volume> GetPhantomVolume();
 	RESULT Update(); // TODO: app?
