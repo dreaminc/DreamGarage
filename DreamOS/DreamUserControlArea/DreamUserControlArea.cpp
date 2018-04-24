@@ -71,8 +71,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	if (m_pDreamUserApp == nullptr) {
 		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
+//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 		CN(m_pDreamUserApp);
 
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);

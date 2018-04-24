@@ -275,6 +275,17 @@ RESULT DreamUserApp::Update(void *pContext) {
 	qOrientation.Reverse();
 	m_pOrientationRay->SetOrientation(qOrientation);
 
+	if (m_pLeftHand == nullptr) {
+		if (GetDOS()->GetHMD()->GetSenseControllerObject(CONTROLLER_LEFT) != nullptr) {
+			SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT));
+		}
+	}
+	if (m_pRightHand == nullptr) {
+		if (GetDOS()->GetHMD()->GetSenseControllerObject(CONTROLLER_RIGHT) != nullptr) {
+			SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT));
+		}
+	}
+
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
@@ -329,15 +340,23 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
 
 			//pHand->SetOverlayVisible(true);
-			m_pLeftHand->SetOverlayVisible(true);
-			m_pRightHand->SetOverlayVisible(true);
+			if (m_pLeftHand != nullptr) {
+				m_pLeftHand->SetOverlayVisible(true);
+			}
+			if (m_pRightHand != nullptr) {
+				m_pRightHand->SetOverlayVisible(true);
+			}
 
 			//UpdateOverlayTexture(type);
 			UpdateOverlayTextures();
 			if (m_pEventApp == nullptr) {
 				//pHand->SetModelState(hand::ModelState::CONTROLLER);
-				m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-				m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+				if (m_pLeftHand != nullptr) {
+					m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+				}
+				if (m_pRightHand != nullptr) {
+					m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+				}
 			}
 		}
 	}
@@ -353,18 +372,26 @@ RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
 	m_fHasOpenApp = fHasOpenApp;
 
 	if (m_fHasOpenApp) {
-		m_pLeftMallet->Show();
-		m_pRightMallet->Show();
 
-		m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-		m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+		if (m_pLeftHand != nullptr) {
+			m_pLeftMallet->Show();
+			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
+		}
+		if (m_pRightHand != nullptr) {
+			m_pRightMallet->Show();
+			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
+		}
 	}
 	else {
-		m_pLeftMallet->Hide();
-		m_pRightMallet->Hide();
 
-		m_pLeftHand->SetModelState(hand::ModelState::HAND);
-		m_pRightHand->SetModelState(hand::ModelState::HAND);
+		if (m_pLeftHand != nullptr) {
+			m_pLeftHand->SetModelState(hand::ModelState::HAND);
+			m_pLeftMallet->Hide();
+		}
+		if (m_pRightHand != nullptr) {
+			m_pRightMallet->Hide();
+			m_pRightHand->SetModelState(hand::ModelState::HAND);
+		}
 	}
 
 	UpdateOverlayTextures();
@@ -432,8 +459,14 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		auto pEventObj = mEvent->m_pEventObject;
 		auto pInteractionObj = mEvent->m_pInteractionObject;
 
-		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
-		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
+		volume* pLeftVolume = nullptr;
+		volume* pRightVolume = nullptr;
+		if (m_pLeftHand != nullptr) {
+			pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
+		}
+		if (m_pRightHand != nullptr) {
+			pRightVolume = m_pRightHand->GetPhantomVolume().get();
+		}
 
 		if (pInteractionObj == m_pOrientationRay.get() && (pEventObj == pLeftVolume || pEventObj == pRightVolume)) {
 			m_msGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
@@ -450,8 +483,14 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	case (ELEMENT_INTERSECT_ENDED): {
 
 		auto pEventObj = mEvent->m_pEventObject;
-		auto pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
-		auto pRightVolume = m_pRightHand->GetPhantomVolume().get();
+		volume* pLeftVolume = nullptr;
+		volume* pRightVolume = nullptr;
+		if (m_pLeftHand != nullptr) {
+			pLeftVolume = m_pLeftHand->GetPhantomVolume().get();
+		}
+		if (m_pRightHand != nullptr) {
+			pRightVolume = m_pRightHand->GetPhantomVolume().get();
+		}
 
 		if (pEventObj == pLeftVolume || pEventObj == pRightVolume) {
 			if (pEventObj == pLeftVolume) {
@@ -462,11 +501,19 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			}
 		}
 		if (!m_fCollisionLeft && !m_fCollisionRight) {
-			m_pLeftHand->SetOverlayVisible(false);
-			m_pRightHand->SetOverlayVisible(false);
+			if (m_pLeftHand != nullptr) {
+				m_pLeftHand->SetOverlayVisible(false);
+			}
+			if (m_pRightHand != nullptr) {
+				m_pRightHand->SetOverlayVisible(false);
+			}
 			if (m_pEventApp == nullptr && !m_fStreaming) {
-				m_pLeftHand->SetModelState(hand::ModelState::HAND);
-				m_pRightHand->SetModelState(hand::ModelState::HAND);
+				if (m_pLeftHand != nullptr) {
+					m_pLeftHand->SetModelState(hand::ModelState::HAND);
+				}
+				if (m_pRightHand != nullptr) {
+					m_pRightHand->SetModelState(hand::ModelState::HAND);
+				}
 			}
 		}
 
@@ -539,6 +586,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	RESULT r = R_PASS;
 	auto pDreamOS = GetDOS();
 	HAND_TYPE type;
+	hand *pOtherHand = nullptr;
 
 	CNR(pHand, R_OBJECT_NOT_FOUND);
 
@@ -557,8 +605,21 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 		m_pRightHand->SetOverlayTexture(m_pTextureDefaultGazeRight);
 	}
 
-	pHand->SetOverlayVisible(false);
-	pHand->SetModelState(hand::ModelState::HAND);
+	// if the second hand is created later on, make sure that the states match
+	if (pHand == m_pLeftHand) {
+		pOtherHand = m_pRightHand;
+	}
+	else {
+		pOtherHand = m_pLeftHand;
+	}
+	if (pOtherHand != nullptr) {
+		pHand->SetOverlayVisible(pOtherHand->IsOverlayVisible());
+		pHand->SetModelState(pOtherHand->GetModelState());
+	}
+	else {
+		pHand->SetOverlayVisible(false);
+		pHand->SetModelState(hand::ModelState::HAND);
+	}
 
 	auto pVolume = pHand->GetPhantomVolume().get();
 	CNR(pVolume, R_SKIPPED);

@@ -131,6 +131,7 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 			m_pRightController->AddObject(m_pControllerMeshRight);
 		}
 	}
+	/*
 	else if (controllerRole == vr::TrackedControllerRole_Invalid) {
 		if (m_pControllerMeshLeft == nullptr) {
 			m_pControllerMeshLeft = std::shared_ptr<mesh>(pMesh);
@@ -156,8 +157,9 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 			CBM((0), "Invalid controller role and both controllers already set");
 		}
 	}
+	//*/
 
-Error:
+//Error:
 	return r;
 }
 
@@ -172,6 +174,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 
 	std::string sRenderModelName = GetTrackedDeviceString(m_pIVRHMD, deviceID, vr::Prop_RenderModelName_String);
 	CB((sRenderModelName.length() > 0));
+
+	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
+	CBR(controllerRole != vr::TrackedControllerRole_Invalid, R_SKIPPED);
 
 	while (1) {
 		error = vr::VRRenderModels()->LoadRenderModel_Async(sRenderModelName.c_str(), &pRenderModel);
@@ -244,7 +249,6 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, PIXEL_FORMAT::Unspecified, channels, pBuffer, pBuffer_n);
 	pControllerMesh->SetDiffuseTexture(pTexture);
 
-	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
 	CR(SetControllerMeshTexture(pControllerMesh, pTexture, controllerRole))
 
 Error:
@@ -288,19 +292,21 @@ composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType)
 	//*
 	switch (controllerType) {
 	case CONTROLLER_LEFT: {
-#ifdef _USE_TEST_APP
+	/*
+		if (m_pLeftController == nullptr) {
+			m_pLeftController = m_pParentSandbox->MakeComposite();
+		}
+	//*/
 		return m_pLeftController;
-#else
-		return m_pLeftController;
-#endif
 	} break;
 
 	case CONTROLLER_RIGHT: {
-#ifdef _USE_TEST_APP
+	/*
+		if (m_pRightController == nullptr) {
+			m_pRightController = m_pParentSandbox->MakeComposite();
+		}
+	//*/
 		return m_pRightController;
-#else
-		return m_pRightController;
-#endif
 	} break;
 	}
 	
@@ -367,7 +373,20 @@ ViewMatrix OpenVRDevice::ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_
 
 RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state) {
 
+	RESULT r = R_PASS;
+
 	ControllerState cState;
+
+	CBR(controllerRole != vr::TrackedControllerRole_Invalid, R_SKIPPED);
+
+	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+		CBR(m_pLeftController != nullptr, R_SKIPPED);
+		cState.type = CONTROLLER_LEFT;
+	} 
+	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+		CBR(m_pRightController != nullptr, R_SKIPPED);
+		cState.type = CONTROLLER_RIGHT;
+	}
 
 	cState.triggerRange = state.rAxis[1].x;
 	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
@@ -375,15 +394,10 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 	cState.fMenu = (state.ulButtonPressed & (1<<1)) != 0;
 	cState.fGrip = (state.ulButtonPressed & (1<<2)) != 0;
 
-	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
-		cState.type = CONTROLLER_LEFT;
-	} 
-	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
-		cState.type = CONTROLLER_RIGHT;
-	}
 	m_pSenseController->SetControllerState(cState); 
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::UpdateHMD() {
@@ -412,13 +426,26 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		// TODO: currently not getting click events from touch pad or trigger
 		// more info: https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetControllerState
+		vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
+
+		if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+			if (m_pLeftController == nullptr) {
+				InitializeRenderModel(unDevice);
+			}
+		}
+		if (controllerRole == vr::TrackedControllerRole_RightHand) {
+			if (m_pRightController == nullptr) {
+				InitializeRenderModel(unDevice);
+			}
+		}
+
 		if (m_pIVRHMD->GetControllerState(unDevice, &state, sizeof(vr::VRControllerState_t))) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
 				uint32_t currentFrame = state.unPacketNum;
 
 				if (currentFrame != m_vrFrameCount) {
 					m_vrFrameCount = currentFrame;
-					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
+
 					UpdateSenseController(controllerRole, state);
 				}
 			}
