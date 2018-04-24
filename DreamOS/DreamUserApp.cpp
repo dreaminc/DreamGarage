@@ -200,6 +200,10 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		} break;
+		case HMDDeviceType::META: {
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
 		}
 		CN(m_pTextureDefaultGazeLeft);
 		CN(m_pTextureDefaultGazeRight);
