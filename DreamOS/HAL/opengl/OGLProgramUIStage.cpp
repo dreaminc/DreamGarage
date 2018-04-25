@@ -33,6 +33,7 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 
 	// Clipping
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformAR), std::string("u_arEnabled")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformQuadCenter), std::string("u_ptQuadCenter")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformParentModelMatrix), std::string("u_mat4ParentModel")));
@@ -117,6 +118,8 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
 	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
+	m_pUniformAR->SetUniform(m_fIsAugmented);
+
 	m_pUniformClippingEnabled->SetUniform(true);
 	RenderObjectStore(m_pClippingSceneGraph);
 
@@ -182,6 +185,11 @@ RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
 	m_vOrigin = vOrigin;
 
 	return r;
+}
+
+RESULT OGLProgramUIStage::SetIsAugmented(bool fAugmented) {
+	m_fIsAugmented = fAugmented;
+	return R_PASS;
 }
 
 RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {

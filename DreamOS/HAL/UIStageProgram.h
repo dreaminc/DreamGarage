@@ -20,6 +20,7 @@ public:
 
 	virtual RESULT SetOriginPoint(point ptOrigin) = 0;
 	virtual RESULT SetOriginDirection(vector vOrigin) = 0;
+	virtual RESULT SetIsAugmented(bool fAugmented) = 0;
 
 protected:
 	ViewMatrix m_clippingView;
@@ -27,6 +28,7 @@ protected:
 
 	point m_ptOrigin;
 	vector m_vOrigin;
+	bool m_fIsAugmented = false;
 };
 
 #endif // ! UI_STAGE_PROGRAM_H_

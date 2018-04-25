@@ -16,6 +16,7 @@ uniform bool u_hasTextureColor;
 uniform sampler2D u_textureColor;
 
 uniform bool u_clippingEnabled;
+uniform bool u_arEnabled;
 uniform vec4 u_ptOrigin;
 uniform vec4 u_vOrigin;
 
@@ -63,6 +64,9 @@ void main(void) {
 		if (minDistance < 0.0f) {
 			discard;
 		}
+		if (u_arEnabled == true && color.a != 0.0) {
+			color.a = 1.0;
+		}
 
 		float ratio = (g_knee - minDistance) / g_knee;
 		if (ratio > 0.0f) {
@@ -78,7 +82,11 @@ void main(void) {
 			//vec3 white = vec3(1.0f, 1.0f, 1.0f);
 			//color.rgb = color.rgb + (white - (white * (1.0 - y)));
 		}
+		if (u_arEnabled == true) {
+			color = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
+		}
 	}
+
 
 	out_vec4Color = material.m_colorDiffuse * color + g_ambient;
 	if (out_vec4Color.a == 0.0f) {
