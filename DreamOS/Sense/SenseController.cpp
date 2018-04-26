@@ -64,6 +64,10 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 	}
 	currentState->fMenu = controllerState.fMenu;
 
+	//TODO:
+	currentState->fClosed = controllerState.fClosed;
+	eventType = SENSE_CONTROLLER_META_CLOSED;
+	NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 
 	return R_PASS;
 }
