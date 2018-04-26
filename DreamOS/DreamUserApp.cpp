@@ -200,6 +200,10 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		} break;
+		case HMDDeviceType::META: {
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		} break;
 		}
 		CN(m_pTextureDefaultGazeLeft);
 		CN(m_pTextureDefaultGazeRight);
@@ -248,8 +252,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 	if (m_pKeyboardHandle == nullptr) {
 		auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
-		CBR(keyUIDs.size() == 1, R_SKIPPED);
-		m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
+		if (keyUIDs.size() == 1) {
+			m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
+		}
 
 		//CN(m_pKeyboardHandle);
 	}
@@ -640,6 +645,18 @@ UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
 	}
 	else if (type == HAND_TYPE::HAND_RIGHT) {
 		return m_pRightMallet;
+	}
+
+	return nullptr;
+}
+
+hand *DreamUserApp::GetHand(HAND_TYPE type) {
+
+	if (type == HAND_TYPE::HAND_LEFT) {
+		return m_pLeftHand;
+	}
+	else if (type == HAND_TYPE::HAND_RIGHT) {
+		return m_pRightHand;
 	}
 
 	return nullptr;

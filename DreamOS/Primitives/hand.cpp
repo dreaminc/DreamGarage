@@ -126,6 +126,17 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		m_pOverlayQuad->SetVisible(false);
 
 	} break;
+	case (HMDDeviceType::META): {
+		float scale = VIVE_OVERLAY_SCALE;
+		float overlayAspect = VIVE_ASPECT_RATIO;
+		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
+		m_pOverlayQuad = m_pController->MakeQuad(scale / overlayAspect, scale);
+		m_pDreamOS->AddObjectToUIGraph(m_pOverlayQuad.get());
+		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X,
+			scale * VIVE_OVERLAY_POSITION_Y,
+			scale * VIVE_OVERLAY_POSITION_Z));
+		m_pOverlayQuad->SetVisible(false);
+	} break;
 	}
 
 

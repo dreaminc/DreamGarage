@@ -125,6 +125,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	// save interface for UI apps
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
+	if (GetHMD() != nullptr) {
+		if (GetHMD()->GetDeviceType() == HMDDeviceType::META) {
+			m_pUIProgramNode->SetIsAugmented(true);
+		}
+	}
+
 	/*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
@@ -224,10 +230,6 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-	CR(SetupUserModelPool());
-
-	AddSkybox();
-
 	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight->EnableShadows();
 
@@ -238,7 +240,22 @@ RESULT DreamGarage::LoadScene() {
 
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
+	CR(SetupUserModelPool());
+
+	bool fShowModels = true;
+	auto pHMD = GetHMD();
+	if (pHMD != nullptr) {
+		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
+			fShowModels = false;
+		}
+	}
+
+	CBR(fShowModels, R_SKIPPED);
+
+	AddSkybox();
+
 #ifndef _DEBUG
+
 	//*
 	model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
 	pModel->SetPosition(ptSceneOffset);

@@ -33,6 +33,8 @@ public:
 	virtual RESULT SetOriginPoint(point ptOrigin) override;
 	virtual RESULT SetOriginDirection(vector vOrigin) override;
 
+	virtual RESULT SetIsAugmented(bool fAugmented) override;
+
 protected:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
@@ -50,6 +52,7 @@ private:
 	OGLUniformBool *m_pUniformHasTextureColor;
 
 	OGLUniformBool *m_pUniformClippingEnabled;
+	OGLUniformBool *m_pUniformAR;
 
 	// quad uniforms for clip
 	OGLUniformPoint *m_pUniformQuadCenter;

@@ -39,6 +39,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMeta());
+
 	CR(AddTestDreamDesktop());
 
 	CR(AddTestDreamOS());
@@ -396,6 +398,125 @@ RESULT DreamOSTestSuite::Notify(InteractionObjectEvent *pEvent) {
 //*/
 
 	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestMeta() {
+	RESULT r = R_PASS;
+
+	struct TestContext : public Subscriber<SenseControllerEvent> {
+		std::shared_ptr<DreamUserApp> m_pUserApp = nullptr;
+
+		virtual RESULT Notify(SenseControllerEvent *event) override {
+			RESULT r = R_PASS;
+			if (event->type == SENSE_CONTROLLER_META_CLOSED) {
+				//hardcoded values taken from DreamUIBar
+				if (m_pUserApp != nullptr) {
+					auto pLeftMallet = m_pUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+					auto pRightMallet = m_pUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+					auto pLeftHand = m_pUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+					auto pRightHand = m_pUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+					if (event->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT && pLeftHand != nullptr) {
+						if (event->state.fClosed == false) {
+						//	pLeftMallet->GetH
+						//	pLeftMallet->GetMalletHead()->SetScale(1.5f);
+							//pLeftHand->SetScale(1.5f);
+							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.02f);
+						}
+						else {
+							//pLeftHand->SetScale(1.0f);
+							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.03f);
+							//pLeftMallet->GetMalletHead()->SetScale(1.0f);
+						}
+					//	pLeftMallet->
+					}
+					if (event->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT && pRightHand != nullptr) {
+						if (event->state.fClosed == false) {
+						//	pLeftMallet->GetH
+						//	pLeftMallet->GetMalletHead()->SetScale(1.5f);
+							pRightHand->SetScale(1.0f);
+						}
+						else {
+							pRightHand->SetScale(1.5f);
+							//pLeftMallet->GetMalletHead()->SetScale(1.0f);
+						}
+
+					}
+				}
+			}
+		//Error:
+			return r;
+		}
+	};
+	TestContext *pTestContext = new TestContext();
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupDreamAppPipeline());
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->m_pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		//m_pDreamOS->RegisterEventSubscriber()
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_META_CLOSED, pTestContext);
+	
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->m_pUserApp->Update();
+		//pTestContext->m_pUserApp->SetHasOpenApp(true);
+
+//		pTestContext->m_pUserApp->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
+//		pTestContext->m_pUserApp->GetMallet(HAND_TYPE::HAND_RIGHT)->Show();
+
+		//pTestContext->m_pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
 
 Error:
 	return r;

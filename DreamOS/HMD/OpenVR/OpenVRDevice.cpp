@@ -80,6 +80,9 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 
 	m_strDriver = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	m_strDisplay = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
+	m_strName = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_ManufacturerName_String);
+
+	InitializeDeviceType();
 
 	// Eye Widths
 	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
@@ -265,6 +268,25 @@ Error:
 	return r;
 }
 
+RESULT OpenVRDevice::InitializeDeviceType() {
+	RESULT r = R_PASS;
+
+	if (m_strName == "HTC") {
+		//m_strDriver == "lighthouse"
+		m_deviceType = HMDDeviceType::VIVE;
+	}
+	else if (m_strName == "MVN") {
+		//m_deviceType = HMDDeviceType::VIVE;
+		//m_strDriver == "meta"
+		m_deviceType = HMDDeviceType::META;
+	}
+	else {
+		m_deviceType = HMDDeviceType::NONE;
+	}
+
+	return R_PASS;
+}
+
 // TODO: Might not want to have this here (move to sandbox or sense)
 RESULT OpenVRDevice::InitializeRenderModels() {
 	RESULT r = R_PASS;
@@ -317,7 +339,7 @@ composite *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType)
 }
 
 HMDDeviceType OpenVRDevice::GetDeviceType() {
-	return HMDDeviceType::VIVE;
+	return m_deviceType;
 }
 
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
@@ -382,19 +404,34 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
 		CBR(m_pLeftController != nullptr, R_SKIPPED);
 		cState.type = CONTROLLER_LEFT;
-	} 
+	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		CBR(m_pRightController != nullptr, R_SKIPPED);
 		cState.type = CONTROLLER_RIGHT;
 	}
 
-	cState.triggerRange = state.rAxis[1].x;
-	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
+	switch (m_deviceType) {
+		case HMDDeviceType::VIVE: {
+			cState.triggerRange = state.rAxis[1].x;
+			cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
 
-	cState.fMenu = (state.ulButtonPressed & (1<<1)) != 0;
-	cState.fGrip = (state.ulButtonPressed & (1<<2)) != 0;
+			cState.fMenu = (state.ulButtonPressed & (1 << 1)) != 0;
+			cState.fGrip = (state.ulButtonPressed & (1 << 2)) != 0;
 
-	m_pSenseController->SetControllerState(cState); 
+		} break;
+			/*
+		case HMDDeviceType::META: {
+			cState.fGrip = false;
+			uint64_t flag = (uint64_t)1 << 33;
+			//cState.fMenu = (state.ulButtonPressed & flag) != 0;
+			//cState.fClosed = (state.ulButtonPressed & flag) != 0;
+			cState.triggerRange = 0.0f;
+			cState.ptTouchpad = point(0.0f, 0.0f, 0.0f);
+		} break;
+		//*/
+	}
+
+	m_pSenseController->SetControllerState(cState);
 
 Error:
 	return r;

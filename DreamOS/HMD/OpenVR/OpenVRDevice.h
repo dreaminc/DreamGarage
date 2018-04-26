@@ -74,6 +74,8 @@ private:
 	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
 	ViewMatrix ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_t &matPose);
 
+	RESULT InitializeDeviceType();
+
 	// Models
 	RESULT InitializeRenderModels();								// This sets up the models
 	RESULT InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
@@ -86,6 +88,8 @@ public:
 
 	std::string m_strDriver;
 	std::string m_strDisplay;
+	std::string m_strName;
+	HMDDeviceType m_deviceType;
 
 	// Pose / device tracking
 	int m_trackedControllerCount;

@@ -131,6 +131,7 @@ public:
 	RESULT SetHand(hand* pHand);
 
 	virtual UIMallet *GetMallet(HAND_TYPE type) override;
+	hand *GetHand(HAND_TYPE type);
 	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) override;
 
 	virtual RESULT GetAppBasisPosition(point& ptOrigin) override;

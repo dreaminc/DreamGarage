@@ -43,6 +43,7 @@ typedef enum HMDEventType {
 enum class HMDDeviceType {
 	OCULUS,
 	VIVE,
+	META,
 	NONE	
 };
 

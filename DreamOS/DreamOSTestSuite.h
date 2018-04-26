@@ -32,6 +32,9 @@ public:
 	RESULT AddTestUserApp();
 	RESULT AddTestPeerApps();
 
+	// Meta UI
+	RESULT AddTestMeta();
+
 	// Apps
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();
