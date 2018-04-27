@@ -28,6 +28,7 @@ light *g_pLight = nullptr;
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 #include "HAL/UIStageProgram.h"
+#include "HAL/EnvironmentProgram.h"
 
 #include "Core/Utilities.h"
 
@@ -124,10 +125,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	// save interface for UI apps
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+	auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
 	if (GetHMD() != nullptr) {
 		if (GetHMD()->GetDeviceType() == HMDDeviceType::META) {
 			m_pUIProgramNode->SetIsAugmented(true);
+			pEnvironmentNode->SetIsAugmented(true);
 		}
 	}
 

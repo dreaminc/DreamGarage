@@ -343,12 +343,16 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 
 		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
-
+			bool fMeta = false;
+			auto pHMD = GetDOS()->GetHMD();
+			if (pHMD != nullptr) {
+				fMeta = pHMD->GetDeviceType() == HMDDeviceType::META;
+			}
 			//pHand->SetOverlayVisible(true);
-			if (m_pLeftHand != nullptr) {
+			if (m_pLeftHand != nullptr && !fMeta) {
 				m_pLeftHand->SetOverlayVisible(true);
 			}
-			if (m_pRightHand != nullptr) {
+			if (m_pRightHand != nullptr && !fMeta) {
 				m_pRightHand->SetOverlayVisible(true);
 			}
 

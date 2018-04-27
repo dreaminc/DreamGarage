@@ -2171,6 +2171,9 @@
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFStringVisitor.h">
       <Filter>WebBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

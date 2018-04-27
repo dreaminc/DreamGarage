@@ -72,6 +72,7 @@ uniform bool	u_hasTextureSpecular;
 uniform sampler2D u_textureSpecular;
 
 uniform bool	u_fRiverAnimation;
+uniform bool	u_fAREnabled;
 
 layout (location = 0) out vec4 out_vec4Color;
 
@@ -125,7 +126,18 @@ vec4 EnableRiverAnimation() {
 }
 //*/
 
+vec4 IncreaseColorSaturation(vec4 color) {
+	//vec4 colorBrighter = color*2;
+	//colorBrighter = clamp(colorBrighter, 0.0, 1.0);
+	vec4 colorBrighter = vec4(tanh(2*color.r), tanh(2*color.g), tanh(2*color.b), color.a);
+	return colorBrighter;	
+}
+
 void main(void) {  
+
+	if (u_fAREnabled) {
+		g_ambient += 0.35f;
+	}
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
@@ -171,7 +183,12 @@ void main(void) {
 	
 	// opaque/fully transparent blending without reordering
 	EnableBlending(colorAmbient.a, colorDiffuse.a);
-	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
+	vec4 outColor = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
+
+	// testing increasing the saturation
+	if (u_fAREnabled) {
+		out_vec4Color = IncreaseColorSaturation(outColor);
+	}
 
 	//	out_vec4Color = material.m_colorDiffuse;
 	//out_vec4Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);

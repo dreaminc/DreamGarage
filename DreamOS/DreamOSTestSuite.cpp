@@ -6,6 +6,7 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 #include "HAL/UIStageProgram.h"
+#include "HAL/EnvironmentProgram.h"
 
 #include "DreamTestingApp.h"
 #include "DreamUserApp.h"
@@ -145,6 +146,14 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+	auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+
+	if (m_pDreamOS->GetHMD() != nullptr) {
+		if (m_pDreamOS->GetHMD()->GetDeviceType() == HMDDeviceType::META) {
+			pEnvironmentNode->SetIsAugmented(true);
+		}
+	}
+
 	// Reference Geometry Shader Program
 	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
@@ -154,11 +163,13 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Skybox
+	/*
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//*/
 
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
@@ -167,7 +178,8 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 	//*/
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
@@ -468,6 +480,11 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 		pTestContext->m_pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		//m_pDreamOS->RegisterEventSubscriber()
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_META_CLOSED, pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+		pModel->SetScale(0.02f);
 	
 	Error:
 		return r;

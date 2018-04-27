@@ -9,13 +9,14 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../EnvironmentProgram.h"
 
 #include <chrono>
 
 class ObjectStore;
 class stereocamera;
 
-class OGLProgramEnvironmentObjects : public OGLProgram {
+class OGLProgramEnvironmentObjects : public OGLProgram, public EnvironmentProgram {
 public:
 	OGLProgramEnvironmentObjects(OpenGLImp *pParentImp);
 
@@ -23,6 +24,8 @@ public:
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
+
+	virtual RESULT SetIsAugmented(bool fAugmented) override;
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 	RESULT SetLights(std::vector<light*> *pLights);
@@ -38,6 +41,8 @@ private:
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
+
+	bool m_fAREnabled = false;
 
 private:
 	// Vertex Attribute
@@ -69,6 +74,7 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureSpecular;
 
 	OGLUniformBool *m_pUniformRiverAnimation;
+	OGLUniformBool *m_pUniformAREnabled;
 
 	OGLUniform *m_pUniformTime;
 
