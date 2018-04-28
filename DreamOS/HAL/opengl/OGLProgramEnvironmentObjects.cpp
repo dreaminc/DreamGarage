@@ -51,6 +51,7 @@ RESULT OGLProgramEnvironmentObjects::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureSpecular), std::string("u_textureSpecular")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformRiverAnimation), std::string("u_fRiverAnimation")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformAREnabled), std::string("u_fAREnabled")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTime), std::string("u_time")));
 
@@ -117,6 +118,8 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 
 	SetLights(pLights);
 
+	m_pUniformAREnabled->SetUniform(m_fAREnabled);
+
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
@@ -126,6 +129,11 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 
 	//Error:
 	return r;
+}
+
+RESULT OGLProgramEnvironmentObjects::SetIsAugmented(bool fAugmented) {
+	m_fAREnabled = fAugmented;
+	return R_PASS;
 }
 
 RESULT OGLProgramEnvironmentObjects::SetObjectTextures(OGLObj *pOGLObj) {

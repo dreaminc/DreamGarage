@@ -423,8 +423,8 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 		case HMDDeviceType::META: {
 			cState.fGrip = false;
 			uint64_t flag = (uint64_t)1 << 33;
-			//cState.fMenu = (state.ulButtonPressed & flag) != 0;
-			//cState.fClosed = (state.ulButtonPressed & flag) != 0;
+			cState.fMenu = (state.ulButtonPressed & flag) != 0;
+			cState.fClosed = (state.ulButtonPressed & flag) != 0;
 			cState.triggerRange = 0.0f;
 			cState.ptTouchpad = point(0.0f, 0.0f, 0.0f);
 		} break;
