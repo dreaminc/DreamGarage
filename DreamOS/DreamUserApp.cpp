@@ -280,12 +280,13 @@ RESULT DreamUserApp::Update(void *pContext) {
 	qOrientation.Reverse();
 	m_pOrientationRay->SetOrientation(qOrientation);
 
-	if (m_pLeftHand == nullptr) {
+	auto pHMD = GetDOS()->GetHMD();
+	if (m_pLeftHand == nullptr && pHMD != nullptr) {
 		if (GetDOS()->GetHMD()->GetSenseControllerObject(CONTROLLER_LEFT) != nullptr) {
 			SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT));
 		}
 	}
-	if (m_pRightHand == nullptr) {
+	if (m_pRightHand == nullptr && pHMD != nullptr) {
 		if (GetDOS()->GetHMD()->GetSenseControllerObject(CONTROLLER_RIGHT) != nullptr) {
 			SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT));
 		}

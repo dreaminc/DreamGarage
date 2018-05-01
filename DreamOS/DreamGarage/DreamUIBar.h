@@ -63,6 +63,7 @@ class DreamUIBar :	public DreamApp<DreamUIBar>,
 {
 
 	friend class DreamAppManager;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamUIBar(DreamOS *pDreamOS, void *pContext = nullptr);
