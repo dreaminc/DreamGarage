@@ -722,6 +722,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 
 //			pTestContext->pUserControlArea->m_pDreamUIBar->ShowRootMenu();
 //			pTestContext->pUserControlArea->m_pDreamUIBar->ShowApp();
+			//*
 			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
 			std::vector<std::shared_ptr<UIButton>> pButtons;
 

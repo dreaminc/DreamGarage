@@ -114,7 +114,15 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
-		CR(GetDOS()->InitializeKeyboard());
+		//CR(GetDOS()->InitializeKeyboard());
+		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
+		CN(pKeyboard);
+		pKeyboard->InitializeWithParent(this);
+		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
+		//pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, 0.0f));
+		//pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, m_pDreamTabView->GetBorderHeight()/4.0f));
+		pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z() + m_pDreamTabView->GetBorderHeight() / 2.0f - pKeyboard->m_surfaceHeight / 2.0f));
+		pKeyboard->m_ptComposite = pKeyboard->GetComposite()->GetPosition();
 	}
 
 	//CR(m_pWebBrowserManager->Update());
@@ -200,6 +208,10 @@ float DreamUserControlArea::GetBaseHeight() {
 
 float DreamUserControlArea::GetSpacingSize() {
 	return m_spacingSize;
+}
+
+float DreamUserControlArea::GetViewAngle() {
+	return VIEW_ANGLE; //????
 }
 
 RESULT DreamUserControlArea::Show() {

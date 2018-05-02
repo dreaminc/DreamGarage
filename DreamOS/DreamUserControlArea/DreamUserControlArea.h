@@ -69,6 +69,7 @@ public:
 	float GetSpacingSize();
 	float GetBaseWidth();
 	float GetBaseHeight();
+	float GetViewAngle();
 
 // Animations
 public:

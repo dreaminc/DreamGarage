@@ -10,12 +10,13 @@
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 
 #include <vector>
 #include <string>
 
-#define SURFACE_WIDTH 0.5f // surface is a quad that holds the entire keyboard layout
-#define SURFACE_HEIGHT 0.25f
+#define SURFACE_WIDTH 0.523f //0.5f // surface is a quad that holds the entire keyboard layout
+#define SURFACE_HEIGHT 0.294f // 0.25f
 #define SURFACE_ANGLE 30.0f
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
@@ -24,7 +25,7 @@
 
 #define KEY_TYPE_THRESHOLD 0.0f 
 #define KEY_RELEASE_THRESHOLD -0.025f
-#define KEY_SCALE 0.9f
+#define KEY_SCALE (5.0f / 6.0f)
 #define KEY_MARGIN 0.25f
 
 #define KEY_RELEASE_DURATION 0.1f
@@ -69,6 +70,7 @@ class UIKeyboard :	public DreamApp<UIKeyboard>,
 					public UIKeyboardHandle, 
 					public SenseKeyboard {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -82,6 +84,9 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
+
+public:
+	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
 //DreamApp
 public:
@@ -212,6 +217,8 @@ private:
 
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UID m_userAppUID;
+
+	DreamUserControlArea *m_pParentApp = nullptr;
 };
 
 #endif // ! UI_KEYBOARD_H_
