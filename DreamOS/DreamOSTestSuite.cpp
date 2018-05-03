@@ -605,6 +605,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 		std::shared_ptr<Dream2DMouseApp> m_pDream2DMouse = nullptr;
+		quad *m_pBrowserQuad = nullptr;
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
@@ -645,6 +646,11 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		pTestContext->m_pDreamBrowser->SetURI(strURL);
 
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+
 	Error:
 		return R_PASS;
 	};
@@ -658,7 +664,10 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(r);
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
 
 	Error:
 		return r;
