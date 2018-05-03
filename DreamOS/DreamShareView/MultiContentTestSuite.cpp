@@ -11,6 +11,7 @@
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamTabView.h"
+#include "DreamGarage/DreamUIBar.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -23,6 +24,8 @@
 
 #include "UI/UIFlatScrollView.h"
 #include "UI/UIButton.h"
+#include "UI/UIMenuItem.h"
+#include "UI/UISpatialScrollView.h"
 
 #include "Sandbox/CommandLineManager.h"
 
@@ -63,6 +66,8 @@ Error:
 
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestAllUIObjects());
 
 	CR(AddTestActiveSource());
 
@@ -282,6 +287,143 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestAllUIObjects() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<DreamBrowser> pBrowser1;
+		std::shared_ptr <DreamBrowser> pBrowser2;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+		bool fFirst = true;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+		
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+
+		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
+		pTestContext->pBrowser1->SetURI("www.twitch.tv");
+		//pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
+
+		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
+		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
+
+		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
+		pControlArea->m_fFromMenu = true;
+
+		pTestContext->strURIs = {
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.nyt.com",
+			"www.dreamos.com",
+			"en.wikipedia.org/wiki/Tropical_house",
+			"www.livelovely.com",
+			"www.twitch.tv"
+		} ;
+
+		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
+			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
+			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
+			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
+		}
+
+//		auto pDreamUIBar = 
+//		m_Start();
+//		m_pDreamOS->GetCloudController()->Login();
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = pTestContext->pUserControlArea;
+
+		if (pTestContext->fFirst) {
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			//for (auto pBrowser : pTestContext->pDreamBrowsers) {
+			//	pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
+			//}
+			pTestContext->fFirst = false;
+
+//			pTestContext->pUserControlArea->m_pDreamUIBar->ShowRootMenu();
+//			pTestContext->pUserControlArea->m_pDreamUIBar->ShowApp();
+			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
+			std::vector<std::shared_ptr<UIButton>> pButtons;
+
+			//pDreamUIBar->m_pScrollView
+			// setup fake menu
+			for (int i = 0; i < 4; i++) {
+
+				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem();
+				CN(pButton);
+
+				auto iconFormat = IconFormat();
+				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
+
+				auto labelFormat = LabelFormat();
+				labelFormat.strLabel = "Label " + i;
+				labelFormat.pFont = pDreamUIBar->m_pFont;
+				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
+
+				pButton->Update(iconFormat, labelFormat);
+
+				pButtons.emplace_back(pButton);
+			}
+
+			pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
+
+			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
+
+			pDreamUIBar->ResetAppComposite();
+			pTestContext->pUserControlArea->ResetAppComposite();
+
+			pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
+		}
+	Error:
+		return r;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

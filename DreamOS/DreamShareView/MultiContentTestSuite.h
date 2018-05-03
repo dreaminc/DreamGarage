@@ -53,6 +53,9 @@ public:
 	// flat context with dream tab view
 	RESULT AddTestDreamTabView();
 
+	// all ui objects visible at once
+	RESULT AddTestAllUIObjects();
+
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
