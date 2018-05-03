@@ -427,7 +427,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 	// and another application running on a different system that receives the desktop images via a network and display the image. This
 	// sample contains both these aspects into a single application.
 	// This routine is the part of the sample that displays the desktop image onto the display
-
+	DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
 	// Try and acquire sync on common display buffer
 	HRESULT hr = m_pKeyMutex->AcquireSync(1, 100);
 	if (hr == static_cast<HRESULT>(WAIT_TIMEOUT)) {
@@ -439,8 +439,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::UpdateApplicationWindow(_In_ P
 	}
 
 	// Got mutex, so draw
-	DUPL_RETURN Ret = DrawFrame();
-	//*	This Draws the Mouse, disabling for Now
+	Ret = DrawFrame();
+	/*	This Draws the Mouse, disabling for Now
 	if (Ret == DUPL_RETURN_SUCCESS) {
 		// We have keyed mutex so we can access the mouse info
 
@@ -992,6 +992,10 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ResizeSwapChain() {
 	GetClientRect(m_pWindowHandle, &WindowRect);
 	UINT Width = WindowRect.right - WindowRect.left;
 	UINT Height = WindowRect.bottom - WindowRect.top;
+	if (Width > 938) {	// forcing larger than 1080p to this size.
+		UINT Width = 938;
+		UINT Height = 484;
+	}
 
 	// Resize swapchain
 	DXGI_SWAP_CHAIN_DESC SwapChainDesc;

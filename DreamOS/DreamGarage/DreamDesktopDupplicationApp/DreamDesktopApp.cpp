@@ -186,11 +186,16 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	
 	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobELI = { 0 };	// In case we want to add memory limits, and can track peak usage
 	jobELI.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	
+	JOBOBJECT_CPU_RATE_CONTROL_INFORMATION jobCRCI = { 0 };
+	jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
+	jobCRCI.CpuRate = 1500;	// percent used * 100;
 
 	m_dreamJobHandle = CreateJobObject(nullptr, L"DreamJob");
 	CNM(m_dreamJobHandle, "Failed to create job object");
 
 	SetInformationJobObject(m_dreamJobHandle, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
+	SetInformationJobObject(m_dreamJobHandle, JobObjectCpuRateControlInformation, &jobCRCI, sizeof(jobCRCI));
 
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
@@ -201,7 +206,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 		nullptr,							// Process handle not inheritable
 		nullptr,							// Thread handle not inheritable
 		false,								// Set handle inheritance to FALSE
-		0,									// No creation flags
+		IDLE_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP,		// Creation flags
 		nullptr,							// Use parent's environment block
 		nullptr,							// Use parent's starting directory
 		&startupinfoDesktopDuplication,     // Pointer to STARTUPINFO structure
@@ -237,6 +242,7 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 	if (msTimeNow - m_msTimeSinceLastSent > m_msMessageTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
 		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
+		ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
 	}
 
 	// Once duplication process is running, we want to grab the title of the foreground window for title
@@ -483,6 +489,7 @@ RESULT DreamDesktopApp::CloseSource() {
 	RESULT r = R_PASS;
 
 	CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP));
+	ShowWindow(m_hwndDreamHandle, SW_RESTORE);
 
 Error:
 	return r;

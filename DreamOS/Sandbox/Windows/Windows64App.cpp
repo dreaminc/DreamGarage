@@ -334,13 +334,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 		if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::FRAME) {
 			unsigned long messageSize = pDataStruct->cbData;
+			/*
 			void* pMessageData;
 			pMessageData = (unsigned char*)malloc(messageSize);
 			memcpy(pMessageData, pDataStruct->lpData, messageSize);
+			*/
+			m_pDreamOSHandle->OnDesktopFrame(messageSize, pDataStruct->lpData, m_desktoppxHeight, m_desktoppxWidth);
 
-			m_pDreamOSHandle->OnDesktopFrame(messageSize, pMessageData, m_desktoppxHeight, m_desktoppxWidth);
-
-			free(pMessageData);
+			//free(pMessageData);
 		}
 		else if (pDataStruct->dwData == (unsigned long)DDCIPCMessage::type::RESIZE) {
 			DDCIPCMessage *pMessageData;
