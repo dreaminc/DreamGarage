@@ -589,13 +589,17 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
+	if (m_pParentApp != nullptr) {
+		CR(m_pParentApp->HandleAudioPacket(pendingAudioPacket, this));
+	}
+
 	/*
 	if (m_fStreaming) {
 		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
 	}
 	//*/
 
-//Error:
+Error:
 	return r;
 }
 
