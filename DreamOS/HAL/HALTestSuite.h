@@ -69,6 +69,8 @@ public:
 	RESULT AddTestFramerateVolumes();
 	RESULT AddTestAlphaVolumes();
 
+	RESULT AddTestRemoveObjects();
+
 private:
 	RESULT ResetTest(void *pContext);
 

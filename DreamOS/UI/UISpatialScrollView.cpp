@@ -261,8 +261,6 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 				//TODO: this works for now, but it may be necessary to have some of the individual
 				// RemoveObject functions properly cascade the call for future situations
 
-				//CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
-				//CR(m_pDreamOS->RemoveObject(pButton));
 
 				m_pDreamOS->UnregisterInteractionObject(pButton);
 				m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
@@ -274,16 +272,20 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 				}
 
 				m_pMenuButtonsContainer->RemoveChild(pButton);
+				CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
+				CR(m_pDreamOS->RemoveObject(pButton));
 
 				//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton->GetSurface().get());
 				//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton->GetSurfaceComposite().get());
 
 				//m_pMenuButtonsContainer->RemoveChild(pButton);
-
-				//UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
-				//if (pMenuItem) {
-				//	CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurfaceComposite().get()));
-				//}
+				/*
+				UIMenuItem* pMenuItem = reinterpret_cast<UIMenuItem*>(pObj.get());
+				if (pMenuItem) {
+					CR(m_pDreamOS->RemoveObject(pMenuItem->GetSurface().get()));
+					//CR(m_pDreamOS->RemoveObject(pMenuItem));
+				}
+				//*/
 			}
 		}
 	}

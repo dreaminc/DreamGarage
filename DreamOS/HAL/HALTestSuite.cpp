@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestRemoveObjects());
+
 	CR(AddTestFlatContextNesting());
 
 	CR(TestNestedOBB());
@@ -141,6 +143,69 @@ RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 Error:
 	return r;
 }
+
+RESULT HALTestSuite::AddTestRemoveObjects() {
+	RESULT r = R_PASS;
+	
+	double sTestTime = 10000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+
+		double msLastSent = 0.0;
+		double msTimeDelay = 500.0;
+		bool fObject = true;
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(SetupSkyboxPipeline());
+		CR(Initialize());
+		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
+	Error:
+		return r;
+	};
+	
+	auto fnUpdate = [&](void *pContext) {
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+			if (pTestContext->fObject) {
+				CR(m_pDreamOS->RemoveAllObjects());
+				pTestContext->fObject = false;
+			}
+			else {
+				m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
+				pTestContext->fObject = true;
+			}
+			pTestContext->msLastSent = msTimeNow;
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnPass = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnPass, fnPass, pTestContext);
+	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Remove Test");
+	pNewTest->SetTestDescription("remove");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 
 RESULT HALTestSuite::AddTestDepthPeelingShader() {
 	RESULT r = R_PASS;

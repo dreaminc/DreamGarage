@@ -56,6 +56,9 @@ public:
 	// all ui objects visible at once
 	RESULT AddTestAllUIObjects();
 
+	// test for memory leaks in the menu
+	RESULT AddTestMenuMemory();
+
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 

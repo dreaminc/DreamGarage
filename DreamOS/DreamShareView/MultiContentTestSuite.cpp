@@ -67,6 +67,7 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMenuMemory());
 	CR(AddTestAllUIObjects());
 
 	CR(AddTestActiveSource());
@@ -409,6 +410,118 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 
 			pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
 		}
+	Error:
+		return r;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestMenuMemory() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::vector<std::string> strURIs;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::shared_ptr<CEFBrowserManager> pWebBrowserManager;
+
+		bool fFirst = true;
+
+		double msLastSent = 0.0;
+		double msTimeDelay = 1000.0;
+
+		RESULT CreateFakeMenu() {
+			RESULT r = R_PASS;
+			auto pDreamUIBar = pUserControlArea->m_pDreamUIBar;
+			std::vector<std::shared_ptr<UIButton>> pButtons;
+
+			// setup fake menu
+			for (int i = 0; i < 4; i++) {
+
+				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem();
+				CN(pButton);
+
+				auto iconFormat = IconFormat();
+				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
+
+				auto labelFormat = LabelFormat();
+				labelFormat.strLabel = "Label " + i;
+				labelFormat.pFont = pDreamUIBar->m_pFont;
+				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
+
+				pButton->Update(iconFormat, labelFormat);
+
+				pButtons.emplace_back(pButton);
+			}
+
+			pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
+
+			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
+		Error:
+			return r;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+		
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
+		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
+		pControlArea->m_fFromMenu = true;
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = pTestContext->pUserControlArea;
+
+		if (pTestContext->fFirst) {
+			pTestContext->fFirst = false;
+
+			CR(pTestContext->CreateFakeMenu());
+			pTestContext->pUserControlArea->ResetAppComposite();
+		}
+		else {
+			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+				CR(pTestContext->CreateFakeMenu());
+				pTestContext->msLastSent = msTimeNow;
+			}
+		}
+
 	Error:
 		return r;
 	};
