@@ -356,7 +356,9 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 
 RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
-	ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
+	if (!m_fDesktopDuplicationIsRunning) {
+		ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
+	}
 	m_fDesktopDuplicationIsRunning = true;
 	CNR(pMessageData, R_SKIPPED);
 	m_frameDataBuffer_n = messageSize;
