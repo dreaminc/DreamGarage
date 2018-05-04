@@ -78,7 +78,7 @@ RESULT DreamDesktopApp::OnKeyPress(char chKey, bool fkeyDown) {
 	SendInput(1, &inputStruct, sizeof(INPUT));	// this function is subject to User Interface Privilege Isolation (UIPI)- application is only permitted to inject input to applications that are running at an equal or lesser integrity level
 
 	keyboardInputStruct.dwFlags |= KEYEVENTF_KEYUP;	// key up for key release
-	SendInput(1, &inputStruct, sizeof(INPUT));
+//	SendInput(1, &inputStruct, sizeof(INPUT));
 
 Error:
 	return r;
@@ -414,7 +414,7 @@ int DreamDesktopApp::GetWidth() {
 
 std::string DreamDesktopApp::GetTitle() {
 	HWND hwndForegroundWindow = GetForegroundWindow();
-	wchar_t pszTitle[256];
+	wchar_t pszTitle[2048];
 
 	GetWindowText(hwndForegroundWindow, pszTitle, sizeof(pszTitle));
 	

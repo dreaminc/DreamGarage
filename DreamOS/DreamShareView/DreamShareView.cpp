@@ -185,8 +185,9 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	//if (m_pDreamUserHandle != nullptr)
 	//	m_pDreamUserHandle->SendPreserveSharingState(false);
 
-	ShowCastingTexture();
+	//ShowCastingTexture();
 	m_pCastQuad->SetVisible(true);
+	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 
 	// Switch to input
 	if (IsStreaming()) {
@@ -221,7 +222,7 @@ Error:
 
 RESULT DreamShareView::PendReceiving() {
 	RESULT r = R_PASS;
-	ShowCastingTexture();
+	//ShowCastingTexture();
 	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
