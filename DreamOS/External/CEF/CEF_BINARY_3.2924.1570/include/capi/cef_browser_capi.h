@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=ff3ebc51ed5743aabac0be94caf2edeedbd413b7$
+// $hash=70ad2db918b06d70899ee5eeb620a3c2f416c81b$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_BROWSER_CAPI_H_
@@ -405,6 +405,9 @@ typedef struct _cef_browser_host_t {
   ///
   void(CEF_CALLBACK* start_download)(struct _cef_browser_host_t* self,
                                      const cef_string_t* url);
+
+  // Audio Mirroring virtual bool StartMirroring() = 0; virtual bool
+  // StopMirroring() = 0;
 
   ///
   // Download |image_url| and execute |callback| on completion with the images

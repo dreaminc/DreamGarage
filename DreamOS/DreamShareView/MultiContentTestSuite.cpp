@@ -330,8 +330,13 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
 		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
-		pTestContext->pBrowser2->SetURI("www.twitch.tv");
+		
+		//pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
+		//pTestContext->pBrowser2->SetURI("www.twitch.tv");
+
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=IP-iKQn8hWw");
+		pTestContext->pBrowser2->SetURI("https://www.youtube.com/watch?v=IP-iKQn8hWw");
+
 		////pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
 		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
