@@ -993,8 +993,8 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ResizeSwapChain() {
 	UINT Width = WindowRect.right - WindowRect.left;
 	UINT Height = WindowRect.bottom - WindowRect.top;
 	if (Width > 938) {	// forcing larger than 1080p to this size.
-		UINT Width = 938;
-		UINT Height = 484;
+		Height = (Height * 938) / Width;
+		Width = 938;
 	}
 
 	// Resize swapchain

@@ -242,7 +242,6 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 	if (msTimeNow - m_msTimeSinceLastSent > m_msMessageTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
 		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
-		ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
 	}
 
 	// Once duplication process is running, we want to grab the title of the foreground window for title
@@ -357,6 +356,7 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 
 RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
+	ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
 	m_fDesktopDuplicationIsRunning = true;
 	CNR(pMessageData, R_SKIPPED);
 	m_frameDataBuffer_n = messageSize;
