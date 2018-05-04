@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2018 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,14 +33,13 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=0340a6f34b671fc2ef4681503073baba4ce90469$
+// $hash=1dbb0adf7ac5fd42b5a79d271834781664a7fd47$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_CLIENT_CAPI_H_
 #define CEF_INCLUDE_CAPI_CEF_CLIENT_CAPI_H_
 #pragma once
 
-#include "include/capi/cef_audio_handler_capi.h"
 #include "include/capi/cef_base_capi.h"
 #include "include/capi/cef_context_menu_handler_capi.h"
 #include "include/capi/cef_dialog_handler_capi.h"
@@ -49,7 +48,6 @@
 #include "include/capi/cef_drag_handler_capi.h"
 #include "include/capi/cef_find_handler_capi.h"
 #include "include/capi/cef_focus_handler_capi.h"
-#include "include/capi/cef_geolocation_handler_capi.h"
 #include "include/capi/cef_jsdialog_handler_capi.h"
 #include "include/capi/cef_keyboard_handler_capi.h"
 #include "include/capi/cef_life_span_handler_capi.h"
@@ -70,12 +68,6 @@ typedef struct _cef_client_t {
   // Base structure.
   ///
   cef_base_ref_counted_t base;
-
-  ///
-  // Return the handler for off-screen audio rendering events.
-  ///
-  struct _cef_audio_handler_t*(CEF_CALLBACK* get_audio_handler)(
-      struct _cef_client_t* self);
 
   ///
   // Return the handler for context menus. If no handler is provided the default
@@ -120,13 +112,6 @@ typedef struct _cef_client_t {
   // Return the handler for focus events.
   ///
   struct _cef_focus_handler_t*(CEF_CALLBACK* get_focus_handler)(
-      struct _cef_client_t* self);
-
-  ///
-  // Return the handler for geolocation permissions requests. If no handler is
-  // provided geolocation access will be denied by default.
-  ///
-  struct _cef_geolocation_handler_t*(CEF_CALLBACK* get_geolocation_handler)(
       struct _cef_client_t* self);
 
   ///

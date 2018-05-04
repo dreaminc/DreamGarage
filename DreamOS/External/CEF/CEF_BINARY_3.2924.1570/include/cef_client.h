@@ -39,7 +39,6 @@
 #pragma once
 
 #include "include/cef_base.h"
-#include "include/cef_audio_handler.h"
 #include "include/cef_context_menu_handler.h"
 #include "include/cef_dialog_handler.h"
 #include "include/cef_display_handler.h"
@@ -47,7 +46,6 @@
 #include "include/cef_drag_handler.h"
 #include "include/cef_find_handler.h"
 #include "include/cef_focus_handler.h"
-#include "include/cef_geolocation_handler.h"
 #include "include/cef_jsdialog_handler.h"
 #include "include/cef_keyboard_handler.h"
 #include "include/cef_life_span_handler.h"
@@ -62,14 +60,6 @@
 /*--cef(source=client,no_debugct_check)--*/
 class CefClient : public virtual CefBaseRefCounted {
  public:
-  ///
-  // Return the handler for off-screen audio rendering events.
-  ///
-  /*--cef()--*/
-  virtual CefRefPtr<CefAudioHandler> GetAudioHandler() {
-    return NULL;
-  }
-
   ///
   // Return the handler for context menus. If no handler is provided the default
   // implementation will be used.
@@ -116,15 +106,6 @@ class CefClient : public virtual CefBaseRefCounted {
   ///
   /*--cef()--*/
   virtual CefRefPtr<CefFocusHandler> GetFocusHandler() { return NULL; }
-
-  ///
-  // Return the handler for geolocation permissions requests. If no handler is
-  // provided geolocation access will be denied by default.
-  ///
-  /*--cef()--*/
-  virtual CefRefPtr<CefGeolocationHandler> GetGeolocationHandler() {
-    return NULL;
-  }
 
   ///
   // Return the handler for JavaScript dialogs. If no handler is provided the

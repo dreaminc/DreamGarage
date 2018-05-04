@@ -611,7 +611,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		std::string strURL = "http://www.youtube.com";
+		std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
 		
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);

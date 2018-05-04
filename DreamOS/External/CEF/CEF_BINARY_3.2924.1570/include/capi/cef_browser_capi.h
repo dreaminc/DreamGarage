@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2018 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=40f40435195b0a7ee2aee2390b11c5001a435ad3$
+// $hash=ff3ebc51ed5743aabac0be94caf2edeedbd413b7$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_BROWSER_CAPI_H_
@@ -405,9 +405,6 @@ typedef struct _cef_browser_host_t {
   ///
   void(CEF_CALLBACK* start_download)(struct _cef_browser_host_t* self,
                                      const cef_string_t* url);
-
-  // Audio Mirroring virtual bool StartMirroring() = 0; virtual bool
-  // StopMirroring() = 0;
 
   ///
   // Download |image_url| and execute |callback| on completion with the images

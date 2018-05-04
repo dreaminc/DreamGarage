@@ -239,6 +239,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 #endif
 
 	cefSettings.multi_threaded_message_loop = true;
+	cefSettings.windowless_rendering_enabled = true;
 
 	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
 	CN(pCEFApp);

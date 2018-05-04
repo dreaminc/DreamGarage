@@ -429,10 +429,6 @@ class CefBrowserHost : public virtual CefBaseRefCounted {
   /*--cef()--*/
   virtual void StartDownload(const CefString& url) = 0;
 
-  // Audio Mirroring
-  //virtual bool StartMirroring() = 0;
-  //virtual bool StopMirroring() = 0;
-
   ///
   // Download |image_url| and execute |callback| on completion with the images
   // received from the renderer. If |is_favicon| is true then cookies are not
