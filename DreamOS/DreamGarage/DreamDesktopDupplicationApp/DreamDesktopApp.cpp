@@ -414,7 +414,7 @@ int DreamDesktopApp::GetWidth() {
 
 std::string DreamDesktopApp::GetTitle() {
 	HWND hwndForegroundWindow = GetForegroundWindow();
-	wchar_t pszTitle[256];
+	wchar_t pszTitle[2048];
 
 	GetWindowText(hwndForegroundWindow, pszTitle, sizeof(pszTitle));
 	
