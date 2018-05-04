@@ -147,8 +147,12 @@ RESULT DreamBrowser::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) {
 
 	m_pxXPosition += (int)pxXDiff;
 	m_pxYPosition += (int)pxYDiff;
-
-	CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, (int)pxXDiff, (int)pxYDiff));
+	
+	m_fScroll = true;
+	m_pxYScroll = pxYDiff;
+	m_pxXScroll = pxXDiff;
+	m_mouseEvent = mouseEvent;
+	//CR(m_pWebBrowserController->SendMouseWheel(mouseEvent, (int)pxXDiff, (int)pxYDiff));
 
 Error:
 	return r;
@@ -469,6 +473,11 @@ RESULT DreamBrowser::Update(void *pContext) {
 		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
 		CBR(userAppIDs.size() == 1, R_SKIPPED);
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
+	}
+
+	if (m_fScroll) {
+		CR(m_pWebBrowserController->SendMouseWheel(m_mouseEvent, (int)m_pxXScroll, (int)m_pxYScroll));
+		m_fScroll = false;
 	}
 	
 Error:

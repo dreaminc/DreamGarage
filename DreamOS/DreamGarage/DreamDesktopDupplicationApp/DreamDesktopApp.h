@@ -20,8 +20,8 @@
 #include "Sense/SenseController.h"
 #include "Primitives/TextEntryString.h"
 
-#define DESKTOP_PXWIDTH 1920;
-#define DESKTOP_PXHEIGHT 1080;
+#define DESKTOP_PXWIDTH 0;	// I don't think we need these anymore
+#define DESKTOP_PXHEIGHT 0;
 
 #define WSTRDREAMCAPTURELOCATION L"\\DreamDesktopCapture.exe"
 

@@ -179,6 +179,11 @@ private:
 	int m_pxXPosition = 0;
 	int m_pxYPosition = 0;
 
+	bool m_fScroll = false;
+	int m_pxXScroll = 0;
+	int m_pxYScroll = 0;
+	WebBrowserMouseEvent m_mouseEvent;
+
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 
 	int m_pageDepth = 0; // hack to avoid the loading page on back

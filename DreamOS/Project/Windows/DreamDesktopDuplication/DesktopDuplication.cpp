@@ -22,7 +22,7 @@ D3D11DesktopDuplicationOutputManager OutMgr;
 HWND pWindowHandle;		// These can go to the .h if we want
 HWND g_pDreamHandle;
 bool g_fStartSending = false;
-float g_msTimeDelay = 1000 / 12.0f; // fps
+float g_msTimeDelay = 1000 / 24.0f; // fps
 
 // These are the errors we expect from general Dxgi API due to a transition
 HRESULT SystemTransitionsExpectedErrors[] = {
@@ -312,6 +312,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 						ddcMessage.pxHeight = pxHeight;
 						ddcMessage.pxWidth = pxWidth;
+
+						if (pxWidth > 600) {	// arbitrary cutoff, basically hard limit anything > down sampled 1080p (width ~ 500)
+							g_msTimeDelay = 1000 / 2.0f;
+						}
 
 						COPYDATASTRUCT desktopCDS;
 
