@@ -118,7 +118,7 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::InitOutput(HWND Window, INT ou
 	GetClientRect(m_pWindowHandle, &WindowRect);
 	UINT Width = WindowRect.right - WindowRect.left;
 	UINT Height = WindowRect.bottom - WindowRect.top;
-
+	
 	// Create swapchain for window
 	//*
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
@@ -989,12 +989,15 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ResizeSwapChain() {
 	}
 
 	RECT WindowRect;
-	GetClientRect(m_pWindowHandle, &WindowRect);
-	UINT Width = WindowRect.right - WindowRect.left;
-	UINT Height = WindowRect.bottom - WindowRect.top;
-	if (Width > 938) {	// forcing larger than 1080p to this size.
-		Height = (Height * 938) / Width;
-		Width = 938;
+	
+	D3D11_TEXTURE2D_DESC shardSurfDesc;
+	m_pSharedSurf->GetDesc(&shardSurfDesc);
+	UINT Width = shardSurfDesc.Width;
+	UINT Height = shardSurfDesc.Height;
+	if (Width > 1920) {	// if we're larger than 1920 then we're gonna down sample
+		GetClientRect(m_pWindowHandle, &WindowRect);
+		Width = WindowRect.right - WindowRect.left;
+		Height = WindowRect.bottom - WindowRect.top;
 	}
 
 	// Resize swapchain
