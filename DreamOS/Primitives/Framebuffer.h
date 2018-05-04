@@ -15,31 +15,17 @@
 
 class framebuffer {
 public:
-	framebuffer() :
-		m_width(0),
-		m_height(0),
-		m_channels(DEFAULT_FRAMEBUFFER_CHANNELS)
-	{
-		// empty
-	}
-
-	framebuffer(int width, int height, int channels) :
-		m_width(width),
-		m_height(height),
-		m_channels(channels)
-	{
-		// empty
-	}
-
-	~framebuffer() {
-		// empty
-	}
+	framebuffer();
+	framebuffer(int width, int height, int channels);
+	~framebuffer();
 
 	int GetWidth() { return m_width; }
 	int GetHeight() { return m_height; }
 	int GetChannels() { return m_channels; }
 
 	virtual texture *GetColorTexture() = 0;
+	
+	virtual RESULT ClearAttachments() = 0;
 
 protected:
 	int m_width;

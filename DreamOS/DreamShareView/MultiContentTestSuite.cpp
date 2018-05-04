@@ -32,6 +32,11 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+
+#include <memory>
+
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -67,6 +72,9 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestRemoveText());
+	//CR(AddTestRemoveObjects2());
+	//CR(AddTestRemoveObjects());
 	CR(AddTestMenuMemory());
 	CR(AddTestAllUIObjects());
 
@@ -103,19 +111,20 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
+//*
 	// Reference Geometry Shader Program
 	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
+//*/
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
@@ -288,6 +297,337 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 	pNewTest->SetTestName("Multi-browser");
 	pNewTest->SetTestDescription("Multi browser, will allow a net of users to share a chrome browser");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestRemoveObjects() {
+	RESULT r = R_PASS;
+	
+	double sTestTime = 10000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+
+		composite *pComposite = nullptr;
+		std::shared_ptr<UIView> pView = nullptr;
+		DreamOS *pDreamOS = nullptr; 
+
+		double msLastSent = 0.0;
+		double msTimeDelay = 500.0;
+		bool fObject = true;
+
+		RESULT TestAddObject() {
+			if (pComposite != nullptr) {
+
+				pView = pComposite->AddUIView(pDreamOS);
+				auto pButton = pView->AddUIButton();
+				//auto pText = pDreamOS->MakeText();
+
+			}
+			return R_PASS;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		pTestContext->pComposite = m_pDreamOS->AddComposite();
+		pTestContext->pDreamOS = m_pDreamOS;
+		pTestContext->TestAddObject();
+		//CN(pTestContext);
+
+	//Error:
+		return r;
+	};
+	
+	auto fnUpdate = [&](void *pContext) {
+		
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+			if (pTestContext->fObject) {
+				CR(m_pDreamOS->RemoveObject(pTestContext->pView.get()));
+				pTestContext->pComposite->RemoveChild(pTestContext->pView);
+				pTestContext->fObject = false;
+			}
+			else {
+				pTestContext->TestAddObject();
+
+				pTestContext->fObject = true;
+			}
+			pTestContext->msLastSent = msTimeNow;
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Remove Test");
+	pNewTest->SetTestDescription("remove");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestRemoveText() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+
+		composite *pComposite = nullptr;
+		std::shared_ptr<text> pLabel = nullptr;
+		DreamOS *pDreamOS = nullptr;
+		std::shared_ptr<font> pFont;
+
+		double msLastSent = 0.0;
+		double msTimeDelay = 500.0;
+		bool fObject = false;
+
+		RESULT TestAddObject() {
+			//if (pComposite != nullptr) {
+
+				pLabel = std::shared_ptr<text>(pDreamOS->MakeText(
+				pFont,
+				"", 
+				0.225,
+				0.0703125, 
+				text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+
+//				pComposite->AddObject(pLabel);
+				pDreamOS->AddObject(pLabel.get());
+
+				pLabel->RotateXByDeg(-90.0f);
+
+			//}
+			return R_PASS;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pComposite = m_pDreamOS->AddComposite();
+		pTestContext->pDreamOS = m_pDreamOS;
+
+		pTestContext->pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+
+	//Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+			if (pTestContext->fObject) {
+			//	pTestContext->pComposite->RemoveChild(pTestContext->pLabel);
+				CR(m_pDreamOS->RemoveAllObjects());
+				//pTestContext->pLabel.reset();
+				pTestContext->pLabel = nullptr;
+				pTestContext->fObject = false;
+			}
+			else {
+				pTestContext->TestAddObject();
+
+				pTestContext->fObject = true;
+			}
+			pTestContext->msLastSent = msTimeNow;
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Remove Test");
+	pNewTest->SetTestDescription("remove");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
+	RESULT r = R_PASS;
+	
+	double sTestTime = 10000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+
+		composite *pComposite = nullptr;
+		std::shared_ptr<UIView> pView = nullptr;
+		std::shared_ptr<UIMenuItem> pButton = nullptr;
+		std::shared_ptr<text> pLabel = nullptr;
+		DreamOS *pDreamOS = nullptr; 
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+
+		double msLastSent = 0.0;
+		double msTimeDelay = 500.0;
+		bool fObject = false;
+		bool fFirst = true;
+
+		RESULT TestAddObject() {
+			if (pComposite != nullptr) {
+
+				pView = pComposite->AddUIView(pDreamOS);
+//				auto pQuad = pView->AddQuad(1.0f, 1.0f);
+//				pQuad->RotateXByDeg(90.0f);
+				//*
+				pButton = pView->AddUIMenuItem();
+				//CN(pButton);
+
+				auto pDreamUIBar = pUserControlArea->m_pDreamUIBar;
+
+				pLabel = std::shared_ptr<text>(pDreamOS->MakeText(
+				pDreamUIBar->m_pFont,
+				"", 
+				0.225,
+				0.0703125, 
+				text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+
+				pButton->AddObject(pLabel);
+
+				/*
+				auto iconFormat = IconFormat();
+				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
+
+				auto labelFormat = LabelFormat();
+				labelFormat.strLabel = "Label ";
+				labelFormat.pFont = pDreamUIBar->m_pFont;
+				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
+
+				pButton->Update(iconFormat, labelFormat);
+				//*/
+
+			}
+			return R_PASS;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+
+		pTestContext->pComposite = m_pDreamOS->AddComposite();
+		pTestContext->pDreamOS = m_pDreamOS;
+		//pTestContext->TestAddObject();
+		//CN(pTestContext);
+
+	//Error:
+		return r;
+	};
+	
+	auto fnUpdate = [&](void *pContext) {
+		
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		if (pTestContext->fFirst) {
+			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
+			pTestContext->fFirst = false;
+		}
+
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
+			if (pTestContext->fObject) {
+				CR(m_pDreamOS->RemoveObject(pTestContext->pView.get()));
+				pTestContext->pLabel->ClearChildren();
+				pTestContext->pButton->RemoveChild(pTestContext->pLabel);
+				CR(m_pDreamOS->RemoveObject(pTestContext->pButton.get()));
+				CR(m_pDreamOS->RemoveObject(pTestContext->pLabel.get()));
+				pTestContext->pComposite->RemoveChild(pTestContext->pView);
+
+				pTestContext->pLabel = nullptr;
+				pTestContext->pButton = nullptr;
+				pTestContext->pView = nullptr;
+				pTestContext->fObject = false;
+			}
+			else {
+				pTestContext->TestAddObject();
+
+				pTestContext->fObject = true;
+			}
+			pTestContext->msLastSent = msTimeNow;
+		}
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Remove Test");
+	pNewTest->SetTestDescription("remove");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

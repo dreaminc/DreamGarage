@@ -18,6 +18,7 @@
 class OGLFlatContext : public FlatContext, public OGLObj {
 public:
 	OGLFlatContext(OpenGLImp *pParentImp);
+	~OGLFlatContext();
 
 public:
 	// TODO: Need to make this better

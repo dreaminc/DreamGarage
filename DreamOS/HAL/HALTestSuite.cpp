@@ -161,10 +161,10 @@ RESULT HALTestSuite::AddTestRemoveObjects() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupSkyboxPipeline());
-		CR(Initialize());
+		SetupSkyboxPipeline();
+		Initialize();
 		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
-	Error:
+	//Error:
 		return r;
 	};
 	
@@ -189,11 +189,15 @@ RESULT HALTestSuite::AddTestRemoveObjects() {
 		return r;
 	};
 
-	auto fnPass = [&](void *pContext) {
+	auto fnTest = [&](void *pContext) {
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnPass, fnPass, pTestContext);
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	//auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 

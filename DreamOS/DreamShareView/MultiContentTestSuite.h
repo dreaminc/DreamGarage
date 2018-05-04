@@ -58,6 +58,9 @@ public:
 
 	// test for memory leaks in the menu
 	RESULT AddTestMenuMemory();
+	RESULT AddTestRemoveObjects();
+	RESULT AddTestRemoveObjects2();
+	RESULT AddTestRemoveText();
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

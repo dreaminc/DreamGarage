@@ -823,6 +823,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\DimRay.cpp" />
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\image.cpp" />

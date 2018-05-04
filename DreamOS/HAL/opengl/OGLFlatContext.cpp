@@ -8,6 +8,10 @@ OGLFlatContext::OGLFlatContext(OpenGLImp *pParentImp) :
 	RESULT r = OGLInitialize();
 }
 
+OGLFlatContext::~OGLFlatContext() {
+	// empty
+}
+
 // TODO: Need to make this better
 RESULT OGLFlatContext::UpdateBuffers() {
 	return UpdateOGLBuffers();

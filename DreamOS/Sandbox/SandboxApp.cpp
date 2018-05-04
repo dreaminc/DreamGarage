@@ -1194,9 +1194,12 @@ text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strCo
 
 	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
 
+	/*
 	if (pText->IsRenderToQuad()) {
 		CR(pText->RenderToQuad());
 	}
+	//*/
+	CR(r);
 
 	return pText;
 
