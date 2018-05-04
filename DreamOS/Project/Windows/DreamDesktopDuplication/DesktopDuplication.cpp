@@ -1,6 +1,7 @@
 #include "RESULT/EHM.h"
 #include <limits.h>
 #include <vector>
+#include <chrono>
 
 #include "D3D11DesktopDuplicationDisplayManager.h"
 #include "D3D11DesktopDuplicationManager.h"
@@ -21,6 +22,7 @@ D3D11DesktopDuplicationOutputManager OutMgr;
 HWND pWindowHandle;		// These can go to the .h if we want
 HWND g_pDreamHandle;
 bool g_fStartSending = false;
+float g_msTimeDelay = 1000 / 12.0f; // fps
 
 // These are the errors we expect from general Dxgi API due to a transition
 HRESULT SystemTransitionsExpectedErrors[] = {
@@ -158,14 +160,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	UINT OutputCount;
 	UINT texturepxWidth = 0;
 	UINT texturepxHeight = 0;
-	//UINT texturepxWidth = 0;
-	//UINT texturepxHeight = 0;
 	// Message loop (attempts to update screen when no other messages to process)
 	MSG msg = { 0 };
 	bool FirstTime = true;
 	bool Occluded = true;
 	DynamicWait DynamicWait;
-
+	float msLastSent = 0.0f;
 	// Window
 	pWindowHandle = nullptr;
 
@@ -260,6 +260,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			else {
 				// First time through the loop so nothing to clean up
 				FirstTime = false;
+
 			}
 
 			// Re-initialize
@@ -280,59 +281,65 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		}
 
 		else {
-			// Nothing else to do, so try to present to write out to window if not occluded
-			if (!Occluded) {
-				Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);
-			}
-		}
-		//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
-		if (g_fStartSending && (pBuffer != nullptr) /*&& (pBuffer [0] != '\0')*/) {
-			//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
-			DDCIPCMessage ddcMessage;
+			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			if (msTimeNow - msLastSent > g_msTimeDelay) {
+				msLastSent = msTimeNow; 
+				// Nothing else to do, so try to present to write out to window if not occluded
+				if (!Occluded) {
+					Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);
+				}
 
-			if (pxHeight == texturepxHeight && pxWidth == texturepxWidth) {
-				ddcMessage.m_msgType = DDCIPCMessage::type::FRAME;
-				COPYDATASTRUCT desktopCDS;
+				//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
+				if (g_fStartSending && (pBuffer != nullptr) /*&& (pBuffer [0] != '\0')*/) {
+					//MessageBox(g_pDreamHandle, L"Start sending", L"Status", MB_OK);
+					DDCIPCMessage ddcMessage;
 
-				desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
-				desktopCDS.cbData = (pxHeight * pxWidth * 4);
-				desktopCDS.lpData = pBuffer;
+					if (pxHeight == texturepxHeight && pxWidth == texturepxWidth) {
+						ddcMessage.m_msgType = DDCIPCMessage::type::FRAME;
+						COPYDATASTRUCT desktopCDS;
 
-				SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
-			}
+						desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
+						desktopCDS.cbData = (pxHeight * pxWidth * 4);
+						desktopCDS.lpData = pBuffer;
 
-			else {
-				texturepxWidth = pxWidth;
-				texturepxHeight = pxHeight;
+						SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+					}
 
-				ddcMessage.pxHeight = pxHeight;
-				ddcMessage.pxWidth = pxWidth;
+					else {
+						texturepxWidth = pxWidth;
+						texturepxHeight = pxHeight;
 
-				COPYDATASTRUCT desktopCDS;
+						ddcMessage.pxHeight = pxHeight;
+						ddcMessage.pxWidth = pxWidth;
 
-				desktopCDS.dwData = (unsigned long)DDCIPCMessage::type::RESIZE;
-				desktopCDS.cbData = sizeof(DDCIPCMessage);
-				desktopCDS.lpData = &ddcMessage;
+						COPYDATASTRUCT desktopCDS;
 
-				SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
-			}
-		}
+						desktopCDS.dwData = (unsigned long)DDCIPCMessage::type::RESIZE;
+						desktopCDS.cbData = sizeof(DDCIPCMessage);
+						desktopCDS.lpData = &ddcMessage;
 
-		if (pBuffer != nullptr) {
-			delete[] pBuffer;
-			pBuffer = nullptr;
-			//memset(&m_pDataBuffer, 0, m_pDataBuffer_n);
-		}
+						SendMessage(g_pDreamHandle, WM_COPYDATA, (WPARAM)(HWND)pWindowHandle, (LPARAM)(LPVOID)&desktopCDS);
+					}
+				}
 
-		// Check if for errors
-		if (Ret != DUPL_RETURN_SUCCESS) {
-			if (Ret == DUPL_RETURN_ERROR_EXPECTED) {
-				// Some type of system transition is occurring so retry
-				SetEvent(ExpectedErrorEvent);
-			}
-			else {
-				// Unexpected error so exit
-				break;
+				if (pBuffer != nullptr) {
+					delete[] pBuffer;
+					pBuffer = nullptr;
+					//memset(&m_pDataBuffer, 0, m_pDataBuffer_n);
+				}
+
+				// Check if for errors
+				if (Ret != DUPL_RETURN_SUCCESS) {
+					if (Ret == DUPL_RETURN_ERROR_EXPECTED) {
+						// Some type of system transition is occurring so retry
+						SetEvent(ExpectedErrorEvent);
+					}
+					else {
+						// Unexpected error so exit
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -468,7 +475,9 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	// Classes
 	D3D11DesktopDuplicationDisplayManager DispMgr;
 	D3D11DesktopDuplicationManager DuplMgr;
-
+	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	float msLastProcessed = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	
 	// D3D objects
 	ID3D11Texture2D* pSharedSurfaceTexture = nullptr;
 	IDXGIKeyedMutex* pKeyMutex = nullptr;
@@ -512,61 +521,66 @@ DWORD WINAPI DDProc(_In_ void* Param) {
 	FRAME_DATA CurrentData;
 
 	while ((WaitForSingleObjectEx(pThreadData->TerminateThreadsEvent, 0, FALSE) == WAIT_TIMEOUT)) {
-		if (!WaitToProcessCurrentFrame) {
-			// Get new frame from desktop duplication
-			bool TimeOut;
-			Ret = DuplMgr.GetFrame(&CurrentData, &TimeOut);
+		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		if (msTimeNow - msLastProcessed > g_msTimeDelay) {
+			msLastProcessed = msTimeNow;
+			if (!WaitToProcessCurrentFrame) {
+				// Get new frame from desktop duplication
+				bool TimeOut;
+				Ret = DuplMgr.GetFrame(&CurrentData, &TimeOut);
+				if (Ret != DUPL_RETURN_SUCCESS) {
+					// An error occurred getting the next frame drop out of loop which
+					// will check if it was expected or not
+					break;
+				}
+
+				// Check for timeout
+				if (TimeOut) {
+					// No new frame at the moment
+					continue;
+				}
+			}
+
+			// We have a new frame so try and process it
+			// Try to acquire keyed mutex in order to access shared surface
+			r = pKeyMutex->AcquireSync(0, 1000);
+			if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
+				// Can't use shared surface right now, try again later
+				WaitToProcessCurrentFrame = true;
+				continue;
+			}
+			else {	// check if failed
+				CR(r);
+			}
+
+			// We can now process the current frame
+			WaitToProcessCurrentFrame = false;
+
+			// Get mouse info
+			//Ret = DuplMgr.GetMouse(pThreadData->PtrInfo, &(CurrentData.FrameInfo), pThreadData->OffsetX, pThreadData->OffsetY);
 			if (Ret != DUPL_RETURN_SUCCESS) {
-				// An error occurred getting the next frame drop out of loop which
-				// will check if it was expected or not
+				DuplMgr.DoneWithFrame();
+				pKeyMutex->ReleaseSync(1);
 				break;
 			}
 
-			// Check for timeout
-			if (TimeOut) {
-				// No new frame at the moment
-				continue;
+			// Process new frame
+			Ret = DispMgr.ProcessFrame(&CurrentData, pSharedSurfaceTexture, pThreadData->OffsetX, pThreadData->OffsetY, &DesktopDesc);
+			if (Ret != DUPL_RETURN_SUCCESS) {
+				DuplMgr.DoneWithFrame();
+				pKeyMutex->ReleaseSync(1);
+				break;
 			}
-		}
 
-		// We have a new frame so try and process it
-		// Try to acquire keyed mutex in order to access shared surface
-		r = pKeyMutex->AcquireSync(0, 1000);
-		if (r == static_cast<HRESULT>(WAIT_TIMEOUT)) {
-			// Can't use shared surface right now, try again later
-			WaitToProcessCurrentFrame = true;
-			continue;
-		}
-		else {	// check if failed
-			CR(r);
-		}
+			// Release acquired keyed mutex
+			CRM(pKeyMutex->ReleaseSync(1), "Unexpected error releasing the keyed mutex");
 
-		// We can now process the current frame
-		WaitToProcessCurrentFrame = false;
-
-		// Get mouse info
-		Ret = DuplMgr.GetMouse(pThreadData->PtrInfo, &(CurrentData.FrameInfo), pThreadData->OffsetX, pThreadData->OffsetY);
-		if (Ret != DUPL_RETURN_SUCCESS) {
-			DuplMgr.DoneWithFrame();
-			pKeyMutex->ReleaseSync(1);
-			break;
-		}
-
-		// Process new frame
-		Ret = DispMgr.ProcessFrame(&CurrentData, pSharedSurfaceTexture, pThreadData->OffsetX, pThreadData->OffsetY, &DesktopDesc);
-		if (Ret != DUPL_RETURN_SUCCESS) {
-			DuplMgr.DoneWithFrame();
-			pKeyMutex->ReleaseSync(1);
-			break;
-		}
-
-		// Release acquired keyed mutex
-		CRM(pKeyMutex->ReleaseSync(1), "Unexpected error releasing the keyed mutex");
-
-		// Release frame back to desktop duplication
-		Ret = DuplMgr.DoneWithFrame();
-		if (Ret != DUPL_RETURN_SUCCESS) {
-			break;
+			// Release frame back to desktop duplication
+			Ret = DuplMgr.DoneWithFrame();
+			if (Ret != DUPL_RETURN_SUCCESS) {
+				break;
+			}
 		}
 	}
 
