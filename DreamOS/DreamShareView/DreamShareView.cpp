@@ -6,6 +6,8 @@
 #include "DreamShareViewMessage.h"
 #include "DreamControlView/DreamControlView.h"
 
+#include "Sound/AudioPacket.h"
+
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
 {
@@ -360,6 +362,19 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 			CR(GetDOS()->GetCloudController()->BroadcastVideoFrame((unsigned char*)(pBuffer), width, height, 4));
 		}
 	}
+Error:
+	return r;
+}
+
+RESULT DreamShareView::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CBR(m_fStreaming, R_SKIPPED);
+
+	auto pCloudController = GetDOS()->GetCloudController();
+	CN(pCloudController);
+	CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+
 Error:
 	return r;
 }

@@ -2407,4 +2407,9 @@
   <ItemGroup>
     <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="manifest.xml">
+      <Filter>Core</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>

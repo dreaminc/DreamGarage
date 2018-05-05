@@ -58,6 +58,13 @@ public:
 		return this;
 	}
 
+	virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
+
+		command_line->AppendSwitchWithValue(L"autoplay-policy", L"no-user-gesture-required");
+
+		return;
+	}
+
 	// CefBrowserProcessHandler methods:
 	virtual void OnContextInitialized() override;
 

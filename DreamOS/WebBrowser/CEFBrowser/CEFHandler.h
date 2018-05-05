@@ -6,6 +6,9 @@
 // DREAM OS
 // DreamOS/Cloud/WebBrowser/CefHandler.h
 
+// CEF_AUDIO_HANDLER will turn on the audio mirroring capabilities for the CEF 
+// changes we made - to switch to "native CEF" ensure this flag is not set
+
 #ifdef LOG
 #undef LOG
 #endif
@@ -39,7 +42,9 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRenderHandler,
+#ifdef CEF_AUDIO_MIRROR	
 	public CefAudioHandler,
+#endif
 	public CefRequestHandler
 	//public CefDownloadHandler
 {
@@ -68,7 +73,10 @@ public:
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
 
 	// CefClient
+#ifdef CEF_AUDIO_MIRROR
 	virtual CefRefPtr<CefAudioHandler> GetAudioHandler() override;
+#endif
+
 	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
@@ -117,10 +125,12 @@ public:
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
 	virtual void OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) override;
 
+#ifdef CEF_AUDIO_MIRROR
 	// CefAudioHandler
 	virtual void OnAudioData(CefRefPtr<CefBrowser> browser,
 		int frames, int channels, int bits_per_sample,
 		const void* data_buffer) override;
+#endif
 
 	// CefRequestHandler
 	virtual ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) override;

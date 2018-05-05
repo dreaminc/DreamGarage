@@ -1133,3 +1133,11 @@ RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidt
 Error:
 	return r;
 }
+
+RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+	CN(m_pDreamShareView);
+	CR(m_pDreamShareView->BroadcastAudioPacket(pendingAudioPacket));
+Error:
+	return r;
+}

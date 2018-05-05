@@ -22,6 +22,8 @@ class CEFBrowserManager;
 struct WebBrowserPoint;
 class EnvironmentAsset;
 
+class AudioPacket;
+
 struct InteractionObjectEvent;
 
 class UIStageProgram;
@@ -104,9 +106,12 @@ public:
 
 // DreamBrowser
 public:
+
 	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext);
 	RESULT UpdateControlBarText(std::string& strTitle);
 	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward);
+	RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext);
+
 	//TODO: present keyboard from browser::OnNodeFocusChanged
 	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
 	bool IsContentVisible();

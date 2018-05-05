@@ -86,10 +86,12 @@ Error:
 
 RESULT CEFBrowserManager::OnAudioData(CefRefPtr<CefBrowser> pCEFBrowser, int frames, int channels, int bitsPerSample, const void* pDataBuffer) {
 	RESULT r = R_PASS;
-	//DEBUG_LINEOUT("CEFBrowserManager: OnAudioData");
+	
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
 	CN(pCEFBrowserController);
+
+	DEBUG_LINEOUT("CEFBrowserManager: OnAudioData %S", pCEFBrowser->GetFocusedFrame()->GetURL().c_str());
 
 	CR(pCEFBrowserController->OnAudioData(pCEFBrowser, frames, channels, bitsPerSample, pDataBuffer));
 
@@ -239,6 +241,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 #endif
 
 	cefSettings.multi_threaded_message_loop = true;
+	cefSettings.windowless_rendering_enabled = true;
 
 	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
 	CN(pCEFApp);

@@ -14,6 +14,7 @@
 
 class quad;
 class texture;
+class AudioPacket;
 
 class DreamShareView :
 	public DreamApp<DreamShareView>,
@@ -55,6 +56,8 @@ public:
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
+
+	RESULT BroadcastAudioPacket(const AudioPacket &pendingAudioPacket);
 
 	// Video Stream Subscriber
 	RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height);

@@ -19,6 +19,8 @@
 #include "UI/UIButton.h"
 #include "UI/UIFlatScrollView.h"
 
+#include "Sound/AudioPacket.h"
+
 DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserControlArea>(pDreamOS, pContext)
 {
@@ -471,6 +473,22 @@ RESULT DreamUserControlArea::UpdateControlBarNavigation(bool fCanGoBack, bool fC
 
 	CR(m_pControlBar->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
 	
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	// if the content source that received an audio packet is the active piece of content, 
+	// send the audio packet to the shared view
+	if (pContext == m_pActiveSource.get()) {
+		auto pCloudController = GetDOS()->GetCloudController();
+		if (pCloudController != nullptr) {
+			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
+		}
+	}
+
 Error:
 	return r;
 }

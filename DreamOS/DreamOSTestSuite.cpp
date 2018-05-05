@@ -20,6 +20,7 @@
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 
 #include <chrono>
 
@@ -42,6 +43,8 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestMeta());
 
+	CR(AddTestDreamBrowser());
+	
 	CR(AddTestDreamDesktop());
 
 	CR(AddTestDreamOS());
@@ -49,8 +52,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	// Casting tests
 
 	CR(AddTestBasicBrowserCast());
-
-	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamShareView());
 
@@ -600,12 +601,20 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		std::shared_ptr<Dream2DMouseApp> m_pDream2DMouse = nullptr;
+		quad *m_pBrowserQuad = nullptr;
+	} *pTestContext = new TestContext();
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
-
-		std::string strURL = "http://www.youtube.com";
+		
+		std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
+		
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		//std::string strURL = "http://ncu.rcnpv.com.tw/Uploads/20131231103232738561744.pdf";
@@ -617,19 +626,30 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the 2D Mouse App
-		pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
-		CNM(pDream2DMouse, "Failed to create dream 2D mouse app");
+		pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
+
+
+		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->m_pWebBrowserManager);
+		CR(pTestContext->m_pWebBrowserManager->Initialize());
 
 		// Create the Shared View App
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
+		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(10.0f);
+		pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
 
-		pDreamBrowser->SetURI(strURL);
+		pTestContext->m_pDreamBrowser->SetURI(strURL);
+
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 
 	Error:
 		return R_PASS;
@@ -644,7 +664,10 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(r);
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
 
 	Error:
 		return r;
@@ -662,7 +685,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");

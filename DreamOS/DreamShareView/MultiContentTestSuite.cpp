@@ -40,11 +40,13 @@
 MultiContentTestSuite::MultiContentTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
-	// empty
 	RESULT r = R_PASS;
+
 	CR(Initialize());
+
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -81,14 +83,14 @@ RESULT MultiContentTestSuite::AddTests() {
 	CR(AddTestAllUIObjects());
 
 	CR(AddTestActiveSource());
-
-	CR(AddTestDreamTabView());
-	CR(AddTestUserControlAreaLayout());
-
+	
 	CR(AddTestManyBrowsers());
 
-	CR(AddTestUserControlArea());
+	CR(AddTestDreamTabView());
 
+	CR(AddTestUserControlAreaLayout());
+
+	CR(AddTestUserControlArea());
 
 	CR(AddTestMultiPeerBrowser());
 
@@ -920,13 +922,19 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
-		pTestContext->pBrowser1->SetURI("www.twitch.tv");
-		//pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
+		pTestContext->pBrowser1->SetURI("https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
+		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
 		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
-		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
+		
+		//pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
+		//pTestContext->pBrowser2->SetURI("www.twitch.tv");
+
+		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=IP-iKQn8hWw");
+		pTestContext->pBrowser2->SetURI("https://www.youtube.com/watch?v=IP-iKQn8hWw");
+
+		////pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
 		pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
 		pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
@@ -947,7 +955,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 		pTestContext->msLastSent = msTimeNow;
 
-		//*
+		/*
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
 
 			pTestContext->pDreamBrowsers.emplace_back(m_pDreamOS->LaunchDreamApp<DreamBrowser>(this));
@@ -965,20 +973,24 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		auto pControlArea = pTestContext->pUserControlArea;
 
+
 		if (pTestContext->fFirst) {
-//			pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-//			pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
-			//pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
-			//*
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			
+			/*
 			for (auto pBrowser : pTestContext->pDreamBrowsers) {
 				pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
 //				pBrowser->InitializeWithParent(pControlArea.get());
 			}
 			//*/
+			
 			pTestContext->fFirst = false;
 		}
 		else {
+			
+			return R_PASS;
+
 			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
