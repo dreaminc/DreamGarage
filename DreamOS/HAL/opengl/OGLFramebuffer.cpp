@@ -25,8 +25,8 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
-	//ClearAttachments();
-	//m_pParentImp->glDeleteFramebuffers(1, &m_framebufferIndex);
+	ClearAttachments();
+	m_pParentImp->glDeleteFramebuffers(1, &m_framebufferIndex);
 }
 
 RESULT OGLFramebuffer::ClearAttachments() {

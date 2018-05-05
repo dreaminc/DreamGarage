@@ -871,7 +871,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, width, height, textFlags);
 	CN(pText);
 
-//	CR(pText->SetText(strContent));
+	CR(pText->SetText(strContent));
 
 	int fbWidth = pText->GetDPM(pText->GetWidth());
 	int fbHeight = pText->GetDPM(pText->GetHeight());
@@ -899,7 +899,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 	//*/
 	
-	//CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
