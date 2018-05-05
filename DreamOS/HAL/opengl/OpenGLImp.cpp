@@ -880,6 +880,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	//std::clamp(fbWidth, 32, 2048);
 	//std::clamp(fbHeight, 32, 2048);
 
+//*
 	util::Clamp(fbWidth, 32, 2048);
 	util::Clamp(fbHeight, 32, 2048);
 
@@ -896,6 +897,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+	//*/
 	
 	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
@@ -1293,6 +1295,16 @@ RESULT OpenGLImp::glBindFramebuffer(GLenum target, GLuint gluiFramebuffer) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindFramebuffer(target, gluiFramebuffer);
+	CRM(CheckGLError(), "glBindFramebuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteFramebuffers(GLsizei n, const GLuint *gluiFramebuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteFramebuffers(n, gluiFramebuffer);
 	CRM(CheckGLError(), "glBindFramebuffer failed");
 
 Error:

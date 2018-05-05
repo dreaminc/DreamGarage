@@ -91,6 +91,10 @@ text::~text() {
 		m_pQuad = nullptr;
 	}
 
+//	if (GetFramebuffer() != nullpt)
+	//delete GetFramebuffer();
+
+
 	ClearChildren();
 }
 
@@ -107,6 +111,7 @@ RESULT text::RenderToQuad() {
 	}
 
 	// Render with the appropriate curve
+	//CR(r);
 	CR(FlatContext::RenderToQuad(m_width, m_height, m_xOffset, m_yOffset, curveType));
 
 Error:

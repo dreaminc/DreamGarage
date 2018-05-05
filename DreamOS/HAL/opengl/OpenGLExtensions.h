@@ -280,6 +280,10 @@ public:
 		return m_glBindFramebuffer(target, framebufferID);
 	}
 
+	inline void glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers) {
+		return m_glDeleteFrameBuffers(n, framebuffers);
+	}
+
 	inline void glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 		return m_glGenRenderbuffers(n, renderbuffers);
 	}
@@ -480,6 +484,7 @@ private:
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
 	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
+	PFNGLDELETEFRAMEBUFFERSPROC m_glDeleteFrameBuffers;
 
 	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
 	PFNGLDELETERENDERBUFFERSPROC m_glDeleteRenderbuffers;

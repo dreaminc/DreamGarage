@@ -16,6 +16,7 @@ class framebuffer;
 class FlatContext : public composite {
 public:
 	FlatContext(HALImp *pHALImp);
+	~FlatContext();
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin = point(0.0f));
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector());

@@ -25,6 +25,13 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
+	ClearAttachments();
+	m_pParentImp->glDeleteFramebuffers(1, &m_framebufferIndex);
+}
+
+RESULT OGLFramebuffer::ClearAttachments() {
+	RESULT r = R_PASS;
+
 	if (m_pOGLDepthAttachment != nullptr) {
 		delete m_pOGLDepthAttachment;
 		m_pOGLDepthAttachment = nullptr;
@@ -39,6 +46,10 @@ OGLFramebuffer::~OGLFramebuffer() {
 		delete[] m_pDrawBuffers;
 		m_pDrawBuffers = nullptr;
 	}
+
+	Unbind();
+
+	return r;
 }
 
 RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat, GLenum typeDepth) {

@@ -146,6 +146,7 @@ public:
 	// FBO
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
+	RESULT glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers);
 
 	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);

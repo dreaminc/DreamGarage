@@ -6,6 +6,9 @@
 
 #include "Primitives/BoundingQuad.h"
 
+// cheating
+#include "HAL/opengl/OGLFramebuffer.h"
+
 FlatContext::FlatContext(HALImp * pHALImp) :
 	composite(pHALImp)
 {
@@ -22,6 +25,14 @@ FlatContext::FlatContext(HALImp * pHALImp) :
 Error:
 	Invalidate();
 	return;
+}
+
+FlatContext::~FlatContext() {
+	// empty
+	if (m_pFramebuffer != nullptr) {
+		delete m_pFramebuffer;
+		m_pFramebuffer = nullptr;
+	}
 }
 
 std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin) {

@@ -195,6 +195,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer")),
 		"Failed to initialize glBindFramebuffer extension");
 
+	CNMW((m_glDeleteFrameBuffers = (PFNGLDELETEFRAMEBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers")),
+		"Failed to initialize glDeleteFramebuffers extension");
+
 	CNMW((m_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers")),
 		"Failed to initialize glGenRenderbuffers extension");
 
