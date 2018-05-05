@@ -1301,6 +1301,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glDeleteFramebuffers(GLsizei n, const GLuint *gluiFramebuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteFramebuffers(n, gluiFramebuffer);
+	CRM(CheckGLError(), "glBindFramebuffer failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 	RESULT r = R_PASS;
 

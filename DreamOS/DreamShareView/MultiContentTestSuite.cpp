@@ -72,10 +72,12 @@ Error:
 RESULT MultiContentTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestRemoveText());
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 	CR(AddTestMenuMemory());
+	
+	CR(AddTestRemoveText());
+
 	CR(AddTestAllUIObjects());
 
 	CR(AddTestActiveSource());

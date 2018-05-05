@@ -99,7 +99,6 @@ FlatProgram* HALImp::GetFlatProgram() {
 
 //Success:
 	return pFlatProgram;
-
 Error:
 	if (pFlatProgram != nullptr) {
 		delete pFlatProgram;
