@@ -17,7 +17,7 @@ class framebuffer {
 public:
 	framebuffer();
 	framebuffer(int width, int height, int channels);
-	~framebuffer();
+	virtual ~framebuffer() = 0;
 
 	int GetWidth() { return m_width; }
 	int GetHeight() { return m_height; }

@@ -30,8 +30,7 @@ Error:
 FlatContext::~FlatContext() {
 	// empty
 	if (m_pFramebuffer != nullptr) {
-		//delete m_pFramebuffer;
-		delete dynamic_cast<OGLFramebuffer*>(m_pFramebuffer);
+		delete m_pFramebuffer;
 		m_pFramebuffer = nullptr;
 	}
 }

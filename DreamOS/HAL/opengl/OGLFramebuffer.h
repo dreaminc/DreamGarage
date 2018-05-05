@@ -22,7 +22,7 @@ public:
 	OGLFramebuffer(OpenGLImp *pParentImp);
 	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
 
-	~OGLFramebuffer();
+	virtual ~OGLFramebuffer() override;
 
 	virtual texture *GetColorTexture() override;
 	virtual RESULT ClearAttachments() override;
