@@ -70,6 +70,11 @@ public:
 
 		command_line->AppendSwitchWithValue(L"autoplay-policy", L"no-user-gesture-required");
 
+		command_line->AppendSwitchWithValue(L"disable-blink-features", L"RootLayerScrolling");
+
+		command_line->AppendSwitchWithValue(L"disable-features", L"AsyncWheelEvents");
+		command_line->AppendSwitchWithValue(L"disable-features", L"TouchpadAndWheelScrollLatching");
+
 		return;
 	}
 
