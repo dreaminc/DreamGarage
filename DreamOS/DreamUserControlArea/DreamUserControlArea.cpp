@@ -482,12 +482,12 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 
 	// if the content source that received an audio packet is the active piece of content, 
 	// send the audio packet to the shared view
-	if (pContext == m_pActiveSource.get()) {
+	//if (pContext == m_pActiveSource.get()) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr) {
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
 		}
-	}
+	//}
 
 Error:
 	return r;

@@ -598,7 +598,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_pParentApp != nullptr) {
+	if (m_pParentApp != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
 		CR(m_pParentApp->HandleAudioPacket(pendingAudioPacket, this));
 	}
 
