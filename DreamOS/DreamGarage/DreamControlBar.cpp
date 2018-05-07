@@ -203,6 +203,8 @@ RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentTy
 
 	if (m_pParentApp != nullptr) {
 		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+		fIsSharing = (fIsSharing && GetDOS()->IsSharing());
+
 		CR(SetSharingFlag(fIsSharing));
 		if (m_barType == BarType::BROWSER) {
 			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());

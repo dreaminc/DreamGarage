@@ -1111,6 +1111,10 @@ Error:
 	return r;
 }
 
+bool DreamOS::IsSharing() {
+	return m_pDreamShareView->IsStreaming();
+}
+
 std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
 	RESULT r = R_PASS;
 	CN(m_pDreamShareView);
