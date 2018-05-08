@@ -150,6 +150,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 
 	// Initialize texture
 	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
+	m_pLoadingScreenTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	CR(GetComposite()->SetVisible(true));
 
@@ -390,6 +391,7 @@ RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 	
 	m_pParentApp = pParentApp;
+	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture, this);
 	CRM(StartDuplicationProcess(), "Error starting duplication process");
 	
 Error:

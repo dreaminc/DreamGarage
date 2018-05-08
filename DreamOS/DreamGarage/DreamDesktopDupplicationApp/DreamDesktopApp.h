@@ -99,6 +99,7 @@ public:
 	unsigned char* m_pFrameDataBuffer = nullptr;
 
 private:
+	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
 
 protected:
 	static DreamDesktopApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -106,7 +107,7 @@ protected:
 private:
 	std::shared_ptr<quad> m_pDesktopQuad = nullptr;
 	std::shared_ptr<texture> m_pDesktopTexture = nullptr;
-
+	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	int m_pxDesktopWidth = DESKTOP_PXWIDTH;
