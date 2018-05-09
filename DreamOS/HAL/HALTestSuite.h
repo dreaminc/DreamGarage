@@ -31,7 +31,9 @@ public:
 
 	RESULT AddTestSkybox();
 
+	// Environments
 	RESULT AddTestEnvironmentShader();
+	RESULT AddTestEnvironments();
 
 	// Objects
 	RESULT AddTestModelInstancing();

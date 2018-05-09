@@ -221,6 +221,9 @@ RESULT DreamGarage::LoadScene() {
 	float sceneScale = 0.1f;
 	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment path");
+
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
@@ -233,15 +236,23 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-	g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
-	g_pLight->EnableShadows();
+	if (strEnvironmentPath == "") {
+		g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+		g_pLight->EnableShadows();
 
-	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
-	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	}
+	else {
+		AddLight(LIGHT_POINT, 15.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 15.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 15.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		AddLight(LIGHT_POINT, 15.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	}
 
 	CR(SetupUserModelPool());
 
@@ -260,30 +271,32 @@ RESULT DreamGarage::LoadScene() {
 #ifndef _DEBUG
 
 	//*
-	model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
-	pModel->SetPosition(ptSceneOffset);
-	pModel->SetScale(sceneScale);
-	//pModel->SetEulerOrientation(vSceneEulerOrientation);
-	//pModel->SetVisible(false);
+	//std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+	if (strEnvironmentPath == "") {
+		model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
+		pModel->SetPosition(ptSceneOffset);
+		pModel->SetScale(sceneScale);
+		//pModel->SetEulerOrientation(vSceneEulerOrientation);
+		//pModel->SetVisible(false);
 
-	model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
-	pRiver->SetPosition(ptSceneOffset);
-	pRiver->SetScale(sceneScale);
-	//pModel->SetEulerOrientation(vSceneEulerOrientation);
-	//pRiver->SetVisible(false);
+		model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
+		pRiver->SetPosition(ptSceneOffset);
+		pRiver->SetScale(sceneScale);
+		//pModel->SetEulerOrientation(vSceneEulerOrientation);
+		//pRiver->SetVisible(false);
 
-	model* pClouds = AddModel(L"\\FloatingIsland\\clouds.obj");
-	pClouds->SetPosition(ptSceneOffset);
-	pClouds->SetScale(sceneScale);
-	//pModel->SetEulerOrientation(vSceneEulerOrientation);
-	//pClouds->SetVisible(false);
+		model* pClouds = AddModel(L"\\FloatingIsland\\clouds.obj");
+		pClouds->SetPosition(ptSceneOffset);
+		pClouds->SetScale(sceneScale);
+		//pModel->SetEulerOrientation(vSceneEulerOrientation);
+		//pClouds->SetVisible(false);
 
-	pClouds->SetMaterialAmbient(0.8f);
+		pClouds->SetMaterialAmbient(0.8f);
 
-	pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
-	if (pOGLObj != nullptr) {
-		pOGLObj->SetOGLProgramPreCallback(
-			[](OGLProgram* pOGLProgram, void *pContext) {
+		pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+		if (pOGLObj != nullptr) {
+			pOGLObj->SetOGLProgramPreCallback(
+				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff pre-render
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
@@ -291,10 +304,10 @@ RESULT DreamGarage::LoadScene() {
 				}
 				return R_PASS;
 			}
-		);
+			);
 
-		pOGLObj->SetOGLProgramPostCallback(
-			[](OGLProgram* pOGLProgram, void *pContext) {
+			pOGLObj->SetOGLProgramPostCallback(
+				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff post
 
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
@@ -303,7 +316,16 @@ RESULT DreamGarage::LoadScene() {
 				}
 				return R_PASS;
 			}
-		);
+			);
+		}
+	}
+	else {
+		model *pModel = AddModel(util::StringToWideString(strEnvironmentPath));
+		//TODO: in theory this should be 1.0f if the models we get are in meters
+		pModel->RotateXByDeg(-90.0f);
+		pModel->RotateYByDeg(90.0f);
+		pModel->SetScale(sceneScale);
+		pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
 	}
 	//*/
 #endif
