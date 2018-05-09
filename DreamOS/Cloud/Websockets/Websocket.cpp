@@ -45,7 +45,7 @@ Websocket::~Websocket() {
 }
 
 RESULT Websocket::SetToken(const std::string& strToken) {
-	m_strToken = strToken;
+	m_strToken = "Token " + strToken;
 	return R_PASS;
 }
 
@@ -224,7 +224,7 @@ RESULT Websocket::ProcessingThread() {
 			CBM((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());
 
 			if (m_strToken.size() > 0) {
-				m_pWebsocketConnection->append_header("token", m_strToken);
+				m_pWebsocketConnection->append_header("Authorization", m_strToken);
 			}
 
 			m_websocketClient.connect(m_pWebsocketConnection);

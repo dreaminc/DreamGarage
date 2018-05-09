@@ -199,7 +199,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	//m_pendingMessageID = guidMessage.GetGUIDString();
 
 	jsonData["id"] = guidMessage.GetGUIDString();
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.create";
 	jsonData["params"] = {
 		//{"sdp_offer", "{'foo': 'bar2'}"},
@@ -233,7 +233,7 @@ nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerCo
 	std::string strGUID = guidMessage.GetGUIDString();
 
 	jsonData["id"] = guidMessage.GetGUIDString();
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	//jsonData["type"] = "response";
 	jsonData["type"] = "request";
 
@@ -406,7 +406,7 @@ RESULT EnvironmentController::GetEnvironmentPeerList(User user) {
 	// Set up the JSON data
 	m_pendingMessageID = UID().GetID();
 	jsonData["id"] = m_pendingMessageID;
-	jsonData["token"] = user.GetToken();
+	//jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.list";
 	jsonData["params"] = "";
 	jsonData["version"] = user.GetVersion().GetString(false);
