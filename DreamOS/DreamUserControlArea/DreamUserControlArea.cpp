@@ -259,7 +259,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::CLOSE: {
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-
+		CNR(m_pActiveSource, R_SKIPPED);	// double tapping close? 
 //		long assetID = m_pActiveBrowser->Get
 		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 

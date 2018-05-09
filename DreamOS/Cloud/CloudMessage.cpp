@@ -142,7 +142,7 @@ std::string CloudMessage::GetJSONDataString(int indent) {
 	nlohmann::json jsonData;
 
 	jsonData["id"] = m_GUID.GetGUIDString();
-	jsonData["token"] = m_strToken;
+	//jsonData["token"] = m_strToken;
 	
 	switch (m_type) {
 		case type::REQUEST:		jsonData["type"] = "request"; break;
