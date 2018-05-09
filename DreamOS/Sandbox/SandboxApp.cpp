@@ -469,7 +469,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// This can attempt to connect to a given environment
 
 #ifndef PRODUCTION_BUILD
-	CR(m_pCommandLineManager->RegisterParameter("environment path", "envpath", ""));
+	CR(m_pCommandLineManager->RegisterParameter("environment.path", "env.path", "default"));
 #endif
 
 	// For auto login, use '-l auto'

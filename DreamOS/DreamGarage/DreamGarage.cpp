@@ -222,7 +222,7 @@ RESULT DreamGarage::LoadScene() {
 	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment path");
+	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
 
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
@@ -236,23 +236,22 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-	if (strEnvironmentPath == "") {
+	float intensity = 1.0f;
+
+	if (strEnvironmentPath == "default") {
 		g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 		g_pLight->EnableShadows();
-
-		AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 1.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 1.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 		AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	}
 	else {
-		AddLight(LIGHT_POINT, 15.0f, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 15.0f, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 15.0f, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-		AddLight(LIGHT_POINT, 15.0f, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		intensity = 15.0f;
 	}
+
+	AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	CR(SetupUserModelPool());
 
@@ -272,7 +271,7 @@ RESULT DreamGarage::LoadScene() {
 
 	//*
 	//std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-	if (strEnvironmentPath == "") {
+	if (strEnvironmentPath == "default") {
 		model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
 		pModel->SetPosition(ptSceneOffset);
 		pModel->SetScale(sceneScale);

@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-u jason_test1@dreamos.com -p nightmare -env 168 -envpath "\\TestEnvironments\\DREAM_OS_2018_05_07\\007.fbx"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-u jason_test1@dreamos.com -p nightmare -env 168 -env.path "\\TestEnvironments\\DREAM_OS_2018_05_07\\007.fbx"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
