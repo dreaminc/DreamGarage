@@ -468,7 +468,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// This can attempt to connect to a given environment
 
-#ifndef DEV_PRODUCTION_BUILD
+#ifndef PRODUCTION_BUILD
 	CR(m_pCommandLineManager->RegisterParameter("environment path", "envpath", ""));
 #endif
 
