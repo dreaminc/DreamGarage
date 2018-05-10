@@ -464,9 +464,13 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
 	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
+	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
 
 	// This can attempt to connect to a given environment
-	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
+
+#ifndef PRODUCTION_BUILD
+	CR(m_pCommandLineManager->RegisterParameter("environment.path", "env.path", "default"));
+#endif
 
 	// For auto login, use '-l auto'
 #if defined(_USE_TEST_APP) || defined(_UNIT_TESTING)
