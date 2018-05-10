@@ -95,8 +95,8 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	float borderWidth = m_borderWidth * baseWidth;
 	float borderHeight = m_borderHeight * baseWidth;
 
-	//m_borderHeight *= baseWidth;
-	//m_borderWidth *= baseWidth;
+	m_borderHeight *= baseWidth;
+	m_borderWidth *= baseWidth;
 
 	// ties this app to the control area's size
 	m_tabWidth *= baseWidth;

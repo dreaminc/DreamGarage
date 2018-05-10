@@ -66,10 +66,15 @@ protected:
 
 // Expose size variables
 public:
+	// Sizes relative to control view width
 	float GetSpacingSize();
 	float GetBaseWidth();
 	float GetBaseHeight();
 	float GetViewAngle();
+
+	// absolute positions
+	point GetCenter();
+	float GetTotalHeight();
 
 // Animations
 public:

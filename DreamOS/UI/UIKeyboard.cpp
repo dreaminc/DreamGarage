@@ -166,6 +166,13 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
+	GetComposite()->SetVisible(false);
+	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
+
+	// position keyboard composite
+	float kbOffset = (-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
+	GetComposite()->SetPosition(pParent->GetCenter() + point(0.0f, 0.0f, kbOffset));
+	m_ptComposite = GetComposite()->GetPosition();
 
 	{
 		//Setup textbox
@@ -188,7 +195,12 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
 
 		m_pHeaderContainer->AddObject(m_pTextBoxText);
+
+		// position near the top of the keyboard
 		m_pHeaderContainer->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight/2.0f -m_pTextBoxBackground->GetHeight() / 2.0f));
+
+		// position near the top of the control area
+		//m_pHeaderContainer->SetPosition(point(0.0f, 0.0f, -GetComposite()->GetPosition().z() -pParent->GetTotalHeight() / 2.0f));
 
 		float scale = m_pTextBoxBackground->GetHeight() / 2.0f;
 		m_pHeaderContainer->SetPosition(m_pHeaderContainer->GetPosition() + point(0.0f, sin(angle)*scale, -cos(angle)*scale));
@@ -216,9 +228,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pLayout = pLayout;
 
 	m_currentLayout = LayoutType::QWERTY;
-
-	GetComposite()->SetVisible(false);
-	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 Error:
 	return r;

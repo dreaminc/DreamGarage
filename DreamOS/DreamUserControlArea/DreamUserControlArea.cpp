@@ -119,10 +119,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CN(pKeyboard);
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
-		//pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, 0.0f));
-		//pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, m_pDreamTabView->GetBorderHeight()/4.0f));
-		pKeyboard->GetComposite()->SetPosition(point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z() + m_pDreamTabView->GetBorderHeight() / 2.0f - pKeyboard->m_surfaceHeight / 2.0f));
-		pKeyboard->m_ptComposite = pKeyboard->GetComposite()->GetPosition();
 	}
 
 	//CR(m_pWebBrowserManager->Update());
@@ -212,6 +208,14 @@ float DreamUserControlArea::GetSpacingSize() {
 
 float DreamUserControlArea::GetViewAngle() {
 	return VIEW_ANGLE; //????
+}
+
+point DreamUserControlArea::GetCenter() {
+	return point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z());
+}
+
+float DreamUserControlArea::GetTotalHeight() {
+	return m_pDreamTabView->GetBorderHeight();
 }
 
 RESULT DreamUserControlArea::Show() {
