@@ -276,9 +276,15 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	// Root folder
 	PathManager* pPathManager = PathManager::instance();
 	std::wstring wstrModelFilePath;
-	CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
-	CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
-	
+
+	if (!pPathManager->IsAbsolutePath(&wstrModelFilename[0])) {
+		CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
+		CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
+	}
+	else {
+		wstrModelFilePath = wstrModelFilename;
+	}
+
 	//pModel = new model(pParentImp);
 	pModel = pParentImp->MakeModel();
 	CN(pModel);
