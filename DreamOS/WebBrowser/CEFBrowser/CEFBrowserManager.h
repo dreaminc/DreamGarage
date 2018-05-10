@@ -65,6 +65,7 @@ private:
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(int cefBrowserID) override;
 
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL)  override;
+	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) override;
 
 private:
 	RESULT CEFManagerThread();

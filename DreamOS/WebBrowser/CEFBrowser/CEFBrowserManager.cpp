@@ -210,6 +210,18 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->CheckForHeaders(headermap, strURL));
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 

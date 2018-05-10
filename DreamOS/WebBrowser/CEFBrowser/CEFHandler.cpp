@@ -227,15 +227,34 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 	}
 }
 
-bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
-
+bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
+	/*
 	// false to allow pop up, true to cancel creation
 	CefRefPtr<CefRequest> pCEFRequest = CefRequest::Create();
+	std::multimap<std::string, std::string> checkForRequestHeaders;
+	CefRequest::HeaderMap requestHeaders;
+	std::string strURL = target_url;	
+
+	CheckForHeaders(checkForRequestHeaders, browser, strURL);
+	if (!checkForRequestHeaders.empty()) {
+		for (std::multimap<std::string, std::string>::iterator itr = checkForRequestHeaders.begin(); itr != checkForRequestHeaders.end(); ++itr) {
+
+			std::string strKey = itr->first;
+			CefString cefstrKey = strKey;
+			std::string strValue = itr->second;
+			CefString cefstrValue = strValue;
+
+			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
+		}
+	}
+
+	pCEFRequest->SetHeaderMap(requestHeaders);
 	pCEFRequest->SetURL(target_url);
 	pCEFRequest->SetMethod(L"GET");
 	browser->GetFocusedFrame()->LoadRequest(pCEFRequest);
-
-	return true;
+	*/
+	parentBrowser->GetHost()->SetFocus(true);
+	return false;
 }
 
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
@@ -367,13 +386,20 @@ Error:
 	return r;
 }
 
+RESULT CEFHandler::CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) {
+	return m_pCEFHandlerObserver->CheckForHeaders(headermap, pCefBrowser, strURL);
+}
+
 CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefRequestCallback> callback) {
 	
-	CefString strRequestURL = request->GetURL();
+	CefString cefstrRequestURL = request->GetURL();
 	CefRequest::HeaderMap requestHeaders;
+	std::multimap<std::string, std::string> checkForRequestHeaders;
+	std::string strURL = cefstrRequestURL;
 	request->GetHeaderMap(requestHeaders);
+	/*
 	bool fUsesAuthentication = false;
-
+	
 	// Check for an authorization token
 	for (std::multimap<CefString, CefString>::iterator it = requestHeaders.begin(); it != requestHeaders.end(); ++it) {
 		if (it->first == "Authorization") {
@@ -383,23 +409,36 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 
 	if (fUsesAuthentication) {	// If the link uses an authorization token we need to save it
 		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
-		it = m_savedRequestHeaders.find(strRequestURL);
+		it = m_savedRequestHeaders.find(cefstrRequestURL);
 
 		if (it != m_savedRequestHeaders.end()) {	// If the link already exists, update the headers
 			it->second = requestHeaders;
 		}
 
 		else if (it == m_savedRequestHeaders.end()) {	// Otherwise insert it
-			m_savedRequestHeaders.insert(std::pair<CefString, std::multimap<CefString, CefString>>(strRequestURL, requestHeaders));
+			m_savedRequestHeaders.insert(std::pair<CefString, std::multimap<CefString, CefString>>(cefstrRequestURL, requestHeaders));
 		}
 	}
 
 	else {	// If the link doesn't have an auth header we need to check if it's one of the saved links
 		std::map<CefString, std::multimap<CefString, CefString>>::iterator it;
-		it = m_savedRequestHeaders.find(strRequestURL);
+		it = m_savedRequestHeaders.find(cefstrRequestURL);
 
 		if (it != m_savedRequestHeaders.end()) {	// If it is, insert the headers
 			requestHeaders = it->second;
+		}
+	}*/
+	
+	CheckForHeaders(checkForRequestHeaders, browser, strURL);
+	if (!checkForRequestHeaders.empty()) {
+		for (std::multimap<std::string, std::string>::iterator itr = checkForRequestHeaders.begin(); itr != checkForRequestHeaders.end(); ++itr) {
+
+			std::string strKey = itr->first;
+			CefString cefstrKey = strKey;
+			std::string strValue = itr->second;
+			CefString cefstrValue = strValue;
+
+			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
 		}
 	}
 
@@ -415,6 +454,8 @@ bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<Cef
 	// TODO: comment out if not in testing
 	CefRequest::HeaderMap cefHeaders;
 	response->GetHeaderMap(cefHeaders);
+	CefRequest::HeaderMap cefReqHeaders;
+	request->GetHeaderMap(cefReqHeaders);
 
 	CefResponse::HeaderMap::iterator headeritem;
 	DEBUG_LINEOUT("OnResourceResponse::Response headers size = %i", (int)cefHeaders.size());
