@@ -77,6 +77,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 //		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 		CN(m_pDreamUserApp);
 
+		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
+		CN(pKeyboard);
+
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(m_pDreamUIBar);
 		m_pDreamUIBar->InitializeWithParent(this);
@@ -114,9 +117,12 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
+		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
+		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_spacingSize + m_pDreamTabView->GetBorderWidth()) / 2.0f;
+		m_centerOffset = currentCenter - totalCenter;
+		GetComposite()->SetPosition(GetComposite()->GetPosition() + point(currentCenter - totalCenter, 0.0f, 0.0f));
+		
 		//CR(GetDOS()->InitializeKeyboard());
-		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
-		CN(pKeyboard);
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
 	}
@@ -212,6 +218,16 @@ float DreamUserControlArea::GetViewAngle() {
 
 point DreamUserControlArea::GetCenter() {
 	return point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z());
+}
+
+float DreamUserControlArea::GetCenterOffset() {
+	return m_centerOffset;
+}
+
+float DreamUserControlArea::GetTotalWidth() {
+//	return 2*(m_pDreamTabView->GetComposite()->GetPosition().x() + m_pDreamTabView->GetBorderWidth() / 2.0f);
+	return m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
+	//return m_pControlView->GetBor
 }
 
 float DreamUserControlArea::GetTotalHeight() {
@@ -526,6 +542,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
 		CR(m_pControlBar->Hide());
+		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
 	}
 
@@ -715,9 +732,8 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 	//	CR(m_pDreamUserApp->GetKeyboard()->Hide());
 		m_fKeyboardUp = false;
 		CR(m_pControlView->HandleKeyboardDown());
-		//CR(Show());
-		//m_pControlView->Show();
 		m_pControlBar->Show();
+		m_pDreamTabView->Show();
 	}
 
 Error:

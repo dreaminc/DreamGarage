@@ -76,11 +76,12 @@ RESULT MultiContentTestSuite::AddTests() {
 
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
+
+	CR(AddTestAllUIObjects());
+
 	CR(AddTestMenuMemory());
 	
 	CR(AddTestRemoveText());
-
-	CR(AddTestAllUIObjects());
 
 	CR(AddTestActiveSource());
 	

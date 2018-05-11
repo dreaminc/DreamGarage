@@ -143,16 +143,19 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	CBR(m_pParentApp == nullptr, R_SKIPPED);
 	m_pParentApp = pParent;
 
+	//m_surfaceWidth = m_pParentApp->GetTotalWidth();
+
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
 	float keyDimension = m_surfaceWidth / (float)pLayout->GetKeys()[0].size();
 
 	// after being placed, the keys are scaled down by m_keyScale to create gaps in between the quads.
-	// need to incrase the overall surface width to accomodate for this, and decrease the width of the text box
+	// need to increase the overall surface width to accommodate for this, and decrease the width of the text box
 	float marginError = keyDimension * (1 - m_keyScale);
-
-	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f + marginError;
+	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f;// +m_pParentApp->GetTotalWidth();
+	m_surfaceWidth += marginError;
 	m_surfaceHeight = m_surfaceWidth * 0.4f;
+
 
 	//TODO this may become deprecated
 	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
@@ -170,8 +173,9 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	// position keyboard composite
-	float kbOffset = (-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
-	GetComposite()->SetPosition(pParent->GetCenter() + point(0.0f, 0.0f, kbOffset));
+	//float kbOffset = -(-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
+	float kbOffset = 0.0f;
+	GetComposite()->SetPosition(pParent->GetCenter() + point(-pParent->GetCenterOffset(), 0.0f, kbOffset));
 	m_ptComposite = GetComposite()->GetPosition();
 
 	{
@@ -518,8 +522,9 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
-		m_pTitleIcon->SetVisible(false);
-		m_pTitleText->SetVisible(false);
+		m_pHeaderContainer->SetVisible(false);
+		//m_pTitleIcon->SetVisible(false);
+		//m_pTitleText->SetVisible(false);
 		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
@@ -561,6 +566,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
 		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -599,6 +605,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
 		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -804,8 +811,10 @@ Error:
 
 RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
-	m_pTitleIcon->SetVisible(true);
-	m_pTitleText->SetVisible(true);
+	m_pHeaderContainer->SetVisible(true);
+	//m_pTitleIcon->SetVisible(true);
+	//m_pTitleText->SetVisible(true);
+	
 	if (pIconTexture != nullptr) {
 		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}

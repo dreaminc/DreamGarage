@@ -682,7 +682,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 		m_pView.get(),
 		m_ptVisiblePosition,	
 		m_qViewQuadOrientation,
-		m_pView->GetScale(),
+		vector(1.0f, 1.0f, 1.0f),
 		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
@@ -724,6 +724,10 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
+	float vScale = (m_pViewQuad->GetWidth() + m_pParentApp->GetTotalWidth()) / m_pViewQuad->GetWidth();
+
+	ptTypingPosition += point(m_pParentApp->GetTotalWidth()/2.0f, 0.0f, 0.0f);
+
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
 		CR(m_pKeyboardHandle->PopulateTextBox(strTextField));
@@ -734,7 +738,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
 		//vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		m_pView->GetScale(),
+		vector(vScale, vScale, vScale),
 		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
@@ -776,4 +780,8 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
+}
+
+float DreamControlView::GetBackgroundWidth() {
+	return m_pViewBackground->GetWidth();
 }

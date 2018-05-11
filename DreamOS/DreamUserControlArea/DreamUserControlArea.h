@@ -70,10 +70,13 @@ public:
 	float GetSpacingSize();
 	float GetBaseWidth();
 	float GetBaseHeight();
+	//point GetBaseCenter();
 	float GetViewAngle();
 
 	// absolute positions
 	point GetCenter();
+	float GetCenterOffset();
+	float GetTotalWidth();
 	float GetTotalHeight();
 
 // Animations
@@ -200,6 +203,7 @@ private:
 	float m_aspectRatio;
 	float m_baseWidth;
 	float m_baseHeight;
+	float m_centerOffset;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
