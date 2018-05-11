@@ -357,6 +357,21 @@ RESULT DreamBrowser::GetResourceHandlerType(ResourceHandlerType &resourceHandler
 	return r;
 }
 
+RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
+	RESULT r = R_PASS;
+
+	std::map<std::string, std::multimap<std::string, std::string>>::iterator it;
+
+	if (!m_headermap.empty()) {
+		it = m_headermap.find(strURL);
+		if (it != m_headermap.end()) {
+			headermap = it->second;
+		}
+	}
+
+	return r;
+}
+
 RESULT DreamBrowser::HandleBackEvent() {
 	RESULT r = R_PASS;
 
@@ -765,7 +780,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();	
+		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
 
 		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
 			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
@@ -783,7 +798,7 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
 		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
-		
+		/*
 		for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
 
 			std::string strKey = itr->first;
@@ -793,8 +808,12 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 			
 			wstrRequestHeaders.insert(std::pair<std::wstring, std::wstring>(wstrKey, wstrValue));
 		}
-		
 		webRequest.SetRequestHeaders(wstrRequestHeaders);
+		*/
+
+		if (!requestHeaders.empty()) {
+			m_headermap[strEnvironmentAssetURL] = requestHeaders;
+		}	
 		//*/
 		
 		LoadRequest(webRequest);

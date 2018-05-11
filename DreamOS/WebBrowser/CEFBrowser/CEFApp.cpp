@@ -203,6 +203,17 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->CheckForHeaders(headermap, pCefBrowser, strURL));
+	}
+
+Error:
+	return r;
+}
+
 // This doesn't do much right now
 // but this gives us back a different browser than the browser process (render process)
 void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {

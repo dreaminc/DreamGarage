@@ -537,6 +537,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->CheckForHeaders(headermap, strURL));
+	}
+
+Error:
+	return r;
+}
+
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }

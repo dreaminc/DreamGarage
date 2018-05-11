@@ -105,6 +105,7 @@ public:
 	virtual RESULT SetTitle(std::string strTitle) override;
 
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
+	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 
 	virtual RESULT HandleBackEvent();
 	virtual RESULT HandleForwardEvent();
@@ -198,6 +199,8 @@ private:
 
 	long m_currentEnvironmentAssetID = 0;
 	std::map<std::string, ResourceHandlerType> m_dreamResourceHandlerLinks;
+	std::map<std::string, std::multimap<std::string, std::string>> m_headermap;
+
 	bool m_fShowControlView = false;
 
 	bool m_fShouldBeginStream = false;
