@@ -228,33 +228,15 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 }
 
 bool CEFHandler::OnBeforePopup(CefRefPtr<CefBrowser> parentBrowser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, bool* no_javascript_access) {
-	/*
+	
 	// false to allow pop up, true to cancel creation
 	CefRefPtr<CefRequest> pCEFRequest = CefRequest::Create();
-	std::multimap<std::string, std::string> checkForRequestHeaders;
-	CefRequest::HeaderMap requestHeaders;
-	std::string strURL = target_url;	
 
-	CheckForHeaders(checkForRequestHeaders, browser, strURL);
-	if (!checkForRequestHeaders.empty()) {
-		for (std::multimap<std::string, std::string>::iterator itr = checkForRequestHeaders.begin(); itr != checkForRequestHeaders.end(); ++itr) {
-
-			std::string strKey = itr->first;
-			CefString cefstrKey = strKey;
-			std::string strValue = itr->second;
-			CefString cefstrValue = strValue;
-
-			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
-		}
-	}
-
-	pCEFRequest->SetHeaderMap(requestHeaders);
 	pCEFRequest->SetURL(target_url);
 	pCEFRequest->SetMethod(L"GET");
-	browser->GetFocusedFrame()->LoadRequest(pCEFRequest);
-	*/
-	parentBrowser->GetHost()->SetFocus(true);
-	return false;
+	frame->LoadRequest(pCEFRequest);
+
+	return true;
 }
 
 void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, ErrorCode errorCode,
@@ -396,8 +378,11 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 	CefRequest::HeaderMap requestHeaders;
 	std::multimap<std::string, std::string> checkForRequestHeaders;
 	std::string strURL = cefstrRequestURL;
-	request->GetHeaderMap(requestHeaders);
+	
+	// replacing with full headers list from server instead
 	/*
+	request->GetHeaderMap(requestHeaders);
+	
 	bool fUsesAuthentication = false;
 	
 	// Check for an authorization token
@@ -440,10 +425,9 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
 		}
+		request->SetHeaderMap(requestHeaders);
 	}
 
-	request->SetHeaderMap(requestHeaders);
-	
 	return RV_CONTINUE;
 }
 
@@ -494,4 +478,14 @@ CefRefPtr<CefResourceHandler> CEFHandler::GetResourceHandler(CefRefPtr<CefBrowse
 
 Error:
 	return nullptr;
+}
+
+bool CEFHandler::OnOpenURLFromTab(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, CefRequestHandler::WindowOpenDisposition target_disposition, bool user_gesture) {
+	CefRefPtr<CefRequest> pCEFRequest = CefRequest::Create();
+
+	pCEFRequest->SetURL(target_url);
+	pCEFRequest->SetMethod(L"GET");
+	frame->LoadRequest(pCEFRequest);
+
+	return true;
 }
