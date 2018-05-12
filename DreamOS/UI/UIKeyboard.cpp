@@ -143,8 +143,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	CBR(m_pParentApp == nullptr, R_SKIPPED);
 	m_pParentApp = pParent;
 
-	//m_surfaceWidth = m_pParentApp->GetTotalWidth();
-
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
 	float keyDimension = m_surfaceWidth / (float)pLayout->GetKeys()[0].size();
@@ -152,7 +150,7 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	// after being placed, the keys are scaled down by m_keyScale to create gaps in between the quads.
 	// need to increase the overall surface width to accommodate for this, and decrease the width of the text box
 	float marginError = keyDimension * (1 - m_keyScale);
-	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f;// +m_pParentApp->GetTotalWidth();
+	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f;
 	m_surfaceWidth += marginError;
 	m_surfaceHeight = m_surfaceWidth * 0.4f;
 
@@ -190,10 +188,11 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(textBoxWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
 		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 
+		m_pFont->SetLineHeight(m_lineHeight);
 		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
 			"",
-			textBoxWidth - 0.02f,
+			textBoxWidth - m_textboxMargin,
 			//0.25f,
 			m_lineHeight * m_numLines, 
 			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
@@ -211,17 +210,17 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 		
 
 		//Setup title / icon
-		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
-		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		m_pTitleIcon = m_pHeaderContainer->AddQuad(m_titleIconWidth, m_titleIconHeight);
+		m_pTitleIcon->SetPosition(point((-m_surfaceWidth + m_titleIconWidth + marginError)/2.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
 		
 		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
 
-		m_pFont->SetLineHeight(0.050f);
+		m_pFont->SetLineHeight(m_titleLineHeight);
 		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
 			"Website",
-			m_surfaceWidth - 0.02f,
-			0.050,
+			m_surfaceWidth - m_textboxMargin,
+			m_titleLineHeight,
 			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
 		m_pHeaderContainer->AddObject(m_pTitleText);

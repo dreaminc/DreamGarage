@@ -39,7 +39,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 
-	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
+	float viewAngleRad = m_viewAngle * (float)(M_PI) / 180.0f;
 	quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 	point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
 	
@@ -73,8 +73,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	if (m_pDreamUserApp == nullptr) {
 		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 		CN(m_pDreamUserApp);
 
 		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
@@ -97,13 +95,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CN(m_pDreamTabView);
 		m_pDreamTabView->InitializeWithParent(this);
 
-		//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-		//CN(m_pActiveBrowser);
-		//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
-
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
-		//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
@@ -122,7 +115,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_centerOffset = currentCenter - totalCenter;
 		GetComposite()->SetPosition(GetComposite()->GetPosition() + point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
-		//CR(GetDOS()->InitializeKeyboard());
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
 	}
@@ -213,7 +205,7 @@ float DreamUserControlArea::GetSpacingSize() {
 }
 
 float DreamUserControlArea::GetViewAngle() {
-	return VIEW_ANGLE; //????
+	return m_viewAngle;
 }
 
 point DreamUserControlArea::GetCenter() {
@@ -225,9 +217,7 @@ float DreamUserControlArea::GetCenterOffset() {
 }
 
 float DreamUserControlArea::GetTotalWidth() {
-//	return 2*(m_pDreamTabView->GetComposite()->GetPosition().x() + m_pDreamTabView->GetBorderWidth() / 2.0f);
-	return m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
-	//return m_pControlView->GetBor
+	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
 }
 
 float DreamUserControlArea::GetTotalHeight() {

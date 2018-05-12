@@ -200,6 +200,7 @@ private:
 	float m_pxHeight = DEFAULT_PX_HEIGHT;
 
 	float m_diagonalSize = MAIN_DIAGONAL;
+	float m_viewAngle = VIEW_ANGLE;
 	float m_aspectRatio;
 	float m_baseWidth;
 	float m_baseHeight;

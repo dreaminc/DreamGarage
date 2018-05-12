@@ -724,9 +724,9 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
-	float vScale = (m_pViewQuad->GetWidth() + m_pParentApp->GetTotalWidth()) / m_pViewQuad->GetWidth();
+	float vScale = (m_pParentApp->GetTotalWidth()) / m_pViewQuad->GetWidth();
 
-	ptTypingPosition += point(m_pParentApp->GetTotalWidth()/2.0f, 0.0f, 0.0f);
+	ptTypingPosition += point((m_pParentApp->GetTotalWidth() - m_pViewQuad->GetWidth())/2.0f, 0.0f, 0.0f);
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());

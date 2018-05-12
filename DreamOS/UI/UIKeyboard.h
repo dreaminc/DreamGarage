@@ -21,7 +21,11 @@
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
-//#define TEXTBOX_WIDTH 0.5f // textbox width matches surface width
+#define TEXTBOX_MARGIN 0.02f
+
+#define TITLE_LINE_HEIGHT 0.05f
+#define	TITLE_ICON_WIDTH 0.068f
+#define TITLE_ICON_HEIGHT (TITLE_ICON_WIDTH * (3.0f / 4.0f))
 
 #define KEY_TYPE_THRESHOLD 0.0f 
 #define KEY_RELEASE_THRESHOLD -0.025f
@@ -180,6 +184,11 @@ private:
 	float m_animationOffsetHeight = ANIMATION_OFFSET_HEIGHT;
 
 	float m_ambientIntensity = AMBIENT_INTENSITY;
+	float m_textboxMargin = TEXTBOX_MARGIN;
+
+	float m_titleLineHeight = TITLE_LINE_HEIGHT;
+	float m_titleIconWidth = TITLE_ICON_WIDTH;
+	float m_titleIconHeight = TITLE_ICON_HEIGHT;
 
 	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
