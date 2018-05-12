@@ -682,7 +682,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 		m_pView.get(),
 		m_ptVisiblePosition,	
 		m_qViewQuadOrientation,
-		m_pView->GetScale(),
+		vector(1.0f, 1.0f, 1.0f),
 		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
@@ -713,12 +713,20 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
 	float viewHeight = m_pViewQuad->GetHeight();
-	//textBoxYOffset = ptTextBox.y() / (m_pParentApp->GetHeight() / viewHeight);	// scaled with ControlViewQuad dimensions
-	textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight);
+	// used to center view 
+	//textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight); 
+
+	// currently always fully shown
+	textBoxYOffset = viewHeight;
+
 	textBoxYOffset -= 0.25 * viewHeight; // shift closer to text box
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
+
+	float vScale = (m_pParentApp->GetTotalWidth()) / m_pViewQuad->GetWidth();
+
+	ptTypingPosition += point((m_pParentApp->GetTotalWidth() - m_pViewQuad->GetWidth())/2.0f, 0.0f, 0.0f);
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
@@ -730,7 +738,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
 		//vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		m_pView->GetScale(),
+		vector(vScale, vScale, vScale),
 		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
@@ -772,4 +780,8 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
+}
+
+float DreamControlView::GetBackgroundWidth() {
+	return m_pViewBackground->GetWidth();
 }

@@ -101,6 +101,7 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
+	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 	point GetLastEvent();

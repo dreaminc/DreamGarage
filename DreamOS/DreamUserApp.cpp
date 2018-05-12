@@ -798,8 +798,6 @@ RESULT DreamUserApp::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	CR(UpdateCompositeWithHands(m_menuHeight));
-	CNR(m_pKeyboardHandle, R_SKIPPED);
-	CR(m_pKeyboardHandle->SendUpdateComposite(m_menuDepth, m_pAppBasis->GetPosition(), m_pAppBasis->GetOrientation()));
 
 Error:
 	return r;

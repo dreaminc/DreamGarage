@@ -10,26 +10,31 @@
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
+#include "DreamUserControlArea/DreamUserControlArea.h"
 
 #include <vector>
 #include <string>
 
-#define SURFACE_WIDTH 0.5f // surface is a quad that holds the entire keyboard layout
-#define SURFACE_HEIGHT 0.25f
+#define SURFACE_WIDTH 0.523f //0.5f // surface is a quad that holds the entire keyboard layout
+#define SURFACE_HEIGHT 0.294f // 0.25f
 #define SURFACE_ANGLE 30.0f
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
-//#define TEXTBOX_WIDTH 0.5f // textbox width matches surface width
+#define TEXTBOX_MARGIN 0.02f
+
+#define TITLE_LINE_HEIGHT 0.05f
+#define	TITLE_ICON_WIDTH 0.068f
+#define TITLE_ICON_HEIGHT (TITLE_ICON_WIDTH * (3.0f / 4.0f))
 
 #define KEY_TYPE_THRESHOLD 0.0f 
 #define KEY_RELEASE_THRESHOLD -0.025f
-#define KEY_SCALE 0.9f
+#define KEY_SCALE (5.0f / 6.0f)
 #define KEY_MARGIN 0.25f
 
 #define KEY_RELEASE_DURATION 0.1f
-#define ANIMATION_DURATION 0.2f
-#define ANIMATION_OFFSET_HEIGHT 1.0f
+#define ANIMATION_DURATION 0.1f
+#define ANIMATION_OFFSET_HEIGHT 0.25f
 
 #define AMBIENT_INTENSITY 0.75f
 
@@ -69,6 +74,7 @@ class UIKeyboard :	public DreamApp<UIKeyboard>,
 					public UIKeyboardHandle, 
 					public SenseKeyboard {
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -82,6 +88,9 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
+
+public:
+	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
 //DreamApp
 public:
@@ -175,6 +184,11 @@ private:
 	float m_animationOffsetHeight = ANIMATION_OFFSET_HEIGHT;
 
 	float m_ambientIntensity = AMBIENT_INTENSITY;
+	float m_textboxMargin = TEXTBOX_MARGIN;
+
+	float m_titleLineHeight = TITLE_LINE_HEIGHT;
+	float m_titleIconWidth = TITLE_ICON_WIDTH;
+	float m_titleIconHeight = TITLE_ICON_HEIGHT;
 
 	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
@@ -212,6 +226,8 @@ private:
 
 	DreamUserHandle *m_pUserHandle = nullptr;
 	UID m_userAppUID;
+
+	DreamUserControlArea *m_pParentApp = nullptr;
 };
 
 #endif // ! UI_KEYBOARD_H_

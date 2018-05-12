@@ -105,18 +105,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
-	//TODO this may become deprecated
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
-
-	m_pSurfaceContainer = GetComposite()->AddComposite();
-	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
-
-	m_pSurface = m_pSurfaceContainer->AddQuad(m_surfaceHeight, m_surfaceWidth);
-	CN(m_pSurface);
-
-	m_pSurface->SetVisible(false);
-	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
-
 	m_pHeaderContainer = GetComposite()->AddComposite();
 
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -136,44 +124,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pDefaultIconTexture = GetComposite()->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-	{
-		//Setup textbox
-		float offset = m_surfaceHeight / 2.0f;
-		float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
-
-		m_pHeaderContainer->RotateXByDeg(90.0f);
-
-		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
-		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
-
-		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
-			m_pFont,
-			"",
-			m_surfaceWidth - 0.02f,
-			//0.25f,
-			m_lineHeight * m_numLines, 
-			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
-
-		m_pHeaderContainer->AddObject(m_pTextBoxText);
-
-		//Setup title / icon
-		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
-		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
-		
-		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
-
-		m_pFont->SetLineHeight(0.050f);
-		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
-			m_pFont,
-			"Website",
-			m_surfaceWidth - 0.02f,
-			0.050,
-			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
-		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
-		m_pHeaderContainer->AddObject(m_pTitleText);
-
-	}
-
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
@@ -183,15 +133,104 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	InitializeLayoutTexture(LayoutType::QWERTY_NUM);
 	InitializeLayoutTexture(LayoutType::QWERTY_SYMBOL);
 
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
+	RESULT r = R_PASS;
+
+	CBR(m_pParentApp == nullptr, R_SKIPPED);
+	m_pParentApp = pParent;
+
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
+	float keyDimension = m_surfaceWidth / (float)pLayout->GetKeys()[0].size();
+
+	// after being placed, the keys are scaled down by m_keyScale to create gaps in between the quads.
+	// need to increase the overall surface width to accommodate for this, and decrease the width of the text box
+	float marginError = keyDimension * (1 - m_keyScale);
+	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f;
+	m_surfaceWidth += marginError;
+	m_surfaceHeight = m_surfaceWidth * 0.4f;
+
+
+	//TODO this may become deprecated
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+
+	m_pSurfaceContainer = GetComposite()->AddComposite();
+	//m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+
+	m_pSurface = m_pSurfaceContainer->AddQuad(m_surfaceHeight, m_surfaceWidth);
+	CN(m_pSurface);
+
+	m_pSurface->SetVisible(false);
+	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
+
+	GetComposite()->SetVisible(false);
+	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
+
+	// position keyboard composite
+	//float kbOffset = -(-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
+	float kbOffset = 0.0f;
+	GetComposite()->SetPosition(pParent->GetCenter() + point(-pParent->GetCenterOffset(), 0.0f, kbOffset));
+	m_ptComposite = GetComposite()->GetPosition();
+
+	{
+		//Setup textbox
+		float offset = m_surfaceHeight / 2.0f;
+		float angle = (m_pParentApp->GetViewAngle()) * (float)(M_PI) / 180.0f;
+
+		float textBoxWidth = m_surfaceWidth - marginError;
+
+		m_pHeaderContainer->RotateXByDeg(90.0f - m_pParentApp->GetViewAngle());
+
+		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(textBoxWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
+		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
+
+		m_pFont->SetLineHeight(m_lineHeight);
+		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"",
+			textBoxWidth - m_textboxMargin,
+			//0.25f,
+			m_lineHeight * m_numLines, 
+			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
+
+		m_pHeaderContainer->AddObject(m_pTextBoxText);
+
+		// position near the top of the keyboard
+		m_pHeaderContainer->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight/2.0f -m_pTextBoxBackground->GetHeight() / 2.0f));
+
+		// position near the top of the control area
+		//m_pHeaderContainer->SetPosition(point(0.0f, 0.0f, -GetComposite()->GetPosition().z() -pParent->GetTotalHeight() / 2.0f));
+
+		float scale = m_pTextBoxBackground->GetHeight() / 2.0f;
+		m_pHeaderContainer->SetPosition(m_pHeaderContainer->GetPosition() + point(0.0f, sin(angle)*scale, -cos(angle)*scale));
+		
+
+		//Setup title / icon
+		m_pTitleIcon = m_pHeaderContainer->AddQuad(m_titleIconWidth, m_titleIconHeight);
+		m_pTitleIcon->SetPosition(point((-m_surfaceWidth + m_titleIconWidth + marginError)/2.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		
+		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
+
+		m_pFont->SetLineHeight(m_titleLineHeight);
+		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"Website",
+			m_surfaceWidth - m_textboxMargin,
+			m_titleLineHeight,
+			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		m_pHeaderContainer->AddObject(m_pTitleText);
+
+	}
+
 	InitializeQuadsWithLayout(pLayout);
 	m_pLayout = pLayout;
 
 	m_currentLayout = LayoutType::QWERTY;
-
-	GetComposite()->SetVisible(false);
-	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 Error:
 	return r;
@@ -231,7 +270,7 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 	}
 
 	// this calculation seems weird, but has a value similar to the "fudge factor" in AddGlyphQuad
-	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()) / m_keyScale);
+	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()));// / m_keyScale);
 
 	m_pFont->SetLineHeight(m_lineHeight);
 	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), m_keyMargin, text::flags::NONE);
@@ -259,10 +298,10 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 			float uvLeft = pKey->m_left;// / (m_surfaceWidth * 2.0f);
 			float uvRight = (pKey->m_left + pKey->m_width);// / (m_surfaceWidth * 2.0f);
 
-			float uvTop = (rowIndex * m_surfaceHeight);
-			float uvBottom = (((rowIndex + 1) * m_surfaceHeight));
-
 			float rowCount = (float)pLayoutKeys.size();
+			float uvTop = (rowIndex / rowCount);
+			float uvBottom = (((rowIndex + 1) / rowCount));
+
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
 			float xPos = m_surfaceWidth * (pKey->m_left + pKey->m_width / 2.0f) - (m_surfaceWidth / 2.0f);
@@ -279,8 +318,10 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 			pQuad->SetDiffuseTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
 			// Set up key quad positioning
-			pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
-			pQuad->ScaleY(m_keyScale);
+			//pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
+			//pQuad->ScaleY(m_keyScale);
+			pQuad->ScaleX(pKey->m_width * (float)pLayoutKeys[0].size() - (1.0f - m_keyScale));
+			pQuad->ScaleZ(pQuad->GetScale().z() * m_keyScale);
 
 			pQuad->SetMaterialAmbient(m_ambientIntensity);
 
@@ -480,8 +521,9 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
-		m_pTitleIcon->SetVisible(false);
-		m_pTitleText->SetVisible(false);
+		m_pHeaderContainer->SetVisible(false);
+		//m_pTitleIcon->SetVisible(false);
+		//m_pTitleText->SetVisible(false);
 		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
@@ -523,6 +565,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
 		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -561,6 +604,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
 		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -766,8 +810,10 @@ Error:
 
 RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
-	m_pTitleIcon->SetVisible(true);
-	m_pTitleText->SetVisible(true);
+	m_pHeaderContainer->SetVisible(true);
+	//m_pTitleIcon->SetVisible(true);
+	//m_pTitleText->SetVisible(true);
+	
 	if (pIconTexture != nullptr) {
 		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}
@@ -837,7 +883,8 @@ RESULT UIKeyboard::UpdateComposite(float depth, point ptOrigin, quaternion qOrig
 
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
-	point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+	//point ptkbOffset = point(0.0f, -0.07f, 0.0f);
+	point ptkbOffset = point(0.0f, 0.0f, 0.0f);
 
 	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
 	GetComposite()->SetOrientation(qOrigin);

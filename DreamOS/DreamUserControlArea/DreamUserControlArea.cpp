@@ -39,7 +39,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 
-	float viewAngleRad = VIEW_ANGLE * (float)(M_PI) / 180.0f;
+	float viewAngleRad = m_viewAngle * (float)(M_PI) / 180.0f;
 	quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 	point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
 	
@@ -73,9 +73,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	if (m_pDreamUserApp == nullptr) {
 		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-//		WCRM(m_pDreamUserApp->SetHand(GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 		CN(m_pDreamUserApp);
+
+		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
+		CN(pKeyboard);
 
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(m_pDreamUIBar);
@@ -94,13 +95,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CN(m_pDreamTabView);
 		m_pDreamTabView->InitializeWithParent(this);
 
-		//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-		//CN(m_pActiveBrowser);
-		//m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager);
-
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
-		//m_pDreamUserApp->GetComposite()->SetPosition(0.0f, 0.0f, 0.0f);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
@@ -114,7 +110,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
-		CR(GetDOS()->InitializeKeyboard());
+		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
+		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_spacingSize + m_pDreamTabView->GetBorderWidth()) / 2.0f;
+		m_centerOffset = currentCenter - totalCenter;
+		GetComposite()->SetPosition(GetComposite()->GetPosition() + point(currentCenter - totalCenter, 0.0f, 0.0f));
+		
+		pKeyboard->InitializeWithParent(this);
+		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
 	}
 
 	//CR(m_pWebBrowserManager->Update());
@@ -200,6 +202,26 @@ float DreamUserControlArea::GetBaseHeight() {
 
 float DreamUserControlArea::GetSpacingSize() {
 	return m_spacingSize;
+}
+
+float DreamUserControlArea::GetViewAngle() {
+	return m_viewAngle;
+}
+
+point DreamUserControlArea::GetCenter() {
+	return point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z());
+}
+
+float DreamUserControlArea::GetCenterOffset() {
+	return m_centerOffset;
+}
+
+float DreamUserControlArea::GetTotalWidth() {
+	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
+}
+
+float DreamUserControlArea::GetTotalHeight() {
+	return m_pDreamTabView->GetBorderHeight();
 }
 
 RESULT DreamUserControlArea::Show() {
@@ -510,6 +532,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
 		CR(m_pControlBar->Hide());
+		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
 	}
 
@@ -699,9 +722,8 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 	//	CR(m_pDreamUserApp->GetKeyboard()->Hide());
 		m_fKeyboardUp = false;
 		CR(m_pControlView->HandleKeyboardDown());
-		//CR(Show());
-		//m_pControlView->Show();
 		m_pControlBar->Show();
+		m_pDreamTabView->Show();
 	}
 
 Error:
