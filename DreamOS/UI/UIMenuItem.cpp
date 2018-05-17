@@ -20,6 +20,22 @@ Error:
 	return;
 }
 
+UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height) :
+	UIButton(pHALImp, pDreamOS, width, height)
+{
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+// Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
 RESULT UIMenuItem::Initialize() {
 	RESULT r = R_PASS;
 
@@ -54,17 +70,19 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<text> pText;
 	std::shared_ptr<quad> pIcon;
 
-	labelFormat.pFont->SetLineHeight(0.025f);
+	labelFormat.pFont->SetLineHeight(LABEL_LINE_HEIGHT_SCALE * GetSurface()->GetWidth());
 
 	m_pLabel = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		labelFormat.pFont,
 		labelFormat.strLabel, 
-		0.225,
-		0.0703125, 
+		GetSurface()->GetWidth() * LABEL_WIDTH_SCALE,//0.225,
+		GetSurface()->GetWidth() * LABEL_HEIGHT_SCALE,//0.0703125, 
 		text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
 	m_pLabel->RotateXByDeg(90.0f);
 
+	// ptPosition should probably not be a member of LabelFormat anymore
+	labelFormat.ptPosition = point(0.0f, LABEL_HEIGHT_POSITION * GetSurface()->GetWidth(), 0.0f);
 	m_pLabel->SetPosition(labelFormat.ptPosition);
 
 	vector bgNormal = vector(0.0f, sin(-M_PI / 6.0), cos(-M_PI / 6.0));

@@ -560,7 +560,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		std::vector<std::shared_ptr<UIButton>> pButtons;
 
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-			auto pButton = m_pView->MakeUIMenuItem();
+			auto pButton = m_pView->MakeUIMenuItem(m_pScrollView->GetWidth(), m_pScrollView->GetWidth() * 9.0f / 16.0f);
 			CN(pButton);
 
 			auto iconFormat = IconFormat();
@@ -790,8 +790,19 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 }
 
 RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	RESULT r = R_PASS;
+
 	m_pParentApp = pParentApp;
-	return R_PASS;
+	CNR(m_pParentApp, R_SKIPPED);
+
+	float totalWidth = m_pParentApp->GetTotalWidth();
+	m_pScrollView->InitializeWithWidth(totalWidth);
+
+//	m_
+
+
+Error:
+	return r;
 }
 
 bool DreamUIBar::IsEmpty() {

@@ -43,6 +43,7 @@ public:
 	~UISpatialScrollView();
 
 	RESULT Initialize();
+	RESULT InitializeWithWidth(float totalWidth);
 
 	RESULT Update();
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
@@ -69,6 +70,8 @@ public:
 	std::shared_ptr<text> GetTitleText();
 	std::shared_ptr<UIView> GetMenuItemsView();
 
+	float GetWidth();
+
 public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
@@ -80,6 +83,8 @@ private:
 	float m_itemAngleY = ITEM_ANGLE_Y;
 	float m_itemStartAngleY = ITEM_START_ANGLE_Y;
 	float m_itemHeight = ITEM_HEIGHT;
+
+	float m_itemWidth;
 
 	float m_titleAngleX = TITLE_ANGLE_X;
 	float m_titleHeight = TITLE_HEIGHT;

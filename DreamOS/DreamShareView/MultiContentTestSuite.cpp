@@ -669,6 +669,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
+		//*
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		pTestContext->pBrowser1->SetURI("www.twitch.tv");
@@ -682,6 +683,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
 
+		/*
 		pTestContext->strURIs = {
 			"www.nyt.com",
 			"www.dreamos.com",
@@ -698,6 +700,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 			pTestContext->pDreamBrowsers[i]->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, pTestContext->strURIs[i]);
 			pTestContext->pDreamBrowsers[i]->SetURI(pTestContext->strURIs[i]);
 		}
+		//*/
 
 //		auto pDreamUIBar = 
 //		m_Start();
@@ -731,7 +734,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 			// setup fake menu
 			for (int i = 0; i < 4; i++) {
 
-				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem();
+				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem(pDreamUIBar->m_pScrollView->GetWidth(), pDreamUIBar->m_pScrollView->GetWidth() * 9.0f / 16.0f);
 				CN(pButton);
 
 				auto iconFormat = IconFormat();
