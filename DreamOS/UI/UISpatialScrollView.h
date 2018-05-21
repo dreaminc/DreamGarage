@@ -71,6 +71,8 @@ public:
 	std::shared_ptr<UIView> GetMenuItemsView();
 
 	float GetWidth();
+	float GetClippingThreshold();
+	float GetClippingRate();
 
 public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
@@ -85,6 +87,8 @@ private:
 	float m_itemHeight = ITEM_HEIGHT;
 
 	float m_itemWidth;
+	float m_clippingThreshold;
+	float m_clippingRate;
 
 	float m_titleAngleX = TITLE_ANGLE_X;
 	float m_titleHeight = TITLE_HEIGHT;

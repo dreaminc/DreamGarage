@@ -41,16 +41,6 @@ class UIStageProgram;
 
 #define ACTUATION_DEPTH 0.055f
 
-//Projection clipping values
-//TODO: optimize these values to reduce error,
-// once scrolling snap animation is determined
-#define CLIPPING_OFFSET -0.6f
-#define PROJECTION_WIDTH 0.575f
-#define PROJECTION_HEIGHT 0.25f
-#define PROJECTION_NEAR 0.0f
-#define PROJECTION_FAR 5.0f
-#define PROJECTION_ANGLE 30.0f
-
 enum class MenuState {
 	NONE,
 	ANIMATING
@@ -163,12 +153,6 @@ private:
 	float m_menuDepth = MENU_DEPTH;
 	float m_animationDuration = MENU_ANIMATION_DURATION;
 	float m_actuationDepth = ACTUATION_DEPTH;
-
-	float m_projectionWidth = PROJECTION_WIDTH;
-	float m_projectionHeight = PROJECTION_HEIGHT;
-	float m_projectionNearPlane = PROJECTION_NEAR;
-	float m_projectionFarPlane = PROJECTION_FAR;
-	float m_projectionAngle = PROJECTION_ANGLE;
 
 	bool m_fWaitingForMenuResponse = false;
 

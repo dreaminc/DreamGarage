@@ -197,8 +197,11 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	// calculate available space based on chord length and depth
 	float theta = 2.0f*asin(halfChord / abs(m_menuCenterOffset));
 
+	m_clippingRate = (theta / m_maxElements) * (1.0f / 6.0f);
 	// scale to add margins in between items
-	theta += (theta / m_maxElements) * (1.0f / 6.0f);
+	theta += m_clippingRate;
+	m_clippingThreshold = cos(theta / 2.0f);
+
 
 	// calculate angle between each element
 	float itemAngleYRad = theta / m_maxElements;
@@ -234,7 +237,7 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
 	m_pTitleText->RotateXByDeg(90.0f);
-	m_pTitleText->SetPosition(point(totalWidth * 0.6f, totalWidth * m_titleHeight - 0.005f, 0.0f));
+	m_pTitleText->SetPosition(point(totalWidth * 0.6f, totalWidth * (m_titleHeight - 0.005f), 0.0f));
 	m_pTitleText->SetVisible(false);
 
 	m_pTitleView->AddObject(m_pTitleText);
@@ -594,6 +597,14 @@ std::shared_ptr<UIView> UISpatialScrollView::GetMenuItemsView() {
 
 float UISpatialScrollView::GetWidth() {
 	return m_itemWidth;
+}
+
+float UISpatialScrollView::GetClippingThreshold() {
+	return m_clippingThreshold;
+}
+
+float UISpatialScrollView::GetClippingRate() {
+	return m_clippingRate;
 }
 
 RESULT UISpatialScrollView::Notify(SenseControllerEvent *pEvent) {

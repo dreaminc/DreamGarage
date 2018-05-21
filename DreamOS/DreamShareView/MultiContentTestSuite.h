@@ -16,6 +16,7 @@ class sphere;
 class quad;
 class composite;
 class texture;
+class UIStageProgram;
 
 class MultiContentTestSuite : public TestSuite, public Subscriber<InteractionObjectEvent>, public valid
 {
@@ -30,6 +31,9 @@ public:
 	RESULT SetupPipeline();
 
 public:
+
+	// test to fix ui clipping shader
+	RESULT AddTestMenuShader();
 
 	// test active source switching
 	RESULT AddTestActiveSource();
@@ -84,6 +88,7 @@ private:
 	std::shared_ptr<quad> m_pTestQuad2 = nullptr;
 
 	std::string m_strURL;
+	UIStageProgram *m_pUIProgramNode = nullptr;;
 };
 
 #endif // ! MULTI_CONTENT_TEST_SUITE_H_

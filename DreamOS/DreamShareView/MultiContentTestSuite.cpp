@@ -5,6 +5,7 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 #include "HAL/opengl/OGLProgram.h"
+#include "HAL/UIStageProgram.h"
 
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
@@ -77,6 +78,8 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestMenuShader());
+
 	CR(AddTestAllUIObjects());
 
 	CR(AddTestMenuMemory());
@@ -138,6 +141,8 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
@@ -640,6 +645,98 @@ Error:
 	return r;
 }
 
+RESULT MultiContentTestSuite::AddTestMenuShader() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		bool fFirst = true;
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = pTestContext->pUserControlArea;
+
+		if (pTestContext->fFirst) {
+			pTestContext->fFirst = false;
+			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
+			std::vector<std::shared_ptr<UIButton>> pButtons;
+
+			//pDreamUIBar->m_pScrollView
+			// setup fake menu
+			for (int i = 0; i < 8; i++) {
+
+				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem(pDreamUIBar->m_pScrollView->GetWidth(), pDreamUIBar->m_pScrollView->GetWidth() * 9.0f / 16.0f);
+				CN(pButton);
+
+				auto iconFormat = IconFormat();
+				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
+
+				auto labelFormat = LabelFormat();
+				labelFormat.strLabel = "Label " + std::to_string(i);
+				labelFormat.pFont = pDreamUIBar->m_pFont;
+				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
+
+				pButton->Update(iconFormat, labelFormat);
+
+				pButtons.emplace_back(pButton);
+			}
+
+			pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
+			pDreamUIBar->SetUIStageProgram(m_pUIProgramNode);
+
+			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
+
+			//pDreamUIBar->ResetAppComposite();
+			pTestContext->pUserControlArea->ResetAppComposite();
+		}
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+
+}
+
 RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 	RESULT r = R_PASS;
 	double sTestTime = 2000.0f;
@@ -669,7 +766,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
-		//*
+		/*
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		pTestContext->pBrowser1->SetURI("www.twitch.tv");
@@ -717,8 +814,8 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		auto pControlArea = pTestContext->pUserControlArea;
 
 		if (pTestContext->fFirst) {
-			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			//pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			//pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
 			//for (auto pBrowser : pTestContext->pDreamBrowsers) {
 			//	pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
 			//}

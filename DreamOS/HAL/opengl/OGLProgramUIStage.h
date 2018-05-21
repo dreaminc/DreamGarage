@@ -34,6 +34,8 @@ public:
 	virtual RESULT SetOriginDirection(vector vOrigin) override;
 
 	virtual RESULT SetIsAugmented(bool fAugmented) override;
+	virtual RESULT SetClippingThreshold(float clippingThreshold) override;
+	virtual RESULT SetClippingRate(float clippingRate) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -53,6 +55,9 @@ private:
 
 	OGLUniformBool *m_pUniformClippingEnabled;
 	OGLUniformBool *m_pUniformAR;
+
+	OGLUniformFloat *m_pUniformClippingThreshold;
+	OGLUniformFloat *m_pUniformClippingRate;
 
 	// quad uniforms for clip
 	OGLUniformPoint *m_pUniformQuadCenter;
