@@ -120,18 +120,12 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		if (m_pLeftController == nullptr) {
 			m_pLeftController = m_pParentSandbox->MakeComposite();
 		}
-		if (!m_pLeftController->HasChildren()) {
-			m_pLeftController->AddObject(m_pControllerMeshLeft);
-		}
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		m_pControllerMeshRight = std::shared_ptr<mesh>(pMesh);
 		m_pControllerMeshRightTexture = pTexture;
 		if (m_pRightController == nullptr) {
 			m_pRightController = m_pParentSandbox->MakeComposite();
-		}
-		if (!m_pRightController->HasChildren()) {
-			m_pRightController->AddObject(m_pControllerMeshRight);
 		}
 	}
 	/*
