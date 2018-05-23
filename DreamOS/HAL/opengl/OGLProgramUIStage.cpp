@@ -158,25 +158,6 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
-	m_clippingView = matView;
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
-	m_clippingProjection = ProjectionMatrix(left, right, top, bottom, nearPlane, farPlane);
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) {
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 10.0f);
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 5.0f, 15.0f);
-	//m_clippingProjection = ProjectionMatrix(0.09f, 0.25f, 0.0f, 5.0f, 120.0f);
-	//m_clippingProjection = ProjectionMatrix(1.2f, 0.25f, 0.0f, 5.0f, 15.0f);
-	m_clippingProjection = ProjectionMatrix(width, height, nearPlane, farPlane, angle);
-	return R_PASS;
-}
-
 RESULT OGLProgramUIStage::SetOriginPoint(point ptOrigin) {
 	RESULT r = R_PASS;
 

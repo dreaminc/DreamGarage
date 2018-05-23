@@ -197,7 +197,7 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	// calculate available space based on chord length and depth
 	float theta = 2.0f*asin(halfChord / abs(m_menuCenterOffset));
 
-	m_clippingRate = (theta / m_maxElements) * (1.0f / 6.0f);
+	m_clippingRate = (theta / m_maxElements) * (1.0f - m_itemScale);
 	// scale to add margins in between items
 	theta += m_clippingRate;
 	m_clippingThreshold = cos(theta / 2.0f);
@@ -213,7 +213,7 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	m_itemStartAngleY = -(m_maxElements / 2.0f - 0.5f) * m_itemAngleY;
 
 	// calculate new chord length to get width for future menu items
-	m_itemWidth = abs(m_menuCenterOffset) * 2.0f * sin(itemAngleYRad / 2.0f) *(5.0f / 6.0f);
+	m_itemWidth = abs(m_menuCenterOffset) * 2.0f * sin(itemAngleYRad / 2.0f) * m_itemScale;
 
 	m_pTitleView = AddUIView();
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
@@ -221,23 +221,25 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	point ptContext = point(-sin(radY) * m_menuCenterOffset, m_itemHeight, 0.0f);
 	m_pTitleView->SetPosition(ptContext);
 
-	m_pTitleQuad = m_pTitleView->AddQuad(totalWidth * 0.068f, totalWidth * 0.068f * (3.0f / 4.0f));
+	float titleWidth = m_titleWidth * totalWidth;
+	m_pTitleQuad = m_pTitleView->AddQuad(titleWidth, titleWidth * m_titleAspectRatio);
 	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pTitleQuad->RotateXByDeg(90.0f);
-	m_pTitleQuad->SetPosition(point(totalWidth * 0.034f, totalWidth * m_titleHeight, 0.0f));
+	m_pTitleQuad->SetPosition(point(titleWidth / 2.0f, totalWidth * m_titleHeight, 0.0f));
 	m_pTitleQuad->SetVisible(false);
 
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pFont->SetLineHeight(totalWidth * 0.055f);
+	float titleLineHeight = m_titleLineHeight * totalWidth;
+	pFont->SetLineHeight(titleLineHeight);
 	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		pFont,
 		"Share",
 		totalWidth,
-		totalWidth * 0.055,
+		titleLineHeight,
 		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
 	m_pTitleText->RotateXByDeg(90.0f);
-	m_pTitleText->SetPosition(point(totalWidth * 0.6f, totalWidth * (m_titleHeight - 0.005f), 0.0f));
+	m_pTitleText->SetPosition(point(totalWidth * m_titleOffsetX, totalWidth * (m_titleHeight - m_titleOffsetY), 0.0f));
 	m_pTitleText->SetVisible(false);
 
 	m_pTitleView->AddObject(m_pTitleText);

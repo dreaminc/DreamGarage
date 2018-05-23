@@ -26,10 +26,6 @@ public:
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 	//UIStageProgram
-	virtual RESULT SetClippingViewMatrix(ViewMatrix matView) override;
-	virtual RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) override;
-	virtual RESULT SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) override;
-
 	virtual RESULT SetOriginPoint(point ptOrigin) override;
 	virtual RESULT SetOriginDirection(vector vOrigin) override;
 
