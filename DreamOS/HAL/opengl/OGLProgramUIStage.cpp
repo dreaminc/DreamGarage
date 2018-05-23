@@ -41,6 +41,9 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformptOrigin), std::string("u_ptOrigin")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformvOrigin), std::string("u_vOrigin")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingThreshold), std::string("u_clippingThreshold")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingRate), std::string("u_clippingRate")));
+
 	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
@@ -118,6 +121,9 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	m_pUniformptOrigin->SetUniform(point(m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(), 0.0f));
 	m_pUniformvOrigin->SetUniform(m_vOrigin);
 
+	m_pUniformClippingThreshold->SetUniform(m_clippingThreshold);
+	m_pUniformClippingRate->SetUniform(m_clippingRate);
+
 	m_pUniformAR->SetUniform(m_fIsAugmented);
 
 	m_pUniformClippingEnabled->SetUniform(true);
@@ -152,25 +158,6 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
-	m_clippingView = matView;
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
-	m_clippingProjection = ProjectionMatrix(left, right, top, bottom, nearPlane, farPlane);
-	return R_PASS;
-}
-
-RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) {
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 10.0f);
-	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 5.0f, 15.0f);
-	//m_clippingProjection = ProjectionMatrix(0.09f, 0.25f, 0.0f, 5.0f, 120.0f);
-	//m_clippingProjection = ProjectionMatrix(1.2f, 0.25f, 0.0f, 5.0f, 15.0f);
-	m_clippingProjection = ProjectionMatrix(width, height, nearPlane, farPlane, angle);
-	return R_PASS;
-}
-
 RESULT OGLProgramUIStage::SetOriginPoint(point ptOrigin) {
 	RESULT r = R_PASS;
 
@@ -189,6 +176,16 @@ RESULT OGLProgramUIStage::SetOriginDirection(vector vOrigin) {
 
 RESULT OGLProgramUIStage::SetIsAugmented(bool fAugmented) {
 	m_fIsAugmented = fAugmented;
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingThreshold(float clippingThreshold) {
+	m_clippingThreshold = clippingThreshold;
+	return R_PASS;
+}
+
+RESULT OGLProgramUIStage::SetClippingRate(float clippingRate) {
+	m_clippingRate = clippingRate;
 	return R_PASS;
 }
 

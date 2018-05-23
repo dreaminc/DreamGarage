@@ -119,6 +119,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem(float width, float height) {
+	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS, width, height));
+
+	return pButton;
+}
+
+std::shared_ptr<UIMenuItem> UIView::AddUIUIMenuItem(float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIMenuItem> pButton = MakeUIMenuItem(width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
 	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
 

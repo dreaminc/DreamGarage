@@ -525,7 +525,7 @@ RESULT HALTestSuite::AddTestEnvironments() {
 
 		float sceneScale = 0.025f;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_POINT, 15.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// environment strings
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\001.fbx"); // open ceiling
@@ -533,10 +533,13 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\004.fbx"); // pillars
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\005.fbx"); // wave
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\006.fbx"); // dome
-		model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\007.fbx"); // cave
+		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\007.fbx"); // cave
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\008.fbx"); // wood house
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\009.fbx"); // industrial
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\010.fbx"); // tube
+
+		model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\007.fbx"); // cave
+		//model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\006.fbx"); // cave
 
 		// Ambient Occlusion textures
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\001_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
@@ -544,14 +547,17 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\004_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\005_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\006_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\008_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\009_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\010_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
+		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\006_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
 		pModel->RotateXByDeg(-90.0f);
 		pModel->RotateYByDeg(90.0f);
-		pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+		pModel->SetPosition(point(0.0f, -2.5f, 0.0f));
 		//pModel->RotateZByDeg(-90.0f);
 		pModel->SetScale(sceneScale);
 

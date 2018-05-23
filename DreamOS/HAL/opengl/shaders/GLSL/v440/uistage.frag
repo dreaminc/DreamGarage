@@ -19,6 +19,8 @@ uniform bool u_clippingEnabled;
 uniform bool u_arEnabled;
 uniform vec4 u_ptOrigin;
 uniform vec4 u_vOrigin;
+uniform float u_clippingThreshold;
+uniform float u_clippingRate;
 
 struct Material {
 	float m_shine;
@@ -36,11 +38,8 @@ layout(std140) uniform ub_material {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-//vec4 g_ambient = vec4(0.05f);
 vec4 g_ambient = vec4(0.0f);
 
-float g_knee = 0.1f;
-float g_cosThreshold = 0.56f;
 float g_fadeRate = 6.0f;
 
 void main(void) {  
@@ -59,24 +58,25 @@ void main(void) {
 		vec3 vOrigintoQuadVertex = normalize(vec3(DataIn.ptMid.x - u_ptOrigin.x, 0.0f, DataIn.ptMid.z - u_ptOrigin.z));
 		float angle = dot(vOrigin, vOrigintoQuadVertex);
 
-		float minDistance = angle - g_cosThreshold;
+		float minDistance = acos(u_clippingThreshold) - acos(angle);
 
-		if (minDistance < 0.0f) {
+		if (minDistance < -u_clippingRate/2.0f) {
 			discard;
 		}
 		if (u_arEnabled == true && color.a != 0.0) {
 			color.a = 1.0;
 		}
 
-		float ratio = (g_knee - minDistance) / g_knee;
-		if (ratio > 0.0f) {
+		float ratio = ((-u_clippingRate - minDistance) / -u_clippingRate) - 0.5;
+		if (ratio <= 1.0f && ratio > 0.0f) {
 			//scale function to fit domain of [0,1]
 			float x = ratio-0.5f;
 
 			//scale y to range of [0,1]
 			float y = (tanh(g_fadeRate*x)+1.0f)/2.0f;
 
-			color.a = color.a * (1.0 - y);
+			//color.a = color.a * (1.0 - y);
+			color.a = color.a * y;
 
 			//potentially normalize color
 			//vec3 white = vec3(1.0f, 1.0f, 1.0f);

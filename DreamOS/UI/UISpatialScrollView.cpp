@@ -37,34 +37,6 @@ RESULT UISpatialScrollView::Initialize() {
 //	m_pDreamOS->AddObjectToUIGraph(this);
 //	m_pDreamOS->AddObjectToUIClippingGraph(this);
 
-	m_pTitleView = AddUIView();
-	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
-
-	point ptContext = point(-sin(radY) * m_menuCenterOffset, m_itemHeight, 0.0f);
-	m_pTitleView->SetPosition(ptContext);
-
-	//TODO:  clean this up, potentially with curved quad implementation
-	m_pTitleQuad = m_pTitleView->AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
-	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pTitleQuad->RotateXByDeg(90.0f);
-	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
-	m_pTitleQuad->SetVisible(false);
-
-	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pFont->SetLineHeight(0.055f);
-	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
-		pFont,
-		"Share",
-		1.0,
-		0.055,
-		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
-
-	m_pTitleText->RotateXByDeg(90.0f);
-	m_pTitleText->SetPosition(point(0.6f, m_titleHeight - 0.005f, 0.0f));
-	m_pTitleText->SetVisible(false);
-
-	m_pTitleView->AddObject(m_pTitleText);
-	m_pDreamOS->AddObjectToUIGraph(m_pTitleView.get());
 
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
@@ -214,6 +186,66 @@ RESULT UISpatialScrollView::Update() {
 
 Error:
 	return r; 
+}
+
+RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
+	RESULT r = R_PASS;
+
+	// treat width as a chord of a circle with radius m_menuCenterOffset;
+	float halfChord = totalWidth/2.0f;
+
+	// calculate available space based on chord length and depth
+	float theta = 2.0f*asin(halfChord / abs(m_menuCenterOffset));
+
+	m_clippingRate = (theta / m_maxElements) * (1.0f - m_itemScale);
+	// scale to add margins in between items
+	theta += m_clippingRate;
+	m_clippingThreshold = cos(theta / 2.0f);
+
+
+	// calculate angle between each element
+	float itemAngleYRad = theta / m_maxElements;
+
+	// convert to degrees
+	m_itemAngleY = itemAngleYRad * 180.0f / (float)(M_PI);
+
+	// update starting angle
+	m_itemStartAngleY = -(m_maxElements / 2.0f - 0.5f) * m_itemAngleY;
+
+	// calculate new chord length to get width for future menu items
+	m_itemWidth = abs(m_menuCenterOffset) * 2.0f * sin(itemAngleYRad / 2.0f) * m_itemScale;
+
+	m_pTitleView = AddUIView();
+	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
+
+	point ptContext = point(-sin(radY) * m_menuCenterOffset, m_itemHeight, 0.0f);
+	m_pTitleView->SetPosition(ptContext);
+
+	float titleWidth = m_titleWidth * totalWidth;
+	m_pTitleQuad = m_pTitleView->AddQuad(titleWidth, titleWidth * m_titleAspectRatio);
+	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTitleQuad->RotateXByDeg(90.0f);
+	m_pTitleQuad->SetPosition(point(titleWidth / 2.0f, totalWidth * m_titleHeight, 0.0f));
+	m_pTitleQuad->SetVisible(false);
+
+	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	float titleLineHeight = m_titleLineHeight * totalWidth;
+	pFont->SetLineHeight(titleLineHeight);
+	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+		pFont,
+		"Share",
+		totalWidth,
+		titleLineHeight,
+		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+
+	m_pTitleText->RotateXByDeg(90.0f);
+	m_pTitleText->SetPosition(point(totalWidth * m_titleOffsetX, totalWidth * (m_titleHeight - m_titleOffsetY), 0.0f));
+	m_pTitleText->SetVisible(false);
+
+	m_pTitleView->AddObject(m_pTitleText);
+	m_pDreamOS->AddObjectToUIGraph(m_pTitleView.get());
+
+	return r;
 }
 
 // mostly borrowed from UIBar right now, current default values make sense with ray selection
@@ -563,6 +595,18 @@ std::shared_ptr<text> UISpatialScrollView::GetTitleText() {
 
 std::shared_ptr<UIView> UISpatialScrollView::GetMenuItemsView() {
 	return m_pMenuButtonsContainer;
+}
+
+float UISpatialScrollView::GetWidth() {
+	return m_itemWidth;
+}
+
+float UISpatialScrollView::GetClippingThreshold() {
+	return m_clippingThreshold;
+}
+
+float UISpatialScrollView::GetClippingRate() {
+	return m_clippingRate;
 }
 
 RESULT UISpatialScrollView::Notify(SenseControllerEvent *pEvent) {

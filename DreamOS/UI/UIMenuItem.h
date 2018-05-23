@@ -30,6 +30,10 @@ struct IconFormat
 };
 
 #define LABEL_SIZE 0.8f
+#define LABEL_WIDTH_SCALE 0.9 
+#define LABEL_HEIGHT_SCALE 0.28125
+#define LABEL_HEIGHT_POSITION -0.46f
+#define LABEL_LINE_HEIGHT_SCALE 0.1f
 
 struct LabelFormat
 {
@@ -59,6 +63,7 @@ struct LabelFormat
 class UIMenuItem : public UIButton {
 public:
 	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS);
+	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height);
 
 	RESULT Initialize();
 

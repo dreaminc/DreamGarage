@@ -40,6 +40,9 @@ public:
 	std::shared_ptr<UIMenuItem> MakeUIMenuItem();
 	std::shared_ptr<UIMenuItem> AddUIMenuItem();
 
+	std::shared_ptr<UIMenuItem> MakeUIMenuItem(float width, float height);
+	std::shared_ptr<UIMenuItem> AddUIUIMenuItem(float width, float height);
+
 	std::shared_ptr<UIControlBar> MakeUIControlBar();
 	std::shared_ptr<UIControlBar> AddUIControlBar();
 

@@ -212,12 +212,8 @@ RESULT DreamUIBar::ResetAppComposite() {
 	vCameraToMenu.y() = 0.0f;
 	vCameraToMenu.Normalize();
 
+	m_pUIStageProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
 	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
-	// TODO: This offset doesn't behave quite as expected, 
-	// will probably need corrections whenever we change menu position
-	ptOrigin += vCameraToMenu * CLIPPING_OFFSET;
-
-	m_pUIStageProgram->SetOriginPoint(ptOrigin);
 
 Error:
 	return r;
@@ -560,7 +556,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		std::vector<std::shared_ptr<UIButton>> pButtons;
 
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-			auto pButton = m_pView->MakeUIMenuItem();
+			auto pButton = m_pView->MakeUIMenuItem(m_pScrollView->GetWidth(), m_pScrollView->GetWidth() * ASPECT_RATIO);
 			CN(pButton);
 
 			auto iconFormat = IconFormat();
@@ -790,8 +786,19 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 }
 
 RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	RESULT r = R_PASS;
+
 	m_pParentApp = pParentApp;
-	return R_PASS;
+	CNR(m_pParentApp, R_SKIPPED);
+
+	float totalWidth = m_pParentApp->GetTotalWidth();
+	m_pScrollView->InitializeWithWidth(totalWidth);
+
+	m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
+	m_pUIStageProgram->SetClippingRate(m_pScrollView->GetClippingRate());
+
+Error:
+	return r;
 }
 
 bool DreamUIBar::IsEmpty() {

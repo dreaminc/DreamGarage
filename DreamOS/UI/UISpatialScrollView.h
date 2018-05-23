@@ -20,8 +20,16 @@ class text;
 #define ITEM_START_ANGLE_Y (-1.5f * ITEM_ANGLE_Y)
 #define ITEM_HEIGHT 0.0f 
 
+#define ITEM_SCALE (5.0f / 6.0f) // shrink menu items to create space between them
+
 #define TITLE_ANGLE_X 75.0f
 #define TITLE_HEIGHT (ITEM_HEIGHT + 0.125f) //TODO: derive out of item angle + defined margin
+#define TITLE_WIDTH 0.068f
+#define TITLE_ASPECT (3.0f / 4.0f)
+#define MENU_TITLE_LINE_HEIGHT 0.055f
+
+#define TITLE_TEXT_OFFSET_X 0.6f
+#define TITLE_TEXT_OFFSET_Y 0.005f
 
 #define SCROLL_SCALE 0.2f 
 #define SCROLL_ARROW_BIAS 0.4f // Pulls scroll chevrons in towards the menu items
@@ -43,6 +51,7 @@ public:
 	~UISpatialScrollView();
 
 	RESULT Initialize();
+	RESULT InitializeWithWidth(float totalWidth);
 
 	RESULT Update();
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
@@ -69,6 +78,10 @@ public:
 	std::shared_ptr<text> GetTitleText();
 	std::shared_ptr<UIView> GetMenuItemsView();
 
+	float GetWidth();
+	float GetClippingThreshold();
+	float GetClippingRate();
+
 public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
@@ -80,9 +93,23 @@ private:
 	float m_itemAngleY = ITEM_ANGLE_Y;
 	float m_itemStartAngleY = ITEM_START_ANGLE_Y;
 	float m_itemHeight = ITEM_HEIGHT;
+	
+	float m_itemScale = ITEM_SCALE;
+
+	float m_itemWidth;
+
+	// values for UIClipping shader
+	float m_clippingThreshold;
+	float m_clippingRate;
 
 	float m_titleAngleX = TITLE_ANGLE_X;
 	float m_titleHeight = TITLE_HEIGHT;
+
+	float m_titleWidth = TITLE_WIDTH;
+	float m_titleAspectRatio = TITLE_ASPECT;
+	float m_titleLineHeight = MENU_TITLE_LINE_HEIGHT;
+	float m_titleOffsetX = TITLE_TEXT_OFFSET_X;
+	float m_titleOffsetY = TITLE_TEXT_OFFSET_Y;
 
 	// scrolling
 	float m_scrollScale = SCROLL_SCALE;

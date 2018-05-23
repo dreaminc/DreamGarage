@@ -80,8 +80,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(m_pDreamUIBar);
-		m_pDreamUIBar->InitializeWithParent(this);
-		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
 
 		m_pControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
 		CN(m_pControlBar);
@@ -94,6 +92,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 		CN(m_pDreamTabView);
 		m_pDreamTabView->InitializeWithParent(this);
+
+		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
+		m_pDreamUIBar->InitializeWithParent(this);
 
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
