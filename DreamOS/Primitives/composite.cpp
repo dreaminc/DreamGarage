@@ -414,11 +414,12 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptO
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+	CN(pQuad);
 
 	//Success:
 	return pQuad;
 
-	//Error:
+Error:
 	return nullptr;
 }
 
@@ -440,7 +441,6 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHo
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
 	CN(pQuad);
-	CR(AddObject(pQuad));
 
 //Success:
 	return pQuad;
@@ -450,7 +450,16 @@ Error:
 }
 
 std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal){
-	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+	CN(pQuad);
+	CR(AddObject(pQuad));
+
+	return pQuad;
+
+Error:
+	return nullptr;
 }
 
 std::shared_ptr<DimRay> composite::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
