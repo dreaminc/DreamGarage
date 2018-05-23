@@ -176,6 +176,8 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	GetComposite()->SetPosition(pParent->GetCenter() + point(-pParent->GetCenterOffset(), 0.0f, kbOffset));
 	m_ptComposite = GetComposite()->GetPosition();
 
+	float totalWidth = m_pParentApp->GetTotalWidth();
+
 	{
 		//Setup textbox
 		float offset = m_surfaceHeight / 2.0f;
@@ -185,7 +187,8 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 		m_pHeaderContainer->RotateXByDeg(90.0f - m_pParentApp->GetViewAngle());
 
-		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(textBoxWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
+		float quadHeight = m_lineHeight * m_numLines * 1.5f;
+		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(textBoxWidth, quadHeight, point(0.0f, -0.001f, 0.0f));
 		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 
 		m_pFont->SetLineHeight(m_lineHeight);
@@ -193,7 +196,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 			m_pFont,
 			"",
 			textBoxWidth - m_textboxMargin,
-			//0.25f,
 			m_lineHeight * m_numLines, 
 			text::flags::LEAD_ELLIPSIS | text::flags::RENDER_QUAD));
 
@@ -210,19 +212,20 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 		
 
 		//Setup title / icon
-		m_pTitleIcon = m_pHeaderContainer->AddQuad(m_titleIconWidth, m_titleIconHeight);
-		m_pTitleIcon->SetPosition(point((-m_surfaceWidth + m_titleIconWidth + marginError)/2.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		float iconWidth = quadHeight * (4.0f / 3.0f);
+		point ptTitle = point((-m_surfaceWidth + iconWidth + marginError) / 2.0f, 0.0f, -(quadHeight + m_pParentApp->GetSpacingSize()));
+		m_pTitleIcon = m_pHeaderContainer->AddQuad(iconWidth, quadHeight);
+		m_pTitleIcon->SetPosition(ptTitle);
 		
 		m_pTitleIcon->SetDiffuseTexture(m_pDefaultIconTexture.get());
 
-		m_pFont->SetLineHeight(m_titleLineHeight);
 		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
 			"Website",
-			m_surfaceWidth - m_textboxMargin,
-			m_titleLineHeight,
+			m_surfaceWidth,
+			m_lineHeight,
 			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
-		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		m_pTitleText->SetPosition(point(m_pTitleIcon->GetWidth() + m_pParentApp->GetSpacingSize(), 0.0f, m_pTitleIcon->GetPosition().z()));
 		m_pHeaderContainer->AddObject(m_pTitleText);
 
 	}
