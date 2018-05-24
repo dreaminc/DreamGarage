@@ -8,6 +8,7 @@
 #include "Core/Utilities.h"
 
 
+
 DreamEnvironment::DreamEnvironment(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamEnvironment>(pDreamOS, pContext)
 {
@@ -19,16 +20,17 @@ RESULT DreamEnvironment::InitializeApp(void *pContext) {
 
 	auto pDreamOS = GetDOS();
 
-	float intensity = 1.0f;
+	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
+	m_sceneScale = 1.0f;
+	m_lightIntensity = 1.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
-	point ptSceneOffset = point(90, -5, -25);
-	float sceneScale = 0.1f;
-	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
+	//TODO: way to change environment after initialization
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
 
+	//TODO: environments probably won't all have the same lighting
 	if (strEnvironmentPath == "default") {
 		auto pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 		pDirectionalLight->EnableShadows();
@@ -36,39 +38,26 @@ RESULT DreamEnvironment::InitializeApp(void *pContext) {
 		pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	}
 	else {
-		intensity = 15.0f;
+		m_lightIntensity = 15.0f;
 	}
 
-	pDreamOS->AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
-	bool fShowModels = true;
-	auto pHMD = pDreamOS->GetHMD();
-	if (pHMD != nullptr) {
-		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
-			fShowModels = false;
-		}
-	}
-
-	CBR(fShowModels, R_SKIPPED);
 
 	if (strEnvironmentPath == "default") {
-		model* pModel = pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
-		pModel->SetPosition(ptSceneOffset);
-		pModel->SetScale(sceneScale);
+		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
+		m_sceneScale = 0.1f;
 
-		model* pRiver = pDreamOS->AddModel(L"\\FloatingIsland\\river.obj");
-		pRiver->SetPosition(ptSceneOffset);
-		pRiver->SetScale(sceneScale);
-
-		model* pClouds = pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
-		pClouds->SetPosition(ptSceneOffset);
-		pClouds->SetScale(sceneScale);
-		//pModel->SetEulerOrientation(vSceneEulerOrientation);
-		//pClouds->SetVisible(false);
-
+		//TODO: may need a way to load multiple files for the environment in a more general way
+		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
+		CN(pModel);
+		auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
+		CN(pRiver);
+		auto pClouds = GetComposite()->AddModel(L"\\FloatingIsland\\clouds.obj");
+		CN(pClouds);
 		pClouds->SetMaterialAmbient(0.8f);
 
 		pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
@@ -98,14 +87,16 @@ RESULT DreamEnvironment::InitializeApp(void *pContext) {
 		}
 	}
 	else {
-		model *pModel = pDreamOS->AddModel(util::StringToWideString(strEnvironmentPath));
+		auto pModel = GetComposite()->AddModel(util::StringToWideString(strEnvironmentPath));
 		pModel->RotateXByDeg(-90.0f);
 		pModel->RotateYByDeg(90.0f);
 		//TODO: in theory this should be 1.0f if the models we get are in meters
-		pModel->SetScale(sceneScale);
-		pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+		m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
 	}
 	//*/
+
+	GetComposite()->SetPosition(m_ptSceneOffset);
+	GetComposite()->SetScale(m_sceneScale);
 
 Error:
 	return r;

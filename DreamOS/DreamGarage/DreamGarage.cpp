@@ -230,8 +230,21 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 #ifndef _DEBUG
-	auto pEnvironmentApp = LaunchDreamApp<DreamEnvironment>(this);
-	CN(pEnvironmentApp);
+
+	bool fShowModels = true;
+	auto pHMD = GetHMD();
+
+	if (pHMD != nullptr) {
+		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
+			fShowModels = false;
+		}
+	}
+
+	if (fShowModels) {
+		auto pEnvironmentApp = LaunchDreamApp<DreamEnvironment>(this);
+		CN(pEnvironmentApp);
+	}
+
 #endif
 
 	CR(SetupUserModelPool());
