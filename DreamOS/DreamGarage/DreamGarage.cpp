@@ -15,6 +15,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamEnvironment.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
@@ -216,14 +217,6 @@ user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<OGLObj> pOGLObj = nullptr;
-	point ptSceneOffset = point(90, -5, -25);
-	float sceneScale = 0.1f;
-	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
-
-	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
-
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
@@ -236,98 +229,15 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-	float intensity = 1.0f;
-
-	if (strEnvironmentPath == "default") {
-		g_pLight = AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
-		g_pLight->EnableShadows();
-
-		AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	}
-	else {
-		intensity = 15.0f;
-	}
-
-	AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, intensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	AddLight(LIGHT_POINT, intensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+#ifndef _DEBUG
+	auto pEnvironmentApp = LaunchDreamApp<DreamEnvironment>(this);
+	CN(pEnvironmentApp);
+#endif
 
 	CR(SetupUserModelPool());
 
-	bool fShowModels = true;
-	auto pHMD = GetHMD();
-	if (pHMD != nullptr) {
-		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
-			fShowModels = false;
-		}
-	}
-
-	CBR(fShowModels, R_SKIPPED);
-
 	AddSkybox();
 
-#ifndef _DEBUG
-
-	//*
-	//std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-	if (strEnvironmentPath == "default") {
-		model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
-		pModel->SetPosition(ptSceneOffset);
-		pModel->SetScale(sceneScale);
-		//pModel->SetEulerOrientation(vSceneEulerOrientation);
-		//pModel->SetVisible(false);
-
-		model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
-		pRiver->SetPosition(ptSceneOffset);
-		pRiver->SetScale(sceneScale);
-		//pModel->SetEulerOrientation(vSceneEulerOrientation);
-		//pRiver->SetVisible(false);
-
-		model* pClouds = AddModel(L"\\FloatingIsland\\clouds.obj");
-		pClouds->SetPosition(ptSceneOffset);
-		pClouds->SetScale(sceneScale);
-		//pModel->SetEulerOrientation(vSceneEulerOrientation);
-		//pClouds->SetVisible(false);
-
-		pClouds->SetMaterialAmbient(0.8f);
-
-		pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
-		if (pOGLObj != nullptr) {
-			pOGLObj->SetOGLProgramPreCallback(
-				[](OGLProgram* pOGLProgram, void *pContext) {
-				// Do some stuff pre-render
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
-				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetRiverAnimation(true);
-				}
-				return R_PASS;
-			}
-			);
-
-			pOGLObj->SetOGLProgramPostCallback(
-				[](OGLProgram* pOGLProgram, void *pContext) {
-				// Do some stuff post
-
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
-				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetRiverAnimation(false);
-				}
-				return R_PASS;
-			}
-			);
-		}
-	}
-	else {
-		model *pModel = AddModel(util::StringToWideString(strEnvironmentPath));
-		//TODO: in theory this should be 1.0f if the models we get are in meters
-		pModel->RotateXByDeg(-90.0f);
-		pModel->RotateYByDeg(90.0f);
-		pModel->SetScale(sceneScale);
-		pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
-	}
-	//*/
-#endif
 
 Error:
 	return r;

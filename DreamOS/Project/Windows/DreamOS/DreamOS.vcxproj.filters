@@ -1001,6 +1001,9 @@
     <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamEnvironment.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2176,6 +2179,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h">
       <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamEnvironment.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
