@@ -15,7 +15,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamEnvironment.h"
+#include "DreamGarage/DreamEnvironmentApp.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
@@ -241,7 +241,7 @@ RESULT DreamGarage::LoadScene() {
 	}
 
 	if (fShowModels) {
-		auto pEnvironmentApp = LaunchDreamApp<DreamEnvironment>(this);
+		auto pEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
 		CN(pEnvironmentApp);
 	}
 

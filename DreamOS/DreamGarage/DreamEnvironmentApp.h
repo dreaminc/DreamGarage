@@ -7,12 +7,12 @@
 
 class DreamOS;
 
-class DreamEnvironment : public DreamApp<DreamEnvironment> {
+class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	friend class DreamAppManager;
 
 	// DreamApp
 public:
-	DreamEnvironment(DreamOS *pDreamOS, void *pContext = nullptr);
+	DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext = nullptr);
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
@@ -20,7 +20,7 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 protected:
-	static DreamEnvironment* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	static DreamEnvironmentApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	point m_ptSceneOffset;

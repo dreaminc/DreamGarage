@@ -1,4 +1,4 @@
-#include "DreamEnvironment.h"
+#include "DreamEnvironmentApp.h"
 #include "DreamOS.h"
 
 #include "HAL/opengl/OGLObj.h"
@@ -9,13 +9,13 @@
 
 
 
-DreamEnvironment::DreamEnvironment(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamEnvironment>(pDreamOS, pContext)
+DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamEnvironmentApp>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
 
-RESULT DreamEnvironment::InitializeApp(void *pContext) {
+RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -102,19 +102,19 @@ Error:
 	return r;
 }
 
-RESULT DreamEnvironment::OnAppDidFinishInitializing(void *pContext) {
+RESULT DreamEnvironmentApp::OnAppDidFinishInitializing(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamEnvironment::Update(void *pContext) {
+RESULT DreamEnvironmentApp::Update(void *pContext) {
 	return R_PASS;
 }
 
-RESULT DreamEnvironment::Shutdown(void *pContext) {
+RESULT DreamEnvironmentApp::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
-DreamEnvironment* DreamEnvironment::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamEnvironment *pDreamApp = new DreamEnvironment(pDreamOS, pContext);
+DreamEnvironmentApp* DreamEnvironmentApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamEnvironmentApp *pDreamApp = new DreamEnvironmentApp(pDreamOS, pContext);
 	return pDreamApp;
 }
