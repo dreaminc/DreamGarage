@@ -197,6 +197,36 @@ float DreamUserControlArea::GetBaseWidth() {
 	return m_baseWidth;
 }
 
+RESULT DreamUserControlArea::SetBaseWidth() {
+	RESULT r = R_PASS;
+	return r;
+}
+
+float DreamUserControlArea::GetViewHeight() {
+	return GetComposite()->GetPosition().y();
+}
+
+float DreamUserControlArea::GetViewDepth() {
+	return GetComposite()->GetPosition().z();
+}
+
+RESULT DreamUserControlArea::SetViewHeight(float height) {
+
+	point ptOrigin = GetComposite()->GetPosition();
+	GetComposite()->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
+
+	return R_PASS;
+}
+
+RESULT DreamUserControlArea::SetViewDepth(float depth) {
+
+	// TODO: should be moving the user position instead
+	point ptOrigin = GetComposite()->GetPosition();
+	GetComposite()->SetPosition(point(ptOrigin.x(), ptOrigin.y(), depth));
+
+	return R_PASS;
+}
+
 float DreamUserControlArea::GetBaseHeight() {
 	return m_baseHeight;
 }

@@ -794,8 +794,10 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	float totalWidth = m_pParentApp->GetTotalWidth();
 	m_pScrollView->InitializeWithWidth(totalWidth);
 
-	m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
-	m_pUIStageProgram->SetClippingRate(m_pScrollView->GetClippingRate());
+	if (m_pUIStageProgram != nullptr) {
+		m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
+		m_pUIStageProgram->SetClippingRate(m_pScrollView->GetClippingRate());
+	}
 
 Error:
 	return r;

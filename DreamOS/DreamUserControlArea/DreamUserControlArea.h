@@ -31,6 +31,8 @@ class UIStageProgram;
 class quad;
 
 #define MAIN_DIAGONAL 0.70f
+#define DIAGONAL_INCREMENT (MAIN_DIAGONAL * 0.05f)
+
 #define SPACING_SIZE 0.016129f
 #define DEFAULT_PX_WIDTH 1366
 #define DEFAULT_PX_HEIGHT 768
@@ -72,6 +74,15 @@ public:
 	float GetBaseHeight();
 	//point GetBaseCenter();
 	float GetViewAngle();
+
+	// Set Base width and update everything else
+	RESULT SetBaseWidth();
+
+	// 
+	float GetViewHeight();
+	float GetViewDepth();
+	RESULT SetViewHeight(float height);
+	RESULT SetViewDepth(float depth);
 
 	// absolute positions
 	point GetCenter();

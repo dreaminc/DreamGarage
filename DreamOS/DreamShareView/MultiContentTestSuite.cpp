@@ -80,6 +80,8 @@ RESULT MultiContentTestSuite::AddTests() {
 
 	CR(AddTestManyBrowsers());
 
+	CR(AddTestChangeUIWidth());
+
 	CR(AddTestMenuShader());
 
 	CR(AddTestAllUIObjects());
@@ -735,6 +737,117 @@ RESULT MultiContentTestSuite::AddTestMenuShader() {
 Error:
 	return r;
 
+}
+
+RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public Subscriber<SenseControllerEvent> {
+		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		bool fFirst = true;
+
+		bool fDirty = false;
+
+		virtual RESULT Notify(SenseControllerEvent *pEvent) override {
+			RESULT r = R_PASS;
+
+			if (pEvent->type == SENSE_CONTROLLER_MENU_UP) {
+				
+			}
+			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
+				float height = pEvent->state.ptTouchpad.y() * 0.015f;
+				if (pUserControlArea != nullptr) {
+					float currentHeight = pUserControlArea->GetViewHeight();
+					pUserControlArea->SetViewHeight(currentHeight + height);
+				}
+			}
+			//else if (pEvent->type == SENSE_CONTROLLER_)
+
+			return r;
+		};
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+
+		CN(pTestContext);
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, pTestContext);
+
+		pTestContext->pUserControlArea = pControlArea;
+		CN(pControlArea);
+		
+		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pControlArea = pTestContext->pUserControlArea;
+
+		if (pTestContext->fFirst) {
+			pTestContext->fFirst = false;
+
+			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
+			std::vector<std::shared_ptr<UIButton>> pButtons;
+
+			for (int i = 0; i < 6; i++) {
+
+				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem(pDreamUIBar->m_pScrollView->GetWidth(), pDreamUIBar->m_pScrollView->GetWidth() * 9.0f / 16.0f);
+				CN(pButton);
+
+				auto iconFormat = IconFormat();
+				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
+
+				auto labelFormat = LabelFormat();
+				labelFormat.strLabel = "Label " + std::to_string(i);
+				labelFormat.pFont = pDreamUIBar->m_pFont;
+				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
+
+				pButton->Update(iconFormat, labelFormat);
+
+				pButtons.emplace_back(pButton);
+			}
+
+			pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
+
+			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
+
+			pDreamUIBar->ResetAppComposite();
+			pTestContext->pUserControlArea->ResetAppComposite();
+
+			pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
+		}
+	Error:
+		return r;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
 
 RESULT MultiContentTestSuite::AddTestAllUIObjects() {

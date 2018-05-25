@@ -60,6 +60,8 @@ public:
 	// all ui objects visible at once
 	RESULT AddTestAllUIObjects();
 
+	RESULT AddTestChangeUIWidth();
+
 	// test for memory leaks in the menu
 	RESULT AddTestMenuMemory();
 	RESULT AddTestRemoveObjects();
