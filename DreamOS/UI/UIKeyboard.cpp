@@ -673,11 +673,11 @@ UIKey* UIKeyboard::CollisionPointToKey(point ptCollision) {
 
 	auto& keyboardLayout = m_pLayout->GetKeys();
 
-	int rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
+	float rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
 	float xPos = (ptCollision.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
-	auto& row = keyboardLayout[rowIndex];
+	auto& row = keyboardLayout[(int)rowIndex];
 
 	for (int i = (int)row.size() - 1; i >= 0; i--) {
 		auto k = row[i];
