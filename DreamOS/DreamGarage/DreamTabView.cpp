@@ -91,20 +91,27 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	float baseWidth = m_pParentApp->GetBaseWidth();
 	float baseHeight = m_pParentApp->GetBaseHeight();
-	float itemSpacing = m_pParentApp->GetSpacingSize();
+	m_itemSpacing = m_pParentApp->GetSpacingSize() * baseWidth;
 	float borderWidth = m_borderWidth * baseWidth;
 	float borderHeight = m_borderHeight * baseWidth;
 
-	m_borderHeight *= baseWidth;
-	m_borderWidth *= baseWidth;
+	//m_borderHeight *= baseWidth;
+	//m_borderWidth *= baseWidth;
 
 	// ties this app to the control area's size
-	m_tabWidth *= baseWidth;
-	m_tabHeight *= baseWidth * 1.01f;
+	float tabWidth = m_tabWidth * baseWidth;
+	
+	float tabHeight = (borderHeight - 5.0f * m_itemSpacing) / 4.0f;
+
+	//sometimes the top sliver of the fifth tab gets rendered on the bottom
+	tabHeight *= 1.001f;
+	
+	m_tabWidth = tabWidth;
+	m_tabHeight = tabHeight;
 
 	m_pBackgroundQuad = GetComposite()->AddQuad(borderWidth, borderHeight);
 	CN(m_pBackgroundQuad);
-	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight - itemSpacing);
+	m_pRenderQuad = GetComposite()->AddQuad(borderWidth, borderHeight);// -m_itemSpacing);
 	CN(m_pRenderQuad);
 
 	{
@@ -114,9 +121,9 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 		pRenderContext->SetAbsoluteBounds(m_pRenderQuad->GetWidth(), m_pRenderQuad->GetHeight());
 
 		m_pScrollView->SetRenderQuad(m_pRenderQuad, pRenderContext);
-		m_pScrollView->SetScrollSnapDistance(m_tabHeight + itemSpacing / 2.0f);
-		m_pScrollView->SetTabWidth(m_tabWidth);
-		m_pScrollView->SetTabHeight(m_tabHeight);
+		m_pScrollView->SetScrollSnapDistance(tabHeight + m_itemSpacing);
+		m_pScrollView->SetTabWidth(tabWidth);
+		m_pScrollView->SetTabHeight(tabHeight);
 
 		//unclear how the object structure should work here, should UIFlatScrollView be a FlatContext?
 		m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
@@ -128,9 +135,9 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);
 	m_pBackgroundQuad->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
-	GetComposite()->SetPosition(point(baseWidth / 2.0f + itemSpacing + borderWidth / 2.0f, 0.0f, -itemSpacing/2.0f -(baseHeight - borderHeight) / 2.0f));
+	GetComposite()->SetPosition(point(2*m_itemSpacing + (baseWidth + borderWidth) / 2.0f, 0.0f, -((baseHeight + 2*m_itemSpacing) - borderHeight)/2.0f));
 
-	m_ptMostRecent = point(0.0f, 0.0f, (-borderHeight / 2.0f) + (m_tabHeight / 2.0f) + (itemSpacing / 2.0f));
+	m_ptMostRecent = point(0.0f, 0.0f, (-borderHeight / 2.0f) + (tabHeight / 2.0f) + (m_itemSpacing));
 
 Error:
 	return r;
@@ -178,8 +185,8 @@ RESULT DreamTabView::AddContent(std::shared_ptr<DreamContentSource> pContent) {
 	CN(pNewTabButton);
 
 	for (auto pButton : m_tabButtons) {
-		//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
-		TranslateTabDown(pButton.get());
+		pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_itemSpacing)));
+		//TranslateTabDown(pButton.get());
 	}
 
 	m_tabButtons.emplace_back(pNewTabButton);
@@ -262,7 +269,7 @@ RESULT DreamTabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 			break;
 		} 
 		else {
-			//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f)));
+			//pButton->SetPosition(pButton->GetPosition() + point(0.0f, 0.0f, m_tabHeight + (m_itemSpacing)));
 			TranslateTabDown(pButton.get());
 		}
 	}
@@ -397,7 +404,7 @@ Error:
 RESULT DreamTabView::TranslateTabDown(DimObj *pTabButton) {
 	RESULT r = R_PASS;
 
-	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_pParentApp->GetSpacingSize() / 2.0f));
+	point ptDisplacement = point(0.0f, 0.0f, m_tabHeight + (m_itemSpacing));
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pTabButton,

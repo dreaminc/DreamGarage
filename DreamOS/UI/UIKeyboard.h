@@ -15,7 +15,7 @@
 #include <vector>
 #include <string>
 
-#define SURFACE_WIDTH 0.523f //0.5f // surface is a quad that holds the entire keyboard layout
+#define SURFACE_WIDTH 0.75 // surface is a quad that holds the entire keyboard layout
 #define SURFACE_HEIGHT 0.294f // 0.25f
 #define SURFACE_ANGLE 30.0f
 

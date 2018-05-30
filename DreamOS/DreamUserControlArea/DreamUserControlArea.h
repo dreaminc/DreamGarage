@@ -30,7 +30,7 @@ class UIStageProgram;
 
 class quad;
 
-#define MAIN_DIAGONAL 0.6f
+#define MAIN_DIAGONAL 0.70f
 #define SPACING_SIZE 0.016129f
 #define DEFAULT_PX_WIDTH 1366
 #define DEFAULT_PX_HEIGHT 768
