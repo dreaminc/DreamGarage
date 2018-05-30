@@ -150,7 +150,7 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	// after being placed, the keys are scaled down by m_keyScale to create gaps in between the quads.
 	// need to increase the overall surface width to accommodate for this, and decrease the width of the text box
 	float marginError = keyDimension * (1 - m_keyScale);
-	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f * 0.75f;
+	m_surfaceWidth *= m_pParentApp->GetBaseWidth();
 	m_surfaceWidth += marginError;
 	m_surfaceHeight = m_surfaceWidth * 0.4f;
 
