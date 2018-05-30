@@ -6,6 +6,7 @@
 #include "Primitives/model/mesh.h"
 #include "DreamOS.h"
 #include "InteractionEngine/AnimationItem.h"
+#include "Core/Utilities.h"
 
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
@@ -43,15 +44,41 @@ RESULT hand::Initialize(HAND_TYPE type) {
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
+	std::string strLeftHandPath = "default";
+	std::string strRightHandPath = "default";
+
+#ifndef PRODUCTION_BUILD
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	strLeftHandPath = pCommandLineManager->GetParameterValue("lefthand.path");
+	strRightHandPath = pCommandLineManager->GetParameterValue("righthand.path");
+#endif
+
 #ifndef _DEBUG
+
 	if (type == HAND_TYPE::HAND_LEFT) {
-		m_pModel = AddModel(L"\\face4\\LeftHand.obj");
-		m_pModel->SetOrientationOffset((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
+		vector vLeftHandOffset;
+		if (strLeftHandPath == "default") {
+			vLeftHandOffset = vector((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
+			strLeftHandPath = k_strDefaultLeftHandPath;
+		}
+		else {
+			vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
+		}
+		m_pModel = AddModel(util::StringToWideString(strLeftHandPath));
+		m_pModel->SetOrientationOffset(vLeftHandOffset);
 	}
 	
 	if (type == HAND_TYPE::HAND_RIGHT) {
-		m_pModel = AddModel(L"\\face4\\RightHand.obj");
-		m_pModel->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+		vector vRightHandOffset;
+		if (strRightHandPath == "default") {
+			vRightHandOffset = vector((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+			strRightHandPath = k_strDefaultRightHandPath;
+		}
+		else {
+			vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
+		}
+		m_pModel = AddModel(util::StringToWideString(strRightHandPath));
+		m_pModel->SetOrientationOffset(vRightHandOffset);
 	}
 
 	CN(m_pModel);

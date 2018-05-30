@@ -2,6 +2,9 @@
 #include "Primitives/quad.h"
 #include "Primitives/model/model.h"
 
+#include "Core/Utilities.h"
+#include "Sandbox/CommandLineManager.h"
+
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
 {
@@ -15,12 +18,28 @@ RESULT user::Initialize() {
 
 	InitializeOBB();
 
+	std::string strHeadPath = "default";
+
+#ifndef PRODUCTION_BUILD
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	strHeadPath = pCommandLineManager->GetParameterValue("head.path");
+#endif
+
 #ifndef _DEBUG
 	//SetScale(0.018f);
 
-	m_pHead = AddModel(L"\\face4\\untitled.obj");
+	vector vHeadOffset;
+	if (strHeadPath == "default") {
+		strHeadPath = k_strDefaultHeadPath;
+		vHeadOffset = vector(0.0f, (float)M_PI, 0.0f);
+	}
+	else {
+		vHeadOffset = vector(-(float)(M_PI_2), (float)(M_PI), 0.0f);
+	}
+
+	m_pHead = AddModel(util::StringToWideString(strHeadPath));
+	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
-	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
 	m_pHead->SetScale(0.018f);
 
 #else

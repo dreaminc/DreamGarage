@@ -110,10 +110,13 @@ protected:
 
 protected:
 
+	std::string k_strDefaultLeftHandPath = "\\face4\\LeftHand.obj";
+	std::string k_strDefaultRightHandPath = "\\face4\\RightHand.obj";
+
 	HAND_TYPE m_handType;
 
-	std::shared_ptr<composite> m_pModel;
-	std::shared_ptr<sphere> m_pPalm;
+	std::shared_ptr<composite> m_pModel = nullptr;;
+	std::shared_ptr<sphere> m_pPalm = nullptr;
 
 	bool m_fOriented;
 

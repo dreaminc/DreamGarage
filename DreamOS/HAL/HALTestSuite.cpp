@@ -538,7 +538,7 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\009.fbx"); // industrial
 		//model* pModel = m_pDreamOS->AddModel(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\010.fbx"); // tube
 
-		model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\007.fbx"); // cave
+		model* pModel = m_pDreamOS->AddModel(L"..\\..\\..\\Downloads\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\007.fbx"); // cave
 		//model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\006.fbx"); // cave
 
 		// Ambient Occlusion textures
@@ -552,7 +552,7 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\009_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\010_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
-		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\006_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 		pModel->RotateXByDeg(-90.0f);
@@ -560,6 +560,12 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		pModel->SetPosition(point(0.0f, -2.5f, 0.0f));
 		//pModel->RotateZByDeg(-90.0f);
 		pModel->SetScale(sceneScale);
+
+//		m_pDreamOS->AddUser();
+		auto pHead = m_pDreamOS->AddModel(L"face4\\untitled.obj");
+		//auto pHead = m_pDreamOS->AddModel(L"head.FBX");
+		pHead->SetScale(sceneScale);
+		pHead->RotateYByDeg(180.0f);
 
 	Error:
 		return r;
