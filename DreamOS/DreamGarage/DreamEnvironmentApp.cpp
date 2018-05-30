@@ -27,8 +27,12 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
 	//TODO: way to change environment after initialization
+	std::string strEnvironmentPath = "default";
+
+#ifndef PRODUCTION_BUILD
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	std::string strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
+	strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
+#endif
 
 	//TODO: environments probably won't all have the same lighting
 	if (strEnvironmentPath == "default") {
