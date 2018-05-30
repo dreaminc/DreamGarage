@@ -717,16 +717,11 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	//textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight); 
 
 	// currently always fully shown
-	textBoxYOffset = viewHeight;
+	textBoxYOffset = viewHeight/2.0f;
 
-	textBoxYOffset -= 0.25 * viewHeight; // shift closer to text box
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
-
-	float vScale = (m_pParentApp->GetTotalWidth()) / m_pViewQuad->GetWidth();
-
-	ptTypingPosition += point((m_pParentApp->GetTotalWidth() - m_pViewQuad->GetWidth())/2.0f, 0.0f, 0.0f);
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
@@ -738,7 +733,7 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
 		//vector(m_visibleScale, m_visibleScale, m_visibleScale),
-		vector(vScale, vScale, vScale),
+		vector(1.0f, 1.0f, 1.0f),
 		m_keyboardAnimationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()

@@ -145,12 +145,12 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
-	float keyDimension = m_surfaceWidth / (float)pLayout->GetKeys()[0].size();
+	float keyDimension = (m_surfaceWidth) / (float)pLayout->GetKeys()[0].size();
 
 	// after being placed, the keys are scaled down by m_keyScale to create gaps in between the quads.
 	// need to increase the overall surface width to accommodate for this, and decrease the width of the text box
 	float marginError = keyDimension * (1 - m_keyScale);
-	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f;
+	m_surfaceWidth = m_pParentApp->GetBaseWidth() * 1.0323f * 0.75f;
 	m_surfaceWidth += marginError;
 	m_surfaceHeight = m_surfaceWidth * 0.4f;
 
@@ -173,10 +173,9 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	// position keyboard composite
 	//float kbOffset = -(-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
 	float kbOffset = 0.0f;
-	GetComposite()->SetPosition(pParent->GetCenter() + point(-pParent->GetCenterOffset(), 0.0f, kbOffset));
+	//GetComposite()->SetPosition(pParent->GetCenter() + point(-pParent->GetCenterOffset(), 0.0f, kbOffset));
+	GetComposite()->SetPosition(pParent->GetCenter());
 	m_ptComposite = GetComposite()->GetPosition();
-
-	float totalWidth = m_pParentApp->GetTotalWidth();
 
 	{
 		//Setup textbox
