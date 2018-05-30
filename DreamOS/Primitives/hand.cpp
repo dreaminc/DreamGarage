@@ -59,7 +59,7 @@ RESULT hand::Initialize(HAND_TYPE type) {
 		vector vLeftHandOffset;
 		if (strLeftHandPath == "default") {
 			vLeftHandOffset = vector((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
-			strLeftHandPath = "\\face4\\LeftHand.obj";
+			strLeftHandPath = k_strDefaultLeftHandPath;
 		}
 		else {
 			vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
@@ -72,7 +72,7 @@ RESULT hand::Initialize(HAND_TYPE type) {
 		vector vRightHandOffset;
 		if (strRightHandPath == "default") {
 			vRightHandOffset = vector((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
-			strRightHandPath = "\\face4\\RightHand.obj";
+			strRightHandPath = k_strDefaultRightHandPath;
 		}
 		else {
 			vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));

@@ -30,7 +30,7 @@ RESULT user::Initialize() {
 
 	vector vHeadOffset;
 	if (strHeadPath == "default") {
-		strHeadPath = "\\face4\\untitled.obj";
+		strHeadPath = k_strDefaultHeadPath;
 		vHeadOffset = vector(0.0f, (float)M_PI, 0.0f);
 	}
 	else {
