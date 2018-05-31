@@ -67,7 +67,21 @@ DreamLogger::DreamLogger() {
 }
 
 DreamLogger::~DreamLogger() {
-	// empty
+
+	if (m_pDreamLogger != nullptr) {
+		m_pDreamLogger = nullptr;
+	}
+
+	spdlog::drop_all();
+}
+
+RESULT DreamLogger::Flush() {
+	if (m_pDreamLogger != nullptr)
+		m_pDreamLogger->flush();
+	else
+		R_NOT_INITIALIZED;
+
+	return R_PASS;
 }
 
 RESULT DreamLogger::InitializeLogger() {
@@ -83,6 +97,7 @@ RESULT DreamLogger::InitializeLogger() {
 
 	// TODO: Move this to PathManager please 
 	auto pszAppDataPath = std::getenv(DREAM_OS_PATH_ENV);
+
 	if (pszAppDataPath != nullptr) {
 		m_strDreamLogPath = std::string{ pszAppDataPath } + "\\logs\\" + "log-" + szTime + ".log";
 	}
@@ -90,39 +105,22 @@ RESULT DreamLogger::InitializeLogger() {
 		m_strDreamLogPath = std::string("\\logs\\") + "log-" + szTime + ".log";
 	}
 
-	// Set up the logger 
-	/*
-	el::Configurations loggerConfiguration;
-	m_pDreamLogger = el::Loggers::getLogger("dos");
+	// Check if logs folder exists 
+	PathManager::instance()->GetDirectoryPathFromFilePath(m_strDreamLogPath);
+	if (PathManager::instance()->DoesPathExist(m_strDreamLogPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		PathManager::instance()->CreateDirectory(L"logs");
+	}
+
+	// Set up async mode and flush to 1 second
+	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
+
+	m_pDreamLogger = spdlog::basic_logger_mt("DOS", m_strDreamLogPath);
 	CN(m_pDreamLogger);
 
-	loggerConfiguration.setToDefault();
-	loggerConfiguration.set(el::Level::Info, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	loggerConfiguration.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-
-	loggerConfiguration.setGlobally(el::ConfigurationType::Filename, m_strDreamLogPath);
-	loggerConfiguration.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-
-	m_pDreamLogger->configure(loggerConfiguration);
-	*/
-
-	el::Configurations defaultConf;
-
-	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
-	
-	defaultConf.setGlobally(el::ConfigurationType::Filename, m_strDreamLogPath);
-	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-
-	el::Loggers::reconfigureLogger("default", defaultConf);
-
-	m_pDreamLogger = el::Loggers::getLogger("default");
-	CN(m_pDreamLogger);
-
-	Log(DreamLogger::Level::INFO, "Process Launched: %v", GetPathOfExecutible());
-	Log(DreamLogger::Level::INFO, "PID: %v", GetProcessID());
-	Log(DreamLogger::Level::INFO, "Process Arguments: %v", GetCommandLineString());
+	Log(DreamLogger::Level::INFO, "Process Launched: %s", GetPathOfExecutible());
+	Log(DreamLogger::Level::INFO, "PID: %d", GetProcessID());
+	//Log(DreamLogger::Level::INFO, "Process Arguments: %s", GetCommandLineString());
 
 Error:
 	return R_PASS;

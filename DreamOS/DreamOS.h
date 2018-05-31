@@ -43,6 +43,8 @@
 #include "DreamAppHandle.h"
 #include "DreamShareView/DreamShareView.h"
 
+#include "DreamLogger/DreamLogger.h"
+
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
@@ -87,6 +89,16 @@ public:
 	RESULT RegisterVideoStreamSubscriber(PeerConnection *pVideoSteamPeerConnectionSource, DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	RESULT UnregisterVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
 	bool IsRegisteredVideoStreamSubscriber(DreamVideoStreamSubscriber *pVideoStreamSubscriber);
+
+public:
+	// Log (pass through to Dream logger)
+	template <typename... Args>
+	inline RESULT Log(DreamLogger::Level logLevel, const char* pszMessage, const Args&... args) {
+		return DreamLogger::instance()->Log(logLevel, pszMessage, args...);
+	}
+
+	// Console
+	// TODO:
 
 public:
 	DreamOS();

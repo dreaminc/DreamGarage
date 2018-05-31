@@ -14,6 +14,7 @@
 
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
+#define _ENABLE_LOGGING
 
 /*
 #ifndef NOARRAYSIZE
@@ -22,14 +23,17 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #endif
 */
 
+// Logging
+
+class DreamLogger;
+
 // Logging (needs DreamLogger included)
-//#define _ENABLE_LOGGING
 #ifdef _ENABLE_LOGGING
-	#define DOSLOG(level, strMsg, ...) do { \
+#define DOSLOG(level, strMsg, ...) do { \
 		DreamLogger::instance()->Log(DreamLogger::Level::level, strMsg, ##__VA_ARGS__); \
 	} while (0);
 #else
-	#define DOSLOG(level, strMsg, ...)
+#define DOSLOG(level, strMsg, ...)
 #endif
 // ------------------------------------
  

@@ -27,6 +27,9 @@ public:
 
 public:
 
+	// Logging
+	RESULT AddTestDreamLogger();
+
 	// Tests
 	RESULT AddTestDreamApps();
 	RESULT AddTestUserApp();

@@ -14,11 +14,9 @@
 
 #include <string>
 
-#include "easylogging++.h"
+#include "spdlog.h"
 
-// LOG helper shortcuts
-#define LOG_XYZ(xyz) "(" << xyz.x() << "," << xyz.y() << "," << xyz.z() << ")"
-#define LOG_RGBA(rgba) "[" << rgba.r() << "," << rgba.g() << "," << rgba.b() << rgba.a() << "]"
+#define LOG_QUEUE_SIZE 1024
 
 class DreamLogger {
 public:
@@ -26,6 +24,7 @@ public:
 		INFO,
 		WARN,
 		ERR,
+		CRITICAL,
 		INVALID
 	};
 
@@ -49,6 +48,10 @@ public:
 			case DreamLogger::Level::ERR: {
 				m_pDreamLogger->error(pszMessage, args...);
 			} break;
+
+			//case DreamLogger::Level::CRITICAL: {
+			//	m_pDreamLogger->critical(pszMessage, args...);
+			//} break;
 		}
 
 	Error:
@@ -62,9 +65,12 @@ private:
 
 public:
 	RESULT InitializeLogger();
+	RESULT Flush();
 
 private:
-	el::Logger *m_pDreamLogger = nullptr;
+	//el::Logger *m_pDreamLogger = nullptr;
+	std::shared_ptr<spdlog::logger> m_pDreamLogger = nullptr;
+
 	std::string m_strDreamLogPath;
 
 // Singleton

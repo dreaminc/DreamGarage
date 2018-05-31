@@ -81,6 +81,9 @@ protected:
 	PATH_VALUE_TYPE GetPathValueType(wchar_t *pszValue);
 
 public:
+	virtual RESULT CreateDirectory(wchar_t *pszDirectoryName) = 0;
+
+public:
 	// Print Paths
 	virtual RESULT PrintPaths() = 0;
 	RESULT IsPathRegistered(PATH_VALUE_TYPE type);
@@ -111,6 +114,7 @@ public:
 	std::wstring GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 
 	std::wstring GetDirectoryPathFromFilePath(std::wstring wstrFilePath);
+	std::string GetDirectoryPathFromFilePath(std::string strFilePath);
 
 	bool IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename);
 	bool IsAbsolutePath(wchar_t *pwszFilename);
@@ -122,6 +126,7 @@ public:
 
 	RESULT DoesPathExist(PATH_VALUE_TYPE type);
 	RESULT DoesPathExist(std::wstring wstrPath, bool fCheckFile = false);
+	RESULT DoesPathExist(std::string strPath, bool fCheckFile = false);
 	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
 

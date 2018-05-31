@@ -1,5 +1,4 @@
 #include "DreamOSTestSuite.h"
-
 #include "DreamOS.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
@@ -20,7 +19,7 @@
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
 #include <chrono>
 
@@ -40,6 +39,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestDreamLogger());
 
 	CR(AddTestMeta());
 
@@ -764,6 +765,68 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 	pUITest->SetTestDescription("Basic test of shared content view working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestDreamLogger() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamTestingApp> pDreamTestApps[5];// = { nullptr };
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		DOSLOG(INFO, "AddTestDreamLogger DOSLOG (EHM) Test");
+		DreamLogger::instance()->Log(DreamLogger::Level::INFO, "AddTestDreamLogger DreamLogger instance Test");
+		m_pDreamOS->Log(DreamLogger::Level::INFO, "AddTestDreamLogger log test via m_pDOS");
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Logging Test");
+	pUITest->SetTestDescription("Basic logging test which will spin up a few SPD logs and test out the system");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

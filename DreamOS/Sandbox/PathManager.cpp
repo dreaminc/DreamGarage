@@ -453,6 +453,10 @@ std::wstring PathManager::GetDirectoryPathFromFilePath(std::wstring wstrFilePath
 	return wstrFilePath.substr(0, wstrFilePath.find_last_of(L"\\/")) + L"\\";
 }
 
+std::string PathManager::GetDirectoryPathFromFilePath(std::string strFilePath) {
+	return strFilePath.substr(0, strFilePath.find_last_of("\\/")) + "\\";
+}
+
 bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename) {
 	wchar_t *pwszFirst = nullptr;
 	bool fRetVal = false;
@@ -536,6 +540,11 @@ RESULT PathManager::DoesPathExist(std::wstring wstrPath, bool fCheckFile) {
 		
 Error:
 	return r;
+}
+
+RESULT PathManager::DoesPathExist(std::string strPath, bool fCheckFile) {
+	std::wstring wstrPath = util::StringToWideString(strPath.c_str());
+	return DoesPathExist(wstrPath, fCheckFile);
 }
 
 RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {

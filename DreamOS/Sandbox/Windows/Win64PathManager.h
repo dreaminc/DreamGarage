@@ -22,12 +22,14 @@ public:
 	RESULT GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr);
 
 protected:
-	RESULT Dealloc();
-	RESULT InitializePaths();
-	RESULT OpenDreamPathsFile();
-	RESULT UpdateCurrentPath();
-	RESULT SetCurrentPath(wchar_t *pszPath);
+	virtual RESULT Dealloc() override;
+	virtual RESULT InitializePaths() override;
+	virtual RESULT OpenDreamPathsFile() override;
+	virtual RESULT UpdateCurrentPath() override;
+	virtual RESULT SetCurrentPath(wchar_t *pszPath) override;
 	//RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
+
+	virtual RESULT CreateDirectory(wchar_t *pszDirectoryName) override;
 
 public:
 	RESULT PrintPaths();
