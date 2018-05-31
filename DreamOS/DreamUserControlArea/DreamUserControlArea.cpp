@@ -103,6 +103,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
+		//GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
 
 		m_pControlBar->Hide();
 		m_pDreamTabView->GetComposite()->SetVisible(false);
@@ -212,8 +213,15 @@ float DreamUserControlArea::GetViewDepth() {
 
 RESULT DreamUserControlArea::SetViewHeight(float height) {
 
-	point ptOrigin = GetComposite()->GetPosition();
-	GetComposite()->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
+	point ptOrigin = m_pDreamUserApp->m_pAppBasis->GetPosition();
+	//point ptOrigin = m_pDreamUserApp->GetComposite()->GetPosition();
+	//m_pDreamUserApp->GetComposite()->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
+	m_pDreamUserApp->m_pAppBasis->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
+	m_pDreamUserApp->GetComposite()->SetPosition(m_pDreamUserApp->m_pAppBasis->GetPosition());
+
+	if (m_pDreamUIBar != nullptr) {
+		m_pDreamUIBar->ResetAppComposite();
+	}
 
 	return R_PASS;
 }

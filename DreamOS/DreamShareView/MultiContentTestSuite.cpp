@@ -759,8 +759,8 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 				float height = pEvent->state.ptTouchpad.y() * 0.015f;
-				if (pUserControlArea != nullptr) {
-					float currentHeight = pUserControlArea->GetViewHeight();
+				if (pUserControlArea != nullptr && !fFirst) {
+					float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
 					pUserControlArea->SetViewHeight(currentHeight + height);
 				}
 			}
@@ -777,6 +777,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 		CN(pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, pTestContext);
@@ -797,6 +798,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		if (pTestContext->fFirst) {
 			pTestContext->fFirst = false;
+
 
 			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
 			std::vector<std::shared_ptr<UIButton>> pButtons;

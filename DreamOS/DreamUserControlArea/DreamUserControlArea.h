@@ -51,6 +51,7 @@ class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subsc
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamOSTestSuite;
+	friend class DreamUIBar;
 
 public:
 	DreamUserControlArea(DreamOS *pDreamOS, void *pContext = nullptr);

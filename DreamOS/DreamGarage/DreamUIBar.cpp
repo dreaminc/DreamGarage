@@ -199,16 +199,22 @@ RESULT DreamUIBar::ResetAppComposite() {
 	point ptOrigin;
 	quaternion qOrigin;
 	vector vCameraToMenu;
+	//*
 	if (m_pUserHandle != nullptr) {
-		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+	//	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+	}
+	//*/
+	if (m_pParentApp != nullptr) {
+		ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
+		//qOrigin = m_pParentApp->GetComposite()->GetOrientation(true);
 	}
 	
 	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);
-	vCameraToMenu = ptOrigin - GetDOS()->GetCameraPosition();
+	vCameraToMenu = GetComposite()->GetPosition(true) - GetDOS()->GetCameraPosition();
 	vCameraToMenu.y() = 0.0f;
 	vCameraToMenu.Normalize();
 

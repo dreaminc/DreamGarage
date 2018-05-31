@@ -107,6 +107,7 @@ private:
 
 class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
+	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
 
 public:

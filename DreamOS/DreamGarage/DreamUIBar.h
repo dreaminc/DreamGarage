@@ -53,6 +53,7 @@ class DreamUIBar :	public DreamApp<DreamUIBar>,
 {
 
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 	friend class MultiContentTestSuite;
 
 public:
