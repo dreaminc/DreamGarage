@@ -549,7 +549,7 @@ RESULT SandboxApp::InitializePhysicsEngine() {
 	RESULT r = R_PASS;
 
 	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
-	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
+	WCNM(m_pPhysicsEngine, "Physics Engine failed to initialize");
 
 	// Set up physics graph
 	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -568,7 +568,7 @@ RESULT SandboxApp::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
 	m_pInteractionEngine = InteractionEngine::MakeEngine(this);
-	CNMW(m_pInteractionEngine, "Interaction Engine failed to initialize");
+	WCNM(m_pInteractionEngine, "Interaction Engine failed to initialize");
 
 	// Set up interaction graph
 	m_pInteractionGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);

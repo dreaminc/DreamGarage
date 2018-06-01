@@ -133,6 +133,7 @@ public:
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+	virtual RESULT GetStackTrace() = 0;
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
 	virtual HWND GetWindowHandle() = 0;
 	

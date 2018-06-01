@@ -46,8 +46,10 @@ public:	// Sandbox Interface
 
 	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
 	virtual long GetTickCount() override;
+	virtual RESULT GetStackTrace() override;
 
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) override;
+
 
 public:
 	RESULT InitializePathManager();

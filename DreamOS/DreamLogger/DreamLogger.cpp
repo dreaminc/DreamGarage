@@ -125,3 +125,30 @@ RESULT DreamLogger::InitializeLogger() {
 Error:
 	return R_PASS;
 }
+
+/*
+// Note: constructor must be public for this to work
+DreamLogger* DreamLogger::instance() {
+	RESULT r = R_PASS;
+
+	if (!s_pInstance) {
+		s_pInstance = new DreamLogger();
+		CN(s_pInstance);
+
+		// This allows the singleton to run an initialization function that
+		// can fail (unlike the constructor)
+		CR(s_pInstance->InitializeLogger());
+	}
+
+	// Success:
+	return s_pInstance;
+
+Error:
+	if (s_pInstance != nullptr) {
+		delete s_pInstance;
+		s_pInstance = nullptr;
+	}
+
+	return nullptr;
+}
+*/

@@ -803,7 +803,20 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+// 		const int kMaxCallers = 62;
+// 		void* callers[kMaxCallers];
+// 		int count = ::CaptureStackBackTrace(0, kMaxCallers, callers, nullptr);
+// 
+// 		for (int i = 0; i < count; i++)
+// 			printf("*** %d called from %016I64X\n", i, (unsigned __int64)callers[
+
+		// We want to force a "crash here" so we can get the track in the log
+		CBM(0, "Crashing logging test to see what happens");
+
+	Error:
+		return r;
 	};
 
 	// Reset Code

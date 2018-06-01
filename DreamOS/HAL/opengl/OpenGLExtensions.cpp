@@ -6,133 +6,133 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	RESULT r = R_PASS;
 
 	// TODO: WGL stuff should be else where
-	CNMW((m_wglSwapIntervalEXT = (BOOL(WINAPI *)(int interval))wglGetProcAddress("wglSwapIntervalEXT")),
+	WCNM((m_wglSwapIntervalEXT = (BOOL(WINAPI *)(int interval))wglGetProcAddress("wglSwapIntervalEXT")),
 		"Failed to initialzie wglSwapIntervalEXT extension");
 
-	CNMW((m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram")),
+	WCNM((m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram")),
 		"Failed to initialzie glCreateProgram extension");
 
-	CNMW((m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram")),
+	WCNM((m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram")),
 		"Failed to initialize glDeleteProgram extension");
 
-	CNMW((m_glIsProgram = (PFNGLISPROGRAMPROC)wglGetProcAddress("glIsProgram")),
+	WCNM((m_glIsProgram = (PFNGLISPROGRAMPROC)wglGetProcAddress("glIsProgram")),
 		"Failed to initialize glIsProgram extension");
 
-	CNMW((m_glGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)wglGetProcAddress("glGetProgramInterfaceiv")),
+	WCNM((m_glGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)wglGetProcAddress("glGetProgramInterfaceiv")),
 		"Failed to initialize glGetProgramInterfaceiv extension");
 
-	CNMW((m_glGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)wglGetProcAddress("glGetProgramResourceiv")),
+	WCNM((m_glGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)wglGetProcAddress("glGetProgramResourceiv")),
 		"Failred to initialize glGetProgramResourceiv extension");
 
-	CNMW((m_glGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)wglGetProcAddress("glGetProgramResourceName")),
+	WCNM((m_glGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)wglGetProcAddress("glGetProgramResourceName")),
 		"Failred to initialize glGetProgramResourceName extension");
 
-	CNMW((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")),
+	WCNM((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")),
 		"Failed to initialzie glUseProgram extension");
 
-	CNMW((m_glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader")),
+	WCNM((m_glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader")),
 		"Failed to initialize glAttachShader extension");
 
-	CNMW((m_glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader")),
+	WCNM((m_glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader")),
 		"Failed to initialize glDetachShader extension");
 
-	CNMW((m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram")),
+	WCNM((m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram")),
 		"Failed to initialize glLinkProgram extension");
 
-	CNMW((m_glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog")),
+	WCNM((m_glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog")),
 		"Failed to initialize glGetProgramiv extension");
 
-	CNMW((m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv")),
+	WCNM((m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv")),
 		"Failed to initialize glGetProgramiv extension");
 
-	CNMW((m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog")),
+	WCNM((m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog")),
 		"Failed to initialize glGetShaderInfoLog extension");
 
 	// Draw
-	CNMW((m_glDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC)wglGetProcAddress("glDrawRangeElements")),
+	WCNM((m_glDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC)wglGetProcAddress("glDrawRangeElements")),
 		"Failed to initialize glDrawRangeElements extension");
 
 	// Uniform
-	CNMW((m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation")),
+	WCNM((m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation")),
 		"Failed to initialize glGetUniformLocation extension");
 
-	CNMW((m_glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i")),
+	WCNM((m_glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i")),
 		"Failed to initialize glUniform1i extension");
 
-	CNMW((m_glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv")),
+	WCNM((m_glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv")),
 		"Failed to initialize glUniform1iv extension");
 
-	CNMW((m_glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv")),
+	WCNM((m_glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv")),
 		"Failed to initialize glUniform2iv extension");
 
-	CNMW((m_glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv")),
+	WCNM((m_glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv")),
 		"Failed to initialize glUniform3iv extension");
 
-	CNMW((m_glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv")),
+	WCNM((m_glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv")),
 		"Failed to initialize glUniform4iv extension");
 
-	CNMW((m_glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f")),
+	WCNM((m_glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f")),
 		"Failed to initialize glUniform1f extension");
 
-	CNMW((m_glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv")),
+	WCNM((m_glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv")),
 		"Failed to initialize glUniform1fv extension");
 
-	CNMW((m_glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv")),
+	WCNM((m_glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv")),
 		"Failed to initialize glUniform2fv extension");
 
-	CNMW((m_glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv")),
+	WCNM((m_glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv")),
 		"Failed to initialize glUniform3fv extension");
 
-	CNMW((m_glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv")),
+	WCNM((m_glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv")),
 		"Failed to initialize glUniform4fv extension");
 
-	CNMW((m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv")),
+	WCNM((m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv")),
 		"Failed to initialize glUniformMatrix4fv extension");
 
 	// Uniform Blocks
-	CNMW((m_glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)wglGetProcAddress("glGetUniformBlockIndex")),
+	WCNM((m_glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)wglGetProcAddress("glGetUniformBlockIndex")),
 		"Failed to initialize glGetUniformBlockIndex extension");
  
-	CNMW((m_glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)wglGetProcAddress("glUniformBlockBinding")),
+	WCNM((m_glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)wglGetProcAddress("glUniformBlockBinding")),
 		"Failed to initialize glUniformBlockBinding extension");
 
-	CNMW((m_glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase")),
+	WCNM((m_glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase")),
 		"Failed to initialize glBindBufferBase extension");
 
-	CNMW((m_glGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC)wglGetProcAddress("glGetUniformIndices")),
+	WCNM((m_glGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC)wglGetProcAddress("glGetUniformIndices")),
 		"Failed to initialize glGetUniformIndices extension");
 
 	// Attributes
-	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")),
+	WCNM((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")),
 		"Failed to initialize glGetAttribLocation extension");
 
-	CNMW((m_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f")),
+	WCNM((m_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f")),
 		"Failed to initialize glVertexAttrib1f extension");
 
-	CNMW((m_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv")),
+	WCNM((m_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv")),
 		"Failed to initialize glVertexAttrib1fv extension");
 
-	CNMW((m_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv")),
+	WCNM((m_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv")),
 		"Failed to initialize glVertexAttrib2fv extension");
 
-	CNMW((m_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv")),
+	WCNM((m_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv")),
 		"Failed to initialize glVertexAttrib3fv extension");
 
-	CNMW((m_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv")),
+	WCNM((m_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv")),
 		"Failed to initialize glVertexAttrib4fv extension");
 
-	CNMW((m_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray")),
+	WCNM((m_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray")),
 		"Failed to initialize glEnableVertexAttribArray extension");
 
-	CNMW((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")),
+	WCNM((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")),
 		"Failed to initialize glBindAttribLocation extension");
 
 	// Blending
 
-	CNMW((m_glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation")),
+	WCNM((m_glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation")),
 		"Failed to initialize glBlendEquation extension");
 
-	CNMW((m_glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress("glBlendFuncSeparate")),
+	WCNM((m_glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress("glBlendFuncSeparate")),
 		"Failed to initialize glBlendFuncSeparate extension");
 
 	// Not supported yet?
@@ -140,19 +140,19 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	m_glGetActiveUniform = NULL;
 
 	// Shader
-	CNMW((m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader")),
+	WCNM((m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader")),
 		"Failed to initialize glCreateShader extension");
 
-	CNMW((m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader")),
+	WCNM((m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader")),
 		"Failed to initialize glDeleteShader extension");
 
-	CNMW((m_glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource")),
+	WCNM((m_glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource")),
 		"Failed to initialize glShaderSource extension");
 
-	CNMW((m_glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader")),
+	WCNM((m_glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader")),
 		"Failed to initialize glCompileShader extension");
 
-	CNMW((m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv")),
+	WCNM((m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv")),
 		"Failed to initialize glGetShaderiv extension");
 
 	// Textures
@@ -161,16 +161,16 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 		"Failed to initialize glGenTextures extension");
 	*/
 
-	CNMW((m_glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture")),
+	WCNM((m_glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture")),
 		"Failed to initialize glActiveTexture extension");
 	
-	CNMW((m_glBindTextures = (PFNGLBINDTEXTURESPROC)wglGetProcAddress("glBindTextures")),
+	WCNM((m_glBindTextures = (PFNGLBINDTEXTURESPROC)wglGetProcAddress("glBindTextures")),
 		"Failed to initialize glBindTextures extension");
 
-	CNMW((m_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D")),
+	WCNM((m_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D")),
 		"Failed to initialize glTexStorage2D extension");
 
-	CNMW((m_glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)wglGetProcAddress("glTexImage2DMultisample")),
+	WCNM((m_glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)wglGetProcAddress("glTexImage2DMultisample")),
 		"Failed to initialize glTexImage2DMultisample extension");
 
 	//CNMW((m_glTexParameteri = (PFNGLTEXPARAMETERIPROC)wglGetProcAddress("glTexParameteri")),
@@ -179,110 +179,110 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	//CNMW((m_glTexImage2D = (PFNGLTEXIMAGE2DPROC)wglGetProcAddress("glTexImage2D")),
 	//	"Failed to initializm_glTexImage2D extension");
 
-	CNMW((m_glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap")),
+	WCNM((m_glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap")),
 		"Failed to initialize glGenerateMipmap extension");
 
-	CNMW((m_glGetnTexImage = (PFNGLGETNTEXIMAGEPROC)wglGetProcAddress("glGetnTexImage")),
+	WCNM((m_glGetnTexImage = (PFNGLGETNTEXIMAGEPROC)wglGetProcAddress("glGetnTexImage")),
 		"Failed to initialize glGetnTexImage extension");
 
-	CNMW((m_glGetTextureImage = (PFNGLGETTEXTUREIMAGEPROC)wglGetProcAddress("glGetTextureImage")),
+	WCNM((m_glGetTextureImage = (PFNGLGETTEXTUREIMAGEPROC)wglGetProcAddress("glGetTextureImage")),
 		"Failed to initialize glGetTextureImage extension");
 
 	// FBO
-	CNMW((m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers")),
+	WCNM((m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers")),
 		"Failed to initialzie glGenFramebuffers extension");
 
-	CNMW((m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer")),
+	WCNM((m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer")),
 		"Failed to initialize glBindFramebuffer extension");
 
-	CNMW((m_glDeleteFrameBuffers = (PFNGLDELETEFRAMEBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers")),
+	WCNM((m_glDeleteFrameBuffers = (PFNGLDELETEFRAMEBUFFERSPROC)wglGetProcAddress("glDeleteFramebuffers")),
 		"Failed to initialize glDeleteFramebuffers extension");
 
-	CNMW((m_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers")),
+	WCNM((m_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers")),
 		"Failed to initialize glGenRenderbuffers extension");
 
-	CNMW((m_glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteRenderbuffers")),
+	WCNM((m_glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteRenderbuffers")),
 		"Failed to initialize glDeleteRenderbuffers extension");
 
-	CNMW((m_glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer")),
+	WCNM((m_glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer")),
 		"Failed to initialize glBindRenderbuffer extension");
 
-	CNMW((m_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage")),
+	WCNM((m_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage")),
 		"Failed to initialize glRenderbufferStorage extension");
 
-	CNMW((m_glRenderBufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderbufferStorageMultisample")),
+	WCNM((m_glRenderBufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderbufferStorageMultisample")),
 		"Failed to initialize glRenderBufferStorageMultisample extension");
 
-	CNMW((m_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer")),
+	WCNM((m_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer")),
 		"Failed to initialize glFramebufferRenderbuffer extension");
 
-	CNMW((m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus")),
+	WCNM((m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus")),
 		"Failed to initialize glCheckFramebufferStatus extension");
 
-	CNMW((m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D")),
+	WCNM((m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D")),
 		"Failed to initialize glFramebufferTexture2D extension");
 
-	CNMW((m_glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)wglGetProcAddress("glBlitFramebuffer")),
+	WCNM((m_glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)wglGetProcAddress("glBlitFramebuffer")),
 		"Failed to initialize glBlitFramebuffer extension");
 
-	CNMW((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
+	WCNM((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
 		"Failed to initialize glFramebufferTexture extension");
 
 	// VBO
-	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
+	WCNM((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
 		"Failed to initialzie glGenBuffers extension");
 
-	CNMW((m_glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer")),
+	WCNM((m_glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer")),
 		"Failed to initialize glBindBuffer extension");
 
-	CNMW((m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData")),
+	WCNM((m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData")),
 		"Failed to initialize glBuifferData extension");
 
-	CNMW((m_glBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData")),
+	WCNM((m_glBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData")),
 		"Failed to initialize glBuifferSubData extension");
 
-	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")),
+	WCNM((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")),
 		"Failed to initialize glVertexAttribPointer extension");
 
-	CNMW((m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers")),
+	WCNM((m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers")),
 		"Failed to initialize glDeleteBuffers extension");
 
-	CNMW((m_glDrawBuffers = (PFNGLDRAWBUFFERSPROC)wglGetProcAddress("glDrawBuffers")),
+	WCNM((m_glDrawBuffers = (PFNGLDRAWBUFFERSPROC)wglGetProcAddress("glDrawBuffers")),
 		"Failed to initialize glDrawBuffers extension");
 
 	// VAO
-	CNMW((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),
+	WCNM((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),
 		"Failed to initialize glGenVertexArrays extension");
 
-	CNMW((m_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray")),
+	WCNM((m_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray")),
 		"Failed to initialize glBindVertexArray extension");
 
-	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
+	WCNM((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
 		"Failed to initialize glDeleteVertexArrays extension");
 
 	// Queries 
-	CNMW((m_glGenQueries = (PFNGLGENQUERIESPROC)wglGetProcAddress("glGenQueries")),
+	WCNM((m_glGenQueries = (PFNGLGENQUERIESPROC)wglGetProcAddress("glGenQueries")),
 		"Failed to initialize glGenQueries extension");
 
-	CNMW((m_glDeleteQueries = (PFNGLDELETEQUERIESPROC)wglGetProcAddress("glDeleteQueries")),
+	WCNM((m_glDeleteQueries = (PFNGLDELETEQUERIESPROC)wglGetProcAddress("glDeleteQueries")),
 		"Failed to initialize glDeleteQueries extension");
 
-	CNMW((m_glIsQuery = (PFNGLISQUERYPROC)wglGetProcAddress("glIsQuery")),
+	WCNM((m_glIsQuery = (PFNGLISQUERYPROC)wglGetProcAddress("glIsQuery")),
 		"Failed to initialize glIsQuery extension");
 
-	CNMW((m_glBeginQuery = (PFNGLBEGINQUERYPROC)wglGetProcAddress("glBeginQuery")),
+	WCNM((m_glBeginQuery = (PFNGLBEGINQUERYPROC)wglGetProcAddress("glBeginQuery")),
 		"Failed to initialize glBeginQuery extension");
 
-	CNMW((m_glEndQuery = (PFNGLENDQUERYPROC)wglGetProcAddress("glEndQuery")),
+	WCNM((m_glEndQuery = (PFNGLENDQUERYPROC)wglGetProcAddress("glEndQuery")),
 		"Failed to initialize glEndQuery extension");
 
-	CNMW((m_glGetQueryiv = (PFNGLGETQUERYIVPROC)wglGetProcAddress("glGetQueryiv")),
+	WCNM((m_glGetQueryiv = (PFNGLGETQUERYIVPROC)wglGetProcAddress("glGetQueryiv")),
 		"Failed to initialize glGetQueryiv extension");
 
-	CNMW((m_glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC)wglGetProcAddress("glGetQueryObjectiv")),
+	WCNM((m_glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC)wglGetProcAddress("glGetQueryObjectiv")),
 		"Failed to initialize glGetQueryObjectiv extension");
 
-	CNMW((m_glGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC)wglGetProcAddress("glGetQueryObjectuiv")),
+	WCNM((m_glGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC)wglGetProcAddress("glGetQueryObjectuiv")),
 		"Failed to initialize glGetQueryObjectuiv extension");
 
 	return r;

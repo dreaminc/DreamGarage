@@ -43,7 +43,7 @@
 #include "DreamAppHandle.h"
 #include "DreamShareView/DreamShareView.h"
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 
 #include "UI/UIKeyboard.h"
 

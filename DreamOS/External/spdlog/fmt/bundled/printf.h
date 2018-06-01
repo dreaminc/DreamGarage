@@ -18,6 +18,14 @@
 namespace fmt {
 namespace internal {
 
+#ifdef max
+	#undef max
+#endif
+
+#ifdef min
+	#undef min
+#endif
+
 // Checks if a value fits in int - used to avoid warnings about comparing
 // signed and unsigned integers.
 template<bool IsSigned>

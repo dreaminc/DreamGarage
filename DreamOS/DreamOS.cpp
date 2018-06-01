@@ -1,6 +1,6 @@
 #include "DreamOS.h"
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
 
 #include "Primitives/font.h"

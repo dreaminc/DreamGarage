@@ -389,6 +389,23 @@ long Windows64App::GetTickCount() {
 	return static_cast<long>(GetTickCount());
 }
 
+RESULT Windows64App::GetStackTrace() {
+	RESULT r = R_PASS;
+
+	// Quote from Microsoft Documentation:
+	// ## Windows Server 2003 and Windows XP:  
+	// ## The sum of the FramesToSkip and FramesToCapture parameters must be less than 63.
+	//const int kMaxCallers = 62;
+	//void* callers[kMaxCallers];
+	//int count = ::CaptureStackBackTrace(0, kMaxCallers, callers, nullptr);
+	//
+	//for (int i = 0; i < count; i++)
+	//	printf("*** %d called from %016I64LX\n", i, callers[i]);
+
+//Error:
+	return r;
+}
+
 RESULT Windows64App::GetSandboxWindowSize(int &width, int &height) {
 	width = m_pxWidth;
 	height = m_pxHeight;

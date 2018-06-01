@@ -10,8 +10,6 @@
 // It should be possible to create custom logs per module
 // Internally it is using EasyLogger++ for now
 
-#include "Primitives/singleton.h"
-
 #include <string>
 
 #include "spdlog.h"
@@ -34,7 +32,10 @@ public:
 	RESULT Log(DreamLogger::Level logLevel, const char* pszMessage, const Args&... args) {
 		RESULT r = R_PASS;
 
-		CN(m_pDreamLogger);
+		if (m_pDreamLogger == nullptr) {
+			r = R_FAIL;
+			goto Error;
+		}
 
 		switch (logLevel) {
 			case DreamLogger::Level::INFO: {
@@ -79,16 +80,24 @@ private:
 
 public:
 	// Note: constructor must be public for this to work
+	//static DreamLogger *instance();
+
 	static DreamLogger *instance() {
 		RESULT r = R_PASS;
 
 		if (!s_pInstance) {
 			s_pInstance = new DreamLogger();
-			CN(s_pInstance);
+			if (s_pInstance == nullptr) {
+				r = R_FAIL;
+				goto Error;
+			}
 
 			// This allows the singleton to run an initialization function that
 			// can fail (unlike the constructor)
-			CR(s_pInstance->InitializeLogger());
+			r = s_pInstance->InitializeLogger();
+			if (r != R_PASS) {
+				goto Error;
+			}
 		}
 
 		// Success:
