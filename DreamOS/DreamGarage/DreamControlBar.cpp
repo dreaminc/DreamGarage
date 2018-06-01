@@ -195,6 +195,21 @@ Error:
 	return r;
 }
 
+RESULT DreamControlBar::UpdateWidth() {
+	RESULT r = R_PASS;
+
+	/*
+	m_pUIControlBar->SetTotalWidth(width);
+	m_pUIControlBar->SetItemSide(m_buttonWidth * width);
+	m_pUIControlBar->SetURLWidth(m_urlWidth * width);
+	m_pUIControlBar->SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
+
+	m_pUIControlBar->UpdateWidth();
+	//*/
+
+	return r;
+}
+
 RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
 	RESULT r = R_PASS;
 

@@ -198,11 +198,6 @@ float DreamUserControlArea::GetBaseWidth() {
 	return m_baseWidth;
 }
 
-RESULT DreamUserControlArea::SetBaseWidth() {
-	RESULT r = R_PASS;
-	return r;
-}
-
 float DreamUserControlArea::GetViewHeight() {
 	return GetComposite()->GetPosition().y();
 }
@@ -233,6 +228,25 @@ RESULT DreamUserControlArea::SetViewDepth(float depth) {
 	GetComposite()->SetPosition(point(ptOrigin.x(), ptOrigin.y(), depth));
 
 	return R_PASS;
+}
+
+float DreamUserControlArea::GetViewScale() {
+	return m_widthScale;
+}
+
+RESULT DreamUserControlArea::ScaleViewWidth(float scale) {
+	RESULT r = R_PASS;
+
+	/*
+	m_diagonalSize = width;
+
+	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+	//*/
+	m_widthScale = scale;
+	GetComposite()->SetScale(m_widthScale);
+
+	return r;
 }
 
 float DreamUserControlArea::GetBaseHeight() {

@@ -9,6 +9,7 @@
 
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamControlView/DreamControlView.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamTabView.h"
@@ -746,10 +747,12 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 	struct TestContext : public Subscriber<SenseControllerEvent> {
 		std::shared_ptr<DreamUserControlArea> pUserControlArea;
-		std::vector<std::shared_ptr<DreamBrowser>> pDreamBrowsers;
+		stereocamera *pCamera = nullptr;;
 		bool fFirst = true;
 
 		bool fDirty = false;
+		bool fLeft = false;
+		bool fRight = false;
 
 		virtual RESULT Notify(SenseControllerEvent *pEvent) override {
 			RESULT r = R_PASS;
@@ -759,9 +762,35 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 				float height = pEvent->state.ptTouchpad.y() * 0.015f;
-				if (pUserControlArea != nullptr && !fFirst) {
-					float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
-					pUserControlArea->SetViewHeight(currentHeight + height);
+				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+					if (pUserControlArea != nullptr && !fFirst) {
+						float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
+						pUserControlArea->SetViewHeight(currentHeight + height);
+					}
+				}
+				else {
+					//TODO
+					point ptCamera = pCamera->GetPosition();
+					//pCamera->SetPosition(point(ptCamera.x(), ptCamera.y() + height, ptCamera.z()));
+				}
+			}
+			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
+				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+				//	pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() + 0.001f);
+					fLeft = true;
+				}
+				else {
+				//	pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() - 0.001f);
+					fRight = true;
+				}
+			}
+
+			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_UP) {
+				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+					fLeft = false;
+				}
+				else {
+					fRight = false;
 				}
 			}
 			//else if (pEvent->type == SENSE_CONTROLLER_)
@@ -777,10 +806,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		auto pControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this, false);
+		pTestContext->pCamera = m_pDreamOS->GetCamera();
 		pControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 		CN(pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, pTestContext);
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, pTestContext);
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext);
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, pTestContext);
 
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
@@ -821,15 +854,26 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 				pButtons.emplace_back(pButton);
 			}
 
-			pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
+			//pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
 
 			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
 
 			pDreamUIBar->ResetAppComposite();
-			pTestContext->pUserControlArea->ResetAppComposite();
+			//pTestContext->pUserControlArea->ResetAppComposite();
 
-			pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
+			//pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
+			//pTestContext->pUserControlArea->m_pControlBar->Show();
+			pTestContext->pUserControlArea->ShowControlView();
+			pTestContext->pUserControlArea->m_pDreamTabView->Show();
 		}
+
+		if (pTestContext->fLeft) {
+			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() + 0.001f);
+		}
+		if (pTestContext->fRight) {
+			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() - 0.001f);
+		}
+
 	Error:
 		return r;
 	};

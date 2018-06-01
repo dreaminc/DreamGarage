@@ -76,14 +76,15 @@ public:
 	//point GetBaseCenter();
 	float GetViewAngle();
 
-	// Set Base width and update everything else
-	RESULT SetBaseWidth();
 
 	// 
 	float GetViewHeight();
 	float GetViewDepth();
 	RESULT SetViewHeight(float height);
 	RESULT SetViewDepth(float depth);
+	// Set Base width and update everything else
+	RESULT ScaleViewWidth(float scale);
+	float GetViewScale();
 
 	// absolute positions
 	point GetCenter();
@@ -217,6 +218,7 @@ private:
 	float m_baseWidth;
 	float m_baseHeight;
 	float m_centerOffset;
+	float m_widthScale = 1.0f;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
