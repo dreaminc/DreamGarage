@@ -770,17 +770,18 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 				}
 				else {
 					//TODO
-					point ptCamera = pCamera->GetPosition();
-					//pCamera->SetPosition(point(ptCamera.x(), ptCamera.y() + height, ptCamera.z()));
+					point ptCamera = pCamera->GetEyePosition(EYE_MONO);
+				//	pCamera->SetPosition(point(ptCamera.x(), ptCamera.y() + height, ptCamera.z()));
+					pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), height + ptCamera.z()));
 				}
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
 				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-				//	pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() + 0.001f);
+					pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() + 0.003f);
 					fLeft = true;
 				}
 				else {
-				//	pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() - 0.001f);
+					pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() - 0.003f);
 					fRight = true;
 				}
 			}
