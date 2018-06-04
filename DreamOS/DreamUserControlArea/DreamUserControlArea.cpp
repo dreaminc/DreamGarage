@@ -245,6 +245,7 @@ RESULT DreamUserControlArea::ScaleViewWidth(float scale) {
 	//*/
 	m_widthScale = scale;
 	GetComposite()->SetScale(m_widthScale);
+	m_pDreamUIBar->UpdateWidth(scale);
 
 	return r;
 }
