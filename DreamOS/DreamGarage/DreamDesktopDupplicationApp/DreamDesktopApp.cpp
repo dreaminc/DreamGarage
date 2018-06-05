@@ -361,9 +361,7 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 
 RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
-	if (!m_fDesktopDuplicationIsRunning) {
-		ShowWindow(m_hwndDreamHandle, SW_MINIMIZE);
-	}
+
 	m_fDesktopDuplicationIsRunning = true;
 	CNR(pMessageData, R_SKIPPED);
 	m_frameDataBuffer_n = messageSize;
@@ -496,8 +494,7 @@ long DreamDesktopApp::GetCurrentAssetID() {
 RESULT DreamDesktopApp::CloseSource() {
 	RESULT r = R_PASS;
 
-	CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP));
-	ShowWindow(m_hwndDreamHandle, SW_RESTORE);
+	CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::STOP));	
 
 Error:
 	return r;
