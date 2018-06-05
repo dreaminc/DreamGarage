@@ -78,6 +78,8 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestManyBrowsers());
+
 	CR(AddTestMenuShader());
 
 	CR(AddTestAllUIObjects());
@@ -87,9 +89,7 @@ RESULT MultiContentTestSuite::AddTests() {
 	CR(AddTestRemoveText());
 
 	CR(AddTestActiveSource());
-	
-	CR(AddTestManyBrowsers());
-
+		
 	CR(AddTestDreamTabView());
 
 	CR(AddTestUserControlAreaLayout());

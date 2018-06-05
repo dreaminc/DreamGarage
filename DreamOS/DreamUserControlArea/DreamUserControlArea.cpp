@@ -182,9 +182,9 @@ Error:
 RESULT DreamUserControlArea::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	//CR(m_pWebBrowserManager->Shutdown());
+	CR(m_pWebBrowserManager->Shutdown());
 
-//Error:
+Error:
 	return r;
 }
 
