@@ -105,6 +105,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
+	SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);	// High priority is where things like Task List reside, ignoring load on the operating system.
+																		// Use extreme care when using the high-priority class, because a high-priority class application can use nearly all available CPU time.
 	//TODO: use this label
 	//Success:
 	Validate();
