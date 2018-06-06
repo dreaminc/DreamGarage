@@ -362,15 +362,14 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
 
-	m_fDesktopDuplicationIsRunning = true;
 	CNR(pMessageData, R_SKIPPED);
-	m_frameDataBuffer_n = messageSize;
-
-	if (m_pxDesktopHeight != pxHeight || m_pxDesktopWidth != pxWidth) {
+	
+	if (!m_fDesktopDuplicationIsRunning) {
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
 		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
 		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture, this);
+		m_fDesktopDuplicationIsRunning = true;
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
