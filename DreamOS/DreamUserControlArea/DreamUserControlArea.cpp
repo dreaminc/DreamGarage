@@ -113,8 +113,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_spacingSize + m_pDreamTabView->GetBorderWidth()) / 2.0f;
-		m_centerOffset = currentCenter - totalCenter;
-		GetComposite()->SetPosition(GetComposite()->GetPosition() + point(currentCenter - totalCenter, 0.0f, 0.0f));
+		//m_centerOffset = currentCenter - totalCenter;
+		//GetComposite()->SetPosition(GetComposite()->GetPosition());// +point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
@@ -182,9 +182,9 @@ Error:
 RESULT DreamUserControlArea::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	//CR(m_pWebBrowserManager->Shutdown());
+	CR(m_pWebBrowserManager->Shutdown());
 
-//Error:
+Error:
 	return r;
 }
 

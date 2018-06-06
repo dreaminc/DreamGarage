@@ -470,6 +470,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 #ifndef PRODUCTION_BUILD
 	CR(m_pCommandLineManager->RegisterParameter("environment.path", "env.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("head.path", "head.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("lefthand.path", "lhand.path", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("righthand.path", "rhand.path", "default"));
 #endif
 
 	// For auto login, use '-l auto'

@@ -127,7 +127,7 @@ RESULT UIFlatScrollView::SetScrollSnapDistance(float snapDistance) {
 
 RESULT UIFlatScrollView::Snap() {
 	RESULT r = R_PASS;
-
+	
 	float rawIndex = GetPosition().z() / m_scrollSnapDistance;
 	float endZPosition = (float)(std::round(rawIndex)) * m_scrollSnapDistance;
 	//float distance = std::abs(endZPosition - GetPosition().z());

@@ -108,6 +108,7 @@ private:
 	float m_borderHeight = TAB_BORDER_HEIGHT;
 	float m_tabWidth = TAB_WIDTH;
 	float m_tabHeight = TAB_HEIGHT;
+	float m_itemSpacing;
 
 	bool m_fForceContentFocus = false;
 

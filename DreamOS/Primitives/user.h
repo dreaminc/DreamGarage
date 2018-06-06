@@ -36,6 +36,8 @@ public:
 	RESULT Activate(user::ControllerType type = user::ControllerType::CONTROLLER_INVALID);
 
 private:
+		
+	std::string k_strDefaultHeadPath = "\\face4\\untitled.obj";
 	// Storage of models and textures for head
 	std::shared_ptr<model> m_pHead;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
