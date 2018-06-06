@@ -574,11 +574,13 @@ RESULT Windows64App::Show() {
 	// Show the window
 	//CBM(ShowWindow(m_hwndWindow, SW_SHOWDEFAULT), "Failed to show win64app window");
 	//CBM(UpdateWindow(m_hwndWindow), "Failed to update win64app window");
-#ifdef PRODUCTION_BUILD
-	ShowWindow(m_hwndWindow, SW_HIDE);
-#else
-	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
-#endif
+	if (GetSandboxConfiguration().fHideWindow == true) {
+		ShowWindow(m_hwndWindow, SW_HIDE);
+	}
+	else {
+		ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
+	}
+
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Move this into it's own function

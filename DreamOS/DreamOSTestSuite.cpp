@@ -77,6 +77,8 @@ RESULT DreamOSTestSuite::AddTests() {
 	
 	CR(AddTestDreamDesktop());
 
+	CR(AddTestDreamBrowser());		
+
 	CR(AddTestDreamOS());
 
 	// Casting tests
