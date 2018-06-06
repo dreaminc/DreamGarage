@@ -76,8 +76,7 @@ uniform bool	u_fAREnabled;
 
 layout (location = 0) out vec4 out_vec4Color;
 
-//float g_ambient = material.m_ambient;
-float g_ambient = 0.5f;
+float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 

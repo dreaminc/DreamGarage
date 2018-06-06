@@ -833,7 +833,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		if (pTestContext->fFirst) {
 			pTestContext->fFirst = false;
 
-
+			/*
 			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
 			std::vector<std::shared_ptr<UIButton>> pButtons;
 
@@ -860,19 +860,24 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
 
 			pDreamUIBar->ResetAppComposite();
+			//*/
 			//pTestContext->pUserControlArea->ResetAppComposite();
 
 			//pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
 			//pTestContext->pUserControlArea->m_pControlBar->Show();
-			pTestContext->pUserControlArea->ShowControlView();
-			pTestContext->pUserControlArea->m_pDreamTabView->Show();
+//			pTestContext->pUserControlArea->ShowControlView();
+//			pTestContext->pUserControlArea->m_pDreamTabView->Show();
+//			pTestContext->pUserControlArea->ShowKeyboard();
+//			CR(pTestContext->pUserControlArea->HandleControlBarEvent(ControlEventType::KEYBOARD));
+			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
+
 		}
 
 		if (pTestContext->fLeft) {
-			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() + 0.001f);
+			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() + 0.003f);
 		}
 		if (pTestContext->fRight) {
-			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() - 0.001f);
+			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() - 0.003f);
 		}
 
 	Error:

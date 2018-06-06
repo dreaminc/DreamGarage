@@ -47,7 +47,6 @@ public:
 	//TODO: currently different control bar layouts are not used
 	RESULT UpdateButtonsWithType(BarType type);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
-	RESULT UpdateWidth();
 
 	float GetSpacingOffset();
 

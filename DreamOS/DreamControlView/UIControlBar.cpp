@@ -256,28 +256,6 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 	return r;
 }
 
-RESULT UIControlBar::UpdateWidth() {
-	RESULT r = R_PASS;
-
-	m_pBackButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pKeyboardButton = AddUIButton((2.0f * m_itemSide + m_itemSpacing), m_itemSide);
-
-	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pOpenButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pCloseButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
-
-	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
-
-	return r;
-}
-
 RESULT UIControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 

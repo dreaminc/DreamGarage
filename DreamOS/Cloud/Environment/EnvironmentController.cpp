@@ -844,6 +844,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		// TODO: Handle error 
 	}
 
+
 	/*
 	DEBUG_LINEOUT("HandleWebsocketMessage id:%d statuscode: %d pending:%d pending id:%d state: 0x%x", 
 		(int)(id), (int)(statusCode), m_fPendingMessage, (int)(m_pendingMessageID), m_state);
