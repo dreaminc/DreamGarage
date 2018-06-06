@@ -70,7 +70,6 @@ public:
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
-
 // Animations
 public:
 	RESULT Show();

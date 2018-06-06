@@ -186,6 +186,8 @@ Error:
 RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	RESULT r = R_PASS;
 
+	m_initialWidth = totalWidth;
+
 	// treat width as a chord of a circle with radius m_menuCenterOffset;
 	float halfChord = totalWidth/2.0f;
 
@@ -247,6 +249,50 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
 	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
 
+	return r;
+}
+
+RESULT UISpatialScrollView::UpdateWithWidth(float totalWidth) {
+	RESULT r = R_PASS;
+
+	CBR(m_initialWidth != 0.0f, R_SKIPPED);
+	m_initialWidth = totalWidth;
+	float objectScale = totalWidth / m_initialWidth;
+
+	// treat width as a chord of a circle with radius m_menuCenterOffset;
+	float halfChord = totalWidth/2.0f;
+
+	// calculate available space based on chord length and depth
+	float theta = 2.0f*asin(halfChord / abs(m_menuCenterOffset));
+
+	m_clippingRate = (theta / m_maxElements) * (1.0f - m_itemScale);
+	// scale to add margins in between items
+	theta += m_clippingRate;
+	m_clippingThreshold = cos(theta / 2.0f);
+
+
+	// calculate angle between each element
+	float itemAngleYRad = theta / m_maxElements;
+
+	// convert to degrees
+	m_itemAngleY = itemAngleYRad * 180.0f / (float)(M_PI);
+
+	// update starting angle
+	m_itemStartAngleY = -(m_maxElements / 2.0f - 0.5f) * m_itemAngleY;
+
+	// calculate new chord length to get width for future menu items
+	m_itemWidth = abs(m_menuCenterOffset) * 2.0f * sin(itemAngleYRad / 2.0f) * m_itemScale;
+
+	m_pTitleView->SetScale(objectScale);
+//	m_pTitleQuad->SetScale(objectScale);
+
+	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
+	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+
+	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
+	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+
+Error:
 	return r;
 }
 

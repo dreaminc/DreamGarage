@@ -54,6 +54,7 @@ public:
 	RESULT InitializeWithWidth(float totalWidth);
 
 	RESULT Update();
+	RESULT UpdateWithWidth(float totalWidth);
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
 	RESULT PositionMenuButton(float index, std::shared_ptr<UIButton> pButton);
 
@@ -120,6 +121,7 @@ private:
 	//float m_velocity;
 	float m_fadeDuration = FADE_DURATION;
 	float m_pushDepth = PUSH_DEPTH;
+	float m_initialWidth = 0.0f;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_canScrollColor = color(1.0f, 1.0f, 1.0f, 0.5f);

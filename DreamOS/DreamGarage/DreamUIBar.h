@@ -53,6 +53,7 @@ class DreamUIBar :	public DreamApp<DreamUIBar>,
 {
 
 	friend class DreamAppManager;
+	friend class DreamUserControlArea;
 	friend class MultiContentTestSuite;
 
 public:
@@ -114,6 +115,7 @@ public:
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	RESULT UpdateWidth(float totalWidth);
 	bool IsEmpty();
 
 protected:

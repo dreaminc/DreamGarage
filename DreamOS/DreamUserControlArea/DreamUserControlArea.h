@@ -31,6 +31,7 @@ class UIStageProgram;
 class quad;
 
 #define MAIN_DIAGONAL 0.70f
+
 #define SPACING_SIZE 0.016129f
 #define DEFAULT_PX_WIDTH 1366
 #define DEFAULT_PX_HEIGHT 768
@@ -49,6 +50,7 @@ class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subsc
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamOSTestSuite;
+	friend class DreamUIBar;
 
 public:
 	DreamUserControlArea(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -72,6 +74,13 @@ public:
 	float GetBaseHeight();
 	//point GetBaseCenter();
 	float GetViewAngle();
+
+
+	// 
+	RESULT SetViewHeight(float height);
+	// Set Base width and update everything else
+	RESULT ScaleViewWidth(float scale);
+	float GetViewScale();
 
 	// absolute positions
 	point GetCenter();
@@ -205,6 +214,7 @@ private:
 	float m_baseWidth;
 	float m_baseHeight;
 	float m_centerOffset;
+	float m_widthScale = 1.0f;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
