@@ -37,9 +37,7 @@ public:
 	UserController(Controller* pParentController);
 	~UserController();
 
-	RESULT Initialize() {
-		return R_NOT_IMPLEMENTED;
-	}
+	RESULT Initialize();
 
 	// Read username and password from file and login, get a token
 	RESULT LoginFromFilename(const std::wstring& file);
@@ -65,6 +63,16 @@ public:
 private:
 	std::string GetMethodURI(UserMethod userMethod);
 
+// User Settings
+public:
+	RESULT OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage);
+	RESULT OnSaveSettings(std::shared_ptr<CloudMessage> pCloudMessage);
+
+	RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType);
+	RESULT RequestSetSettings(float yOffset, float zOffset, float scale);
+	RESULT RequestSettingsForm(std::string key);
+
+
 // TODO: Move to private when CommandLineManager is brought in from WebRTC branch
 //private:
 public:
@@ -77,12 +85,23 @@ public:
 
 	long GetUserID() { return m_user.GetUserID(); }
 
+public:
+	class UserControllerObserver {
+	public:
+		virtual RESULT OnGetSettings() = 0;
+		virtual RESULT OnSaveSettings() = 0;
+	};
+
+	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);
+
 private:
 	bool m_fLoggedIn = false;
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
 	User m_user;
 	TwilioNTSInformation m_twilioNTSInformation;
+
+	UserControllerObserver *m_pUserControllerObserver;
 };
 
 #endif	// ! USER_CONTROLLER_H_

@@ -16,6 +16,7 @@
 #include <future>
 
 #include "Cloud/CloudController.h"
+#include "Cloud/CloudMessage.h"
 
 UserController::UserController(Controller* pParentController) :
 	Controller(pParentController),
@@ -27,6 +28,17 @@ UserController::UserController(Controller* pParentController) :
 
 UserController::~UserController() {
 	// 
+}
+
+RESULT UserController::Initialize() {
+	RESULT r = R_PASS;
+
+	// Register Methods
+	CR(RegisterMethod("get_settings", std::bind(&UserController::OnGetSettings, this, std::placeholders::_1)));
+	CR(RegisterMethod("save_settings", std::bind(&UserController::OnSaveSettings, this, std::placeholders::_1)));
+
+Error:
+	return r;
 }
 
 // TODO: Move to Controller - register methods etc
@@ -377,6 +389,112 @@ RESULT UserController::LoadTwilioNTSInformation() {
 		DEBUG_LINEOUT("Twilio NTS Information Loaded");
 		m_twilioNTSInformation.Print();
 	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+
+	if (jsonPayload.size() != 0) {
+		if (m_pUserControllerObserver != nullptr) {
+			// Moving to Send/Receive paradigm
+			CR(m_pUserControllerObserver->OnGetSettings());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnSaveSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+
+	if (jsonPayload.size() != 0) {
+		if (m_pUserControllerObserver != nullptr) {
+			// Moving to Send/Receive paradigm
+			CR(m_pUserControllerObserver->OnSaveSettings());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	CloudController *pParentCloudController = GetCloudController();
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("user.get_settings"));
+
+	jsonPayload["user_settings"] = nlohmann::json::object();
+	jsonPayload["user_settings"]["user"] = m_user->GetUserID();
+	jsonPayload["user_settings"]["instance_id"] = wstrHardwareID;
+	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+
+Error:
+	return r;
+}
+
+RESULT UserController::RequestSetSettings(float yOffset, float zOffset, float scale) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	CloudController *pParentCloudController = GetCloudController();
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("user.set_settings"));
+
+	jsonPayload["user_settings"] = nlohmann::json::object();
+	jsonPayload["user_settings"]["user"] = m_user->GetUserID();
+	jsonPayload["user_settings"]["instance_id"] = wstrHardwareID;
+	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+	jsonPayload["user_settings"]["ui_offset_y"] = yOffset;
+	jsonPayload["user_settings"]["ui_offset_z"] = zOffset;
+	jsonPayload["user_settings"]["ui_scale"] = scale;
+
+	//CR(pParentEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::MENU_API_REQUEST));
+
+Error:
+	return r;
+}
+
+RESULT UserController::RequestSettingsForm(std::string key) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	CloudController *pParentCloudController = GetCloudController();
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("form.get_form"));
+
+	jsonPayload["form"] = nlohmann::json::object();
+	jsonPayload["form"]["key"] = key;
+
+Error:
+	return r;
+}
+
+RESULT UserController::RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pUserControllerObserver), "Observer cannot be nullptr");
+	CBM((m_pUserControllerObserver == nullptr), "Can't overwrite environment observer");
+	m_pUserControllerObserver = pUserControllerObserver;
 
 Error:
 	return r;

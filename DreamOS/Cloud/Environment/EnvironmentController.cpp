@@ -843,6 +843,9 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		RESULT r = HandleOnMethodCallback(pCloudMessage);
 		// TODO: Handle error 
 	}
+	else if (pCloudMessage->GetController() == "user") {
+	//	GetCloudController()->GetUserControllerProxy()->HandleOnMethodCallback(pCloudMessage);
+	}
 
 
 	/*
