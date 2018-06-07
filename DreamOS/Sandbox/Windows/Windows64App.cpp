@@ -96,6 +96,11 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		this                                                // lpParam
 	);
 
+	// Get hardware ID from profile
+	HW_PROFILE_INFO hwProfInfo;
+	GetCurrentHwProfile(&hwProfInfo);
+	m_strHardwareID = hwProfInfo.szHwProfileGuid;
+
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
 	//TODO: use this label

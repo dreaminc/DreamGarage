@@ -1664,3 +1664,7 @@ Error:
 DreamOS *SandboxApp::GetDreamOSHandle() {
 	return m_pDreamOSHandle;
 }
+
+std::wstring SandboxApp::GetHardwareID() {
+	return m_strHardwareID;
+}

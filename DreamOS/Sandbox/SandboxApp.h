@@ -441,6 +441,12 @@ private:
 
 private:
 	UID m_uid;
+
+public:
+	std::wstring GetHardwareID();
+
+protected:
+	std::wstring m_strHardwareID;
 };
 
 #endif // ! SANDBOX_APP_H_
