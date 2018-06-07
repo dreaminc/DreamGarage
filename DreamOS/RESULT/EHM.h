@@ -98,7 +98,6 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 */
 
 #ifdef DEBUG_FILE_LINE
-	//#define CurrentFileLine "%s line#%d func:%s ", __FILE__, __LINE__, __FUNCTION__
 	#define CurrentFileLine "%s line#%d func:%s ", __FILE__, __LINE__, __FUNCTION__
 #else
     #define CurrentFileLine ""
@@ -129,7 +128,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define WCR(res) do{r=(res);if(r&0x80000000){DOSLogError(WARN, "WCR", r);/*goto Error;*/}}while(0);
 #define WCRM(res, msg, ...) do{r = (res);if(r&0x80000000){DOSLogErrorMessage(WARN, "WCRM", msg, r);;DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Warning: 0x%x\n",r);/*goto Error;*/}}while(0)
 
-// Check Boolean Resultre
+// Check Boolean Result
 // Ensures that condition evaluates to true
 #define CB(condition) do{if(!(condition)) {r = R_FAIL; DOSLogError(ERR, "CB", r);goto Error;}}while(0);
 #define WCB(condition) do{if(!(condition)) {r = R_WARNING; DOSLogError(ERR, "WCB", r);goto Error;}}while(0);
