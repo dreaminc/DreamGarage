@@ -4,7 +4,7 @@
 // When we solve logging we need to solve this too
 #pragma warning( disable : 4005)
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 
 #include "WebRTCImp.h"
 

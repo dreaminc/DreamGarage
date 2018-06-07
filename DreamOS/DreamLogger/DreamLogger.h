@@ -10,15 +10,11 @@
 // It should be possible to create custom logs per module
 // Internally it is using EasyLogger++ for now
 
-#include "Primitives/singleton.h"
-
 #include <string>
 
-#include "easylogging++.h"
+#include "spdlog.h"
 
-// LOG helper shortcuts
-#define LOG_XYZ(xyz) "(" << xyz.x() << "," << xyz.y() << "," << xyz.z() << ")"
-#define LOG_RGBA(rgba) "[" << rgba.r() << "," << rgba.g() << "," << rgba.b() << rgba.a() << "]"
+#define LOG_QUEUE_SIZE 1024
 
 class DreamLogger {
 public:
@@ -26,6 +22,7 @@ public:
 		INFO,
 		WARN,
 		ERR,
+		CRITICAL,
 		INVALID
 	};
 
@@ -35,7 +32,10 @@ public:
 	RESULT Log(DreamLogger::Level logLevel, const char* pszMessage, const Args&... args) {
 		RESULT r = R_PASS;
 
-		CN(m_pDreamLogger);
+		if (m_pDreamLogger == nullptr) {
+			r = R_FAIL;
+			goto Error;
+		}
 
 		switch (logLevel) {
 			case DreamLogger::Level::INFO: {
@@ -49,6 +49,10 @@ public:
 			case DreamLogger::Level::ERR: {
 				m_pDreamLogger->error(pszMessage, args...);
 			} break;
+
+			//case DreamLogger::Level::CRITICAL: {
+			//	m_pDreamLogger->critical(pszMessage, args...);
+			//} break;
 		}
 
 	Error:
@@ -62,9 +66,12 @@ private:
 
 public:
 	RESULT InitializeLogger();
+	RESULT Flush();
 
 private:
-	el::Logger *m_pDreamLogger = nullptr;
+	//el::Logger *m_pDreamLogger = nullptr;
+	std::shared_ptr<spdlog::logger> m_pDreamLogger = nullptr;
+
 	std::string m_strDreamLogPath;
 
 // Singleton
@@ -73,16 +80,24 @@ private:
 
 public:
 	// Note: constructor must be public for this to work
+	//static DreamLogger *instance();
+
 	static DreamLogger *instance() {
 		RESULT r = R_PASS;
 
 		if (!s_pInstance) {
 			s_pInstance = new DreamLogger();
-			CN(s_pInstance);
+			if (s_pInstance == nullptr) {
+				r = R_FAIL;
+				goto Error;
+			}
 
 			// This allows the singleton to run an initialization function that
 			// can fail (unlike the constructor)
-			CR(s_pInstance->InitializeLogger());
+			r = s_pInstance->InitializeLogger();
+			if (r != R_PASS) {
+				goto Error;
+			}
 		}
 
 		// Success:

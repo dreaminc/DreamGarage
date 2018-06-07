@@ -389,6 +389,10 @@ long Windows64App::GetTickCount() {
 	return static_cast<long>(GetTickCount());
 }
 
+RESULT Windows64App::GetStackTrace() {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT Windows64App::GetSandboxWindowSize(int &width, int &height) {
 	width = m_pxWidth;
 	height = m_pxHeight;

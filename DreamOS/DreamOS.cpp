@@ -1,6 +1,6 @@
 #include "DreamOS.h"
 
-#include "DreamLogger/DreamLogger.h"
+//#include "DreamLogger/DreamLogger.h"
 #include "DreamAppManager.h"
 
 #include "Primitives/font.h"
@@ -41,17 +41,16 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// TODO: This should be put into time a manager / utility 
 	srand(static_cast <unsigned> (time(0)));
 
-	// Initialize logger
-	// DreamLogger::InitializeLogger();
-	//DOSLOG(INFO, "DreamOS Starting...");
-//	auto pLoggerInstance = DreamLogger::instance();
-//	CN(pLoggerInstance);
-
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");
+
+	// Initialize logger
+	auto pDreamLogger = DreamLogger::instance();
+	CN(pDreamLogger);
+	pDreamLogger->Log(DreamLogger::Level::INFO, "DreamOS Starting ...");
 
 	// This gives our DreamOS app instance a chance to configure the
 	// sandbox prior to it getting initialized 

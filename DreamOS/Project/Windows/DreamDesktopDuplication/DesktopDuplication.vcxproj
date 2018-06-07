@@ -406,7 +406,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(OutDir);$(ProjectDir)include\;$(ProjectDir)..\..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OutDir);$(ProjectDir)include\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

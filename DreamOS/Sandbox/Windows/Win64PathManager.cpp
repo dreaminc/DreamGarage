@@ -138,6 +138,16 @@ Error:
 	return r;
 }
 
+// This will create a local DreamOS path directory
+RESULT Win64PathManager::CreateDirectory(wchar_t *pszDirectoryName) {
+	RESULT r = R_PASS;
+
+	CBM(::CreateDirectoryW(pszDirectoryName, NULL), "Failed to create directory %S", pszDirectoryName);
+
+Error:
+	return r;
+}
+
 RESULT Win64PathManager::UpdateCurrentPath() {
 	RESULT r = R_PASS;
 
