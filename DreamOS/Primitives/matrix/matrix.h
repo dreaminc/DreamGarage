@@ -204,10 +204,10 @@ public:
 		matrix<TMatrix, N - 1, M - 1> retMatrix;
 		retMatrix.clear();
 
-		CRM(RangeCheck(i, j), "%d %d minor not possible in %d x %d matrix", i, j, N, M);
-
 		int rowCount = 0;
 		int colCount = 0;
+
+		CRM(RangeCheck(i, j), "%d %d minor not possible in %d x %d matrix", i, j, N, M);
 
 		for (int x = 0; x < (N - 1); x++) {
 			

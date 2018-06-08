@@ -64,47 +64,50 @@ RESULT CollisionTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) 
 	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
-	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
-	CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
+	{
 
-	CR(pHAL->MakeCurrentContext());
+		m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+		CNM(m_pSceneGraph, "Failed to allocate Debug Scene Graph");
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pHAL->MakeCurrentContext());
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Debug Overlay
-	ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
-	CN(pDebugOverlay);
-	CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-	CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Debug Overlay
+		ProgramNode* pDebugOverlay = pHAL->MakeProgramNode("debug_overlay");
+		CN(pDebugOverlay);
+		CR(pDebugOverlay->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pDebugOverlay->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pDebugOverlay->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDebugOverlay->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	CR(pHAL->ReleaseCurrentContext());
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
-	light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		CR(pHAL->ReleaseCurrentContext());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+	}
 
 Error:
 	return r;
@@ -142,7 +145,8 @@ RESULT CollisionTestSuite::AddTestPlaneOBB() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -260,7 +264,8 @@ RESULT CollisionTestSuite::AddTestPlaneQuad() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -376,7 +381,8 @@ RESULT CollisionTestSuite::AddTestPlaneSphere() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -490,7 +496,8 @@ RESULT CollisionTestSuite::AddTestPlaneRay() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -888,7 +895,8 @@ RESULT CollisionTestSuite::AddTestQuadQuad() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -1000,7 +1008,8 @@ RESULT CollisionTestSuite::AddTestPlanePlane() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -1114,7 +1123,8 @@ RESULT CollisionTestSuite::AddTestSphereSphere() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -1237,7 +1247,8 @@ RESULT CollisionTestSuite::AddTestSphereQuad() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -1350,7 +1361,8 @@ RESULT CollisionTestSuite::AddTestSphereOBB() {
 		CR(SetupSkyboxPipeline("minimal"));
 
 		// Test Context
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		// Objects
@@ -1507,7 +1519,8 @@ RESULT CollisionTestSuite::AddTestRayInComposite() {
 
 		CR(SetupSkyboxPipeline("minimal"));
 
-		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+		RayTestContext *pTestContext;
+		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
 		CN(pTestContext);
 
 		// Ray to composite
@@ -1666,7 +1679,8 @@ RESULT CollisionTestSuite::AddTestScaledCompositeRay() {
 
 		CR(SetupSkyboxPipeline("minimal"));
 
-		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+		RayTestContext *pTestContext;
+		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
 		CN(pTestContext);
 
 		// Ray to composite
@@ -1674,7 +1688,8 @@ RESULT CollisionTestSuite::AddTestScaledCompositeRay() {
 		pTestContext->pComposite = m_pDreamOS->AddComposite();
 		CN(pTestContext->pComposite);
 
-		composite *pComposite = pTestContext->pComposite;
+		composite *pComposite;
+		pComposite = pTestContext->pComposite;
 		CN(pComposite);
 
 		// Test the various bounding types
@@ -1820,17 +1835,20 @@ RESULT CollisionTestSuite::AddTestRayModel() {
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pDreamOS->SetGravityState(false);
-
-		CR(SetupSkyboxPipeline("minimal"));
-
-		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
 
 		double yPos = -1.0f;
 		double xPos = 2.0f;
 
 		// Ray to quads 
 		int quadCount = 0;
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		RayTestContext *pTestContext;
+		pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+		CN(pTestContext);
 
 		pTestContext->pComposite = m_pDreamOS->AddComposite();
 		CN(pTestContext->pComposite);

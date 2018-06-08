@@ -147,7 +147,7 @@ public:
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		
-		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
 		std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
@@ -159,7 +159,7 @@ public:
 
 		for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			Subscriber<PKEventClass>* pTempSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
-			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", GetEventKeyString(keyEvent));
+			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 		}
 
 		// If we made it this far then push the subscriber into the list for the given event

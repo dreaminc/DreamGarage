@@ -65,7 +65,7 @@ public:
 
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
-	RESULT PlaySound(SoundFile *pSoundFile);
+	RESULT PlaySoundFile(SoundFile *pSoundFile);
 
 private:
 	std::thread	m_audioRenderProcessingThread;

@@ -10,6 +10,7 @@
 #include "Primitives/valid.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/vector.h"
+#include "Primitives/point.h"
 
 #include <string>
 #include <memory>
