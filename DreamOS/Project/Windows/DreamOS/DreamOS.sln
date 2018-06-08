@@ -12,6 +12,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamDesktopCapture", "..\DreamDesktopDuplication\DesktopDuplication.vcxproj", "{05050918-71E9-AF87-0B3C-6F34D471A55A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamTestApp", "..\DreamTestApp\DreamTestApp.vcxproj", "{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8896328-06EB-43A0-902C-59C3D2F3A3B5} = {E8896328-06EB-43A0-902C-59C3D2F3A3B5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -276,7 +279,8 @@ Global
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|ARM.Build.0 = Release|x64
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|ARM64.ActiveCfg = Release|x64
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|ARM64.Build.0 = Release|x64
-		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|x64.ActiveCfg = Release|x64
+		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|x64.ActiveCfg = Testing|x64
+		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|x64.Build.0 = Testing|x64
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|x86.ActiveCfg = Release|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|x86.Build.0 = Release|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.TestingRelease|Any CPU.ActiveCfg = Release|x64

@@ -45,7 +45,7 @@ protected:
 		//typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pNewSubscriberMap = nullptr;
 		typename Multipublisher::T_SubscriberMap* pNewSubscriberMap = nullptr;
 
-		CBM((it == m_indexedEvents.end()), "Event %s already registered", GetEventKeyString(keyEvent));
+		CBM((it == m_indexedEvents.end()), "Event %s already registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		// Create a new subscriber list for the event entry
 		pNewSubscriberMap = (T_SubscriberMap*)(new T_SubscriberMap());
@@ -81,7 +81,7 @@ public:
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_indexedEvents.find(keyEvent);
-		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		// Check if already registered
 		pSubscriberMap = reinterpret_cast<T_SubscriberMap*>(it->second);
@@ -117,7 +117,7 @@ public:
 		auto it = m_indexedEvents.find(keyClass);
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyClass));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyClass));
 
 		{
 			typename Multipublisher::T_SubscriberMap* pSubscriberMap = nullptr;
@@ -244,7 +244,7 @@ public:
 		typename Multipublisher::T_SubscriberMap* pSubscriberMap = nullptr;
 		auto it = m_indexedEvents.find(keyEvent);
 
-		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberMap = m_indexedEvents[keyEvent];
 		CNM(pSubscriberMap, "Subscriber map is NULL");
@@ -269,7 +269,7 @@ public:
 		typename Multipublisher::T_SubscriberMap* pSubscriberMap = nullptr;
 		auto it = m_indexedEvents.find(keyEvent);
 
-		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberMap = m_indexedEvents[keyEvent];
 		CNM(pSubscriberMap, "Subscriber map is NULL");
@@ -319,7 +319,7 @@ public:
 		typename Multipublisher::T_SubscriberMap* pSubscriberMap = nullptr;
 		auto it = m_indexedEvents.find(keyEvent);
 
-		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberMap = m_indexedEvents[keyEvent];
 		CNM(pSubscriberMap, "Subscriber list is NULL");
