@@ -62,6 +62,7 @@ class DreamOS :
 	public valid,
 	public CloudController::PeerConnectionObserver,
 	public CloudController::EnvironmentObserver,
+	public CloudController::UserObserver,
 	public DreamPeerApp::DreamPeerAppObserver
 {
 	friend class CloudTestSuite;
@@ -155,6 +156,18 @@ public:
 	}
 
 	virtual RESULT OnCloseAsset() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnGetSettings() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnSetSettings() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnSettings() override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -366,6 +379,7 @@ public:
 protected:
 	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
 	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
+	RESULT RegisterUserObserver(CloudController::UserObserver *pUserObserver);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
@@ -391,6 +405,7 @@ protected:
 
 public:
 	const SandboxApp::configuration& GetSandboxConfiguration();
+	std::wstring GetHardwareID();
 
 private:
 	SandboxApp *m_pSandbox;

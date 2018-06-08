@@ -441,6 +441,39 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnGetSettings() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnGetSettings());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSetSettings() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSetSettings());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSettings() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSettings());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
@@ -894,6 +927,17 @@ RESULT CloudController::RegisterEnvironmentObserver(EnvironmentObserver* pEnviro
 	CNM((pEnvironmentObserver), "Observer cannot be nullptr");
 	CBM((m_pEnvironmentObserver == nullptr), "Can't overwrite environment observer");
 	m_pEnvironmentObserver = pEnvironmentObserver;
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterUserObserver(UserObserver* pUserObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pUserObserver), "Observer cannot be nullptr");
+	CBM((m_pUserObserver == nullptr), "Can't overwrite environment observer");
+	m_pUserObserver = pUserObserver;
 
 Error:
 	return r;

@@ -843,8 +843,10 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		RESULT r = HandleOnMethodCallback(pCloudMessage);
 		// TODO: Handle error 
 	}
-	else if (pCloudMessage->GetController() == "user") {
-	//	GetCloudController()->GetUserControllerProxy()->HandleOnMethodCallback(pCloudMessage);
+	//TODO: split form into separate controller(?)
+	else if (pCloudMessage->GetController() == "user" || pCloudMessage->GetController() == "form") {
+		auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		pUserController->HandleEnvironmentSocketMessage(pCloudMessage);
 	}
 
 

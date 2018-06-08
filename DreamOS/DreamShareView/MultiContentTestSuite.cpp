@@ -753,8 +753,13 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public Subscriber<SenseControllerEvent> {
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	struct TestContext : public Subscriber<SenseControllerEvent>,
+		public UserController::UserControllerObserver	
+	{
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		UserControllerProxy* pUserControllerProxy = nullptr;
+		CloudController *pCloudController = nullptr;
+
 		stereocamera *pCamera = nullptr;;
 		bool fFirst = true;
 
@@ -806,6 +811,16 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 			return r;
 		};
+
+		virtual RESULT OnGetSettings() override {
+			return R_PASS;
+		}
+		virtual RESULT OnSetSettings() override {
+			return R_PASS;
+		}
+		virtual RESULT OnSettings() override {
+			return R_PASS;
+		}
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
@@ -828,6 +843,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		CN(pControlArea);
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+
+		pTestContext->pCloudController = new CloudController();
+		pTestContext->pCloudController->Initialize();
+		pTestContext->pCloudController->Login();
+		//pTestContext->pCloudController->Start();
+
+
+
 	Error:
 		return r;
 	};
@@ -839,45 +862,21 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		auto pControlArea = pTestContext->pUserControlArea;
 
 		if (pTestContext->fFirst) {
-			pTestContext->fFirst = false;
 
-			/*
-			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
-			std::vector<std::shared_ptr<UIButton>> pButtons;
+//			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCloudController = pTestContext->pCloudController;
+			pTestContext->pUserControllerProxy = dynamic_cast<UserControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-			for (int i = 0; i < 6; i++) {
+			CBRM(pCloudController->IsUserLoggedIn(), R_SKIPPED, "User not logged in");
+			CBRM(pCloudController->IsEnvironmentConnected(), R_SKIPPED, "Environment socket not connected");
+			//CBRM(pCloudController->IsE)
 
-				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem(pDreamUIBar->m_pScrollView->GetWidth(), pDreamUIBar->m_pScrollView->GetWidth() * 9.0f / 16.0f);
-				CN(pButton);
+			dynamic_cast<UserController*>(pTestContext->pUserControllerProxy)->RegisterUserControllerObserver(pTestContext);
+			CR(pTestContext->pUserControllerProxy->RequestGetSettings(m_pDreamOS->GetHardwareID(),"HMDType.OculusRift"));
 
-				auto iconFormat = IconFormat();
-				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
-
-				auto labelFormat = LabelFormat();
-				labelFormat.strLabel = "Label " + std::to_string(i);
-				labelFormat.pFont = pDreamUIBar->m_pFont;
-				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
-
-				pButton->Update(iconFormat, labelFormat);
-
-				pButtons.emplace_back(pButton);
-			}
-
-			//pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
-
-			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
-
-			pDreamUIBar->ResetAppComposite();
-			//*/
-			//pTestContext->pUserControlArea->ResetAppComposite();
-
-			//pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
-			//pTestContext->pUserControlArea->m_pControlBar->Show();
-//			pTestContext->pUserControlArea->ShowControlView();
-//			pTestContext->pUserControlArea->m_pDreamTabView->Show();
-//			pTestContext->pUserControlArea->ShowKeyboard();
-//			CR(pTestContext->pUserControlArea->HandleControlBarEvent(ControlEventType::KEYBOARD));
 			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
+
+			pTestContext->fFirst = false;
 
 		}
 

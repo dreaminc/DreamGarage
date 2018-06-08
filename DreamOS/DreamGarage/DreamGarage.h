@@ -85,6 +85,11 @@ public:
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
+	// user
+	virtual RESULT OnGetSettings() override;
+	virtual RESULT OnSetSettings() override;
+	virtual RESULT OnSettings() override;
+
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);

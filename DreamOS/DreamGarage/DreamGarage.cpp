@@ -897,6 +897,16 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnGetSettings() {
+	return R_PASS;
+}
+RESULT DreamGarage::OnSetSettings() {
+	return R_PASS;
+}
+RESULT DreamGarage::OnSettings() {
+	return R_PASS;
+}
+
 RESULT DreamGarage::OnShareAsset() {
 	RESULT r = R_PASS;
 

@@ -34,8 +34,12 @@ RESULT UserController::Initialize() {
 	RESULT r = R_PASS;
 
 	// Register Methods
+	//user
 	CR(RegisterMethod("get_settings", std::bind(&UserController::OnGetSettings, this, std::placeholders::_1)));
-	CR(RegisterMethod("save_settings", std::bind(&UserController::OnSaveSettings, this, std::placeholders::_1)));
+	CR(RegisterMethod("set_settings", std::bind(&UserController::OnSetSettings, this, std::placeholders::_1)));
+
+	//form
+	CR(RegisterMethod("settings", std::bind(&UserController::OnSettingsForm, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -394,6 +398,14 @@ Error:
 	return r;
 }
 
+RESULT UserController::HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	CR(HandleOnMethodCallback(pCloudMessage));
+Error:
+	return r;
+}
+
 RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
@@ -410,7 +422,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::OnSaveSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
+RESULT UserController::OnSetSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
@@ -418,7 +430,23 @@ RESULT UserController::OnSaveSettings(std::shared_ptr<CloudMessage> pCloudMessag
 	if (jsonPayload.size() != 0) {
 		if (m_pUserControllerObserver != nullptr) {
 			// Moving to Send/Receive paradigm
-			CR(m_pUserControllerObserver->OnSaveSettings());
+			CR(m_pUserControllerObserver->OnSetSettings());
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnSettingsForm(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+
+	if (jsonPayload.size() != 0) {
+		if (m_pUserControllerObserver != nullptr) {
+			// Moving to Send/Receive paradigm
+			CR(m_pUserControllerObserver->OnSettings());
 		}
 	}
 
@@ -438,9 +466,13 @@ RESULT UserController::RequestGetSettings(std::wstring wstrHardwareID, std::stri
 	CR(pCloudRequest->SetControllerMethod("user.get_settings"));
 
 	jsonPayload["user_settings"] = nlohmann::json::object();
-	jsonPayload["user_settings"]["user"] = m_user->GetUserID();
+	jsonPayload["user_settings"]["user"] = m_user.GetUserID();
 	jsonPayload["user_settings"]["instance_id"] = wstrHardwareID;
 	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentController);
+	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::USER_GET_SETTINGS));
 
 Error:
 	return r;
@@ -458,9 +490,9 @@ RESULT UserController::RequestSetSettings(float yOffset, float zOffset, float sc
 	CR(pCloudRequest->SetControllerMethod("user.set_settings"));
 
 	jsonPayload["user_settings"] = nlohmann::json::object();
-	jsonPayload["user_settings"]["user"] = m_user->GetUserID();
-	jsonPayload["user_settings"]["instance_id"] = wstrHardwareID;
-	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+	jsonPayload["user_settings"]["user"] = m_user.GetUserID();
+	//jsonPayload["user_settings"]["instance_id"] = wstrHardwareID;
+	//jsonPayload["user_settings"]["hmd_type"] = strHMDType;
 	jsonPayload["user_settings"]["ui_offset_y"] = yOffset;
 	jsonPayload["user_settings"]["ui_offset_z"] = zOffset;
 	jsonPayload["user_settings"]["ui_scale"] = scale;
@@ -471,6 +503,8 @@ Error:
 	return r;
 }
 
+//TODO: this needs to be moved to EnvironmentController (or possibly Controller)
+// so that forms are requested in the same way across all sockets
 RESULT UserController::RequestSettingsForm(std::string key) {
 	RESULT r = R_PASS;
 

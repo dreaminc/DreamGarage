@@ -54,7 +54,8 @@ public:
 class CloudController : public Controller, 
 						public CloudControllerProxy,
 						public std::enable_shared_from_this<CloudController>, 
-						public EnvironmentController::EnvironmentControllerObserver
+						public EnvironmentController::EnvironmentControllerObserver,
+						public UserController::UserControllerObserver
 {
 protected:
 	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
@@ -89,12 +90,21 @@ public:
 		virtual RESULT OnShareAsset() = 0;
 	};
 
+	class UserObserver {
+	public:
+		virtual RESULT OnGetSettings() = 0;
+		virtual RESULT OnSetSettings() = 0;
+		virtual RESULT OnSettings() = 0;
+	};
+
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
 	RESULT RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver);
+	RESULT RegisterUserObserver(UserObserver* pUserObserver);
 
 private:
 	PeerConnectionObserver *m_pPeerConnectionObserver = nullptr;
 	EnvironmentObserver *m_pEnvironmentObserver = nullptr;
+	UserObserver *m_pUserObserver = nullptr;
 	
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
@@ -179,6 +189,11 @@ public:
 
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
+	// UserControllerObserver
+	virtual RESULT OnGetSettings() override;
+	virtual RESULT OnSetSettings() override;
+	virtual RESULT OnSettings() override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
