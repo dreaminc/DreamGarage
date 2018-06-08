@@ -98,7 +98,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -728,7 +728,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
@@ -995,7 +994,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />

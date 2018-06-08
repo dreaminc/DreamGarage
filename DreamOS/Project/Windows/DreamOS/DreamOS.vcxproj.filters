@@ -503,9 +503,6 @@
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
@@ -1513,9 +1510,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UITestSuite.h">
       <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
       <Filter>DreamGarage</Filter>
