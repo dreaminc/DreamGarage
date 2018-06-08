@@ -183,9 +183,6 @@
     <Filter Include="DreamLogger">
       <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\easyloggingpp">
-      <UniqueIdentifier>{9349b760-9d5c-476f-9dc4-086ec2b7ffca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sound">
       <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
@@ -853,9 +850,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
       <Filter>DreamLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc">
-      <Filter>External\easyloggingpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp">
       <Filter>Sound</Filter>
@@ -2053,9 +2047,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h">
       <Filter>DreamLogger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h">
-      <Filter>External\easyloggingpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\SoundTestSuite.h">
       <Filter>Sound</Filter>

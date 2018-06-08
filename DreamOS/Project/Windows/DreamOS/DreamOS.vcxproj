@@ -104,7 +104,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -118,7 +118,7 @@
     <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -510,7 +510,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;_USE_TEST_APP;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -554,7 +554,13 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
     </Manifest>
     <Lib>
       <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLibWarningAsErrors>
+      </TreatLibWarningAsErrors>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
     <ClCompile>
@@ -735,7 +741,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp" />
-    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
@@ -1064,7 +1069,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h" />
-    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h" />
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
