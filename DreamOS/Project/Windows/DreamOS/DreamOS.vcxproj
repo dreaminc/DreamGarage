@@ -322,7 +322,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_USE_TEST_APP;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;_ENABLE_LOGGING;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_USE_TEST_APP;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;_ENABLE_LOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
@@ -721,9 +721,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
-    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSTestSuite.cpp" />
-    <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
+    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
     <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
     <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp" />
@@ -1008,9 +1007,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
-    <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSTestSuite.h" />
-    <ClInclude Include="..\..\..\DreamOSWinMain.h" />
+    <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
     <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h" />
     <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h" />

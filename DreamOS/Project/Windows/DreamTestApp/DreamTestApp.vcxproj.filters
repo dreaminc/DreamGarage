@@ -9,9 +9,15 @@
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestAppMain.cpp">
+      <Filter>DreamTestApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestAppMain.h">
       <Filter>DreamTestApp</Filter>
     </ClInclude>
   </ItemGroup>

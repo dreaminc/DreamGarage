@@ -124,9 +124,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestAppMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestAppMain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

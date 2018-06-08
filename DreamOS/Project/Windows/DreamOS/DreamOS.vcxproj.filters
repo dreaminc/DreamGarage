@@ -206,9 +206,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DreamOSMain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
       <Filter>Primitives\Types</Filter>
     </ClCompile>
@@ -385,9 +382,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
       <Filter>Primitives\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
-      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
@@ -1004,11 +998,11 @@
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamOSMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DreamOSMain.h">
-      <Filter>Main</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
       <Filter>RESULT</Filter>
     </ClInclude>
@@ -1458,9 +1452,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamOSWinMain.h">
-      <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
@@ -2182,6 +2173,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
       <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSMain.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
