@@ -135,9 +135,6 @@
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamTestApp">
-      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="InteractionEngine">
       <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
     </Filter>
@@ -203,6 +200,9 @@
     </Filter>
     <Filter Include="DreamUserControlArea">
       <UniqueIdentifier>{e7693720-b8fe-424c-9d3b-5d6d93aa1029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{1564ed20-d0da-41d8-bbc4-23517e148800}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -481,9 +481,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
       <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
-      <Filter>DreamTestApp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
@@ -1003,6 +1000,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1549,9 +1549,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimRay.h">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
-      <Filter>DreamTestApp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
       <Filter>Primitives</Filter>
@@ -2182,6 +2179,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamEnvironmentApp.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -78,7 +78,7 @@ private:
 
 public:
 
-	DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext = nullptr);
+	DreamPeerApp(DreamOS *pDOS, void *pContext = nullptr);
 	//DreamPeerApp::DreamPeerApp(DreamOS *pDOS, PeerConnection *pPeerConnection, void *pContext = nullptr);
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;

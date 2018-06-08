@@ -29,7 +29,7 @@
 	#include <Windows.h>
 
 	#ifdef WIN32_LEAN_AND_MEAN
-		#undef WIN32_LEAN_AND_MEANndu
+		#undef WIN32_LEAN_AND_MEAN
 	#endif
 
 	#ifndef WIN32

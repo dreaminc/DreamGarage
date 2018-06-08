@@ -267,6 +267,8 @@ public:
 	RESULT PushData(CBType *pDataBuffer, int numFrames) {
 		RESULT r = R_PASS;
 
+		int sampleCount = 0;
+
 		CN(m_ppCircularBuffers);
 
 		// This will block
@@ -281,7 +283,6 @@ public:
 		}
 
 		// This will de-interlace the samples
-		int sampleCount = 0;
 		for (int i = 0; i < numFrames; i++) {
 			for (int j = 0; j < m_channels; j++) {
 				m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
@@ -298,6 +299,8 @@ public:
 	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n) override {
 		RESULT r = R_PASS;
 
+		CircularBuffer<CBType> *pChannelCircBuf = nullptr;
+
 		CN(m_ppCircularBuffers);
 		CBM((channel < m_channels), "Channel %d does not exist in SoundBuffer of width %d", channel, m_channels);
 
@@ -305,7 +308,7 @@ public:
 		m_bufferLock.lock();
 
 		// Make sure the buffer has enough space
-		CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[channel];
+		pChannelCircBuf = m_ppCircularBuffers[channel];
 		CN(pChannelCircBuf);
 
 		CB((pChannelCircBuf->NumAvailableBufferBytes() >= pDataBuffer_n));
@@ -322,16 +325,18 @@ public:
 		RESULT r = R_PASS;
 
 		CB((NumPendingBytes() >= numFrameCount));
+		
+		{
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
 
-		size_t bufferCounter = 0;
-		CBType tempVal = 0;
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+					CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
 
-		for (int j = 0; j < numFrameCount; j++) {
-			for (int i = 0; i < m_channels; i++) {
-				CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
-
-				pDataBuffer[bufferCounter] += tempVal;
-				bufferCounter++;
+					pDataBuffer[bufferCounter] += tempVal;
+					bufferCounter++;
+				}
 			}
 		}
 
@@ -344,15 +349,17 @@ public:
 
 		CB((NumPendingBytes() >= numFrameCount));
 
-		size_t bufferCounter = 0;
-		CBType tempVal = 0;
+		{
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
 
-		for (int j = 0; j < numFrameCount; j++) {
-			for (int i = 0; i < m_channels; i++) {
-				CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+					CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
 
-				pTargetDataBuffer[bufferCounter] = tempVal;
-				bufferCounter++;
+					pTargetDataBuffer[bufferCounter] = tempVal;
+					bufferCounter++;
+				}
 			}
 		}
 

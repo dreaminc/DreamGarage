@@ -1,30 +1,92 @@
 #include "DreamOSMain.h"
-//#include "OSX/OSXApp.h"
 
 #include <ctime>
 #include "RESULT/EHM.h"
 
-// TODO: Eventually this should be a DreamGarage / Application specific main
-// and should likely sit in the same dir as the DreamOS derivation
 #include "DreamGarage/DreamGarage.h"
 #include "../DreamTestApp/DreamTestApp.h"
-
 #include "test/MatrixTestSuite.h"
 
-#define ELPP_THREAD_SAFE 1
-//#define ELPP_FORCE_USE_STD_THREAD 1
-#define ELPP_NO_DEFAULT_LOG_FILE
+#include <string>
 
-#include "easylogging++.h"
+// We use window subsystem in PRODUCTION build to allow Dream to run without a console window
 
-#ifndef _EASY_LOGGINGPP_INITIALIZED
-INITIALIZE_EASYLOGGINGPP
-#define _EASY_LOGGINGPP_INITIALIZED
+//#define ELPP_THREAD_SAFE 1
+////#define ELPP_FORCE_USE_STD_THREAD 1
+//#define ELPP_NO_DEFAULT_LOG_FILE
+//
+//#include "easylogging++.h"
+//
+//#ifndef _EASY_LOGGINGPP_INITIALIZED
+//INITIALIZE_EASYLOGGINGPP
+//#define _EASY_LOGGINGPP_INITIALIZED
+//#endif
+
+#ifdef _WINDOWS
+
+#include <shellapi.h>
+
+int WINAPI WinMain(HINSTANCE hInstance,
+	HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine,
+	int nCmdShow)
+{
+	RESULT r = R_PASS;
+
+	// get cmdln args and put them on the stack in argc,argv format
+	LPWSTR *wargv = nullptr;
+	int argc = 0;
+
+	wargv = CommandLineToArgvW(GetCommandLine(), &argc);
+	char** argv = new char*[argc];
+	std::vector<std::string> args;
+
+	for (int i = 0; i < argc; i++) {
+		std::wstring warg(wargv[i]);
+		args.push_back(std::string(warg.begin(), warg.end()));
+	}
+
+	for (int i = 0; i < argc; i++) {
+		argv[i] = new char;
+		argv[i] = (char*)args[i].c_str();
+	}
+	// now argc,argv are available and will get destroyed on exit
+
+#if defined(_UNIT_TESTING)
+	// TODO: Replace this with a real unit testing framework in testing filter
+	MatrixTestSuite matrixTestSuite;
+
+	matrixTestSuite.Initialize();
+	CRM(matrixTestSuite.RunTests(), "Failed to run matrix test suite tests");
+
+	DEBUG_LINEOUT("Unit tests complete 0x%x result", r);
+	system("pause");
+
+	return (int)(r);
+#elif defined(_USE_TEST_APP)
+	DreamTestApp dreamTestApp;
+	CRM(dreamTestApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+	CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+#else
+	// This is the entry point for the DreamOS Engine
+	DreamGarage dreamGarageApp;
+	CRM(dreamGarageApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
 #endif
 
+//Success:
+	return (int)(r);
+
+Error:
+	DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
+	DEBUG_SYSTEM_PAUSE();
+
+	return (int)(r);
+}
+#else
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
-    
+
 #if defined(_UNIT_TESTING)
 	// TODO: Replace this with a real unit testing framework in testing filter
 	MatrixTestSuite matrixTestSuite;
@@ -67,3 +129,4 @@ Error:
 	return (int)(r);
 #endif
 }
+#endif

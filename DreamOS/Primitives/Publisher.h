@@ -138,7 +138,7 @@ public:
 		return (!(it == m_events.end()));
 	}
 
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
 		return m_events;
 	}
 	
@@ -263,7 +263,7 @@ public:
 	}
 
 private:
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> m_events;
 };
 
 #endif // ! PUBLISHER_H_

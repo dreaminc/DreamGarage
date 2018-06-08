@@ -3,6 +3,8 @@
 
 #include "RESULT/EHM.h"
 
+#include "Core/config.h"
+
 // DREAM GARAGE
 // DreamGarage.h
 // This is the Dream Garage application layer which is derived from DreamOS
@@ -29,7 +31,7 @@ public:
 		// empty
 	}
 
-	virtual RESULT DreamTestApp::ConfigureSandbox() override;
+	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
 	virtual RESULT Update(void) override;
 

@@ -19,7 +19,8 @@ class sphere;
 class volume;
 class DimRay;
 class user;
-class quad;
+//class quad;
+#include "Primitives/quad.h"
 class model;
 
 class hand;
@@ -46,7 +47,8 @@ public:
 
 	virtual RESULT UpdateBoundingVolume() override;
 
-	///*
+	// TODO: This is currently not building correctly, so has been removed for now
+	/*
 	template<typename objType, typename... Targs>
 	std::shared_ptr<objType> Add(Targs... Fargs) {
 		RESULT r = R_PASS;
@@ -148,13 +150,14 @@ public:
 	std::shared_ptr<user> AddUser();
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
-	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
-
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector());
+	
+	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
 	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector());
 
 	std::shared_ptr<DimRay> MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
