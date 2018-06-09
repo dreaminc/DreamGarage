@@ -61,7 +61,7 @@ public:
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);
-	RESULT SetTitleText(std::string& strTitle);
+	RESULT SetTitleText(const std::string& strTitle);
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 
 	RESULT ClearMinimizedState();

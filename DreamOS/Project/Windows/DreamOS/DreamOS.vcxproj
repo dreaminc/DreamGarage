@@ -144,54 +144,6 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -288,30 +240,8 @@
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
-xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -718,24 +648,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamControlBar.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp" />
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
-    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
-    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
-    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
-    <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
@@ -983,31 +900,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamControlBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamEnvironmentApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
-    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
-    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h" />
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
-    <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
-    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamContentSource.h" />
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h" />
@@ -1052,9 +950,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h" />
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h" />
     <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
@@ -1319,7 +1214,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.frag" />
@@ -1419,13 +1313,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\Scripts\copy_assets.py" />
     <None Include="..\..\..\Scripts\make_production.py" />
     <None Include="..\..\..\Scripts\make_production_package.py" />
-    <None Include="DreamOS.development.nuspec" />
-    <None Include="DreamOS.production.nuspec" />
-    <None Include="packages.config" />
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
-    <None Include="PropertySheet.props">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt">
@@ -1446,19 +1334,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="Dream.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">true</DeploymentContent>
-      <DeploymentContent>true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">true</ExcludedFromBuild>
-    </Object>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="manifest.xml" />

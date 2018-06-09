@@ -95,9 +95,12 @@ RESULT DreamControlView::Update(void *pContext) {
 		CN(m_pUserHandle);
 	}
 		
-	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	UIMallet* pLMallet;
+	pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
-	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+
+	UIMallet* pRMallet;
+	pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
 
 	// skip mallet update while keyboard is active
@@ -112,8 +115,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	// if a url is being shared through the keyboard don't update the control view surface
 	CBR(!m_fIsShareURL, R_SKIPPED);
 
-	for (int i = 0; i < 2; i++)
-	{
+	for (int i = 0; i < 2; i++) {
 		UIMallet *pMallet;
 		HAND_TYPE type;
 		if (i == 0) {
@@ -437,7 +439,6 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-
 		if (m_pUserHandle == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 			CB(userUIDs.size() == 1);
@@ -448,13 +449,17 @@ RESULT DreamControlView::ShowView() {
 			CN(m_pUserHandle);
 		}
 
-		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		UIMallet* pLMallet;
+		pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 		CNR(pLMallet, R_SKIPPED);
-		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+
+		UIMallet* pRMallet;
+		pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
 		CNR(pRMallet, R_SKIPPED);
 
 		pLMallet->SetDirty();
 		pRMallet->SetDirty();
+
 		m_fMouseDown[0] = false;
 		m_fMouseDown[1] = false;
 
@@ -712,7 +717,8 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	}
 	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
-	float viewHeight = m_pViewQuad->GetHeight();
+	float viewHeight;
+	viewHeight = m_pViewQuad->GetHeight();
 	// used to center view 
 	//textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight); 
 

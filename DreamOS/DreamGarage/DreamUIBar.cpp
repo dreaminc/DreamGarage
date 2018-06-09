@@ -120,7 +120,8 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
+	UIMenuItem* pSelected;
+	pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
 	pSurface = pSelected->GetSurface();
 
 	//vector for captured object movement
@@ -138,7 +139,10 @@ RESULT DreamUIBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	CBR(m_pScrollView->IsCapturable(pButtonContext), R_OBJECT_NOT_FOUND);
 
 	//DreamOS *pDreamOS = GetDOS();
-	auto pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
+	InteractionEngineProxy *pInteractionProxy;
+	pInteractionProxy = GetDOS()->GetInteractionEngineProxy();
+	CN(pInteractionProxy);
+
 	pInteractionProxy->ResetObjects(pSelected->GetInteractionObject());
 	pInteractionProxy->ReleaseObjects(pSelected->GetInteractionObject());
 
@@ -361,7 +365,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
-	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
+	UIMenuItem* pSelected;
+	pSelected = reinterpret_cast<UIMenuItem*>(pButtonContext);
+	CN(pSelected);
 	
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -375,9 +381,13 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	CBR(m_menuState == MenuState::NONE, R_PASS);
 
 	CNR(m_pUserHandle, R_SKIPPED);
-	auto pLeftMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
-	auto pRightMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	
+	UIMallet* pLeftMallet;
+	pLeftMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
 	CN(pLeftMallet);
+
+	UIMallet* pRightMallet;
+	pRightMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
 	CN(pRightMallet);
 
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
@@ -797,7 +807,9 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
 	CNR(m_pParentApp, R_SKIPPED);
 
-	float totalWidth = m_pParentApp->GetTotalWidth();
+	float totalWidth;
+	totalWidth = m_pParentApp->GetTotalWidth();
+
 	m_pScrollView->InitializeWithWidth(totalWidth);
 
 	if (m_pUIStageProgram != nullptr) {

@@ -371,9 +371,14 @@ RESULT DreamShareView::BroadcastAudioPacket(const AudioPacket &pendingAudioPacke
 
 	CBR(m_fStreaming, R_SKIPPED);
 
-	auto pCloudController = GetDOS()->GetCloudController();
-	CN(pCloudController);
-	CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+	{
+
+		auto pCloudController = GetDOS()->GetCloudController();
+
+		CN(pCloudController);
+		CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+
+	}
 
 Error:
 	return r;
@@ -436,13 +441,15 @@ Error:
 RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	RESULT r = R_PASS;
 
+	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
+
 	CBM(m_pendingFrame.fPending, "No frame pending");
 	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
 
 	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
 
 	// Update texture dimensions if needed
-	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
+
 	if ((int)m_pendingFrame.pDataBuffer_n != castBufferSize) {
 		m_castpxHeight = m_pendingFrame.pxHeight;
 		m_castpxWidth = m_pendingFrame.pxWidth;
@@ -457,7 +464,9 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 			&m_pendingFrame.pDataBuffer[0],
 			(int)m_pendingFrame.pDataBuffer_n);
 		//*/
+		
 		CR(m_pVideoCastTexture->UpdateDimensions(m_pendingFrame.pxWidth, m_pendingFrame.pxHeight));
+
 		if (r != R_NOT_HANDLED) {
 			DEBUG_LINEOUT("Changed texture dimensions");
 		}
@@ -466,6 +475,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 		if (m_pCastQuad->GetTextureDiffuse() != m_pVideoCastTexture.get()) {
 			m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 		}
+
 		CRM(m_pVideoCastTexture->Update((unsigned char*)(m_pendingFrame.pDataBuffer), m_pendingFrame.pxWidth, m_pendingFrame.pxHeight, PIXEL_FORMAT::BGRA), "Failed to update texture from pending frame");
 	}
 

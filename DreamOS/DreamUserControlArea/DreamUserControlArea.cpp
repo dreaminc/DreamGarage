@@ -123,9 +123,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	//CR(m_pWebBrowserManager->Update());
 	CNR(m_pDreamUserApp, R_SKIPPED);
-	UIMallet* pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+	
+	UIMallet* pLMallet;
+	pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
-	UIMallet* pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
+
+	UIMallet* pRMallet;
+	pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
 
 	//m_pDreamUserApp->UpdateCompositeWithHands(-0.16f);
@@ -135,8 +139,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	//GetComposite()->SetPosition(ptOrigin);
 	//GetComposite()->SetOrientation(qOrigin);
 
-	for (int i = 0; i < 2; i++)
-	{
+	for (int i = 0; i < 2; i++) {
 		UIMallet *pMallet;
 		HAND_TYPE type;
 		if (i == 0) {
@@ -742,7 +745,8 @@ RESULT DreamUserControlArea::SetActiveBrowserURI() {
 
 	CR(Show());
 
-	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	EnvironmentControllerProxy* m_pEnvironmentControllerProxy;
+	m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, m_strURL, strTitle), "Failed to share environment asset");
 
