@@ -94,7 +94,7 @@ RESULT point::translate(vector v) {
 	return R_PASS;
 }
 
-RESULT point::Print(char *pszOptName, bool fReturn) {
+RESULT point::Print(const char* const &pszOptName, bool fReturn) {
 	if (fReturn) {
 		DEBUG_LINEOUT_RETURN("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
 	}

@@ -9,10 +9,12 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamClientMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamClientMain.h" />
   </ItemGroup>
 </Project>

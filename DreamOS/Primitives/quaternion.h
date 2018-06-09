@@ -43,7 +43,8 @@ public:
 	quaternion(quaternionXYZW qXYZW);
 	quaternion(vector i, vector j, vector k);
 
-	RESULT Print(char *pszOptName = nullptr);
+	//RESULT Print(char *pszOptName = nullptr);
+	RESULT Print(const char* const &pszOptName = nullptr);
 
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	RESULT SetQuaternion(vector i, vector j, vector k);

@@ -90,68 +90,72 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+	{
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Connect output as pass-thru to internal blend program
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	//TODO: Matrix node
-	//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//TODO: Matrix node
+		//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
-	// save interface for UI apps
-	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-	auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	if (GetHMD() != nullptr) {
-		if (GetHMD()->GetDeviceType() == HMDDeviceType::META) {
-			m_pUIProgramNode->SetIsAugmented(true);
-			pEnvironmentNode->SetIsAugmented(true);
+		// save interface for UI apps
+		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+		auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+
+		if (GetHMD() != nullptr) {
+			if (GetHMD()->GetDeviceType() == HMDDeviceType::META) {
+				m_pUIProgramNode->SetIsAugmented(true);
+				pEnvironmentNode->SetIsAugmented(true);
+			}
 		}
+
+		/*
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		//CR(pHAL->ReleaseCurrentContext());
+
 	}
-
-	/*
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
-
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-	//CR(pHAL->ReleaseCurrentContext());
 
 Error:
 	return r;
@@ -513,23 +517,26 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 
 	CB((index < m_seatLookup.size()));
 
-	float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
-	diffAngle *= -1.0f;
+	{
 
-	rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
+		float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
+		diffAngle *= -1.0f;
 
-	//TODO: fuck this
-	//if (m_pDreamBrowser != nullptr) {
-	//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
-//	}
+		rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 
-	float ptX = -1.0f * m_seatPositioningRadius * std::sin(rotationAngle * M_PI / 180.0f);
-	float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
+		//TODO: fuck this
+		//if (m_pDreamBrowser != nullptr) {
+		//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
+	//	}
 
-	ptPosition = point(ptX, 0.0f, ptZ) + ptSeatingCenter;
+		float ptX = -1.0f * m_seatPositioningRadius * std::sin(rotationAngle * M_PI / 180.0f);
+		float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
 
-	// TODO: Remove this (this is a double reverse)
-	//rotationAngle *= -1.0f;
+		ptPosition = point(ptX, 0.0f, ptZ) + ptSeatingCenter;
+
+		// TODO: Remove this (this is a double reverse)
+		//rotationAngle *= -1.0f;
+	}
 
 Error:
 	return r;
@@ -636,7 +643,9 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 	pDreamPeer->SetVisible(true);
 
 	// Turn on sound
-	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);
+	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy;
+	pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);
+	CN(pWebRTCPeerConnectionProxy);
 
 	if (pWebRTCPeerConnectionProxy != nullptr) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
@@ -839,26 +848,28 @@ RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, Audi
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);
 
-	//auto msg = pAudioDataMessage->GetAudioMessageBody();
-	auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
-	CN(pAudioBuffer);
+	{
+		//auto msg = pAudioDataMessage->GetAudioMessageBody();
+		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
+		CN(pAudioBuffer);
 
-	size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
-	float averageAccumulator = 0.0f;
+		size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
+		float averageAccumulator = 0.0f;
 
-	for (int i = 0; i < numSamples; ++i) {
-		//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
-		int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
-		float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+		for (int i = 0; i < numSamples; ++i) {
+			//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
+			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
+			float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
 
-		averageAccumulator += std::abs(scaledValue);
+			averageAccumulator += std::abs(scaledValue);
+		}
+
+		float mouthScale = averageAccumulator / numSamples;
+		mouthScale *= 10.0f;
+
+		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+		pDreamPeer->UpdateMouth(mouthScale);
 	}
-
-	float mouthScale = averageAccumulator / numSamples;
-	mouthScale *= 10.0f;
-
-	util::Clamp<float>(mouthScale, 0.0f, 1.0f);
-	pDreamPeer->UpdateMouth(mouthScale);
 
 Error:
 	return r;
