@@ -373,27 +373,32 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 		RESULT r = R_PASS;
 
 		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+		CN(pCaptureContext);
 
-		RotationMatrix qOffset = RotationMatrix();
-		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-		CN(pHand);
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-		auto& pLeftMallet = pCaptureContext->pLeftMallet;
-		auto& pRightMallet = pCaptureContext->pRightMallet;
+		{
 
-		if (pLeftMallet)
-			pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+			RotationMatrix qOffset = RotationMatrix();
+			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
+			CN(pHand);
 
-		pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-		CN(pHand);
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			auto& pLeftMallet = pCaptureContext->pLeftMallet;
+			auto& pRightMallet = pCaptureContext->pRightMallet;
 
-		qOffset = RotationMatrix();
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			if (pLeftMallet)
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
 
-		if (pRightMallet)
-			pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+			CN(pHand);
 
-		pCaptureContext->pFlatContext->RenderToQuad(pCaptureContext->pRenderQuad, 0.0f, 0.0f);
+			qOffset = RotationMatrix();
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			if (pRightMallet)
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+
+			pCaptureContext->pFlatContext->RenderToQuad(pCaptureContext->pRenderQuad, 0.0f, 0.0f);
+		}
 
 	Error:
 		return r;
@@ -606,25 +611,31 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 		RESULT r = R_PASS;
 
 		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+		CN(pCaptureContext);
 
-		RotationMatrix qOffset = RotationMatrix();
-		hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-		CN(pHand);
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-		auto& pLeftMallet = pCaptureContext->pLeftMallet;
-		auto& pRightMallet = pCaptureContext->pRightMallet;
+		{
 
-		if (pLeftMallet)
-			pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+			RotationMatrix qOffset = RotationMatrix();
+			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
+			CN(pHand);
 
-		pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-		CN(pHand);
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			
+			auto& pLeftMallet = pCaptureContext->pLeftMallet;
+			auto& pRightMallet = pCaptureContext->pRightMallet;
 
-		qOffset = RotationMatrix();
-		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+			if (pLeftMallet)
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
 
-		if (pRightMallet)
-			pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+			CN(pHand);
+
+			qOffset = RotationMatrix();
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			if (pRightMallet)
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+		}
 
 	Error:
 		return r;
@@ -1681,38 +1692,40 @@ RESULT InteractionEngineTestSuite::SetupPipeline(std::string strRenderProgramNam
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	{
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+	}
 
 	CR(pHAL->ReleaseCurrentContext());
 
@@ -1817,41 +1830,46 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 	auto fnUpdate = [&](void* pContext) {
 		RESULT r = R_PASS;
 
-		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
 		ray rCast;
 
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+		CN(pTestContext);
 		CN(pTestContext->pComposite);
 		CN(pTestContext->pRay);
 
-		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i]->SetVisible(false);
-		}
+		{
 
-		// Get Ray from controller
-
-		hand *pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
-
-		if (pRightHand != nullptr) {
-			point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
-			quaternion q = pRightHand->GetHandState().qOrientation;
-			q.Normalize();
-
-			//TODO: this isn't perfectly accurate, especially when the head is rotated
-			vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
-			vector v2 = vector(-v.x(), -v.y(), v.z());
-			rCast = ray(p0, v2);
-
-			CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
-
-			if (manifold.NumContacts() > 0) {
-				for (int i = 0; i < manifold.NumContacts(); i++) {
-					pTestContext->pCollidePoint[i]->SetVisible(true);
-					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
-				}
+			for (int i = 0; i < 4; i++) {
+				pTestContext->pCollidePoint[i]->SetVisible(false);
 			}
 
-			pTestContext->pRay->UpdateFromRay(rCast);
-			//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+			// Get Ray from controller
+
+			hand *pRightHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+
+			if (pRightHand != nullptr) {
+				point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
+				quaternion q = pRightHand->GetHandState().qOrientation;
+				q.Normalize();
+
+				//TODO: this isn't perfectly accurate, especially when the head is rotated
+				vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+				vector v2 = vector(-v.x(), -v.y(), v.z());
+				rCast = ray(p0, v2);
+
+				CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
+
+				if (manifold.NumContacts() > 0) {
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+
+				pTestContext->pRay->UpdateFromRay(rCast);
+				//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+			}
 
 		}
 

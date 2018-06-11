@@ -59,7 +59,7 @@ quaternion quaternion::GetReverse() {
 	return qNew;
 }
 
-RESULT quaternion::Print(char *pszOptName) {
+RESULT quaternion::Print(const char* const &pszOptName) {
 	DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", m_x, m_y, m_z, m_w);
 	return R_PASS;
 }

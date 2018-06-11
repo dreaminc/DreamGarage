@@ -120,7 +120,7 @@ protected:
 		auto it = m_events.find(keyEvent);
         std::list<Subscriber<PKEventClass>*>* pNewSubscriberList = nullptr;
 
-		CBM((it == m_events.end()), "Event %s already registered", GetEventKeyString(keyEvent));
+		CBM((it == m_events.end()), "Event %s already registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 		
 		// Create a new subscriber list for the event entry
 		pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
@@ -138,7 +138,7 @@ public:
 		return (!(it == m_events.end()));
 	}
 
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
 		return m_events;
 	}
 	
@@ -147,19 +147,19 @@ public:
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		
-		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
 		std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_events.find(keyEvent);
-		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		// Check if already registered
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
 		for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			Subscriber<PKEventClass>* pTempSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
-			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", GetEventKeyString(keyEvent));
+			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 		}
 
 		// If we made it this far then push the subscriber into the list for the given event
@@ -180,7 +180,7 @@ public:
         typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
         
         CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it == m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
@@ -195,7 +195,7 @@ public:
 			}
 		}
 
-		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyEvent));
+		CBM((0), "Subscriber not found for event %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 	Error:
 		return r;
@@ -213,7 +213,7 @@ public:
 		while (it != m_events.end()) {
 			PKeyClass keyEvent = reinterpret_cast<PKeyClass>(it->first);
 
-			CRM(UnregisterSubscriber(keyEvent, pSubscriber), "Failed to unsubscribe for event %s", GetEventKeyString(keyEvent));
+			CRM(UnregisterSubscriber(keyEvent, pSubscriber), "Failed to unsubscribe for event %s", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 			
 			it++;
 		}
@@ -228,7 +228,7 @@ public:
         typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 		auto it = m_events.find(keyEvent);
 
-		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 		
 		pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
@@ -249,7 +249,7 @@ public:
 		typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 		auto it = m_events.find(keyEvent);
 
-		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_events.end()), "Event %s not registered", I_Publisher<PKeyClass, PKEventClass>::GetEventKeyString(keyEvent));
 
 		pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
@@ -263,7 +263,7 @@ public:
 	}
 
 private:
-	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, I_Publisher<PKeyClass, PKEventClass>::MAP_COMPARE_FUNCTION_STRUCT> m_events;
 };
 
 #endif // ! PUBLISHER_H_

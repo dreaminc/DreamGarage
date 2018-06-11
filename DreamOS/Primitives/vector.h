@@ -44,7 +44,8 @@ public:
 	RESULT Normalize();		// Will normalize this vector
 	vector Normal();		// Return a normalized version of this vector
 
-	RESULT Print(char *pszOptName = nullptr);
+	//RESULT Print(char *pszOptName = nullptr);
+	RESULT Print(const char* const &pszOptName = nullptr);
 
 	vector_precision dot(const vector& rhs) const;
 	vector_precision dot(const point& rhs) const;

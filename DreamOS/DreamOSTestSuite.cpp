@@ -78,6 +78,13 @@ Error:
 RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	RESULT r = R_PASS;
 
+	ProgramNode* pRenderProgramNode = nullptr;
+	ProgramNode* pReferenceGeometryProgram = nullptr;
+	ProgramNode* pSkyboxProgram = nullptr;
+	ProgramNode* pUIProgramNode = nullptr;
+
+	ProgramNode *pRenderScreenQuad = nullptr;
+
 	// Set up the pipeline
 	HALImp *pHAL = m_pDreamOS->GetHALImp();
 	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
@@ -87,26 +94,26 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+	pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
@@ -120,7 +127,7 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
@@ -134,6 +141,7 @@ Error:
 
 RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	RESULT r = R_PASS;
+
 	// Set up the pipeline
 	HALImp *pHAL = m_pDreamOS->GetHALImp();
 	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
@@ -143,12 +151,14 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode;
+	pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+	EnvironmentProgram* pEnvironmentNode;
+	pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
 	if (m_pDreamOS->GetHMD() != nullptr) {
 		if (m_pDreamOS->GetHMD()->GetDeviceType() == HMDDeviceType::META) {
@@ -157,7 +167,8 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	}
 
 	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	ProgramNode* pReferenceGeometryProgram;
+	pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -173,7 +184,8 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 	//*/
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	ProgramNode* pUIProgramNode;
+	pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
@@ -186,7 +198,8 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	ProgramNode *pRenderScreenQuad;
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
@@ -476,16 +489,21 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 
 		CR(SetupDreamAppPipeline());
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		pTestContext->m_pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		//m_pDreamOS->RegisterEventSubscriber()
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_META_CLOSED, pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+		model *pModel;
+		pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+		CN(pModel);
+
 		pModel->SetScale(0.02f);
 	
 	Error:
@@ -624,7 +642,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		CR(SetupDreamAppPipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the 2D Mouse App
 		pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
@@ -724,7 +743,8 @@ RESULT DreamOSTestSuite::AddTestUIKeyboard() {
 		CR(Initialize());
 		CR(SetupDreamAppPipeline());
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		CN(m_pDreamOS);
@@ -786,7 +806,8 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 		CR(SetupPipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		DOSLOG(INFO, "AddTestDreamLogger DOSLOG (EHM) Test");
 		DreamLogger::instance()->Log(DreamLogger::Level::INFO, "AddTestDreamLogger DreamLogger instance Test");
@@ -861,7 +882,8 @@ RESULT DreamOSTestSuite::AddTestDreamApps() {
 
 		CR(SetupPipeline());
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the testing apps
 		for (int i = 0; i < 5; i++) {
@@ -1050,10 +1072,12 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 
 		CR(SetupPipeline());
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
 		pTestContext->pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
@@ -1106,7 +1130,8 @@ RESULT DreamOSTestSuite::AddTestUserApp() {
 
 		ray rCast;
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
@@ -1476,8 +1501,11 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+		
 		SetupDreamAppPipeline();
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			//std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
@@ -1596,9 +1624,12 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
 		CN(pTestContext);
+		
+		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
+		
 		if (!pTestContext->once) {
 			//CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
 			pTestContext->pTexture->Update(m_pDataBuffer, m_pxWidth, m_pxHeight, PIXEL_FORMAT::BGRA);

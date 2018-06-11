@@ -250,6 +250,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -269,6 +270,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -358,6 +360,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -381,6 +384,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -404,6 +408,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -427,6 +432,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

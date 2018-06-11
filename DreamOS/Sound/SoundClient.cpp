@@ -178,7 +178,7 @@ Error:
 	return r;
 }
 
-RESULT SoundClient::PlaySound(SoundFile *pSoundFile) {
+RESULT SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 	float *pFloatAudioBuffer = nullptr;
 

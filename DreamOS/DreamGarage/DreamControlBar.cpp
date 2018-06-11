@@ -75,7 +75,7 @@ RESULT DreamControlBar::SetSharingFlag(bool fIsSharing) {
 	return r;
 }
 
-RESULT DreamControlBar::SetTitleText(std::string& strTitle) {
+RESULT DreamControlBar::SetTitleText(const std::string& strTitle) {
 	RESULT r = R_PASS;
 
 	m_fUpdateTitle = true;
@@ -175,21 +175,24 @@ RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 
 	CN(pParentApp);
 	CBM(m_pParentApp == nullptr, "parent app already set");
+	
 	m_pParentApp = pParentApp;
+	
+	{
+		float width = m_pParentApp->GetBaseWidth();
+		float buttonWidth = m_buttonWidth * width;
+		float spacingSize = m_pParentApp->GetSpacingSize() * width;
 
-	float width = m_pParentApp->GetBaseWidth();
-	float buttonWidth = m_buttonWidth * width;
-	float spacingSize = m_pParentApp->GetSpacingSize() * width;
+		m_pUIControlBar->SetTotalWidth(width);
+		m_pUIControlBar->SetItemSide(m_buttonWidth * width);
+		m_pUIControlBar->SetURLWidth(m_urlWidth * width);
+		m_pUIControlBar->SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
 
-	m_pUIControlBar->SetTotalWidth(width);
-	m_pUIControlBar->SetItemSide(m_buttonWidth * width);
-	m_pUIControlBar->SetURLWidth(m_urlWidth * width);
-	m_pUIControlBar->SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
+		CR(m_pUIControlBar->Initialize());
 
-	CR(m_pUIControlBar->Initialize());
-
-	GetComposite()->SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2*spacingSize + buttonWidth / 2.0f);
-	GetComposite()->RotateXByDeg(-90.0f);
+		GetComposite()->SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2 * spacingSize + buttonWidth / 2.0f);
+		GetComposite()->RotateXByDeg(-90.0f);
+	}
 
 Error:
 	return r;

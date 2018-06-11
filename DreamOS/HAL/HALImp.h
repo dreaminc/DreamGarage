@@ -240,7 +240,6 @@ private:
 	UID m_uid;
 };
 
-
 template<>
 template<typename... Targs>
 quad* HALImp::HelperFactory<quad>::TMakeObject(Targs... Fargs) {

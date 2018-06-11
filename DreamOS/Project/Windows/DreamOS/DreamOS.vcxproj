@@ -98,19 +98,19 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -143,54 +143,6 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -288,30 +240,8 @@
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
- /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\*" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		
-
-xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" 
-xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.dll" "$(TargetDir)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -324,7 +254,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_USE_TEST_APP;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;_ENABLE_LOGGING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -367,6 +297,10 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <Manifest>
       <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -507,7 +441,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;_USE_TEST_APP;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -549,6 +483,15 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
     <Manifest>
       <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <Lib>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <TreatLibWarningAsErrors>
+      </TreatLibWarningAsErrors>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
     <ClCompile>
@@ -671,11 +614,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp" />
-    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
@@ -707,36 +648,16 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamControlBar.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp" />
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
-    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
-    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
-    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
-    <ClCompile Include="..\..\..\DreamOSTestSuite.cpp" />
-    <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
-    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
-    <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp" />
-    <ClCompile Include="..\..\..\DreamTestingApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
-    <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp" />
-    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp" />
     <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
-    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLComposite.cpp" />
@@ -813,18 +734,15 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp" />
-    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
@@ -883,7 +801,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
-    <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
@@ -904,10 +821,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundFile.cpp" />
-    <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp" />
     <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp" />
-    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
@@ -923,7 +838,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp" />
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\UI\UIView.cpp" />
-    <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp" />
@@ -936,12 +850,10 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudMessage.h" />
-    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
     <ClInclude Include="..\..\..\Cloud\ControllerObserver.h" />
     <ClInclude Include="..\..\..\Cloud\ControllerProxy.h" />
@@ -988,36 +900,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamControlBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamEnvironmentApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
-    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
-    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h" />
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
-    <ClInclude Include="..\..\..\DreamOSMain.h" />
-    <ClInclude Include="..\..\..\DreamOSTestSuite.h" />
-    <ClInclude Include="..\..\..\DreamOSWinMain.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
-    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h" />
-    <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h" />
-    <ClInclude Include="..\..\..\DreamTestingApp.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamContentSource.h" />
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h" />
@@ -1060,17 +948,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h" />
-    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h" />
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h" />
     <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
-    <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
@@ -1164,7 +1047,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h" />
-    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h" />
     <ClInclude Include="..\..\..\PeerAckMessage.h" />
     <ClInclude Include="..\..\..\PeerHandshakeMessage.h" />
@@ -1172,14 +1054,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
@@ -1266,7 +1146,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
-    <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
@@ -1291,9 +1170,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h" />
     <ClInclude Include="..\..\..\Sound\SoundFile.h" />
     <ClInclude Include="..\..\..\Sound\SoundFileWave.h" />
-    <ClInclude Include="..\..\..\Sound\SoundTestSuite.h" />
     <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h" />
-    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
@@ -1310,7 +1187,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\UI\UISpatialScrollView.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="..\..\..\UI\UIView.h" />
-    <ClInclude Include="..\..\..\UI\UIViewTestSuite.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h" />
@@ -1338,7 +1214,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.inl" />
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.frag" />
@@ -1432,30 +1307,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert" />
     <None Include="..\..\..\Makefile" />
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <DeploymentContent>true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">true</ExcludedFromBuild>
-    </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />
     <None Include="..\..\..\Rakefile" />
-    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="..\..\..\Scripts\copy_assets.py" />
     <None Include="..\..\..\Scripts\make_production.py" />
     <None Include="..\..\..\Scripts\make_production_package.py" />
-    <None Include="DreamOS.development.nuspec" />
-    <None Include="DreamOS.production.nuspec" />
-    <None Include="packages.config" />
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
-    <None Include="PropertySheet.props">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt">
@@ -1466,15 +1324,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ResourceCompile Include="DreamOS.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Models\face4\eye.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="..\..\..\Texture\Fonts\Arial.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -1485,19 +1334,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="Dream.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">true</DeploymentContent>
-      <DeploymentContent>true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">true</ExcludedFromBuild>
-    </Object>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="manifest.xml" />

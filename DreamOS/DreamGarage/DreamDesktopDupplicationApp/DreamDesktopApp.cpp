@@ -162,7 +162,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	RESULT r = R_PASS;
 
 	// Start duplication process
-	STARTUPINFO startupinfoDesktopDuplication;
+	STARTUPINFOW startupinfoDesktopDuplication;
 	PROCESS_INFORMATION processinfoDesktopDuplication;
 
 	memset(&startupinfoDesktopDuplication, 0, sizeof(startupinfoDesktopDuplication));
@@ -170,7 +170,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	memset(&processinfoDesktopDuplication, 0, sizeof(processinfoDesktopDuplication));
 
 	wchar_t pszFilePath[MAX_PATH];
-	GetModuleFileName(NULL, pszFilePath, sizeof(pszFilePath));	// Gets path to .exe, including exe name
+	GetModuleFileNameW(NULL, pszFilePath, sizeof(pszFilePath));	// Gets path to .exe, including exe name
 	std::wstring wstrFilePath = std::wstring(pszFilePath);
 
 	size_t nIndex = wstrFilePath.find_last_of(L"\\");			// Finds index of .exe name, since path will look like "..\\DreamExample.exe"
@@ -192,7 +192,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
 	jobCRCI.CpuRate = 1500;	// percent used * 100;
 
-	m_dreamJobHandle = CreateJobObject(nullptr, L"DreamJob");
+	m_dreamJobHandle = CreateJobObjectW(nullptr, L"DreamJob");
 	CNM(m_dreamJobHandle, "Failed to create job object");
 
 	SetInformationJobObject(m_dreamJobHandle, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
@@ -200,18 +200,17 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 
 	CBR(m_hwndDesktopHandle == nullptr, R_SKIPPED);		// Desktop duplication shouldn't be running, but if it is, and we have a handle, don't start another.
 
-	LPTSTR szCmdline = L" -output 0";
-
-	fCreatedDuplicationProcess = CreateProcess(lpwstrLocation,
-		szCmdline,						// Command line
-		nullptr,							// Process handle not inheritable
-		nullptr,							// Thread handle not inheritable
-		false,								// Set handle inheritance to FALSE
-		IDLE_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP,		// Creation flags
-		nullptr,							// Use parent's environment block
-		nullptr,							// Use parent's starting directory
-		&startupinfoDesktopDuplication,     // Pointer to STARTUPINFO structure
-		&processinfoDesktopDuplication		// Pointer to PROCESS_INFORMATION structure
+	fCreatedDuplicationProcess = CreateProcessW(
+		lpwstrLocation,
+		(LPWSTR)(L" -output 0"),									// Command line
+		nullptr,													// Process handle not inheritable
+		nullptr,													// Thread handle not inheritable
+		false,														// Set handle inheritance to FALSE
+		IDLE_PRIORITY_CLASS | CREATE_NEW_PROCESS_GROUP,				// Creation flags
+		nullptr,													// Use parent's environment block
+		nullptr,													// Use parent's starting directory
+		(LPSTARTUPINFOW)(&startupinfoDesktopDuplication),			// Pointer to STARTUPINFO structure
+		(LPPROCESS_INFORMATION)(&processinfoDesktopDuplication)		// Pointer to PROCESS_INFORMATION structure
 	);
 
 	CBM(fCreatedDuplicationProcess, "CreateProcess failed (%d)", GetLastError());
@@ -234,12 +233,16 @@ RESULT DreamDesktopApp::Update(void *pContext) {
 	CNR(m_hwndDreamHandle, R_SKIPPED);
 
 	if (m_hwndDesktopHandle == nullptr) {	// duplication process may take a bit to load, so catch it when it's done
-		m_hwndDesktopHandle = FindWindow(NULL, L"DreamDesktopDuplication");
+		m_hwndDesktopHandle = FindWindowW(NULL, L"DreamDesktopDuplication");
 	}
 	CNR(m_hwndDesktopHandle, R_SKIPPED);	// duplication process isn't ready yet, so skip
 
-	std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-	float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	std::chrono::steady_clock::duration tNow;
+	tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	
+	float msTimeNow;
+	msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	
 	if (msTimeNow - m_msTimeSinceLastSent > m_msMessageTimeDelay && !m_fDesktopDuplicationIsRunning) {
 		m_msTimeSinceLastSent = msTimeNow;
 		CR(SendDesktopDuplicationIPCMessage(DDCIPCMessage::type::START));
@@ -281,7 +284,8 @@ RESULT DreamDesktopApp::SendDesktopDuplicationIPCMessage(DDCIPCMessage::type msg
 		SendMessage(m_hwndDesktopHandle, WM_COPYDATA, (WPARAM)(HWND)m_hwndDreamHandle, (LPARAM)(LPVOID)&desktopCDS);
 	}
 	
-	DWORD dwError = GetLastError();
+	DWORD dwError;
+	dwError = GetLastError();
 
 	CBR(dwError == ERROR_SUCCESS, R_SKIPPED);
 
@@ -418,7 +422,7 @@ std::string DreamDesktopApp::GetTitle() {
 	HWND hwndForegroundWindow = GetForegroundWindow();
 	wchar_t pszTitle[2048];
 
-	GetWindowText(hwndForegroundWindow, pszTitle, sizeof(pszTitle));
+	GetWindowTextW(hwndForegroundWindow, pszTitle, sizeof(pszTitle));
 	
 	std::wstring wstrTitle = std::wstring(pszTitle);
 	std::string strTitle = util::WideStringToString(wstrTitle);
@@ -430,7 +434,7 @@ std::string DreamDesktopApp::GetTitle() {
 			strTitle = "Windows Desktop";
 		}
 		else {
-			GetWindowText(hwndParentWindow, pszTitle, sizeof(pszTitle));
+			GetWindowTextW(hwndParentWindow, pszTitle, sizeof(pszTitle));
 			wstrTitle = std::wstring(pszTitle);
 			strTitle = util::WideStringToString(wstrTitle);
 		}

@@ -62,7 +62,8 @@ public:
 	RESULT translateY(point_precision y);
 	RESULT translateZ(point_precision z);
 
-	RESULT Print(char *pszOptName = nullptr, bool fReturn = false);
+	//RESULT Print(char *pszOptName = nullptr, bool fReturn = false);
+	RESULT Print(const char* const &pszOptName = nullptr, bool fReturn = false);
 	std::string toString(bool fW = false);
 
 	inline point_precision &GetComponent(component c);

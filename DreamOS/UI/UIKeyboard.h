@@ -143,8 +143,8 @@ public:
 	RESULT SetSurfaceOffset(point ptOffset);
 
 private:
-	RESULT UIKeyboard::UpdateViewQuad();
-	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
+	RESULT UpdateViewQuad();
+	RESULT UpdateKeyboardLayout(LayoutType kbType);
 
 public:
 	RESULT SetAnimatingState(UIKeyboard::state keyboardState);

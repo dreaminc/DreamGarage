@@ -29,7 +29,7 @@ public:
 		// empty
 	}
 
-	virtual RESULT DreamTestApp::ConfigureSandbox() override;
+	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
 	virtual RESULT Update(void) override;
 

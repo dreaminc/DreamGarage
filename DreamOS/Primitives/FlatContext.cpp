@@ -312,15 +312,21 @@ RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float
 		int divs = 100;
 
 
+		// TODO: Fix the variadic object creation stuff
+
 		//m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+
 		if (curveType == quad::CurveType::PARABOLIC) {
-			m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::PARABOLIC, vector::jVector(1.0f));
+			//m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::PARABOLIC, vector::jVector(1.0f));
+			m_pQuad = composite::AddQuad(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::PARABOLIC, vector::jVector(1.0f));
 		}
 		else if (curveType == quad::CurveType::CIRCLE) {
-			m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::CIRCLE, vector::jVector(1.0f));
+			//m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::CIRCLE, vector::jVector(1.0f));
+			m_pQuad = composite::AddQuad(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::CIRCLE, vector::jVector(1.0f));
 		}
 		else {
-			m_pQuad = Add<quad>(width, height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+			//m_pQuad = Add<quad>(width, height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+			m_pQuad = composite::AddQuad(width, height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
 		}
 
 		CN(m_pQuad);

@@ -396,6 +396,32 @@ std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptO
 	return nullptr;
 }
 
+std::shared_ptr<quad> composite::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal));
+	CN(pQuad);
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
+	CR(AddObject(pQuad));
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin) {
 	RESULT r = R_PASS;
 

@@ -43,44 +43,47 @@ RESULT SandboxTestSuite::SetupPipeline(std::string strRenderProgramName) {
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	{
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderProgramName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	//TODO: Matrix node
-	//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//TODO: Matrix node
+		//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
-	CR(pHAL->ReleaseCurrentContext());
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+	}
 
 Error:
 	return r;
@@ -95,47 +98,50 @@ RESULT SandboxTestSuite::SetupDreamAppPipeline() {
 	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
-	//CR(pHAL->MakeCurrentContext());
+	{
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		//CR(pHAL->MakeCurrentContext());
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-	CN(pUIProgramNode);
-	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	// Connect output as pass-thru to internal blend program
-	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Screen Quad Shader (opt - we could replace this if we need to)
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-	CN(pRenderScreenQuad);
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
 
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
 
-	// Connect Program to Display
-	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+	}
 
 Error:
 	return r;
@@ -157,17 +163,21 @@ RESULT SandboxTestSuite::AddTestObjectPipeline() {
 		// TODO: Add some objects
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		// TODO: Why does shit explode with no objects in scene
-		auto pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-		pSphere->MoveTo(point(-1.0f, 0.0f, 0.0f));
+		{
 
-		auto pCube = m_pDreamOS->AddVolume(0.5f);
-		pCube->MoveTo(point(0.0f, 0.0f, 0.0f));
+			// TODO: Why does shit explode with no objects in scene
+			auto pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			pSphere->MoveTo(point(-1.0f, 0.0f, 0.0f));
 
-		auto pCylinder = m_pDreamOS->AddCylinder(0.25f, 0.5f, 20, 20);
-		pCylinder->MoveTo(point(1.0f, -0.25f, 0.0f));
+			auto pCube = m_pDreamOS->AddVolume(0.5f);
+			pCube->MoveTo(point(0.0f, 0.0f, 0.0f));
+
+			auto pCylinder = m_pDreamOS->AddCylinder(0.25f, 0.5f, 20, 20);
+			pCylinder->MoveTo(point(1.0f, -0.25f, 0.0f));
+		}
 
 	Error:
 		return r;
@@ -223,10 +233,12 @@ RESULT SandboxTestSuite::AddTestCompositeObject() {
 		// TODO: Add some objects
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// TODO: Why does shit explode with no objects in scene
-		auto pComposite = m_pDreamOS->AddComposite();
+		composite *pComposite;
+		pComposite = m_pDreamOS->AddComposite();
 		
 		pComposite->AddSphere(0.25f, 10, 10);
 

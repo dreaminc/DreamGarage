@@ -84,7 +84,7 @@ vector vector::Normal() {
 	return result;
 }
 
-RESULT vector::Print(char *pszOptName) {
+RESULT vector::Print(const char* const &pszOptName) {
 	DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "v", x(), y(), z(), w());
 	return R_PASS;
 }

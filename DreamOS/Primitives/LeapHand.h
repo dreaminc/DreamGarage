@@ -120,7 +120,7 @@ public:
 	RESULT ToggleRenderType();
 
 	hand::HandState GetHandState() override;
-	RESULT LeapHand::SetHandState(const LeapHand::LeapHandState& pHandState);
+	RESULT SetHandState(const LeapHand::LeapHandState& pHandState);
 
 	RESULT SetHandModel(HAND_TYPE type) override;
 

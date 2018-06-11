@@ -11,10 +11,6 @@
     <Filter Include="Test">
       <UniqueIdentifier>{4bbf355f-4691-48f4-8232-b4800b606d5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Sandbox">
       <UniqueIdentifier>{394d99b2-78d3-4670-aa3f-893289f45340}</UniqueIdentifier>
     </Filter>
@@ -84,9 +80,6 @@
     <Filter Include="DreamOS">
       <UniqueIdentifier>{730db82d-4c28-45f4-928a-51f3c3fb19a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamGarage">
-      <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Cloud\webrtc">
       <UniqueIdentifier>{e82ece0f-07c1-4cff-87ab-e214e415001c}</UniqueIdentifier>
     </Filter>
@@ -117,26 +110,11 @@
     <Filter Include="Texture\Fonts">
       <UniqueIdentifier>{c0308159-cdcb-4990-9db2-489d8ce4a640}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{064cde94-bbe7-418c-8746-c82ed21a2885}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Fonts">
-      <UniqueIdentifier>{47aac8d7-21b7-41d9-86f4-dc30eebed8c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Models">
-      <UniqueIdentifier>{9a748425-2cc2-4f36-8890-7f0968562c06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Models\face4">
-      <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Primitives\matrix">
       <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
     </Filter>
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamTestApp">
-      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
     </Filter>
     <Filter Include="InteractionEngine">
       <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
@@ -162,9 +140,6 @@
     <Filter Include="Scripts">
       <UniqueIdentifier>{ab12ef14-0c46-4045-ac45-cfe6f65b4332}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NuGet">
-      <UniqueIdentifier>{49713455-67bf-497c-a46d-68456ba95718}</UniqueIdentifier>
-    </Filter>
     <Filter Include="WebBrowser">
       <UniqueIdentifier>{1cefafeb-98c7-4a55-ad04-d0ea29fa152d}</UniqueIdentifier>
     </Filter>
@@ -186,29 +161,11 @@
     <Filter Include="DreamLogger">
       <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\easyloggingpp">
-      <UniqueIdentifier>{9349b760-9d5c-476f-9dc4-086ec2b7ffca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sound">
       <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamControlView">
-      <UniqueIdentifier>{1e6264c6-6ac0-4327-a21a-fe16abc2968e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamGarage\DreamDesktopDuplicationApp">
-      <UniqueIdentifier>{e098da6a-702b-4db9-be71-1c0068c6a747}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamShareView">
-      <UniqueIdentifier>{a5c89bd6-b56b-4917-8ca7-0b81f1e3c36e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamUserControlArea">
-      <UniqueIdentifier>{e7693720-b8fe-424c-9d3b-5d6d93aa1029}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DreamOSMain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
       <Filter>Primitives\Types</Filter>
     </ClCompile>
@@ -386,9 +343,6 @@
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
       <Filter>Primitives\Types</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
@@ -446,9 +400,6 @@
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
@@ -482,9 +433,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
-      <Filter>DreamTestApp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
     </ClCompile>
@@ -502,9 +450,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\quad.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
-      <Filter>PhysicsEngine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
       <Filter>PhysicsEngine</Filter>
@@ -524,9 +469,6 @@
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
@@ -539,17 +481,8 @@
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp">
       <Filter>Cloud\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp">
-      <Filter>Cloud</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Core\Utilities.cpp">
       <Filter>Core</Filter>
@@ -587,17 +520,11 @@
     <ClCompile Include="..\..\..\HMD\HMD.cpp">
       <Filter>HMD</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamApp.cpp">
       <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamAppManager.cpp">
       <Filter>DreamOS</Filter>
@@ -616,9 +543,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp">
       <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
@@ -773,9 +697,6 @@
     <ClCompile Include="..\..\..\UI\UIButton.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\material.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -815,20 +736,11 @@
     <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamOSTestSuite.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamTestingApp.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamUserApp.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamPeerApp.cpp">
       <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionTestSuite.cpp">
-      <Filter>PhysicsEngine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamAppHandle.cpp">
       <Filter>DreamOS</Filter>
@@ -848,9 +760,6 @@
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserFactory.cpp">
       <Filter>WebBrowser</Filter>
     </ClCompile>
@@ -862,12 +771,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp">
       <Filter>DreamLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\easyloggingpp\easylogging++.cc">
-      <Filter>External\easyloggingpp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sound\SoundTestSuite.cpp">
-      <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
       <Filter>Sound</Filter>
@@ -904,9 +807,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\SandboxTestSuite.cpp">
-      <Filter>Sandbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp">
       <Filter>HAL\opengl</Filter>
@@ -959,32 +859,8 @@
     <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp">
-      <Filter>DreamControlView</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
-      <Filter>DreamControlView</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp">
-      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp">
-      <Filter>DreamShareView</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp">
       <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamShareView\MultiContentTestSuite.cpp">
-      <Filter>DreamShareView</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp">
-      <Filter>DreamUserControlArea</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamControlBar.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
@@ -1001,14 +877,8 @@
     <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DreamOSMain.h">
-      <Filter>Main</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
       <Filter>RESULT</Filter>
     </ClInclude>
@@ -1405,9 +1275,6 @@
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h">
       <Filter>Cloud</Filter>
     </ClInclude>
@@ -1458,9 +1325,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamOSWinMain.h">
-      <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
@@ -1514,9 +1378,6 @@
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
       <Filter>Primitives\matrix</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
@@ -1550,9 +1411,6 @@
     <ClInclude Include="..\..\..\Primitives\DimRay.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
-      <Filter>DreamTestApp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1561,9 +1419,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
-      <Filter>PhysicsEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
       <Filter>PhysicsEngine</Filter>
@@ -1576,9 +1431,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h">
       <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h">
-      <Filter>InteractionEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h">
       <Filter>InteractionEngine</Filter>
@@ -1595,17 +1447,8 @@
     <ClInclude Include="..\..\..\UI\UITestSuite.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h">
       <Filter>Cloud\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h">
-      <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\ControllerProxy.h">
       <Filter>Cloud</Filter>
@@ -1631,14 +1474,8 @@
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
       <Filter>Cloud\HTTP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\HALTestSuite.h">
-      <Filter>HAL</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamApp.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamAppManager.h">
       <Filter>DreamOS</Filter>
@@ -1663,9 +1500,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
       <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h">
       <Filter>WebBrowser</Filter>
@@ -1808,9 +1642,6 @@
     <ClInclude Include="..\..\..\UI\UIButton.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h">
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
@@ -1819,18 +1650,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRController.h">
       <Filter>HMD\OpenVR</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamMessage.h">
       <Filter>DreamOS</Filter>
@@ -2006,20 +1825,11 @@
     <ClInclude Include="..\..\..\Primitives\CapturedObj.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamOSTestSuite.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamTestingApp.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamUserApp.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamPeerApp.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionTestSuite.h">
-      <Filter>PhysicsEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\HandType.h">
       <Filter>Primitives</Filter>
@@ -2048,9 +1858,6 @@
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFDOMNode.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserFactory.h">
       <Filter>WebBrowser</Filter>
     </ClInclude>
@@ -2065,12 +1872,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h">
       <Filter>DreamLogger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\easyloggingpp\include\easylogging++.h">
-      <Filter>External\easyloggingpp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sound\SoundTestSuite.h">
-      <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\SoundClient.h">
       <Filter>Sound</Filter>
@@ -2105,14 +1906,8 @@
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFResourceHandler.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\SandboxTestSuite.h">
-      <Filter>Sandbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimPlane.h">
       <Filter>Primitives</Filter>
@@ -2129,35 +1924,8 @@
     <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h">
-      <Filter>DreamControlView</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
-      <Filter>DreamControlView</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h">
-      <Filter>DreamShareView</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamShareViewMessage.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamShareView\MultiContentTestSuite.h">
-      <Filter>DreamShareView</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamUserControlArea.h">
-      <Filter>DreamUserControlArea</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamControlBar.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
-      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamUserControlArea\DreamContentSource.h">
-      <Filter>DreamUserControlArea</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
       <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
@@ -2180,9 +1948,6 @@
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h">
       <Filter>HAL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamEnvironmentApp.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2194,18 +1959,11 @@
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
-      <Filter>Resources\Fonts</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
-      <Filter>Resources\Fonts</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2288,20 +2046,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <Filter>Models\face4</Filter>
-    </None>
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
       <Filter>Scripts</Filter>
-    </None>
-    <None Include="DreamOS.development.nuspec">
-      <Filter>NuGet</Filter>
-    </None>
-    <None Include="DreamOS.production.nuspec">
-      <Filter>NuGet</Filter>
-    </None>
-    <None Include="packages.config">
-      <Filter>NuGet</Filter>
     </None>
     <None Include="..\..\..\Scripts\make_production.py">
       <Filter>Scripts</Filter>
@@ -2311,9 +2057,6 @@
     </None>
     <None Include="..\..\..\Scripts\copy_assets.py">
       <Filter>Scripts</Filter>
-    </None>
-    <None Include="PropertySheet.props">
-      <Filter>Core</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2397,21 +2140,9 @@
     <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
       <Filter>Texture\Fonts</Filter>
     </Image>
-    <Image Include="..\..\..\Models\face4\eye.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
     <Image Include="..\..\..\Texture\mouth.png">
       <Filter>Texture</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="manifest.xml">

@@ -50,7 +50,7 @@ public:
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
 	// border will be zero more often than the buffer is 
-	RESULT OGLTexture::OGLInitialize(GLuint textureID);
+	RESULT OGLInitialize(GLuint textureID);
 
 	RESULT OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer = nullptr, GLint border = 0);
 	RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
@@ -69,7 +69,7 @@ public:
 	GLuint GetOGLTextureIndex();
 
 	RESULT AllocateGLTexture(size_t optOffset = 0);
-	RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
+	RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;

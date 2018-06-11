@@ -305,7 +305,8 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	qRotation.Reverse();
 	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 
-	auto pInteractionProxy = m_pDreamOS->GetInteractionEngineProxy();
+	InteractionEngineProxy* pInteractionProxy;
+	pInteractionProxy = m_pDreamOS->GetInteractionEngineProxy();
 	pInteractionProxy->ResetObjects(pButtonContext->GetInteractionObject());
 	pInteractionProxy->ReleaseObjects(pButtonContext->GetInteractionObject());
 

@@ -118,27 +118,31 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode;
+	pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 //*
 	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	ProgramNode* pReferenceGeometryProgram;
+	pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 //*/
 	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	ProgramNode* pSkyboxProgram;
+	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	ProgramNode* pUIProgramNode;
+	pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
@@ -147,7 +151,8 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
-	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	ProgramNode *pRenderScreenQuad;
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
@@ -243,7 +248,10 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 
 		pTestContext->pFlatScrollView->SetVisible(true);
 
-		auto pTestQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		quad *pTestQuad;
+		pTestQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		CN(pTestQuad);
+
 		pTestQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
 		pTestQuad->RotateXByDeg(90.0f);
 		pTestQuad->SetDiffuseTexture(pTexture);
@@ -1218,8 +1226,12 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 			"www.twitch.tv"
 		} ;
 
-		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+		std::chrono::steady_clock::duration tNow;
+		tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+		
+		float msTimeNow;
+		msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+
 		pTestContext->msLastSent = msTimeNow;
 
 		/*
@@ -1778,7 +1790,9 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this);
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_MOVED, this);
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_ENDED, this);
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
@@ -1788,7 +1802,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 		//m_pDreamShareView->ShowCast
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		/*
@@ -1961,7 +1976,9 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_INTERSECT_BEGAN, this);
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_MOVED, this);
 		m_pDreamOS->RegisterEventSubscriber(m_pTestQuad.get(), ELEMENT_COLLIDE_ENDED, this);
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
 		m_pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this, true);
@@ -1973,7 +1990,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 		//m_pDreamShareView->ShowCast
 
 		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CommandLineManager *pCommandLineManager;
+		pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
 		/*
