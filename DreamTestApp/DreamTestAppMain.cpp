@@ -7,7 +7,7 @@
 
 #include <string>
 
-#ifdef _WIN32
+#ifdef _WINDOWS
 	int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 		RESULT r = R_PASS;
 

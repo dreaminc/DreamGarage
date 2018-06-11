@@ -9,7 +9,7 @@
 
 // We use window subsystem in PRODUCTION build to allow Dream to run without a console window
 
-#ifdef _WIN32
+#ifdef _WINDOWS
 
 	int WINAPI WinMain(HINSTANCE hInstance,
 		HINSTANCE hPrevInstance,
