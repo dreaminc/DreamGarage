@@ -24,7 +24,7 @@ public:
 	virtual std::string GetPeerScreenName(long peerUserID) = 0;
 
 	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) = 0;
-	virtual RESULT RequestSetSettings(float yOffset, float zOffset, float scale) = 0;
+	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) = 0;
 	virtual RESULT RequestSettingsForm(std::string key) = 0;
 };
 
@@ -78,7 +78,7 @@ public:
 	RESULT OnSettingsForm(std::shared_ptr<CloudMessage> pCloudMessage);
 
 	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) override;
-	virtual RESULT RequestSetSettings(float yOffset, float zOffset, float scale) override;
+	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) override;
 	virtual RESULT RequestSettingsForm(std::string key) override;
 
 
@@ -99,7 +99,7 @@ public:
 	public:
 		virtual RESULT OnGetSettings() = 0;
 		virtual RESULT OnSetSettings() = 0;
-		virtual RESULT OnSettings() = 0;
+		virtual RESULT OnSettings(std::string strURL) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

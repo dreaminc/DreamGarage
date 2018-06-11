@@ -903,7 +903,7 @@ RESULT DreamGarage::OnGetSettings() {
 RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
-RESULT DreamGarage::OnSettings() {
+RESULT DreamGarage::OnSettings(std::string strURL) {
 	return R_PASS;
 }
 

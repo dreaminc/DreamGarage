@@ -218,6 +218,8 @@ RESULT CloudController::InitializeUser(version ver) {
 
 	m_pUserController = std::unique_ptr<UserController>(UserFactory::MakeUserController(ver, this));
 	CN(m_pUserController);
+	m_pUserController->Initialize();
+	m_pUserController->RegisterUserControllerObserver(this);
 
 Error:
 	return r;
@@ -463,11 +465,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnSettings() {
+RESULT CloudController::OnSettings(std::string strURL) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnSettings());
+		CR(m_pUserObserver->OnSettings(strURL));
 	}
 
 Error:

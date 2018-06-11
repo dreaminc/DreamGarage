@@ -94,7 +94,7 @@ public:
 	public:
 		virtual RESULT OnGetSettings() = 0;
 		virtual RESULT OnSetSettings() = 0;
-		virtual RESULT OnSettings() = 0;
+		virtual RESULT OnSettings(std::string strURL) = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
@@ -193,7 +193,7 @@ public:
 	// UserControllerObserver
 	virtual RESULT OnGetSettings() override;
 	virtual RESULT OnSetSettings() override;
-	virtual RESULT OnSettings() override;
+	virtual RESULT OnSettings(std::string strURL) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

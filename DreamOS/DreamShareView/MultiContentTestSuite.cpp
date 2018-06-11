@@ -818,7 +818,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		virtual RESULT OnSetSettings() override {
 			return R_PASS;
 		}
-		virtual RESULT OnSettings() override {
+		virtual RESULT OnSettings(std::string strURL) override {
 			return R_PASS;
 		}
 	} *pTestContext = new TestContext();
@@ -836,18 +836,20 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		CN(pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, pTestContext);
-		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext);
-		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, pTestContext);
+//		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext);
+//		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, pTestContext);
 
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
+		/*
 		pTestContext->pCloudController = new CloudController();
 		pTestContext->pCloudController->Initialize();
 		pTestContext->pCloudController->Login();
 		//pTestContext->pCloudController->Start();
+		//*/
 
 
 
@@ -865,14 +867,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 //			auto pCloudController = m_pDreamOS->GetCloudController();
 			auto pCloudController = pTestContext->pCloudController;
-			pTestContext->pUserControllerProxy = dynamic_cast<UserControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		//	pTestContext->pUserControllerProxy = dynamic_cast<UserControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
 			CBRM(pCloudController->IsUserLoggedIn(), R_SKIPPED, "User not logged in");
 			CBRM(pCloudController->IsEnvironmentConnected(), R_SKIPPED, "Environment socket not connected");
 			//CBRM(pCloudController->IsE)
 
-			dynamic_cast<UserController*>(pTestContext->pUserControllerProxy)->RegisterUserControllerObserver(pTestContext);
-			CR(pTestContext->pUserControllerProxy->RequestGetSettings(m_pDreamOS->GetHardwareID(),"HMDType.OculusRift"));
+		//	dynamic_cast<UserController*>(pTestContext->pUserControllerProxy)->RegisterUserControllerObserver(pTestContext);
+//			CR(pTestContext->pUserControllerProxy->RequestGetSettings(m_pDreamOS->GetHardwareID(),"HMDType.OculusRift"));
 
 			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
 

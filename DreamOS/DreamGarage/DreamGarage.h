@@ -88,7 +88,7 @@ public:
 	// user
 	virtual RESULT OnGetSettings() override;
 	virtual RESULT OnSetSettings() override;
-	virtual RESULT OnSettings() override;
+	virtual RESULT OnSettings(std::string strURL) override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
