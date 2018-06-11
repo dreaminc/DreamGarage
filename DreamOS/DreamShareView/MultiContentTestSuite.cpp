@@ -79,13 +79,13 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestAllUIObjects());
+	
 	CR(AddTestManyBrowsers());
 
 	CR(AddTestChangeUIWidth());
 
 	CR(AddTestMenuShader());
-
-	CR(AddTestAllUIObjects());
 
 	CR(AddTestMenuMemory());
 	
@@ -939,7 +939,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
-		/*
+		///*
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		pTestContext->pBrowser1->SetURI("www.twitch.tv");
@@ -952,6 +952,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);
 		//pControlArea->GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(vector(60.0f * (float)M_PI / 180.0f, 0.0f, 0.0f)));
 		pControlArea->m_fFromMenu = true;
+		//*/
 
 		/*
 		pTestContext->strURIs = {
@@ -987,11 +988,13 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		auto pControlArea = pTestContext->pUserControlArea;
 
 		if (pTestContext->fFirst) {
-			//pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
-			//pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			pTestContext->pUserControlArea->SetActiveSource(pTestContext->pBrowser1);
+			pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pTestContext->pBrowser2);
+			
 			//for (auto pBrowser : pTestContext->pDreamBrowsers) {
 			//	pTestContext->pUserControlArea->m_pDreamTabView->AddContent(pBrowser);
 			//}
+			
 			pTestContext->fFirst = false;
 
 //			pTestContext->pUserControlArea->m_pDreamUIBar->ShowRootMenu();
