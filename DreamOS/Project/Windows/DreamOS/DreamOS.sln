@@ -289,7 +289,6 @@ Global
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|ARM64.ActiveCfg = Testing|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|ARM64.Build.0 = Testing|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|x64.ActiveCfg = TestingRelease|x64
-		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|x64.Build.0 = TestingRelease|x64
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|x86.ActiveCfg = TestingRelease|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Release|x86.Build.0 = TestingRelease|Win32
 		{8DBC8FAA-116E-45A1-AB2C-3785CB553FC1}.Testing|Any CPU.ActiveCfg = Testing|Win32
