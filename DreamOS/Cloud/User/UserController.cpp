@@ -467,10 +467,10 @@ RESULT UserController::OnSettingsForm(std::shared_ptr<CloudMessage> pCloudMessag
 	if (!jsonForm.is_null()) {
 		if (m_pUserControllerObserver != nullptr) {
 			if (jsonForm["/key"_json_pointer].is_string()) {
-				;
+				/*TODO*/
 			}
 			if (jsonForm["/title"_json_pointer].is_string()) {
-				;
+				/*TODO*/
 			}
 			if (jsonForm["/url"_json_pointer].is_string()) {
 				CR(m_pUserControllerObserver->OnSettings(jsonForm["/url"_json_pointer].get<std::string>()));

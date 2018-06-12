@@ -159,6 +159,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	//UserObserver
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;
 	}
