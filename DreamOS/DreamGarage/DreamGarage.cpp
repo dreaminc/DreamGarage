@@ -897,6 +897,16 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
+	return R_PASS;
+}
+RESULT DreamGarage::OnSetSettings() {
+	return R_PASS;
+}
+RESULT DreamGarage::OnSettings(std::string strURL) {
+	return R_PASS;
+}
+
 RESULT DreamGarage::OnShareAsset() {
 	RESULT r = R_PASS;
 
