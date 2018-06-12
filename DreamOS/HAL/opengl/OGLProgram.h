@@ -168,9 +168,9 @@ protected:
 	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 	// Shaders
-	OGLVertexShader *m_pVertexShader;
-	OGLFragmentShader *m_pFragmentShader;
-	// TODO: Other shaders ?
+	OGLVertexShader *m_pVertexShader = nullptr;
+	// OGLGeometryShader *m_pGeometryShader = nullptr;
+	OGLFragmentShader *m_pFragmentShader = nullptr;
 
 	// Vertex Attributes
 	RESULT RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttribute, std::string strVertexAttributeName);

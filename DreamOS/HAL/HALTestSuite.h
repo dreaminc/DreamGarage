@@ -31,6 +31,9 @@ public:
 
 	RESULT AddTestSkybox();
 
+	// Shader Tests
+	RESULT AddTestGeometryShader();
+
 	// Environments
 	RESULT AddTestEnvironmentShader();
 	RESULT AddTestEnvironments();
