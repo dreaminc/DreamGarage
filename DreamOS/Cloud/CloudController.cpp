@@ -443,11 +443,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnGetSettings() {
+RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnGetSettings());
+		CR(m_pUserObserver->OnGetSettings(height, depth, scale));
 	}
 
 Error:

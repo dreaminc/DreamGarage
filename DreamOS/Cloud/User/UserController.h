@@ -97,7 +97,7 @@ public:
 public:
 	class UserControllerObserver {
 	public:
-		virtual RESULT OnGetSettings() = 0;
+		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnSettings(std::string strURL) = 0;
 	};

@@ -129,7 +129,10 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
 		// auto login
-		GetCloudController()->Start();
+		CloudController* pCloudController = GetCloudController();
+		if (pCloudController != nullptr) {
+			pCloudController->Start();
+		}
 	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
@@ -678,6 +681,15 @@ RESULT DreamOS::InitializeDreamUser() {
 //	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
 //	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	CR(m_pSandbox->InitializeCloudController());
 
 Error:
 	return r;

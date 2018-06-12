@@ -86,7 +86,7 @@ public:
 	virtual RESULT OnCloseAsset() override;
 
 	// user
-	virtual RESULT OnGetSettings() override;
+	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 	virtual RESULT OnSettings(std::string strURL) override;
 

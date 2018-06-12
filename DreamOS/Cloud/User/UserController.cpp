@@ -416,8 +416,21 @@ RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 	if (!jsonUserSettings.is_null()) {
 		if (m_pUserControllerObserver != nullptr) {
 			// Moving to Send/Receive paradigm
-			CR(m_pUserControllerObserver->OnGetSettings());
+			float height = 0.0f;
+			float depth = 0.0f;
+			float scale = 1.0f;
 
+			if (jsonUserSettings["/ui_offset_y"_json_pointer].is_number_float()) {
+				height = jsonUserSettings["/ui_offset_y"_json_pointer].get<float>();
+			}
+			if (jsonUserSettings["/ui_offset_z"_json_pointer].is_number_float()) {
+				depth = jsonUserSettings["/ui_offset_z"_json_pointer].get<float>();
+			}
+			if (jsonUserSettings["/ui_scale"_json_pointer].is_number_float()) {
+				scale = jsonUserSettings["/ui_scale"_json_pointer].get<float>();
+			}
+
+			CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
 		}
 	}
 	else {
@@ -513,7 +526,9 @@ RESULT UserController::RequestSetSettings(std::wstring wstrHardwareID, std::stri
 	CN(pCloudRequest);
 	CR(pCloudRequest->SetControllerMethod("user.set_settings"));
 
-	//CR(pParentEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::MENU_API_REQUEST));
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentController);
+	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::USER_SET_SETTINGS));
 
 Error:
 	return r;

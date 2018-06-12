@@ -897,7 +897,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetSettings() {
+RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	return R_PASS;
 }
 RESULT DreamGarage::OnSetSettings() {
