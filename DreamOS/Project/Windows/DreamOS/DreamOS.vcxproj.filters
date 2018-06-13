@@ -862,9 +862,6 @@
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp">
-      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp">
       <Filter>UI</Filter>
     </ClCompile>
@@ -876,6 +873,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1927,9 +1930,6 @@
     <ClInclude Include="..\..\..\DreamShareViewMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h">
-      <Filter>DreamGarage\DreamDesktopDuplicationApp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UI\UISpatialScrollView.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -1947,6 +1947,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\EnvironmentProgram.h">
       <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.h">
+      <Filter>HAL\opengl\shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2119,6 +2125,15 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.geo">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

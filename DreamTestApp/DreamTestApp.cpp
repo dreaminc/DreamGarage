@@ -19,7 +19,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
-	sandboxconfig.fInitCloud = true;		// TODO: This is currently breaking stuff
+	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:

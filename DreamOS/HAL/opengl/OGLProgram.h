@@ -20,6 +20,7 @@
 #include "shaders/OpenGLShader.h"
 #include "shaders/OGLVertexShader.h"
 #include "shaders/OGLFragmentShader.h"
+#include "shaders/OGLGeometryShader.h"
 
 #include "shaders/OGLUniform.h"
 #include "shaders/OGLUniformBlock.h"
@@ -47,6 +48,7 @@ public:
 	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	virtual RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL);
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
 	
 	RESULT CreateProgram();
@@ -72,6 +74,7 @@ public:
 	//RESULT MakeShader(const wchar_t *pszFilename, version versionFile);
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
+	RESULT MakeGeometryShader(const wchar_t *pszFilename);
 
 	// TODO: Likely more eloquent way to do this
 	RESULT RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore);
@@ -169,7 +172,7 @@ protected:
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader = nullptr;
-	// OGLGeometryShader *m_pGeometryShader = nullptr;
+	OGLGeometryShader *m_pGeometryShader = nullptr;
 	OGLFragmentShader *m_pFragmentShader = nullptr;
 
 	// Vertex Attributes

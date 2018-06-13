@@ -128,7 +128,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
 		// auto login
-		GetCloudController()->Start();
+		if (GetCloudController() != nullptr) {
+			GetCloudController()->Start();
+		}
 	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");

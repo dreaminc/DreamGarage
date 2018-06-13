@@ -20,6 +20,7 @@
 #include "OGLProgramBlurQuad.h"
 #include "OGLProgramUIStage.h"
 #include "OGLProgramDebugOverlay.h"
+#include "OGLProgramVisualizeNormals.h"
 
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
@@ -43,6 +44,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "blur", OGLPROGRAM_BLUR_QUAD },
 	{ "uistage", OGLPROGRAM_UI_STAGE },
 	{ "debug_overlay", OGLPROGRAM_DEBUG_OVERLAY },
+	{ "visualize_normals", OGLPROGRAM_VISUALIZE_NORMALS },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -192,6 +194,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			pOGLProgram = new OGLProgramDebugOverlay(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL),
+				"Failed to initialize OGL minimal Program");
+		} break;
+
+		case OGLPROGRAM_VISUALIZE_NORMALS: {
+			pOGLProgram = new OGLProgramVisualizeNormals(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
 				"Failed to initialize OGL minimal Program");
 		} break;
 

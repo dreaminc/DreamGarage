@@ -658,6 +658,15 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
+		// Visualize Normals
+		ProgramNode* pVisualNormalsProgram;
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		CN(pVisualNormalsProgram);
+		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
 		// Skybox
 		ProgramNode* pSkyboxProgram;
 		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
@@ -666,7 +675,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Connect output as pass-thru to internal blend program
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad;
