@@ -379,8 +379,6 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
 
-copy  "$(TargetDir)\DreamLaunch.exe" "$(TargetDir)\DreamLauncher.exe"
-
 $(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.development.nuspec" -properties version=$(DREAMVERSION)
 $(SolutionDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify DreamDev.$(DREAMVERSION).nupkg -r DevReleases</Command>
     </PostBuildEvent>
