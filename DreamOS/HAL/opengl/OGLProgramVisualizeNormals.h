@@ -21,6 +21,16 @@ public:
 	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
+
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
+
+protected:
+	OGLVertexAttributeVector *m_pVertexAttributeNormal = nullptr;
+
+	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
 };
 
 #endif // ! OGLPROGRAM_VISUALIZE_NORMALS_H_

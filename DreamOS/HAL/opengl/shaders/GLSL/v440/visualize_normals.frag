@@ -6,10 +6,6 @@
 
 #version 440 core
 
-in Data {
-	vec4 color;
-} DataIn;
-
 struct Material {
 	float m_shine;
 	float m_bump;
@@ -27,5 +23,5 @@ layout(std140) uniform ub_material {
 layout (location = 0) out vec4 out_vec4Color;
 
 void main(void) {  
-	out_vec4Color = DataIn.color;
+	out_vec4Color = vec4(1.0, 1.0, 0.0, 1.0);
 }

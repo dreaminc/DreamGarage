@@ -9,22 +9,24 @@ layout (triangles) in;
 layout (line_strip, max_vertices = 6) out;
 
 in VS_OUT {
-    vec3 normal;
+	vec3 vNormal;
 } gs_in[];
 
-const float MAGNITUDE = 0.4;
+// DEBUG: Start with a pass through 
 
-void GenerateLine(int index)
-{
+const float MAGNITUDE = 0.2;
+
+void GenerateLine(int index) {
     gl_Position = gl_in[index].gl_Position;
     EmitVertex();
-    gl_Position = gl_in[index].gl_Position + vec4(gs_in[index].normal, 0.0) * MAGNITUDE;
+
+	gl_Position = gl_in[index].gl_Position + vec4(gs_in[index].vNormal, 0.0) * MAGNITUDE;
     EmitVertex();
-    EndPrimitive();
+    
+	EndPrimitive();
 }
 
-void main()
-{
+void main() {
     GenerateLine(0); // first vertex normal
     GenerateLine(1); // second vertex normal
     GenerateLine(2); // third vertex normal

@@ -34,23 +34,23 @@ private:
 
 private:
 	// Vertex Attribute
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeVector *m_pVertexAttributeNormal;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
-	OGLVertexAttributeVector *m_pVertexAttributeTangent;
-	OGLVertexAttributeVector *m_pVertexAttributeBitangent;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeNormal = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeTangent = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeBitangent = nullptr;
 
 	// Uniforms
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
 	//OGLUniformMatrix4 *m_pUniformProjectionMatrix;
-	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
 	// Uniform Blocks
-	OGLLightsBlock *m_pLightsBlock;
-	OGLMaterialBlock *m_pMaterialsBlock;
+	OGLLightsBlock *m_pLightsBlock = nullptr;
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_BLINN_PHONG_H_

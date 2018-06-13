@@ -1070,6 +1070,11 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 			CN(this->m_pFragmentShader);
 		} break;
 
+		case GL_GEOMETRY_SHADER: {
+			this->m_pGeometryShader = dynamic_cast<OGLGeometryShader*>(pOpenGLShader);
+			CN(this->m_pGeometryShader);
+		} break;
+
 		default: {
 			CBM((0), "Shader type 0x%x cannot be attached", pOpenGLShader->GetShaderType());
 		}

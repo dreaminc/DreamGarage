@@ -121,6 +121,12 @@ RESULT OGLProgramMinimal::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
+	
+	if (m_pUniformModelMatrix != nullptr) {
+		auto matModel = pDimObj->GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+
 	if (m_pUniformModelMatrix != nullptr) {
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);

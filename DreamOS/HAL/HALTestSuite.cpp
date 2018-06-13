@@ -643,13 +643,16 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		CR(pHAL->MakeCurrentContext());
 
+		///*
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("environment");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		//*/
 
 		// Reference Geometry Shader Program
+		/*
 		ProgramNode* pReferenceGeometryProgram;
 		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 		CN(pReferenceGeometryProgram);
@@ -657,25 +660,18 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		*/
 
 		// Visualize Normals
+		///*
 		ProgramNode* pVisualNormalsProgram;
 		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
 		CN(pVisualNormalsProgram);
 		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		// Skybox
-		ProgramNode* pSkyboxProgram;
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
+		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad;
@@ -684,7 +680,8 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -699,34 +696,39 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		// Objects 
 
-		volume *pVolume;
-		pVolume = nullptr;
-
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		texture *pColorTexture;
-		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		{
 
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetDiffuseTexture(pColorTexture);
+			//texture *pColorTexture;
+			//pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//
+			//volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
+			//CN(pVolume);
+			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+			//pVolume->SetDiffuseTexture(pColorTexture);
+			//
+			//pVolume = m_pDreamOS->AddVolume(width, height, length);
+			//CN(pVolume);
+			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+			//CR(pVolume->SetVertexColor(COLOR_GREEN));
+			//
+			//pVolume = m_pDreamOS->AddVolume(width, height, length);
+			//CN(pVolume);
+			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			//CR(pVolume->SetVertexColor(COLOR_RED));
+			//
+			//pVolume = m_pDreamOS->AddVolume(width, height, length);
+			//CN(pVolume);
+			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			//CR(pVolume->SetVertexColor(COLOR_BLUE));
 
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetVertexColor(COLOR_GREEN));
-
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetVertexColor(COLOR_RED));
-
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetVertexColor(COLOR_BLUE));
+			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			CN(pModel);
+			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pModel->SetScale(0.1f);
+		}
 
 	Error:
 		return r;
