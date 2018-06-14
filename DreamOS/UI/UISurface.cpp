@@ -20,6 +20,9 @@ RESULT UISurface::InitializeSurfaceQuad(float width, float height) {
 
 	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 
+	m_ptLastEvent.x() = -1.0f;
+	m_ptLastEvent.y() = -1.0f;
+
 Error:
 	return r;
 }
@@ -30,19 +33,6 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
 	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
-
-	// if keyboard is up, touching the view quad is always a dismiss
-	/*
-	if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
-		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-			fMalletDirty = false;
-		}
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
-			CR(m_pParentApp->HideWebsiteTyping());
-			fMalletDirty = true;
-		}
-	}
-	//*/
 
 	if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
 
@@ -123,6 +113,20 @@ std::shared_ptr<quad> UISurface::GetViewQuad() {
 }	
 point UISurface::GetLastEvent() {
 	return m_ptLastEvent;
+}
+
+RESULT UISurface::ResetLastEvent() {
+	RESULT r = R_PASS;
+
+	m_ptLastEvent = point(-1.0f, -1.0f, 0.0f);
+
+	UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_BEGIN, m_pViewQuad.get(), nullptr, m_ptLastEvent);
+	CR(NotifySubscribers(UI_SELECT_BEGIN, pUIEvent));
+	pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_pViewQuad.get(), nullptr, m_ptLastEvent);
+	CR(NotifySubscribers(UI_SELECT_ENDED, pUIEvent));
+
+Error:
+	return r;
 }
 	
 RESULT UISurface::Notify(SenseControllerEvent *pEvent) {

@@ -23,6 +23,7 @@ public:
 
 	std::shared_ptr<quad> GetViewQuad();
 	point GetLastEvent();
+	RESULT ResetLastEvent();
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 

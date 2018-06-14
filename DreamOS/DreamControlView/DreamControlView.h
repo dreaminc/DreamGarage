@@ -37,8 +37,7 @@ class UIButton;
 class texture;
 
 class DreamControlView : public DreamApp<DreamControlView>, 
-						 public DreamUserObserver,
-						 public Subscriber<SenseControllerEvent> {
+						 public DreamUserObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
@@ -64,8 +63,6 @@ public:
 	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
 	RESULT SetContentType(std::string strContentType);
 
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
-
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
 
@@ -75,8 +72,6 @@ public:
 	RESULT ResetAppComposite();
 
 private:
-	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fMouseDown, HAND_TYPE handType);
-
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 
@@ -105,7 +100,6 @@ public:
 
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
-	WebBrowserPoint GetRelativePointofContact(point ptContact);
 	point GetLastEvent();
 
 public:
@@ -165,9 +159,6 @@ private:
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
-	WebBrowserPoint m_ptLMalletPointing;
-	WebBrowserPoint m_ptRMalletPointing;
-	WebBrowserPoint m_ptLastEvent;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;

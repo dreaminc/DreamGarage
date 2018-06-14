@@ -982,6 +982,15 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
 			CR(m_pActiveSource->OnKeyPress(chkey, true));
+
+			if (chkey == SVK_RETURN) {
+				if (m_pControlView->m_fIsShareURL) {
+					CR(SetActiveBrowserURI());
+				}
+				else {
+					CR(HideWebsiteTyping());
+				}
+			}
 		}
 		else {
 			//*/
@@ -1010,7 +1019,7 @@ Error:
 RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
-	WebBrowserPoint wptContact = m_pControlView->GetRelativePointofContact(pUIEvent->m_ptContact);
+	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptContact);
 	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
@@ -1036,4 +1045,30 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 
 Error:
 	return r;
+}
+
+WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact) {
+	point ptIntersectionContact = ptContact;
+	ptIntersectionContact.w() = 1.0f;
+	WebBrowserPoint ptRelative;
+
+	// First apply transforms to the ptIntersectionContact 
+	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
+	point ptAdjustedContact = ptIntersectionContact;
+	
+	float width = m_pControlView->GetViewQuad()->GetWidth();
+	float height = m_pControlView->GetViewQuad()->GetHeight();
+
+	float posX = ptAdjustedContact.x() / (width / 2.0f);	
+	float posY = ptAdjustedContact.z() / (height / 2.0f);
+
+	//float posZ = ptAdjustedContact.z();	// 3D browser when
+
+	posX = (posX + 1.0f) / 2.0f;	// flip it
+	posY = (posY + 1.0f) / 2.0f;  
+	
+	ptRelative.x = posX * m_pActiveSource->GetWidth();
+	ptRelative.y = posY * m_pActiveSource->GetHeight();
+
+	return ptRelative;
 }

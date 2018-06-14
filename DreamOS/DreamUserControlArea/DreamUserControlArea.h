@@ -162,6 +162,7 @@ public:
 
 private:
 	RESULT ShowControlView();
+	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
