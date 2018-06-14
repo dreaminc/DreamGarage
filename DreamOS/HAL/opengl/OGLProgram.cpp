@@ -480,11 +480,11 @@ RESULT OGLProgram::AddSharedShaderFilename(GLenum shaderType, std::wstring strSh
 	
 	std::vector<std::wstring> *pShaderFiles = nullptr;
 
-	if (m_sharedShaderFilenames.find(shaderType) == m_sharedShaderFilenames.end()) {
-		m_sharedShaderFilenames[shaderType] = std::vector<std::wstring>();
+	if (m_sharedShaderFilenamesTyped.find(shaderType) == m_sharedShaderFilenamesTyped.end()) {
+		m_sharedShaderFilenamesTyped[shaderType] = std::vector<std::wstring>();
 	}
 	
-	pShaderFiles = &(m_sharedShaderFilenames[shaderType]);
+	pShaderFiles = &(m_sharedShaderFilenamesTyped[shaderType]);
 
 	if (std::find(pShaderFiles->begin(), pShaderFiles->end(), strShaderFilename) == pShaderFiles->end()) {
 		pShaderFiles->push_back(strShaderFilename);
@@ -493,17 +493,35 @@ RESULT OGLProgram::AddSharedShaderFilename(GLenum shaderType, std::wstring strSh
 	return R_PASS;
 }
 
+RESULT OGLProgram::AddSharedShaderFilename(std::wstring strShaderFilename) {
+	if (std::find(m_sharedShaderFilenamesGlobal.begin(), m_sharedShaderFilenamesGlobal.end(), strShaderFilename) == m_sharedShaderFilenamesGlobal.end()) {
+		m_sharedShaderFilenamesGlobal.push_back(strShaderFilename);
+	}
+
+	return R_PASS;
+}
+
 RESULT OGLProgram::ClearSharedShaders() {
-	m_sharedShaderFilenames = std::map<GLenum, std::vector<std::wstring>>();
+	m_sharedShaderFilenamesTyped = std::map<GLenum, std::vector<std::wstring>>();
+	m_sharedShaderFilenamesGlobal = std::vector<std::wstring>();
+
 	return R_PASS;
 }
 
 std::vector<std::wstring> OGLProgram::GetSharedShaderFilenames(GLenum shaderType) {
-	if (m_sharedShaderFilenames.at(shaderType).size() > 0) {
-		return m_sharedShaderFilenames.at(shaderType);
+	std::vector<std::wstring> retFiles = std::vector<std::wstring>();
+	
+	if (m_sharedShaderFilenamesGlobal.size() != 0) {
+		retFiles.insert(retFiles.begin(),
+			m_sharedShaderFilenamesGlobal.begin(), m_sharedShaderFilenamesGlobal.end());
+	}
+
+	if (m_sharedShaderFilenamesTyped.count(shaderType) != 0) {
+		retFiles.insert(retFiles.begin(), 
+			m_sharedShaderFilenamesTyped[shaderType].begin(), m_sharedShaderFilenamesTyped[shaderType].end());
 	}
 	
-	return std::vector<std::wstring>();
+	return retFiles;
 }
 
 RESULT OGLProgram::IsProgram() {
@@ -1085,7 +1103,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
+RESULT OGLProgram::AttachShader(OGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
 

@@ -250,9 +250,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp">
       <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -880,6 +877,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.cpp">
       <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLShader.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -1138,9 +1138,6 @@
       <Filter>HAL\opengl\shaders</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h">
       <Filter>HAL\opengl\shaders</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h">
@@ -1954,6 +1951,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.h">
       <Filter>HAL\opengl\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLShader.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2136,7 +2136,13 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\lightingCommon.vert">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\core440.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\lightingCommon.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\materialCommon.shader">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

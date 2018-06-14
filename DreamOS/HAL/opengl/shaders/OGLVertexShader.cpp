@@ -3,7 +3,7 @@
 #include "../OpenGLImp.h"
 
 OGLVertexShader::OGLVertexShader(OGLProgram *pParentProgram) :
-	OpenGLShader(pParentProgram, GL_VERTEX_SHADER)
+	OGLShader(pParentProgram, GL_VERTEX_SHADER)
 {
 	// empty
 }

@@ -5,7 +5,7 @@
 #include "../OGLObj.h"
 
 OGLGeometryShader::OGLGeometryShader(OGLProgram *pParentProgram) :
-	OpenGLShader(pParentProgram, GL_GEOMETRY_SHADER)
+	OGLShader(pParentProgram, GL_GEOMETRY_SHADER)
 {
 	// empty
 }

@@ -5,7 +5,7 @@
 #include "../OGLObj.h"
 
 OGLFragmentShader::OGLFragmentShader(OGLProgram *pParentProgram) :
-	OpenGLShader(pParentProgram, GL_FRAGMENT_SHADER)
+	OGLShader(pParentProgram, GL_FRAGMENT_SHADER)
 {
 	// empty
 }

@@ -83,11 +83,16 @@ RESULT OGLProgramBlinnPhong::OGLInitialize(version versionOGL) {
 	m_versionOGL = versionOGL;
 
 	// Create and set the shaders
-	//CRM(MakeShaderObject(L"lightingCommon.vert"), "Failed to create a shader object");
+	
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
 
-	CRM(AddSharedShaderFilename(GL_VERTEX_SHADER, L"lightingCommon.vert"), "Failed to add shared vertex shader code");
-
+	// Vertex
 	CRM(MakeVertexShader(L"blinnphong.vert"), "Failed to create vertex shader");
+
+	// Fragment
 	CRM(MakeFragmentShader(L"blinnphong.frag"), "Failed to create fragment shader");
 
 	// Link the program

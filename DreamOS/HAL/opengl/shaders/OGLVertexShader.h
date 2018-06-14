@@ -5,7 +5,7 @@
 // DreamOS/HAL/opengl/OGLVertexShader.h
 // This is a OGL vertex shader object
 
-#include "OpenGLShader.h"
+#include "OGLShader.h"
 #include "OGLVertexAttribute.h"
 
 #include <vector>
@@ -14,7 +14,7 @@
 #define VERTEX_SHADER_COLOR_INDEX 1
 #define VERTEX_SHADER_NORMAL_INDEX 2
 
-class OGLVertexShader : public OpenGLShader {
+class OGLVertexShader : public OGLShader {
 public:
 	OGLVertexShader(OGLProgram *pParentProgram);
 	

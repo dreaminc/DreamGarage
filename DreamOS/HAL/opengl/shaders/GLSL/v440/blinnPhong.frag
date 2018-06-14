@@ -1,12 +1,7 @@
-// minimal.vert
+// blinnPhong.vert
 // shadertype=glsl
 
-// This is a minimal shader that simply displays
-// a vertex color and position (no lighting, no textures)
-
-#version 440 core
-
-#define MAX_TOTAL_LIGHTS 10
+// This is a basic blinn phong shader 
 
 in vec3 inF_vec3Color;
 
@@ -19,38 +14,6 @@ in Data {
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 } DataIn;
-
-// Light Structure
-struct Light {
-	int m_type;
-	float m_power;
-	float m_shine;
-	float m_reserved;
-
-	vec4 m_ptOrigin;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	vec4 m_vectorDirection; 
-};
-
-struct Material {
-	float m_shine;
-	float m_bump;
-	float m_ambient;
-	float reserved3;
-    vec4 m_colorAmbient;
-    vec4 m_colorDiffuse;
-    vec4 m_colorSpecular;
-};
-
-layout(std140) uniform ub_material {
-    Material material;
-};
-
-layout(std140) uniform ub_Lights {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
 
 layout (location = 0) out vec4 out_vec4Color;
 
