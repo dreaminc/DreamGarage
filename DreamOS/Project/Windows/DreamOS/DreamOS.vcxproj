@@ -710,7 +710,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp" />
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLShader.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\DNode.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\Pipeline.cpp" />
@@ -1021,7 +1021,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLShader.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\DNode.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\Pipeline.h" />
@@ -1254,6 +1254,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\core440.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
@@ -1268,6 +1269,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\lightingCommon.shader" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\materialCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>

@@ -17,7 +17,7 @@
 #include "Primitives/light.h"
 #include "Primitives/stereocamera.h"
 
-#include "shaders/OpenGLShader.h"
+#include "shaders/OGLShader.h"
 #include "shaders/OGLVertexShader.h"
 #include "shaders/OGLFragmentShader.h"
 #include "shaders/OGLGeometryShader.h"
@@ -100,6 +100,16 @@ public:
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);
 
+	RESULT AddSharedShaderFilename(GLenum shaderType, std::wstring strShaderFilename);
+	RESULT AddSharedShaderFilename(std::wstring strShaderFilename);
+
+	RESULT ClearSharedShaders();
+	std::vector<std::wstring> GetSharedShaderFilenames(GLenum shaderType);
+	
+	std::map<GLenum, std::vector<std::wstring>> m_sharedShaderFilenamesTyped;
+	std::vector<std::wstring> m_sharedShaderFilenamesGlobal;
+	
+
 	GLuint GetOGLProgramIndex() { 
 		return m_OGLProgramIndex;
 	}
@@ -123,7 +133,7 @@ public:
 	RESULT EnableVertexBitangentAttribute();
 	*/
 
-	RESULT AttachShader(OpenGLShader *pOpenGLShader);
+	RESULT AttachShader(OGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
 	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);

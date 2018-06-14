@@ -5,7 +5,7 @@
 // DreamOS/HAL/opengl/OGLGeometryShader.h
 // This is a OGL fragment shader object
 
-#include "OpenGLShader.h"
+#include "OGLShader.h"
 
 class OGLProgram;	// Declare OpenGLImp class
 class OGLTexture;
@@ -13,7 +13,7 @@ class OGLObj;
 
 //#define FRAGMENT_SHADER_COLOR_INDEX 0
 
-class OGLGeometryShader : public OpenGLShader {
+class OGLGeometryShader : public OGLShader {
 public:
 	OGLGeometryShader(OGLProgram *pParentProgram);
 

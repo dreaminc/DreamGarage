@@ -21,13 +21,13 @@ DreamOS::DreamOS() :
 {
 	RESULT r = R_PASS;
 
-//Success:
+	//Success:
 	Validate();
 	return;
 
-//Error:
-//	Invalidate();
-//	return;
+	//Error:
+	//	Invalidate();
+	//	return;
 }
 
 DreamOS::~DreamOS() {
@@ -59,11 +59,11 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Check if Dream is launching from a web browser url.
 	// a url command from a web page, to trigger the launch of Dream, would start with 'dreamos:run' command line.
 	// The following code splits the white space of a single command line param in that case, into a list of command line arguments.
-	if ((argc > 1) && 
+	if ((argc > 1) &&
 		((std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0) ||
-		 (std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
+		(std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
 		//  Dream is launching from a web page
-		
+
 		DOSLOG(INFO, "[DreamOS] Dream launched from web");
 
 		// Decide if to split args or not
@@ -194,10 +194,10 @@ RESULT DreamOS::CheckDreamPeerAppStates() {
 		CN(pDreamPeerApp);
 
 		// Detect handshake request hung
-		if (pDreamPeerApp->IsDataChannel() && 
-			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED) 
+		if (pDreamPeerApp->IsDataChannel() &&
+			pDreamPeerApp->GetState() != DreamPeerApp::state::ESTABLISHED)
 		{
-		//if (pDreamPeerApp->IsHandshakeRequestHung()) {
+			//if (pDreamPeerApp->IsHandshakeRequestHung()) {
 			long userID = GetUserID();
 			long peerUserID = pDreamPeerApp->GetPeerUserID();
 
@@ -234,7 +234,7 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	CN(pDreamPeer);
 
 	CR(pDreamPeer->RegisterDreamPeerObserver(this));
-	
+
 Error:
 	return r;
 }
@@ -275,9 +275,9 @@ RESULT DreamOS::OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) {
 	RESULT r = R_PASS;
 
 	switch (pDreamPeer->GetState()) {
-		case DreamPeerApp::state::ESTABLISHED: {
-			CR(OnNewDreamPeer(pDreamPeer));
-		} break;
+	case DreamPeerApp::state::ESTABLISHED: {
+		CR(OnNewDreamPeer(pDreamPeer));
+	} break;
 	}
 
 Error:
@@ -296,7 +296,7 @@ Error:
 
 RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
-	
+
 	DreamMessage::type dreamMsgType = (DreamMessage::type)(pDataMessage->GetType());
 
 	// Route the message to the right place
@@ -304,25 +304,25 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 	if (dreamMsgType < DreamMessage::type::CLIENT) {
 		// DREAM OS Messages
 		switch (dreamMsgType) {
-			case DreamMessage::type::PEER_HANDSHAKE: {
-				DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
-				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
-				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
-			} break;
+		case DreamMessage::type::PEER_HANDSHAKE: {
+			DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE user: %v peer: %v", pPeerConnection->GetUserID(), pPeerConnection->GetPeerUserID());
+			PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
+			CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
+		} break;
 
-			case DreamMessage::type::PEER_STAYALIVE: {
-				PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
-				CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
-			} break;
+		case DreamMessage::type::PEER_STAYALIVE: {
+			PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
+			CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
+		} break;
 
-			case DreamMessage::type::PEER_ACK: {
-				PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
-				CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
-			} break;
+		case DreamMessage::type::PEER_ACK: {
+			PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
+			CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
+		} break;
 
-			default: {
-				DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
-			} break;
+		default: {
+			DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+		} break;
 		}
 	}
 	else if (dreamMsgType >= DreamMessage::type::CLIENT && dreamMsgType < DreamMessage::type::APP) {
@@ -362,7 +362,7 @@ RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, Peer
 
 		/*
 		if (pDreamPeer->IsPeerReady()) {
-			int a = 5;
+		int a = 5;
 		}
 		*/
 	}
@@ -404,24 +404,24 @@ RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMes
 	long peerUserID = pPeerConnection->GetPeerUserID();
 
 	switch (pPeerAckMessage->GetACKType()) {
-		case PeerAckMessage::type::PEER_HANDSHAKE: {
-			pDreamPeer->ReceivedHandshakeACK();
-			DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE_ACK, user: %v, peer: %v", userID, peerUserID);
+	case PeerAckMessage::type::PEER_HANDSHAKE: {
+		pDreamPeer->ReceivedHandshakeACK();
+		DOSLOG(INFO, "[DreamOS] PEER_HANDSHAKE_ACK, user: %v, peer: %v", userID, peerUserID);
 
-			/*
-			if (pDreamPeer->IsPeerReady()) {
-				int a = 5;
-			}
-			*/
-		} break;
+		/*
+		if (pDreamPeer->IsPeerReady()) {
+		int a = 5;
+		}
+		*/
+	} break;
 
-		case PeerAckMessage::type::PEER_STAY_ALIVE: {
-			// TODO: update the stay alive
-		} break;
+	case PeerAckMessage::type::PEER_STAY_ALIVE: {
+		// TODO: update the stay alive
+	} break;
 
-		default: {
-			// TODO: ?
-		} break;
+	default: {
+		// TODO: ?
+	} break;
 	}
 
 Error:
@@ -432,8 +432,8 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 	RESULT r = R_PASS;
 	std::shared_ptr<DreamPeerApp> pDreamPeerApp = nullptr;
 
-	long peerUserID = 0; 
-	
+	long peerUserID = 0;
+
 	CNM(pPeerConnection, "Peer Connection invalid");
 	peerUserID = pPeerConnection->GetPeerUserID();
 
@@ -678,8 +678,8 @@ RESULT DreamOS::InitializeDreamUser() {
 	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
 	CNM(m_pDreamUser, "Failed to launch dream user app");
 
-//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
+	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
 
 Error:
@@ -715,7 +715,7 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
-	return m_pSandbox->UpdateInteractionPrimitive(rCast);
+return m_pSandbox->UpdateInteractionPrimitive(rCast);
 }
 */
 
@@ -828,9 +828,9 @@ RESULT DreamOS::ClearFonts() {
 	return R_PASS;
 }
 
-std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap ) {
+std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap) {
 	RESULT r = R_PASS;
-	
+
 	// First check font store
 	std::shared_ptr<font> pFont = GetFont(wstrFontFileName);
 
@@ -917,11 +917,11 @@ skybox *DreamOS::MakeSkybox() {
 
 /*
 model *DreamOS::AddModel(wchar_t *pszModelName) {
-	return m_pSandbox->AddModel(pszModelName);
+return m_pSandbox->AddModel(pszModelName);
 }
 
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
-	return m_pSandbox->AddModel(pszModelName);
+return m_pSandbox->AddModel(pszModelName);
 }
 */
 

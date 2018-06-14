@@ -33,6 +33,7 @@ public:
 
 	// Shader Tests
 	RESULT AddTestGeometryShader();
+	RESULT AddTestIncludeShader();
 
 	// Environments
 	RESULT AddTestEnvironmentShader();

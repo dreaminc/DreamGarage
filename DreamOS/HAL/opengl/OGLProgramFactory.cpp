@@ -102,7 +102,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_BLINNPHONG: {
 			pOGLProgram = new OGLProgramBlinnPhong(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL blinnPhong Program");
 		} break;
 

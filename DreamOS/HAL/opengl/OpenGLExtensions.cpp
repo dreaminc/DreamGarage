@@ -143,6 +143,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	WCNM((m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader")),
 		"Failed to initialize glCreateShader extension");
 
+	WCNM((m_glCreateShaderObject = (PFNGLCREATESHADEROBJECTARBPROC)wglGetProcAddress("glCreateShaderObjectARB")),
+		"Failed to initialize glCreateShaderObjectARB extension");
+
 	WCNM((m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader")),
 		"Failed to initialize glDeleteShader extension");
 
