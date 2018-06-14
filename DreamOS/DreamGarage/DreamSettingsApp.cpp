@@ -38,11 +38,11 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 
 	if (m_pUserHandle == nullptr) {
 		UID userAppUID = GetDOS()->GetUniqueAppUID("DreamUserApp");
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userAppUID, this));
-		CN(m_pUserHandle);
+		//m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userAppUID, this));
+//		CN(m_pUserHandle);
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -55,12 +55,19 @@ DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pCont
 	return pDreamApp;
 }
 
-RESULT DreamSettingsApp::InitializeWithParent(DreamUserControlArea *pParent) {
-	return R_PASS;
-}
-
 RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	RESULT r = R_PASS;
+
+//Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::Show() {
+	RESULT r = R_PASS;
+
+	CNR(m_pSettingsForm, R_SKIPPED);
+
+//	m_pSettingsForm->
 
 Error:
 	return r;

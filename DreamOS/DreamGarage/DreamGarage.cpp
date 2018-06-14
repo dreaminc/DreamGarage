@@ -904,6 +904,8 @@ RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
 RESULT DreamGarage::OnSettings(std::string strURL) {
+	m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", "b", "");
+	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, "");
 	return R_PASS;
 }
 

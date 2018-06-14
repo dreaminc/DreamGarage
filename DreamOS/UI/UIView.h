@@ -16,6 +16,7 @@ class UISpatialScrollView;
 class UIFlatScrollView;
 class UIMenuItem;
 class UIControlBar;
+class UISurface;
 class DreamOS;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
@@ -51,6 +52,9 @@ public:
 
 	std::shared_ptr<UIFlatScrollView> MakeUIFlatScrollView();
 	std::shared_ptr<UIFlatScrollView> AddUIFlatScrollView();
+
+	std::shared_ptr<UISurface> MakeUISurface();
+	std::shared_ptr<UISurface> AddUISurface();
 
 	RESULT Notify(InteractionObjectEvent *pEvent);
 

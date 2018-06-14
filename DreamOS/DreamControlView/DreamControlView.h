@@ -101,6 +101,8 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
+	std::shared_ptr<UISurface> GetViewSurface();
+
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
@@ -119,6 +121,7 @@ private:
 	
 	std::shared_ptr<UIView> m_pView = nullptr;
 
+	std::shared_ptr<UISurface> m_pSurface = nullptr;
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 

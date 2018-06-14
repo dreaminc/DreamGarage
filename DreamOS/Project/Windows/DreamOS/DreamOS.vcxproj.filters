@@ -886,6 +886,9 @@
     <ClCompile Include="..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\OVR_PlatformLoader.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UI\UISurface.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -1962,6 +1965,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRPlatform.h">
       <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UISurface.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

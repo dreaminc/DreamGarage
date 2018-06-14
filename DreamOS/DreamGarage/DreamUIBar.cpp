@@ -444,8 +444,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					ClearMenuWaitingFlag();
 				}
 				else if (strTitle == "Settings") {
-					m_pUserControllerProxy->RequestGetSettings(GetDOS()->GetHardwareID(), "HMDType.OculusRift");
-					//m_pUserControllerProxy->RequestSettingsForm(strPath);
+					//m_pUserControllerProxy->RequestGetSettings(GetDOS()->GetHardwareID(), "HMDType.OculusRift");
+					//m_pUserControllerProxy->RequestSettingsForm("b");
+					m_pUserControllerProxy->RequestSettingsForm(strPath);
 				}
 
 			}

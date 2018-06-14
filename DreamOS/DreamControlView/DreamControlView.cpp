@@ -10,6 +10,7 @@
 //#include "UI/UIView.h"
 //#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
+#include "UI/UISurface.h"
 
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
@@ -129,7 +130,8 @@ RESULT DreamControlView::Update(void *pContext) {
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
 
-		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		//UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		m_pSurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -361,7 +363,10 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 	float width = m_pParentApp->GetBaseWidth();
 	float height = m_pParentApp->GetBaseHeight();
 	
-	m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	m_pSurface = m_pView->AddUISurface();
+	m_pSurface->InitializeSurfaceQuad(width, height);
+	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	m_pViewQuad = m_pSurface->GetViewQuad();
 	CN(m_pViewQuad);
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
@@ -781,6 +786,10 @@ WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
+}
+
+std::shared_ptr<UISurface> DreamControlView::GetViewSurface() {
+	return m_pSurface;
 }
 
 float DreamControlView::GetBackgroundWidth() {

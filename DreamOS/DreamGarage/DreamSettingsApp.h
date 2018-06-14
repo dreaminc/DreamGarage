@@ -5,6 +5,7 @@
 #include "DreamOS.h"
 
 class DreamUserHandle;
+class DreamControlView;
 
 class DreamSettingsApp : public DreamApp<DreamSettingsApp>
 {
@@ -26,14 +27,14 @@ protected:
 	static DreamSettingsApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 	RESULT InitializeSettingsForm(std::string strURL);
 	RESULT Show();
 
 private:
 	std::shared_ptr<DreamUserHandle> m_pUserHandle = nullptr;
 
-	std::shared_ptr<DreamBrowser> m_pSettingsForm = nullptr;
+	std::shared_ptr<DreamControlView> m_pSettingsForm = nullptr;
+	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
 };
 

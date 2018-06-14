@@ -46,7 +46,10 @@ class quad;
 #define TITLE_DESKTOP "Desktop"
 #define TITLE_WEBSITE "website"
  
-class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
+class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
+	public Subscriber<InteractionObjectEvent>,
+	public Subscriber<UIEvent> {
+
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamOSTestSuite;
@@ -162,6 +165,7 @@ private:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
+	virtual RESULT Notify(UIEvent *pUIEvent) override;
 
 // child applications
 private:

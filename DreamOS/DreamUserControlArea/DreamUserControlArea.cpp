@@ -18,6 +18,7 @@
 
 #include "UI/UIButton.h"
 #include "UI/UIFlatScrollView.h"
+#include "UI/UISurface.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -88,6 +89,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 		CN(m_pControlView);
 		m_pControlView->InitializeWithParent(this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
 
 		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 		CN(m_pDreamTabView);
@@ -997,6 +1001,33 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 
 	}
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
+	RESULT r = R_PASS;
+	
+	WebBrowserPoint wptContact = m_pControlView->GetRelativePointofContact(pUIEvent->m_ptContact);
+	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
+
+	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
+	CBR(pUIEvent->m_pObj == m_pControlView->GetViewQuad().get(), R_SKIPPED);
+
+	switch (pUIEvent->m_eventType) {
+	case UI_SELECT_BEGIN: {
+		CR(OnClick(ptContact, true));
+	} break;
+
+	case UI_SELECT_ENDED: {
+		CR(OnClick(ptContact, false));
+	} break;
+
+	case UI_SELECT_MOVED: {
+		CR(OnMouseMove(ptContact));
+	} break;
+	};
 
 Error:
 	return r;
