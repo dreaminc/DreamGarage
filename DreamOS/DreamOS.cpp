@@ -107,7 +107,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// TODO: need that module pattern
 	if (GetSandboxConfiguration().fInitCloud) {
 		CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
-		CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+		CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller observer");
+		CRM(RegisterUserObserver(this), "Failed to register user controller observer");
 	}
 
 	// Give the Client a chance to set up the pipeline
@@ -128,8 +129,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	if (pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
 		// auto login
-		if (GetCloudController() != nullptr) {
-			GetCloudController()->Start();
+		CloudController* pCloudController = GetCloudController();
+		if (pCloudController != nullptr) {
+			pCloudController->Start();
 		}
 	}
 
@@ -684,6 +686,15 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	CR(m_pSandbox->InitializeCloudController());
+
+Error:
+	return r;
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
@@ -954,6 +965,10 @@ const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
 }
 
+std::wstring DreamOS::GetHardwareID() {
+	return m_pSandbox->GetHardwareID();
+}
+
 // Physics Engine
 RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;
@@ -1034,6 +1049,10 @@ RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionOb
 
 RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
 	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
+}
+
+RESULT DreamOS::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+	return m_pSandbox->RegisterUserObserver(pUserObserver);
 }
 
 RESULT DreamOS::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
