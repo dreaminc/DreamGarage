@@ -100,6 +100,13 @@ public:
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);
 
+	RESULT AddSharedShaderFilename(GLenum shaderType, std::wstring strShaderFilename);
+	RESULT ClearSharedShaders();
+	std::vector<std::wstring> GetSharedShaderFilenames(GLenum shaderType);
+
+	std::map<GLenum, std::vector<std::wstring>> m_sharedShaderFilenames;
+	
+
 	GLuint GetOGLProgramIndex() { 
 		return m_OGLProgramIndex;
 	}

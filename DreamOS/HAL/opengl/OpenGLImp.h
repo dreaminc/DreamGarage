@@ -203,6 +203,7 @@ public:
 
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *shaderID);
+	RESULT CreateShaderObject(GLenum type, GLuint *shaderID);
 	RESULT ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length);
 	RESULT CompileShader(GLuint shaderID);
 	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);

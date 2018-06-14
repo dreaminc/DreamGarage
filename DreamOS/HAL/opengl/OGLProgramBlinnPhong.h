@@ -17,6 +17,7 @@ public:
 	OGLProgramBlinnPhong(OpenGLImp *pParentImp);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;

@@ -204,6 +204,10 @@ public:
 		return m_glCreateShader(type);
 	}
 
+	inline GLuint glCreateShaderObject(GLenum type) {
+		return m_glCreateShaderObject(type);
+	}
+
 	inline void glDeleteShader(GLuint shader) {
 		return m_glDeleteShader(shader);
 	}
@@ -459,6 +463,7 @@ private:
 	PFNGLATTACHSHADERPROC m_glAttachShader;
 	PFNGLDETACHSHADERPROC m_glDetachShader;
 	PFNGLCREATESHADERPROC m_glCreateShader;
+	PFNGLCREATESHADEROBJECTARBPROC m_glCreateShaderObject;
 	PFNGLDELETESHADERPROC m_glDeleteShader;
 	PFNGLSHADERSOURCEPROC m_glShaderSource;
 	PFNGLCOMPILESHADERPROC m_glCompileShader;

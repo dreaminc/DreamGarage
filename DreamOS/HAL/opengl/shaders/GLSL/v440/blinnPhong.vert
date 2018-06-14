@@ -1,4 +1,4 @@
-// minimal.vert
+// blinnPhong.vert
 // shadertype=glsl
 
 // This is a minimal shader that simply displays
@@ -7,6 +7,8 @@
 #version 440 core
 
 #define MAX_TOTAL_LIGHTS 10
+
+//#include "lightingCommon.vert"
 
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
@@ -39,7 +41,6 @@ struct Light {
 	float m_power;
 	float m_shine;
 	float m_reserved;
-
 	vec4 m_ptOrigin;
 	vec4 m_colorDiffuse;
 	vec4 m_colorSpecular;
@@ -62,18 +63,7 @@ void main(void) {
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
-		
-		if(lights[i].m_type == 0) {
-			// Directional Light
-			DataOut.directionLight[i] = normalize(vec3(mat3(u_mat4View) * (-lights[i].m_vectorDirection.xyz)));
-			DataOut.distanceLight[i] = 0.0f;
-		}
-		else  {
-			// Point Light
-			vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
-			DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
-			DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
-		}
+		ProcessLightVertex(lights[i], u_mat4View, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
 	}
 
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);

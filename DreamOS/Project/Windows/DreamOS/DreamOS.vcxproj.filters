@@ -2136,6 +2136,9 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\lightingCommon.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

@@ -23,6 +23,7 @@ class OGLProgram;
 
 class OpenGLShader : public Shader, public GLSLObject {
 public:
+	OpenGLShader(OGLProgram *pParentProgram);
 	OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType);
 	~OpenGLShader(void);
 

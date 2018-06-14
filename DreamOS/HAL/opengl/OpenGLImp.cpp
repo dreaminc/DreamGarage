@@ -1614,6 +1614,18 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::CreateShaderObject(GLenum type, GLuint *shaderID) {
+	RESULT r = R_PASS;
+
+	*shaderID = m_OpenGLExtensions.glCreateShaderObject(type);
+	CRM(CheckGLError(), "glCreateShaderObject failed");
+
+	return r;
+Error:
+	*shaderID = NULL;
+	return r;
+}
+
 RESULT OpenGLImp::GetShaderiv(GLuint programID, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 

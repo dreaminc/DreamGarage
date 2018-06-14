@@ -1268,6 +1268,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\lightingCommon.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>

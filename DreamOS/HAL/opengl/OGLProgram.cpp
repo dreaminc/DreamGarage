@@ -476,6 +476,36 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::AddSharedShaderFilename(GLenum shaderType, std::wstring strShaderFilename) {
+	
+	std::vector<std::wstring> *pShaderFiles = nullptr;
+
+	if (m_sharedShaderFilenames.find(shaderType) == m_sharedShaderFilenames.end()) {
+		m_sharedShaderFilenames[shaderType] = std::vector<std::wstring>();
+	}
+	
+	pShaderFiles = &(m_sharedShaderFilenames[shaderType]);
+
+	if (std::find(pShaderFiles->begin(), pShaderFiles->end(), strShaderFilename) == pShaderFiles->end()) {
+		pShaderFiles->push_back(strShaderFilename);
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLProgram::ClearSharedShaders() {
+	m_sharedShaderFilenames = std::map<GLenum, std::vector<std::wstring>>();
+	return R_PASS;
+}
+
+std::vector<std::wstring> OGLProgram::GetSharedShaderFilenames(GLenum shaderType) {
+	if (m_sharedShaderFilenames.at(shaderType).size() > 0) {
+		return m_sharedShaderFilenames.at(shaderType);
+	}
+	
+	return std::vector<std::wstring>();
+}
+
 RESULT OGLProgram::IsProgram() {
 	return m_pParentImp->IsProgram(m_OGLProgramIndex);
 }

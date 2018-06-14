@@ -5,6 +5,15 @@
 #include "Sandbox/SandboxApp.h"
 #include "Sandbox/PathManager.h"
 
+OpenGLShader::OpenGLShader(OGLProgram *pParentProgram) :
+	GLSLObject(pParentProgram),
+	m_pszShaderCode(nullptr),
+	m_shaderID(NULL),
+	m_shaderType(NULL)
+{
+	// empty
+}
+
 OpenGLShader::OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType) :
 	//m_pParentImp(pParentImp),
 	GLSLObject(pParentProgram),
