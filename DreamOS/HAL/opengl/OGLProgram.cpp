@@ -48,6 +48,51 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CBM(0, "OGLInitialize against version not supported for this OGLProgram");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+	CRM(MakeVertexShader(pszVertexShaderFilename), "Failed to create vertex shader");
+	CRM(MakeFragmentShader(pszFragmentShaderFilename), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::SetLights(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 
@@ -420,54 +465,6 @@ Error:
 }
 */
 
-RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionOGL) {
-	RESULT r = R_PASS;
-
-	CR(OGLInitialize());
-
-	m_versionOGL = versionOGL;
-
-	// Create and set the shaders
-	CRM(MakeVertexShader(pszVertexShaderFilename), "Failed to create vertex shader");
-	CRM(MakeFragmentShader(pszFragmentShaderFilename), "Failed to create fragment shader");
-
-	// Link the program
-	CRM(LinkProgram(), "Failed to link program");
-
-	// TODO: This could all be done in one call in the OGLShader honestly
-	// Attributes
-	// TODO: Tabulate attributes (get them from shader, not from class)
-	WCR(GetVertexAttributesFromProgram());
-	WCR(BindAttributes());
-	//WCR(m_pVertexShader->GetAttributeLocationsFromShader());
-	//WCR(m_pVertexShader->EnableAttributes());
-
-	//CR(PrintActiveAttributes());
-
-	// Uniform Variables
-	CR(GetUniformVariablesFromProgram());
-
-	// Uniform Blocks
-	CR(GetUniformBlocksFromProgram());
-	CR(BindUniformBlocks());
-//	CR(InitializeUniformBlocks());
-
-	//WCR(m_pVertexShader->GetUniformLocationsFromShader());
-	//WCR(m_pVertexShader->BindUniformBlocks());
-	//WCR(m_pVertexShader->InitializeUniformBlocks());
-
-	//WCR(m_pFragmentShader->GetUniformLocationsFromShader());
-	//WCR(m_pFragmentShader->BindUniformBlocks());
-	//WCR(m_pFragmentShader->InitializeUniformBlocks());
-
-
-	// TODO:  Currently using a global material 
-	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-
-Error:
-	return r;
-}
-
 // TODO: Just a pass through, but might make sense to absorb the functionality here
 // or stuff it into the OGLShader
 RESULT OGLProgram::CreateShader(GLenum type, GLuint *pShaderID) {
@@ -821,6 +818,21 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::MakeGeometryShader(const wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	OGLGeometryShader *pGeometryShader = new OGLGeometryShader(this);
+	CN(pGeometryShader);
+	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Geometry Shader failed");
+
+	CRM(pGeometryShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize geometry shader from file");
+
+	CRM(AttachShader(pGeometryShader), "Failed to attach geometry shader");
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
@@ -1056,6 +1068,11 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 		case GL_FRAGMENT_SHADER: {
 			this->m_pFragmentShader = dynamic_cast<OGLFragmentShader*>(pOpenGLShader);
 			CN(this->m_pFragmentShader);
+		} break;
+
+		case GL_GEOMETRY_SHADER: {
+			this->m_pGeometryShader = dynamic_cast<OGLGeometryShader*>(pOpenGLShader);
+			CN(this->m_pGeometryShader);
 		} break;
 
 		default: {

@@ -689,6 +689,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
@@ -704,6 +705,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniform.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
@@ -993,6 +995,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
@@ -1013,6 +1016,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLGeometryShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniform.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h" />
@@ -1306,6 +1310,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.geo" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />
