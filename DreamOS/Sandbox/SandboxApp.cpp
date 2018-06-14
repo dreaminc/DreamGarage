@@ -1563,6 +1563,10 @@ RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObser
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
+RESULT SandboxApp::RegisterUserObserver(CloudController::UserObserver *pUserObserver) {
+	return m_pCloudController->RegisterUserObserver(pUserObserver);
+}
+
 RESULT SandboxApp::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {
 	return m_pCloudController->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight, channels);
 }

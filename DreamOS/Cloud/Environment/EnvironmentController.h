@@ -41,6 +41,7 @@ class EnvironmentController : public Controller,
 							  public EnvironmentControllerProxy {
 	friend class MenuController;
 	friend class CloudController;
+	friend class UserController;
 public:
 	enum class state {
 		UNINITIALIZED,
@@ -68,6 +69,13 @@ public:
 		ENVIRONMENT_STOP_SHARING,
 		ENVIRONMENT_ASSET_OPEN,
 		ENVIRONMENT_ASSET_CLOSE,
+
+		// User
+		USER_GET_SETTINGS,
+		USER_SET_SETTINGS,
+
+		// Forms
+		FORM_SETTINGS,
 
 		INVALID
 	};

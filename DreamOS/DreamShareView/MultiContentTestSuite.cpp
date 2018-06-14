@@ -79,11 +79,11 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestChangeUIWidth());
+
 	CR(AddTestAllUIObjects());
 	
 	CR(AddTestManyBrowsers());
-
-	CR(AddTestChangeUIWidth());
 
 	CR(AddTestMenuShader());
 
@@ -753,8 +753,13 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public Subscriber<SenseControllerEvent> {
-		std::shared_ptr<DreamUserControlArea> pUserControlArea;
+	struct TestContext : public Subscriber<SenseControllerEvent>,
+		public CloudController::UserObserver
+	{
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		UserController* pUserControllerProxy = nullptr;
+		CloudController *pCloudController = nullptr;
+
 		stereocamera *pCamera = nullptr;;
 		bool fFirst = true;
 
@@ -762,36 +767,45 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		bool fLeft = false;
 		bool fRight = false;
 
+		float m_height = 0.0f;
+		float m_depth = 0.0f;
+		float m_scale = 1.0f;
+
+		std::wstring wstrHardwareID;
+
 		virtual RESULT Notify(SenseControllerEvent *pEvent) override {
 			RESULT r = R_PASS;
 
-			if (pEvent->type == SENSE_CONTROLLER_MENU_UP) {
-				
+			if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+				pUserControllerProxy->RequestSetSettings(wstrHardwareID,"HMDType.OculusRift", m_height, m_depth, m_scale);
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
-				float height = pEvent->state.ptTouchpad.y() * 0.015f;
+				float diff = pEvent->state.ptTouchpad.y() * 0.015f;
 				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
 					if (pUserControlArea != nullptr && !fFirst) {
 						float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
-						pUserControlArea->SetViewHeight(currentHeight + height);
+						pUserControlArea->SetViewHeight(currentHeight + diff);
+						m_height += diff;
 					}
 				}
 				else {
 					//TODO
 					point ptCamera = pCamera->GetEyePosition(EYE_MONO);
 				//	pCamera->SetPosition(point(ptCamera.x(), ptCamera.y() + height, ptCamera.z()));
-					pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), height + ptCamera.z()));
+					pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), diff + ptCamera.z()));
+					m_depth += diff;
 				}
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
 				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-					pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() + 0.003f);
+					m_scale = pUserControlArea->GetViewScale() + 0.003f;
 					fLeft = true;
 				}
 				else {
-					pUserControlArea->ScaleViewWidth(pUserControlArea->GetViewScale() - 0.003f);
+					m_scale = pUserControlArea->GetViewScale() - 0.003f;
 					fRight = true;
 				}
+				pUserControlArea->ScaleViewWidth(m_scale);
 			}
 
 			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_UP) {
@@ -803,9 +817,42 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 				}
 			}
 			//else if (pEvent->type == SENSE_CONTROLLER_)
-
+		//Error:
 			return r;
 		};
+
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			RESULT r = R_PASS;
+
+			pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();
+			m_height = height;
+			m_depth = depth;
+			m_scale = scale;
+
+			float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
+			pUserControlArea->SetViewHeight(currentHeight + m_height);
+			
+			point ptCamera = pCamera->GetEyePosition(EYE_MONO);
+			pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), m_depth + ptCamera.z()));
+
+			pUserControlArea->ScaleViewWidth(m_scale);
+
+		//Error:
+			return r;
+		}
+		virtual RESULT OnSetSettings() override {
+			return R_PASS;
+		}
+		virtual RESULT OnSettings(std::string strURL) override {
+			RESULT r = R_PASS;
+
+			pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();
+
+			//TODO: make browser in testing release
+
+//		Error:
+			return r;
+		}
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
@@ -823,11 +870,20 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, pTestContext);
 		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, pTestContext);
+		m_pDreamOS->RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, pTestContext);
 
 		pTestContext->pUserControlArea = pControlArea;
 		CN(pControlArea);
 		
+		m_pDreamOS->InitializeCloudController();
+		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
+		pTestContext->pCloudController->Start("jason_test1@dreamos.com", "nightmare", 168);
+		pTestContext->pCloudController->RegisterUserObserver(pTestContext);
+		pTestContext->pUserControllerProxy = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
+
+		pTestContext->wstrHardwareID = m_pDreamOS->GetHardwareID();
 	Error:
 		return r;
 	};
@@ -839,54 +895,22 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		auto pControlArea = pTestContext->pUserControlArea;
 
 		if (pTestContext->fFirst) {
+
+			CR(pTestContext->pUserControllerProxy->RequestGetSettings(m_pDreamOS->GetHardwareID(),"HMDType.OculusRift"));
+//			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
+
 			pTestContext->fFirst = false;
-
-			/*
-			auto pDreamUIBar = pTestContext->pUserControlArea->m_pDreamUIBar;
-			std::vector<std::shared_ptr<UIButton>> pButtons;
-
-			for (int i = 0; i < 6; i++) {
-
-				auto pButton = pDreamUIBar->m_pView->MakeUIMenuItem(pDreamUIBar->m_pScrollView->GetWidth(), pDreamUIBar->m_pScrollView->GetWidth() * 9.0f / 16.0f);
-				CN(pButton);
-
-				auto iconFormat = IconFormat();
-				iconFormat.pTexture = pDreamUIBar->m_pDefaultThumbnail.get();
-
-				auto labelFormat = LabelFormat();
-				labelFormat.strLabel = "Label " + std::to_string(i);
-				labelFormat.pFont = pDreamUIBar->m_pFont;
-				labelFormat.pBgTexture = pDreamUIBar->m_pMenuItemBg.get();
-
-				pButton->Update(iconFormat, labelFormat);
-
-				pButtons.emplace_back(pButton);
-			}
-
-			//pDreamUIBar->m_pScrollView->GetTitleText()->SetText("Testing");
-
-			CR(pDreamUIBar->m_pScrollView->UpdateMenuButtons(pButtons));
-
-			pDreamUIBar->ResetAppComposite();
-			//*/
-			//pTestContext->pUserControlArea->ResetAppComposite();
-
-			//pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
-			//pTestContext->pUserControlArea->m_pControlBar->Show();
-//			pTestContext->pUserControlArea->ShowControlView();
-//			pTestContext->pUserControlArea->m_pDreamTabView->Show();
-//			pTestContext->pUserControlArea->ShowKeyboard();
-//			CR(pTestContext->pUserControlArea->HandleControlBarEvent(ControlEventType::KEYBOARD));
-			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
 
 		}
 
+//*
 		if (pTestContext->fLeft) {
 			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() + 0.003f);
 		}
 		if (pTestContext->fRight) {
 			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() - 0.003f);
 		}
+		//*/
 
 	Error:
 		return r;

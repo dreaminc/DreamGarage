@@ -24,8 +24,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+<<<<<<< HEAD
 	CR(AddTestIncludeShader());
 
+=======
+>>>>>>> e7be34ccb47ad908fc5fc63514157a6daa7bdfb4
 	CR(AddTestGeometryShader());
 
 	CR(AddTestEnvironments());

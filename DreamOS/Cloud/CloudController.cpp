@@ -218,6 +218,8 @@ RESULT CloudController::InitializeUser(version ver) {
 
 	m_pUserController = std::unique_ptr<UserController>(UserFactory::MakeUserController(ver, this));
 	CN(m_pUserController);
+	m_pUserController->Initialize();
+	m_pUserController->RegisterUserControllerObserver(this);
 
 Error:
 	return r;
@@ -435,6 +437,39 @@ RESULT CloudController::OnAudioChannel(PeerConnection* pPeerConnection) {
 
 	if (m_pPeerConnectionObserver != nullptr) {
 		CR(m_pPeerConnectionObserver->OnAudioChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnGetSettings(height, depth, scale));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSetSettings() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSetSettings());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnSettings(std::string strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSettings(strURL));
 	}
 
 Error:
@@ -894,6 +929,17 @@ RESULT CloudController::RegisterEnvironmentObserver(EnvironmentObserver* pEnviro
 	CNM((pEnvironmentObserver), "Observer cannot be nullptr");
 	CBM((m_pEnvironmentObserver == nullptr), "Can't overwrite environment observer");
 	m_pEnvironmentObserver = pEnvironmentObserver;
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterUserObserver(UserObserver* pUserObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pUserObserver), "Observer cannot be nullptr");
+	CBM((m_pUserObserver == nullptr), "Can't overwrite environment observer");
+	m_pUserObserver = pUserObserver;
 
 Error:
 	return r;
