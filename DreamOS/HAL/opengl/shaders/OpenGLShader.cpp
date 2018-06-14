@@ -90,14 +90,13 @@ Error:
 RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version versionFile) {
 	RESULT r = R_PASS;
 
+	auto sharedFiles = m_pParentProgram->GetSharedShaderFilenames(m_shaderType);
+	if (sharedFiles.size() > 0) {
+		int a = 6;
+	}
+
 	CRM(LoadShaderCodeFromFile(pszFilename, versionFile), "Failed to load vertex shader code from %S", pszFilename);
 	CRM(Compile(), "Failed to compile shader");
-	//CRM(AttachShader(), "Failed to attach vertex shader");	// This is pushed into the OGLProgram now
-
-	// Initialize all of the IDs
-	// TODO: This can't be done until after linking
-	//CRM(GetAttributeLocationsFromShader(), "Failed to get attribute locations");
-	//CRM(GetUniformLocationsFromShader(), "Failed to get uniform locations");
 
 Error:
 	return r;

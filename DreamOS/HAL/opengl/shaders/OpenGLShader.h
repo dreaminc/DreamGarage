@@ -63,6 +63,7 @@ public:
 	// Access functions
 	GLuint GetShaderID();
 	GLenum GetShaderType();
+
 	const char *GetShaderCode();
 
 	/*
@@ -82,7 +83,8 @@ protected:
 protected:
 	GLenum	m_shaderType;		// GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
 	GLuint	m_shaderID;
-	char*	m_pszShaderCode;
+
+	char*	m_pszShaderCode = nullptr;
 };
 
 #endif // ! OPEN_GL_SHADER_H_
