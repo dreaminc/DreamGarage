@@ -15,6 +15,7 @@ enum UIEventType {
 	UI_SELECT_TRIGGER,
 	UI_SELECT_ENDED,
 	UI_MENU,
+	UI_SCROLL,
 	UI_EVENT_INVALID
 };
 
@@ -40,8 +41,9 @@ struct UIEvent {
 	VirtualObj *m_pObj;
 	VirtualObj *m_pInteractionObject = nullptr;
 	point m_ptContact;
+	point m_ptScroll;
 
-	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr, point ptContact = point(0.0f, 0.0f, 0.0f));
+	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr, point ptContact = point(0.0f, 0.0f, 0.0f), point ptScroll = point(0.0f, 0.0f, 0.0f));
 };
 
 #endif // ! UI_EVENT_H_

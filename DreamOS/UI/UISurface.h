@@ -2,12 +2,16 @@
 #define UI_SURFACE_H_
 
 #include "UIView.h"
+#include "Primitives/Subscriber.h"
+#include "Sense/SenseController.h"
 
 class DreamOS;
 class UIMallet;
 class quad;
 
-class UISurface : public UIView {
+#define SCROLL_CONSTANT 10.0f;
+
+class UISurface : public UIView, public Subscriber<SenseControllerEvent> {
 public:
 	UISurface(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UISurface();
@@ -18,6 +22,9 @@ public:
 	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType);
 
 	std::shared_ptr<quad> GetViewQuad();
+	point GetLastEvent();
+
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 private:
 	point m_ptLeftHover;

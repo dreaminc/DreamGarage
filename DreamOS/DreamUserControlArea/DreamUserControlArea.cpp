@@ -92,6 +92,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
 		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 		CN(m_pDreamTabView);
@@ -1017,6 +1018,7 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
+		CR(HideWebsiteTyping());
 		CR(OnClick(ptContact, true));
 	} break;
 
@@ -1027,6 +1029,9 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	case UI_SELECT_MOVED: {
 		CR(OnMouseMove(ptContact));
 	} break;
+	case UI_SCROLL: {
+		CR(OnScroll(pUIEvent->m_ptScroll.x(), pUIEvent->m_ptScroll.y(), ptContact));
+	}
 	};
 
 Error:

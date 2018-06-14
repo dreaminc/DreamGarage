@@ -18,6 +18,8 @@ RESULT UISurface::InitializeSurfaceQuad(float width, float height) {
 	m_pViewQuad = AddQuad(width, height, 1, 1, nullptr);
 	CN(m_pViewQuad);
 
+	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
+
 Error:
 	return r;
 }
@@ -118,4 +120,39 @@ Error:
 
 std::shared_ptr<quad> UISurface::GetViewQuad() {
 	return m_pViewQuad;
+}	
+point UISurface::GetLastEvent() {
+	return m_ptLastEvent;
+}
+	
+RESULT UISurface::Notify(SenseControllerEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	CBR(IsVisible(), R_SKIPPED);
+	switch (pEvent->type) {
+	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
+		int pxXDiff = pEvent->state.ptTouchpad.x() * SCROLL_CONSTANT;
+		int pxYDiff = pEvent->state.ptTouchpad.y() * SCROLL_CONSTANT;
+
+		point ptScroll;
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+			ptScroll = m_ptLeftHover;
+		}
+		else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+			ptScroll = m_ptRightHover;
+		}
+
+		if (ptScroll.x() < m_pViewQuad->GetWidth()/2.0f && ptScroll.x() > -m_pViewQuad->GetWidth()/2.0f &&
+			ptScroll.y() < m_pViewQuad->GetHeight()/2.0f && ptScroll.y() > -m_pViewQuad->GetHeight()/2.0f) {
+//			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
+			
+			point ptDiff = point(pxXDiff, pxYDiff, 0.0f);
+			UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SCROLL, m_pViewQuad.get(), nullptr, ptScroll, ptDiff);
+			NotifySubscribers(UI_SCROLL, pUIEvent);
+
+		}
+	} break;
+	}
+Error:
+	return r;
 }

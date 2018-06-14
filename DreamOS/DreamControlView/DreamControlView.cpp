@@ -133,6 +133,9 @@ RESULT DreamControlView::Update(void *pContext) {
 		//UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 		m_pSurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
+		// this is retarded
+		m_ptLastEvent = GetRelativePointofContact(m_pSurface->GetLastEvent());
+
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
 		} 
@@ -242,6 +245,7 @@ Error:
 RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 	CBR(IsVisible(), R_SKIPPED);
+		/*
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 		int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
@@ -261,17 +265,17 @@ RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
 			ptScroll.y < m_pParentApp->GetHeight() && ptScroll.y > 0) {
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
 		}
-		/*
+
 		else {
 			WebBrowserPoint middleOfBrowser;
 			middleOfBrowser.x = m_pParentApp->GetWidth() / 2;
 			middleOfBrowser.y = m_pParentApp->GetHeight() / 2;
 			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(middleOfBrowser.x, middleOfBrowser.y, 0.0f)));
 		}
-		//*/
 
 	} break;
 	}
+	//*/
 Error:
 	return r;
 }
