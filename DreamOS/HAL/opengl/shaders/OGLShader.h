@@ -1,5 +1,5 @@
-#ifndef OPEN_GL_SHADER_H_
-#define OPEN_GL_SHADER_H_
+#ifndef OGL_SHADER_H_
+#define OGL_SHADER_H_
 
 // Dream OS
 // DreamOS/HAL/opengl/OpenGLShader.h
@@ -59,4 +59,4 @@ protected:
 	std::vector<std::string> m_shaderCode;
 };
 
-#endif // ! OPEN_GL_SHADER_H_
+#endif // ! OGL_SHADER_H_
