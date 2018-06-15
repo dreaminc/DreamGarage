@@ -646,7 +646,7 @@ RESULT HALTestSuite::AddTestIncludeShader() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -667,7 +667,7 @@ RESULT HALTestSuite::AddTestIncludeShader() {
 		// Objects 
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, 0.0f, -0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, 0.0f, -0.5f));
 
 		{
 			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");

@@ -29,9 +29,9 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "skybox_scatter", OGLPROGRAM_SKYBOX_SCATTER },
 	{ "blinnphong", OGLPROGRAM_BLINNPHONG },
 	{ "blinnphong_shadow", OGLPROGRAM_BLINNPHONG_SHADOW },
-	{ "blinnphong_text", OGLPROGRAM_BLINNPHONG_TEXTURE },
-	{ "blinnphong_text_shadow", OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW },
-	{ "blinnphong_tex_bump", OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP },
+	{ "blinnphong_texture", OGLPROGRAM_BLINNPHONG_TEXTURE },
+	{ "blinnphong_texture_shadow", OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW },
+	{ "blinnphong_texture_bump", OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP },
 	{ "texture_bitblit", OGLPROGRAM_TEXTURE_BITBLIT },
 	{ "flat", OGLPROGRAM_FLAT },
 	{ "custom", OGLPROGRAM_CUSTOM },
@@ -106,6 +106,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL blinnPhong Program");
 		} break;
 
+		case OGLPROGRAM_BLINNPHONG_TEXTURE: {
+			pOGLProgram = new OGLProgramBlinnPhongTexture(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL blinnPhongTexture Program");
+		} break;
+
 		case OGLPROGRAM_BLINNPHONG_SHADOW: {
 			pOGLProgram = new OGLProgramBlinnPhongShadow(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
@@ -113,12 +120,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL blinnPhongShadow Program");
 		} break;
 
-		case OGLPROGRAM_BLINNPHONG_TEXTURE: {
-			pOGLProgram = new OGLProgramBlinnPhongTexture(pParentImp);
-			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTexture.vert", L"blinnPhongTexture.frag", versionOGL), 
-				"Failed to initialize OGL blinnPhongTexture Program");
-		} break;
+		
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW: {
 			pOGLProgram = new OGLProgramBlinnPhongTextureShadow(pParentImp);
