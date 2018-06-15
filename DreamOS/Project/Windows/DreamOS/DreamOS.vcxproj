@@ -1285,6 +1285,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\noiseCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">

@@ -66,7 +66,7 @@ void CalculateFragmentLightValueToon(in float power, in vec3 vectorNormal, in ve
 
 	//diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
 
-	if (attenuation * max(0.0, dot(vectorNormal, directionLight)) >= 0.1f) {
+	if (attenuation * max(0.0, dot(vectorNormal, directionLight)) >= 0.15f) {
 		diffuseValue = 1.0f;
 	}
 	else {

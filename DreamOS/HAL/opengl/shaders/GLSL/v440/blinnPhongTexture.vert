@@ -38,8 +38,6 @@ void main(void) {
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	// TBN Matrix
-	// TODO: All vectors to tangent space in vert shader?
-	// TODO: Calc this CPU side?  Understand tradeoffs 
 	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
 
 	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
@@ -53,6 +51,9 @@ void main(void) {
 
 	for(int i = 0; i < numLights; i++) {
 		ProcessLightVertex(lights[i], u_mat4View, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
+
+		// Apply TBN matrix 
+		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * DataOut.directionLight[i]);
 	}
 
 	DataOut.vertWorldSpace = vertWorldSpace;

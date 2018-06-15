@@ -122,8 +122,6 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL blinnPhongShadow Program");
 		} break;
 
-		
-
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW: {
 			pOGLProgram = new OGLProgramBlinnPhongTextureShadow(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");

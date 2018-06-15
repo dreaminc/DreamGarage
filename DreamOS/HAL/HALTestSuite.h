@@ -35,6 +35,12 @@ public:
 	RESULT AddTestGeometryShader();
 	RESULT AddTestIncludeShader();
 	RESULT AddTestToonShader();
+	RESULT AddTestBlinnPhongShader();
+	RESULT AddTestBlinnPhongShaderTexture();
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestDepthPeelingShader();
 
 	// Environments
 	RESULT AddTestEnvironmentShader();
@@ -54,23 +60,14 @@ public:
 
 	RESULT AddTestRotation();
 
-	// TODO: Consolidate the HMD tests 
-	// TODO: This should be easy as this is now supported by pipeline
-	RESULT AddTestMinimalShaderHMD();
-	RESULT AddTestBlinnPhongShader();
-	RESULT AddTestBlinnPhongShaderBlurHMD();
-	RESULT AddTestBlinnPhongShaderTextureHMD();
-	RESULT AddTestBlinnPhongShaderTextureCopy();
+	
 
 	RESULT AddTestMouseDrag();
-	RESULT AddTestMinimalShader();
-	RESULT AddTestMinimalTextureShader();
-	RESULT AddTestBlinnPhongShaderBlur();
-	RESULT AddTestBlinnPhongShaderTexture();
+	
 
 	RESULT AddTestSenseHaptics();
 
-	RESULT AddTestDepthPeelingShader();
+	
 
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
