@@ -36,7 +36,7 @@ namespace DreamLaunch {
 
         // This will simply launch DreamOS as pass through
         // TODO: Set up custom arguments 
-        public int LaunchDreamOS(string workingDirectory) {
+        public int LaunchDreamOS(string strWorkingDirectory) {
 
             if(DreamOSExecutableFound() == false) {
                 MessageBox.Show(string.Format("{0} not found - please reinstall Dream from Setup", k_strDreamClientFilename), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -47,7 +47,7 @@ namespace DreamLaunch {
             ProcessStartInfo dreamOSProcessStartInfo = new ProcessStartInfo();
 
             //dreamOSProcessStartInfo.WorkingDirectory = Environment.CurrentDirectory;
-            dreamOSProcessStartInfo.WorkingDirectory = workingDirectory;
+            dreamOSProcessStartInfo.WorkingDirectory = strWorkingDirectory;
             dreamOSProcessStartInfo.UseShellExecute = true;
             dreamOSProcessStartInfo.FileName = k_strDreamClientFilename;
 

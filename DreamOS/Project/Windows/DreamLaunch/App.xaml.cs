@@ -80,8 +80,8 @@ namespace DreamLaunch {
                 m_dreamOSLauncher.Initialize();
 
                 // Launch Dream OS (not on first install)
-                string workingDirectory = m_squirrelUpdateController.GetSquirrelRootAppDirectory();
-                m_dreamOSLauncher.LaunchDreamOS(workingDirectory);
+                string strWorkingDirectory = m_squirrelUpdateController.GetSquirrelRootAppDirectory();
+                m_dreamOSLauncher.LaunchDreamOS(strWorkingDirectory);
             }
 
             // Exit
