@@ -8,6 +8,8 @@
 
 #include "Core/Utilities.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
 }
@@ -216,7 +218,9 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 
-
+	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+	CN(m_pWebBrowserManager);
+	CR(m_pWebBrowserManager->Initialize());
 
 Error:
 	return r;

@@ -36,14 +36,10 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-	CN(m_pWebBrowserManager);
-	CR(m_pWebBrowserManager->Initialize());
-
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
 
-Error:
+//Error:
 	return r;
 }
 
@@ -60,6 +56,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	if (m_pDreamUserApp == nullptr) {
 		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
 		CN(m_pDreamUserApp);
+
+		m_pWebBrowserManager = m_pDreamUserApp->m_pWebBrowserManager;
 
 		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
 		CN(pKeyboard);

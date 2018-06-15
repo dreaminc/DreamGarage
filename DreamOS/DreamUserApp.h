@@ -30,6 +30,8 @@ class UIKeyboard;
 class UIKeyboardHandle;
 class DimObj;
 
+class CEFBrowserManager;
+
 #define MENU_HEIGHT -0.16f
 #define MENU_DEPTH 0.0f
 #define MENU_DEPTH_MIN 0.5f
@@ -243,6 +245,7 @@ private:
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;
 
+	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
 };
 

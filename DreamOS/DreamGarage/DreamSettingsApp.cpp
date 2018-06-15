@@ -4,6 +4,7 @@
 
 #include "DreamUserControlArea/DreamContentSource.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamControlView/DreamControlView.h"
 #include "DreamBrowser.h"
 #include "DreamUserApp.h"
 
@@ -36,13 +37,20 @@ RESULT DreamSettingsApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamSettingsApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	if (m_pUserHandle == nullptr) {
+	if (m_pUserApp == nullptr) {
 		UID userAppUID = GetDOS()->GetUniqueAppUID("DreamUserApp");
-		//m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(userAppUID, this));
-//		CN(m_pUserHandle);
+		m_pUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(userAppUID, this));
+		CN(m_pUserApp);
+
+		m_pFormView = GetDOS()->LaunchDreamApp<DreamControlView>(this);
 	}
 
-//Error:
+	// there's fancier code around this in DreamUserControlArea, 
+	// but we assume that there is only one piece of content here
+
+	CR(m_pFormView->SetViewQuadTexture(m_pForm->GetSourceTexture()));
+
+Error:
 	return r;
 }
 
@@ -58,14 +66,24 @@ DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	RESULT r = R_PASS;
 
-//Error:
+	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CRM(pEnvironmentControllerProxy->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, "website"), "Failed to share environment asset");
+
+	m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	m_pForm->PendUpdateObjectTextures();
+
+	m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
+	m_pForm->SetPath(strURL);
+
+Error:
 	return r;
 }
 
 RESULT DreamSettingsApp::Show() {
 	RESULT r = R_PASS;
 
-	CNR(m_pSettingsForm, R_SKIPPED);
+	CNR(m_pFormView, R_SKIPPED);
 
 //	m_pSettingsForm->
 

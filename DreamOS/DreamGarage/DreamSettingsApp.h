@@ -6,6 +6,7 @@
 
 class DreamUserHandle;
 class DreamControlView;
+class DreamBrowser;
 
 class DreamSettingsApp : public DreamApp<DreamSettingsApp>
 {
@@ -31,9 +32,11 @@ public:
 	RESULT Show();
 
 private:
-	std::shared_ptr<DreamUserHandle> m_pUserHandle = nullptr;
+	DreamUserApp* m_pUserApp = nullptr;
 
-	std::shared_ptr<DreamControlView> m_pSettingsForm = nullptr;
+	std::shared_ptr<DreamControlView> m_pFormView = nullptr;
+	std::shared_ptr<DreamBrowser> m_pForm = nullptr;
+
 	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
 };
