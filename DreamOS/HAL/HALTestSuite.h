@@ -34,6 +34,7 @@ public:
 	// Shader Tests
 	RESULT AddTestGeometryShader();
 	RESULT AddTestIncludeShader();
+	RESULT AddTestToonShader();
 
 	// Environments
 	RESULT AddTestEnvironmentShader();
