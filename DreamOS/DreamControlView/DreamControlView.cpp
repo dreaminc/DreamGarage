@@ -79,21 +79,21 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
 
-	if (m_pUserHandle == nullptr) {
+	if (m_pDreamUserApp == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 
 		CBR(userUIDs.size() == 1, R_SKIPPED);
 		m_userUID = userUIDs[0];
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pUserHandle);
+		m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pDreamUserApp);
 	}
 		
 	UIMallet* pLMallet;
-	pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 
 	UIMallet* pRMallet;
-	pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
 
 	// skip mallet update while keyboard is active
@@ -162,8 +162,8 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			bool fStreaming = false;
 
 			CR(Hide());
-			CN(m_pUserHandle);
-			CR(m_pUserHandle->SendClearFocusStack());
+			CN(m_pDreamUserApp);
+			CR(m_pDreamUserApp->ClearFocusStack());
 
 		}
 
@@ -176,7 +176,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::KB_ENTER): {	
 		if (m_fIsShareURL) {
-			m_pUserHandle->SendPreserveSharingState(true);
+			m_pDreamUserApp->PreserveSharingState(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
@@ -281,22 +281,22 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		if (m_pUserHandle == nullptr) {
+		if (m_pDreamUserApp == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 			CB(userUIDs.size() == 1);
 			m_userUID = userUIDs[0];
 
 			//Capture user app
-			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-			CN(m_pUserHandle);
+			m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
+			CN(m_pDreamUserApp);
 		}
 
 		UIMallet* pLMallet;
-		pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 		CNR(pLMallet, R_SKIPPED);
 
 		UIMallet* pRMallet;
-		pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 		CNR(pRMallet, R_SKIPPED);
 
 		pLMallet->SetDirty();
@@ -334,10 +334,10 @@ RESULT DreamControlView::ResetAppComposite() {
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
 
-	CN(m_pUserHandle);
+	CN(m_pDreamUserApp);
 
-	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
+	CR(m_pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
+	CR(m_pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
 
 	GetComposite()->SetPosition(ptAppBasisPosition);
 	GetComposite()->SetOrientation(qAppBasisOrientation);
@@ -374,8 +374,8 @@ RESULT DreamControlView::Dismiss() {
 	}
 
 	CR(Hide());
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->SendClearFocusStack());
+	CN(m_pDreamUserApp);
+	CR(m_pDreamUserApp->ClearFocusStack());
 
 Error:
 	return r;
@@ -483,10 +483,10 @@ RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
 RESULT DreamControlView::ShowKeyboard() {
 	RESULT r = R_PASS;
 
-	CNM(m_pUserHandle, "user app not found");
+	CNM(m_pDreamUserApp, "user app not found");
 
 	//maintain the keyboard handle until the keyboard is hidden
-	m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+	m_pKeyboardHandle = m_pDreamUserApp->GetKeyboard();
 	CNM(m_pKeyboardHandle, "keyboard handle not available");
 
 	CR(m_pKeyboardHandle->Show());
@@ -499,10 +499,10 @@ RESULT DreamControlView::HideKeyboard() {
 	RESULT r = R_PASS;
 
 	CNR(m_pKeyboardHandle, R_OBJECT_NOT_FOUND);
-	CNR(m_pUserHandle, R_OBJECT_NOT_FOUND);
+	CNR(m_pDreamUserApp, R_OBJECT_NOT_FOUND);
 
 	CR(m_pKeyboardHandle->Hide());
-	CR(m_pUserHandle->SendReleaseKeyboard());
+	CR(m_pDreamUserApp->ReleaseKeyboard());
 
 Error:
 	m_pKeyboardHandle = nullptr;

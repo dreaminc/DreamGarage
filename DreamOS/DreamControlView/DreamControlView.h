@@ -130,7 +130,7 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamUserHandle *m_pUserHandle = nullptr;
+	DreamUserApp *m_pDreamUserApp = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 	DreamUserControlArea *m_pParentApp = nullptr;
 

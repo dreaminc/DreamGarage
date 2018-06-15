@@ -210,6 +210,12 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	}
 
+	// user settings
+
+	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
+	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+
 
 
 Error:
@@ -801,4 +807,41 @@ RESULT DreamUserApp::ResetAppComposite() {
 
 Error:
 	return r;
+}
+
+float DreamUserApp::GetPXWidth() {
+	return m_pxWidth;
+}
+
+float DreamUserApp::GetPXHeight() {
+	return m_pxHeight;
+}
+
+float DreamUserApp::GetBaseWidth() {
+	return m_baseWidth;
+}
+
+float DreamUserApp::GetBaseHeight() {
+	return m_baseHeight;
+}
+
+float DreamUserApp::GetViewAngle() {
+	return m_viewAngle;
+}
+
+float DreamUserApp::GetAnimationDuration() {
+	return m_animationDuration;
+}
+
+float DreamUserApp::GetWidthScale() {
+	return m_widthScale;
+}
+
+float DreamUserApp::GetSpacingSize() {
+	return m_spacingSize;
+}
+
+RESULT DreamUserApp::SetWidthScale(float widthScale) {
+	m_widthScale = widthScale;
+	return R_PASS;
 }

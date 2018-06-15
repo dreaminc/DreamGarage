@@ -36,24 +36,9 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
-	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-
-	float viewAngleRad = m_viewAngle * (float)(M_PI) / 180.0f;
-	quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
-	point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
-	
-	GetComposite()->SetOrientation(qViewQuadOrientation);
-	GetComposite()->SetPosition(ptOrigin);
-
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
-
-	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
-	//CN(m_pActiveBrowser);
-	//CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
 
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
@@ -104,6 +89,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 
+		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
+		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+		point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+		
+		GetComposite()->SetOrientation(qViewQuadOrientation);
+		GetComposite()->SetPosition(ptOrigin);
+
 		//DreamUserControlArea is a friend of these classes to add the composite
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
@@ -118,7 +110,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
-		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_spacingSize + m_pDreamTabView->GetBorderWidth()) / 2.0f;
+		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
 		//GetComposite()->SetPosition(GetComposite()->GetPosition());// +point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
@@ -203,7 +195,7 @@ DreamUserControlArea* DreamUserControlArea::SelfConstruct(DreamOS *pDreamOS, voi
 }
 
 float DreamUserControlArea::GetBaseWidth() {
-	return m_baseWidth;
+	return m_pDreamUserApp->GetBaseWidth();
 }
 
 RESULT DreamUserControlArea::SetViewHeight(float height) {
@@ -222,35 +214,29 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 }
 
 float DreamUserControlArea::GetViewScale() {
-	return m_widthScale;
+	return m_pDreamUserApp->GetWidthScale();
 }
 
 RESULT DreamUserControlArea::ScaleViewWidth(float scale) {
 	RESULT r = R_PASS;
 
-	/*
-	m_diagonalSize = width;
-
-	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	//*/
-	m_widthScale = scale;
-	GetComposite()->SetScale(m_widthScale);
+	m_pDreamUserApp->SetWidthScale(scale);
+	GetComposite()->SetScale(scale);
 	m_pDreamUIBar->UpdateWidth(scale);
 
 	return r;
 }
 
 float DreamUserControlArea::GetBaseHeight() {
-	return m_baseHeight;
+	return m_pDreamUserApp->GetBaseHeight();
 }
 
 float DreamUserControlArea::GetSpacingSize() {
-	return m_spacingSize;
+	return m_pDreamUserApp->GetSpacingSize();
 }
 
 float DreamUserControlArea::GetViewAngle() {
-	return m_viewAngle;
+	return m_pDreamUserApp->GetViewAngle();
 }
 
 point DreamUserControlArea::GetCenter() {
@@ -262,7 +248,7 @@ float DreamUserControlArea::GetCenterOffset() {
 }
 
 float DreamUserControlArea::GetTotalWidth() {
-	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
+	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_pDreamUserApp->GetSpacingSize()/2.0f;
 }
 
 float DreamUserControlArea::GetTotalHeight() {
@@ -449,7 +435,7 @@ RESULT DreamUserControlArea::ShowControlView() {
 		pView->GetPosition(),
 		pView->GetOrientation(),
 		1.0f,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -504,7 +490,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		pView->GetOrientation(),
 		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		m_animationScale,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -898,7 +884,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		pView->GetOrientation(),
 		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		m_animationScale,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -918,7 +904,7 @@ RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
 }
 
 float DreamUserControlArea::GetAnimationDuration() {
-	return m_animationDuration;
+	return m_pDreamUserApp->GetAnimationDuration();
 }
 
 float DreamUserControlArea::GetAnimationScale() {

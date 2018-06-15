@@ -39,6 +39,17 @@ class DimObj;
 
 #define OVERLAY_ASPECT_RATIO (332.0f / 671.0f)
 
+// default user settings
+#define MAIN_DIAGONAL 0.70f
+
+#define SPACING_SIZE 0.016129f
+#define DEFAULT_PX_WIDTH 1366
+#define DEFAULT_PX_HEIGHT 768
+
+#define VIEW_ANGLE 32.0f
+
+#define ANIMATION_DURATION_SECONDS 0.175f
+
 enum class UserObserverEventType {
 	BACK,
 	DISMISS,
@@ -169,6 +180,18 @@ public:
 	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
 	RESULT UpdateCompositeWithHands(float yPos);
 
+// user settings
+public:
+	float GetPXWidth();
+	float GetPXHeight();
+	float GetBaseWidth();
+	float GetBaseHeight();
+	float GetViewAngle();
+	float GetAnimationDuration();
+	float GetSpacingSize();
+	float GetWidthScale();
+	RESULT SetWidthScale(float widthScale);
+
 private:
 	//user *m_pUserModel = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
@@ -195,6 +218,21 @@ private:
 	float m_menuDepth = MENU_DEPTH;
 	float m_menuHeight = MENU_HEIGHT;
 
+	float m_spacingSize = SPACING_SIZE;
+	float m_pxWidth = DEFAULT_PX_WIDTH;
+	float m_pxHeight = DEFAULT_PX_HEIGHT;
+
+	float m_diagonalSize = MAIN_DIAGONAL;
+	float m_viewAngle = VIEW_ANGLE;
+
+	float m_aspectRatio;
+	float m_baseWidth;
+	float m_baseHeight;
+
+	float m_animationDuration = ANIMATION_DURATION_SECONDS;
+
+	float m_widthScale = 1.0f;
+
 	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;
 	double m_msGazeStart;
 
@@ -204,6 +242,8 @@ private:
 
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;
+
+
 };
 
 #endif // ! DREAM_USER_APP_H_
