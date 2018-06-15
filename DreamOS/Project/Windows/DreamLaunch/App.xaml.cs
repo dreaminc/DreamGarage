@@ -28,14 +28,7 @@ namespace DreamLaunch {
                 Environment.Exit(0);
             }
 
-            // Kick off an Update
-            int result = await m_squirrelUpdateController.CheckForSquirrelUpdate();
 
-            if(result == -1) {
-                //MessageBox.Show("Squirrel Update Failed", "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
-                Shutdown();
-                return;
-            }
 
             // Don't launch on first install or if registry updated
             // Not sure if this is the best way (if registry is updated, app will not launch post initial install)
@@ -56,6 +49,16 @@ namespace DreamLaunch {
             string strSquirrelFirstRun = "--squirrel-firstrun";
             strSquirrelFirstRun.Trim();
             strSquirrelFirstRun.ToLower();
+            
+            // Kick off an Update
+            //if (strCommandLineArgs.IndexOf(strSquirrelFirstRun) == -1)
+            int result = await m_squirrelUpdateController.CheckForSquirrelUpdate();
+            
+            if (result == -1) {
+                //MessageBox.Show("Squirrel Update Failed", "DreamLaunch", MessageBoxButton.OK, MessageBoxImage.Information);
+                Shutdown();
+                return;
+            }
 
             // DEBUG
             //MessageBox.Show(string.Format("{0} is {1} to {2}", strCommandLineArgs, strCommandLineArgs.IndexOf(strSquirrelFirstRun), strSquirrelFirstRun), 
@@ -77,7 +80,8 @@ namespace DreamLaunch {
                 m_dreamOSLauncher.Initialize();
 
                 // Launch Dream OS (not on first install)
-                m_dreamOSLauncher.LaunchDreamOS();
+                string workingDirectory = m_squirrelUpdateController.GetSquirrelRootAppDirectory();
+                m_dreamOSLauncher.LaunchDreamOS(workingDirectory);
             }
 
             // Exit
