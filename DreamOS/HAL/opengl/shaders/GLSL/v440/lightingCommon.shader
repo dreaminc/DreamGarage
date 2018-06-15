@@ -58,3 +58,42 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 	}
 	//*/
 }
+
+void CalculateFragmentLightValueToon(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue, out float outlineValue) {
+	
+	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
+	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
+
+	//diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
+
+	if (attenuation * max(0.0, dot(vectorNormal, directionLight)) >= 0.1f) {
+		diffuseValue = 1.0f;
+	}
+	else {
+		diffuseValue = 0.0f;
+	}
+
+	// Light source on the right side?
+	if (cosThetaOfLightToVert > 0.0 &&
+		attenuation * pow(max(0.0, dot(reflect(-directionLight, vectorNormal), directionEye)), material.m_shine) > 0.5)
+		// more than half highlight intensity? 
+	{
+		//fragmentColor = _SpecColor.a * vec3(_LightColor0) * vec3(_SpecColor) + (1.0 - _SpecColor.a) * fragmentColor;
+		specularValue = 1.0f;
+	}
+	else {
+		specularValue = 0.0f;
+	}
+
+	float unlitOutlineThickness = 0.4;
+	float litOutlineThickness = 0.7;
+
+	// Outline
+	if (dot(directionEye, vectorNormal) < mix(unlitOutlineThickness, litOutlineThickness, max(0.0, dot(vectorNormal, directionLight))))
+	{
+		outlineValue = 1.0f;
+	}
+	else {
+		outlineValue = 0.0f;
+	}
+}

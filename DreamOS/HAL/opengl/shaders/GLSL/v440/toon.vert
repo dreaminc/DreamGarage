@@ -17,6 +17,7 @@ out Data {
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
+	vec2 uvCoord;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 } DataOut;
@@ -46,6 +47,7 @@ void main(void) {
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;
+	DataOut.uvCoord = inV_vec2UVCoord;
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

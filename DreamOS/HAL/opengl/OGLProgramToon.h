@@ -7,6 +7,8 @@
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
+#include "OGLObj.h"
+#include "OGLTexture.h"
 
 class stereocamera;
 class ObjectStore;
@@ -47,6 +49,10 @@ private:
 	//OGLUniformMatrix4 *m_pUniformProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
+
+	// Textures
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
+	OGLUniformBool *m_pUniformUseColorTexture = nullptr;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;

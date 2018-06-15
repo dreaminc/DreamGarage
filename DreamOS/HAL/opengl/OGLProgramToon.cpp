@@ -37,6 +37,10 @@ RESULT OGLProgramToon::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
+	// Textures
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseColorTexture), std::string("u_fUseColorTexture")));
+
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -114,7 +118,7 @@ RESULT OGLProgramToon::OGLInitialize(version versionOGL) {
 	CR(BindUniformBlocks());
 
 	// TODO:  Currently using a global material 
-	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	SetMaterial(&material(10.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;
@@ -148,8 +152,12 @@ RESULT OGLProgramToon::ProcessNode(long frameID) {
 
 	UseProgram();
 	
-	if (m_pOGLFramebuffer != nullptr)
+	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
+
+		// for test
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	}
 
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
 	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
@@ -169,7 +177,27 @@ RESULT OGLProgramToon::ProcessNode(long frameID) {
 }
 
 RESULT OGLProgramToon::SetObjectTextures(OGLObj *pOGLObj) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+
+		if (m_pUniformTextureColor != nullptr)
+			m_pUniformTextureColor->SetUniform(0);
+
+		if (m_pUniformUseColorTexture != nullptr)
+			m_pUniformUseColorTexture->SetUniform(true);
+	}
+	else {
+		if (m_pUniformUseColorTexture != nullptr)
+			m_pUniformUseColorTexture->SetUniform(false);
+	}
+
+	//	Error:
+	return r;
 }
 
 RESULT OGLProgramToon::SetLights(std::vector<light*> *pLights) {

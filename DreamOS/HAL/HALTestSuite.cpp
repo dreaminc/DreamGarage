@@ -663,12 +663,12 @@ RESULT HALTestSuite::AddTestToonShader() {
 		// Objects 
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, -0.45f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.35f, -1.0f, -1.0f));
 
 		{
 			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
 			CN(pModel);
-			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pModel->SetPosition(point(0.0f, -2.0f, 0.0f));
 			pModel->SetScale(0.1f);
 		}
 
