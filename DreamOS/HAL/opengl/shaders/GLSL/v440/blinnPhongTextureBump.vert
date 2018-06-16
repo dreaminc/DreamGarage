@@ -50,11 +50,12 @@ void main(void) {
 	// BTN Matrix
 	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
 
-	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
+	// Either the tangent of certain geometry is wrong, or this is not needed
+	vec3 ModelTangent = -normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
 	// Re-orthogonalize T with respect to N with Gram-Schmidt process
-	//ModelTangent = normalize(ModelTangent - dot(ModelTangent, ModelNormal) * ModelNormal);
+	ModelTangent = normalize(ModelTangent - dot(ModelTangent, ModelNormal) * ModelNormal);
 	
 	// Then calc bitangent using normal and tangent
 	vec3 ModelBitangent = normalize(cross(ModelNormal, ModelTangent));
