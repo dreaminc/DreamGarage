@@ -23,6 +23,7 @@ public:
 
 	RESULT OVRInitialize();
 	RESULT RenderMirrorToBackBuffer();
+	RESULT DestroyMirrorTexture();
 
 private:
 	OpenGLImp *m_pParentImp;

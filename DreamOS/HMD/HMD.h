@@ -143,6 +143,8 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
+	bool ShouldShutdown() { return m_fShutdown; }
+
 protected:
 	RESULT SetEyeWidth(int eyeWidth) {
 		m_eyeWidth = eyeWidth;
@@ -169,6 +171,8 @@ protected:
 	hand* m_pRightHand;
 
 	SenseController *m_pSenseController;
+
+	bool m_fShutdown = false;
 
 private:
 	UID m_uid;

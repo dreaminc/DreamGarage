@@ -418,6 +418,13 @@ Error:
 RESULT OVRHMD::ReleaseHMD() {
 	RESULT r = R_PASS;
 
+	if (m_ovrMirrorTexture != nullptr) {
+		m_ovrMirrorTexture->DestroyMirrorTexture();
+	}
+
+	m_pOVRHMDSinkNode->DestroySwapChainTexture();
+
+
 	if (m_ovrSession != nullptr) {
 		ovr_Destroy(m_ovrSession);
 		m_ovrSession = nullptr;

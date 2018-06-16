@@ -29,6 +29,11 @@ OVRMirrorTexture::~OVRMirrorTexture() {
 		delete m_pOGLTexture;
 		m_pOGLTexture = nullptr;
 	}
+
+	if (m_ovrMirrorTexture != nullptr) {
+		ovr_DestroyMirrorTexture(m_ovrSession, m_ovrMirrorTexture);
+		m_ovrMirrorTexture = nullptr;
+	}
 }
 
 RESULT OVRMirrorTexture::OVRInitialize() {
@@ -86,5 +91,13 @@ RESULT OVRMirrorTexture::RenderMirrorToBackBuffer() {
 	CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
 
 Error:
+	return r;
+}
+
+RESULT OVRMirrorTexture::DestroyMirrorTexture() {
+	RESULT r = R_PASS;
+
+	ovr_DestroyMirrorTexture(m_ovrSession, m_ovrMirrorTexture);
+
 	return r;
 }

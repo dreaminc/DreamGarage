@@ -28,6 +28,11 @@ OVRTextureSwapChain::~OVRTextureSwapChain() {
 		delete m_pOGLResolveFramebuffer;
 		m_pOGLResolveFramebuffer = nullptr;
 	}
+
+	if (m_ovrTextureSwapChain != nullptr) {
+		ovr_DestroyTextureSwapChain(m_ovrSession, m_ovrTextureSwapChain);
+		m_ovrTextureSwapChain = nullptr;
+	}
 }
 
 RESULT OVRTextureSwapChain::OVRInitialize() {

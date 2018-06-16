@@ -340,6 +340,11 @@ RESULT SandboxApp::Shutdown() {
 		m_pDreamAppManager = nullptr;
 	}
 
+	if (m_pHMD != nullptr) {
+		CR(m_pHMD->ReleaseHMD());
+		m_pHMD = nullptr;
+	}
+
 	// Implementation specific shutdown
 	CR(ShutdownSandbox());
 
@@ -421,7 +426,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+		if (GetAsyncKeyState(VK_ESCAPE) || m_pHMD->ShouldShutdown() == true) {
 			Shutdown();
 		}
 	}
