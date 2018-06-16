@@ -38,10 +38,10 @@ uniform mat4 u_mat4Normal;
 
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
-mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
+//mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 //mat4 g_mat4InvTransposeModelView = (inverse(g_mat4ModelView));
 //mat4 g_mat4InvTransposeModelView = u_mat4Model;
-//mat4 g_mat4InvTransposeModelView = g_mat4ModelView;
+mat4 g_mat4InvTransposeModelView = g_mat4ModelView;
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
@@ -54,10 +54,10 @@ void main(void) {
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
 	// Re-orthogonalize T with respect to N with Gram-Schmidt process
-	ModelTangent = normalize(ModelTangent - dot(ModelTangent, ModelNormal) * ModelNormal);
+	//ModelTangent = normalize(ModelTangent - dot(ModelTangent, ModelNormal) * ModelNormal);
 	
 	// Then calc bitangent using normal and tangent
-	vec3 ModelBitangent = cross(ModelNormal, ModelTangent);
+	vec3 ModelBitangent = normalize(cross(ModelNormal, ModelTangent));
 
 	DataOut.TangentBitangentNormalMatrix = 
 		transpose(mat3(
@@ -67,6 +67,7 @@ void main(void) {
 		);
 
 	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
+
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {

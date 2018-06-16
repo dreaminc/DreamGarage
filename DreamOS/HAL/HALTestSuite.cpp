@@ -2397,7 +2397,9 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"emboss-texture-256.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			
-			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"roundflat-normal.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"emboss-normalmap-256.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			
