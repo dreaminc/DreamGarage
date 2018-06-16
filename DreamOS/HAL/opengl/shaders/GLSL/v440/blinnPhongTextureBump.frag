@@ -4,9 +4,7 @@
 // This shader implements Blinn Phong lighting with color and bump textures
 // using a BTN matrix
 
-#version 440 core
-
-#define MAX_TOTAL_LIGHTS 10
+// Depends: lightingCommon.shader, materialCommon.shader
 
 in vec3 inF_vec3Color;
 
@@ -23,38 +21,6 @@ in Data {
 	vec3 vertTBNSpace;
 } DataIn;
 
-// Light Structure
-struct Light {
-	int m_type;
-	float m_power;
-	float m_shine;
-	float m_reserved;
-
-	vec4 m_ptOrigin;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	vec4 m_vectorDirection; 
-};
-
-struct Material {
-	float m_shine;
-	float m_bump;
-	float m_ambient;
-	float reserved3;
-    vec4 m_colorAmbient;
-    vec4 m_colorDiffuse;
-    vec4 m_colorSpecular;
-};
-
-layout(std140) uniform ub_material {
-    Material material;
-};
-
-layout(std140) uniform ub_Lights {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
-
 uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
 
@@ -67,39 +33,18 @@ float g_ambient = 0.01f;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
-	//float attenuation = 1 / pow(distanceLight, 2);
-	//float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
-	float attenuation = 1.0f;
-
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
-	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-
-	///*
-	if(diffuseValue > 0.0f) {
-		//vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
-		vec3 halfVector = normalize(directionLight + directionEye);
-		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
-	}
-	else {
-		specularValue = 0.0f;
-	}
-	//*/
-}
-
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	float diffuseValue = 0.0f, specularValue = 0.0f;
+
+	float diffuseValue = 0.0f;
+	float specularValue = 0.0f;
 	
-	vec3 TBNNormal;
+	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);;
 	
 	if(u_fUseBumpTexture == true) {
 		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
-		TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
-	}
-	else {
-		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f);   
 	}
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
@@ -107,8 +52,9 @@ void main(void) {
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
-		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
+		if(dot(TBNNormal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 		}
@@ -116,10 +62,6 @@ void main(void) {
 	vec4LightValue[3] = 1.0f;
 	
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord);
-	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
-
-	// DEBUG:
-	//textureColor = vec4(1.0f) + textureColor * 0.001f;
 
 	if(u_fUseColorTexture == true) {
 		vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
@@ -129,20 +71,4 @@ void main(void) {
 		vec4 ambientColor = g_vec4AmbientLightLevel;
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
-
-	// Fakes blending by moving clear fragments behind the skybox
-	// Remove once blending is fully supported
-	/*
-	if (out_vec4Color.a == 0.0f) {
-		gl_FragDepth = 1.0f;
-	} 
-	else {
-		gl_FragDepth = gl_FragCoord.z;
-	}
-	*/
-	
-	/*
-	vec3 directionEye = DataIn.TangentBitangentNormalMatrix * (-normalize(DataIn.vertViewSpace.xyz));
-	out_vec4Color = vec4(directionEye, 1.0f);
-	*/
 }

@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBlinnPhongShaderTextureBump());
+
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestToonShader());
@@ -2322,6 +2324,168 @@ RESULT HALTestSuite::AddTestText() {
 
 	pNewTest->SetTestName("Blinn Phong Text Test");
 	pNewTest->SetTestDescription("Blinn phong text shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	struct TestContext {
+		quad *m_pQuad = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture_bump");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		volume *pVolume;
+		pVolume = nullptr;
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+		//pLight = m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+		
+		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_GREEN), color(COLOR_GREEN), vector(-1.0f, -1.0f, 1.0f));
+		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_BLUE), color(COLOR_BLUE), vector(-1.0f, -1.0f, -1.0f));
+
+		{
+			
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"emboss-texture-256.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			
+			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"emboss-normalmap-256.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			
+			
+
+			pTestContext->m_pQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f));
+			CN(pTestContext->m_pQuad);
+			pTestContext->m_pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+			//pTestContext->m_pQuad->SetDiffuseTexture(pColorTexture1);
+			pTestContext->m_pQuad->SetBumpTexture(pBumpTexture1);
+
+			/*
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+			texture *pColorTextureCopy = m_pDreamOS->MakeTexture(*pColorTexture1);
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+			pVolume->SetDiffuseTexture(pColorTexture1);
+			//CR(pVolume->SetColor(COLOR_WHITE));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
+			//CR(pVolume->SetColor(COLOR_GREEN));
+			pVolume->SetDiffuseTexture(pColorTexture2);
+
+			auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+			CN(pQuad);
+			pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
+			//CR(pVolume->SetColor(COLOR_GREEN));
+			pQuad->SetDiffuseTexture(pColorTextureCopy);
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			CR(pVolume->SetVertexColor(COLOR_RED));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			CR(pVolume->SetVertexColor(COLOR_BLUE));
+			//*/
+
+			/*
+			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			CN(pModel);
+			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pModel->SetScale(0.1f);
+			//*/
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->m_pQuad->RotateYByDeg(0.01f);
+		pTestContext->m_pQuad->RotateZByDeg(0.005f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Texture Copy Shader");
+	pNewTest->SetTestDescription("Blinn phong texture shader test with a textured copied over");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

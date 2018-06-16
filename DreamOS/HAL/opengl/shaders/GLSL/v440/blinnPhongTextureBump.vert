@@ -4,9 +4,7 @@
 // This shader implements Blinn Phong lighting with color and bump textures
 // using a BTN matrix
 
-#version 440 core
-
-#define MAX_TOTAL_LIGHTS 10
+// Depends: lightingCommon.shader, materialCommon.shader
 
 // TODO: Move to a uniform block
 layout (location = 0) in vec4 inV_vec4Position;
@@ -38,57 +36,44 @@ uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
 
-// Light Structure
-struct Light {
-	int m_type;
-	float m_power;
-	float m_shine;
-	float m_reserved;
-
-	vec4 m_ptOrigin;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	vec4 m_vectorDirection; 
-};
-
-layout(std140) uniform ub_Lights {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
-
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
-//mat4 g_mat4InvTransposeModel = transpose(inverse(u_mat4Model));
+//mat4 g_mat4InvTransposeModelView = (inverse(g_mat4ModelView));
+//mat4 g_mat4InvTransposeModelView = u_mat4Model;
+//mat4 g_mat4InvTransposeModelView = g_mat4ModelView;
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	// BTN Matrix
-	// TODO: All vectors to tangent space in vert shader?
-	// TODO: Calc this CPU side?  Understand tradeoffs 
 	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
 
 	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
-	//vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
-	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
-	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
+	// Re-orthogonalize T with respect to N with Gram-Schmidt process
+	ModelTangent = normalize(ModelTangent - dot(ModelTangent, ModelNormal) * ModelNormal);
+	
+	// Then calc bitangent using normal and tangent
+	vec3 ModelBitangent = cross(ModelNormal, ModelTangent);
+
+	DataOut.TangentBitangentNormalMatrix = 
+		transpose(mat3(
+			ModelTangent, 
+			ModelBitangent, 
+			ModelNormal)
+		);
 
 	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
-	//DataOut.directionEye = -1.0f * DataOut.TangentBitangentNormalMatrix * vertViewSpace.xyz;
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
-		vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
-		//DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+		ProcessLightVertex(lights[i], u_mat4View, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
 
-		vec3 vLightDirectionView = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
-		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * vLightDirectionView);
-		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
+		// Apply TBN matrix 
+		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * DataOut.directionLight[i]);
 	}
 
 	DataOut.vertTBNSpace = DataOut.TangentBitangentNormalMatrix * vertViewSpace.xyz;

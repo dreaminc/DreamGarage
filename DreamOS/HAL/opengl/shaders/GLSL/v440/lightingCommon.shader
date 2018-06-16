@@ -27,7 +27,9 @@ layout(std140) uniform ub_Lights {
 void ProcessLightVertex(in Light light, in mat4 mat4View, in vec4 vertViewSpace, in vec4 vertWorldSpace, out vec3 vLightDirection, out float lightDistance) {
 	if(light.m_type == 0) {
 		// Directional Light
-		vLightDirection = normalize(vec3(mat3(mat4View) * (-light.m_vectorDirection.xyz)));
+		vLightDirection = normalize(mat3(mat4View) * -light.m_vectorDirection.xyz);
+		//vLightDirection = vec3(normalize(mat4View * vec4(-light.m_vectorDirection.xyz, 0.0f)));
+		//vLightDirection = normalize(vec3(-light.m_vectorDirection));
 		lightDistance = 0.0f;
 	}
 	else  {
@@ -49,7 +51,6 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 
 	///*
 	if (diffuseValue > 0.0f) {
-		//vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
 		vec3 halfVector = normalize(directionLight + directionEye);
 		specularValue = pow(max(0.0f, dot(vectorNormal, halfVector)), material.m_shine) * attenuation;
 	}
@@ -64,8 +65,6 @@ void CalculateFragmentLightValueToon(in float power, in vec3 vectorNormal, in ve
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
 
-	//diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-
 	if (attenuation * max(0.0, dot(vectorNormal, directionLight)) >= 0.15f) {
 		diffuseValue = 1.0f;
 	}
@@ -76,9 +75,7 @@ void CalculateFragmentLightValueToon(in float power, in vec3 vectorNormal, in ve
 	// Light source on the right side?
 	if (cosThetaOfLightToVert > 0.0 &&
 		attenuation * pow(max(0.0, dot(reflect(-directionLight, vectorNormal), directionEye)), material.m_shine) > 0.5)
-		// more than half highlight intensity? 
 	{
-		//fragmentColor = _SpecColor.a * vec3(_LightColor0) * vec3(_SpecColor) + (1.0 - _SpecColor.a) * fragmentColor;
 		specularValue = 1.0f;
 	}
 	else {

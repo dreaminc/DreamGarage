@@ -132,7 +132,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP: {
 			pOGLProgram = new OGLProgramBlinnPhongTextureBump(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTextureBump.vert", L"blinnPhongTextureBump.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL blinnPhongTextureBump Program");
 		} break;
 

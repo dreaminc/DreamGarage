@@ -37,6 +37,7 @@ public:
 	RESULT AddTestToonShader();
 	RESULT AddTestBlinnPhongShader();
 	RESULT AddTestBlinnPhongShaderTexture();
+	RESULT AddTestBlinnPhongShaderTextureBump();
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();
 	RESULT AddTestBlinnPhongShaderBlur();
