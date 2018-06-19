@@ -342,6 +342,7 @@ RESULT SandboxApp::Shutdown() {
 
 	if (m_pHMD != nullptr) {
 		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
 		m_pHMD = nullptr;
 	}
 
@@ -426,7 +427,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE) || m_pHMD->ShouldShutdown() == true) {
+		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
 	}

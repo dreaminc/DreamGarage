@@ -46,7 +46,7 @@ private:
 	ovrSession m_ovrSession;
 
 	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;
-	ovrTextureSwapChain  m_ovrTextureSwapChain;
+	ovrTextureSwapChain  m_pOVRTextureSwapChain;
 
 protected:
 	std::vector<OGLTexture*> m_swapChainOGLTextures;

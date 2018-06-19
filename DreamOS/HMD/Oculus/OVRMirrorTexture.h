@@ -30,7 +30,7 @@ private:
 	ovrSession m_ovrSession;
 
 	ovrMirrorTextureDesc m_ovrMirrorTextureDescription;
-	ovrMirrorTexture m_ovrMirrorTexture;
+	ovrMirrorTexture m_pOVRMirrorTexture;
 
 	OGLFramebuffer *m_pOGLFramebuffer;
 	OGLTexture *m_pOGLTexture;

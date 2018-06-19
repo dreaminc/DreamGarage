@@ -12,7 +12,7 @@ OVRMirrorTexture::OVRMirrorTexture(OpenGLImp *pParentImp, ovrSession session, in
 	m_width(width),
 	m_height(height),
 	m_channels(DEFAULT_MIRROR_TEXTURE_CHANNELS),
-	m_ovrMirrorTexture(nullptr),
+	m_pOVRMirrorTexture(nullptr),
 	m_pOGLFramebuffer(nullptr),
 	m_pOGLTexture(nullptr)
 {
@@ -29,11 +29,6 @@ OVRMirrorTexture::~OVRMirrorTexture() {
 		delete m_pOGLTexture;
 		m_pOGLTexture = nullptr;
 	}
-
-	if (m_ovrMirrorTexture != nullptr) {
-		ovr_DestroyMirrorTexture(m_ovrSession, m_ovrMirrorTexture);
-		m_ovrMirrorTexture = nullptr;
-	}
 }
 
 RESULT OVRMirrorTexture::OVRInitialize() {
@@ -45,10 +40,10 @@ RESULT OVRMirrorTexture::OVRInitialize() {
 	m_ovrMirrorTextureDescription.Height = m_height;
 	m_ovrMirrorTextureDescription.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-	CR((RESULT)ovr_CreateMirrorTextureGL(m_ovrSession, &m_ovrMirrorTextureDescription, &m_ovrMirrorTexture));
+	CR((RESULT)ovr_CreateMirrorTextureGL(m_ovrSession, &m_ovrMirrorTextureDescription, &m_pOVRMirrorTexture));
 
 	GLuint textureIndex = 0;
-	CR((RESULT)ovr_GetMirrorTextureBufferGL(m_ovrSession, m_ovrMirrorTexture, &textureIndex));
+	CR((RESULT)ovr_GetMirrorTextureBufferGL(m_ovrSession, m_pOVRMirrorTexture, &textureIndex));
 	CB((textureIndex != NULL));
 
 	// This will create a new OGLTexture object, but will use the already allocated texture from OVR
@@ -97,7 +92,9 @@ Error:
 RESULT OVRMirrorTexture::DestroyMirrorTexture() {
 	RESULT r = R_PASS;
 
-	ovr_DestroyMirrorTexture(m_ovrSession, m_ovrMirrorTexture);
+	ovr_DestroyMirrorTexture(m_ovrSession, m_pOVRMirrorTexture);
+	CNM(m_pOVRMirrorTexture, "Error Destroying ovrMirrorTexture");
 
+Error:
 	return r;
 }

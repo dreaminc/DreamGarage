@@ -69,9 +69,9 @@ RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	int channels = 4;
 
 	ovrSession OVRSession = m_pParentHMD->GetOVRSession();
-	ovrSessionStatus sessionStatus;
-	ovr_GetSessionStatus(OVRSession, &sessionStatus);
-	CBR((bool)sessionStatus.IsVisible == true, R_SKIPPED);	// If experience is not visible in HMD e.g. they're in oculus menu, don't commit frames
+	ovrSessionStatus OVRSessionStatus;
+	CR((RESULT)ovr_GetSessionStatus(OVRSession, &OVRSessionStatus));
+	CBR((bool)OVRSessionStatus.IsVisible == true, R_SKIPPED);	// If experience is not visible in HMD e.g. they're in oculus menu, don't commit frames
 
 	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
@@ -143,12 +143,16 @@ RESULT OVRHMDSinkNode::SubmitFrame() {
 	CR((RESULT)ovr_SubmitFrame(OVRSession, 0, nullptr, &layers, 1));
 
 	//* TODO: Might want to check on session
-	ovrSessionStatus sessionStatus;
-	ovr_GetSessionStatus(OVRSession, &sessionStatus);
-	if (sessionStatus.ShouldQuit)
-		m_pParentHMD->m_fShutdown = true;
-	if (sessionStatus.ShouldRecenter)
-		ovr_RecenterTrackingOrigin(OVRSession);
+	ovrSessionStatus OVRSessionStatus;
+	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
+
+	if (OVRSessionStatus.ShouldQuit) {
+		m_pParentHMD->ShutdownParentSandbox();
+	}
+
+	if (OVRSessionStatus.ShouldRecenter) {
+		CR((RESULT)ovr_RecenterTrackingOrigin(OVRSession));
+	}
 	//*/
 
 Error:
@@ -158,7 +162,12 @@ Error:
 RESULT OVRHMDSinkNode::DestroySwapChainTexture() {
 	RESULT r = R_PASS;
 	for (int eye = 0; eye < 2; eye++) {
-		ovr_DestroyTextureSwapChain(m_pParentHMD->GetOVRSession(), m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain());
+		if (m_ovrTextureSwapChains[eye] != nullptr) {
+			ovr_DestroyTextureSwapChain(m_pParentHMD->GetOVRSession(), m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain());
+			CNM(m_ovrTextureSwapChains[eye], "Error destroying ovrTextureSwapchain");
+		}
 	}
+
+Error:
 	return r;
 }
