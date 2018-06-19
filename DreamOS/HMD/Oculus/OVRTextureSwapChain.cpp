@@ -30,8 +30,7 @@ OVRTextureSwapChain::~OVRTextureSwapChain() {
 	}
 
 	if (m_pOVRTextureSwapChain != nullptr) {
-		ovr_DestroyTextureSwapChain(m_ovrSession, m_pOVRTextureSwapChain);
-		m_pOVRTextureSwapChain = nullptr;
+		DestroySwapChainTexture();
 	}
 }
 
@@ -188,4 +187,14 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 
 Error:
 	return R_PASS;
+}
+
+RESULT OVRTextureSwapChain::DestroySwapChainTexture() {
+	RESULT r = R_PASS;
+	
+	ovr_DestroyTextureSwapChain(m_ovrSession, m_pOVRTextureSwapChain);
+	CNM(m_pOVRTextureSwapChain, "Error destroying ovrTextureSwapchain");
+
+Error:
+	return r;
 }

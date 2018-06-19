@@ -427,13 +427,11 @@ RESULT OVRHMD::ReleaseHMD() {
 	RESULT r = R_PASS;
 
 	if (m_pOVRMirrorTexture != nullptr) {
-		m_pOVRMirrorTexture->DestroyMirrorTexture();
 		delete m_pOVRMirrorTexture;
 		m_pOVRMirrorTexture = nullptr;
 	}
 
 	if (m_pOVRHMDSinkNode != nullptr) {
-		m_pOVRHMDSinkNode->DestroySwapChainTexture();
 		delete m_pOVRHMDSinkNode;
 		m_pOVRHMDSinkNode = nullptr;
 	}
@@ -441,11 +439,6 @@ RESULT OVRHMD::ReleaseHMD() {
 	if (m_ovrSession != nullptr) {
 		ovr_Destroy(m_ovrSession);
 		m_ovrSession = nullptr;
-	}
-
-	if (m_pOVRHMDSinkNode != nullptr) {
-		delete m_pOVRHMDSinkNode;
-		m_pOVRHMDSinkNode = nullptr;
 	}
 
 	ovr_Shutdown();

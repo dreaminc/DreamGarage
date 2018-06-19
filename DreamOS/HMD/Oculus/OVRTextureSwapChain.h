@@ -42,6 +42,8 @@ public:
 
 	RESULT UnsetRenderSurface();
 
+	RESULT DestroySwapChainTexture();
+
 private:
 	ovrSession m_ovrSession;
 

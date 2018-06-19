@@ -20,14 +20,14 @@ OVRMirrorTexture::OVRMirrorTexture(OpenGLImp *pParentImp, ovrSession session, in
 }
 
 OVRMirrorTexture::~OVRMirrorTexture() {
+
 	if (m_pOGLFramebuffer != nullptr) {
 		delete m_pOGLFramebuffer;
 		m_pOGLFramebuffer = nullptr;
 	}
 
-	if (m_pOGLTexture != nullptr) {
-		delete m_pOGLTexture;
-		m_pOGLTexture = nullptr;
+	if (m_pOVRMirrorTexture != nullptr) {
+		DestroyMirrorTexture();
 	}
 }
 

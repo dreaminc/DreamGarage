@@ -158,16 +158,3 @@ RESULT OVRHMDSinkNode::SubmitFrame() {
 Error:
 	return r;
 }
-
-RESULT OVRHMDSinkNode::DestroySwapChainTexture() {
-	RESULT r = R_PASS;
-	for (int eye = 0; eye < 2; eye++) {
-		if (m_ovrTextureSwapChains[eye] != nullptr) {
-			ovr_DestroyTextureSwapChain(m_pParentHMD->GetOVRSession(), m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain());
-			CNM(m_ovrTextureSwapChains[eye], "Error destroying ovrTextureSwapchain");
-		}
-	}
-
-Error:
-	return r;
-}
