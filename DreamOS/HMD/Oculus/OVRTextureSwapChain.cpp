@@ -193,7 +193,7 @@ RESULT OVRTextureSwapChain::DestroySwapChainTexture() {
 	RESULT r = R_PASS;
 	
 	ovr_DestroyTextureSwapChain(m_ovrSession, m_pOVRTextureSwapChain);
-	CNM(m_pOVRTextureSwapChain, "Error destroying ovrTextureSwapchain");
+	CBM(m_pOVRTextureSwapChain == nullptr, "Error destroying ovrTextureSwapchain");
 
 Error:
 	return r;
