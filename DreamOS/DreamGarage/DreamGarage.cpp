@@ -21,7 +21,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+#include "HAL/opengl/OGLProgramStandard.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -92,7 +92,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	{
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));

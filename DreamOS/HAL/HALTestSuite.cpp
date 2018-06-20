@@ -24,8 +24,12 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestBlinnPhongShaderTextureBump());
+	CR(AddTestStandardShader());
 
+	CR(AddTestBlinnPhongShader());
+	
+	CR(AddTestBlinnPhongShaderTextureBump());
+	
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestToonShader());
@@ -56,8 +60,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestUIShaderStage());
 
-	CR(AddTestEnvironmentShader());
-
 	CR(AddTestSkybox());
 
 	CR(AddTestRenderToTextureQuad());
@@ -71,8 +73,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestQuadObject());
 
 	CR(AddTestSenseHaptics());
-	
-	CR(AddTestBlinnPhongShader());
 
 	CR(AddTestBlinnPhongShaderBlur());
 
@@ -820,7 +820,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::AddTestEnvironmentShader() {
+RESULT HALTestSuite::AddTestStandardShader() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 40.0f;
@@ -847,7 +847,7 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -896,13 +896,19 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		volume *pVolume;
 		pVolume = nullptr;
 
+		sphere *pSphere;
+		pVolume = nullptr;
+
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 
 		texture *pColorTexture;
 		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-//#ifndef _DEBUG
+		texture *pBumpTexture;
+		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+#ifndef _DEBUG
 		{
 			point ptSceneOffset = point(90, -5, -25);
 			float sceneScale = 0.1f;
@@ -925,16 +931,22 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 			pClouds->SetMaterialAmbient(0.8f);
 		}
-//#endif
+#endif
 
+		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+		CN(pSphere);
+		pSphere->SetDiffuseTexture(pColorTexture);
+		pSphere->SetBumpTexture(pBumpTexture);
+
+		///*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
 		pVolume->SetDiffuseTexture(pColorTexture);
+		pVolume->SetBumpTexture(pBumpTexture);
 
-		//CR(pVolume->SetColor(COLOR_WHITE));
-
-		///*
+		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
@@ -949,6 +961,7 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetVertexColor(COLOR_BLUE));
+		*/
 
 	Error:
 		return r;
@@ -2397,16 +2410,19 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"emboss-texture-256.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 			
-			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"SimpleNormals.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"emboss-normalmap-256.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 			
 			
 
-			pTestContext->m_pQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f));
+			pTestContext->m_pQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
 			CN(pTestContext->m_pQuad);
+
+			pTestContext->m_pQuad->RotateXByDeg(90.0f);
+
 			pTestContext->m_pQuad->SetPosition(0.0f, 0.0f, 0.0f);
 			//pTestContext->m_pQuad->SetDiffuseTexture(pColorTexture1);
 			pTestContext->m_pQuad->SetBumpTexture(pBumpTexture1);

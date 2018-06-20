@@ -607,9 +607,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -881,6 +878,9 @@
       <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramToon.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramStandard.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1341,9 +1341,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
       <Filter>Primitives</Filter>
@@ -1960,6 +1957,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramToon.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramStandard.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2051,12 +2051,6 @@
     </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
       <Filter>Scripts</Filter>
@@ -2158,6 +2152,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\noiseCommon.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

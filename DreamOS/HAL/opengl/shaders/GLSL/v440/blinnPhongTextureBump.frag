@@ -40,7 +40,7 @@ void main(void) {
 	float diffuseValue = 0.0f;
 	float specularValue = 0.0f;
 	
-	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);;
+	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	
 	if(u_fUseBumpTexture == true) {
 		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;

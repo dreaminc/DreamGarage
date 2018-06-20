@@ -14,7 +14,7 @@
 #include "OGLProgramBlinnPhongTextureBump.h"
 #include "OGLProgramTextureBitBlit.h"
 #include "OGLProgramShadowDepth.h"
-#include "OGLProgramEnvironmentObjects.h"
+#include "OGLProgramStandard.h"
 #include "OGLProgramScreenQuad.h"
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
@@ -39,7 +39,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "custom", OGLPROGRAM_CUSTOM },
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
-	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
+	{ "standard", OGLPROGRAM_STANDARD },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
@@ -51,7 +51,12 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 };
 
 OGLPROGRAM_TYPE OGLProgramFactory::OGLProgramTypeFromstring(std::string strProgramName) {
-	return m_OGLProgramNameType.at(strProgramName);
+	if (m_OGLProgramNameType.count(strProgramName) > 0) {
+		return m_OGLProgramNameType.at(strProgramName);
+	}
+	else {
+		return OGLPROGRAM_INVALID;
+	}
 }
 
 ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
@@ -59,6 +64,15 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 	RESULT r = R_PASS;
 
 	switch (type) {
+
+		case OGLPROGRAM_STANDARD: {
+			pOGLProgram = new OGLProgramStandard(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL environment Program");
+		} break;
+
+
 		case OGLPROGRAM_MINIMAL: {
 			pOGLProgram = new OGLProgramMinimal(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
@@ -146,7 +160,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_FLAT: {
 			pOGLProgram = new OGLProgramFlat(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"toon.vert", L"toon.frag", versionOGL),
+			CRM(pOGLProgram->OGLInitialize(L"flat.vert", L"flat.frag", versionOGL),
 				"Failed to initialize OGL flat Program");
 		} break;
 
@@ -162,13 +176,6 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), 
 				"Failed to initialize OGL shadow depth Program");
-		} break;
-
-		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
-			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
-			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), 
-				"Failed to initialize OGL environment Program");
 		} break;
 
 		case OGLPROGRAM_SCREEN_QUAD: {
@@ -217,6 +224,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_INVALID: 
 		default: {
 			DEBUG_LINEOUT("OGLProgram of type %d not supported", type);
+			return nullptr;
 		} break;
 	}
 

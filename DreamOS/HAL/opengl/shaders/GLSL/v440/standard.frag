@@ -1,12 +1,8 @@
-// blinnPhoneTexTBNBump.vert
+// standard.vert
 // shadertype=glsl
 
-// This shader implements Blinn Phong lighting with color and bump textures
-// using a BTN matrix
-
-#version 440 core
-
-#define MAX_TOTAL_LIGHTS 10
+// This is the standard Dream shader model
+// and will include light, material, and texturing capabilities
 
 in vec3 inF_vec3Color;
 
@@ -23,38 +19,6 @@ in Data {
 	vec3 vertTBNSpace;
 	float riverAnimationDisplacement;
 } DataIn;
-
-// Light Structure
-struct Light {
-	int m_type;
-	float m_power;
-	float m_shine;
-	float m_reserved;
-
-	vec4 m_ptOrigin;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	vec4 m_vectorDirection; 
-};
-
-struct Material {
-	float m_shine;
-	float m_bump;
-	float m_ambient;
-	float reserved3;
-    vec4 m_colorAmbient;
-    vec4 m_colorDiffuse;
-    vec4 m_colorSpecular;
-};
-
-layout(std140) uniform ub_material {
-    Material material;
-};
-
-layout(std140) uniform ub_Lights {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
 
 uniform	bool u_hasBumpTexture;
 uniform sampler2D u_textureBump;
@@ -80,28 +44,7 @@ float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
-	//float attenuation = 1 / pow(distanceLight, 2);
-	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
-	//float attenuation = 1.0f;
-
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
-	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-
-	///*
-	if(diffuseValue > 0.0f) {
-		//vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
-		vec3 halfVector = normalize(directionLight + directionEye);
-		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
-	}
-	else {
-		specularValue = 0.0f;
-	}
-	//*/
-}
-
 void EnableBlending(float ambientAlpha, float diffuseAlpha) {
-	// 
 	// Fakes blending by moving clear fragments behind the skybox
 	// Remove once blending is fully supported
 	if (ambientAlpha < 0.1f || diffuseAlpha < 0.1f) {
@@ -111,7 +54,6 @@ void EnableBlending(float ambientAlpha, float diffuseAlpha) {
 		gl_FragDepth = gl_FragCoord.z;
 	}
 }
-//*
 
 //vec4 lightColor = vec4(57.0f / 255.0f, 158.0f / 255.0f, 253.0f / 255.0f, 1.0f);
 //vec4 darkColor  = vec4(24.0f / 255.0f,  77.0f / 255.0f, 174.0f / 255.0f, 1.0f);
@@ -140,16 +82,14 @@ void main(void) {
 	}
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	float diffuseValue = 0.0f, specularValue = 0.0f;
+	float diffuseValue = 0.0f;
+	float specularValue = 0.0f;
 	
-	vec3 TBNNormal;
+	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	
 	if(u_hasBumpTexture == true) {
 		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
-		TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
-	}
-	else {
-		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 
 	// TODO: move this logic outside of the shader
@@ -162,21 +102,22 @@ void main(void) {
 		colorDiffuse = EnableRiverAnimation();	
 	}
 
-	vec4 lightColorAmbient = g_ambient * vec4(1,1,1,1);
+	vec4 lightColorAmbient = g_ambient * vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
-		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
+		if(dot(TBNNormal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * colorSpecular;
 		}
 	}
 
-	out_vec4Color = vec4LightValue;
+	//out_vec4Color = vec4LightValue;
 
 	// keeping the alpha value outside max() helps with distance-mapped fonts;
 	// max() is component-wise, and some alpha values currently default to one
@@ -190,6 +131,5 @@ void main(void) {
 		out_vec4Color = IncreaseColorSaturation(outColor);
 	}
 
-	//	out_vec4Color = material.m_colorDiffuse;
-	//out_vec4Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	out_vec4Color = outColor;
 }

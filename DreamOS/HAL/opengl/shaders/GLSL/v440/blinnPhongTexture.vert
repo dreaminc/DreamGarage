@@ -38,14 +38,7 @@ void main(void) {
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	// TBN Matrix
-	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
-
-	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
-	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
-
-	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
-
+	DataOut.TangentBitangentNormalMatrix = CalculateTBNMatrix(g_mat4InvTransposeModelView, inV_vec4Tangent, inV_vec4Normal);
 	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 

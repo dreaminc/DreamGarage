@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 
 #include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+#include "HAL/opengl/OGLProgramStandard.h"
 
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
@@ -23,6 +23,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
+	m_directionalIntensity = 0.25f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -36,8 +37,11 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	//TODO: environments probably won't all have the same lighting
 	if (strEnvironmentPath == "default") {
-		auto pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
-		pDirectionalLight->EnableShadows();
+		auto pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, 1.0f));
+		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -1.0f));
+
+		//pDirectionalLight->EnableShadows();
 
 		pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	}
@@ -69,7 +73,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 			pOGLObj->SetOGLProgramPreCallback(
 				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff pre-render
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(true);
 				}
@@ -81,7 +85,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff post
 
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(false);
 				}

@@ -16,7 +16,7 @@
 #pragma warning(disable : 4250)
 class OGLSphere : public sphere, public OGLObj {
 public:
-	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) :
+	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) :
 		sphere(radius, numAngularDivisions, numVerticalDivisions, c),
 		OGLObj(pParentImp)
 	{

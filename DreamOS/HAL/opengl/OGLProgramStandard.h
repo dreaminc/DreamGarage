@@ -16,11 +16,12 @@
 class ObjectStore;
 class stereocamera;
 
-class OGLProgramEnvironmentObjects : public OGLProgram, public EnvironmentProgram {
+class OGLProgramStandard : public OGLProgram, public EnvironmentProgram {
 public:
-	OGLProgramEnvironmentObjects(OpenGLImp *pParentImp);
+	OGLProgramStandard(OpenGLImp *pParentImp);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;

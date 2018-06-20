@@ -44,7 +44,7 @@ public:
 	RESULT AddTestDepthPeelingShader();
 
 	// Environments
-	RESULT AddTestEnvironmentShader();
+	RESULT AddTestStandardShader();
 	RESULT AddTestEnvironments();
 
 	// Objects

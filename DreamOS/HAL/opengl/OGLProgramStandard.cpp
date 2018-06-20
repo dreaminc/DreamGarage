@@ -1,4 +1,4 @@
-#include "OGLProgramEnvironmentObjects.h"
+#include "OGLProgramStandard.h"
 
 #include "Scene/ObjectStoreImp.h"
 #include "Scene/ObjectStore.h"
@@ -9,7 +9,7 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramEnvironmentObjects::OGLProgramEnvironmentObjects(OpenGLImp *pParentImp) :
+OGLProgramStandard::OGLProgramStandard(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglenvironment"),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
@@ -17,7 +17,7 @@ OGLProgramEnvironmentObjects::OGLProgramEnvironmentObjects(OpenGLImp *pParentImp
 	// empty
 }
 
-RESULT OGLProgramEnvironmentObjects::OGLInitialize() {
+RESULT OGLProgramStandard::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -84,7 +84,52 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetupConnections() {
+RESULT OGLProgramStandard::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"standard.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"standard.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramStandard::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
@@ -99,7 +144,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
+RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -131,12 +176,12 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetIsAugmented(bool fAugmented) {
+RESULT OGLProgramStandard::SetIsAugmented(bool fAugmented) {
 	m_fAREnabled = fAugmented;
 	return R_PASS;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramStandard::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
@@ -158,7 +203,7 @@ RESULT OGLProgramEnvironmentObjects::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetLights(std::vector<light*> *pLights) {
+RESULT OGLProgramStandard::SetLights(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
 
 	if (m_pLightsBlock != nullptr) {
@@ -170,7 +215,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetMaterial(material *pMaterial) {
+RESULT OGLProgramStandard::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -182,14 +227,14 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramStandard::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramStandard::SetCameraUniforms(camera *pCamera) {
 
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
@@ -204,7 +249,7 @@ RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(camera *pCamera) {
 	return R_PASS;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramStandard::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
 	m_deltaTime = (float)deltaTime;
 	m_deltaTime *= 0.5f;
@@ -223,13 +268,13 @@ RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(stereocamera* pStereoCame
 	return R_PASS;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetRiverAnimation(bool fRiverAnimation) {
+RESULT OGLProgramStandard::SetRiverAnimation(bool fRiverAnimation) {
 	m_pUniformRiverAnimation->SetUniform(fRiverAnimation);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
+RESULT OGLProgramStandard::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
 	RESULT r = R_PASS;
 	
 	if (pTexture) {

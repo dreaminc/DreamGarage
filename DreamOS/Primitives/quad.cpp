@@ -369,8 +369,11 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 			// TODO: Calculate normal (based on geometry)
 
-			m_pVertices[vertCount].SetTangent(vector(-1.0f, 0.0f, 0.0f));
+			m_pVertices[vertCount].SetTangent(vector(1.0f, 0.0f, 0.0f));
 			m_pVertices[vertCount].SetBitangent(vector(0.0f, 0.0f, -1.0f));
+
+			//m_pVertices[vertCount].SetTangent(vector(0.0f, 0.0f, 1.0f));
+			//m_pVertices[vertCount].SetBitangent(vector(1.0f, 0.0f, 0.0f));
 
 			vertCount++;
 		}
