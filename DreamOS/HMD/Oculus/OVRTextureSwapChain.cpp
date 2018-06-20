@@ -2,7 +2,7 @@
 
 OVRTextureSwapChain::OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
 	m_ovrSession(session),
-	m_ovrTextureSwapChain(nullptr),
+	m_pOVRTextureSwapChain(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(DEFAULT_TEXTURE_SWAP_CHAIN_CHANNELS),
@@ -28,6 +28,10 @@ OVRTextureSwapChain::~OVRTextureSwapChain() {
 		delete m_pOGLResolveFramebuffer;
 		m_pOGLResolveFramebuffer = nullptr;
 	}
+
+	if (m_pOVRTextureSwapChain != nullptr) {
+		DestroySwapChainTexture();
+	}
 }
 
 RESULT OVRTextureSwapChain::OVRInitialize() {
@@ -46,12 +50,12 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	m_ovrTextureSwapChainDescription.SampleCount = 1;
 	m_ovrTextureSwapChainDescription.StaticImage = ovrFalse;
 
-	CR((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_ovrTextureSwapChain));
-	CR((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_ovrTextureSwapChain, &m_textureSwapChainLength));
+	CR((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_pOVRTextureSwapChain));
+	CR((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_pOVRTextureSwapChain, &m_textureSwapChainLength));
 
 	for (int i = 0; i < m_textureSwapChainLength; ++i) {
 		GLuint chainTextureIndex;
-		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
+		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_pOVRTextureSwapChain, i, &chainTextureIndex);
 
 		//OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, m_channels);
 		OGLTexture *pOGLTexture = OGLTexture::MakeTextureFromAllocatedTexture(m_pParentImp, 
@@ -105,7 +109,7 @@ Error:
 }
 
 ovrTextureSwapChain OVRTextureSwapChain::GetOVRTextureSwapChain() {
-	return m_ovrTextureSwapChain;
+	return m_pOVRTextureSwapChain;
 }
 
 ovrSizei OVRTextureSwapChain::GetOVRSizei() {
@@ -128,8 +132,8 @@ ovrRecti OVRTextureSwapChain::GetOVRViewportRecti() {
 }
 
 RESULT OVRTextureSwapChain::Commit() {
-	if (m_ovrTextureSwapChain)
-		return (RESULT)ovr_CommitTextureSwapChain(m_ovrSession, m_ovrTextureSwapChain);
+	if (m_pOVRTextureSwapChain)
+		return (RESULT)ovr_CommitTextureSwapChain(m_ovrSession, m_pOVRTextureSwapChain);
 	else
 		return R_FAIL;
 }
@@ -155,10 +159,10 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 	m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_MULTISAMPLE);
 
-	if (m_ovrTextureSwapChain) {
+	if (m_pOVRTextureSwapChain) {
 		int currentIndex;
-		CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &currentIndex));
-		CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, currentIndex, &currentTextureIndex));
+		CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_pOVRTextureSwapChain, &currentIndex));
+		CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_pOVRTextureSwapChain, currentIndex, &currentTextureIndex));
 	}
 	else {
 		// TODO:
@@ -183,4 +187,14 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 
 Error:
 	return R_PASS;
+}
+
+RESULT OVRTextureSwapChain::DestroySwapChainTexture() {
+	RESULT r = R_PASS;
+	
+	ovr_DestroyTextureSwapChain(m_ovrSession, m_pOVRTextureSwapChain);
+	CBM(m_pOVRTextureSwapChain == nullptr, "Error destroying ovrTextureSwapchain");
+
+Error:
+	return r;
 }

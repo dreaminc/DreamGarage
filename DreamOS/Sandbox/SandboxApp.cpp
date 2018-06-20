@@ -340,6 +340,12 @@ RESULT SandboxApp::Shutdown() {
 		m_pDreamAppManager = nullptr;
 	}
 
+	if (m_pHMD != nullptr) {
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+	}
+
 	// Implementation specific shutdown
 	CR(ShutdownSandbox());
 

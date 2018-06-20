@@ -30,6 +30,7 @@ public:
 	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
 	RESULT UnsetRenderSurface(EYE_TYPE eye);
 	RESULT SubmitFrame();
+	RESULT DestroySwapChainTexture();
 
 	virtual RESULT RenderNode(long frameID = 0) override;
 

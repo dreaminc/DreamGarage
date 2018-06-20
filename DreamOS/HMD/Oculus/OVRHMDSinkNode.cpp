@@ -68,6 +68,11 @@ RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	int pxViewportHeight = m_pParentImp->GetViewport().Height();
 	int channels = 4;
 
+	ovrSession OVRSession = m_pParentHMD->GetOVRSession();
+	ovrSessionStatus OVRSessionStatus;
+	CR((RESULT)ovr_GetSessionStatus(OVRSession, &OVRSessionStatus));
+	CBR((bool)OVRSessionStatus.IsVisible == true, R_SKIPPED);	// If experience is not visible in HMD e.g. they're in oculus menu, don't commit frames
+
 	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
 	for (int i = 0; i < HMD_NUM_EYES; i++) {
@@ -137,14 +142,18 @@ RESULT OVRHMDSinkNode::SubmitFrame() {
 
 	CR((RESULT)ovr_SubmitFrame(OVRSession, 0, nullptr, &layers, 1));
 
-	/* TODO: Might want to check on session
-	ovrSessionStatus sessionStatus;
-	ovr_GetSessionStatus(session, &sessionStatus);
-	if (sessionStatus.ShouldQuit)
-	goto Done;
-	if (sessionStatus.ShouldRecenter)
-	ovr_RecenterTrackingOrigin(session);
-	*/
+	//* TODO: Might want to check on session
+	ovrSessionStatus OVRSessionStatus;
+	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
+
+	if (OVRSessionStatus.ShouldQuit) {
+		m_pParentHMD->ShutdownParentSandbox();
+	}
+
+	if (OVRSessionStatus.ShouldRecenter) {
+		CR((RESULT)ovr_RecenterTrackingOrigin(OVRSession));
+	}
+	//*/
 
 Error:
 	return r;

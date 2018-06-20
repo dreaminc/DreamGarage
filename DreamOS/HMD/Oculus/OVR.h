@@ -62,6 +62,8 @@ public:
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
 
+	RESULT ShutdownParentSandbox();
+
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }
 	inline const ovrHmdDesc &GetOVRHMDDescription() { return m_ovrHMDDescription; }
@@ -75,14 +77,14 @@ public:
 	std::vector<ovrTrackerDesc> m_TrackerDescriptions;
 
 	// Mirror Texture (TODO: Move to separate sink node)
-	OVRMirrorTexture *m_ovrMirrorTexture;
+	OVRMirrorTexture *m_pOVRMirrorTexture = nullptr;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
 
 	quaternion qLeftRotation;
 	quaternion qRightRotation;
 
-	composite *m_pLeftControllerModel;
-	composite *m_pRightControllerModel;
+	composite *m_pLeftControllerModel = nullptr;
+	composite *m_pRightControllerModel = nullptr;
 
 private:
 	OVRHMDSinkNode *m_pOVRHMDSinkNode = nullptr;
