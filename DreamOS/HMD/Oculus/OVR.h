@@ -26,6 +26,7 @@
 
 #include "HAL/opengl/OGLFramebuffer.h"
 #include "OVRMirrorTexture.h"
+#include "OVRPlatform.h"
 
 class OGLFramebuffer;
 
@@ -75,6 +76,8 @@ public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;
 	std::vector<ovrTrackerDesc> m_TrackerDescriptions;
+
+	OVRPlatform* ovrPlatform = nullptr;
 
 	// Mirror Texture (TODO: Move to separate sink node)
 	OVRMirrorTexture *m_pOVRMirrorTexture = nullptr;

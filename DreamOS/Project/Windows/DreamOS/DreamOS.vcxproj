@@ -172,6 +172,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -385,7 +386,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -429,6 +430,11 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
     <Manifest>
       <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
     <ClCompile>
@@ -654,6 +660,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\OVR_PlatformLoader.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp" />
@@ -723,6 +730,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRMirrorTexture.cpp" />
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRPlatform.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTouchController.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
@@ -1038,6 +1046,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HMD\Oculus\OVR.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRPlatform.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
