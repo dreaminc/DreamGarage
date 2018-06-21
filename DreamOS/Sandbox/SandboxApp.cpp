@@ -396,7 +396,7 @@ RESULT SandboxApp::RunAppLoop() {
 		//m_pWin64Mouse->UpdateMousePosition();
 
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
+			CRM(m_pHMD->UpdateHMD(), "UpdateHMD failed in Sandbox");
 		}
 
 		// Update Scene 

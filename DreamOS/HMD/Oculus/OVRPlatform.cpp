@@ -1,5 +1,5 @@
 #include "OVRPlatform.h"
-#include "External/OCULUS/OVRPlatformSDK_v1.24.0/Include/OVR_Platform.h"
+#include "OVR_Platform.h"
 
 OVRPlatform::OVRPlatform() 
 {
@@ -14,13 +14,10 @@ OVRPlatform::~OVRPlatform()
 RESULT OVRPlatform::InitializePlatform() {
 	RESULT r = R_PASS;
 	
-	ovr_PlatformInitializeWindowsAsynchronous(m_appID, &m_initPlatformResult);
-
 	// Initialization call
-	if (m_initPlatformResult != ovrPlatformInitialize_Success) {
-		// Exit.  Initialization failed which means either the oculus service isn’t on the machine or they’ve hacked their DLL
-		CBM(m_initPlatformResult == ovrPlatformInitialize_Success, "Failed to initialize Oculus Platform, check if service is running");
-	}
+	// Exit if failed.  Initialization failed which means either the oculus service isn’t on the machine or they’ve hacked their DLL
+	CBM(ovr_PlatformInitializeWindows(m_appID) == ovrPlatformInitialize_Success, "Failed to initialize Oculus Platform, check if service is running");
+	
 	ovr_Entitlement_GetIsViewerEntitled();
 
 Error:
@@ -41,17 +38,7 @@ RESULT OVRPlatform::Update() {
 		} break;
 
 		case ovrMessage_Entitlement_GetIsViewerEntitled: {
-
-			if(!ovr_Message_IsError(ovrMessage)) {
-				// User is entitled.  Continue with normal game behaviour
-				// Is what they say but we're not a "game" >:O
-				CR(r);
-			}
-			else {
-				// Not entitled, can't launch full app, but can handle elegantly... probably?
-				// We'll want to bubble up an event for this, fail for now
-				CBM(!ovr_Message_IsError(ovrMessage), "User failed Oculus entitlement check");
-			}
+			CBM(!ovr_Message_IsError(ovrMessage), "User failed Oculus entitlement check");
 		} break;
 
 		default: {

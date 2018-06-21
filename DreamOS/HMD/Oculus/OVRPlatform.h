@@ -3,7 +3,7 @@
 
 #include "./RESULT/EHM.h"
 
-#include "External/OCULUS/OVRPlatformSDK_v1.24.0/Include/OVR_Platform.h"
+#include "OVR_Platform.h"
 
 class OVRPlatform {
 	
@@ -15,8 +15,9 @@ public:
 	RESULT Update();
 
 protected:
-	const char* m_appID = "DreamOS";
-	ovrPlatformInitializeResult m_initPlatformResult;
+
+	// TODO: get from API?
+	const char* m_appID = "2255211697837160";
 
 };
 #endif
