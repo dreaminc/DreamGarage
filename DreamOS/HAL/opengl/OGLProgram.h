@@ -158,7 +158,8 @@ protected:
 
 	// OGL Framebuffer
 	// This can be used to render the program to a texture / framebuffer
-	OGLFramebuffer *m_pOGLFramebuffer;
+	OGLFramebuffer *m_pOGLFramebuffer = nullptr;
+
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
 	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);

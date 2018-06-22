@@ -137,6 +137,9 @@ RESULT OGLProgramStandard::SetupConnections() {
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
+	// Reflection Map
+	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
+
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 

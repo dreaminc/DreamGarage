@@ -10,6 +10,7 @@
 #include "OGLProgramFlat.h"
 #include "OGLProgramToon.h"
 #include "OGLProgramReflection.h"
+#include "OGLProgramWater.h"
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureShadow.h"
 #include "OGLProgramBlinnPhongTextureBump.h"
@@ -38,6 +39,8 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "flat", OGLPROGRAM_FLAT },
 	{ "toon", OGLPROGRAM_TOON },
 	{ "reflection", OGLPROGRAM_REFLECTION },
+	{ "refraction", OGLPROGRAM_REFRACTION },
+	{ "water", OGLPROGRAM_WATER },
 	{ "custom", OGLPROGRAM_CUSTOM },
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
@@ -178,6 +181,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL),
 				"Failed to initialize OGL flat Program");
+		} break;
+
+		case OGLPROGRAM_WATER: {
+			pOGLProgram = new OGLProgramWater(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL water Program");
 		} break;
 
 		case OGLPROGRAM_SHADOW_DEPTH: {

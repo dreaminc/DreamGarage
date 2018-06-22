@@ -1,4 +1,4 @@
-#include "OGLProgramReflection.h"
+#include "OGLProgramWater.h"
 
 #include "Scene/ObjectStoreImp.h"
 #include "Scene/ObjectStore.h"
@@ -9,17 +9,15 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-#include "Primitives/matrix/ReflectionMatrix.h"
-
-OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglreflection"),
+OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "oglwater"),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
 	// empty
 }
 
-RESULT OGLProgramReflection::OGLInitialize() {
+RESULT OGLProgramWater::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -35,14 +33,9 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	// Uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
+	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
-
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformReflectionMatrix), std::string("u_mat4Reflection")));
-	
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformReflectionPlane), std::string("u_vec4ReflectionPlane")));
-	
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasBumpTexture")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
@@ -61,7 +54,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
-	// Frame buffer Output
+	// Framebuffer Output
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -83,7 +76,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::OGLInitialize(version versionOGL) {
+RESULT OGLProgramWater::OGLInitialize(version versionOGL) {
 	RESULT r = R_PASS;
 
 	CR(OGLInitialize());
@@ -98,10 +91,10 @@ RESULT OGLProgramReflection::OGLInitialize(version versionOGL) {
 	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
 
 	// Vertex
-	CRM(MakeVertexShader(L"reflection.vert"), "Failed to create vertex shader");
+	CRM(MakeVertexShader(L"water.vert"), "Failed to create vertex shader");
 
 	// Fragment
-	CRM(MakeFragmentShader(L"reflection.frag"), "Failed to create fragment shader");
+	CRM(MakeFragmentShader(L"water.frag"), "Failed to create fragment shader");
 
 	// Link the program
 	CRM(LinkProgram(), "Failed to link program");
@@ -128,13 +121,16 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetupConnections() {
+RESULT OGLProgramWater::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
+
+	// Reflection Map
+	CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer_in));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
@@ -143,12 +139,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetReflectionPlane(plane reflectionPlane) {
-	m_reflectionPlane = reflectionPlane;
-	return R_PASS;
-}
-
-RESULT OGLProgramReflection::ProcessNode(long frameID) {
+RESULT OGLProgramWater::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -164,8 +155,6 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 		BindToFramebuffer(m_pOGLFramebuffer);
 
 	glEnable(GL_BLEND);
-	
-	glFrontFace(GL_CW);
 
 	SetLights(pLights);
 
@@ -174,15 +163,13 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
-	glFrontFace(GL_CCW);
-
 	UnbindFramebuffer();
 
 	//Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
@@ -204,7 +191,7 @@ RESULT OGLProgramReflection::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
-RESULT OGLProgramReflection::SetLights(std::vector<light*> *pLights) {
+RESULT OGLProgramWater::SetLights(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
 
 	if (m_pLightsBlock != nullptr) {
@@ -216,7 +203,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetMaterial(material *pMaterial) {
+RESULT OGLProgramWater::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -228,55 +215,43 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
-
-	auto matReflection = ReflectionMatrix(m_reflectionPlane);
-	//matReflection.identity(1.0f);
-	//matReflection.PrintMatrix();
-	m_pUniformReflectionMatrix->SetUniform(matReflection);
-
-	vector vReflectionPlane = m_reflectionPlane.GetNormal();
-	vReflectionPlane.w() = m_reflectionPlane.GetDValue();
-
-	if(m_pUniformReflectionPlane != nullptr)
-		m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
-	RESULT r = R_PASS;
+RESULT OGLProgramWater::SetCameraUniforms(camera *pCamera) {
 
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
-	auto matP = pCamera->GetProjectionMatrix();
-	//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+	//auto matP = pCamera->GetProjectionMatrix();
+	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	//m_pUniformProjectionMatrix->SetUniform(matP);
+	//m_pUniformModelViewMatrix
+	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
-	return r;
+	return R_PASS;
 }
 
-RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-	RESULT r = R_PASS;
-
+RESULT OGLProgramWater::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	//auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
-	auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	//auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+	//auto matP = pStereoCamera->GetProjectionMatrix(eye);
+	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	//m_pUniformProjectionMatrix->SetUniform(matP);
+	//m_pUniformModelViewMatrix->SetUniform(matM)
+	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
-	return r;
+	return R_PASS;
 }
 
-RESULT OGLProgramReflection::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
+RESULT OGLProgramWater::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
 	RESULT r = R_PASS;
 	
 	if (pTexture) {

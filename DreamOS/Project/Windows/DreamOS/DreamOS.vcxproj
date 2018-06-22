@@ -764,6 +764,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramToon.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramWater.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
@@ -1073,6 +1074,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramToon.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramWater.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
@@ -1399,6 +1401,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.geo" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />

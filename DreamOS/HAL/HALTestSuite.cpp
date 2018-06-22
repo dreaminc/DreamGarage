@@ -850,6 +850,15 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+		ProgramNode* pWaterProgramNode;
+		pWaterProgramNode = pHAL->MakeProgramNode("water");
+		CN(pWaterProgramNode);
+		CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		// TODO: This is not particularly general yet
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionProgramNode->Output("output_framebuffer")));
+
 		// Skybox
 		//ProgramNode* pSkyboxProgram;
 		//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
@@ -865,7 +874,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -905,10 +914,11 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pVolume->SetDiffuseTexture(pColorTexture);
 		pVolume->SetBumpTexture(pBumpTexture);
 
-		pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
+		pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1);
 		CN(pReflectionQuad);
 		pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
-		
+		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
+	
 		if (pReflectionProgramNode != nullptr) {
 			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
 		}
