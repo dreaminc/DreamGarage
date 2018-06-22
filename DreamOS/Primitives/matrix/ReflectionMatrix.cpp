@@ -23,7 +23,7 @@ RESULT ReflectionMatrix::CalculateMatrix(point pt, vector vNormal) {
 
 	this->identity();
 
-	reflect_precision Dvalue = 
+	reflect_precision Dvalue = plane::GetDValue(pt, vNormal);
 
 	this->element(0, 0) = 1.0f - 2.0f * vNormal.x() * vNormal.x();
 	this->element(0, 1) = -2.0f * vNormal.x() * vNormal.y();

@@ -227,7 +227,8 @@ RESULT OGLProgramReflection::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
-	m_pUniformReflectionMatrix->SetUniform(ReflectionMatrix(m_reflectionPlane));
+	auto matReflection = ReflectionMatrix(m_reflectionPlane);
+	m_pUniformReflectionMatrix->SetUniform(matReflection);
 
 	return R_PASS;
 }

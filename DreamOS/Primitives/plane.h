@@ -75,6 +75,18 @@ public:
 		return m_ptPosition;
 	}
 
+	point_precision GetDValue() const {
+		return GetDValue(m_ptPosition, m_vNormal);
+	}
+
+	static point_precision GetDValue(point ptOrigin, vector vNormal) {
+		point_precision dVal = -1.0f * (vNormal.x() * ptOrigin.x() +
+										vNormal.y() * ptOrigin.y() +
+										vNormal.z() * ptOrigin.z());
+
+		return dVal;
+	}
+
 // Utilities for axes
 	static plane iPlane() { return plane(point(0.0f, 0.0f, 0.0f), vector::iVector(1.0f)); }
 	static plane jPlane() { return plane(point(0.0f, 0.0f, 0.0f), vector::jVector(1.0f)); }
