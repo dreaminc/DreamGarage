@@ -12,11 +12,42 @@
 
 class plane {
 public:
+
+	enum class type {
+		XY,
+		XZ,
+		YZ,
+		INVALID
+	};
+
+public:
 	plane() :
 		m_ptPosition(),
 		m_vNormal(vector::jVector(1.0f))
 	{
 		// Empty
+	}
+
+	plane(plane::type planeType) :
+		m_ptPosition()
+	{
+		switch (planeType) {
+			case plane::type::XY: {
+				m_vNormal = vector::kVector(1.0f);
+			} break;
+
+			case plane::type::XZ: {
+				m_vNormal = vector::jVector(1.0f);
+			} break;
+
+			case plane::type::YZ: {
+				m_vNormal = vector::iVector(1.0f);
+			} break;
+
+			case plane::type::INVALID: {
+				// empty
+			}
+		}
 	}
 
 	plane(point ptPosition, vector vNormal) :
