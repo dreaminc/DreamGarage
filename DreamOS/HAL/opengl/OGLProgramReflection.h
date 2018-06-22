@@ -1,24 +1,21 @@
-#ifndef OGLPROGRAM_STANDARD_H_
-#define OGLPROGRAM_STANDARD_H_
+#ifndef OGLPROGRAM_REFLECTION_H_
+#define OGLPROGRAM_REFLECTION_H_
 
 // Dream OS
-// DreamOS/HAL/opengl/OGLProgramEnvironmentObjects.h
-// This is a production shader used for environment models such as head and hands
+// DreamOS/HAL/opengl/OGLProgramReflection.h
+// This is the shader to get the reflection map for a plane
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
-#include "../EnvironmentProgram.h"
-
-#include <chrono>
 
 class ObjectStore;
 class stereocamera;
 
-class OGLProgramStandard : public OGLProgram, public EnvironmentProgram {
+class OGLProgramReflection : public OGLProgram {
 public:
-	OGLProgramStandard(OpenGLImp *pParentImp);
+	OGLProgramReflection(OpenGLImp *pParentImp);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -26,15 +23,12 @@ public:
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
 
-	virtual RESULT SetIsAugmented(bool fAugmented) override;
-
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 	RESULT SetLights(std::vector<light*> *pLights);
 	RESULT SetMaterial(material *pMaterial);
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
-	RESULT SetRiverAnimation(bool fRiverAnimation);
 
 private:
 	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
@@ -42,8 +36,7 @@ private:
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
-
-	bool m_fAREnabled = false;
+	plane *m_pReflectionPlane = nullptr;
 
 private:
 	// Vertex Attribute
@@ -74,19 +67,9 @@ private:
 	OGLUniformBool *m_pUniformHasTextureSpecular;
 	OGLUniformSampler2D *m_pUniformTextureSpecular;
 
-	OGLUniformBool *m_pUniformRiverAnimation;
-	OGLUniformBool *m_pUniformAREnabled;
-
-	OGLUniform *m_pUniformTime;
-
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;
 	OGLMaterialBlock *m_pMaterialsBlock;
-
-	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
-
-	float m_deltaTime; 
-
 };
 
-#endif // ! OGLPROGRAM_STANDARD_H_
+#endif // ! OGLPROGRAM_REFLECTION_H_

@@ -9,6 +9,7 @@
 #include "OGLProgramMinimalTexture.h"
 #include "OGLProgramFlat.h"
 #include "OGLProgramToon.h"
+#include "OGLProgramReflection.h"
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureShadow.h"
 #include "OGLProgramBlinnPhongTextureBump.h"
@@ -36,6 +37,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "texture_bitblit", OGLPROGRAM_TEXTURE_BITBLIT },
 	{ "flat", OGLPROGRAM_FLAT },
 	{ "toon", OGLPROGRAM_TOON },
+	{ "reflection", OGLPROGRAM_REFLECTION },
 	{ "custom", OGLPROGRAM_CUSTOM },
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
@@ -166,6 +168,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 
 		case OGLPROGRAM_TOON: {
 			pOGLProgram = new OGLProgramToon(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL flat Program");
+		} break;
+
+		case OGLPROGRAM_REFLECTION: {
+			pOGLProgram = new OGLProgramReflection(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL),
 				"Failed to initialize OGL flat Program");

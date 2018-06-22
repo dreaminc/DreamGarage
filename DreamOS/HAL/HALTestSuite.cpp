@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestReflectionShader());
+
 	CR(AddTestStandardShader());
 
 	CR(AddTestBlinnPhongShader());
@@ -787,6 +789,144 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
 			pModel->SetScale(0.1f);
 		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Environment Shader");
+	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestReflectionShader() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("reflection");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Skybox
+		//ProgramNode* pSkyboxProgram;
+		//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		//CN(pSkyboxProgram);
+		//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		//CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		// CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		volume *pVolume;
+		pVolume = nullptr;
+
+		sphere *pSphere;
+		pVolume = nullptr;
+
+		quad *pReflectionQuad;
+		pReflectionQuad = nullptr;
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+
+		texture *pColorTexture;
+		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+		texture *pBumpTexture;
+		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, 0.25f, 0.0f));
+		pSphere->SetDiffuseTexture(pColorTexture);
+		pSphere->SetBumpTexture(pBumpTexture);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, 0.25f, 0.0f));
+		CR(pVolume->SetVertexColor(COLOR_WHITE));
+		pVolume->SetDiffuseTexture(pColorTexture);
+		pVolume->SetBumpTexture(pBumpTexture);
+
+		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
+		//CN(pReflectionQuad);
+		//pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+
+		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
+
+		/*
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+		CR(pVolume->SetVertexColor(COLOR_GREEN));
+
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+		CR(pVolume->SetVertexColor(COLOR_RED));
+
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+		CR(pVolume->SetVertexColor(COLOR_BLUE));
+		*/
 
 	Error:
 		return r;
