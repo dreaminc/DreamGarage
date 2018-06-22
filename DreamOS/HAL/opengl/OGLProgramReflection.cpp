@@ -9,6 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
+#include "Primitives/matrix/ReflectionMatrix.h"
+
 OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglreflection"),
 	m_pLightsBlock(nullptr),
@@ -36,6 +38,10 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformReflectionMatrix), std::string("u_mat4Reflection")));
+
+	
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasBumpTexture")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
@@ -127,7 +133,6 @@ RESULT OGLProgramReflection::SetupConnections() {
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<plane>("reflection_plane", &m_pReflectionPlane, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
@@ -135,6 +140,11 @@ RESULT OGLProgramReflection::SetupConnections() {
 
 Error:
 	return r;
+}
+
+RESULT OGLProgramReflection::SetReflectionPlane(plane reflectionPlane) {
+	m_reflectionPlane = reflectionPlane;
+	return R_PASS;
 }
 
 RESULT OGLProgramReflection::ProcessNode(long frameID) {
@@ -216,6 +226,8 @@ Error:
 RESULT OGLProgramReflection::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
+
+	m_pUniformReflectionMatrix->SetUniform(ReflectionMatrix(m_reflectionPlane));
 
 	return R_PASS;
 }

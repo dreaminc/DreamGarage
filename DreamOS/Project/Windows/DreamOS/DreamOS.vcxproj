@@ -847,6 +847,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ReflectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
@@ -1175,6 +1176,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ReflectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />

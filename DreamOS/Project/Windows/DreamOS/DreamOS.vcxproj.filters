@@ -886,6 +886,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReflection.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ReflectionMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -1965,6 +1968,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReflection.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ReflectionMatrix.h">
+      <Filter>Primitives\matrix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #include "quad.h"
 #include "BoundingQuad.h"
+#include "plane.h"
 
 // copy ctor
 quad::quad(quad& q) :
@@ -204,6 +205,13 @@ float quad::GetWidth() {
 
 float quad::GetHeight() {
 	return m_height;
+}
+
+// Note: Always in absolute space (vs composite)
+plane quad::GetPlane() {
+	plane retPlane(GetOrigin(true), GetNormal());
+
+	return retPlane;
 }
 
 RESULT quad::UpdateParams(float width, float height, vector vNormal) {

@@ -47,41 +47,41 @@ private:
 
 private:
 	// Vertex Attribute
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeVector *m_pVertexAttributeNormal;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
-	OGLVertexAttributeVector *m_pVertexAttributeTangent;
-	OGLVertexAttributeVector *m_pVertexAttributeBitangent;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeNormal = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeTangent = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeBitangent = nullptr;
 
 	// Uniforms
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewMatrix;
-	//OGLUniformMatrix4 *m_pUniformProjectionMatrix;
-	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
+	//OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureBump;
-	OGLUniformSampler2D *m_pUniformTextureBump;
+	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureColor;
-	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureAmbient;
-	OGLUniformSampler2D *m_pUniformTextureAmbient;
-	OGLUniformBool *m_pUniformHasTextureDiffuse;
-	OGLUniformSampler2D *m_pUniformTextureDiffuse;
-	OGLUniformBool *m_pUniformHasTextureSpecular;
-	OGLUniformSampler2D *m_pUniformTextureSpecular;
+	OGLUniformBool *m_pUniformHasTextureAmbient = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureAmbient = nullptr;
+	OGLUniformBool *m_pUniformHasTextureDiffuse = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
+	OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
 
-	OGLUniformBool *m_pUniformRiverAnimation;
-	OGLUniformBool *m_pUniformAREnabled;
+	OGLUniformBool *m_pUniformRiverAnimation = nullptr;
+	OGLUniformBool *m_pUniformAREnabled = nullptr;
 
-	OGLUniform *m_pUniformTime;
+	OGLUniform *m_pUniformTime = nullptr;
 
 	// Uniform Blocks
-	OGLLightsBlock *m_pLightsBlock;
-	OGLMaterialBlock *m_pMaterialsBlock;
+	OGLLightsBlock *m_pLightsBlock = nullptr;
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
 

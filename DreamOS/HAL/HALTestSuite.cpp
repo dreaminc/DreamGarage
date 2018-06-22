@@ -11,6 +11,8 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "HAL/opengl/OGLProgramReflection.h"
+
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -842,11 +844,11 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("reflection");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		ProgramNode* pReflectionProgramNode;
+		pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+		CN(pReflectionProgramNode);
+		CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Skybox
 		//ProgramNode* pSkyboxProgram;
@@ -863,7 +865,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -903,9 +905,13 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pVolume->SetDiffuseTexture(pColorTexture);
 		pVolume->SetBumpTexture(pBumpTexture);
 
-		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
-		//CN(pReflectionQuad);
-		//pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+		pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
+		CN(pReflectionQuad);
+		pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+		
+		if (pReflectionProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
+		}
 
 		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
 		CN(pSphere);

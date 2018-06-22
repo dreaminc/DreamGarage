@@ -19,6 +19,7 @@
 #include "texture.h"
 
 class BoundingQuad;
+class plane;
 
 class quad : public virtual DimObj {
 public:
@@ -104,6 +105,8 @@ public:
 
 	float GetWidth();
 	float GetHeight();
+
+	plane GetPlane();
 
 private:
 	type m_quadType = type::INVALID;

@@ -30,46 +30,50 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
+public:
+	RESULT SetReflectionPlane(plane reflectionPlane);
+
 private:
 	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
 
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
-	plane *m_pReflectionPlane = nullptr;
+	plane m_reflectionPlane;
 
 private:
 	// Vertex Attribute
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeVector *m_pVertexAttributeNormal;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
-	OGLVertexAttributeVector *m_pVertexAttributeTangent;
-	OGLVertexAttributeVector *m_pVertexAttributeBitangent;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeNormal = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeTangent = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeBitangent = nullptr;
 
 	// Uniforms
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewMatrix;
-	//OGLUniformMatrix4 *m_pUniformProjectionMatrix;
-	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
+	//OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureBump;
-	OGLUniformSampler2D *m_pUniformTextureBump;
+	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureColor;
-	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureAmbient;
-	OGLUniformSampler2D *m_pUniformTextureAmbient;
-	OGLUniformBool *m_pUniformHasTextureDiffuse;
-	OGLUniformSampler2D *m_pUniformTextureDiffuse;
-	OGLUniformBool *m_pUniformHasTextureSpecular;
-	OGLUniformSampler2D *m_pUniformTextureSpecular;
+	OGLUniformBool *m_pUniformHasTextureAmbient = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureAmbient = nullptr;
+	OGLUniformBool *m_pUniformHasTextureDiffuse = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
+	OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
 
 	// Uniform Blocks
-	OGLLightsBlock *m_pLightsBlock;
-	OGLMaterialBlock *m_pMaterialsBlock;
+	OGLLightsBlock *m_pLightsBlock = nullptr;
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 };
 
 #endif // ! OGLPROGRAM_REFLECTION_H_
