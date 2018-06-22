@@ -35,9 +35,9 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	// Uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformReflectionMatrix), std::string("u_mat4Reflection")));
 
@@ -163,6 +163,8 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 		BindToFramebuffer(m_pOGLFramebuffer);
 
 	glEnable(GL_BLEND);
+	
+	glFrontFace(GL_CW);
 
 	SetLights(pLights);
 
@@ -170,6 +172,8 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	glFrontFace(GL_CCW);
 
 	UnbindFramebuffer();
 
@@ -228,6 +232,8 @@ RESULT OGLProgramReflection::SetObjectUniforms(DimObj *pDimObj) {
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	auto matReflection = ReflectionMatrix(m_reflectionPlane);
+	//matReflection.identity(1.0f);
+	//matReflection.PrintMatrix();
 	m_pUniformReflectionMatrix->SetUniform(matReflection);
 
 	return R_PASS;
@@ -238,13 +244,12 @@ RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
 
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
-	//auto matP = pCamera->GetProjectionMatrix();
-	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+	auto matP = pCamera->GetProjectionMatrix();
+	//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformModelViewMatrix
-	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	m_pUniformProjectionMatrix->SetUniform(matP);
+	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return r;
 }
@@ -254,13 +259,12 @@ RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 
 	//auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
-	//auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+	auto matP = pStereoCamera->GetProjectionMatrix(eye);
+	//auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformModelViewMatrix->SetUniform(matM)
-	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	m_pUniformProjectionMatrix->SetUniform(matP);
+	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return r;
 }

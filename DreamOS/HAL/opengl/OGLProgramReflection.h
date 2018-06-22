@@ -53,9 +53,9 @@ private:
 	// Uniforms
 	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
-	//OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
+	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
 
 	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
