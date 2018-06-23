@@ -60,6 +60,7 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	// Framebuffer Output
+	/*
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -76,6 +77,7 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	*/
 
 	m_deltaTime = 0.0f;
 	m_startTime = std::chrono::high_resolution_clock::now();
@@ -141,7 +143,11 @@ RESULT OGLProgramStandard::SetupConnections() {
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	// Treat framebuffer as pass-thru
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
@@ -159,8 +165,10 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 
 	UseProgram();
 
-	if (m_pOGLFramebuffer != nullptr)
-		BindToFramebuffer(m_pOGLFramebuffer);
+	if (m_pOGLFramebuffer != nullptr) {
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();
+	}
 
 	glEnable(GL_BLEND);
 

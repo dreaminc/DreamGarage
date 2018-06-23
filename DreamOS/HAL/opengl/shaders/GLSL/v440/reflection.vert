@@ -44,16 +44,16 @@ mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
 						 0.0f, 0.0f, 1.0f, 0.0f,
 						 0.0f, 0.0f, 0.0f, 1.0f);
 
-//mat4 g_mat4ReflectedView = u_mat4Reflection * u_mat4View * xzFlipMatrix;	// This could easily be done on the CPU side
-mat4 g_mat4ReflectedView = u_mat4Reflection * u_mat4View;	// This could easily be done on the CPU side
+mat4 g_mat4ReflectedView = u_mat4Reflection * u_mat4View;// * xzFlipMatrix;	// This could easily be done on the CPU side
+//mat4 g_mat4ReflectedView = u_mat4Reflection * u_mat4View;	// This could easily be done on the CPU side
+
 mat4 g_mat4ModelView = g_mat4ReflectedView * u_mat4Model;
-//mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 mat4 g_mat4ViewProjection = u_mat4Projection * g_mat4ReflectedView;
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
-	vec4 vertViewSpace = g_mat4ReflectedView * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
+	vec4 vertViewSpace = g_mat4ModelView * vec4(inV_vec4Position.xyz, 1.0f);
 	vec4 vertEyeSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	// BTN Matrix
@@ -79,7 +79,6 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	// Projected Vert Position
-	vec4 position = g_mat4ViewProjection * vertWorldSpace;
-
-	gl_Position = position;
+	//gl_Position = g_mat4ViewProjection * vertWorldSpace;
+	gl_Position = u_mat4Projection * vertViewSpace;
 }

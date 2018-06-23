@@ -34,8 +34,11 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-private:
-	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
+	
+
+public:
+	RESULT SetReflectionObject(VirtualObj* pReflectionObject);
+	RESULT SetReflectionPlane(plane reflectionPlane);
 
 private:
 	stereocamera *m_pCamera = nullptr;
@@ -45,6 +48,7 @@ private:
 	OGLFramebuffer *m_pOGLRefractionFramebuffer_in = nullptr;
 
 	VirtualObj *m_pReflectionObject = nullptr;
+	plane m_reflectionPlane;
 
 private:
 	// Vertex Attribute
@@ -58,24 +62,27 @@ private:
 	// Uniforms
 	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
-	//OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
-	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;
+	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
+	OGLUniformVector *m_pUniformReflectionPlane = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
-	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
+	OGLUniformBool *m_pUniformHasTextureReflection = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureReflection = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureAmbient = nullptr;
-	OGLUniformSampler2D *m_pUniformTextureAmbient = nullptr;
-	OGLUniformBool *m_pUniformHasTextureDiffuse = nullptr;
-	OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
-	OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
-	OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
+	OGLUniformBool *m_pUniformHasTextureRefraction = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureRefraction = nullptr;
 
-	OGLUniform *m_pUniformTime = nullptr;
+	
+
+	//OGLUniformBool *m_pUniformHasTextureAmbient = nullptr;
+	//OGLUniformSampler2D *m_pUniformTextureAmbient = nullptr;
+	//OGLUniformBool *m_pUniformHasTextureDiffuse = nullptr;
+	//OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
+	//OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
+	//OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;

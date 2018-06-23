@@ -69,7 +69,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+	CR(m_pOGLFramebuffer->SetSampleCount(1));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));

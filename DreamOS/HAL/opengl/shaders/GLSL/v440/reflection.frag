@@ -44,32 +44,13 @@ vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 uniform vec4 u_vec4ReflectionPlane;
 
-void EnableBlending(float ambientAlpha, float diffuseAlpha) {
-	// Fakes blending by moving clear fragments behind the skybox
-	// Remove once blending is fully supported
-	if (ambientAlpha < 0.1f || diffuseAlpha < 0.1f) {
-		gl_FragDepth = 1.0f;
-	} 
-	else {
-		gl_FragDepth = gl_FragCoord.z;
-	}
-}
-
-vec4 lightColor = vec4(76.0f / 255.0f, 203.0f / 255.0f, 247.0f / 255.0f, 1.0f);
-vec4 darkColor  = vec4(21.0f / 255.0f,  50.0f / 255.0f, 115.0f / 255.0f, 1.0f);
-
-vec4 IncreaseColorSaturation(vec4 color) {
-	vec4 colorBrighter = vec4(tanh(2.0f * color.r), tanh(2.0f * color.g), tanh(2.0f * color.b), color.a);
-	return colorBrighter;	
-}
-
 void main(void) {  
 	
 	// Clip fragments on our side of the plane
-	float fragmentClipPosition = dot (DataIn.vertEyeSpace.xyz, u_vec4ReflectionPlane.xyz) + u_vec4ReflectionPlane.w;
-    if (fragmentClipPosition < 0.0) {
-        discard;
-    }
+	//float fragmentClipPosition = dot(DataIn.vertEyeSpace.xyz, normalize(u_vec4ReflectionPlane.xyz)) + u_vec4ReflectionPlane.w;
+    //if (fragmentClipPosition < 0.0) {
+    //    discard;
+    //}
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
@@ -102,14 +83,5 @@ void main(void) {
 		}
 	}
 
-	//out_vec4Color = vec4LightValue;
-
-	// keeping the alpha value outside max() helps with distance-mapped fonts;
-	// max() is component-wise, and some alpha values currently default to one
-	
-	// opaque/fully transparent blending without reordering
-	EnableBlending(colorAmbient.a, colorDiffuse.a);
-	vec4 outColor = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
-
-	out_vec4Color = outColor;
+	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
 }

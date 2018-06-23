@@ -9,6 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
+#include "Primitives/matrix/ReflectionMatrix.h"
+
 OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglwater"),
 	m_pLightsBlock(nullptr),
@@ -33,22 +35,15 @@ RESULT OGLProgramWater::OGLInitialize() {
 	// Uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasBumpTexture")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureReflection), std::string("u_hasTextureReflection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureReflection), std::string("u_textureReflection")));
 
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
-
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureAmbient), std::string("u_hasTextureAmbient")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureAmbient), std::string("u_textureAmbient")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureDiffuse), std::string("u_hasTextureDiffuse")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDiffuse), std::string("u_textureDiffuse")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureSpecular), std::string("u_hasTextureSpecular")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureSpecular), std::string("u_textureSpecular")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureRefraction), std::string("u_hasTextureRefraction")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureRefraction), std::string("u_textureRefraction")));
 
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -139,6 +134,22 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramWater::SetReflectionObject(VirtualObj* pReflectionObject) {
+	RESULT r = R_PASS;
+
+	CN(pReflectionObject);
+
+	m_pReflectionObject = pReflectionObject;
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramWater::SetReflectionPlane(plane reflectionPlane) {
+	m_reflectionPlane = reflectionPlane;
+	return R_PASS;
+}
+
 RESULT OGLProgramWater::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
@@ -161,7 +172,13 @@ RESULT OGLProgramWater::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
-	RenderObjectStore(m_pSceneGraph);
+	//RenderObjectStore(m_pSceneGraph);
+
+	DimObj *pReflectionObj = dynamic_cast<DimObj*>(m_pReflectionObject);
+	if (pReflectionObj != nullptr) {
+		pReflectionObj->SetDiffuseTexture(m_pOGLReflectionFramebuffer_in->GetColorTexture());
+		RenderObject(pReflectionObj);
+	}
 
 	UnbindFramebuffer();
 
@@ -173,19 +190,26 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
-	SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
+	//SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
+	//
+	//// Color texture
+	//SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
+	//
+	//// Material textures
+	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	//SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
+	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
+	//
+	//// bump texture
+	//// TODO: add bump texture to shader
+	//m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
 
-	// Color texture
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
-
-	// Material textures
-	SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
-	SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
-
-	// bump texture
-	// TODO: add bump texture to shader
-	m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
+	// Reflection Texture
+	m_pParentImp->glActiveTexture(GL_TEXTURE0);
+	m_pParentImp->BindTexture(m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(), 
+							  m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
+	m_pUniformTextureReflection->SetUniform(0);
+	m_pUniformHasTextureReflection->SetUniform(true);
 
 	//	Error:
 	return r;
@@ -219,6 +243,17 @@ RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
+	auto matReflection = ReflectionMatrix(m_reflectionPlane);
+	
+	if(m_pUniformReflectionMatrix != nullptr)
+		m_pUniformReflectionMatrix->SetUniform(matReflection);
+
+	vector vReflectionPlane = m_reflectionPlane.GetNormal();
+	vReflectionPlane.w() = m_reflectionPlane.GetDValue();
+
+	if (m_pUniformReflectionPlane != nullptr)
+		m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
+
 	return R_PASS;
 }
 
@@ -226,11 +261,13 @@ RESULT OGLProgramWater::SetCameraUniforms(camera *pCamera) {
 
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
-	//auto matP = pCamera->GetProjectionMatrix();
+	auto matP = pCamera->GetProjectionMatrix();
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
+
+	if (m_pUniformProjectionMatrix != nullptr)
+		m_pUniformProjectionMatrix->SetUniform(matP);
 	//m_pUniformModelViewMatrix
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
@@ -240,32 +277,15 @@ RESULT OGLProgramWater::SetCameraUniforms(camera *pCamera) {
 RESULT OGLProgramWater::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	//auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
-	//auto matP = pStereoCamera->GetProjectionMatrix(eye);
+	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformProjectionMatrix->SetUniform(matP);
+
+	if(m_pUniformProjectionMatrix != nullptr)
+		m_pUniformProjectionMatrix->SetUniform(matP);
 	//m_pUniformModelViewMatrix->SetUniform(matM)
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return R_PASS;
-}
-
-RESULT OGLProgramWater::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
-	RESULT r = R_PASS;
-	
-	if (pTexture) {
-		pBoolUniform->SetUniform(true);
-
-		m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
-		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-
-		pTextureUniform->SetUniform(texUnit);
-	}
-	else {
-		pBoolUniform->SetUniform(false);
-	}
-
-//Error:
-	return r;
 }

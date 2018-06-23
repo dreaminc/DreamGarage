@@ -12,6 +12,7 @@
 #include "PhysicsEngine/CollisionManifold.h"
 
 #include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramWater.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -851,6 +852,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		ProgramNode* pWaterProgramNode;
+		pWaterProgramNode = nullptr;
 		pWaterProgramNode = pHAL->MakeProgramNode("water");
 		CN(pWaterProgramNode);
 		CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -858,6 +860,15 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		
 		// TODO: This is not particularly general yet
 		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionProgramNode->Output("output_framebuffer")));
+		
+		
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 		// Skybox
 		//ProgramNode* pSkyboxProgram;
@@ -874,7 +885,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -909,20 +920,27 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolume);
-		pVolume->SetPosition(point(0.0f, 0.25f, 0.0f));
+		pVolume->SetPosition(point(0.0f, -0.75f, 0.0f));
 		CR(pVolume->SetVertexColor(COLOR_WHITE));
 		pVolume->SetDiffuseTexture(pColorTexture);
 		pVolume->SetBumpTexture(pBumpTexture);
 
+		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
 		pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1);
 		CN(pReflectionQuad);
 		pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
+
+		if (pWaterProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionObject(pReflectionQuad));
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
+		}
 	
 		if (pReflectionProgramNode != nullptr) {
 			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
 		}
 
+		// TOOD: Test clipping
 		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
 		CN(pSphere);
 		pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
