@@ -47,6 +47,8 @@ RESULT ReflectionMatrix::CalculateMatrix(point pt, vector vNormal) {
 	this->element(3, 2) = 0.0f;
 	this->element(3, 3) = 1.0f;
 
+	//this->element(3, 3) = 0.0f;
+
 //Error:	
 	return r;
 }

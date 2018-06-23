@@ -82,5 +82,5 @@ void main(void) {
 		}
 	}
 
-	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a) + vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.2f, 0.2f, 0.2f, 1.0f);
 }
