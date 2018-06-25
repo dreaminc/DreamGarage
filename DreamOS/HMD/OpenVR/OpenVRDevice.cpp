@@ -336,6 +336,24 @@ HMDDeviceType OpenVRDevice::GetDeviceType() {
 	return m_deviceType;
 }
 
+std::string OpenVRDevice::GetDeviceTypeString() {
+	std::string strDeviceType;
+
+	switch (m_deviceType) {
+
+		case HMDDeviceType::VIVE: {
+			strDeviceType = "HMDType.HTCVive";
+		} break;
+
+		case HMDDeviceType::META: {
+			strDeviceType = "HMDType.MVNMeta";
+		} break;
+
+	}
+
+	return strDeviceType;
+}
+
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 	RESULT r = R_PASS;
 

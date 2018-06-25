@@ -110,13 +110,15 @@ RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	m_strURL = strURL;
 	m_strURL = "www.twitch.tv";
 
-	m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+	if (m_pForm == nullptr) {
+		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 
-	m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
-	m_pForm->SetPath(m_strURL);
+		m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
+		m_pForm->SetPath(m_strURL);
 
-	m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
-	m_pForm->InitializeWithForm();
+		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
+		m_pForm->InitializeWithForm();
+	}
 
 //Error:
 	return r;
@@ -131,6 +133,19 @@ RESULT DreamSettingsApp::Show() {
 	m_pFormView->Show();
 	m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f));
 	//m_pFormView->ResetAppComposite();
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::Hide() {
+	RESULT r = R_PASS;
+
+	CNR(m_pFormView, R_SKIPPED);
+	CNR(m_pForm, R_SKIPPED);
+
+	CR(m_pFormView->Hide());
+	CR(m_pFormView->HandleKeyboardDown());
 
 Error:
 	return r;
@@ -202,8 +217,9 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-		auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-		pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
+		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
+		CR(Hide());
 	}
 	else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
@@ -212,7 +228,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 			m_height += diff;
 		}
 		else {
-			//TODO scale depth in variable
+			//TODO: scale depth in variable
 			m_pUserApp->UpdateDepth(diff/4.0f);
 			m_depth += diff/4.0f;
 		}
@@ -226,6 +242,6 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 		}
 		m_pUserApp->UpdateWidthScale(m_scale);
 	}
-//Error:
+Error:
 	return r;
 }

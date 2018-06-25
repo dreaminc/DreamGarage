@@ -58,6 +58,7 @@ public:
 	RESULT LoadTwilioNTSInformation();
 
 	bool IsLoggedIn();
+	RESULT SetIsLoggedIn(bool fLoggedIn);
 
 	// UserControllerProxy
 	UserControllerProxy* GetUserControllerProxy();
@@ -100,6 +101,8 @@ public:
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnSettings(std::string strURL) = 0;
+		virtual RESULT OnLogin() = 0;
+		virtual RESULT OnLogout() = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

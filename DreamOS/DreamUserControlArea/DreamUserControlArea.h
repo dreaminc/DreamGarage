@@ -161,13 +161,13 @@ public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
 
 // child applications
+public:
+	RESULT SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp);
+
 private:
 
 	// positioning helper
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
-
-	// Generates browsers
-	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
 	// App used for opening content
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;

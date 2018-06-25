@@ -445,6 +445,7 @@ private:
 
 public:
 	std::wstring GetHardwareID();
+	std::string GetHMDTypeString();
 
 protected:
 	std::wstring m_strHardwareID;

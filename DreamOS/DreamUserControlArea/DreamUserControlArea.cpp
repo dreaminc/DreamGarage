@@ -53,12 +53,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	point ptOrigin;
 	quaternion qOrigin;
 
-	if (m_pDreamUserApp == nullptr) {
-		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-		CN(m_pDreamUserApp);
-
-		m_pWebBrowserManager = m_pDreamUserApp->m_pWebBrowserManager;
-
+	if (m_pDreamUserApp != nullptr && m_pDreamUIBar == nullptr) {
 		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
 		CN(pKeyboard);
 
@@ -116,7 +111,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
 	}
 
-	//CR(m_pWebBrowserManager->Update());
 	CNR(m_pDreamUserApp, R_SKIPPED);
 	
 	UIMallet* pLMallet;
@@ -134,6 +128,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	//GetComposite()->SetPosition(ptOrigin);
 	//GetComposite()->SetOrientation(qOrigin);
 
+	//TODO: change this to a UISurface
 	for (int i = 0; i < 2; i++) {
 		UIMallet *pMallet;
 		HAND_TYPE type;
@@ -181,7 +176,7 @@ Error:
 RESULT DreamUserControlArea::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserManager->Shutdown());
+	CR(r);
 
 Error:
 	return r;
@@ -790,7 +785,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {	
 		
-		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
+		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
@@ -1055,4 +1050,9 @@ WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact)
 	ptRelative.y = posY * m_pActiveSource->GetHeight();
 
 	return ptRelative;
+}
+
+RESULT DreamUserControlArea::SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp) {
+	m_pDreamUserApp = pDreamUserApp;
+	return R_PASS;
 }

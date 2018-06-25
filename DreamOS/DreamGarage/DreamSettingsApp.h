@@ -32,6 +32,7 @@ protected:
 public:
 	RESULT InitializeSettingsForm(std::string strURL);
 	RESULT Show();
+	RESULT Hide();
 
 public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
@@ -54,6 +55,9 @@ private:
 	float m_depth = 0.0f;
 	float m_height = 0.0f;
 	float m_scale = 1.0f;
+
+	//TODO: should be temporary
+	bool m_fRespondToController = false;
 };
 
 #endif // ! DREAM_SETTINGS_APP_H_

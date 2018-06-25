@@ -107,7 +107,8 @@ RESULT UserController::LoginWithOTK(std::string& strOTK, long& environmentID) {
 		environmentID = jsonResponse["/data/environment"_json_pointer].get<long>();
 
 		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
-		m_fLoggedIn = true;
+		//m_fLoggedIn = true;
+		SetIsLoggedIn(true);
 
 		DOSLOG(INFO, "[UserController] User logged in with OTK");
 	}
@@ -141,7 +142,8 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	m_strToken = jsonResponse["/token"_json_pointer].get<std::string>();
 
 	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
-	m_fLoggedIn = true;
+	//m_fLoggedIn = true;
+	SetIsLoggedIn(true);
 
 	DOSLOG(INFO, "[UserController] User %v logged in", strUsername);
 
@@ -334,6 +336,23 @@ Error:
 
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
+}
+
+RESULT UserController::SetIsLoggedIn(bool fLoggedIn) {
+	RESULT r = R_PASS;
+
+	m_fLoggedIn = fLoggedIn;
+
+	if (m_fLoggedIn) {
+		CR(m_pUserControllerObserver->OnLogin());
+	}
+	else {
+		//TODO: currently SetIsLoggedIn is never called with false
+		CR(m_pUserControllerObserver->OnLogout());
+	}
+
+Error:
+	return r;
 }
 
 UserControllerProxy* UserController::GetUserControllerProxy() {

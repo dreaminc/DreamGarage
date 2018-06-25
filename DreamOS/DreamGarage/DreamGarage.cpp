@@ -268,6 +268,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
+
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
 	CN(m_pDreamUserControlArea);
 
@@ -502,12 +503,22 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	//TODO: use the DremaUserControlArea
+	//TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
 		m_pDreamUserControlArea->ResetAppComposite();
 
 		m_fShouldUpdateAppComposites = false;
 	}
+
+	if (m_pDreamUserApp == nullptr) {
+		m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+		CN(m_pDreamUserApp);
+
+		//TODO: not sure about proper architecture for where each app should be
+		m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
+	}
+
+//	if (m_pD)
 
 Error:
 	return r;
@@ -901,11 +912,18 @@ Error:
 }
 
 RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
+
+	m_pDreamUserApp->UpdateHeight(height);
+	m_pDreamUserApp->UpdateDepth(depth);
+	m_pDreamUserApp->UpdateWidthScale(scale);
+
 	return R_PASS;
 }
+
 RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
+
 RESULT DreamGarage::OnSettings(std::string strURL) {
 	RESULT r = R_PASS;
 	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", "b", "");
@@ -916,6 +934,22 @@ RESULT DreamGarage::OnSettings(std::string strURL) {
 
 Error:
 	return r;
+}
+
+RESULT DreamGarage::OnLogin() {
+	RESULT r = R_PASS;
+
+	//TODO: other pieces of login flow
+	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
+	
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnLogout() {
+	return R_PASS;
 }
 
 RESULT DreamGarage::OnShareAsset() {

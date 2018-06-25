@@ -239,7 +239,7 @@ RESULT DreamUserApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	CR(m_pWebBrowserManager->Shutdown());
 
 Error:
 	return r;
