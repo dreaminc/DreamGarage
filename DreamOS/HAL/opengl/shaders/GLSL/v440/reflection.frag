@@ -47,10 +47,10 @@ uniform vec4 u_vec4ReflectionPlane;
 void main(void) {  
 	
 	// Clip fragments on our side of the plane
-	//float fragmentClipPosition = dot(DataIn.vertEyeSpace.xyz, normalize(u_vec4ReflectionPlane.xyz)) + u_vec4ReflectionPlane.w;
-    //if (fragmentClipPosition < 0.0) {
-    //    discard;
-    //}
+	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ReflectionPlane.xyz)) + u_vec4ReflectionPlane.w;
+    if (fragmentClipPosition < 0.0) {
+        discard;
+    }
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
@@ -84,4 +84,5 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
+	//out_vec4Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

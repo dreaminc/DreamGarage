@@ -48,7 +48,7 @@ private:
 	OGLFramebuffer *m_pOGLRefractionFramebuffer_in = nullptr;
 
 	VirtualObj *m_pReflectionObject = nullptr;
-	plane m_reflectionPlane;
+	//plane m_reflectionPlane;
 
 private:
 	// Vertex Attribute

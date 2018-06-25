@@ -143,9 +143,21 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramReflection::SetReflectionPlane(plane reflectionPlane) {
-	m_reflectionPlane = reflectionPlane;
-	return R_PASS;
+//RESULT OGLProgramReflection::SetReflectionPlane(plane reflectionPlane) {
+//	m_reflectionPlane = reflectionPlane;
+//	return R_PASS;
+//}
+
+RESULT OGLProgramReflection::SetReflectionObject(VirtualObj *pReflectionObject) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
+	CNM(pQuad, "Object not supported for reflection");
+
+	m_pReflectionObject = pQuad;
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramReflection::ProcessNode(long frameID) {
@@ -165,7 +177,7 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 
 	glEnable(GL_BLEND);
 	
-	glFrontFace(GL_CW);
+	//glFrontFace(GL_CW);
 
 	SetLights(pLights);
 
@@ -174,7 +186,7 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
-	glFrontFace(GL_CCW);
+	//glFrontFace(GL_CCW);
 
 	UnbindFramebuffer();
 
@@ -232,16 +244,20 @@ RESULT OGLProgramReflection::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
-	auto matReflection = ReflectionMatrix(m_reflectionPlane);
-	//matReflection.identity(1.0f);
-	//matReflection.PrintMatrix();
-	m_pUniformReflectionMatrix->SetUniform(matReflection);
+	if (m_pReflectionObject != nullptr) {
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
 
-	vector vReflectionPlane = m_reflectionPlane.GetNormal();
-	vReflectionPlane.w() = m_reflectionPlane.GetDValue();
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+		//matReflection.identity(1.0f);
+		//matReflection.PrintMatrix();
+		m_pUniformReflectionMatrix->SetUniform(matReflection);
 
-	if(m_pUniformReflectionPlane != nullptr)
-		m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
+		vector vReflectionPlane = reflectionPlane.GetNormal();
+		vReflectionPlane.w() = reflectionPlane.GetDValue();
+
+		if (m_pUniformReflectionPlane != nullptr)
+			m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
+	}
 
 	return R_PASS;
 }
@@ -279,8 +295,9 @@ RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 RESULT OGLProgramReflection::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
 	RESULT r = R_PASS;
 	
-	if (pTexture) {
-		pBoolUniform->SetUniform(true);
+	if (pTexture && pTextureUniform != nullptr) {
+		if(pBoolUniform != nullptr)
+			pBoolUniform->SetUniform(true);
 
 		m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
@@ -288,7 +305,8 @@ RESULT OGLProgramReflection::SetTextureUniform(OGLTexture* pTexture, OGLUniformS
 		pTextureUniform->SetUniform(texUnit);
 	}
 	else {
-		pBoolUniform->SetUniform(false);
+		if (pBoolUniform != nullptr)
+			pBoolUniform->SetUniform(false);
 	}
 
 //Error:

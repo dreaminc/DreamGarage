@@ -80,11 +80,11 @@ public:
 	}
 
 	static point_precision GetDValue(point ptOrigin, vector vNormal) {
-		//point_precision dVal = -1.0f * (vNormal.x() * ptOrigin.x() +
-		//								vNormal.y() * ptOrigin.y() +
-		//								vNormal.z() * ptOrigin.z());
+		point_precision dVal = -1.0f * (vNormal.x() * ptOrigin.x() +
+										vNormal.y() * ptOrigin.y() +
+										vNormal.z() * ptOrigin.z());
 
-		point_precision dVal = -1.0f * vector(ptOrigin).dot(vNormal);
+		//point_precision dVal = -1.0f * vector(ptOrigin).dot(vNormal);
 
 		return dVal;
 	}

@@ -22,24 +22,27 @@ RESULT ReflectionMatrix::CalculateMatrix(point pt, vector vNormal) {
 	RESULT r = R_PASS;
 
 	this->identity();
+	
+	vNormal = vNormal.Normal();
 
-	reflect_precision Dvalue = plane::GetDValue(pt, vNormal);
+	//reflect_precision Dvalue = plane::GetDValue(pt, vNormal);
+	reflect_precision d = vector(pt).dot(vNormal);
 
 	this->element(0, 0) = 1.0f - 2.0f * vNormal.x() * vNormal.x();
 	this->element(0, 1) = -2.0f * vNormal.x() * vNormal.y();
 	this->element(0, 2) = -2.0f * vNormal.x() * vNormal.z();
-	this->element(0, 3) = -2.0f * vNormal.x() * Dvalue;
+	this->element(0, 3) = 2.0f * vNormal.x() * d;
 
 	
 	this->element(1, 0) = -2.0f * vNormal.y() * vNormal.x();
 	this->element(1, 1) = 1.0f - 2.0f * vNormal.y() * vNormal.y();
 	this->element(1, 2) = -2.0f * vNormal.y() * vNormal.z();
-	this->element(1, 3) = -2.0f * vNormal.y() * Dvalue;
+	this->element(1, 3) = 2.0f * vNormal.y() * d;
 
 	this->element(2, 0) = -2.0f * vNormal.z() * vNormal.x();
 	this->element(2, 1) = -2.0f * vNormal.z() * vNormal.y();
 	this->element(2, 2) = 1.0f - 2.0f * vNormal.z() * vNormal.z();
-	this->element(2, 3) = -2.0f * vNormal.z() * Dvalue;
+	this->element(2, 3) = 2.0f * vNormal.z() * d;
 
 	// Done by identity 
 	this->element(3, 0) = 0.0f;

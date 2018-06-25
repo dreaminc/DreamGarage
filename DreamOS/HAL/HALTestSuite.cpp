@@ -831,6 +831,13 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 	double sTestTime = 40.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		quad *pReflectionQuad = nullptr;
+		sphere *pSphere = nullptr;
+		volume *pVolume = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
@@ -869,6 +876,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
 
 		// Skybox
 		//ProgramNode* pSkyboxProgram;
@@ -894,14 +902,9 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 		// Objects 
 
-		volume *pVolume;
-		pVolume = nullptr;
-
-		sphere *pSphere;
-		pVolume = nullptr;
-
-		quad *pReflectionQuad;
-		pReflectionQuad = nullptr;
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
@@ -912,38 +915,43 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		texture *pBumpTexture;
 		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-		pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-		CN(pSphere);
-		pSphere->SetPosition(point(1.0f, 0.25f, 0.0f));
-		pSphere->SetDiffuseTexture(pColorTexture);
-		pSphere->SetBumpTexture(pBumpTexture);
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pTestContext->pSphere->SetDiffuseTexture(pColorTexture);
+		pTestContext->pSphere->SetBumpTexture(pBumpTexture);
 
-		pVolume = m_pDreamOS->AddVolume(0.5f);
-		CN(pVolume);
-		pVolume->SetPosition(point(0.0f, -0.75f, 0.0f));
-		CR(pVolume->SetVertexColor(COLOR_WHITE));
-		pVolume->SetDiffuseTexture(pColorTexture);
-		pVolume->SetBumpTexture(pBumpTexture);
+		pTestContext->pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pTestContext->pVolume);
+		pTestContext->pVolume->SetPosition(point(0.0f, -0.75f, 0.0f));
+		CR(pTestContext->pVolume->SetVertexColor(COLOR_WHITE));
+		pTestContext->pVolume->SetDiffuseTexture(pColorTexture);
+		pTestContext->pVolume->SetBumpTexture(pBumpTexture);
 
 		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
-		pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1);
-		CN(pReflectionQuad);
-		pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+		pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
+		CN(pTestContext->pReflectionQuad);
+		pTestContext->pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+		//pTestContext->pReflectionQuad->RotateZByDeg(5.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
 		if (pWaterProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionObject(pReflectionQuad));
-			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionObject(pTestContext->pReflectionQuad));
+			//CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetReflectionPlane(pTestContext->pReflectionQuad->GetPlane()));
 		}
 	
 		if (pReflectionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pReflectionQuad->GetPlane()));
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pTestContext->pReflectionQuad));
+			//CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pTestContext->pReflectionQuad->GetPlane()));
 		}
 
 		// TOOD: Test clipping
-		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
-		CN(pSphere);
-		pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
+		//sphere *pSphere;
+		//pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
+		//CN(pSphere);
+		//pSphere->SetPosition(point(0.0f, -0.65f, 0.0f));
+
+		m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 5.0f);
 
 		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
@@ -973,7 +981,18 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->pSphere->translateY(-0.001f);
+		//pTestContext->pVolume->translateY(0.001f);
+
+		pTestContext->pReflectionQuad->translateY(-0.0001f);
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
@@ -982,7 +1001,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Environment Shader");

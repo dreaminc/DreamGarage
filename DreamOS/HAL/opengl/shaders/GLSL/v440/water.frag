@@ -42,6 +42,12 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Reflection;
 
+// TODO: Move to CPU side
+mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
+						 0.0f, -1.0f, 0.0f, 0.0f,
+						 0.0f, 0.0f, 1.0f, 0.0f,
+						 0.0f, 0.0f, 0.0f, 1.0f);
+
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -55,8 +61,22 @@ void main(void) {
 	//	TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	//}
 	
-	vec4 vClipReflection = u_mat4Projection * (u_mat4Reflection - mat4(1.0f)) * u_mat4View * vec4(DataIn.vertWorldSpace.xyz, 1.0);
-	vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
+	mat4 mat4ReflectedView = u_mat4Reflection * u_mat4View * xzFlipMatrix;	// This could easily be done on the CPU side
+	mat4ReflectedView = mat4ReflectedView - mat4(1.0f);
+
+	mat4ReflectedView = xzFlipMatrix * u_mat4View * (u_mat4Reflection - mat4(1.0f));
+	//mat4ReflectedView = u_mat4View * (u_mat4Reflection - mat4(1.0f));
+	//mat4ReflectedView =  u_mat4View * u_mat4Reflection * xzFlipMatrix;
+
+	//mat4ReflectedView = u_mat4Reflection * u_mat4View * xzFlipMatrix;
+	//mat4ReflectedView = inverse(mat4ReflectedView);
+
+	mat4ReflectedView =  xzFlipMatrix  * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
+
+	vec4 vClipReflection = u_mat4Projection * mat4ReflectedView * DataIn.vertWorldSpace;
+	
+	//vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
+	vec2 vDeviceReflection = vClipReflection.xy / vClipReflection.w;
 	vec2 vTextureReflection = vec2(0.5f, 0.5f) + 0.5f * vDeviceReflection;
 
 	//vec4 reflectionTextureColor = texture2D (reflection_sampler, vTextureReflection);
@@ -82,5 +102,5 @@ void main(void) {
 		}
 	}
 
-	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a) + vec4(0.2f, 0.2f, 0.2f, 1.0f);
 }

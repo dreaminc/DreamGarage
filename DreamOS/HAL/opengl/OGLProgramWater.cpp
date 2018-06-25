@@ -137,7 +137,8 @@ Error:
 RESULT OGLProgramWater::SetReflectionObject(VirtualObj* pReflectionObject) {
 	RESULT r = R_PASS;
 
-	CN(pReflectionObject);
+	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
+	CNM(pQuad, "Non quad not supported in reflection");
 
 	m_pReflectionObject = pReflectionObject;
 
@@ -145,10 +146,10 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramWater::SetReflectionPlane(plane reflectionPlane) {
-	m_reflectionPlane = reflectionPlane;
-	return R_PASS;
-}
+//RESULT OGLProgramWater::SetReflectionPlane(plane reflectionPlane) {
+//	m_reflectionPlane = reflectionPlane;
+//	return R_PASS;
+//}
 
 RESULT OGLProgramWater::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
@@ -243,16 +244,21 @@ RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
-	auto matReflection = ReflectionMatrix(m_reflectionPlane);
-	
-	if(m_pUniformReflectionMatrix != nullptr)
-		m_pUniformReflectionMatrix->SetUniform(matReflection);
+	if (m_pReflectionObject != nullptr) {
 
-	vector vReflectionPlane = m_reflectionPlane.GetNormal();
-	vReflectionPlane.w() = m_reflectionPlane.GetDValue();
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
 
-	if (m_pUniformReflectionPlane != nullptr)
-		m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+
+		if (m_pUniformReflectionMatrix != nullptr)
+			m_pUniformReflectionMatrix->SetUniform(matReflection);
+
+		vector vReflectionPlane = reflectionPlane.GetNormal();
+		vReflectionPlane.w() = reflectionPlane.GetDValue();
+
+		if (m_pUniformReflectionPlane != nullptr)
+			m_pUniformReflectionPlane->SetUniform(vReflectionPlane);
+	}
 
 	return R_PASS;
 }

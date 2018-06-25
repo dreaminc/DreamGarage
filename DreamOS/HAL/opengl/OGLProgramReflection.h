@@ -31,7 +31,8 @@ public:
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 public:
-	RESULT SetReflectionPlane(plane reflectionPlane);
+	//RESULT SetReflectionPlane(plane reflectionPlane);
+	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
 
 private:
 	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
@@ -39,7 +40,8 @@ private:
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
-	plane m_reflectionPlane;
+	//plane m_reflectionPlane;
+	VirtualObj *m_pReflectionObject = nullptr;
 
 private:
 	// Vertex Attribute
