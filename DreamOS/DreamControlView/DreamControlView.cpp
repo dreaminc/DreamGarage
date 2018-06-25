@@ -191,14 +191,19 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
+RESULT DreamControlView::InitializeWithParent(DreamUserApp *pParent) {
 	RESULT r = R_PASS;
 
-	m_pParentApp = pParent;
 	auto pDreamOS = GetDOS();
 
-	float width = m_pParentApp->GetBaseWidth();
-	float height = m_pParentApp->GetBaseHeight();
+	m_pDreamUserApp = pParent;
+	CNR(m_pDreamUserApp, R_SKIPPED);
+
+	float width;
+	width = m_pDreamUserApp->GetBaseWidth();
+
+	float height;
+	height = m_pDreamUserApp->GetBaseHeight();
 	
 	m_pSurface = m_pView->AddUISurface();
 	m_pSurface->InitializeSurfaceQuad(width, height);
@@ -225,7 +230,7 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
@@ -357,7 +362,7 @@ RESULT DreamControlView::Show() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 1.0f),
-		m_pParentApp->GetAnimationDuration(),
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
@@ -427,7 +432,7 @@ RESULT DreamControlView::Hide() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 0.0f),
-		m_pParentApp->GetAnimationDuration(),
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags(),
 		nullptr,
@@ -447,7 +452,7 @@ bool DreamControlView::IsVisible() {
 	bool fKeyboardVisible = m_pKeyboardHandle != nullptr;
 
 	//TODO: replace with GetComposite()->IsVisible() if possible
-	bool fViewVisible = m_pViewQuad->IsVisible();
+	bool fViewVisible = m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
 	
 	// this function is closer to IsAppBeingUsed
 	return fKeyboardVisible || fViewVisible;

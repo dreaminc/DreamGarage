@@ -40,6 +40,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 						 public DreamUserObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
+	friend class DreamSettingsApp;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -56,7 +57,7 @@ protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	RESULT InitializeWithParent(DreamUserApp *pParent);
 	
 // DreamAppHandle
 public:
@@ -77,10 +78,11 @@ private:
 
 
 // Animations
-private:
-
+public:
 	RESULT Show();
 	RESULT Hide();
+
+private:
 	RESULT ShowView();
 	RESULT HideView();
 	RESULT Dismiss();

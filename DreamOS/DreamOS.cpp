@@ -9,6 +9,7 @@
 #include "DreamMessage.h"
 
 #include "DreamAppMessage.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 // Messages
 #include "PeerHandshakeMessage.h"

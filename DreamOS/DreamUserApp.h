@@ -122,6 +122,7 @@ class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, publ
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
+	friend class DreamSettingsApp;
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -193,6 +194,12 @@ public:
 	float GetSpacingSize();
 	float GetWidthScale();
 	RESULT SetWidthScale(float widthScale);
+
+	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
+
+	RESULT UpdateHeight(float heightDiff);
+	RESULT UpdateDepth(float depthDiff);
+	RESULT UpdateWidthScale(float scale);
 
 private:
 	//user *m_pUserModel = nullptr;

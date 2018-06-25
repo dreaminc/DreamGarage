@@ -50,6 +50,7 @@
 class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
+class DreamSettingsApp;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -428,6 +429,7 @@ private:
 protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 	std::shared_ptr<DreamShareView> m_pDreamShareView;
+	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 
 private:
 	version m_versionDreamOS;

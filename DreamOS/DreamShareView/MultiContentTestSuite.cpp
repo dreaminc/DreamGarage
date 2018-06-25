@@ -79,7 +79,7 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
-	CR(AddTestChangeUIWidth());
+	//CR(AddTestChangeUIWidth());
 
 	CR(AddTestAllUIObjects());
 	
@@ -965,12 +965,15 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 
 		///*
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
-		pTestContext->pBrowser1->SetURI("www.twitch.tv");
+		//pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.develop.dreamos.com/forms/settings");
+		//pTestContext->pBrowser1->SetURI("https://www.develop.dreamos.com/forms/settings");
+		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "twitch.tv");
+		pTestContext->pBrowser1->SetURI("twitch.tv");
 		//pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
 		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
+		pTestContext->pBrowser2->SetURI("www.nyt.com");
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
 		//pControlArea->GetComposite()->SetPosition(0.0f, -0.125f, 4.6f);

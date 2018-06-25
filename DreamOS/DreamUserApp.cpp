@@ -10,6 +10,8 @@
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
+#include "Primitives/camera.h"	
+
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
 }
@@ -847,5 +849,35 @@ float DreamUserApp::GetSpacingSize() {
 
 RESULT DreamUserApp::SetWidthScale(float widthScale) {
 	m_widthScale = widthScale;
+	return R_PASS;
+}
+
+std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
+	return m_pWebBrowserManager;
+}
+
+RESULT DreamUserApp::UpdateHeight(float heightDiff) {
+
+	point ptComposite = GetComposite()->GetPosition();
+	ptComposite += point(0.0f, heightDiff, 0.0f);
+	GetComposite()->SetPosition(ptComposite);
+
+	return R_PASS;
+}
+
+RESULT DreamUserApp::UpdateDepth(float depthDiff) {
+
+	stereocamera *pCamera = GetDOS()->GetCamera();
+
+	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
+	pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), depthDiff + ptCamera.z()));
+
+	return R_PASS;
+}
+RESULT DreamUserApp::UpdateWidthScale(float scale) {
+
+	m_widthScale = scale;
+	GetComposite()->SetScale(scale);
+
 	return R_PASS;
 }

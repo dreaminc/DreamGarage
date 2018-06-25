@@ -19,6 +19,7 @@ light *g_pLight = nullptr;
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -273,6 +274,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+
+	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 
 Error:
 	return r;
@@ -904,9 +907,15 @@ RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
 RESULT DreamGarage::OnSettings(std::string strURL) {
-	m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", "b", "");
+	RESULT r = R_PASS;
+	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", "b", "");
 	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, "");
-	return R_PASS;
+
+	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
+	CR(m_pDreamSettings->Show());
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnShareAsset() {

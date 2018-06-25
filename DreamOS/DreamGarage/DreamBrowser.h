@@ -144,6 +144,7 @@ public:
 
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
+	RESULT InitializeWithForm();
 
 	virtual std::shared_ptr<texture> GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;

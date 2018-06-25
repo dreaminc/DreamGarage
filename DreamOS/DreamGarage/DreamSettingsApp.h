@@ -3,12 +3,14 @@
 
 #include "DreamApp.h"
 #include "DreamOS.h"
+#include "Primitives/Subscriber.h"
 
 class DreamUserHandle;
 class DreamControlView;
 class DreamBrowser;
+struct UIEvent;
 
-class DreamSettingsApp : public DreamApp<DreamSettingsApp>
+class DreamSettingsApp : public DreamApp<DreamSettingsApp>, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
 {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
@@ -31,6 +33,13 @@ public:
 	RESULT InitializeSettingsForm(std::string strURL);
 	RESULT Show();
 
+public:
+	virtual RESULT Notify(UIEvent *pUIEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+
+private:
+	WebBrowserPoint GetRelativePointofContact(point ptContact);
+
 private:
 	DreamUserApp* m_pUserApp = nullptr;
 
@@ -39,6 +48,12 @@ private:
 
 	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
+	std::string m_strURL;
+
+	// settings TODO: userApp
+	float m_depth = 0.0f;
+	float m_height = 0.0f;
+	float m_scale = 1.0f;
 };
 
 #endif // ! DREAM_SETTINGS_APP_H_
