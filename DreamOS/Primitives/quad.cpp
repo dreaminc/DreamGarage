@@ -209,7 +209,7 @@ float quad::GetHeight() {
 
 // Note: Always in absolute space (vs composite)
 plane quad::GetPlane() {
-	plane retPlane(GetOrigin(true), GetNormal());
+	plane retPlane(GetOrigin(true), GetNormal(true));
 
 	return retPlane;
 }
@@ -327,8 +327,16 @@ Error:
 	return r;
 }
 
-vector quad::GetNormal() {
-	return m_vNormal;
+vector quad::GetNormal(bool fAbsolute) {
+	vector vNormal = m_vNormal;
+
+	if (fAbsolute) {
+		//vNormal = GetModelMatrix() * vNormal;
+		//vNormal.RotateByQuaternion(GetOrientation(true));
+		vNormal = RotationMatrix(GetOrientation(true)) * vNormal;
+	}
+
+	return vNormal;
 }
 
 // TODO: not supporting triangle based yet

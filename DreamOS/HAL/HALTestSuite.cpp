@@ -852,11 +852,24 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 		CR(pHAL->MakeCurrentContext());
 
+		// Reflection 
+
 		ProgramNode* pReflectionProgramNode;
 		pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
 		CN(pReflectionProgramNode);
 		CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pReflectionSkyboxProgram;
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pReflectionSkyboxProgram);
+		CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+
+		// "Water"
 
 		ProgramNode* pWaterProgramNode;
 		pWaterProgramNode = nullptr;
@@ -866,9 +879,10 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		
 		// TODO: This is not particularly general yet
-		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionProgramNode->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
 		
-		
+		// Standard Shader
+
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
@@ -876,24 +890,23 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
-		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		//ProgramNode* pSkyboxProgram;
-		//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		//CN(pSkyboxProgram);
-		//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		// Connect output as pass-thru to internal blend program
-		// CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -923,16 +936,17 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 
 		pTestContext->pVolume = m_pDreamOS->AddVolume(0.5f);
 		CN(pTestContext->pVolume);
-		pTestContext->pVolume->SetPosition(point(0.0f, -0.75f, 0.0f));
+		pTestContext->pVolume->SetPosition(point(0.0f, -0.5f, 0.0f));
 		CR(pTestContext->pVolume->SetVertexColor(COLOR_WHITE));
 		pTestContext->pVolume->SetDiffuseTexture(pColorTexture);
 		pTestContext->pVolume->SetBumpTexture(pBumpTexture);
 
 		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
-		pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
+		//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
+		pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
 		CN(pTestContext->pReflectionQuad);
 		pTestContext->pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
-		//pTestContext->pReflectionQuad->RotateZByDeg(5.0f);
+		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
 		if (pWaterProgramNode != nullptr) {
@@ -946,10 +960,10 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		}
 
 		// TOOD: Test clipping
-		//sphere *pSphere;
-		//pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
-		//CN(pSphere);
-		//pSphere->SetPosition(point(0.0f, -0.65f, 0.0f));
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
 
 		m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 5.0f);
 
@@ -990,6 +1004,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		//pTestContext->pVolume->translateY(0.001f);
 
 		pTestContext->pReflectionQuad->translateY(-0.0001f);
+		pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
 
 	Error:
 		return r;

@@ -85,7 +85,7 @@ public:
 
 	RESULT SetUVValues(float top, float left, float bottom, float right);
 
-	vector GetNormal();
+	vector GetNormal(bool fAbsolute = false);
 	
 	type EvaluatePoints(point a, point b, point c);
 

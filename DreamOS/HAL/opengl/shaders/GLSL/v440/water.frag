@@ -61,25 +61,11 @@ void main(void) {
 	//	TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	//}
 	
-	mat4 mat4ReflectedView = u_mat4Reflection * u_mat4View * xzFlipMatrix;	// This could easily be done on the CPU side
-	mat4ReflectedView = mat4ReflectedView - mat4(1.0f);
-
-	mat4ReflectedView = xzFlipMatrix * u_mat4View * (u_mat4Reflection - mat4(1.0f));
-	//mat4ReflectedView = u_mat4View * (u_mat4Reflection - mat4(1.0f));
-	//mat4ReflectedView =  u_mat4View * u_mat4Reflection * xzFlipMatrix;
-
-	//mat4ReflectedView = u_mat4Reflection * u_mat4View * xzFlipMatrix;
-	//mat4ReflectedView = inverse(mat4ReflectedView);
-
-	mat4ReflectedView =  xzFlipMatrix  * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
+	mat4 mat4ReflectedView = xzFlipMatrix * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
 
 	vec4 vClipReflection = u_mat4Projection * mat4ReflectedView * DataIn.vertWorldSpace;
-	
-	//vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
-	vec2 vDeviceReflection = vClipReflection.xy / vClipReflection.w;
+	vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
 	vec2 vTextureReflection = vec2(0.5f, 0.5f) + 0.5f * vDeviceReflection;
-
-	//vec4 reflectionTextureColor = texture2D (reflection_sampler, vTextureReflection);
 
 	vec4 colorDiffuse = material.m_colorDiffuse; 
 	if(u_hasTextureReflection) {
@@ -102,5 +88,5 @@ void main(void) {
 		}
 	}
 
-	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a) + vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.2f, 0.2f, 0.2f, 1.0f);
 }
