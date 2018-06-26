@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <cstring>
 
+#include <ShlObj.h>	// For SHGetKnownFolderPath()
+
 Win64PathManager::Win64PathManager() :
 	PathManager()	// Call super
 {
@@ -76,6 +78,42 @@ RESULT Win64PathManager::GetCurrentPath(wchar_t *& pszCurrentPath) {
 	CNM(m_pszCurDirectiory, "CurDirectory NULL");
 	pszCurrentPath = m_pszCurDirectiory;
 	
+Error:
+	return r;
+}
+
+RESULT Win64PathManager::GetAppDataPath(std::wstring &wstrAppDataPath, PATH_VALUE_TYPE pathValueType) {
+	RESULT r = R_PASS;
+
+	switch (pathValueType) {
+	case (PATH_ROAMING): {
+		REFKNOWNFOLDERID rfid = FOLDERID_RoamingAppData;
+		DWORD dwFlags = 0;
+		HANDLE hToken = NULL;	// Get for Current User
+		PWSTR ppszPath[MAX_PATH];
+
+		CRM((RESULT)SHGetKnownFolderPath(rfid, dwFlags, hToken, ppszPath), "Could not find appdata folder");
+		wstrAppDataPath = *ppszPath;
+	} break;
+		
+	}
+
+#ifdef PRODUCTION_BUILD
+	wstrAppDataPath = wstrAppDataPath + L"\\Dream";
+	// Check if Dream folder exists 
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		PathManager::instance()->CreateDirectory(L"Dream");
+	}
+#else
+	wstrAppDataPath = wstrAppDataPath + L"\\DreamDev";
+	// Check if Dream folder exists 
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		PathManager::instance()->CreateDirectory(L"DreamDev");
+	}
+#endif
+
 Error:
 	return r;
 }
