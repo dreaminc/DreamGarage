@@ -40,9 +40,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamLogger());
+//	CR(AddTestDreamLogger());
 
-	CR(AddTestMeta());
+//	CR(AddTestMeta());
 
 	CR(AddTestDreamBrowser());
 	
@@ -630,7 +630,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
+		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
+		std::string strURL = "https://twitch.tv";
 		
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -661,8 +662,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 
 		// Set up the view
 		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
 
 		pTestContext->m_pDreamBrowser->SetURI(strURL);
 

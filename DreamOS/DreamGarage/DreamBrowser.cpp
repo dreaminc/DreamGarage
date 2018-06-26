@@ -527,24 +527,24 @@ RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
 RESULT DreamBrowser::InitializeWithForm() {
 	RESULT r = R_PASS;
 
-	m_assetID = -1;
-	WebRequest webRequest;
+	//m_assetID = -1;
+	//WebRequest webRequest;
 
 	//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 	std::string strEnvironmentAssetURL = m_strPath;
 	m_strContentType = CONTENT_TYPE_BROWSER;
 
 	//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
-	std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
-	CR(webRequest.SetURL(wstrAssetURL));
-	CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+	//std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
+	//CR(webRequest.SetURL(wstrAssetURL));
+	//CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
 
-	LoadRequest(webRequest);
-	//SetURI(strEnvironmentAssetURL);
+	//LoadRequest(webRequest);
+	SetURI(strEnvironmentAssetURL);
 
-	m_currentEnvironmentAssetID = -1;// pEnvironmentAsset->GetAssetID();
+	//m_currentEnvironmentAssetID = -1;// pEnvironmentAsset->GetAssetID();
 
-Error:
+//Error:
 	return r;
 }
 

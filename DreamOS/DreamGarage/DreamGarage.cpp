@@ -942,9 +942,10 @@ RESULT DreamGarage::OnLogin() {
 	//TODO: other pieces of login flow
 	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-	CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
+	//TODO: uncomment when everything else works
+	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
-Error:
+//Error:
 	return r;
 }
 

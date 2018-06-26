@@ -444,8 +444,10 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
-	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	if (m_pControlBar != nullptr) {
+		m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+		m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
@@ -782,6 +784,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	//it is not safe to set the environment asset until after the browser is finished initializing
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
 	m_fHasOpenApp = true;
+	m_pDreamUserApp->SetHasOpenApp(true);
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {	
 		
@@ -930,6 +933,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			ResetAppComposite();
 
 			if (m_fHasOpenApp) {
+//			if (m_pDreamUserApp->m_fHasOpenApp) {
 				Hide();
 			}
 			else {
@@ -940,6 +944,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
 			if (m_pDreamUIBar->IsEmpty()) {
 				if (m_fHasOpenApp) {
+			//	if (m_pDreamUserApp->m_fHasOpenApp) {
 					Show();
 				}
 				else {

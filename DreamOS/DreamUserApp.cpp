@@ -869,8 +869,15 @@ RESULT DreamUserApp::UpdateDepth(float depthDiff) {
 
 	stereocamera *pCamera = GetDOS()->GetCamera();
 
+	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+	vAppLook.Normalize();
+	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+	vector vDiff = depthDiff * vAppLookXZ;
+
 	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
-	pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), depthDiff + ptCamera.z()));
+
+	pCamera->SetHMDAdjustedPosition(ptCamera + vDiff);
 
 	return R_PASS;
 }

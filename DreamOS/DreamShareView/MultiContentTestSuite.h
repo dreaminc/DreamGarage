@@ -61,6 +61,7 @@ public:
 	RESULT AddTestAllUIObjects();
 
 	RESULT AddTestChangeUIWidth();
+	RESULT AddTestDreamSettingsApp();
 
 	// test for memory leaks in the menu
 	RESULT AddTestMenuMemory();

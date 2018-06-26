@@ -14,6 +14,7 @@
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamTabView.h"
 #include "DreamGarage/DreamUIBar.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -79,7 +80,9 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
-	//CR(AddTestChangeUIWidth());
+	CR(AddTestDreamSettingsApp());
+
+	CR(AddTestChangeUIWidth());
 
 	CR(AddTestAllUIObjects());
 	
@@ -748,6 +751,102 @@ Error:
 
 }
 
+RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext 
+	{
+		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
+		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager = nullptr;
+		std::shared_ptr<texture> pTestTexture = nullptr;
+
+		quad *pBrowserQuad = nullptr;
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		std::string strURL = "https://twitch.tv";
+
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		//pTestContext->pUserApp->ResetAppComposite();
+		//*
+		pTestContext->pSettingsApp = m_pDreamOS->LaunchDreamApp<DreamSettingsApp>(this, false);
+		CR(pTestContext->pSettingsApp->Show());
+		//*/
+
+
+		pTestContext->pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->pDreamBrowser->InitializeWithBrowserManager(pTestContext->pUserApp->GetBrowserManager(), strURL);
+		//pTestContext->pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->pDreamBrowser, "Failed to create dream browser");
+
+		pTestContext->pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pTestContext->pDreamBrowser->SetDiagonalSize(10.0f);
+
+		pTestContext->pDreamBrowser->SetURI(strURL);
+
+
+		pTestContext->pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f * 9.0f / 16.0f);
+		CN(pTestContext->pBrowserQuad);
+		pTestContext->pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->pBrowserQuad->RotateZByDeg(180.0f);
+
+		pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 0.5f, -0.5f));
+
+		pTestContext->pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture((wchar_t*)(L"client-loading-1366-768.png"), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		auto pTexture = pTestContext->pDreamBrowser->GetSourceTexture();
+		auto pFormView = pTestContext->pSettingsApp->m_pFormView;
+		//pFormView->SetViewQuadTexture(pTexture);
+		//pFormView->SetViewQuadTexture(pTestContext->pTestTexture);
+		//pTestContext->pSettingsApp->InitializeSettingsForm("https://twitch.tv");
+
+		pTestContext->pBrowserQuad->SetDiffuseTexture(pTexture.get());
+
+	//Error:
+		return r;
+	};
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 	RESULT r = R_PASS;
 	double sTestTime = 2000.0f;
@@ -853,6 +952,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 //		Error:
 			return r;
 		}
+		virtual RESULT OnLogin() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
 	} *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
@@ -967,12 +1074,12 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		//pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.develop.dreamos.com/forms/settings");
 		//pTestContext->pBrowser1->SetURI("https://www.develop.dreamos.com/forms/settings");
-		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "twitch.tv");
+//		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "twitch.tv");
 		pTestContext->pBrowser1->SetURI("twitch.tv");
 		//pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());
 
 		pTestContext->pBrowser2 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
+//		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.nyt.com");
 		pTestContext->pBrowser2->SetURI("www.nyt.com");
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
@@ -1227,7 +1334,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		m_pDreamOS->AddObjectToInteractionGraph(pControlArea->GetComposite());	
 
 		pTestContext->pBrowser1 = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
+//		pTestContext->pBrowser1->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
 		pTestContext->pBrowser1->SetURI("https://www.youtube.com/watch?v=OPV3D7f3bHY&t=340s");
 		//pTestContext->pBrowser2->InitializeWithParent(pControlArea.get());
 
@@ -1236,7 +1343,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 		//pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "www.twitch.tv");
 		//pTestContext->pBrowser2->SetURI("www.twitch.tv");
 
-		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=IP-iKQn8hWw");
+//		pTestContext->pBrowser2->InitializeWithBrowserManager(pControlArea->m_pWebBrowserManager, "https://www.youtube.com/watch?v=IP-iKQn8hWw");
 		pTestContext->pBrowser2->SetURI("https://www.youtube.com/watch?v=IP-iKQn8hWw");
 
 		////pTestContext->pBrowser1->InitializeWithParent(pControlArea.get());

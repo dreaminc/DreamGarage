@@ -62,7 +62,7 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
-//		m_pFormView->Hide();
+		m_pFormView->Hide();
 
 		//TODO: temporary
 		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
@@ -72,7 +72,7 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		GetComposite()->SetOrientation(qViewQuadOrientation);
 
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pFormView->GetComposite()));
-		m_pFormView->Hide();
+		//m_pFormView->Hide();
 
 		m_pUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 
@@ -80,11 +80,32 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 
 	// there's fancier code around this in DreamUserControlArea, 
 	// but we assume that there is only one piece of content here
+	if (m_fInitBrowser) {
+		m_fInitBrowser = false;
+		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		CN(m_pForm);
+
+		//m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
+		//m_pForm->SetPath(m_strURL);
+
+		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
+		m_pForm->SetURI(m_strURL);
+	}
+
 	if (m_pForm != nullptr) {
-		m_pForm->PendUpdateObjectTextures();
+		//m_pForm->PendUpdateObjectTextures();
 	}
 	if (m_pFormView != nullptr && m_pForm != nullptr && m_pForm->GetSourceTexture() != nullptr) {
-		//CR(m_pFormView->SetViewQuadTexture(m_pForm->GetSourceTexture()));
+		CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(m_pForm->GetSourceTexture().get()));
+	}
+
+	if (m_fLeftTriggerDown) {
+		m_scale = m_pUserApp->GetWidthScale() + 0.003f;
+		m_pUserApp->UpdateWidthScale(m_scale);
+	}
+	else if (m_fRightTriggerDown) {
+		m_scale = m_pUserApp->GetWidthScale() - 0.003f;
+		m_pUserApp->UpdateWidthScale(m_scale);
 	}
 
 Error:
@@ -103,21 +124,9 @@ DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	RESULT r = R_PASS;
 
-//	auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-//	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-//	CRM(pEnvironmentControllerProxy->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, "website"), "Failed to share environment asset");
-
-	m_strURL = strURL;
-	m_strURL = "www.twitch.tv";
-
 	if (m_pForm == nullptr) {
-		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-
-		m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
-		m_pForm->SetPath(m_strURL);
-
-		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
-		m_pForm->InitializeWithForm();
+		m_strURL = strURL;
+		m_fInitBrowser = true;
 	}
 
 //Error:
@@ -128,11 +137,11 @@ RESULT DreamSettingsApp::Show() {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);
-	CNR(m_pForm, R_SKIPPED);
 
-	m_pFormView->Show();
-	m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f));
-	//m_pFormView->ResetAppComposite();
+	CR(m_pFormView->Show());
+	//CR(m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f)));
+
+	m_fRespondToController = true;
 
 Error:
 	return r;
@@ -146,6 +155,11 @@ RESULT DreamSettingsApp::Hide() {
 
 	CR(m_pFormView->Hide());
 	CR(m_pFormView->HandleKeyboardDown());
+
+	m_fRespondToController = true;
+
+	//m_pUserApp->SetHasOpenApp(false);
+	//m_pUserApp->SetEventApp(nullptr);
 
 Error:
 	return r;
@@ -216,6 +230,9 @@ WebBrowserPoint DreamSettingsApp::GetRelativePointofContact(point ptContact) {
 RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
+	//TODO: unregister/register instead of this flag?
+	CBR(m_fRespondToController, R_SKIPPED);
+
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
 		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
@@ -235,13 +252,22 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	}
 	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
 		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-			m_scale = m_pUserApp->GetWidthScale() + 0.003f;
+			m_fLeftTriggerDown = true;
+		}
+
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+			m_fRightTriggerDown = true;
+		}
+	}
+	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_UP) {
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+			m_fLeftTriggerDown = false;
 		}
 		else {
-			m_scale = m_pUserApp->GetWidthScale() - 0.003f;
+			m_fRightTriggerDown = false;
 		}
-		m_pUserApp->UpdateWidthScale(m_scale);
 	}
+
 Error:
 	return r;
 }
