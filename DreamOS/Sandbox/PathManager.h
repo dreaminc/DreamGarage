@@ -35,9 +35,16 @@ typedef enum {
 	PATH_MODEL,
 	PATH_DATA,
 	PATH_SOUND,
-	PATH_ROAMING,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
+
+typedef enum {
+	DREAM_PATH_TEMP,
+	DREAM_PATH_ROAMING,
+	DREAM_PATH_LOCAL,
+	DREAM_PATH_LOCALLOW,
+	DREAM_PATH_INVALID
+} DREAM_PATH_TYPE;
 
 // This sets the configuration that version paths will be preceded by
 // the letter v as in "v123\" vs "123\" for example
@@ -90,7 +97,7 @@ public:
 	RESULT IsPathRegistered(PATH_VALUE_TYPE type);
 
 	virtual RESULT GetCurrentPath(wchar_t*&pszCurrentPath) = 0;
-	virtual RESULT GetAppDataPath(std::wstring &wstrAppDataPath, PATH_VALUE_TYPE pathValueType) = 0;
+	virtual RESULT GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathType) = 0;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) = 0;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) = 0;
 	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) = 0;

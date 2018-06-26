@@ -249,14 +249,10 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.locale) = "en";
 	
 	std::wstring wstrAppDataPath;
-	PathManager::instance()->GetAppDataPath(wstrAppDataPath, PATH_VALUE_TYPE::PATH_ROAMING);
-	wstrAppDataPath = wstrAppDataPath + L"\\CEFCache";
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
+	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
 	CefString(&cefSettings.cache_path) = wstrAppDataPath;
-
-	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
-		// Create the directory
-		PathManager::instance()->CreateDirectory(L"CEFCache");
-	}
+	// CEF will create the Directory(s) if necessary
 
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);

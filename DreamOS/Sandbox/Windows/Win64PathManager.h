@@ -35,7 +35,7 @@ public:
 	RESULT PrintPaths();
 
 	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
-	virtual RESULT GetAppDataPath(std::wstring &wstrAppDataPath, PATH_VALUE_TYPE pathValueType) override;
+	virtual RESULT GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) override;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) override;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) override;
 	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) override;

@@ -95,21 +95,22 @@ RESULT DreamLogger::InitializeLogger() {
 	char szTime[32];
 	std::strftime(szTime, 32, "%Y-%m-%d_%H-%M-%S", localTimeNow);
 
-	// TODO: Move this to PathManager please 
-	auto pszAppDataPath = std::getenv(DREAM_OS_PATH_ENV);
-
-	if (pszAppDataPath != nullptr) {
-		m_strDreamLogPath = std::string{ pszAppDataPath } + "\\logs\\" + "log-" + szTime + ".log";
-	}
-	else {
-		m_strDreamLogPath = std::string("\\logs\\") + "log-" + szTime + ".log";
-	}
+	std::wstring wstrAppDataPath;
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_LOCAL);
+	wstrAppDataPath = wstrAppDataPath + L"logs\\";
 
 	// Check if logs folder exists 
-	PathManager::instance()->GetDirectoryPathFromFilePath(m_strDreamLogPath);
-	if (PathManager::instance()->DoesPathExist(m_strDreamLogPath) != R_DIRECTORY_FOUND) {
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
 		// Create the directory
-		PathManager::instance()->CreateDirectory(L"logs");
+		wchar_t* pwszDirectory = const_cast<wchar_t*>(wstrAppDataPath.c_str());
+		PathManager::instance()->CreateDirectory(pwszDirectory);
+	}
+
+	if (wstrAppDataPath.c_str() != nullptr) {
+		m_strDreamLogPath = std::string(wstrAppDataPath.begin(), wstrAppDataPath.end()) + "log-" + szTime + ".log";
+	}
+	else {
+		m_strDreamLogPath = std::string(wstrAppDataPath.begin(), wstrAppDataPath.end()) + "log-" + szTime + ".log";
 	}
 
 	// Set up async mode and flush to 1 second
