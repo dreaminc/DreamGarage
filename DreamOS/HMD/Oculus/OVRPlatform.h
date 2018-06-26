@@ -17,7 +17,7 @@ public:
 protected:
 
 	// TODO: get from API?
-	const char* m_appID = "2255211697837160";
+	const char* m_pszappID = "2255211697837160";
 
 };
 #endif
