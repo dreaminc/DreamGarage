@@ -248,11 +248,8 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
 
-		//matV = matFlip * matV * matReflection;
-		//matVO = matFlip * matVO * matReflection;
-
-		matV = matFlip * matReflection * matV;
-		matVO = matFlip * matHouseholderReflection * matVO;
+		matV = matFlip * matV * matReflection;
+		matVO = matFlip * matVO * matHouseholderReflection;
 	}
 
 	//auto matVP = matP * matV;
