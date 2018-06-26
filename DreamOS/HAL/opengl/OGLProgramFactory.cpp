@@ -116,7 +116,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_SKYBOX_SCATTER: {
 			pOGLProgram = new OGLProgramSkyboxScatter(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"skyboxScatter.vert", L"skyboxScatter.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL skybox scatter Program");
 		} break;
 		

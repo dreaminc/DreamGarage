@@ -21,73 +21,26 @@ public:
 	};
 
 public:
-	plane() :
-		m_ptPosition(),
-		m_vNormal(vector::jVector(1.0f))
-	{
-		// Empty
-	}
+	plane();
 
-	plane(plane::type planeType) :
-		m_ptPosition()
-	{
-		switch (planeType) {
-			case plane::type::XY: {
-				m_vNormal = vector::kVector(1.0f);
-			} break;
+	plane(plane::type planeType);
 
-			case plane::type::XZ: {
-				m_vNormal = vector::jVector(1.0f);
-			} break;
-
-			case plane::type::YZ: {
-				m_vNormal = vector::iVector(1.0f);
-			} break;
-
-			case plane::type::INVALID: {
-				// empty
-			}
-		}
-	}
-
-	plane(point ptPosition, vector vNormal) :
-		m_ptPosition(ptPosition),
-		m_vNormal(vNormal)
-	{
-		// Empty
-	}
+	plane(point ptPosition, vector vNormal);
 
 	// Distance of point from plane
-	point_precision Distance(point pt) {
-		return m_vNormal.Normal().dot(m_ptPosition - pt);
-	}
+	point_precision Distance(point pt);
 
-	vector GetNormal() const {
-		return m_vNormal;
-	}
+	vector GetNormal() const;
 
-	RESULT SetNormal(vector vNormal) {
-		m_vNormal = vNormal.Normal();
-		return R_PASS;
-	}
+	RESULT SetNormal(vector vNormal);
 
-	point GetPosition() const {
-		return m_ptPosition;
-	}
+	RESULT SetPlanePosition(point ptPosition);
 
-	point_precision GetDValue() const {
-		return GetDValue(m_ptPosition, m_vNormal);
-	}
+	point GetPosition() const;
 
-	static point_precision GetDValue(point ptOrigin, vector vNormal) {
-		point_precision dVal = -1.0f * (vNormal.x() * ptOrigin.x() +
-										vNormal.y() * ptOrigin.y() +
-										vNormal.z() * ptOrigin.z());
+	point_precision GetDValue() const;
 
-		//point_precision dVal = -1.0f * vector(ptOrigin).dot(vNormal);
-
-		return dVal;
-	}
+	static point_precision GetDValue(point ptOrigin, vector vNormal);
 
 // Utilities for axes
 	static plane iPlane() { return plane(point(0.0f, 0.0f, 0.0f), vector::iVector(1.0f)); }

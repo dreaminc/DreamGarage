@@ -16,6 +16,7 @@ public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp);
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
@@ -26,10 +27,15 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
+public:
+	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
+
 private:
 	float m_SunY = 1.0f;
 	float m_theta = 0.0f;
 	float m_delta = 0.0f;	//0.00005f;
+
+	VirtualObj *m_pReflectionObject = nullptr;
 
 private:
 	stereocamera *m_pCamera = nullptr;

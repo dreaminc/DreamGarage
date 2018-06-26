@@ -13,6 +13,7 @@
 
 #include "HAL/opengl/OGLProgramReflection.h"
 #include "HAL/opengl/OGLProgramWater.h"
+#include "HAL/opengl/OGLProgramSkyboxScatter.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -828,7 +829,7 @@ Error:
 RESULT HALTestSuite::AddTestReflectionShader() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
+	double sTestTime = 300.0f;
 	int nRepeats = 1;
 
 	struct TestContext {
@@ -959,6 +960,10 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 			//CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionPlane(pTestContext->pReflectionQuad->GetPlane()));
 		}
 
+		if (pReflectionSkyboxProgram != nullptr) {
+			CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pReflectionQuad));
+		}
+
 		// TOOD: Test clipping
 		sphere *pSphere;
 		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
@@ -1003,8 +1008,9 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		//pTestContext->pSphere->translateY(-0.001f);
 		//pTestContext->pVolume->translateY(0.001f);
 
-		pTestContext->pReflectionQuad->translateY(-0.0001f);
-		pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
+		//pTestContext->pReflectionQuad->translateY(-0.0001f);
+		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
+		pTestContext->pReflectionQuad->RotateXByDeg(0.001f);
 
 	Error:
 		return r;

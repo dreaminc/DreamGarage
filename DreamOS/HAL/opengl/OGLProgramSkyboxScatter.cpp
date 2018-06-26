@@ -9,6 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
+#include "Primitives/matrix/ReflectionMatrix.h"
+
 OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglskyboxscatter")
 {
@@ -53,6 +55,63 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	*/
 
 	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"skyboxScatter.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"skyboxScatter.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::SetReflectionObject(VirtualObj *pReflectionObject) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
+	CNM(pQuad, "Object not supported for reflection");
+
+	m_pReflectionObject = pQuad;
 
 Error:
 	return r;
@@ -130,9 +189,18 @@ RESULT OGLProgramSkyboxScatter::SetObjectUniforms(DimObj *pDimObj) {
 RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 
 	auto matV = pCamera->GetViewMatrix();
-	auto matP = pCamera->GetProjectionMatrix();
-	auto matVP = matP * matV;
+	auto matP = pCamera->GetProjectionMatrix();	
 	auto matVO = pCamera->GetOrientationMatrix();
+
+	if (m_pReflectionObject != nullptr) {
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+		matV = matFlip * matV * matReflection;
+		matVO = matFlip * matVO * matReflection;
+	}
+
+	auto matVP = matP * matV;
 
 	auto pxWidth = pCamera->GetViewWidth();
 	auto pxHeight = pCamera->GetViewHeight();
@@ -158,7 +226,6 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	auto matVP = matP * matV;
 	auto matVO = pStereoCamera->GetOrientationMatrix();
 
 	auto pxWidth = (pStereoCamera->GetViewWidth());
@@ -169,6 +236,26 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 	sunY += 0.0002f;
 	DEBUG_OUT("%f\n", sunY);
 	*/
+
+	if (m_pReflectionObject != nullptr) {
+		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+
+		plane householderReflectionPlane = reflectionPlane;
+		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
+
+		auto matReflection = ReflectionMatrix(reflectionPlane);
+		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
+
+		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+
+		//matV = matFlip * matV * matReflection;
+		//matVO = matFlip * matVO * matReflection;
+
+		matV = matFlip * matReflection * matV;
+		matVO = matFlip * matHouseholderReflection * matVO;
+	}
+
+	//auto matVP = matP * matV;
 
 	vector sunDirection = vector(0.0f, m_SunY, -0.5f);
 	sunDirection.Normalize();

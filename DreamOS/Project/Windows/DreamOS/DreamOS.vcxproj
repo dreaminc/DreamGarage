@@ -857,6 +857,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
+    <ClCompile Include="..\..\..\Primitives\plane.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
