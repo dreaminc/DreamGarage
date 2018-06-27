@@ -17,6 +17,8 @@
 
 #include "OVRTouchController.h"
 
+#include "OVRPlatform.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
@@ -65,6 +67,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
+	// Initializes Oculus Platform
+	m_pOVRPlatform = new OVRPlatform();
+	CN(m_pOVRPlatform);
+	CRM(m_pOVRPlatform->InitializePlatform(), "Failed to initialize Oculus Platform");
+	
 	// Initializes LibOVR, and the Rift
 	// TODO: may be important to make an OVR Logger.  
 	// use it as an arg to ovr_Initialize
@@ -286,6 +293,8 @@ RESULT OVRHMD::UpdateHMD() {
 
 	//ovr_RecenterTrackingOrigin(m_ovrSession);
 
+	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");
+
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
 #else
@@ -361,7 +370,7 @@ RESULT OVRHMD::UpdateHMD() {
 	}
 
 
-//Error:
+Error:
 	return r;
 }
 

@@ -28,6 +28,7 @@
 #include "OVRMirrorTexture.h"
 
 class OGLFramebuffer;
+class OVRPlatform;
 
 class OVRHMD : public HMD {
 	friend class OVRHMDSinkNode;
@@ -75,6 +76,8 @@ public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;
 	std::vector<ovrTrackerDesc> m_TrackerDescriptions;
+
+	OVRPlatform* m_pOVRPlatform = nullptr;
 
 	// Mirror Texture (TODO: Move to separate sink node)
 	OVRMirrorTexture *m_pOVRMirrorTexture = nullptr;
