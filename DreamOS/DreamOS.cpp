@@ -970,6 +970,10 @@ std::wstring DreamOS::GetHardwareID() {
 	return m_pSandbox->GetHardwareID();
 }
 
+std::string DreamOS::GetHMDTypeString() {
+	return m_pSandbox->GetHMDTypeString();
+}
+
 // Physics Engine
 RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;

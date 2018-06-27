@@ -49,7 +49,7 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		CNR(m_pUserApp, R_SKIPPED);
 
 		m_pFormView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
-		m_pFormView->InitializeWithParent(m_pUserApp);
+		m_pFormView->InitializeWithUserApp(m_pUserApp);
 
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);

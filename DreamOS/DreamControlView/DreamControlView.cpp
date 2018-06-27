@@ -122,7 +122,7 @@ RESULT DreamControlView::Update(void *pContext) {
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
 
-		m_pSurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		m_pUISurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -191,7 +191,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithParent(DreamUserApp *pParent) {
+RESULT DreamControlView::InitializeWithUserApp(DreamUserApp *pParent) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -205,10 +205,10 @@ RESULT DreamControlView::InitializeWithParent(DreamUserApp *pParent) {
 	float height;
 	height = m_pDreamUserApp->GetBaseHeight();
 	
-	m_pSurface = m_pView->AddUISurface();
-	m_pSurface->InitializeSurfaceQuad(width, height);
+	m_pUISurface = m_pView->AddUISurface();
+	m_pUISurface->InitializeSurfaceQuad(width, height);
 	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
-	m_pViewQuad = m_pSurface->GetViewQuad();
+	m_pViewQuad = m_pUISurface->GetViewQuad();
 	CN(m_pViewQuad);
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
@@ -520,7 +520,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	
 	CR(HideKeyboard());
 
-	m_pSurface->ResetLastEvent();
+	m_pUISurface->ResetLastEvent();
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
@@ -579,7 +579,7 @@ Error:
 }
 
 point DreamControlView::GetLastEvent() {
-	return m_pSurface->GetLastEvent();
+	return m_pUISurface->GetLastEvent();
 }
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
@@ -587,7 +587,7 @@ std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 }
 
 std::shared_ptr<UISurface> DreamControlView::GetViewSurface() {
-	return m_pSurface;
+	return m_pUISurface;
 }
 
 float DreamControlView::GetBackgroundWidth() {

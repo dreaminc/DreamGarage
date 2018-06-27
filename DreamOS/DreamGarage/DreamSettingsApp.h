@@ -59,9 +59,6 @@ private:
 	bool m_fLeftTriggerDown = false;
 	bool m_fRightTriggerDown = false;
 	bool m_fInitBrowser = false;
-
-	//TODO: temp
-	std::shared_ptr<texture> m_pTestTexture = nullptr;
 };
 
 #endif // ! DREAM_SETTINGS_APP_H_
