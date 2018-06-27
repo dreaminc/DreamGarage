@@ -926,8 +926,6 @@ RESULT DreamGarage::OnSetSettings() {
 
 RESULT DreamGarage::OnSettings(std::string strURL) {
 	RESULT r = R_PASS;
-	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", "b", "");
-	//m_pDreamUserControlArea->RequestOpenAsset("WebsiteProviderScope.WebsiteProvider", strURL, "");
 
 	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
 	CR(m_pDreamSettings->Show());

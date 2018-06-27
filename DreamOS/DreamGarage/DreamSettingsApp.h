@@ -1,6 +1,8 @@
 #ifndef DREAM_SETTINGS_APP_H_
 #define DREAM_SETTINGS_APP_H_
 
+#define SCALE_TICK 0.003f;
+
 #include "DreamApp.h"
 #include "DreamOS.h"
 #include "Primitives/Subscriber.h"
@@ -50,6 +52,8 @@ private:
 	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
 	std::string m_strURL;
+
+	float m_scaleTick = SCALE_TICK;
 
 	// settings TODO: userApp
 	float m_depth = 0.0f;

@@ -85,26 +85,20 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		CN(m_pForm);
 
-		//m_pForm->SetScope("WebsiteProviderScope.WebsiteProvider");
-		//m_pForm->SetPath(m_strURL);
-
 		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
 		m_pForm->SetURI(m_strURL);
 	}
 
-	if (m_pForm != nullptr) {
-		//m_pForm->PendUpdateObjectTextures();
-	}
 	if (m_pFormView != nullptr && m_pForm != nullptr && m_pForm->GetSourceTexture() != nullptr) {
 		CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(m_pForm->GetSourceTexture().get()));
 	}
 
 	if (m_fLeftTriggerDown) {
-		m_scale = m_pUserApp->GetWidthScale() + 0.003f;
+		m_scale = m_pUserApp->GetWidthScale() + m_scaleTick;
 		m_pUserApp->UpdateWidthScale(m_scale);
 	}
 	else if (m_fRightTriggerDown) {
-		m_scale = m_pUserApp->GetWidthScale() - 0.003f;
+		m_scale = m_pUserApp->GetWidthScale() - m_scaleTick;
 		m_pUserApp->UpdateWidthScale(m_scale);
 	}
 
@@ -129,7 +123,6 @@ RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 		m_fInitBrowser = true;
 	}
 
-//Error:
 	return r;
 }
 
@@ -157,9 +150,6 @@ RESULT DreamSettingsApp::Hide() {
 	CR(m_pFormView->HandleKeyboardDown());
 
 	m_fRespondToController = true;
-
-	//m_pUserApp->SetHasOpenApp(false);
-	//m_pUserApp->SetEventApp(nullptr);
 
 Error:
 	return r;
