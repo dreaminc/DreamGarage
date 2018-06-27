@@ -8,6 +8,8 @@
 
 #include "Cloud/Environment/EnvironmentAsset.h"
 
+#include "Sandbox/PathManager.h"
+
 CEFBrowserManager::CEFBrowserManager() {
 	// empty
 }
@@ -245,6 +247,13 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
+	
+	std::wstring wstrAppDataPath;
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
+	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
+	CefString(&cefSettings.cache_path) = wstrAppDataPath;
+	// CEF will create the Directory(s) if necessary
+
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
 	
