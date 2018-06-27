@@ -929,6 +929,9 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		texture *pBumpTexture;
 		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
+		texture *pBumpTextureWater;
+		pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
 		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
@@ -947,6 +950,7 @@ RESULT HALTestSuite::AddTestReflectionShader() {
 		pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
 		CN(pTestContext->pReflectionQuad);
 		pTestContext->pReflectionQuad->SetPosition(0.0f, -1.0f, 0.0f);
+		pTestContext->pReflectionQuad->SetBumpTexture(pBumpTextureWater);
 		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 

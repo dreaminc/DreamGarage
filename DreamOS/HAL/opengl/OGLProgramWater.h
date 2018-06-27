@@ -38,7 +38,7 @@ public:
 
 public:
 	RESULT SetReflectionObject(VirtualObj* pReflectionObject);
-	RESULT SetReflectionPlane(plane reflectionPlane);
+	//RESULT SetReflectionPlane(plane reflectionPlane);
 
 private:
 	stereocamera *m_pCamera = nullptr;
@@ -75,10 +75,9 @@ private:
 	OGLUniformBool *m_pUniformHasTextureRefraction = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureRefraction = nullptr;
 
-	
+	OGLUniformBool *m_pUniformHasTextureNormal = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureNormal = nullptr;
 
-	//OGLUniformBool *m_pUniformHasTextureAmbient = nullptr;
-	//OGLUniformSampler2D *m_pUniformTextureAmbient = nullptr;
 	//OGLUniformBool *m_pUniformHasTextureDiffuse = nullptr;
 	//OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
 	//OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;

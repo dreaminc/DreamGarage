@@ -24,8 +24,8 @@ uniform sampler2D u_textureReflection;
 uniform bool	u_hasTextureRefraction;
 uniform sampler2D u_textureRefraction;
 
-//uniform bool	u_hasTextureAmbient;
-//uniform sampler2D u_textureAmbient;
+uniform bool	u_hasTextureNormal;
+uniform sampler2D u_textureNormal;
 //
 //uniform bool	u_hasTextureDiffuse;
 //uniform sampler2D u_textureDiffuse;
@@ -42,6 +42,8 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Reflection;
 
+float g_normalDisplacementFactor = 0.1f;
+
 // TODO: Move to CPU side
 mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
 						 0.0f, -1.0f, 0.0f, 0.0f,
@@ -56,10 +58,10 @@ void main(void) {
 	
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	
-	//if(u_hasBumpTexture == true) {
-	//	TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
-	//	TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
-	//}
+	if(u_hasTextureNormal == true) {
+		TBNNormal = texture(u_textureNormal, DataIn.uvCoord).rgb;
+		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
+	}
 	
 	mat4 mat4ReflectedView = xzFlipMatrix * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
 
@@ -70,6 +72,11 @@ void main(void) {
 	vec4 colorDiffuse = material.m_colorDiffuse; 
 	if(u_hasTextureReflection) {
 		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
+		
+		// Displace Normals
+		vTextureReflection.x += g_normalDisplacementFactor * TBNNormal.x;
+		vTextureReflection.y += g_normalDisplacementFactor * TBNNormal.y;
+
 		colorDiffuse = colorDiffuse * texture(u_textureReflection, vTextureReflection);
 	}
 
@@ -79,6 +86,8 @@ void main(void) {
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
+
+		//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 
 		if(dot(TBNNormal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);

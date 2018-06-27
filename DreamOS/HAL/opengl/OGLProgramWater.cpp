@@ -45,6 +45,12 @@ RESULT OGLProgramWater::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureRefraction), std::string("u_hasTextureRefraction")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureRefraction), std::string("u_textureRefraction")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureNormal), std::string("u_hasTextureNormal")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureNormal), std::string("u_textureNormal")));
+
+	OGLUniformBool *m_pUniformHasTextureNormal = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureNormal = nullptr;
+
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -192,7 +198,7 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 
 	// Bump
 	//SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
-	//
+	
 	//// Color texture
 	//SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
 	//
@@ -206,11 +212,32 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 	//m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
 
 	// Reflection Texture
-	m_pParentImp->glActiveTexture(GL_TEXTURE0);
-	m_pParentImp->BindTexture(m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(), 
-							  m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
-	m_pUniformTextureReflection->SetUniform(0);
-	m_pUniformHasTextureReflection->SetUniform(true);
+	if (m_pOGLReflectionFramebuffer_in != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
+			m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
+		m_pUniformTextureReflection->SetUniform(0);
+		m_pUniformHasTextureReflection->SetUniform(true);
+	}
+
+	// Refraction Texture
+	if (m_pOGLRefractionFramebuffer_in != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE1);
+		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
+			m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
+		m_pUniformTextureRefraction->SetUniform(1);
+		m_pUniformHasTextureRefraction->SetUniform(true);
+	}
+
+	// Normal map
+	if (pOGLObj->GetOGLTextureBump() != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE2);
+		m_pParentImp->BindTexture(pOGLObj->GetOGLTextureBump()->GetOGLTextureTarget(), 
+			pOGLObj->GetOGLTextureBump()->GetOGLTextureIndex());
+
+		m_pUniformTextureNormal->SetUniform(2);
+		m_pUniformHasTextureNormal->SetUniform(true);
+	}
 
 	//	Error:
 	return r;
