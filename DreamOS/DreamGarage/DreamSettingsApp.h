@@ -15,7 +15,6 @@ struct UIEvent;
 class DreamSettingsApp : public DreamApp<DreamSettingsApp>, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
 {
 	friend class DreamAppManager;
-	friend class DreamUserControlArea;
 	friend class MultiContentTestSuite;
 
 public:
@@ -54,11 +53,6 @@ private:
 	std::string m_strURL;
 
 	float m_scaleTick = SCALE_TICK;
-
-	// settings TODO: userApp
-	float m_depth = 0.0f;
-	float m_height = 0.0f;
-	float m_scale = 1.0f;
 
 	//TODO: should be temporary
 	bool m_fRespondToController = false;

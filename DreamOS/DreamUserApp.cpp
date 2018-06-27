@@ -839,16 +839,16 @@ float DreamUserApp::GetAnimationDuration() {
 	return m_animationDuration;
 }
 
-float DreamUserApp::GetWidthScale() {
-	return m_widthScale;
+float DreamUserApp::GetScale() {
+	return m_scale;
 }
 
 float DreamUserApp::GetSpacingSize() {
 	return m_spacingSize;
 }
 
-RESULT DreamUserApp::SetWidthScale(float widthScale) {
-	m_widthScale = widthScale;
+RESULT DreamUserApp::SetScale(float widthScale) {
+	m_scale = widthScale;
 	return R_PASS;
 }
 
@@ -881,9 +881,9 @@ RESULT DreamUserApp::UpdateDepth(float depthDiff) {
 
 	return R_PASS;
 }
-RESULT DreamUserApp::UpdateWidthScale(float scale) {
+RESULT DreamUserApp::UpdateScale(float scale) {
 
-	m_widthScale = scale;
+	m_scale = scale;
 	GetComposite()->SetScale(scale);
 
 	return R_PASS;

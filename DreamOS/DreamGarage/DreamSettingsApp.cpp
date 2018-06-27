@@ -10,7 +10,6 @@
 
 #include "UI/UISurface.h"
 
-//#include "CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 
 
@@ -94,12 +93,12 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 	}
 
 	if (m_fLeftTriggerDown) {
-		m_scale = m_pUserApp->GetWidthScale() + m_scaleTick;
-		m_pUserApp->UpdateWidthScale(m_scale);
+	//	m_scale = m_pUserApp->GetWidthScale() + m_scaleTick;
+		m_pUserApp->UpdateScale(m_pUserApp->GetScale() + m_scaleTick);
 	}
 	else if (m_fRightTriggerDown) {
-		m_scale = m_pUserApp->GetWidthScale() - m_scaleTick;
-		m_pUserApp->UpdateWidthScale(m_scale);
+	//	m_scale = m_pUserApp->GetWidthScale() - m_scaleTick;
+		m_pUserApp->UpdateScale(m_pUserApp->GetScale() - m_scaleTick);
 	}
 
 Error:
@@ -232,12 +231,10 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
 		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
 			m_pUserApp->UpdateHeight(diff);
-			m_height += diff;
 		}
 		else {
 			//TODO: scale depth in variable
 			m_pUserApp->UpdateDepth(diff/4.0f);
-			m_depth += diff/4.0f;
 		}
 	}
 	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {

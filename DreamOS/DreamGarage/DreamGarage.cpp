@@ -915,7 +915,7 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 
 	m_pDreamUserApp->UpdateHeight(height);
 	m_pDreamUserApp->UpdateDepth(depth);
-	m_pDreamUserApp->UpdateWidthScale(scale);
+	m_pDreamUserApp->UpdateScale(scale);
 
 	return R_PASS;
 }

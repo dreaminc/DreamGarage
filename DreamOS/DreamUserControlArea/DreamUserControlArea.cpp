@@ -207,13 +207,13 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 }
 
 float DreamUserControlArea::GetViewScale() {
-	return m_pDreamUserApp->GetWidthScale();
+	return m_pDreamUserApp->GetScale();
 }
 
 RESULT DreamUserControlArea::ScaleViewWidth(float scale) {
 	RESULT r = R_PASS;
 
-	m_pDreamUserApp->SetWidthScale(scale);
+	m_pDreamUserApp->SetScale(scale);
 	GetComposite()->SetScale(scale);
 	m_pDreamUIBar->UpdateWidth(scale);
 

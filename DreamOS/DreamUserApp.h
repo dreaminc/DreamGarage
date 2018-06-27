@@ -192,14 +192,14 @@ public:
 	float GetViewAngle();
 	float GetAnimationDuration();
 	float GetSpacingSize();
-	float GetWidthScale();
-	RESULT SetWidthScale(float widthScale);
+	float GetScale();
+	RESULT SetScale(float widthScale);
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
 	RESULT UpdateHeight(float heightDiff);
 	RESULT UpdateDepth(float depthDiff);
-	RESULT UpdateWidthScale(float scale);
+	RESULT UpdateScale(float scale);
 
 private:
 	//user *m_pUserModel = nullptr;
@@ -240,7 +240,7 @@ private:
 
 	float m_animationDuration = ANIMATION_DURATION_SECONDS;
 
-	float m_widthScale = 1.0f;
+	float m_scale = 1.0f;
 
 	double m_msGazeOverlayDelay = GAZE_OVERLAY_MS;
 	double m_msGazeStart;
