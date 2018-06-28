@@ -234,6 +234,26 @@ Error:
 	return;
 }
 
+void CEFApp::OnWebKitInitialized() {
+	/*
+	RESULT r = R_PASS;
+
+	DOSLOG(DreamLogger::Level::INFO, "OnWebKitInitialized");
+
+	// Create an instance of my CefV8Handler object.
+	m_pCEFV8Handler = new CEFV8Handler();
+	CN(m_pCEFV8Handler);
+
+	// Register Extension
+
+	m_pCEFDreamExtension = new CEFExtension(L"DreamCEFExtension.js", m_pCEFV8Handler);
+	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
+	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
+
+Error:*/
+	return;
+}
+
 RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {
 	RESULT r = R_PASS;
 

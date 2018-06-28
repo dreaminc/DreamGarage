@@ -27,6 +27,7 @@
 
 class WebBrowserController;
 
+
 class CEFApp : public singleton<CEFApp>, 
 	public CEFHandler::CEFHandlerObserver,
 	public CefApp, 
@@ -88,6 +89,7 @@ public:
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
 	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
+	virtual void OnWebKitInitialized() override;
 
 	// CEFAppObserver
 	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
