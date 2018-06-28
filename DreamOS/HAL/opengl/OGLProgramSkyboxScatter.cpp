@@ -194,10 +194,17 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 
 	if (m_pReflectionObject != nullptr) {
 		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+
+		plane householderReflectionPlane = reflectionPlane;
+		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
+
 		auto matReflection = ReflectionMatrix(reflectionPlane);
+		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
+
 		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+
 		matV = matFlip * matV * matReflection;
-		matVO = matFlip * matVO * matReflection;
+		matVO = matFlip * matVO * matHouseholderReflection;
 	}
 
 	auto matVP = matP * matV;

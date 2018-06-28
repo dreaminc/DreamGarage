@@ -1,8 +1,8 @@
-// reflection.vert
+// standard_clipping.vert
 // shadertype=glsl
 
-// This is a reflection shader and will reflect the camera against 
-// a reflection matrix provided 
+// This is a shader based off the standard shader that allows for setting a 
+// clipping plane
 
 // TODO: Move to a uniform block
 layout (location = 0) in vec4 inV_vec4Position;
@@ -34,9 +34,8 @@ uniform mat4 u_mat4ModelView;
 //uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Normal;
-uniform mat4 u_mat4Reflection;
 
-uniform vec4 u_vec4ReflectionPlane;
+uniform vec4 u_vec4ClippingPlane;
 
 // TODO: Move to CPU side
 mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
@@ -44,16 +43,8 @@ mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
 						 0.0f, 0.0f, 1.0f, 0.0f,
 						 0.0f, 0.0f, 0.0f, 1.0f);
 
-//mat4 g_mat4Reflection = mat4(1.0f) - 2.0f * (u_vec4ReflectionPlane * transpose(u_vec4ReflectionPlane));
-//mat4 g_mat4ReflectedView = g_mat4Reflection * u_mat4View;
-
-mat4 g_mat4ReflectedView = xzFlipMatrix * u_mat4View * u_mat4Reflection ;	// This could easily be done on the CPU side
-//mat4 g_mat4ReflectedView = u_mat4Reflection * u_mat4View;	// This could easily be done on the CPU side
-
-mat4 g_mat4ModelView = g_mat4ReflectedView * u_mat4Model;
+mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
-mat4 g_mat4ViewProjection = u_mat4Projection * g_mat4ReflectedView;
-
 
 void main(void) {	
 
@@ -67,7 +58,7 @@ void main(void) {
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
-		ProcessLightVertex(lights[i], g_mat4ReflectedView, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
+		ProcessLightVertex(lights[i], g_mat4ModelView, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
 
 		// Apply TBN matrix 
 		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * DataOut.directionLight[i]);
@@ -84,6 +75,5 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	// Projected Vert Position
-	//gl_Position = g_mat4ViewProjection * vertWorldSpace;
 	gl_Position = u_mat4Projection * vertViewSpace;
 }

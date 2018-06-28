@@ -60,7 +60,7 @@ private:
 	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
 
-	OGLUniformVector *m_pUniformReflectionPlane = nullptr;
+	OGLUniformVector *m_pUniformClippingPlane = nullptr;
 
 	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;

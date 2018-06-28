@@ -1,8 +1,8 @@
-// reflection.frag
+// standard_clipping.frag
 // shadertype=glsl
 
-// This is a reflection shader and will reflect the camera against 
-// a reflection matrix provided 
+// This is a shader based on the standard shader that includes a clipping
+// plane as would be used for reflection or refraction mapping
 
 in vec3 inF_vec3Color;
 
@@ -42,12 +42,12 @@ float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-uniform vec4 u_vec4ReflectionPlane;
+uniform vec4 u_vec4ClippingPlane;
 
 void main(void) {  
 	
 	// Clip fragments on our side of the plane
-	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ReflectionPlane.xyz)) + u_vec4ReflectionPlane.w;
+	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ClippingPlane.xyz)) + u_vec4ClippingPlane.w;
     if (fragmentClipPosition < 0.0) {
         discard;
     }

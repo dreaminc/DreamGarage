@@ -2181,16 +2181,16 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\reflection.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\reflection.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
