@@ -269,14 +269,20 @@ RESULT DreamGarage::DidFinishLoading() {
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 
+	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+	CN(m_pDreamUserApp);
+
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
 	CN(m_pDreamUserControlArea);
 
+	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+	CN(m_pDreamShareView);
 
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
+	CN(m_pDreamSettings);
 
 Error:
 	return r;
@@ -509,16 +515,6 @@ RESULT DreamGarage::Update(void) {
 
 		m_fShouldUpdateAppComposites = false;
 	}
-
-	if (m_pDreamUserApp == nullptr) {
-		m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
-		CN(m_pDreamUserApp);
-
-		//TODO: not sure about proper architecture for where each app should be
-		m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
-	}
-
-//	if (m_pD)
 
 Error:
 	return r;

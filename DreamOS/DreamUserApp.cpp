@@ -215,10 +215,11 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	}
 
 	// user settings
+	m_userSettings = new UserSettings();
 
-	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
-	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+	m_userSettings->m_aspectRatio = ((float)m_userSettings->m_pxWidth / (float)m_userSettings->m_pxHeight);
+	m_userSettings->m_baseWidth = std::sqrt(((m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio) * (m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize)) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
+	m_userSettings->m_baseHeight = std::sqrt((m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
 
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
@@ -816,39 +817,39 @@ Error:
 }
 
 float DreamUserApp::GetPXWidth() {
-	return m_pxWidth;
+	return m_userSettings->m_pxWidth;
 }
 
 float DreamUserApp::GetPXHeight() {
-	return m_pxHeight;
+	return m_userSettings->m_pxHeight;
 }
 
 float DreamUserApp::GetBaseWidth() {
-	return m_baseWidth;
+	return m_userSettings->m_baseWidth;
 }
 
 float DreamUserApp::GetBaseHeight() {
-	return m_baseHeight;
+	return m_userSettings->m_baseHeight;
 }
 
 float DreamUserApp::GetViewAngle() {
-	return m_viewAngle;
+	return m_userSettings->m_viewAngle;
 }
 
 float DreamUserApp::GetAnimationDuration() {
-	return m_animationDuration;
+	return m_userSettings->m_animationDuration;
 }
 
 float DreamUserApp::GetScale() {
-	return m_scale;
+	return m_userSettings->m_scale;
 }
 
 float DreamUserApp::GetSpacingSize() {
-	return m_spacingSize;
+	return m_userSettings->m_spacingSize;
 }
 
 RESULT DreamUserApp::SetScale(float widthScale) {
-	m_scale = widthScale;
+	m_userSettings->m_scale = widthScale;
 	return R_PASS;
 }
 
@@ -883,7 +884,7 @@ RESULT DreamUserApp::UpdateDepth(float depthDiff) {
 }
 RESULT DreamUserApp::UpdateScale(float scale) {
 
-	m_scale = scale;
+	m_userSettings->m_scale = scale;
 	GetComposite()->SetScale(scale);
 
 	return R_PASS;

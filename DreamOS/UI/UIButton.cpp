@@ -57,7 +57,7 @@ RESULT UIButton::Notify(UIEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	m_pInteractionObject = pEvent->m_pInteractionObject;
-	m_ptContact = pEvent->m_ptContact;
+	m_ptContact = pEvent->m_ptEvent;
 
 	std::function<RESULT(UIButton*,void*)> fnCallback;
 

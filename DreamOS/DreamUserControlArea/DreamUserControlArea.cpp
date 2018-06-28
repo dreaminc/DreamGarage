@@ -1003,7 +1003,7 @@ Error:
 RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
-	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptContact);
+	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
 	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
@@ -1023,7 +1023,7 @@ RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 		CR(OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(OnScroll(pUIEvent->m_ptScroll.x(), pUIEvent->m_ptScroll.y(), ptContact));
+		CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
 	}
 	};
 

@@ -1,12 +1,12 @@
 #include "UIEvent.h"
 #include "Primitives/VirtualObj.h"
 
-UIEvent::UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj *pInteractionObject, point ptContact, point ptScroll) :
+UIEvent::UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj *pInteractionObject, point ptEvent, vector vDelta) :
 	m_eventType(eventType),
 	m_pObj(pObj),
 	m_pInteractionObject(pInteractionObject),
-	m_ptContact(ptContact),
-	m_ptScroll(ptScroll)
+	m_ptEvent(ptEvent),
+	m_vDelta(vDelta)
 {
 
 }

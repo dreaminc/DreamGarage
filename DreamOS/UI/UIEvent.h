@@ -2,6 +2,8 @@
 #define UI_EVENT_H_
 
 #include "Primitives/point.h"
+#include "Primitives/vector.h"
+
 class VirtualObj;
 
 enum UIEventType {
@@ -40,10 +42,10 @@ struct UIEvent {
 	UIEventType m_eventType;
 	VirtualObj *m_pObj;
 	VirtualObj *m_pInteractionObject = nullptr;
-	point m_ptContact;
-	point m_ptScroll;
+	point m_ptEvent;
+	vector m_vDelta;
 
-	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr, point ptContact = point(0.0f, 0.0f, 0.0f), point ptScroll = point(0.0f, 0.0f, 0.0f));
+	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr, point ptEvent = point(0.0f, 0.0f, 0.0f), vector vDelta = vector(0.0f, 0.0f, 0.0f));
 };
 
 #endif // ! UI_EVENT_H_

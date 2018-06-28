@@ -148,7 +148,7 @@ RESULT DreamSettingsApp::Hide() {
 	CR(m_pFormView->Hide());
 	CR(m_pFormView->HandleKeyboardDown());
 
-	m_fRespondToController = true;
+	m_fRespondToController = false;
 
 Error:
 	return r;
@@ -157,12 +157,16 @@ Error:
 RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
-	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptContact);
-	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
+	WebBrowserPoint wptContact;
+	point ptContact;
 
 	CNR(m_pFormView, R_SKIPPED);
 	CBR(pUIEvent->m_pObj == m_pFormView->GetViewQuad().get(), R_SKIPPED);
 	CNR(m_pForm, R_SKIPPED);
+	CBR(m_fRespondToController, R_SKIPPED);
+
+	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
+	ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
@@ -179,7 +183,7 @@ RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 		CR(m_pForm->OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(m_pForm->OnScroll(pUIEvent->m_ptScroll.x(), pUIEvent->m_ptScroll.y(), ptContact));
+		CR(m_pForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
 	}
 	};
 
