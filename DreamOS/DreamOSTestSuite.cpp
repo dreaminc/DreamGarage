@@ -40,7 +40,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-//	CR(AddTestDreamLogger());
+	CR(AddTest2DCamera());
+
+	CR(AddTestDreamLogger());
 
 //	CR(AddTestMeta());
 
@@ -1671,6 +1673,114 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	pUITest->SetTestDescription("Dream Desktop working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTest2DCamera() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public Subscriber<InteractionObjectEvent> {
+		sphere *pSphere = nullptr;
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
+		virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
+			RESULT r = R_PASS;
+
+			CR(r);
+
+			DEBUG_LINEOUT("notify");
+
+			if (mEvent->m_numContacts > 0)
+				pSphere->SetPosition(mEvent->m_ptContact[0]);
+
+		Error:
+			return r;
+		}
+
+	} *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// TODO:
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the Shared View App
+		pTestContext->pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
+
+		// Sphere test
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
+		pTestContext->pSphere->SetPosition(0, 0, 0);
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps as needed
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
