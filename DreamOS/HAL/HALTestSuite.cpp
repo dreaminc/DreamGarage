@@ -858,20 +858,20 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		ProgramNode* pReflectionProgramNode;
 		pReflectionProgramNode = nullptr;
-		//pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
-		//CN(pReflectionProgramNode);
-		//CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+		CN(pReflectionProgramNode);
+		CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		ProgramNode* pReflectionSkyboxProgram;
 		pReflectionSkyboxProgram = nullptr;
-		//pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		//CN(pReflectionSkyboxProgram);
-		//CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//
-		//// Connect output as pass-thru to internal blend program
-		//CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pReflectionSkyboxProgram);
+		CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		// Connect output as pass-thru to internal blend program
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
 
 		// Refraction
 
@@ -883,13 +883,13 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		ProgramNode* pRefractionSkyboxProgram;
 		pRefractionSkyboxProgram = nullptr;
-		//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		//CN(pRefractionSkyboxProgram);
-		//CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pRefractionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//
-		//// Connect output as pass-thru to internal blend program
-		//CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
+		pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pRefractionSkyboxProgram);
+		CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRefractionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		// Connect output as pass-thru to internal blend program
+		CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
 
 		// "Water"
 
@@ -901,8 +901,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		
 		// TODO: This is not particularly general yet
-		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNode->Output("output_framebuffer")));
-		//CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionSkyboxProgram->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
 		
 		// Standard Shader
 
@@ -915,21 +915,21 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 		
 		//// Skybox
-		//ProgramNode* pSkyboxProgram;
-		//pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		//CN(pSkyboxProgram);
-		//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//
-		//// Connect output as pass-thru to internal blend program
-		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -992,6 +992,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pWaterQuad));
 		}
 
+		// NOTE: Refraction skybox needs no reflection plane - it's just looking through
+
 		// TOOD: Test clipping
 		sphere *pSphere;
 		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
@@ -1038,7 +1040,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		//pTestContext->pReflectionQuad->translateY(-0.0001f);
 		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
-		pTestContext->pWaterQuad->RotateXByDeg(0.001f);
+		pTestContext->pWaterQuad->RotateXByDeg(0.002f);
 
 	Error:
 		return r;

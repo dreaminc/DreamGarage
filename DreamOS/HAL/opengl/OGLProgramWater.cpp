@@ -229,6 +229,10 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pUniformTextureReflection->SetUniform(0);
 		m_pUniformHasTextureReflection->SetUniform(true);
 	}
+	else {
+		if (m_pUniformHasTextureReflection != nullptr)
+			m_pUniformHasTextureReflection->SetUniform(false);
+	}
 
 	// Refraction Texture
 	if (m_pOGLRefractionFramebuffer_in != nullptr) {
@@ -242,6 +246,10 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		if(m_pUniformHasTextureRefraction != nullptr)
 			m_pUniformHasTextureRefraction->SetUniform(true);
 	}
+	else {
+		if (m_pUniformHasTextureRefraction != nullptr)
+			m_pUniformHasTextureRefraction->SetUniform(false);
+	}
 
 	// Normal map
 	if (pOGLObj->GetOGLTextureBump() != nullptr) {
@@ -251,6 +259,9 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 
 		m_pUniformTextureNormal->SetUniform(2);
 		m_pUniformHasTextureNormal->SetUniform(true);
+	}
+	else {
+		m_pUniformHasTextureNormal->SetUniform(false);
 	}
 
 	//	Error:

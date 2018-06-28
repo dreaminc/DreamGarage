@@ -60,16 +60,27 @@ void main(void) {
 	
 	if(u_hasTextureNormal == true) {
 		TBNNormal = texture(u_textureNormal, DataIn.uvCoord).rgb;
+		//TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 	
+	// Reflection
 	mat4 mat4ReflectedView = xzFlipMatrix * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
 
 	vec4 vClipReflection = u_mat4Projection * mat4ReflectedView * DataIn.vertWorldSpace;
 	vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
 	vec2 vTextureReflection = vec2(0.5f, 0.5f) + 0.5f * vDeviceReflection;
 
+	// Refraction
+
+	// We can do refraction entirely in the displacement map
+	vec4 vClipRefraction = u_mat4Projection * u_mat4View * DataIn.vertWorldSpace;
+	vec2 vDeviceRefraction = vClipRefraction.st / vClipRefraction.q;
+	vec2 vTextureRefraction = vec2(0.5f, 0.5f) + 0.5f * vDeviceRefraction;
+
+
 	vec4 colorDiffuse = material.m_colorDiffuse; 
+
 	if(u_hasTextureReflection) {
 		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
 		
@@ -77,7 +88,21 @@ void main(void) {
 		vTextureReflection.x += g_normalDisplacementFactor * TBNNormal.x;
 		vTextureReflection.y += g_normalDisplacementFactor * TBNNormal.y;
 
-		colorDiffuse = colorDiffuse * texture(u_textureReflection, vTextureReflection);
+		// TODO: Need to add actual fresnel term and shit
+
+		colorDiffuse = colorDiffuse * (0.5f * texture(u_textureReflection, vTextureReflection));
+		
+	}
+
+	if(u_hasTextureRefraction) {
+
+		// Displace Normals
+		vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
+		vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
+
+		// TODO: Need to add actual refractive index and shit
+
+		colorDiffuse = colorDiffuse + (0.5f * texture(u_textureRefraction, vTextureRefraction));
 	}
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
@@ -97,5 +122,5 @@ void main(void) {
 		}
 	}
 
-	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.2f, 0.2f, 0.2f, 1.0f);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a) + vec4(0.1f, 0.1f, 0.1f, 1.0f);
 }
