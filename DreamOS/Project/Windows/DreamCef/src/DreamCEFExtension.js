@@ -1,13 +1,11 @@
-"use strict";
+var dreamos;
 
-var test;
-
-if (!test) {
-    test = {};
+if (!dreamos) {
+    dreamos = {};
 }
 
 (function() {
-  test.myfunc = function() {
+  dreamos.myfunc = function() {
       native function myfunc();
       return myfunc();
   }

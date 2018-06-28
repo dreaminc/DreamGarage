@@ -460,6 +460,9 @@
   <ItemGroup>
     <Xml Include="manifest.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DreamCEFExtension.js" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

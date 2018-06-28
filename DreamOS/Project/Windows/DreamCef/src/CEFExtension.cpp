@@ -14,6 +14,10 @@ CEFExtension::~CEFExtension() {
 	// empty
 }
 
+#include <string>
+#include <fstream>
+#include <streambuf>
+
 RESULT CEFExtension::Initialize() {
 	RESULT r = R_PASS;
 
@@ -22,23 +26,26 @@ RESULT CEFExtension::Initialize() {
 	CNM(m_pszExtensionCodeFilename, "Extension file path not valid");
 	//CRM(LoadExtensionCodeFromFile(m_pszExtensionCodeFilename), "Failed to load extension file %S", m_pszExtensionCodeFilename);
 	
-	
-
 	{
 		// Register the extension.
 		//CefString cefStrExtensionCode = CefString(m_strExtensionCode);
-		CefString cefStrExtensionCode =
-			"var test;"
-			"if (!test)"
-			"  test = {};"
-			"(function() {"
-			"  test.myfunc = function() {"
-			"    native function myfunc();"
-			"    return myfunc();"
-			"  };"
-			"})();";
+		//CefString cefStrExtensionCode =
+		//	"var test;"
+		//	"if (!test)"
+		//	"  test = {};"
+		//	"(function() {"
+		//	"  test.myfunc = function() {"
+		//	"    native function myfunc();"
+		//	"    return myfunc();"
+		//	"  };"
+		//	"})();";
 
-		CBM((CefRegisterExtension("v8/test", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
+		std::ifstream ifstreamExtensionFile("C:\\dev\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js");
+		std::stringstream bufferExtensionCode;
+		bufferExtensionCode << ifstreamExtensionFile.rdbuf();
+		CefString cefStrExtensionCode = bufferExtensionCode.str();
+
+		CBM((CefRegisterExtension("v8/dreamos", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
 	}
 
 Error:
@@ -48,24 +55,32 @@ Error:
 RESULT CEFExtension::LoadExtensionCodeFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
+	/*
 	PathManager *pPathManager = PathManager::instance();
 	wchar_t *pFilePath = nullptr;
-
+	
 	CRM(pPathManager->GetFilePath(PATH_SCRIPTS, pszFilename, pFilePath),
 		"Failed to get path for %S extension", pszFilename);
 
 	const char *pszExtensionCode = FileRead(pFilePath);
 	CNM(pszExtensionCode, "Failed to read file %S", pFilePath);
+	*/
+
+	// Temporary workaround until we migrate DreamCEF to sandbox
+	//const char *pszExtensionCode = FileRead(const_cast<wchar_t*>(pszFilename));
+	const char *pszExtensionCode = FileRead(L"DreamCEFExtension.js");
+	CNM(pszExtensionCode, "Failed to read file %S", pszFilename);
 
 	m_strExtensionCode = std::string(pszExtensionCode);
 
-	DEBUG_LINEOUT("Loaded new script extension %S", pFilePath);
+	//DEBUG_LINEOUT("Loaded new script extension %S", pFilePath);
+	DEBUG_LINEOUT("Loaded new script extension %S", pszFilename);
 
 Error:
-	if (pFilePath != nullptr) {
-		delete[] pFilePath;
-		pFilePath = nullptr;
-	}
+	//if (pFilePath != nullptr) {
+	//	delete[] pFilePath;
+	//	pFilePath = nullptr;
+	//}
 
 	return r;
 }

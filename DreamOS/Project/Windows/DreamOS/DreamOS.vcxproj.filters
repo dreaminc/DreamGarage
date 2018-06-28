@@ -2157,9 +2157,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\materialCommon.shader">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\Scripts\DreamCEFExtension.js">
-      <Filter>Scripts</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

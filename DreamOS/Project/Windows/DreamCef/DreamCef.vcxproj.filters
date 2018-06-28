@@ -15,4 +15,7 @@
   <ItemGroup>
     <Xml Include="manifest.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DreamCEFExtension.js" />
+  </ItemGroup>
 </Project>

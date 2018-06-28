@@ -1332,7 +1332,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\Primitives\plane.h" />
     <None Include="..\..\..\Rakefile" />
     <None Include="..\..\..\Scripts\copy_assets.py" />
-    <None Include="..\..\..\Scripts\DreamCEFExtension.js" />
     <None Include="..\..\..\Scripts\make_production.py" />
     <None Include="..\..\..\Scripts\make_production_package.py" />
   </ItemGroup>
