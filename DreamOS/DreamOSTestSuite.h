@@ -34,6 +34,7 @@ public:
 	RESULT AddTestDreamApps();
 	RESULT AddTestUserApp();
 	RESULT AddTestPeerApps();
+	RESULT AddTest2DCamera();
 
 	// Meta UI
 	RESULT AddTestMeta();
