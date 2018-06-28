@@ -32,7 +32,7 @@ public:
 	RESULT AddTestSkybox();
 
 	// Shader Tests
-	RESULT AddTestReflectionShader();
+	RESULT AddTestWaterShader();
 	RESULT AddTestGeometryShader();
 	RESULT AddTestIncludeShader();
 	RESULT AddTestToonShader();

@@ -133,6 +133,9 @@ RESULT OGLProgramWater::SetupConnections() {
 	// Reflection Map
 	CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer_in));
 
+	// Refraction Map
+	CR(MakeInput<OGLFramebuffer>("input_refraction_map", &m_pOGLRefractionFramebuffer_in));
+
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
@@ -140,13 +143,13 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramWater::SetReflectionObject(VirtualObj* pReflectionObject) {
+RESULT OGLProgramWater::SetPlaneObject(VirtualObj* pReflectionObject) {
 	RESULT r = R_PASS;
 
 	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
 	CNM(pQuad, "Non quad not supported in reflection");
 
-	m_pReflectionObject = pReflectionObject;
+	m_pPlaneObject = pReflectionObject;
 
 Error:
 	return r;
@@ -181,10 +184,17 @@ RESULT OGLProgramWater::ProcessNode(long frameID) {
 	// 3D Object / skybox
 	//RenderObjectStore(m_pSceneGraph);
 
-	DimObj *pReflectionObj = dynamic_cast<DimObj*>(m_pReflectionObject);
-	if (pReflectionObj != nullptr) {
-		pReflectionObj->SetDiffuseTexture(m_pOGLReflectionFramebuffer_in->GetColorTexture());
-		RenderObject(pReflectionObj);
+	DimObj *pPlaneObj = dynamic_cast<DimObj*>(m_pPlaneObject);
+	if (pPlaneObj != nullptr) {
+		//if (m_pOGLReflectionFramebuffer_in != nullptr) {
+		//	pPlaneObj->SetDiffuseTexture(m_pOGLReflectionFramebuffer_in->GetColorTexture());
+		//}
+		//
+		//if (m_pOGLRefractionFramebuffer_in != nullptr) {
+		//	pPlaneObj->SetDiffuseTexture(m_pOGLRefractionFramebuffer_in->GetColorTexture());
+		//}
+
+		RenderObject(pPlaneObj);
 	}
 
 	UnbindFramebuffer();
@@ -225,8 +235,12 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE1);
 		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
 			m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
-		m_pUniformTextureRefraction->SetUniform(1);
-		m_pUniformHasTextureRefraction->SetUniform(true);
+		
+		if(m_pUniformTextureRefraction != nullptr)
+			m_pUniformTextureRefraction->SetUniform(1);
+
+		if(m_pUniformHasTextureRefraction != nullptr)
+			m_pUniformHasTextureRefraction->SetUniform(true);
 	}
 
 	// Normal map
@@ -271,9 +285,9 @@ RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
-	if (m_pReflectionObject != nullptr) {
+	if (m_pPlaneObject != nullptr) {
 
-		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+		plane reflectionPlane = dynamic_cast<quad*>(m_pPlaneObject)->GetPlane();
 
 		auto matReflection = ReflectionMatrix(reflectionPlane);
 

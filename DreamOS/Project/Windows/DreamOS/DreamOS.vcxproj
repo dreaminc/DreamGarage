@@ -752,6 +752,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReflection.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramRefraction.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramStandard.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
@@ -1061,6 +1062,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReflection.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramRefraction.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramStandard.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />

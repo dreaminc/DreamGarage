@@ -10,6 +10,7 @@
 #include "OGLProgramFlat.h"
 #include "OGLProgramToon.h"
 #include "OGLProgramReflection.h"
+#include "OGLProgramRefraction.h"
 #include "OGLProgramWater.h"
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureShadow.h"
@@ -181,6 +182,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL),
 				"Failed to initialize OGL flat Program");
+		} break;
+
+		case OGLPROGRAM_REFRACTION: {
+			pOGLProgram = new OGLProgramRefraction(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL refraction Program");
 		} break;
 
 		case OGLPROGRAM_WATER: {
