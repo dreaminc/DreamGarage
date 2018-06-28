@@ -10,6 +10,7 @@
 //#include "UI/UIView.h"
 //#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
+#include "UI/UISurface.h"
 
 DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamControlView>(pDreamOS, pContext)
@@ -57,19 +58,11 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 		CN(m_pOverlayRight);
 	}
 
-	//pDreamOS->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
-
-	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
-	pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_MENU_DOWN, this);
-
 	m_fMouseDown[0] = false;
 	m_fMouseDown[1] = false;
 
 	m_fMalletDirty[0] = dirty();
 	m_fMalletDirty[1] = dirty();
-
-	m_ptLastEvent.x = -1;
-	m_ptLastEvent.y = -1;
 
 Error:
 	return r;
@@ -86,21 +79,21 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
 
-	if (m_pUserHandle == nullptr) {
+	if (m_pDreamUserApp == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 
 		CBR(userUIDs.size() == 1, R_SKIPPED);
 		m_userUID = userUIDs[0];
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pUserHandle);
+		m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pDreamUserApp);
 	}
 		
 	UIMallet* pLMallet;
-	pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 
 	UIMallet* pRMallet;
-	pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
 
 	// skip mallet update while keyboard is active
@@ -129,7 +122,7 @@ RESULT DreamControlView::Update(void *pContext) {
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
 
-		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		m_pUISurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -139,137 +132,6 @@ RESULT DreamControlView::Update(void *pContext) {
 		}
 	}
 
-Error:
-	return r;
-}
-
-RESULT DreamControlView::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
-	RESULT r = R_PASS;
-
-	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
-	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
-	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
-
-	// if keyboard is up, touching the view quad is always a dismiss
-	if (m_pKeyboardHandle != nullptr && !m_fIsShareURL) {
-		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-			fMalletDirty = false;
-		}
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
-			CR(m_pParentApp->HideWebsiteTyping());
-			fMalletDirty = true;
-		}
-	}
-
-	else {
-		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
-
-			fMalletDirty = false;
-
-			if (fMouseDown) {
-				fMouseDown = false;
-				WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
-				//WebBrowserPoint ptContact = GetRelativePointofContact(m_ptClick);
-				if (m_pParentApp != nullptr) {
-					if (m_fMouseDrag) {
-						m_fMouseDrag = false;
-						CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
-					}
-					else {
-						CR(m_pParentApp->OnClick(point(m_ptLastEvent.x, m_ptLastEvent.y, 0.0f), fMouseDown));
-					}
-				}
-			}
-
-			if (handType == HAND_TYPE::HAND_LEFT) {
-				m_ptLMalletPointing = GetRelativePointofContact(ptSphereOrigin);
-			}
-			else {
-				m_ptRMalletPointing = GetRelativePointofContact(ptSphereOrigin);
-			}
-
-		}
-
-		float xDistance = ptSphereOrigin.x() - m_ptClick.x();
-		float zDistance = ptSphereOrigin.z() - m_ptClick.z();
-		float squaredDistance = xDistance * xDistance + zDistance * zDistance;
-
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
-			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
-			if (m_pParentApp != nullptr) {
-				m_fMouseDrag = true;
-				CR(m_pParentApp->OnMouseMove(point(ptContact.x, ptContact.y, 0.0f)));
-			}
-			//m_ptClick = ptSphereOrigin;
-		}
-
-		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
-			WebBrowserPoint ptContact = GetRelativePointofContact(ptSphereOrigin);
-
-			float browserWidth = m_pParentApp->GetWidth();
-			float browserHeight = m_pParentApp->GetHeight();
-
-			bool fNotInBrowserQuad = ptContact.x > browserWidth || ptContact.x < 0 ||
-				ptContact.y > browserHeight || ptContact.y < 0;
-
-			fMalletDirty = true;
-
-			fNotInBrowserQuad = fNotInBrowserQuad || m_fIsMinimized;
-			CBR(!fNotInBrowserQuad, R_SKIPPED);
-
-			m_ptClick = ptSphereOrigin;
-			fMouseDown = true;
-
-			if (handType == HAND_TYPE::HAND_LEFT) {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_LEFT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			}
-			else {
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			}
-
-			CR(m_pParentApp->OnClick(point(ptContact.x, ptContact.y, 0.0f), fMouseDown));
-			m_ptLastEvent = ptContact;
-		}
-	}
-
-Error:
-	return r;
-}
-
-RESULT DreamControlView::Notify(SenseControllerEvent *pEvent) {
-	RESULT r = R_PASS;
-	CBR(IsVisible(), R_SKIPPED);
-	switch (pEvent->type) {
-	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-		int pxXDiff = pEvent->state.ptTouchpad.x() * BROWSER_SCROLL_CONSTANT;
-		int pxYDiff = pEvent->state.ptTouchpad.y() * BROWSER_SCROLL_CONSTANT;
-
-		WebBrowserPoint ptScroll;
-		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-			ptScroll = m_ptLMalletPointing;
-		}
-		else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-			ptScroll = m_ptRMalletPointing;
-		}
-
-		CNR(m_pParentApp, R_OBJECT_NOT_FOUND);
-
-		if (ptScroll.x < m_pParentApp->GetWidth() && ptScroll.x > 0 &&
-			ptScroll.y < m_pParentApp->GetHeight() && ptScroll.y > 0) {
-			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(ptScroll.x, ptScroll.y, 0.0f)));
-		}
-		/*
-		else {
-			WebBrowserPoint middleOfBrowser;
-			middleOfBrowser.x = m_pParentApp->GetWidth() / 2;
-			middleOfBrowser.y = m_pParentApp->GetHeight() / 2;
-			CR(m_pParentApp->OnScroll(pxXDiff, pxYDiff, point(middleOfBrowser.x, middleOfBrowser.y, 0.0f)));
-		}
-		//*/
-
-	} break;
-	}
 Error:
 	return r;
 }
@@ -300,8 +162,8 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			bool fStreaming = false;
 
 			CR(Hide());
-			CN(m_pUserHandle);
-			CR(m_pUserHandle->SendClearFocusStack());
+			CN(m_pDreamUserApp);
+			CR(m_pDreamUserApp->ClearFocusStack());
 
 		}
 
@@ -310,41 +172,18 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::DISMISS): {
 		CR(Dismiss());
-	}
+	} break;
 
 	case (UserObserverEventType::KB_ENTER): {	
-
-
 		if (m_fIsShareURL) {
-			//CR(ShowView());
-			m_pUserHandle->SendPreserveSharingState(true);
+			m_pDreamUserApp->PreserveSharingState(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
 
 			m_fIsShareURL = false;
-
-			//TODO: when using the control bar, we know that a website will be shared on enter,
-			// need a way to not have the scope and path hardcoded here
-
-			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->SetActiveBrowserURI());
-			}
-
-			//TODO: bypass making a request to help smooth the loading
-			//CR(SendURI());
 		}
-		else {
-			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->OnKeyPress(SVK_RETURN, true));	// ensures browser gets a return key before controlview changes state
-			}
-
-			CR(m_pParentApp->HideWebsiteTyping());
-
-		}	
-
-
-		} break;
+	} break;
 
 	} 
 	
@@ -352,16 +191,24 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
+RESULT DreamControlView::InitializeWithUserApp(DreamUserApp *pParent) {
 	RESULT r = R_PASS;
 
-	m_pParentApp = pParent;
 	auto pDreamOS = GetDOS();
 
-	float width = m_pParentApp->GetBaseWidth();
-	float height = m_pParentApp->GetBaseHeight();
+	m_pDreamUserApp = pParent;
+	CNR(m_pDreamUserApp, R_SKIPPED);
+
+	float width;
+	width = m_pDreamUserApp->GetBaseWidth();
+
+	float height;
+	height = m_pDreamUserApp->GetBaseHeight();
 	
-	m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	m_pUISurface = m_pView->AddUISurface();
+	m_pUISurface->InitializeSurfaceQuad(width, height);
+	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	m_pViewQuad = m_pUISurface->GetViewQuad();
 	CN(m_pViewQuad);
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
@@ -383,7 +230,7 @@ RESULT DreamControlView::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
@@ -439,22 +286,22 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		if (m_pUserHandle == nullptr) {
+		if (m_pDreamUserApp == nullptr) {
 			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 			CB(userUIDs.size() == 1);
 			m_userUID = userUIDs[0];
 
 			//Capture user app
-			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-			CN(m_pUserHandle);
+			m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
+			CN(m_pDreamUserApp);
 		}
 
 		UIMallet* pLMallet;
-		pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 		CNR(pLMallet, R_SKIPPED);
 
 		UIMallet* pRMallet;
-		pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 		CNR(pRMallet, R_SKIPPED);
 
 		pLMallet->SetDirty();
@@ -492,10 +339,10 @@ RESULT DreamControlView::ResetAppComposite() {
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
 
-	CN(m_pUserHandle);
+	CN(m_pDreamUserApp);
 
-	CR(m_pUserHandle->RequestAppBasisPosition(ptAppBasisPosition));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qAppBasisOrientation));
+	CR(m_pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
+	CR(m_pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
 
 	GetComposite()->SetPosition(ptAppBasisPosition);
 	GetComposite()->SetOrientation(qAppBasisOrientation);
@@ -515,7 +362,7 @@ RESULT DreamControlView::Show() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 1.0f),
-		m_pParentApp->GetAnimationDuration(),
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
@@ -532,8 +379,8 @@ RESULT DreamControlView::Dismiss() {
 	}
 
 	CR(Hide());
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->SendClearFocusStack());
+	CN(m_pDreamUserApp);
+	CR(m_pDreamUserApp->ClearFocusStack());
 
 Error:
 	return r;
@@ -585,7 +432,7 @@ RESULT DreamControlView::Hide() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 0.0f),
-		m_pParentApp->GetAnimationDuration(),
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags(),
 		nullptr,
@@ -605,7 +452,7 @@ bool DreamControlView::IsVisible() {
 	bool fKeyboardVisible = m_pKeyboardHandle != nullptr;
 
 	//TODO: replace with GetComposite()->IsVisible() if possible
-	bool fViewVisible = m_pViewQuad->IsVisible();
+	bool fViewVisible = m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
 	
 	// this function is closer to IsAppBeingUsed
 	return fKeyboardVisible || fViewVisible;
@@ -641,10 +488,10 @@ RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
 RESULT DreamControlView::ShowKeyboard() {
 	RESULT r = R_PASS;
 
-	CNM(m_pUserHandle, "user app not found");
+	CNM(m_pDreamUserApp, "user app not found");
 
 	//maintain the keyboard handle until the keyboard is hidden
-	m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
+	m_pKeyboardHandle = m_pDreamUserApp->GetKeyboard();
 	CNM(m_pKeyboardHandle, "keyboard handle not available");
 
 	CR(m_pKeyboardHandle->Show());
@@ -657,10 +504,10 @@ RESULT DreamControlView::HideKeyboard() {
 	RESULT r = R_PASS;
 
 	CNR(m_pKeyboardHandle, R_OBJECT_NOT_FOUND);
-	CNR(m_pUserHandle, R_OBJECT_NOT_FOUND);
+	CNR(m_pDreamUserApp, R_OBJECT_NOT_FOUND);
 
 	CR(m_pKeyboardHandle->Hide());
-	CR(m_pUserHandle->SendReleaseKeyboard());
+	CR(m_pDreamUserApp->ReleaseKeyboard());
 
 Error:
 	m_pKeyboardHandle = nullptr;
@@ -673,15 +520,7 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	
 	CR(HideKeyboard());
 
-	CN(m_pParentApp);			// This unfocuses the text box so that node change event
-	WebBrowserPoint ptUnFocusText;	// will fire if user closes keyboard and then wants
-	ptUnFocusText.x = -1;				// to go back into the same textbox
-	ptUnFocusText.y = -1;
-	if (m_pParentApp->GetActiveSource().get()->GetContentType() == CONTENT_TYPE_BROWSER) {
-		CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), false));
-		CR(m_pParentApp->OnClick(point(ptUnFocusText.x, ptUnFocusText.y, 0.0f), true));
-	}
-	m_ptLastEvent = ptUnFocusText;
+	m_pUISurface->ResetLastEvent();
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
@@ -705,22 +544,12 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptText
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
 	point ptTypingOffset;
 
-	CN(m_pParentApp);
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
-	CBR(ptTextBox.x() != -1 || ptTextBox.y() != -1, R_SKIPPED);
-
-	// TODO: get textbox location from node, for now just defaulting to the middle
-	if (ptTextBox.y() == -1) {
-		ptTextBox.y() = m_pParentApp->GetHeight() / 2.0f;
-	}
-	//CBR(ptTextBox.y() != -1, R_SKIPPED);
 
 	float viewHeight;
 	viewHeight = m_pViewQuad->GetHeight();
-	// used to center view 
-	//textBoxYOffset = ptTextBox.y() / (DEFAULT_PX_HEIGHT / viewHeight); 
 
 	// currently always fully shown
 	textBoxYOffset = viewHeight/2.0f;
@@ -750,37 +579,15 @@ Error:
 }
 
 point DreamControlView::GetLastEvent() {
-	return point(m_ptLastEvent.x, m_ptLastEvent.y, 0.0f);
-}
-
-WebBrowserPoint DreamControlView::GetRelativePointofContact(point ptContact) {
-	point ptIntersectionContact = ptContact;
-	ptIntersectionContact.w() = 1.0f;
-	WebBrowserPoint ptRelative;
-
-	// First apply transforms to the ptIntersectionContact 
-	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
-	point ptAdjustedContact = ptIntersectionContact;
-	
-	float width = m_pViewQuad->GetWidth();
-	float height = m_pViewQuad->GetHeight();
-
-	float posX = ptAdjustedContact.x() / (width / 2.0f);	
-	float posY = ptAdjustedContact.z() / (height / 2.0f);
-
-	//float posZ = ptAdjustedContact.z();	// 3D browser when
-
-	posX = (posX + 1.0f) / 2.0f;	// flip it
-	posY = (posY + 1.0f) / 2.0f;  
-	
-	ptRelative.x = posX * m_pParentApp->GetWidth();
-	ptRelative.y = posY * m_pParentApp->GetHeight();
-
-	return ptRelative;
+	return m_pUISurface->GetLastEvent();
 }
 
 std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
+}
+
+std::shared_ptr<UISurface> DreamControlView::GetViewSurface() {
+	return m_pUISurface;
 }
 
 float DreamControlView::GetBackgroundWidth() {

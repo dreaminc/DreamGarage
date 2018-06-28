@@ -1678,3 +1678,7 @@ DreamOS *SandboxApp::GetDreamOSHandle() {
 std::wstring SandboxApp::GetHardwareID() {
 	return m_strHardwareID;
 }
+
+std::string SandboxApp::GetHMDTypeString() {
+	return m_pHMD->GetDeviceTypeString();
+}

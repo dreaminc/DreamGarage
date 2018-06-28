@@ -140,6 +140,9 @@ public:
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) = 0;
 	virtual HMDDeviceType GetDeviceType() = 0;
 
+	// string is used instead of HMDDeviceType for server commands like settings
+	virtual std::string GetDeviceTypeString() = 0;
+
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 

@@ -846,6 +846,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\UI\UIMallet.cpp" />
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp" />
     <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp" />
+    <ClCompile Include="..\..\..\UI\UISurface.cpp" />
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\UI\UIView.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp" />
@@ -1198,6 +1199,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\UI\UIMenuItem.h" />
     <ClInclude Include="..\..\..\UI\UIScrollView.h" />
     <ClInclude Include="..\..\..\UI\UISpatialScrollView.h" />
+    <ClInclude Include="..\..\..\UI\UISurface.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="..\..\..\UI\UIView.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />

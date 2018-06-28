@@ -183,6 +183,10 @@ HMDDeviceType OVRHMD::GetDeviceType() {
 	return HMDDeviceType::OCULUS;
 }
 
+std::string OVRHMD::GetDeviceTypeString() {
+	return "HMDType.OculusRift";
+}
+
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
 	

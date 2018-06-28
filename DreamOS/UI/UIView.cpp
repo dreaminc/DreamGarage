@@ -4,6 +4,7 @@
 #include "UIMenuItem.h"
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
+#include "UISurface.h"
 #include "DreamControlView/UIControlBar.h"
 
 #include "DreamOS.h"
@@ -179,6 +180,21 @@ std::shared_ptr<UIFlatScrollView> UIView::AddUIFlatScrollView() {
 	std::shared_ptr<UIFlatScrollView> pScrollView = MakeUIFlatScrollView();
 	CR(AddObject(pScrollView));
 	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UISurface> UIView::MakeUISurface() {
+	std::shared_ptr<UISurface> pSurface(new UISurface(m_pHALImp, m_pDreamOS));
+
+	return pSurface;
+}
+
+std::shared_ptr<UISurface> UIView::AddUISurface() {
+	RESULT r = R_PASS;
+	std::shared_ptr<UISurface> pSurface = MakeUISurface();
+	CR(AddObject(pSurface));
+	return pSurface;
 Error:
 	return nullptr;
 }

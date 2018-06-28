@@ -9,6 +9,7 @@
 #include "DreamMessage.h"
 
 #include "DreamAppMessage.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 // Messages
 #include "PeerHandshakeMessage.h"
@@ -967,6 +968,10 @@ const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 
 std::wstring DreamOS::GetHardwareID() {
 	return m_pSandbox->GetHardwareID();
+}
+
+std::string DreamOS::GetHMDTypeString() {
+	return m_pSandbox->GetHMDTypeString();
 }
 
 // Physics Engine

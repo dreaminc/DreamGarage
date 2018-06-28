@@ -1,0 +1,42 @@
+#ifndef UI_SURFACE_H_
+#define UI_SURFACE_H_
+
+#include "UIView.h"
+#include "Primitives/Subscriber.h"
+#include "Sense/SenseController.h"
+
+class DreamOS;
+class UIMallet;
+class quad;
+
+#define SCROLL_CONSTANT 10.0f;
+
+class UISurface : public UIView, public Subscriber<SenseControllerEvent> {
+public:
+	UISurface(HALImp *pHALImp, DreamOS *pDreamOS);
+	~UISurface();
+
+	RESULT InitializeSurfaceQuad(float width, float height);
+
+public:
+	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType);
+
+	std::shared_ptr<quad> GetViewQuad();
+	point GetLastEvent();
+	RESULT ResetLastEvent();
+
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+
+private:
+	point m_ptLeftHover;
+	point m_ptRightHover;
+	point m_ptLastEvent;
+	point m_ptClick;
+
+	float m_dragThresholdSquared;
+	bool m_fMouseDrag = false;
+
+	std::shared_ptr<quad> m_pViewQuad = nullptr;
+};
+
+#endif // ! UI_SURFACE_H_

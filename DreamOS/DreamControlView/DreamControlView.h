@@ -37,10 +37,10 @@ class UIButton;
 class texture;
 
 class DreamControlView : public DreamApp<DreamControlView>, 
-						 public DreamUserObserver,
-						 public Subscriber<SenseControllerEvent> {
+						 public DreamUserObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
+	friend class DreamSettingsApp;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -57,14 +57,12 @@ protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	RESULT InitializeWithUserApp(DreamUserApp *pParent);
 	
 // DreamAppHandle
 public:
 	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
 	RESULT SetContentType(std::string strContentType);
-
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
@@ -75,17 +73,16 @@ public:
 	RESULT ResetAppComposite();
 
 private:
-	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDitry, bool &fMouseDown, HAND_TYPE handType);
-
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 
 
 // Animations
-private:
-
+public:
 	RESULT Show();
 	RESULT Hide();
+
+private:
 	RESULT ShowView();
 	RESULT HideView();
 	RESULT Dismiss();
@@ -101,9 +98,10 @@ private:
 // View Context
 public:
 	std::shared_ptr<quad> GetViewQuad();
+	std::shared_ptr<UISurface> GetViewSurface();
+
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
-	WebBrowserPoint GetRelativePointofContact(point ptContact);
 	point GetLastEvent();
 
 public:
@@ -119,6 +117,7 @@ private:
 	
 	std::shared_ptr<UIView> m_pView = nullptr;
 
+	std::shared_ptr<UISurface> m_pUISurface = nullptr;
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 
@@ -133,9 +132,8 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamUserHandle *m_pUserHandle = nullptr;
+	DreamUserApp *m_pDreamUserApp = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
-	DreamUserControlArea *m_pParentApp = nullptr;
 
 	UID m_browserUID;
 	UID m_userUID;	
@@ -162,9 +160,6 @@ private:
 	float m_visibleScale;
 	float m_keyboardAnimationDuration;	// In seconds (direct plug into PushAnimationItem)
 
-	WebBrowserPoint m_ptLMalletPointing;
-	WebBrowserPoint m_ptRMalletPointing;
-	WebBrowserPoint m_ptLastEvent;
 	point m_ptHiddenPosition;
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;

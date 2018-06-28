@@ -18,6 +18,7 @@
 
 #include "UI/UIButton.h"
 #include "UI/UIFlatScrollView.h"
+#include "UI/UISurface.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -35,29 +36,10 @@ DreamUserControlArea::~DreamUserControlArea()
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_aspectRatio = ((float)m_pxWidth / (float)m_pxHeight);
-	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-
-	float viewAngleRad = m_viewAngle * (float)(M_PI) / 180.0f;
-	quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
-	point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
-	
-	GetComposite()->SetOrientation(qViewQuadOrientation);
-	GetComposite()->SetPosition(ptOrigin);
-
-	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-	CN(m_pWebBrowserManager);
-	CR(m_pWebBrowserManager->Initialize());
-
-	//m_pActiveBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this, false);
-	//CN(m_pActiveBrowser);
-	//CR(m_pActiveBrowser->InitializeWithBrowserManager(m_pWebBrowserManager));
-
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
 
-Error:
+//Error:
 	return r;
 }
 
@@ -71,10 +53,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	point ptOrigin;
 	quaternion qOrigin;
 
-	if (m_pDreamUserApp == nullptr) {
-		m_pDreamUserApp = GetDOS()->LaunchDreamApp<DreamUserApp>(this, false);
-		CN(m_pDreamUserApp);
-
+	if (m_pDreamUserApp != nullptr && m_pDreamUIBar == nullptr) {
 		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
 		CN(pKeyboard);
 
@@ -87,7 +66,11 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 		CN(m_pControlView);
-		m_pControlView->InitializeWithParent(this);
+		m_pControlView->InitializeWithUserApp(m_pDreamUserApp.get());
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
 		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
 		CN(m_pDreamTabView);
@@ -98,6 +81,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+
+		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
+		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
+		point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+		
+		GetComposite()->SetOrientation(qViewQuadOrientation);
+		GetComposite()->SetPosition(ptOrigin);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlBar->GetComposite()));
@@ -113,7 +103,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
-		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_spacingSize + m_pDreamTabView->GetBorderWidth()) / 2.0f;
+		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
 		//GetComposite()->SetPosition(GetComposite()->GetPosition());// +point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
@@ -121,7 +111,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
 	}
 
-	//CR(m_pWebBrowserManager->Update());
 	CNR(m_pDreamUserApp, R_SKIPPED);
 	
 	UIMallet* pLMallet;
@@ -139,6 +128,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	//GetComposite()->SetPosition(ptOrigin);
 	//GetComposite()->SetOrientation(qOrigin);
 
+	//TODO: change this to a UISurface
 	for (int i = 0; i < 2; i++) {
 		UIMallet *pMallet;
 		HAND_TYPE type;
@@ -186,7 +176,7 @@ Error:
 RESULT DreamUserControlArea::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserManager->Shutdown());
+	CR(r);
 
 Error:
 	return r;
@@ -198,7 +188,7 @@ DreamUserControlArea* DreamUserControlArea::SelfConstruct(DreamOS *pDreamOS, voi
 }
 
 float DreamUserControlArea::GetBaseWidth() {
-	return m_baseWidth;
+	return m_pDreamUserApp->GetBaseWidth();
 }
 
 RESULT DreamUserControlArea::SetViewHeight(float height) {
@@ -217,35 +207,29 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 }
 
 float DreamUserControlArea::GetViewScale() {
-	return m_widthScale;
+	return m_pDreamUserApp->GetScale();
 }
 
 RESULT DreamUserControlArea::ScaleViewWidth(float scale) {
 	RESULT r = R_PASS;
 
-	/*
-	m_diagonalSize = width;
-
-	m_baseWidth = std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	m_baseHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
-	//*/
-	m_widthScale = scale;
-	GetComposite()->SetScale(m_widthScale);
+	m_pDreamUserApp->SetScale(scale);
+	GetComposite()->SetScale(scale);
 	m_pDreamUIBar->UpdateWidth(scale);
 
 	return r;
 }
 
 float DreamUserControlArea::GetBaseHeight() {
-	return m_baseHeight;
+	return m_pDreamUserApp->GetBaseHeight();
 }
 
 float DreamUserControlArea::GetSpacingSize() {
-	return m_spacingSize;
+	return m_pDreamUserApp->GetSpacingSize();
 }
 
 float DreamUserControlArea::GetViewAngle() {
-	return m_viewAngle;
+	return m_pDreamUserApp->GetViewAngle();
 }
 
 point DreamUserControlArea::GetCenter() {
@@ -257,7 +241,7 @@ float DreamUserControlArea::GetCenterOffset() {
 }
 
 float DreamUserControlArea::GetTotalWidth() {
-	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_spacingSize/2.0f;
+	return m_pControlView->GetViewQuad()->GetWidth() + m_pDreamTabView->GetBorderWidth() + m_pDreamUserApp->GetSpacingSize()/2.0f;
 }
 
 float DreamUserControlArea::GetTotalHeight() {
@@ -444,7 +428,7 @@ RESULT DreamUserControlArea::ShowControlView() {
 		pView->GetPosition(),
 		pView->GetOrientation(),
 		1.0f,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -460,8 +444,10 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
-	m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	if (m_pControlBar != nullptr) {
+		m_pControlBar->SetTitleText(m_pActiveSource->GetTitle());
+		m_pControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
@@ -499,7 +485,7 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 		pView->GetOrientation(),
 		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		m_animationScale,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -798,10 +784,11 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	//it is not safe to set the environment asset until after the browser is finished initializing
 	// this is because LoadRequest requires a URL to have been set (about:blank in InitializeWithBrowserManager)
 	m_fHasOpenApp = true;
+	m_pDreamUserApp->SetHasOpenApp(true);
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {	
 		
-		pBrowser->InitializeWithBrowserManager(m_pWebBrowserManager, pEnvironmentAsset->GetURL());
+		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
@@ -893,7 +880,7 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		pView->GetOrientation(),
 		//vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		m_animationScale,
-		m_animationDuration,
+		m_pDreamUserApp->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags(),
 		nullptr,
@@ -913,7 +900,7 @@ RESULT DreamUserControlArea::SetUIProgramNode(UIStageProgram *pUIProgramNode) {
 }
 
 float DreamUserControlArea::GetAnimationDuration() {
-	return m_animationDuration;
+	return m_pDreamUserApp->GetAnimationDuration();
 }
 
 float DreamUserControlArea::GetAnimationScale() {
@@ -946,6 +933,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			ResetAppComposite();
 
 			if (m_fHasOpenApp) {
+//			if (m_pDreamUserApp->m_fHasOpenApp) {
 				Hide();
 			}
 			else {
@@ -956,6 +944,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
 			if (m_pDreamUIBar->IsEmpty()) {
 				if (m_fHasOpenApp) {
+			//	if (m_pDreamUserApp->m_fHasOpenApp) {
 					Show();
 				}
 				else {
@@ -977,6 +966,15 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
 
 			CR(m_pActiveSource->OnKeyPress(chkey, true));
+
+			if (chkey == SVK_RETURN) {
+				if (m_pControlView->m_fIsShareURL) {
+					CR(SetActiveBrowserURI());
+				}
+				else {
+					CR(HideWebsiteTyping());
+				}
+			}
 		}
 		else {
 			//*/
@@ -1000,4 +998,66 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 
 Error:
 	return r;
+}
+
+RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
+	RESULT r = R_PASS;
+	
+	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
+	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
+
+	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
+	CBR(pUIEvent->m_pObj == m_pControlView->GetViewQuad().get(), R_SKIPPED);
+
+	switch (pUIEvent->m_eventType) {
+	case UI_SELECT_BEGIN: {
+		CR(HideWebsiteTyping());
+		CR(OnClick(ptContact, true));
+	} break;
+
+	case UI_SELECT_ENDED: {
+		CR(OnClick(ptContact, false));
+	} break;
+
+	case UI_SELECT_MOVED: {
+		CR(OnMouseMove(ptContact));
+	} break;
+	case UI_SCROLL: {
+		CR(OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+	}
+	};
+
+Error:
+	return r;
+}
+
+WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact) {
+	point ptIntersectionContact = ptContact;
+	ptIntersectionContact.w() = 1.0f;
+	WebBrowserPoint ptRelative;
+
+	// First apply transforms to the ptIntersectionContact 
+	//point ptAdjustedContact = inverse(m_pViewQuad->GetModelMatrix()) * ptIntersectionContact;
+	point ptAdjustedContact = ptIntersectionContact;
+	
+	float width = m_pControlView->GetViewQuad()->GetWidth();
+	float height = m_pControlView->GetViewQuad()->GetHeight();
+
+	float posX = ptAdjustedContact.x() / (width / 2.0f);	
+	float posY = ptAdjustedContact.z() / (height / 2.0f);
+
+	//float posZ = ptAdjustedContact.z();	// 3D browser when
+
+	posX = (posX + 1.0f) / 2.0f;	// flip it
+	posY = (posY + 1.0f) / 2.0f;  
+	
+	ptRelative.x = posX * m_pActiveSource->GetWidth();
+	ptRelative.y = posY * m_pActiveSource->GetHeight();
+
+	return ptRelative;
+}
+
+RESULT DreamUserControlArea::SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp) {
+	m_pDreamUserApp = pDreamUserApp;
+	return R_PASS;
 }

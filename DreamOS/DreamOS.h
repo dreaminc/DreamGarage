@@ -50,6 +50,7 @@
 class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
+class DreamSettingsApp;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -159,7 +160,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	//UserObserver
+	//User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;
 	}
@@ -169,6 +170,14 @@ public:
 	}
 
 	virtual RESULT OnSettings(std::string strURL) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnLogin() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT OnLogout() override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -408,6 +417,7 @@ protected:
 public:
 	const SandboxApp::configuration& GetSandboxConfiguration();
 	std::wstring GetHardwareID();
+	std::string GetHMDTypeString();
 
 private:
 	SandboxApp *m_pSandbox;
@@ -428,6 +438,7 @@ private:
 protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 	std::shared_ptr<DreamShareView> m_pDreamShareView;
+	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 
 private:
 	version m_versionDreamOS;

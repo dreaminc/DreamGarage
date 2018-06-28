@@ -62,6 +62,7 @@ public:
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
+	virtual std::string GetDeviceTypeString() override;
 
 	RESULT ShutdownParentSandbox();
 

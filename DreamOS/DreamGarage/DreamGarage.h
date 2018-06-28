@@ -85,10 +85,13 @@ public:
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
-	// user
+	// User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 	virtual RESULT OnSettings(std::string strURL) override;
+
+	virtual RESULT OnLogin() override;
+	virtual RESULT OnLogout() override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
@@ -139,6 +142,7 @@ private:
 	UIStageProgram *m_pUIProgramNode;
 
 	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
+	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar = nullptr;
 	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
