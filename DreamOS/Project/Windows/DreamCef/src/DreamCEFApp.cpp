@@ -1,6 +1,5 @@
 #include "DreamCEFApp.h"
 
-#include "CEFV8Handler.h"
 #include "CEFExtension.h"
 
 DreamCEFApp::DreamCEFApp() {
@@ -79,7 +78,18 @@ void DreamCEFApp::OnWebKitInitialized() {
 	m_pCEFDreamExtension = new CEFExtension(L"C:\\dev\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js", m_pCEFV8Handler);
 	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
 	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
+	CRM(m_pCEFV8Handler->RegisterObserver(this), "Failed to register v8 observer");
 
 Error:
 	return;
+}
+
+RESULT DreamCEFApp::DreamFormSuccess(CefRefPtr<CefBrowser> browser) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamFormSuccess");
+	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
 }

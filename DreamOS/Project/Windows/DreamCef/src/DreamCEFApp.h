@@ -21,16 +21,17 @@
 
 //#include "CEFHandler.h"
 //#include "CEFAppObserver.h"
+#include "CEFV8Handler.h"
 
 //class WebBrowserController;
 
-class CEFV8Handler;
 class CEFExtension;
 
 class DreamCEFApp :  //public CEFHandler::CEFHandlerObserver, 
 	public CefApp,
 	public CefBrowserProcessHandler,
-	public CefRenderProcessHandler
+	public CefRenderProcessHandler,
+	public CEFV8Observer
 {
 public:
 	DreamCEFApp();
@@ -83,6 +84,9 @@ public:
 	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
 	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
 	virtual void OnWebKitInitialized() override;
+
+	// CEFV8Observer
+	virtual RESULT DreamFormSuccess(CefRefPtr<CefBrowser> browser) override;
 
 	// CEFAppObserver
 	//virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;

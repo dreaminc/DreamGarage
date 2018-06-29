@@ -107,6 +107,8 @@ public:
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 
+	virtual RESULT DreamFormSuccess();
+
 	virtual RESULT HandleBackEvent();
 	virtual RESULT HandleForwardEvent();
 	virtual RESULT HandleStopEvent();

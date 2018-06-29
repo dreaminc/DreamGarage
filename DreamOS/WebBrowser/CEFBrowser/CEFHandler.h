@@ -69,6 +69,9 @@ public:
 		
 		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) = 0;
 		virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) = 0;
+
+		// forms
+		virtual RESULT DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser) = 0;
 	};
 
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
@@ -115,6 +118,8 @@ public:
 	virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
 	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type) override;
 	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override;
+
+	RESULT DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser);
 
 
 	// Request that all existing browser windows close.

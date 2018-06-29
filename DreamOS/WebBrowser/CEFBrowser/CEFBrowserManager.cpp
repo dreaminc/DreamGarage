@@ -224,6 +224,18 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->DreamFormSuccess());
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 

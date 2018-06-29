@@ -135,6 +135,9 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 
 				fHandled = true;
 			}
+			else if (strMethodName == "DreamFormSuccess") {
+				CR(m_pCEFHandlerObserver->DreamFormSuccess(pCefBrowser));
+			}
 		}
 	}
 
@@ -291,6 +294,17 @@ void CEFHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 
 Error:
 	return;
+}
+
+RESULT CEFHandler::DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFHANDLE: DreamFormSuccess");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->DreamFormSuccess(pCefBrowser));
+
+Error:
+	return r;
 }
 
 void CEFHandler::CloseAllBrowsers(bool fForceClose) {

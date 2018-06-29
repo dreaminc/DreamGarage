@@ -66,6 +66,7 @@ public:
 		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 		virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) = 0;
 		virtual RESULT SetTitle(std::string strTitle) = 0;
+		virtual RESULT DreamFormSuccess() = 0;
 	};
 
 public:

@@ -82,6 +82,8 @@ public:
 	RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefString strCEFURL);
 	RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL);
 
+	RESULT DreamFormSuccess();
+
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
 	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;

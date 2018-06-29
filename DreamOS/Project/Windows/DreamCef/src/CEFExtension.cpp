@@ -40,12 +40,13 @@ RESULT CEFExtension::Initialize() {
 		//	"  };"
 		//	"})();";
 
-		std::ifstream ifstreamExtensionFile("C:\\dev\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js");
+		std::ifstream ifstreamExtensionFile("C:\\Users\\jason\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js");
 		std::stringstream bufferExtensionCode;
 		bufferExtensionCode << ifstreamExtensionFile.rdbuf();
 		CefString cefStrExtensionCode = bufferExtensionCode.str();
 
 		CBM((CefRegisterExtension("v8/dreamos", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
+		//CBM((CefRegisterExtension("v8/Dream.Form", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
 	}
 
 Error:

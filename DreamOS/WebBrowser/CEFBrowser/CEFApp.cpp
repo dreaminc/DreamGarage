@@ -192,6 +192,19 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser) {
+
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->DreamFormSuccess(pCefBrowser));
+	}
+
+Error:
+	return r;
+
+}
+
 RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
