@@ -2,6 +2,8 @@
 
 #include "CEFExtension.h"
 
+#include <functional>
+
 DreamCEFApp::DreamCEFApp() {
 	// empty
 }
@@ -80,15 +82,36 @@ void DreamCEFApp::OnWebKitInitialized() {
 	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
 	CRM(m_pCEFV8Handler->RegisterObserver(this), "Failed to register v8 observer");
 
+	m_formFunctionMap["success"] = std::bind(&DreamCEFApp::DreamFormSuccess, this, std::placeholders::_1, std::placeholders::_2);
+
 Error:
 	return;
 }
 
-RESULT DreamCEFApp::DreamFormSuccess(CefRefPtr<CefBrowser> browser) {
+RESULT DreamCEFApp::DreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
 	RESULT r = R_PASS;
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamFormSuccess");
+
+	CB(CefArguments.size() == 0);
 	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
+}
+
+RESULT DreamCEFApp::DreamFormExecute(CefRefPtr<CefBrowser> browser, const CefString& strName, const CefV8ValueList& CefArguments) {
+	RESULT r = R_PASS;
+
+
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamFormSuccess");
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+	
+	CBM(m_formFunctionMap.count(strName) > 0, "function not registered");
+
+	CR(m_formFunctionMap[strName](browser, CefArguments));
+
+//	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
 
 Error:
 	return r;

@@ -12,7 +12,7 @@ class DreamCEFApp;
 
 class CEFV8Observer {
 public:
-	virtual RESULT DreamFormSuccess(CefRefPtr<CefBrowser> pBrowser) = 0;
+	virtual RESULT DreamFormExecute(CefRefPtr<CefBrowser> browser, const CefString& strName, const CefV8ValueList& CefArguments) = 0;
 };
 
 class CEFV8Handler : public CefV8Handler {

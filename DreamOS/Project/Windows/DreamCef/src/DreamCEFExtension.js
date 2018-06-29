@@ -1,12 +1,34 @@
-var dreamos;
+var Dream;
 
-if (!dreamos) {
-    dreamos = {};
+if (!Dream) {
+    Dream = {};
+    Dream.Form = {};
 }
 
 (function() {
-  dreamos.myfunc = function() {
-      native function myfunc();
-      return myfunc();
+  Dream.Form.cancel = function() {
+      native function cancel();
+      return cancel();
+  }
+})();
+
+(function() {
+  Dream.Form.success = function() {
+      native function success();
+      return success();
+  }
+})();
+
+(function() {
+  Dream.Form.setCredentials = function(refreshToken, accessToken) {
+      native function setCredentials(refreshToken, accessToken);
+      return setCredentials(refreshToken, accessToken);
+  }
+})();
+
+(function() {
+  Dream.Form.setEnvironmentId = function(environmentId) {
+      native function setEnvironmentId(environmentId);
+      return setEnvironmentId(environmentId);
   }
 })();
