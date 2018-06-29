@@ -192,12 +192,11 @@ Error:
 	return r;
 }
 
-RESULT CEFApp::DreamFormSuccess(CefRefPtr<CefBrowser> pCefBrowser) {
-
+RESULT CEFApp::DreamExtension(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
 	RESULT r = R_PASS;
 
 	if (m_pCEFAppObserver != nullptr) {
-		CR(m_pCEFAppObserver->DreamFormSuccess(pCefBrowser));
+		CR(m_pCEFAppObserver->DreamExtension(pCefBrowser, pMessageArguments));
 	}
 
 Error:

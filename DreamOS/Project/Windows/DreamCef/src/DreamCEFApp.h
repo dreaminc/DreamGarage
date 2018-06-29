@@ -21,17 +21,16 @@
 
 //#include "CEFHandler.h"
 //#include "CEFAppObserver.h"
-#include "CEFV8Handler.h"
 
 //class WebBrowserController;
+class CEFV8Handler;
 
 class CEFExtension;
 
 class DreamCEFApp :  //public CEFHandler::CEFHandlerObserver, 
 	public CefApp,
 	public CefBrowserProcessHandler,
-	public CefRenderProcessHandler,
-	public CEFV8Observer
+	public CefRenderProcessHandler
 {
 public:
 	DreamCEFApp();
@@ -85,11 +84,6 @@ public:
 	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
 	virtual void OnWebKitInitialized() override;
 
-	// CEFV8Observer
-	virtual RESULT DreamFormExecute(CefRefPtr<CefBrowser> browser, const CefString& strName, const CefV8ValueList& CefArguments) override;
-
-	RESULT DreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
-
 	// CEFAppObserver
 	//virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
 	//virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) override;
@@ -98,11 +92,8 @@ private:
 	// Include the default reference counting implementation.
 	//std::promise<std::shared_ptr<CEFBrowserController>> m_promiseCEFBrowserController;
 
-	//CEFAppObserver* m_pCEFAppObserver = nullptr;
-
 	CefRefPtr<CEFV8Handler> m_pCEFV8Handler = nullptr;
 	CEFExtension *m_pCEFDreamExtension = nullptr;
-	std::map<CefString, std::function<RESULT(CefRefPtr<CefBrowser>, const CefV8ValueList&)>> m_formFunctionMap;
 
 	IMPLEMENT_REFCOUNTING(DreamCEFApp);
 };
