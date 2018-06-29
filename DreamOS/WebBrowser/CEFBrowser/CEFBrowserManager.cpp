@@ -241,6 +241,15 @@ RESULT CEFBrowserManager::DreamExtension(CefRefPtr<CefBrowser> pCefBrowser, CefR
 		if (strMethod == "success") {
 			CR(pCEFBrowserController->DreamFormSuccess());
 		}
+		else if (strMethod == "cancel") {
+			// TODO:
+		}
+		else if (strMethod == "setCredentials") {
+			// TODO:
+		}
+		else if (strMethod == "setEnvironmentId") {
+			// TODO:
+		}
 	}
 
 

@@ -54,7 +54,6 @@ RESULT CEFV8Handler::DreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
 
-
 	const CefString strType = "Form";
 	const CefString strMethod = "success";
 
@@ -72,13 +71,69 @@ Error:
 }
 
 RESULT CEFV8Handler::DreamFormCancel(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
+
+	const CefString strType = "Form";
+	const CefString strMethod = "cancel";
+
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+	cefProcessMessageArguments->SetSize(2);
+
+	cefProcessMessageArguments->SetString(0, strType);
+	cefProcessMessageArguments->SetString(1, strMethod);
+
+	CB(CefArguments.size() == 0);
+	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
 }
 
 RESULT CEFV8Handler::DreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
+
+	const CefString strType = "Form";
+	const CefString strMethod = "setCredentials";
+
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+	cefProcessMessageArguments->SetSize(4);
+
+	cefProcessMessageArguments->SetString(0, strType);
+	cefProcessMessageArguments->SetString(1, strMethod);
+
+	CB(CefArguments.size() == 2);
+	cefProcessMessageArguments->SetString(2, CefArguments[0]->GetStringValue());
+	cefProcessMessageArguments->SetString(3, CefArguments[1]->GetStringValue());
+
+	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
 }
 
 RESULT CEFV8Handler::DreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
+
+	const CefString strType = "Form";
+	const CefString strMethod = "setCredentials";
+
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+	cefProcessMessageArguments->SetSize(3);
+
+	cefProcessMessageArguments->SetString(0, strType);
+	cefProcessMessageArguments->SetString(1, strMethod);
+
+	CB(CefArguments.size() == 1);
+	cefProcessMessageArguments->SetInt(2, CefArguments[0]->GetIntValue());
+
+	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
 }
