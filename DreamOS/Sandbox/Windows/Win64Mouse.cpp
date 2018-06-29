@@ -20,7 +20,7 @@ RESULT Win64Mouse::CaptureMouse() {
 		SenseMouse::CaptureMouse();
 		GetCenterPosition(m_lastX, m_lastY);
 		HWND hwndLast = SetCapture(hwnd);
-		CB(ShowCursor(true));
+		CB(ShowCursor(false));
 	}
 
 Error:
