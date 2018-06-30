@@ -121,7 +121,7 @@ RESULT CEFV8Handler::DreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, co
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
 
 	const CefString strType = "Form";
-	const CefString strMethod = "setCredentials";
+	const CefString strMethod = "setEnvironmentId";
 
 	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
 	cefProcessMessageArguments->SetSize(3);
