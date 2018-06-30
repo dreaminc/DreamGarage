@@ -64,6 +64,8 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
+	OGLUniformVector *m_pUniformEye = nullptr;
+
 	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
 	OGLUniformVector *m_pUniformReflectionPlane = nullptr;
 

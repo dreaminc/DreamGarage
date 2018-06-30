@@ -26,6 +26,7 @@ public:
 	virtual point GetPosition(bool fAbsolute = false) override;
 
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
+	ViewMatrix GetViewMatrix(EYE_TYPE eye, quaternion qAdjust);
 
 	virtual EYE_TYPE GetCameraEye() override;
 	RESULT SetCameraEye(EYE_TYPE eye);

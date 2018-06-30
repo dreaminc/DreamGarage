@@ -952,7 +952,9 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 		texture *pBumpTextureWater;
-		pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		
+		//pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
 		CN(pTestContext->pSphere);
@@ -1040,7 +1042,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		//pTestContext->pReflectionQuad->translateY(-0.0001f);
 		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
-		pTestContext->pWaterQuad->RotateXByDeg(0.002f);
+		//pTestContext->pWaterQuad->RotateXByDeg(0.002f);
 
 	Error:
 		return r;

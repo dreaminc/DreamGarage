@@ -25,12 +25,14 @@ out Data {
 	vec3 vertTBNSpace;
 } DataOut;
 
-uniform vec4 u_vec4Eye;
+
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
+
+
 
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;

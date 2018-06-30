@@ -265,12 +265,22 @@ RESULT OGLProgramRefraction::SetCameraUniforms(camera *pCamera) {
 	auto matP = pCamera->GetProjectionMatrix();
 	//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
+	/*
 	if (m_pRefractionObject != nullptr) {
 		plane refractionPlane = dynamic_cast<quad*>(m_pRefractionObject)->GetPlane();		
 	
-		//auto matRefraction = ReflectionMatrix(refractionPlane);
-		//matV = matV * matRefraction;
+		//float refractiveRatio = 1.0f / 1.333f;
+		//float rR2 = pow(refractiveRatio, 2);
+		//
+		//float cVal = dot((-1.0f * refractionPlane.GetNormal()), (pCamera->GetLookVector()));
+		//float cVal2 = pow(cVal, 2);
+		//
+		//vector vRefraction = refractiveRatio * pCamera->GetLookVector();
+		//vRefraction = vRefraction + (refractiveRatio * cVal - sqrt(1.0f - rR2 * (1.0f - cVal2))) * refractionPlane.GetNormal();
+	
+		matV = ViewMatrix(pCamera->GetOrigin(), pCamera->GetLookVector());
 	}
+	*/
 
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);
@@ -287,12 +297,33 @@ RESULT OGLProgramRefraction::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	//auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
+	/*
 	if (m_pRefractionObject != nullptr) {
 		plane refractionPlane = dynamic_cast<quad*>(m_pRefractionObject)->GetPlane();
+	
+		//vector vLookVector = RotationMatrix(pStereoCamera->GetOrientation(true)) * vector(0.0f, 0.0f, -1.0f);
+		//vLookVector.Normalize();
 
-		//auto matRefraction = RotationMatrix()
-		//matV = matV * matRefraction;
+		// Use this to determine refraction rotation "effect"
+		vector vEffectiveLook = refractionPlane.GetPosition() - pStereoCamera->GetEyePosition(eye);
+		vEffectiveLook.Normalize();
+		
+		// TODO: Put this into a function or something
+		float refractiveRatio = 1.0f / 1.333f;
+		float rR2 = pow(refractiveRatio, 2);
+		
+		float cVal = ((vector)(-1.0f * refractionPlane.GetNormal())).dot(vEffectiveLook);
+		float cVal2 = pow(cVal, 2);
+		
+		vector vEffectiveRefraction = refractiveRatio * vEffectiveLook;
+		vEffectiveRefraction = vEffectiveRefraction + (refractiveRatio * cVal - sqrt(1.0f - rR2 * (1.0f - cVal2))) * refractionPlane.GetNormal();
+		vEffectiveRefraction.Normalize();
+
+		quaternion qEffectiveRotation = quaternion(vEffectiveLook, vEffectiveRefraction);
+		
+		matV = pStereoCamera->GetViewMatrix(eye, qEffectiveRotation);
 	}
+	*/
 
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);

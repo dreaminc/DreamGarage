@@ -35,6 +35,9 @@ RESULT OGLProgramWater::OGLInitialize() {
 	// Uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformEye), std::string("u_vec4Eye")));
+
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
@@ -226,8 +229,11 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
 			m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
-		m_pUniformTextureReflection->SetUniform(0);
-		m_pUniformHasTextureReflection->SetUniform(true);
+		if(m_pUniformTextureReflection != nullptr)
+			m_pUniformTextureReflection->SetUniform(0);
+
+		if(m_pUniformHasTextureReflection != nullptr)
+			m_pUniformHasTextureReflection->SetUniform(true);
 	}
 	else {
 		if (m_pUniformHasTextureReflection != nullptr)
@@ -257,11 +263,15 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(pOGLObj->GetOGLTextureBump()->GetOGLTextureTarget(), 
 			pOGLObj->GetOGLTextureBump()->GetOGLTextureIndex());
 
-		m_pUniformTextureNormal->SetUniform(2);
-		m_pUniformHasTextureNormal->SetUniform(true);
+		if(m_pUniformTextureNormal != nullptr)
+			m_pUniformTextureNormal->SetUniform(2);
+
+		if(m_pUniformHasTextureNormal != nullptr)
+			m_pUniformHasTextureNormal->SetUniform(true);
 	}
 	else {
-		m_pUniformHasTextureNormal->SetUniform(false);
+		if(m_pUniformHasTextureNormal != nullptr)
+			m_pUniformHasTextureNormal->SetUniform(false);
 	}
 
 	//	Error:
@@ -317,7 +327,7 @@ RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 
 RESULT OGLProgramWater::SetCameraUniforms(camera *pCamera) {
 
-	//auto ptEye = pCamera->GetOrigin();
+	auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
@@ -328,12 +338,14 @@ RESULT OGLProgramWater::SetCameraUniforms(camera *pCamera) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
 	//m_pUniformModelViewMatrix
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	m_pUniformEye->SetUniform(ptEye);
 
 	return R_PASS;
 }
 
 RESULT OGLProgramWater::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	//auto ptEye = pStereoCamera->GetEyePosition(eye);
+	//auto ptEye = pStereoCamera->GetPosition(true);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
@@ -344,6 +356,7 @@ RESULT OGLProgramWater::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE 
 		m_pUniformProjectionMatrix->SetUniform(matP);
 	//m_pUniformModelViewMatrix->SetUniform(matM)
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	//m_pUniformEye->SetUniform(ptEye);
 
 	return R_PASS;
 }
