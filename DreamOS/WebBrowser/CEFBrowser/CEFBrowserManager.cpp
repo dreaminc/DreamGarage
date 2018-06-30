@@ -224,6 +224,40 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+	RESULT r = R_PASS;
+
+	std::string strType;
+	std::string strMethod;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	strType = pMessageArguments->GetString(0);
+	strMethod = pMessageArguments->GetString(1);
+
+	//TODO: implement the other ones
+	if (strType == "Form") {
+		if (strMethod == "success") {
+			CR(pCEFBrowserController->HandleDreamFormSuccess());
+		}
+		else if (strMethod == "cancel") {
+			// TODO:
+		}
+		else if (strMethod == "setCredentials") {
+			// TODO:
+		}
+		else if (strMethod == "setEnvironmentId") {
+			// TODO:
+		}
+	}
+
+
+Error:
+	return r;
+
+}
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 

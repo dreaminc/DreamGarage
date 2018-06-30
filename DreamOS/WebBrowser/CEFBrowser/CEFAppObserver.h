@@ -38,6 +38,7 @@ public:
 	virtual std::shared_ptr<CEFBrowserController> GetCEFBrowserController(int cefBrowserID) = 0;
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) = 0;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, CefRefPtr<CefBrowser> pCefBrowser, std::string strURL) = 0;
+	virtual RESULT HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) = 0;
 };
 
 #endif	// ! CEF_APP_OBSERVER_H_

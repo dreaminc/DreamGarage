@@ -23,6 +23,9 @@
 //#include "CEFAppObserver.h"
 
 //class WebBrowserController;
+class CEFV8Handler;
+
+class CEFExtension;
 
 class DreamCEFApp :  //public CEFHandler::CEFHandlerObserver, 
 	public CefApp,
@@ -79,6 +82,7 @@ public:
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefProcessId source_process, CefRefPtr<CefProcessMessage> message) override;
 	virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override;
 	virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) override;
+	virtual void OnWebKitInitialized() override;
 
 	// CEFAppObserver
 	//virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
@@ -88,7 +92,8 @@ private:
 	// Include the default reference counting implementation.
 	//std::promise<std::shared_ptr<CEFBrowserController>> m_promiseCEFBrowserController;
 
-	//CEFAppObserver* m_pCEFAppObserver = nullptr;
+	CefRefPtr<CEFV8Handler> m_pCEFV8Handler = nullptr;
+	CEFExtension *m_pCEFDreamExtension = nullptr;
 
 	IMPLEMENT_REFCOUNTING(DreamCEFApp);
 };

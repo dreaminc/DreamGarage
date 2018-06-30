@@ -3,12 +3,19 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\DreamCEFApp.cpp" />
+    <ClCompile Include="src\CEFV8Handler.cpp" />
+    <ClCompile Include="src\CEFExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\DreamCEFApp.h" />
+    <ClInclude Include="src\CEFExtension.h" />
+    <ClInclude Include="src\CEFV8Handler.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="manifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DreamCEFExtension.js" />
   </ItemGroup>
 </Project>

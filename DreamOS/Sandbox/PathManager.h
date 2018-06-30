@@ -35,6 +35,7 @@ typedef enum {
 	PATH_MODEL,
 	PATH_DATA,
 	PATH_SOUND,
+	PATH_SCRIPTS,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -64,7 +65,8 @@ class PathManager : public valid {
 		L"FONT",
 		L"MODEL",
 		L"DATA",
-		L"SOUND"
+		L"SOUND",
+		L"SCRIPTS"
 	};
 
 	int m_cszPathValues_n;

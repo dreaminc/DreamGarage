@@ -99,9 +99,9 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 		std::string strMethodName = tokens[1];
 
 		if (strObjectName == "DreamCEFApp") {
+			auto pCEFProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
 			if (strMethodName == "OnFocusedNodeChanged") {
 				
-				auto pCEFProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
 				size_t numArgs = pCEFProcessMessageArguments->GetSize();
 
 				CB((numArgs > 0));
@@ -134,6 +134,10 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 				}
 
 				fHandled = true;
+			}
+			else if (strMethodName == "DreamExtension") {
+				CR(m_pCEFHandlerObserver->HandleDreamExtensionCall(pCefBrowser, pCEFProcessMessageArguments));
+
 			}
 		}
 	}
@@ -291,6 +295,18 @@ void CEFHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
 
 Error:
 	return;
+}
+
+RESULT CEFHandler::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFHANDLE: DreamExtension");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->HandleDreamExtensionCall(pCefBrowser, pMessageArguments));
+
+Error:
+	return r;
+	
 }
 
 void CEFHandler::CloseAllBrowsers(bool fForceClose) {

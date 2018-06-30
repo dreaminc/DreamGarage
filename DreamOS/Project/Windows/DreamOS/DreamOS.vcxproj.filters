@@ -2067,9 +2067,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
-      <Filter>Scripts</Filter>
-    </None>
     <None Include="..\..\..\Scripts\make_production.py">
       <Filter>Scripts</Filter>
     </None>

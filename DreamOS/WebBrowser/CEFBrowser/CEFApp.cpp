@@ -192,6 +192,18 @@ Error:
 	return r;
 }
 
+RESULT CEFApp::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+	RESULT r = R_PASS;
+
+	if (m_pCEFAppObserver != nullptr) {
+		CR(m_pCEFAppObserver->HandleDreamExtensionCall(pCefBrowser, pMessageArguments));
+	}
+
+Error:
+	return r;
+
+}
+
 RESULT CEFApp::GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, CefRefPtr<CefBrowser> pCefBrowser, CefString strCEFURL) {
 	RESULT r = R_PASS;
 
@@ -231,6 +243,26 @@ void CEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	*/
 
 Error:
+	return;
+}
+
+void CEFApp::OnWebKitInitialized() {
+	/*
+	RESULT r = R_PASS;
+
+	DOSLOG(DreamLogger::Level::INFO, "OnWebKitInitialized");
+
+	// Create an instance of my CefV8Handler object.
+	m_pCEFV8Handler = new CEFV8Handler();
+	CN(m_pCEFV8Handler);
+
+	// Register Extension
+
+	m_pCEFDreamExtension = new CEFExtension(L"DreamCEFExtension.js", m_pCEFV8Handler);
+	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
+	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
+
+Error:*/
 	return;
 }
 
