@@ -119,7 +119,7 @@ RESULT OGLProgramRefraction::OGLInitialize(version versionOGL) {
 	CR(BindUniformBlocks());
 
 	// TODO:  Currently using a global material 
-	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	SetMaterial(&material(1.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;

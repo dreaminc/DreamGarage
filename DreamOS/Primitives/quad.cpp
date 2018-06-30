@@ -350,6 +350,10 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 	m_height = height;
 	m_vNormal = vNormal;
 
+	//m_heightMapScale = sqrt(m_width * m_width + m_height * m_height);
+
+	m_heightMapScale = 2.0f;
+
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
 
@@ -375,7 +379,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
 
 			if (m_pTextureHeight != nullptr) {
-				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, vValue);
+				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, 1.0f - vValue);
 				yValue *= m_heightMapScale;
 			}
 

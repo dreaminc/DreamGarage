@@ -31,6 +31,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestWaterShader());
 
+	CR(AddTestHeightQuadObject());
+
 	CR(AddTestStandardShader());
 
 	CR(AddTestBlinnPhongShader());
@@ -837,6 +839,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		quad *pWaterQuad = nullptr;
 		sphere *pSphere = nullptr;
 		volume *pVolume = nullptr;
+		quad *pLandQuad = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -943,7 +946,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CN(pTestContext);
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 1.0f));
 
 		texture *pColorTexture;
 		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -954,8 +957,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		texture *pBumpTextureWater;
 		
 		//pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		//pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pBumpTextureWater = m_pDreamOS->MakeTexture(L"water_new_height.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
+		/*
 		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
@@ -968,15 +973,27 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CR(pTestContext->pVolume->SetVertexColor(COLOR_WHITE));
 		pTestContext->pVolume->SetDiffuseTexture(pColorTexture);
 		pTestContext->pVolume->SetBumpTexture(pBumpTexture);
+		*/
 
 		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
 		//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
-		pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
+		pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(20.0f, 20.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
 		CN(pTestContext->pWaterQuad);
-		pTestContext->pWaterQuad->SetPosition(0.0f, -1.0f, 0.0f);
-		pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
+		pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
+		//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
 		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
+
+		texture *pLandColorTexture;
+		texture *pLandHeightTexture;
+
+		pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 1000, 1000, pLandHeightTexture);
+		CN(pTestContext->pLandQuad);
+		pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
+		pTestContext->pLandQuad->SetPosition(0.0f, -2.0f, 0.0f);
 
 		if (pWaterProgramNode != nullptr) {
 			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pTestContext->pWaterQuad));
@@ -997,12 +1014,12 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		// NOTE: Refraction skybox needs no reflection plane - it's just looking through
 
 		// TOOD: Test clipping
-		sphere *pSphere;
-		pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
-		CN(pSphere);
-		pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
+		//sphere *pSphere;
+		//pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
+		//CN(pSphere);
+		//pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
 
-		m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 5.0f);
+		m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
 
 		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
@@ -2098,6 +2115,128 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestHeightQuadObject() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	float width = 5.5f;
+
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram;
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.1f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		{
+			//quad *pWaterQuad = m_pDreamOS->MakeQuad(20.0f, 20.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+			//CN(pWaterQuad);
+			//pWaterQuad->SetPosition(0.0f, -1.5f, 0.0f);
+			//pWaterQuad->SetBumpTexture(pBumpTextureWater);
+			//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
+			//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
+
+			texture *pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+			quad *pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 200, 200, pLandHeightTexture);
+			CN(pLandQuad);
+			pLandQuad->SetDiffuseTexture(pLandColorTexture);
+			pLandQuad->SetPosition(0.0f, -2.0f, -5.0f);
+			
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 5.0f, 10.0f);
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("UI Shader Stage Test");
+	pNewTest->SetTestDescription("UI Shader Stage shader test");
+
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 Error:
 	return r;
 }

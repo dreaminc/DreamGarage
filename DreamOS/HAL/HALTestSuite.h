@@ -55,6 +55,7 @@ public:
 	RESULT AddTestUserModel();
 	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
+	RESULT AddTestHeightQuadObject();
 	RESULT AddTestUIShaderStage();
 	RESULT AddTestFlatContextNesting();
 

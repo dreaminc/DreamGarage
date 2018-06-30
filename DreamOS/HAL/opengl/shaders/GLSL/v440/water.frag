@@ -22,9 +22,11 @@ in Data {
 
 uniform	bool u_hasTextureReflection;
 uniform sampler2D u_textureReflection;
+//uniform sampler2DMS u_textureReflection;
 
 uniform bool	u_hasTextureRefraction;
 uniform sampler2D u_textureRefraction;
+//uniform sampler2DMS u_textureRefraction;
 
 uniform bool	u_hasTextureNormal;
 uniform sampler2D u_textureNormal;
@@ -45,7 +47,7 @@ uniform vec4 u_vec4Eye;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Reflection;
 
-float g_normalDisplacementFactor = 0.05f;
+float g_normalDisplacementFactor = 0.025f;
 
 float g_refractiveIndexAir = 1.0f;
 float g_refractiveIndexWater = 1.333f;
@@ -94,8 +96,14 @@ void main(void) {
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	
 	if(u_hasTextureNormal == true) {
-		TBNNormal = texture(u_textureNormal, DataIn.uvCoord).rgb;
-		//TBNNormal.z *= 2.0f;
+		// tiling
+		vec2 uvCoord = DataIn.uvCoord * 30.0f;
+		uvCoord = mod(uvCoord, 1.0f);
+		//uvCoord.x = mod(uvCoord.x, 1.0f);
+		//uvCoord.y = mod(uvCoord.y, 1.0f);
+
+		TBNNormal = texture(u_textureNormal, uvCoord).rgb;
+		TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 	
@@ -107,6 +115,7 @@ void main(void) {
 	vec2 vTextureReflection = vec2(0.5f, 0.5f) + 0.5f * vDeviceReflection;
 
 	float reflectionCoefficient = GetFresnelReflectionCoefficient(-directionEye, TBNNormal);
+	//reflectionCoefficient = 1.0f - reflectionCoefficient;
 	//reflectionCoefficient = 1.0f;
 
 	float refractionCoefficient = 1.0f - reflectionCoefficient;
@@ -139,11 +148,11 @@ void main(void) {
 	if(u_hasTextureRefraction) {
 
 		// Displace Normals
-		vTextureRefraction.x -= g_normalDisplacementFactor * TBNNormal.x;
-		vTextureRefraction.y -= g_normalDisplacementFactor * TBNNormal.y;
+		vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
+		vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
 
-		//vTextureRefraction.x += (g_normalDisplacementFactor/5) * vRefraction.x;
-		//vTextureRefraction.y += (g_normalDisplacementFactor/5) * vRefraction.y;
+		//vTextureRefraction.x -= (g_normalDisplacementFactor/5) * vRefraction.x;
+		//vTextureRefraction.y -= (g_normalDisplacementFactor/5) * vRefraction.y;
 		
 
 		// TODO: Need to add actual refractive index and shit
@@ -158,8 +167,6 @@ void main(void) {
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
-		//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
-
 		if(dot(TBNNormal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
@@ -168,5 +175,5 @@ void main(void) {
 		}
 	}
 
-	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a) + vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.1f, 0.1f, 0.1f, 1.0f);
 }

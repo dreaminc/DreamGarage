@@ -49,7 +49,9 @@ void main(void) {
 	// Clip fragments on our side of the plane
 	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ClippingPlane.xyz)) + u_vec4ClippingPlane.w;
     if (fragmentClipPosition < 0.0) {
-        discard;
+		//out_vec4Color = material.m_colorDiffuse;
+        //return;
+		discard;
     }
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
