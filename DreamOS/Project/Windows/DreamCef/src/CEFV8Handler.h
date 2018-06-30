@@ -21,10 +21,13 @@ public:
 						 CefRefPtr<CefV8Value>& pCEFV8ValueReturn,
 						 CefString& strCEFException) override;
 
-	RESULT DreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
-	RESULT DreamFormCancel(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
-	RESULT DreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
-	RESULT DreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
+	RESULT RegisterExtensionFunction(std::string strName, std::function<RESULT(CefRefPtr<CefBrowser>, const CefV8ValueList&)>);
+	RESULT ExecuteExtensionFunction(std::string strName, const CefV8ValueList& cefArguments);
+
+	RESULT HandleDreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
+	RESULT HandleDreamFormCancel(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
+	RESULT HandleDreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
+	RESULT HandleDreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
 
 	// Provide the reference counting implementation for this class.
 	IMPLEMENT_REFCOUNTING(CEFV8Handler);

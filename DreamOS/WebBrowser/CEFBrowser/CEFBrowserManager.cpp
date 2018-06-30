@@ -224,7 +224,7 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserManager::DreamExtension(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
 	RESULT r = R_PASS;
 
 	std::string strType;
@@ -239,7 +239,7 @@ RESULT CEFBrowserManager::DreamExtension(CefRefPtr<CefBrowser> pCefBrowser, CefR
 	//TODO: implement the other ones
 	if (strType == "Form") {
 		if (strMethod == "success") {
-			CR(pCEFBrowserController->DreamFormSuccess());
+			CR(pCEFBrowserController->HandleDreamFormSuccess());
 		}
 		else if (strMethod == "cancel") {
 			// TODO:

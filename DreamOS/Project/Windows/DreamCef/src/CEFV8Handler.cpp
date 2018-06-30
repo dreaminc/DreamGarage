@@ -10,14 +10,15 @@ CEFV8Handler::~CEFV8Handler() {
 }
 
 RESULT CEFV8Handler::Initialize() {
+	RESULT r = R_PASS;
 
-	m_formFunctionMap["success"] = std::bind(&CEFV8Handler::DreamFormSuccess, this, std::placeholders::_1, std::placeholders::_2);
-	m_formFunctionMap["cancel"] = std::bind(&CEFV8Handler::DreamFormCancel, this, std::placeholders::_1, std::placeholders::_2);
-	m_formFunctionMap["setCredentials"] = std::bind(&CEFV8Handler::DreamFormSetCredentials, this, std::placeholders::_1, std::placeholders::_2);
-	m_formFunctionMap["setEnvironmentId"] = std::bind(&CEFV8Handler::DreamFormSetEnvironmentId, this, std::placeholders::_1, std::placeholders::_2);
+	CR(RegisterExtensionFunction("success", std::bind(&CEFV8Handler::HandleDreamFormSuccess, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(RegisterExtensionFunction("cancel", std::bind(&CEFV8Handler::HandleDreamFormCancel, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(RegisterExtensionFunction("setCredentials", std::bind(&CEFV8Handler::HandleDreamFormSetCredentials, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(RegisterExtensionFunction("setEnvironmentId", std::bind(&CEFV8Handler::HandleDreamFormSetEnvironmentId, this, std::placeholders::_1, std::placeholders::_2)));
 
-	return R_PASS;
-
+Error:
+	return r;
 }
 
 bool CEFV8Handler::Execute(const CefString& strName, 
@@ -28,17 +29,7 @@ bool CEFV8Handler::Execute(const CefString& strName,
 {
 	RESULT r = R_PASS;
 
-	CefRefPtr<CefV8Context> pContext;
-	CefRefPtr<CefBrowser> pBrowser;
-
-	pContext = CefV8Context::GetCurrentContext();
-	CN(pContext);
-
-	pBrowser = CefV8Context::GetCurrentContext()->GetBrowser();
-	CN(pBrowser);
-
-	CB(m_formFunctionMap.count(strName) > 0);
-	CR(m_formFunctionMap[strName](pBrowser, cefArguments));
+	CR(ExecuteExtensionFunction(strName, cefArguments));
 
 	pCEFV8ValueReturn = CefV8Value::CreateInt(r);
 	return true;
@@ -48,8 +39,37 @@ Error:
 	pCEFV8ValueReturn = CefV8Value::CreateInt(r);
 	return false;
 }
+		
+RESULT CEFV8Handler::RegisterExtensionFunction(std::string strName, std::function<RESULT(CefRefPtr<CefBrowser>, const CefV8ValueList&)> extensionFunction) {
+	RESULT r = R_PASS;
 
-RESULT CEFV8Handler::DreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
+	CBM(m_formFunctionMap.count(strName) == 0, "function already registered");
+	m_formFunctionMap[strName] = extensionFunction;
+
+Error:
+	return r;
+}
+
+RESULT CEFV8Handler::ExecuteExtensionFunction(std::string strName, const CefV8ValueList& cefArguments) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefV8Context> pContext;
+	CefRefPtr<CefBrowser> pBrowser;
+
+	CBM(m_formFunctionMap.count(strName) > 0, "function not registered");
+
+	pContext = CefV8Context::GetCurrentContext();
+	CN(pContext);
+	pBrowser = pContext->GetBrowser();
+	CN(pBrowser);
+
+	CR(m_formFunctionMap[strName](pBrowser, cefArguments));
+
+Error:
+	return r;
+}
+
+RESULT CEFV8Handler::HandleDreamFormSuccess(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
 	RESULT r = R_PASS;
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
@@ -70,7 +90,7 @@ Error:
 	return r;
 }
 
-RESULT CEFV8Handler::DreamFormCancel(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
+RESULT CEFV8Handler::HandleDreamFormCancel(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
 	RESULT r = R_PASS;
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
@@ -91,7 +111,7 @@ Error:
 	return r;
 }
 
-RESULT CEFV8Handler::DreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
+RESULT CEFV8Handler::HandleDreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
 	RESULT r = R_PASS;
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
@@ -115,7 +135,7 @@ Error:
 	return r;
 }
 
-RESULT CEFV8Handler::DreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
+RESULT CEFV8Handler::HandleDreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
 	RESULT r = R_PASS;
 
 	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");

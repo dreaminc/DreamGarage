@@ -548,11 +548,11 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::DreamFormSuccess() {
+RESULT CEFBrowserController::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
-		CR(m_pWebBrowserControllerObserver->DreamFormSuccess());
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSuccess());
 	}
 
 Error:

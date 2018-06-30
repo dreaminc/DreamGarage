@@ -372,7 +372,7 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 	return r;
 }
 
-RESULT DreamBrowser::DreamFormSuccess() {
+RESULT DreamBrowser::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	int a = 5;

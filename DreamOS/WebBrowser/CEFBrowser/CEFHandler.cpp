@@ -136,7 +136,7 @@ bool CEFHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> pCefBrowser, Cef
 				fHandled = true;
 			}
 			else if (strMethodName == "DreamExtension") {
-				CR(m_pCEFHandlerObserver->DreamExtension(pCefBrowser, pCEFProcessMessageArguments));
+				CR(m_pCEFHandlerObserver->HandleDreamExtensionCall(pCefBrowser, pCEFProcessMessageArguments));
 
 			}
 		}
@@ -297,12 +297,12 @@ Error:
 	return;
 }
 
-RESULT CEFHandler::DreamExtension(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+RESULT CEFHandler::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: DreamExtension");
 
 	CN(m_pCEFHandlerObserver);
-	CR(m_pCEFHandlerObserver->DreamExtension(pCefBrowser, pMessageArguments));
+	CR(m_pCEFHandlerObserver->HandleDreamExtensionCall(pCefBrowser, pMessageArguments));
 
 Error:
 	return r;

@@ -40,6 +40,7 @@ RESULT CEFExtension::Initialize() {
 		//	"  };"
 		//	"})();";
 
+		//TODO: remove absolute path once path manager code is available here
 		std::ifstream ifstreamExtensionFile("C:\\Users\\jason\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js");
 		std::stringstream bufferExtensionCode;
 		bufferExtensionCode << ifstreamExtensionFile.rdbuf();
