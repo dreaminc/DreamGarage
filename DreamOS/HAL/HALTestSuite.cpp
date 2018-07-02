@@ -29,17 +29,17 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestStandardShader());
+
+	CR(AddTestBlinnPhongShaderTextureBump());
+
+	CR(AddTestBlinnPhongShader());
+
+	CR(AddTestBlinnPhongShaderTexture());
+	
 	CR(AddTestWaterShader());
 
 	CR(AddTestHeightQuadObject());
-
-	CR(AddTestStandardShader());
-
-	CR(AddTestBlinnPhongShader());
-	
-	CR(AddTestBlinnPhongShaderTextureBump());
-	
-	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestToonShader());
 
@@ -684,95 +684,6 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::AddTestIncludeShader() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 40.0f;
-	int nRepeats = 1;
-
-	float width = 1.5f;
-	float height = width;
-	float length = width;
-
-	float padding = 0.5f;
-
-	// Initialize Code 
-	auto fnInitialize = [=](void *pContext) {
-		RESULT r = R_PASS;
-		m_pDreamOS->SetGravityState(false);
-
-		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		CR(pHAL->MakeCurrentContext());
-
-		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad;
-		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-
-		
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-		CR(pHAL->ReleaseCurrentContext());
-
-		// Objects 
-
-		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, 0.0f, -0.5f));
-
-		{
-			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
-			CN(pModel);
-			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
-			pModel->SetScale(0.1f);
-		}
-
-	Error:
-		return r;
-	};
-
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	// Update Code 
-	auto fnReset = [&](void *pContext) {
-		return ResetTest(pContext);
-	};
-
-	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
-	CN(pNewTest);
-
-	pNewTest->SetTestName("Include Shader");
-	pNewTest->SetTestDescription("Testing shaders including other shader files test");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
-
-Error:
-	return r;
-}
-
 RESULT HALTestSuite::AddTestGeometryShader() {
 	RESULT r = R_PASS;
 
@@ -1180,7 +1091,7 @@ Error:
 RESULT HALTestSuite::AddTestStandardShader() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
+	double sTestTime = 400.0f;
 	int nRepeats = 1;
 
 	float width = 1.5f;
@@ -1250,14 +1161,44 @@ RESULT HALTestSuite::AddTestStandardShader() {
 
 		// Objects 
 
-		volume *pVolume;
-		pVolume = nullptr;
-
-		sphere *pSphere;
-		pVolume = nullptr;
+		
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+
+		
+
+#ifndef _DEBUG
+		{
+			point ptSceneOffset = point(90, -5, -25);
+			float sceneScale = 0.025f;
+			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
+
+			//model* pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
+			//pModel->SetPosition(ptSceneOffset);
+			//pModel->SetScale(sceneScale);
+			////pModel->SetEulerOrientation(vSceneEulerOrientation);
+			//
+			//model* pRiver = m_pDreamOS->AddModel(L"\\FloatingIsland\\river.obj");
+			//pRiver->SetPosition(ptSceneOffset);
+			//pRiver->SetScale(sceneScale);
+			////pModel->SetEulerOrientation(vSceneEulerOrientation);
+			//
+			//model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
+			//pClouds->SetPosition(ptSceneOffset);
+			//pClouds->SetScale(sceneScale);
+			////pModel->SetEulerOrientation(vSceneEulerOrientation);
+			//
+			//pClouds->SetMaterialAmbient(0.8f);
+
+			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.fbx");
+			CN(pCaveModel);
+			pCaveModel->SetScale(sceneScale);
+
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.0f, -2.0f);
+			m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
+		}
+#else
 
 		texture *pColorTexture;
 		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
@@ -1265,37 +1206,14 @@ RESULT HALTestSuite::AddTestStandardShader() {
 		texture *pBumpTexture;
 		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-#ifndef _DEBUG
-		{
-			point ptSceneOffset = point(90, -5, -25);
-			float sceneScale = 0.1f;
-			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
-
-			model* pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
-			pModel->SetPosition(ptSceneOffset);
-			pModel->SetScale(sceneScale);
-			//pModel->SetEulerOrientation(vSceneEulerOrientation);
-
-			model* pRiver = m_pDreamOS->AddModel(L"\\FloatingIsland\\river.obj");
-			pRiver->SetPosition(ptSceneOffset);
-			pRiver->SetScale(sceneScale);
-			//pModel->SetEulerOrientation(vSceneEulerOrientation);
-
-			model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
-			pClouds->SetPosition(ptSceneOffset);
-			pClouds->SetScale(sceneScale);
-			//pModel->SetEulerOrientation(vSceneEulerOrientation);
-
-			pClouds->SetMaterialAmbient(0.8f);
-		}
-#endif
-
-		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
 		CN(pSphere);
 		pSphere->SetDiffuseTexture(pColorTexture);
 		pSphere->SetBumpTexture(pBumpTexture);
 
 		///*
+		volume *pVolume;
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
@@ -1319,6 +1237,7 @@ RESULT HALTestSuite::AddTestStandardShader() {
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetVertexColor(COLOR_BLUE));
 		*/
+#endif
 
 	Error:
 		return r;

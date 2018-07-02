@@ -60,24 +60,24 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	// Framebuffer Output
-	/*
-	int pxWidth = m_pParentImp->GetViewport().Width();
-	int pxHeight = m_pParentImp->GetViewport().Height();
+	if (m_fPassThru == false) {
+		int pxWidth = m_pParentImp->GetViewport().Width();
+		int pxHeight = m_pParentImp->GetViewport().Height();
 
-	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
-	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->Bind());
+		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+		CR(m_pOGLFramebuffer->OGLInitialize());
+		CR(m_pOGLFramebuffer->Bind());
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+		CR(m_pOGLFramebuffer->SetSampleCount(4));
 
-	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		CR(m_pOGLFramebuffer->MakeColorAttachment());
+		CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
-	*/
+		CR(m_pOGLFramebuffer->MakeDepthAttachment());
+		CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+		CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	}
 
 	m_deltaTime = 0.0f;
 	m_startTime = std::chrono::high_resolution_clock::now();
@@ -143,11 +143,14 @@ RESULT OGLProgramStandard::SetupConnections() {
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
 
 	// Outputs
-	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
-
 	// Treat framebuffer as pass-thru
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
-	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	if (m_fPassThru == true) {
+		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	}
+	else {
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	}
 
 Error:
 	return r;
@@ -166,8 +169,13 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		//BindToFramebuffer(m_pOGLFramebuffer);
-		m_pOGLFramebuffer->Bind();
+		
+		if (m_fPassThru) {
+			m_pOGLFramebuffer->Bind();
+		}
+		else {
+			BindToFramebuffer(m_pOGLFramebuffer);
+		}
 	}
 
 	glEnable(GL_BLEND);
