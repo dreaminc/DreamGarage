@@ -17,10 +17,12 @@
 
 #include "OVRTouchController.h"
 
+#include "OVRPlatform.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
-	m_ovrMirrorTexture(nullptr)
+	m_pOVRMirrorTexture(nullptr)
 {
 	// empty stub
 }
@@ -65,6 +67,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
+	// Initializes Oculus Platform
+	m_pOVRPlatform = new OVRPlatform();
+	CN(m_pOVRPlatform);
+	CRM(m_pOVRPlatform->InitializePlatform(), "Failed to initialize Oculus Platform");
+	
 	// Initializes LibOVR, and the Rift
 	// TODO: may be important to make an OVR Logger.  
 	// use it as an arg to ovr_Initialize
@@ -90,10 +97,10 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	if (wndHeight == 0)
 		wndHeight = m_ovrHMDDescription.Resolution.h / 2;
 
-	m_ovrMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
+	m_pOVRMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
 	
-	CN(m_ovrMirrorTexture);
-	CR(m_ovrMirrorTexture->OVRInitialize());
+	CN(m_pOVRMirrorTexture);
+	CR(m_pOVRMirrorTexture->OVRInitialize());
 	
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
@@ -176,6 +183,10 @@ HMDDeviceType OVRHMD::GetDeviceType() {
 	return HMDDeviceType::OCULUS;
 }
 
+std::string OVRHMD::GetDeviceTypeString() {
+	return "HMDType.OculusRift";
+}
+
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
 	
@@ -254,7 +265,7 @@ RESULT OVRHMD::SetUpFrame() {
 }
 
 RESULT OVRHMD::RenderHMDMirror() {
-	return m_ovrMirrorTexture->RenderMirrorToBackBuffer();
+	return m_pOVRMirrorTexture->RenderMirrorToBackBuffer();
 }
 
 RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {
@@ -285,6 +296,8 @@ RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
 
 	//ovr_RecenterTrackingOrigin(m_ovrSession);
+
+	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");
 
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
@@ -361,7 +374,7 @@ RESULT OVRHMD::UpdateHMD() {
 	}
 
 
-//Error:
+Error:
 	return r;
 }
 
@@ -415,17 +428,30 @@ Error:
 	return r;
 }
 
+RESULT OVRHMD::ShutdownParentSandbox() {
+	RESULT r = R_PASS;
+	CR(m_pParentSandbox->Shutdown());
+
+Error:
+	return r;
+}
+
 RESULT OVRHMD::ReleaseHMD() {
 	RESULT r = R_PASS;
 
-	if (m_ovrSession != nullptr) {
-		ovr_Destroy(m_ovrSession);
-		m_ovrSession = nullptr;
+	if (m_pOVRMirrorTexture != nullptr) {
+		delete m_pOVRMirrorTexture;
+		m_pOVRMirrorTexture = nullptr;
 	}
 
 	if (m_pOVRHMDSinkNode != nullptr) {
 		delete m_pOVRHMDSinkNode;
 		m_pOVRHMDSinkNode = nullptr;
+	}
+
+	if (m_ovrSession != nullptr) {
+		ovr_Destroy(m_ovrSession);
+		m_ovrSession = nullptr;
 	}
 
 	ovr_Shutdown();

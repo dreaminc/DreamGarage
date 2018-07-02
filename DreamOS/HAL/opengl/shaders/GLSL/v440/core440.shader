@@ -33,3 +33,4 @@ mat3 CalculateTBNMatrix(in mat4 mat3ModelView, in vec4 vTangent, in vec4 vNormal
 
 	return mat3TBNMatrix;
 }
+

@@ -30,23 +30,18 @@ class UIStageProgram;
 
 class quad;
 
-#define MAIN_DIAGONAL 0.70f
-
-#define SPACING_SIZE 0.016129f
-#define DEFAULT_PX_WIDTH 1366
-#define DEFAULT_PX_HEIGHT 768
-
-#define VIEW_ANGLE 32.0f
 #define VIEW_POS_DEPTH 0.1f	
 #define VIEW_POS_HEIGHT -0.2f
 
-#define ANIMATION_DURATION_SECONDS 0.175f
 #define ANIMATION_SCALE 0.1f
 
 #define TITLE_DESKTOP "Desktop"
 #define TITLE_WEBSITE "website"
  
-class DreamUserControlArea : public DreamApp<DreamUserControlArea>, public Subscriber<InteractionObjectEvent> {
+class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
+	public Subscriber<InteractionObjectEvent>,
+	public Subscriber<UIEvent> {
+
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamOSTestSuite;
@@ -159,18 +154,20 @@ public:
 
 private:
 	RESULT ShowControlView();
+	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *pSubscriberEvent) override;
+	virtual RESULT Notify(UIEvent *pUIEvent) override;
 
 // child applications
+public:
+	RESULT SetDreamUserApp(std::shared_ptr<DreamUserApp> pDreamUserApp);
+
 private:
 
 	// positioning helper
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp;
-
-	// Generates browsers
-	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 
 	// App used for opening content
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
@@ -204,21 +201,10 @@ private:
 
 // layout variables
 private:
-	float m_spacingSize = SPACING_SIZE;
-	float m_pxWidth = DEFAULT_PX_WIDTH;
-	float m_pxHeight = DEFAULT_PX_HEIGHT;
-
-	float m_diagonalSize = MAIN_DIAGONAL;
-	float m_viewAngle = VIEW_ANGLE;
-	float m_aspectRatio;
-	float m_baseWidth;
-	float m_baseHeight;
 	float m_centerOffset;
-	float m_widthScale = 1.0f;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 
-	float m_animationDuration = ANIMATION_DURATION_SECONDS;
 	float m_animationScale = ANIMATION_SCALE;
 
 	UIStageProgram *m_pUIStageProgram = nullptr;

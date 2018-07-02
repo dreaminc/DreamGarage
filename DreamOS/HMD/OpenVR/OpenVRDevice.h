@@ -66,6 +66,7 @@ public:
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
+	virtual std::string GetDeviceTypeString() override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);

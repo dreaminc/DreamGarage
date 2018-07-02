@@ -3,7 +3,7 @@
 #include "OGLTexture.h"
 #include "OGLRenderbuffer.h"
 
-OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
+OGLAttachment::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
@@ -13,7 +13,7 @@ OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int
 	// Empty
 }
 
-OGLAttachment ::~OGLAttachment () {
+OGLAttachment::~OGLAttachment () {
 	if (m_pOGLRenderbuffer != nullptr) {
 		delete m_pOGLRenderbuffer;
 		m_pOGLRenderbuffer = nullptr;
@@ -25,7 +25,7 @@ OGLAttachment ::~OGLAttachment () {
 	}
 }
 
-GLuint OGLAttachment ::GetOGLRenderbufferIndex() {
+GLuint OGLAttachment::GetOGLRenderbufferIndex() {
 	if (m_pOGLRenderbuffer != nullptr) {
 		return m_pOGLRenderbuffer->GetOGLRenderbufferIndex();
 	}

@@ -548,6 +548,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSuccess());
+	}
+
+Error:
+	return r;
+}
+
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }

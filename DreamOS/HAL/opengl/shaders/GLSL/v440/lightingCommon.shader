@@ -27,9 +27,12 @@ layout(std140) uniform ub_Lights {
 void ProcessLightVertex(in Light light, in mat4 mat4View, in vec4 vertViewSpace, in vec4 vertWorldSpace, out vec3 vLightDirection, out float lightDistance) {
 	if(light.m_type == 0) {
 		// Directional Light
+
 		vLightDirection = normalize(mat3(mat4View) * -light.m_vectorDirection.xyz);
 		//vLightDirection = vec3(normalize(mat4View * vec4(-light.m_vectorDirection.xyz, 0.0f)));
 		//vLightDirection = normalize(vec3(-light.m_vectorDirection));
+		//vLightDirection = normalize(vec3(mat3(mat4View) * (-light.m_vectorDirection.xyz)));
+
 		lightDistance = 0.0f;
 	}
 	else  {
@@ -94,3 +97,4 @@ void CalculateFragmentLightValueToon(in float power, in vec3 vectorNormal, in ve
 		outlineValue = 0.0f;
 	}
 }
+

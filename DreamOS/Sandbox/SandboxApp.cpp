@@ -340,6 +340,12 @@ RESULT SandboxApp::Shutdown() {
 		m_pDreamAppManager = nullptr;
 	}
 
+	if (m_pHMD != nullptr) {
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+	}
+
 	// Implementation specific shutdown
 	CR(ShutdownSandbox());
 
@@ -390,7 +396,7 @@ RESULT SandboxApp::RunAppLoop() {
 		//m_pWin64Mouse->UpdateMousePosition();
 
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
+			CRM(m_pHMD->UpdateHMD(), "UpdateHMD failed in Sandbox");
 		}
 
 		// Update Scene 
@@ -1671,4 +1677,8 @@ DreamOS *SandboxApp::GetDreamOSHandle() {
 
 std::wstring SandboxApp::GetHardwareID() {
 	return m_strHardwareID;
+}
+
+std::string SandboxApp::GetHMDTypeString() {
+	return m_pHMD->GetDeviceTypeString();
 }

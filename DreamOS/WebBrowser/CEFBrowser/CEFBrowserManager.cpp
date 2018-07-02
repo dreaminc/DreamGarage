@@ -8,6 +8,8 @@
 
 #include "Cloud/Environment/EnvironmentAsset.h"
 
+#include "Sandbox/PathManager.h"
+
 CEFBrowserManager::CEFBrowserManager() {
 	// empty
 }
@@ -222,6 +224,40 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBrowser, CefRefPtr<CefListValue> pMessageArguments) {
+	RESULT r = R_PASS;
+
+	std::string strType;
+	std::string strMethod;
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCefBrowser->GetIdentifier());
+	CN(pCEFBrowserController);
+
+	strType = pMessageArguments->GetString(0);
+	strMethod = pMessageArguments->GetString(1);
+
+	//TODO: implement the other ones
+	if (strType == "Form") {
+		if (strMethod == "success") {
+			CR(pCEFBrowserController->HandleDreamFormSuccess());
+		}
+		else if (strMethod == "cancel") {
+			// TODO:
+		}
+		else if (strMethod == "setCredentials") {
+			// TODO:
+		}
+		else if (strMethod == "setEnvironmentId") {
+			// TODO:
+		}
+	}
+
+
+Error:
+	return r;
+
+}
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 
@@ -245,6 +281,13 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
+	
+	std::wstring wstrAppDataPath;
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
+	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
+	CefString(&cefSettings.cache_path) = wstrAppDataPath;
+	// CEF will create the Directory(s) if necessary
+
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
 	

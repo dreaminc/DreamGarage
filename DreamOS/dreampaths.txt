@@ -14,3 +14,4 @@ FONT			./Resources/Fonts/
 MODEL			./Models/
 DATA			./Data/
 SOUND			./Resources/Sounds/
+SCRIPTS			./Scripts/

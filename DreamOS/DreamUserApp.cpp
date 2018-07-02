@@ -8,6 +8,10 @@
 
 #include "Core/Utilities.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+
+#include "Primitives/camera.h"	
+
 texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
 }
@@ -210,7 +214,16 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	}
 
+	// user settings
+	m_userSettings = new UserSettings();
 
+	m_userSettings->m_aspectRatio = ((float)m_userSettings->m_pxWidth / (float)m_userSettings->m_pxHeight);
+	m_userSettings->m_baseWidth = std::sqrt(((m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio) * (m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize)) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
+	m_userSettings->m_baseHeight = std::sqrt((m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
+
+	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+	CN(m_pWebBrowserManager);
+	CR(m_pWebBrowserManager->Initialize());
 
 Error:
 	return r;
@@ -227,7 +240,7 @@ RESULT DreamUserApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	CR(m_pWebBrowserManager->Shutdown());
 
 Error:
 	return r;
@@ -801,4 +814,78 @@ RESULT DreamUserApp::ResetAppComposite() {
 
 Error:
 	return r;
+}
+
+float DreamUserApp::GetPXWidth() {
+	return m_userSettings->m_pxWidth;
+}
+
+float DreamUserApp::GetPXHeight() {
+	return m_userSettings->m_pxHeight;
+}
+
+float DreamUserApp::GetBaseWidth() {
+	return m_userSettings->m_baseWidth;
+}
+
+float DreamUserApp::GetBaseHeight() {
+	return m_userSettings->m_baseHeight;
+}
+
+float DreamUserApp::GetViewAngle() {
+	return m_userSettings->m_viewAngle;
+}
+
+float DreamUserApp::GetAnimationDuration() {
+	return m_userSettings->m_animationDuration;
+}
+
+float DreamUserApp::GetScale() {
+	return m_userSettings->m_scale;
+}
+
+float DreamUserApp::GetSpacingSize() {
+	return m_userSettings->m_spacingSize;
+}
+
+RESULT DreamUserApp::SetScale(float widthScale) {
+	m_userSettings->m_scale = widthScale;
+	return R_PASS;
+}
+
+std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
+	return m_pWebBrowserManager;
+}
+
+RESULT DreamUserApp::UpdateHeight(float heightDiff) {
+
+	point ptComposite = GetComposite()->GetPosition();
+	ptComposite += point(0.0f, heightDiff, 0.0f);
+	GetComposite()->SetPosition(ptComposite);
+
+	return R_PASS;
+}
+
+RESULT DreamUserApp::UpdateDepth(float depthDiff) {
+
+	stereocamera *pCamera = GetDOS()->GetCamera();
+
+	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+	vAppLook.Normalize();
+	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+	vector vDiff = depthDiff * vAppLookXZ;
+
+	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
+
+	pCamera->SetHMDAdjustedPosition(ptCamera + vDiff);
+
+	return R_PASS;
+}
+RESULT DreamUserApp::UpdateScale(float scale) {
+
+	m_userSettings->m_scale = scale;
+	GetComposite()->SetScale(scale);
+
+	return R_PASS;
 }

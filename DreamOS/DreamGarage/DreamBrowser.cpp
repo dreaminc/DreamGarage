@@ -284,7 +284,7 @@ RESULT DreamBrowser::OnAfterCreated() {
 RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) {
 	RESULT r = R_PASS;
 
-	if (!fLoading && m_pParentApp != nullptr) {
+	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
 		CR(PendUpdateObjectTextures());
 	}
@@ -368,6 +368,14 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 			headermap = it->second;
 		}
 	}
+
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	int a = 5;
 
 	return r;
 }
@@ -559,8 +567,10 @@ bool DreamBrowser::ShouldUpdateObjectTextures() {
 RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
-	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-		CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));	
+	if (m_pParentApp != nullptr) {
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+			CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
+		}
 	}
 
 	m_fUpdateObjectTextures = false;

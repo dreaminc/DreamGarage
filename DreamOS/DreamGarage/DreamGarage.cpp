@@ -19,6 +19,7 @@ light *g_pLight = nullptr;
 #include "DreamControlView/DreamControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
+#include "DreamGarage/DreamSettingsApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -267,12 +268,21 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
+
+	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+	CN(m_pDreamUserApp);
+
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
 	CN(m_pDreamUserControlArea);
 
+	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+	CN(m_pDreamShareView);
+
+	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
+	CN(m_pDreamSettings);
 
 Error:
 	return r;
@@ -499,7 +509,7 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	//TODO: use the DremaUserControlArea
+	//TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
 		m_pDreamUserControlArea->ResetAppComposite();
 
@@ -898,12 +908,42 @@ Error:
 }
 
 RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
+
+	m_pDreamUserApp->UpdateHeight(height);
+	m_pDreamUserApp->UpdateDepth(depth);
+	m_pDreamUserApp->UpdateScale(scale);
+
 	return R_PASS;
 }
+
 RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
+
 RESULT DreamGarage::OnSettings(std::string strURL) {
+	RESULT r = R_PASS;
+
+	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
+	CR(m_pDreamSettings->Show());
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnLogin() {
+	RESULT r = R_PASS;
+
+	//TODO: other pieces of login flow
+	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	//TODO: uncomment when everything else works
+	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
+	
+//Error:
+	return r;
+}
+
+RESULT DreamGarage::OnLogout() {
 	return R_PASS;
 }
 
