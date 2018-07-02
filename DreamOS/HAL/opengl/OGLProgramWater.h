@@ -86,6 +86,8 @@ private:
 	//OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
 	//OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
 
+	OGLUniform *m_pUniformTime = nullptr;
+
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock = nullptr;
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;

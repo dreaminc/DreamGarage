@@ -11,6 +11,8 @@
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
+#include <chrono>
+
 OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglwater"),
 	m_pLightsBlock(nullptr),
@@ -61,6 +63,8 @@ RESULT OGLProgramWater::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTime), std::string("u_time")));
+
 	// Framebuffer Output
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
@@ -96,6 +100,7 @@ RESULT OGLProgramWater::OGLInitialize(version versionOGL) {
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
 	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"noiseCommon.shader"), "Failed to add shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"water.vert"), "Failed to create vertex shader");
@@ -199,6 +204,12 @@ RESULT OGLProgramWater::ProcessNode(long frameID) {
 		//if (m_pOGLRefractionFramebuffer_in != nullptr) {
 		//	pPlaneObj->SetDiffuseTexture(m_pOGLRefractionFramebuffer_in->GetColorTexture());
 		//}
+
+		if (m_pUniformTime != nullptr) {
+			static std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now();
+			float msTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - timeStart).count();
+			m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&msTime));
+		}
 
 		RenderObject(pPlaneObj);
 	}

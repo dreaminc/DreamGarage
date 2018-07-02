@@ -34,6 +34,9 @@ uniform sampler2D u_textureRefractionDepth;
 
 uniform bool	u_hasTextureNormal;
 uniform sampler2D u_textureNormal;
+
+uniform float u_time;
+
 //
 //uniform bool	u_hasTextureDiffuse;
 //uniform sampler2D u_textureDiffuse;
@@ -73,7 +76,7 @@ vec3 GetRefractionVector(in vec3 vDirection, in vec3 vNormal, in float refractiv
 
 // This is an approximation of the fresnel equation
 float GetFresnelReflectionCoefficient(in vec3 vDirection, in vec3 vNormal) {
-	float Rmin = 0.1f;
+	float Rmin = 0.2f;
 	float cVal = dot((-1.0f * vNormal), (vDirection));
 
 	float reflectionCoefficient = Rmin + (1.0f - Rmin) * pow((1.0f - cVal), 5);
@@ -103,12 +106,23 @@ void main(void) {
 		// tiling
 		vec2 uvCoord = DataIn.uvCoord * 5.0f;
 		uvCoord = mod(uvCoord, 1.0f);
-		//uvCoord.x = mod(uvCoord.x, 1.0f);
-		//uvCoord.y = mod(uvCoord.y, 1.0f);
 
 		TBNNormal = texture(u_textureNormal, uvCoord).rgb;
-		//TBNNormal.z *= 2.0f;
+		TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
+	}
+	else {
+	vec2 pos = vec2(DataIn.uvCoord * 500.0);
+		
+		vec3 normalHHF = getNoiseNormal(vec2(DataIn.uvCoord * 5500.0) + 0.5f * u_time);
+		normalHHF /= 3.0f;
+
+		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
+		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
+		normalLF.z *= 2.0f;
+
+		TBNNormal = normalHHF + normalHF + normalLF;
+		TBNNormal = normalize(TBNNormal);
 	}
 	
 	// Reflection
@@ -133,8 +147,6 @@ void main(void) {
 	// TODO: This is a simplification - the right approach will be to use CPU side on the projection piece
 	//vec3 vRefraction = GetRefractionVector(-directionEye, TBNNormal, g_refractiveIndexAir, g_refractiveIndexWater);
 
-	//float depth = 1.0f - pow(texture(u_textureRefractionDepth, vTextureRefraction).x, 10);
-
 	// Displace Normals for refraction 
 	vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
 	vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
@@ -150,13 +162,15 @@ void main(void) {
 	// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
 	float minWaterOpacity = 0.2f;
 	float depthOpaque = 5.0f;
-	vec4 colorWater =  vec4(67.0f/255.0f, 88.0f/255.0f, 151.0f/255.0f, 1.0f);
+	vec4 colorWater =  vec4(57.0f/255.0f, 88.0f/255.0f, 151.0f/255.0f, 1.0f);
 	float waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 
 	vec4 colorTint = colorWater * waterOpacity;
 	colorTint.a = 1.0f;
 
-	colorDiffuse = colorWater * material.m_colorDiffuse;
+	// TODO: We should probably just use the diffuse color of the plane
+	// This means we need to fix materials!
+	colorDiffuse = colorWater * material.m_colorDiffuse;	
 
 	if(u_hasTextureReflection) {
 		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
@@ -204,4 +218,9 @@ void main(void) {
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.1f, 0.1f, 0.1f, 1.0f);
 	//out_vec4Color = colorDiffuse;
+
+	//out_vec4Color = vec4(1.0f) * noise(DataIn.uvCoord);
+	//vec2 pos = vec2(DataIn.uvCoord * 100.0);
+    //vec3 noiseColor = getNoiseNormal(pos);
+    //out_vec4Color = vec4(noiseColor, 1.0);
 }
