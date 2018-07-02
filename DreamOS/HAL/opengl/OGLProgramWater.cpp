@@ -47,6 +47,9 @@ RESULT OGLProgramWater::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureRefraction), std::string("u_hasTextureRefraction")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureRefraction), std::string("u_textureRefraction")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureRefractionDepth), std::string("u_hasTextureRefractionDepth")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureRefractionDepth), std::string("u_textureRefractionDepth")));
+
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureNormal), std::string("u_hasTextureNormal")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureNormal), std::string("u_textureNormal")));
@@ -240,7 +243,7 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 			m_pUniformHasTextureReflection->SetUniform(false);
 	}
 
-	// Refraction Texture
+	// Refraction Texture & depth map
 	if (m_pOGLRefractionFramebuffer_in != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE1);
 		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
@@ -248,18 +251,36 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		
 		if(m_pUniformTextureRefraction != nullptr)
 			m_pUniformTextureRefraction->SetUniform(1);
-
+		
 		if(m_pUniformHasTextureRefraction != nullptr)
 			m_pUniformHasTextureRefraction->SetUniform(true);
+
+		// Depth
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE2);
+		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetDepthAttachment()->GetOGLTextureTarget(),
+			m_pOGLRefractionFramebuffer_in->GetDepthAttachment()->GetOGLTextureIndex());
+		
+		if (m_pUniformTextureRefractionDepth != nullptr)
+			m_pUniformTextureRefractionDepth->SetUniform(2);
+
+		if (m_pUniformHasTextureRefractionDepth != nullptr)
+			m_pUniformHasTextureRefractionDepth->SetUniform(true);
+
 	}
 	else {
 		if (m_pUniformHasTextureRefraction != nullptr)
 			m_pUniformHasTextureRefraction->SetUniform(false);
+
+		if (m_pUniformHasTextureRefractionDepth != nullptr)
+			m_pUniformHasTextureRefractionDepth->SetUniform(false);
 	}
+
+	
 
 	// Normal map
 	if (pOGLObj->GetOGLTextureBump() != nullptr) {
-		m_pParentImp->glActiveTexture(GL_TEXTURE2);
+		m_pParentImp->glActiveTexture(GL_TEXTURE3);
 		m_pParentImp->BindTexture(pOGLObj->GetOGLTextureBump()->GetOGLTextureTarget(), 
 			pOGLObj->GetOGLTextureBump()->GetOGLTextureIndex());
 

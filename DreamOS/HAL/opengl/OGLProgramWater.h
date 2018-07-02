@@ -74,6 +74,9 @@ private:
 
 	OGLUniformBool *m_pUniformHasTextureRefraction = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureRefraction = nullptr;
+	OGLUniformBool *m_pUniformHasTextureRefractionDepth = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureRefractionDepth = nullptr;
+
 
 	OGLUniformBool *m_pUniformHasTextureNormal = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureNormal = nullptr;

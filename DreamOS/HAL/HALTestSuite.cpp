@@ -979,7 +979,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
 		pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(20.0f, 20.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
 		CN(pTestContext->pWaterQuad);
-		pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
+		//pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
+		pTestContext->pWaterQuad->SetPosition(0.0f, 0.0f, 0.0f);
 		//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
 		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
@@ -990,7 +991,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 1000, 1000, pLandHeightTexture);
+		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 100, 100, pLandHeightTexture);
 		CN(pTestContext->pLandQuad);
 		pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
 		pTestContext->pLandQuad->SetPosition(0.0f, -2.0f, 0.0f);
@@ -1019,7 +1020,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		//CN(pSphere);
 		//pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
 
-		m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
+		//m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
+		m_pDreamOS->GetCamera()->SetPosition(0.0f, 3.1f, 10.0f);
 
 		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
@@ -1060,6 +1062,9 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		//pTestContext->pReflectionQuad->translateY(-0.0001f);
 		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
 		//pTestContext->pWaterQuad->RotateXByDeg(0.002f);
+
+		//m_pDreamOS->GetCamera()->translateZ(0.0001f);
+		//m_pDreamOS->GetCamera()->translateY(0.0001f);
 
 	Error:
 		return r;
@@ -3917,3 +3922,4 @@ Error:
 HALImp* HALTestSuite::GetHALImp() {
 	return m_pDreamOS->GetHALImp();
 }
+

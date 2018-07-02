@@ -72,9 +72,27 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32, GL_FLOAT));
+
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+
+	// Reference Compare
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL));
+
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+
+	//auto pDrawBuffers = new GLenum[2];
+	//CN(pDrawBuffers);
+	//
+	//pDrawBuffers[0] = GL_COLOR_ATTACHMENT0;
+	//pDrawBuffers[1] = GL_DEPTH_ATTACHMENT;
+	//
+	//CR(m_pParentImp->glDrawBuffers(2, pDrawBuffers));
 
 Error:
 	return r;

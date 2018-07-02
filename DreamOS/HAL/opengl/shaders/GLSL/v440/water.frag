@@ -28,6 +28,10 @@ uniform bool	u_hasTextureRefraction;
 uniform sampler2D u_textureRefraction;
 //uniform sampler2DMS u_textureRefraction;
 
+uniform bool	u_hasTextureRefractionDepth;
+uniform sampler2D u_textureRefractionDepth;
+//uniform sampler2DMS u_textureRefractionDepth;
+
 uniform bool	u_hasTextureNormal;
 uniform sampler2D u_textureNormal;
 //
@@ -130,6 +134,12 @@ void main(void) {
 	// TODO: This is a simplification - the right approach will be to use CPU side on the projection piece
 	//vec3 vRefraction = GetRefractionVector(-directionEye, TBNNormal, g_refractiveIndexAir, g_refractiveIndexWater);
 
+	//float depth = 1.0f - pow(texture(u_textureRefractionDepth, vTextureRefraction).x, 10);
+
+	float zRefractionDepth = u_mat4Projection[3].z / (texture(u_textureRefractionDepth, vTextureRefraction).x * -2.0 + 1.0 - u_mat4Projection[2].z);
+	float depth = vClipRefraction.z - zRefractionDepth;
+	depth = depth / 20.0f;
+
 	vec4 colorDiffuse = vec4(1.0f); 
 
 	if(u_hasTextureReflection) {
@@ -157,12 +167,13 @@ void main(void) {
 
 		// TODO: Need to add actual refractive index and shit
 
-		colorDiffuse = colorDiffuse + (refractionCoefficient * texture(u_textureRefraction, vTextureRefraction));
+		//colorDiffuse = colorDiffuse + (depth * refractionCoefficient * texture(u_textureRefraction, vTextureRefraction));
+		//colorDiffuse = colorDiffuse + (refractionCoefficient * texture(u_textureRefraction, vTextureRefraction));
 	}
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
-	
+	colorDiffuse = material.m_colorDiffuse * depth;
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
@@ -176,4 +187,5 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.1f, 0.1f, 0.1f, 1.0f);
+	out_vec4Color = colorDiffuse;
 }
