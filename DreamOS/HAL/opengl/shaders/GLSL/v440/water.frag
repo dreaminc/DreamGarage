@@ -101,13 +101,13 @@ void main(void) {
 	
 	if(u_hasTextureNormal == true) {
 		// tiling
-		vec2 uvCoord = DataIn.uvCoord * 30.0f;
+		vec2 uvCoord = DataIn.uvCoord * 5.0f;
 		uvCoord = mod(uvCoord, 1.0f);
 		//uvCoord.x = mod(uvCoord.x, 1.0f);
 		//uvCoord.y = mod(uvCoord.y, 1.0f);
 
 		TBNNormal = texture(u_textureNormal, uvCoord).rgb;
-		TBNNormal.z *= 2.0f;
+		//TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 	
@@ -120,7 +120,6 @@ void main(void) {
 
 	float reflectionCoefficient = GetFresnelReflectionCoefficient(-directionEye, TBNNormal);
 	//reflectionCoefficient = 1.0f - reflectionCoefficient;
-	//reflectionCoefficient = 1.0f;
 
 	float refractionCoefficient = 1.0f - reflectionCoefficient;
 
@@ -136,11 +135,28 @@ void main(void) {
 
 	//float depth = 1.0f - pow(texture(u_textureRefractionDepth, vTextureRefraction).x, 10);
 
+	// Displace Normals for refraction 
+	vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
+	vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
+
 	float zRefractionDepth = u_mat4Projection[3].z / (texture(u_textureRefractionDepth, vTextureRefraction).x * -2.0 + 1.0 - u_mat4Projection[2].z);
-	float depth = vClipRefraction.z - zRefractionDepth;
-	depth = depth / 20.0f;
+	float depthOfPoint = (u_mat4View * DataIn.vertWorldSpace).z;
+	float waterDepth = depthOfPoint - zRefractionDepth;
+	//depth = depth / 20.0f;
 
 	vec4 colorDiffuse = vec4(1.0f); 
+
+	// Water Color / Opacity
+	// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
+	float minWaterOpacity = 0.2f;
+	float depthOpaque = 5.0f;
+	vec4 colorWater =  vec4(67.0f/255.0f, 88.0f/255.0f, 151.0f/255.0f, 1.0f);
+	float waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
+
+	vec4 colorTint = colorWater * waterOpacity;
+	colorTint.a = 1.0f;
+
+	colorDiffuse = colorWater * material.m_colorDiffuse;
 
 	if(u_hasTextureReflection) {
 		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
@@ -151,15 +167,17 @@ void main(void) {
 
 		// TODO: Need to add actual fresnel term and shit
 
-		colorDiffuse = material.m_colorDiffuse * (reflectionCoefficient * texture(u_textureReflection, vTextureReflection));
+		// Blend with reflection 
+		vec4 colorReflection = (reflectionCoefficient * texture(u_textureReflection, vTextureReflection));
+		colorDiffuse = mix(colorDiffuse, colorReflection, colorReflection.a);
 		
 	}
 
 	if(u_hasTextureRefraction) {
 
-		// Displace Normals
-		vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
-		vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
+		// Displace Normals for refraction 
+		//vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
+		//vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
 
 		//vTextureRefraction.x -= (g_normalDisplacementFactor/5) * vRefraction.x;
 		//vTextureRefraction.y -= (g_normalDisplacementFactor/5) * vRefraction.y;
@@ -167,13 +185,11 @@ void main(void) {
 
 		// TODO: Need to add actual refractive index and shit
 
-		//colorDiffuse = colorDiffuse + (depth * refractionCoefficient * texture(u_textureRefraction, vTextureRefraction));
-		//colorDiffuse = colorDiffuse + (refractionCoefficient * texture(u_textureRefraction, vTextureRefraction));
+		vec4 colorRefraction = refractionCoefficient * (texture(u_textureRefraction, vTextureRefraction));
+		colorDiffuse = mix(colorDiffuse, colorRefraction, waterOpacity);
 	}
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
-
-	colorDiffuse = material.m_colorDiffuse * depth;
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
@@ -187,5 +203,5 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.1f, 0.1f, 0.1f, 1.0f);
-	out_vec4Color = colorDiffuse;
+	//out_vec4Color = colorDiffuse;
 }

@@ -981,7 +981,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		CN(pTestContext->pWaterQuad);
 		//pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
 		pTestContext->pWaterQuad->SetPosition(0.0f, 0.0f, 0.0f);
-		//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
+		pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
 		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
@@ -991,10 +991,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 100, 100, pLandHeightTexture);
+		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 1000, 1000, pLandHeightTexture);
 		CN(pTestContext->pLandQuad);
 		pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
-		pTestContext->pLandQuad->SetPosition(0.0f, -2.0f, 0.0f);
+		pTestContext->pLandQuad->SetPosition(0.0f, -0.75f, 0.0f);
 
 		if (pWaterProgramNode != nullptr) {
 			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pTestContext->pWaterQuad));
@@ -1021,7 +1021,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		//pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
 
 		//m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
-		m_pDreamOS->GetCamera()->SetPosition(0.0f, 3.1f, 10.0f);
+		m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.1f, 10.0f);
 
 		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);

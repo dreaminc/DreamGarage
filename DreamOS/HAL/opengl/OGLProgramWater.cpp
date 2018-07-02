@@ -285,7 +285,7 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 			pOGLObj->GetOGLTextureBump()->GetOGLTextureIndex());
 
 		if(m_pUniformTextureNormal != nullptr)
-			m_pUniformTextureNormal->SetUniform(2);
+			m_pUniformTextureNormal->SetUniform(3);
 
 		if(m_pUniformHasTextureNormal != nullptr)
 			m_pUniformHasTextureNormal->SetUniform(true);
