@@ -170,6 +170,8 @@ public:
 		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
 
 		virtual RESULT ShowKeyboard(std::string strInitial) = 0;
+
+		virtual RESULT HandleDreamFormSuccess() = 0;
 	};
 
 	RESULT RegisterObserver(DreamBrowser::observer *pObserver);

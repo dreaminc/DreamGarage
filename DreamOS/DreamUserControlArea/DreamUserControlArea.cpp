@@ -569,6 +569,10 @@ bool DreamUserControlArea::IsContentVisible() {
 	return true;
 }
 
+RESULT DreamUserControlArea::HandleDreamFormSuccess() {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
 
@@ -918,6 +922,11 @@ RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
 
 RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
+	CBR(pEventApp == m_pControlView.get() || 
+		pEventApp == m_pDreamUIBar.get() ||
+		pEventApp == nullptr, R_SKIPPED);
 
 	switch (pSubscriberEvent->m_eventType) {
 	case INTERACTION_EVENT_MENU: {

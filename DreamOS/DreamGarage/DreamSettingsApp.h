@@ -15,6 +15,7 @@ struct UIEvent;
 class DreamSettingsApp : public DreamApp<DreamSettingsApp>, 
 						public Subscriber<UIEvent>, 
 						public Subscriber<SenseControllerEvent>,
+						public Subscriber<InteractionObjectEvent>,
 						public DreamBrowser::observer
 {
 	friend class DreamAppManager;
@@ -38,6 +39,7 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
+// Dream Browser observer
 public:
 	RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
@@ -48,9 +50,12 @@ public:
 
 	RESULT ShowKeyboard(std::string strInitial) override;
 
+	RESULT HandleDreamFormSuccess() override;
+
 public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
 private:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);

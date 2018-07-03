@@ -61,6 +61,10 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
+
+		GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this);
+		GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
+
 		m_pFormView->Hide();
 
 		//TODO: temporary
@@ -134,6 +138,7 @@ RESULT DreamSettingsApp::Show() {
 
 	CR(m_pFormView->Show());
 	//CR(m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f)));
+	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
 
 	m_fRespondToController = true;
 
@@ -149,6 +154,8 @@ RESULT DreamSettingsApp::Hide() {
 
 	CR(m_pFormView->Hide());
 	CR(m_pFormView->HandleKeyboardDown());
+	CR(m_pUserApp->SetEventApp(nullptr));
+	CR(m_pUserApp->SetHasOpenApp(false));
 
 	m_fRespondToController = false;
 
@@ -205,6 +212,15 @@ RESULT DreamSettingsApp::ShowKeyboard(std::string strInitial) {
 	//}
 
 Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
+	int a = 5;
+
 	return r;
 }
 
@@ -283,7 +299,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
 		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
-		CR(Hide());
+		//CR(Hide());
 	}
 	else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
@@ -311,6 +327,41 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 		else {
 			m_fRightTriggerDown = false;
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pUserApp->m_pEventApp;
+	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
+
+	switch (pEvent->m_eventType) {
+	case INTERACTION_EVENT_MENU: {
+		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			CR(m_pFormView->HandleKeyboardDown());
+		}
+		else {
+			CR(Hide());
+		}
+		
+	} break;
+	case INTERACTION_EVENT_KEY_DOWN: {
+
+		char chkey = (char)(pEvent->m_value);
+		CBR(chkey != 0x00, R_SKIPPED);	
+
+		CR(m_pForm->OnKeyPress(chkey, true));
+
+		if (chkey == SVK_RETURN) {
+			//CR(m_pFormView->HandleKeyboardDown());
+			CR(Hide());
+		}
+
+	} break;
 	}
 
 Error:

@@ -130,6 +130,8 @@ public:
 	virtual RESULT ShowKeyboard(std::string strInitial) override;
 	bool IsContentVisible();
 
+	virtual RESULT HandleDreamFormSuccess() override;
+
 // Dream Desktop
 public:
 	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);

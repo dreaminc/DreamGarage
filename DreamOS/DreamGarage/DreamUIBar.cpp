@@ -445,6 +445,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				}
 				else if (strTitle == "Settings") {
 					m_pUserControllerProxy->RequestSettingsForm(strPath);
+					m_pathStack = std::stack<std::shared_ptr<MenuNode>>(); // clear stack
 					ClearMenuWaitingFlag();
 				}
 
