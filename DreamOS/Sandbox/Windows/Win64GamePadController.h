@@ -12,6 +12,7 @@
 #include "Sense/SenseGamePadController.h"
 
 class Windows64App;
+class XINPUT_GAMEPAD;
 
 class Win64GamePadController : public SenseGamePadController {
 public:
@@ -21,12 +22,14 @@ public:
 
 private:
 	RESULT GetGamePadState();
+	RESULT ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad);
 
 private:
 	Windows64App* m_pWin64AppParent = nullptr;
 
-	DWORD dwStatePacketNumber;
-
+	DWORD m_dwPreviousPacketNumber = 0;
+	WORD m_buttonState = 0;
+	ButtonStruct m_buttonStruct = { 0 };
 };
 
 #endif // ! WIN64_KEYBOARD_H_
