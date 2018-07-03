@@ -145,7 +145,6 @@ public:
 	RESULT SetScrollFactor(int scrollFactor);
 
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
-	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
 	virtual std::shared_ptr<texture> GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;
@@ -231,9 +230,6 @@ private:
 	bool m_fUpdateObjectTextures = false;
 
 	long m_assetID = -1;
-
-	//TODO: delete parent
-	DreamUserControlArea *m_pParentApp = nullptr;
 
 	DreamBrowser::observer *m_pObserver = nullptr;
 

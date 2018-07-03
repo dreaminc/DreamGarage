@@ -304,7 +304,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	
 	m_strCurrentURL = strCurrentURL;
 
-//	if (m_pParentApp != nullptr) {
 	if (m_pObserver != nullptr) {
 		CR(PendUpdateObjectTextures());
 	}
@@ -318,7 +317,6 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	bool fMaskPasswordEnabled = false;
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-	//	if (m_pParentApp != nullptr && m_pParentApp->IsContentVisible()) {
 		if (m_pObserver != nullptr) {
 			std::string strTextField = pDOMNode->GetValue();
 			CR(m_pObserver->ShowKeyboard(strTextField));
@@ -529,12 +527,6 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
-	m_pParentApp = pParentApp;
-	PendUpdateObjectTextures();
-	return R_PASS;
-}
-
 std::shared_ptr<texture> DreamBrowser::GetSourceTexture() {
 	return m_pBrowserTexture;
 }
@@ -570,11 +562,8 @@ bool DreamBrowser::ShouldUpdateObjectTextures() {
 RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
-	//if (m_pParentApp != nullptr) {
-	//	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
 	if (m_pObserver != nullptr) {
 		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture, this));
-	//	}
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -589,7 +578,6 @@ RESULT DreamBrowser::UpdateNavigationFlags() {
 	bool fCanGoBack = m_pWebBrowserController->CanGoBack();
 	bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
-//	if (m_pParentApp != nullptr) {
 	if (m_pObserver != nullptr) {
 		CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
 	}
@@ -600,6 +588,7 @@ Error:
 
 RESULT DreamBrowser::RegisterObserver(DreamBrowser::observer *pObserver) {
 	m_pObserver = pObserver;
+	PendUpdateObjectTextures();
 	return R_PASS;
 }
 
@@ -608,7 +597,6 @@ RESULT DreamBrowser::RegisterObserver(DreamBrowser::observer *pObserver) {
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	//CNR(m_pParentApp != nullptr, R_SKIPPED);
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
@@ -633,7 +621,6 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	//if (m_pParentApp != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
 	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
 		CR(m_pObserver->HandleAudioPacket(pendingAudioPacket, this));
 	}

@@ -694,7 +694,6 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		m_pActiveSource = pBrowser;
 
-		pBrowser->InitializeWithParent(this);
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
 
