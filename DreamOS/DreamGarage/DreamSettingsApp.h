@@ -6,13 +6,17 @@
 #include "DreamApp.h"
 #include "DreamOS.h"
 #include "Primitives/Subscriber.h"
+#include "DreamGarage/DreamBrowser.h"
 
 class DreamUserHandle;
 class DreamControlView;
-class DreamBrowser;
 struct UIEvent;
 
-class DreamSettingsApp : public DreamApp<DreamSettingsApp>, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
+class DreamSettingsApp : public DreamApp<DreamSettingsApp>, 
+						public Subscriber<UIEvent>, 
+						public Subscriber<SenseControllerEvent>,
+						public Subscriber<InteractionObjectEvent>,
+						public DreamBrowserObserver
 {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -35,9 +39,23 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
+// Dream Browser observer
+public:
+	RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
+
+	RESULT UpdateControlBarText(std::string& strTitle) override;
+	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+
+	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override;
+
+	RESULT HandleNodeFocusChanged(std::string strInitial) override;
+
+	RESULT HandleDreamFormSuccess() override;
+
 public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
 private:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
@@ -46,7 +64,7 @@ private:
 	DreamUserApp* m_pUserApp = nullptr;
 
 	std::shared_ptr<DreamControlView> m_pFormView = nullptr;
-	std::shared_ptr<DreamBrowser> m_pForm = nullptr;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowserForm = nullptr;
 
 	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 

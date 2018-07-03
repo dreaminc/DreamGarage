@@ -304,7 +304,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	
 	m_strCurrentURL = strCurrentURL;
 
-	if (m_pParentApp != nullptr) {
+	if (m_pObserver != nullptr) {
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -317,10 +317,9 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	bool fMaskPasswordEnabled = false;
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		if (m_pParentApp != nullptr && m_pParentApp->IsContentVisible()) {
+		if (m_pObserver != nullptr) {
 			std::string strTextField = pDOMNode->GetValue();
-			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
-			CR(m_pParentApp->ShowKeyboard(strTextField, ptTextBox));
+			CR(m_pObserver->HandleNodeFocusChanged(strTextField));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
@@ -375,8 +374,10 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 RESULT DreamBrowser::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
-	int a = 5;
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSuccess());
 
+Error:
 	return r;
 }
 
@@ -526,12 +527,6 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithParent(DreamUserControlArea *pParentApp) {
-	m_pParentApp = pParentApp;
-	PendUpdateObjectTextures();
-	return R_PASS;
-}
-
 std::shared_ptr<texture> DreamBrowser::GetSourceTexture() {
 	return m_pBrowserTexture;
 }
@@ -567,10 +562,8 @@ bool DreamBrowser::ShouldUpdateObjectTextures() {
 RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
-	if (m_pParentApp != nullptr) {
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
-		}
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture, this));
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -585,9 +578,34 @@ RESULT DreamBrowser::UpdateNavigationFlags() {
 	bool fCanGoBack = m_pWebBrowserController->CanGoBack();
 	bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
-	if (m_pParentApp != nullptr) {
-		CR(m_pParentApp->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::RegisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pObserver), "Observer cannot be nullptr");
+	CBM((m_pObserver == nullptr), "Can't overwrite browser observer");
+
+	PendUpdateObjectTextures();
+	m_pObserver = pObserver;
+
+Error:
+	return R_PASS;
+}
+
+RESULT DreamBrowser::UnregisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pObserver == pObserver), "Browser Observer is not set to this object");
+
+	m_pObserver = nullptr;
 
 Error:
 	return r;
@@ -598,7 +616,6 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
-	//CNR(m_pParentApp != nullptr, R_SKIPPED);
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed
@@ -623,8 +640,8 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_pParentApp != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
-		CR(m_pParentApp->HandleAudioPacket(pendingAudioPacket, this));
+	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+		CR(m_pObserver->HandleAudioPacket(pendingAudioPacket, this));
 	}
 
 	/*
@@ -709,13 +726,13 @@ int DreamBrowser::GetHeight() {
 
 RESULT DreamBrowser::SetTitle(std::string strTitle) {
 	RESULT r = R_PASS;
-	CNR(m_pParentApp, R_SKIPPED);
+	CNR(m_pObserver, R_SKIPPED);
 	if (strTitle != "") {
 		m_strCurrentTitle = strTitle;
-		CR(m_pParentApp->UpdateControlBarText(strTitle));
+		CR(m_pObserver->UpdateControlBarText(strTitle));
 	}
 	else {
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		CR(m_pObserver->UpdateControlBarText(m_strCurrentURL));
 	}
 Error:
 	return r;

@@ -364,7 +364,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
-		ShowKeyboard("", point(0.0f, yValue, 0.0f));
+		HandleNodeFocusChanged("");
 	}
 	}
 
@@ -541,14 +541,13 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
+RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
 	RESULT r = R_PASS;
 
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());
 	point ptLastEvent = m_pControlView->GetLastEvent();
 	
-	if (((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
-		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) &&
+	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) &&
 		m_pActiveSource != m_pDreamDesktop) {
 		OnClick(ptLastEvent, false);
 		OnClick(ptLastEvent, true);
@@ -556,7 +555,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 	else {
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
+		CR(m_pControlView->HandleKeyboardUp(strInitial));
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
@@ -568,6 +567,10 @@ Error:
 
 bool DreamUserControlArea::IsContentVisible() {
 	return true;
+}
+
+RESULT DreamUserControlArea::HandleDreamFormSuccess() {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
@@ -691,7 +694,6 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		m_pActiveSource = pBrowser;
 
-		pBrowser->InitializeWithParent(this);
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
 
@@ -789,6 +791,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	if (pBrowser != nullptr) {	
 		
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
+		pBrowser->RegisterObserver(this);
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
@@ -918,6 +921,11 @@ RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
 
 RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
+	CBR(pEventApp == m_pControlView.get() || 
+		pEventApp == m_pDreamUIBar.get() ||
+		pEventApp == nullptr, R_SKIPPED);
 
 	switch (pSubscriberEvent->m_eventType) {
 	case INTERACTION_EVENT_MENU: {

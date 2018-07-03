@@ -61,6 +61,10 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
 		GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
+
+		GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this);
+		GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this);
+
 		m_pFormView->Hide();
 
 		//TODO: temporary
@@ -81,23 +85,25 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 	// but we assume that there is only one piece of content here
 	if (m_fInitBrowser) {
 		m_fInitBrowser = false;
-		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-		CN(m_pForm);
 
-		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
-		m_pForm->SetURI(m_strURL);
+		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		CN(m_pDreamBrowserForm);
+		CR(m_pDreamBrowserForm->RegisterObserver(this));
+
+		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+		CR(m_pDreamBrowserForm->SetURI(m_strURL));
 	}
 
+	/*
 	if (m_pFormView != nullptr && m_pForm != nullptr && m_pForm->GetSourceTexture() != nullptr) {
 		CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(m_pForm->GetSourceTexture().get()));
 	}
+	//*/
 
 	if (m_fLeftTriggerDown) {
-	//	m_scale = m_pUserApp->GetWidthScale() + m_scaleTick;
 		m_pUserApp->UpdateScale(m_pUserApp->GetScale() + m_scaleTick);
 	}
 	else if (m_fRightTriggerDown) {
-	//	m_scale = m_pUserApp->GetWidthScale() - m_scaleTick;
 		m_pUserApp->UpdateScale(m_pUserApp->GetScale() - m_scaleTick);
 	}
 
@@ -117,7 +123,7 @@ DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	RESULT r = R_PASS;
 
-	if (m_pForm == nullptr) {
+	if (m_pDreamBrowserForm == nullptr) {
 		m_strURL = strURL;
 		m_fInitBrowser = true;
 	}
@@ -132,6 +138,7 @@ RESULT DreamSettingsApp::Show() {
 
 	CR(m_pFormView->Show());
 	//CR(m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f)));
+	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
 
 	m_fRespondToController = true;
 
@@ -143,14 +150,77 @@ RESULT DreamSettingsApp::Hide() {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);
-	CNR(m_pForm, R_SKIPPED);
+	CNR(m_pDreamBrowserForm, R_SKIPPED);
 
 	CR(m_pFormView->Hide());
 	CR(m_pFormView->HandleKeyboardDown());
+	CR(m_pUserApp->SetEventApp(nullptr));
+	CR(m_pUserApp->SetHasOpenApp(false));
 
 	m_fRespondToController = false;
 
 Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	auto pCloudController = GetDOS()->GetCloudController();
+	if (pCloudController != nullptr) {
+		CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::UpdateControlBarText(std::string& strTitle) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamSettingsApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamSettingsApp::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	CNR(m_pFormView, R_SKIPPED);
+	CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(pTexture.get()));
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
+	RESULT r = R_PASS;
+
+	point ptLastEvent = m_pFormView->GetLastEvent();
+	
+	/*
+	if (ptLastEvent.x() == -1 && ptLastEvent.y() == -1) {
+
+		m_pForm->OnClick(ptLastEvent, false);
+		m_pForm->OnClick(ptLastEvent, true);
+	}
+	else {
+	//*/
+		// TODO: this should probably be moved into the menu kb_enter
+		m_pUserApp->SetEventApp(m_pFormView.get());
+		CR(m_pFormView->HandleKeyboardUp(strInitial));
+	//}
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
+	int a = 5;
+
 	return r;
 }
 
@@ -162,7 +232,7 @@ RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 
 	CNR(m_pFormView, R_SKIPPED);
 	CBR(pUIEvent->m_pObj == m_pFormView->GetViewQuad().get(), R_SKIPPED);
-	CNR(m_pForm, R_SKIPPED);
+	CNR(m_pDreamBrowserForm, R_SKIPPED);
 	CBR(m_fRespondToController, R_SKIPPED);
 
 	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
@@ -172,18 +242,18 @@ RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 	case UI_SELECT_BEGIN: {
 	//	CR(HideWebsiteTyping());
 		//CR(m_pFormView->HandleKeyboardDown());
-		CR(m_pForm->OnClick(ptContact, true));
+		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
 	} break;
 
 	case UI_SELECT_ENDED: {
-		CR(m_pForm->OnClick(ptContact, false));
+		CR(m_pDreamBrowserForm->OnClick(ptContact, false));
 	} break;
 
 	case UI_SELECT_MOVED: {
-		CR(m_pForm->OnMouseMove(ptContact));
+		CR(m_pDreamBrowserForm->OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(m_pForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+		CR(m_pDreamBrowserForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
 	}
 	};
 
@@ -214,8 +284,8 @@ WebBrowserPoint DreamSettingsApp::GetRelativePointofContact(point ptContact) {
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
 	
-	ptRelative.x = posX * m_pForm->GetWidth();
-	ptRelative.y = posY * m_pForm->GetHeight();
+	ptRelative.x = posX * m_pDreamBrowserForm->GetWidth();
+	ptRelative.y = posY * m_pDreamBrowserForm->GetHeight();
 
 	return ptRelative;
 }
@@ -229,7 +299,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
 		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
-		CR(Hide());
+		//CR(Hide());
 	}
 	else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
@@ -257,6 +327,41 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 		else {
 			m_fRightTriggerDown = false;
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pUserApp->m_pEventApp;
+	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
+
+	switch (pEvent->m_eventType) {
+	case INTERACTION_EVENT_MENU: {
+		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			CR(m_pFormView->HandleKeyboardDown());
+		}
+		else {
+			CR(Hide());
+		}
+		
+	} break;
+	case INTERACTION_EVENT_KEY_DOWN: {
+
+		char chkey = (char)(pEvent->m_value);
+		CBR(chkey != 0x00, R_SKIPPED);	
+
+		CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
+
+		if (chkey == SVK_RETURN) {
+			//CR(m_pFormView->HandleKeyboardDown());
+			CR(Hide());
+		}
+
+	} break;
 	}
 
 Error:
