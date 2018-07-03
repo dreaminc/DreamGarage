@@ -6,6 +6,7 @@
 #include "Primitives/point.h"
 
 class DreamOS;
+class quad;
 
 class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	friend class DreamAppManager;

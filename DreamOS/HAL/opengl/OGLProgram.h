@@ -136,7 +136,10 @@ public:
 	RESULT AttachShader(OGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
-	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);
+	
+	RESULT BindToFramebuffer();
+	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer);
+
 	RESULT UnbindFramebuffer();
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 

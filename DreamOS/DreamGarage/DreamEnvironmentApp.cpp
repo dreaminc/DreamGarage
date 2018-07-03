@@ -23,7 +23,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 0.25f;
+	m_directionalIntensity = 0.35f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -62,13 +62,15 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 		//TODO: may need a way to load multiple files for the environment in a more general way
 		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
 		CN(pModel);
-		auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
-		CN(pRiver);
+
+		//auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
+		//CN(pRiver);
+
 		auto pClouds = GetComposite()->AddModel(L"\\FloatingIsland\\clouds.obj");
 		CN(pClouds);
 		pClouds->SetMaterialAmbient(0.8f);
 
-		pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+		//pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 		if (pOGLObj != nullptr) {
 			pOGLObj->SetOGLProgramPreCallback(
 				[](OGLProgram* pOGLProgram, void *pContext) {

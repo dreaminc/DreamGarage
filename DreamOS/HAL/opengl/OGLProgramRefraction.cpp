@@ -62,6 +62,9 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
+	//int pxWidth = 1024;
+	//int pxHeight = 1024;
+
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
@@ -178,25 +181,48 @@ Error:
 RESULT OGLProgramRefraction::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
+	//// Trick to only render at reduced frame rate
+	//if (frameID % 10 != 0) {
+	//	return R_SKIPPED;
+	//}
+
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT32, GL_FLOAT);
 
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	
 	//glFrontFace(GL_CW);
 
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+
+	if (m_pRefractionObject != nullptr) {
+		plane refractionPlane = dynamic_cast<quad*>(m_pRefractionObject)->GetPlane();
+
+		// Try to eliminate edge artifacts 
+		point ptRefractionPlanePosition = refractionPlane.GetPosition();
+		ptRefractionPlanePosition.y() += 0.1f;
+		refractionPlane.SetPlanePosition(ptRefractionPlanePosition);
+
+		// Invert clipping here
+		refractionPlane.SetNormal(-1.0f * refractionPlane.GetNormal());
+
+		vector vRefractionPlane = refractionPlane.GetNormal();
+		vRefractionPlane.w() = refractionPlane.GetDValue();
+
+		if (m_pUniformClippingPlane != nullptr)
+			m_pUniformClippingPlane->SetUniform(vRefractionPlane);
+	}
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
@@ -213,19 +239,16 @@ RESULT OGLProgramRefraction::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
-	SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
-
-	// Color texture
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
+	//SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
 	// Material textures
-	SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
 	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
-	SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
+	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	// bump texture
 	// TODO: add bump texture to shader
-	m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
+	//m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
 
 	//	Error:
 	return r;
@@ -258,19 +281,6 @@ Error:
 RESULT OGLProgramRefraction::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
-
-	if (m_pRefractionObject != nullptr) {
-		plane refractionPlane = dynamic_cast<quad*>(m_pRefractionObject)->GetPlane();
-		
-		// Invert clipping here
-		refractionPlane.SetNormal(-1.0f * refractionPlane.GetNormal());
-
-		vector vRefractionPlane = refractionPlane.GetNormal();
-		vRefractionPlane.w() = refractionPlane.GetDValue();
-	
-		if (m_pUniformClippingPlane != nullptr)
-			m_pUniformClippingPlane->SetUniform(vRefractionPlane);
-	}
 
 	return R_PASS;
 }

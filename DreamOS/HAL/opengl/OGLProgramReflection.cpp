@@ -63,6 +63,9 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
+	//int pxWidth = 1024;
+	//int pxHeight = 1024;
+
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
@@ -161,6 +164,11 @@ Error:
 RESULT OGLProgramReflection::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
+	// Trick to only render at reduced frame rate
+	//if (frameID % 10 != 0) {
+	//	return R_SKIPPED;
+	//}
+
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
 	std::vector<light*> *pLights = nullptr;
@@ -173,7 +181,7 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	
 	//glFrontFace(GL_CW);
 
@@ -196,19 +204,16 @@ RESULT OGLProgramReflection::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
-	SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
-
-	// Color texture
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
+	//SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
 	// Material textures
-	SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
 	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
-	SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
+	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	// bump texture
 	// TODO: add bump texture to shader
-	m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
+	//m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
 
 	//	Error:
 	return r;
@@ -265,7 +270,12 @@ RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
 
 	if (m_pReflectionObject != nullptr) {
 		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();		
-	
+		
+		// Try to eliminate edge artifacts 
+		point ptReflectionPlanePosition = reflectionPlane.GetPosition();
+		ptReflectionPlanePosition.y() += 0.025f;
+		reflectionPlane.SetPlanePosition(ptReflectionPlanePosition);
+
 		auto matReflection = ReflectionMatrix(reflectionPlane);
 		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
 	
@@ -289,6 +299,11 @@ RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 
 	if (m_pReflectionObject != nullptr) {
 		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
+
+		// Try to eliminate edge artifacts 
+		point ptReflectionPlanePosition = reflectionPlane.GetPosition();
+		ptReflectionPlanePosition.y() += 0.025f;
+		reflectionPlane.SetPlanePosition(ptReflectionPlanePosition);
 	
 		auto matReflection = ReflectionMatrix(reflectionPlane);
 		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
