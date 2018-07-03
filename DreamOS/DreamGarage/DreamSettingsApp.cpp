@@ -81,23 +81,25 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 	// but we assume that there is only one piece of content here
 	if (m_fInitBrowser) {
 		m_fInitBrowser = false;
+
 		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		CN(m_pForm);
+		CR(m_pForm->RegisterObserver(this));
 
-		m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL);
-		m_pForm->SetURI(m_strURL);
+		CR(m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+		CR(m_pForm->SetURI(m_strURL));
 	}
 
+	/*
 	if (m_pFormView != nullptr && m_pForm != nullptr && m_pForm->GetSourceTexture() != nullptr) {
 		CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(m_pForm->GetSourceTexture().get()));
 	}
+	//*/
 
 	if (m_fLeftTriggerDown) {
-	//	m_scale = m_pUserApp->GetWidthScale() + m_scaleTick;
 		m_pUserApp->UpdateScale(m_pUserApp->GetScale() + m_scaleTick);
 	}
 	else if (m_fRightTriggerDown) {
-	//	m_scale = m_pUserApp->GetWidthScale() - m_scaleTick;
 		m_pUserApp->UpdateScale(m_pUserApp->GetScale() - m_scaleTick);
 	}
 
@@ -149,6 +151,58 @@ RESULT DreamSettingsApp::Hide() {
 	CR(m_pFormView->HandleKeyboardDown());
 
 	m_fRespondToController = false;
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	auto pCloudController = GetDOS()->GetCloudController();
+	if (pCloudController != nullptr) {
+		CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::UpdateControlBarText(std::string& strTitle) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamSettingsApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamSettingsApp::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	CNR(m_pFormView, R_SKIPPED);
+	CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(pTexture.get()));
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::ShowKeyboard(std::string strInitial) {
+	RESULT r = R_PASS;
+
+	point ptLastEvent = m_pFormView->GetLastEvent();
+	
+	/*
+	if (ptLastEvent.x() == -1 && ptLastEvent.y() == -1) {
+
+		m_pForm->OnClick(ptLastEvent, false);
+		m_pForm->OnClick(ptLastEvent, true);
+	}
+	else {
+	//*/
+		// TODO: this should probably be moved into the menu kb_enter
+		m_pUserApp->SetEventApp(m_pFormView.get());
+		CR(m_pFormView->HandleKeyboardUp(strInitial));
+	//}
 
 Error:
 	return r;

@@ -364,7 +364,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
-		ShowKeyboard("", point(0.0f, yValue, 0.0f));
+		ShowKeyboard("");
 	}
 	}
 
@@ -541,14 +541,13 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBox) {
+RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial) {
 	RESULT r = R_PASS;
 
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());
 	point ptLastEvent = m_pControlView->GetLastEvent();
 	
-	if (((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) ||
-		(ptTextBox.x() == -1 && ptTextBox.y() == -1)) &&
+	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) &&
 		m_pActiveSource != m_pDreamDesktop) {
 		OnClick(ptLastEvent, false);
 		OnClick(ptLastEvent, true);
@@ -556,7 +555,7 @@ RESULT DreamUserControlArea::ShowKeyboard(std::string strInitial, point ptTextBo
 	else {
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		CR(m_pControlView->HandleKeyboardUp(strInitial, ptTextBox));
+		CR(m_pControlView->HandleKeyboardUp(strInitial));
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
@@ -789,6 +788,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	if (pBrowser != nullptr) {	
 		
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
+		pBrowser->RegisterObserver(this);
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled

@@ -304,7 +304,8 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	
 	m_strCurrentURL = strCurrentURL;
 
-	if (m_pParentApp != nullptr) {
+//	if (m_pParentApp != nullptr) {
+	if (m_pObserver != nullptr) {
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -317,10 +318,10 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	bool fMaskPasswordEnabled = false;
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		if (m_pParentApp != nullptr && m_pParentApp->IsContentVisible()) {
+	//	if (m_pParentApp != nullptr && m_pParentApp->IsContentVisible()) {
+		if (m_pObserver != nullptr) {
 			std::string strTextField = pDOMNode->GetValue();
-			point ptTextBox = point(0.0f, m_lastWebBrowserPoint.y, 0.0f);
-			CR(m_pParentApp->ShowKeyboard(strTextField, ptTextBox));
+			CR(m_pObserver->ShowKeyboard(strTextField));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
@@ -567,10 +568,11 @@ bool DreamBrowser::ShouldUpdateObjectTextures() {
 RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
-	if (m_pParentApp != nullptr) {
-		if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
-			CR(m_pParentApp->UpdateContentSourceTexture(m_pBrowserTexture, this));
-		}
+	//if (m_pParentApp != nullptr) {
+	//	if (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pBrowserTexture.get()) {
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture, this));
+	//	}
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -585,12 +587,18 @@ RESULT DreamBrowser::UpdateNavigationFlags() {
 	bool fCanGoBack = m_pWebBrowserController->CanGoBack();
 	bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
-	if (m_pParentApp != nullptr) {
-		CR(m_pParentApp->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+//	if (m_pParentApp != nullptr) {
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
 	}
 
 Error:
 	return r;
+}
+
+RESULT DreamBrowser::RegisterObserver(DreamBrowser::observer *pObserver) {
+	m_pObserver = pObserver;
+	return R_PASS;
 }
 
 // TODO: Only update the rect
@@ -623,8 +631,9 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_pParentApp != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
-		CR(m_pParentApp->HandleAudioPacket(pendingAudioPacket, this));
+	//if (m_pParentApp != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+		CR(m_pObserver->HandleAudioPacket(pendingAudioPacket, this));
 	}
 
 	/*
@@ -709,13 +718,13 @@ int DreamBrowser::GetHeight() {
 
 RESULT DreamBrowser::SetTitle(std::string strTitle) {
 	RESULT r = R_PASS;
-	CNR(m_pParentApp, R_SKIPPED);
+	CNR(m_pObserver, R_SKIPPED);
 	if (strTitle != "") {
 		m_strCurrentTitle = strTitle;
-		CR(m_pParentApp->UpdateControlBarText(strTitle));
+		CR(m_pObserver->UpdateControlBarText(strTitle));
 	}
 	else {
-		CR(m_pParentApp->UpdateControlBarText(m_strCurrentURL));
+		CR(m_pObserver->UpdateControlBarText(m_strCurrentURL));
 	}
 Error:
 	return r;

@@ -6,13 +6,16 @@
 #include "DreamApp.h"
 #include "DreamOS.h"
 #include "Primitives/Subscriber.h"
+#include "DreamGarage/DreamBrowser.h"
 
 class DreamUserHandle;
 class DreamControlView;
-class DreamBrowser;
 struct UIEvent;
 
-class DreamSettingsApp : public DreamApp<DreamSettingsApp>, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
+class DreamSettingsApp : public DreamApp<DreamSettingsApp>, 
+						public Subscriber<UIEvent>, 
+						public Subscriber<SenseControllerEvent>,
+						public DreamBrowser::observer
 {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -34,6 +37,16 @@ public:
 	RESULT InitializeSettingsForm(std::string strURL);
 	RESULT Show();
 	RESULT Hide();
+
+public:
+	RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
+
+	RESULT UpdateControlBarText(std::string& strTitle) override;
+	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+
+	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override;
+
+	RESULT ShowKeyboard(std::string strInitial) override;
 
 public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;

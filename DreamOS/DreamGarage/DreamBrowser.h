@@ -159,6 +159,21 @@ public:
 
 	RESULT UpdateNavigationFlags();
 
+
+	class observer {
+	public:
+		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) = 0;
+
+		virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
+
+		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
+
+		virtual RESULT ShowKeyboard(std::string strInitial) = 0;
+	};
+
+	RESULT RegisterObserver(DreamBrowser::observer *pObserver);
+
 protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -215,7 +230,10 @@ private:
 
 	long m_assetID = -1;
 
+	//TODO: delete parent
 	DreamUserControlArea *m_pParentApp = nullptr;
+
+	DreamBrowser::observer *m_pObserver = nullptr;
 
 };
 

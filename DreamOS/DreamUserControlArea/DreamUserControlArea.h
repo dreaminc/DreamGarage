@@ -5,6 +5,7 @@
 
 #include "DreamApp.h"
 #include "DreamGarage/DreamControlBar.h"
+#include "DreamGarage/DreamBrowser.h"
 #include "Primitives/Subscriber.h"
 
 #include <vector>
@@ -14,7 +15,6 @@ class DreamUserApp;
 class DreamControlView;
 class DreamUIBar;
 class DreamTabView;
-class DreamBrowser;
 class DreamContentSource;
 class DreamDesktopApp;
 
@@ -40,7 +40,8 @@ class quad;
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,
-	public Subscriber<UIEvent> {
+	public Subscriber<UIEvent>,
+	public DreamBrowser::observer {
 
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -120,13 +121,13 @@ public:
 // DreamBrowser
 public:
 
-	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext);
-	RESULT UpdateControlBarText(std::string& strTitle);
-	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward);
-	RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext);
+	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) override;
+	virtual RESULT UpdateControlBarText(std::string& strTitle) override;
+	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
 	//TODO: present keyboard from browser::OnNodeFocusChanged
-	RESULT ShowKeyboard(std::string strInitial, point ptTextBox);
+	virtual RESULT ShowKeyboard(std::string strInitial) override;
 	bool IsContentVisible();
 
 // Dream Desktop

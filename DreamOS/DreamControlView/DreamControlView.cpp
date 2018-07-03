@@ -536,7 +536,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardUp(std::string strTextField, point ptTextBox) {
+RESULT DreamControlView::HandleKeyboardUp(std::string strTextField) {
 	RESULT r = R_PASS;
 
 	point ptTypingPosition;
