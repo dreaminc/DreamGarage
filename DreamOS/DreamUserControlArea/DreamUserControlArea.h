@@ -41,7 +41,7 @@ class quad;
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,
 	public Subscriber<UIEvent>,
-	public DreamBrowser::observer {
+	public DreamBrowserObserver {
 
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -127,7 +127,7 @@ public:
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
 	//TODO: present keyboard from browser::OnNodeFocusChanged
-	virtual RESULT ShowKeyboard(std::string strInitial) override;
+	virtual RESULT HandleNodeFocusChanged(std::string strInitial) override;
 	bool IsContentVisible();
 
 	virtual RESULT HandleDreamFormSuccess() override;

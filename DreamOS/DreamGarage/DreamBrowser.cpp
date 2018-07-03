@@ -319,7 +319,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		if (m_pObserver != nullptr) {
 			std::string strTextField = pDOMNode->GetValue();
-			CR(m_pObserver->ShowKeyboard(strTextField));
+			CR(m_pObserver->HandleNodeFocusChanged(strTextField));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 	}
@@ -586,10 +586,29 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::RegisterObserver(DreamBrowser::observer *pObserver) {
-	m_pObserver = pObserver;
+RESULT DreamBrowser::RegisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pObserver), "Observer cannot be nullptr");
+	CBM((m_pObserver == nullptr), "Can't overwrite browser observer");
+
 	PendUpdateObjectTextures();
+	m_pObserver = pObserver;
+
+Error:
 	return R_PASS;
+}
+
+RESULT DreamBrowser::UnregisterObserver(DreamBrowserObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pObserver == pObserver), "Browser Observer is not set to this object");
+
+	m_pObserver = nullptr;
+
+Error:
+	return r;
 }
 
 // TODO: Only update the rect

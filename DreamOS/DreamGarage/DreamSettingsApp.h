@@ -16,7 +16,7 @@ class DreamSettingsApp : public DreamApp<DreamSettingsApp>,
 						public Subscriber<UIEvent>, 
 						public Subscriber<SenseControllerEvent>,
 						public Subscriber<InteractionObjectEvent>,
-						public DreamBrowser::observer
+						public DreamBrowserObserver
 {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
@@ -48,7 +48,7 @@ public:
 
 	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override;
 
-	RESULT ShowKeyboard(std::string strInitial) override;
+	RESULT HandleNodeFocusChanged(std::string strInitial) override;
 
 	RESULT HandleDreamFormSuccess() override;
 
@@ -64,7 +64,7 @@ private:
 	DreamUserApp* m_pUserApp = nullptr;
 
 	std::shared_ptr<DreamControlView> m_pFormView = nullptr;
-	std::shared_ptr<DreamBrowser> m_pForm = nullptr;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowserForm = nullptr;
 
 	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 

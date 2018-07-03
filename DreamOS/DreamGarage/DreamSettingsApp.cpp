@@ -86,12 +86,12 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 	if (m_fInitBrowser) {
 		m_fInitBrowser = false;
 
-		m_pForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
-		CN(m_pForm);
-		CR(m_pForm->RegisterObserver(this));
+		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+		CN(m_pDreamBrowserForm);
+		CR(m_pDreamBrowserForm->RegisterObserver(this));
 
-		CR(m_pForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
-		CR(m_pForm->SetURI(m_strURL));
+		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+		CR(m_pDreamBrowserForm->SetURI(m_strURL));
 	}
 
 	/*
@@ -123,7 +123,7 @@ DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pCont
 RESULT DreamSettingsApp::InitializeSettingsForm(std::string strURL) {
 	RESULT r = R_PASS;
 
-	if (m_pForm == nullptr) {
+	if (m_pDreamBrowserForm == nullptr) {
 		m_strURL = strURL;
 		m_fInitBrowser = true;
 	}
@@ -150,7 +150,7 @@ RESULT DreamSettingsApp::Hide() {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);
-	CNR(m_pForm, R_SKIPPED);
+	CNR(m_pDreamBrowserForm, R_SKIPPED);
 
 	CR(m_pFormView->Hide());
 	CR(m_pFormView->HandleKeyboardDown());
@@ -193,7 +193,7 @@ Error:
 	return r;
 }
 
-RESULT DreamSettingsApp::ShowKeyboard(std::string strInitial) {
+RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
 	RESULT r = R_PASS;
 
 	point ptLastEvent = m_pFormView->GetLastEvent();
@@ -232,7 +232,7 @@ RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 
 	CNR(m_pFormView, R_SKIPPED);
 	CBR(pUIEvent->m_pObj == m_pFormView->GetViewQuad().get(), R_SKIPPED);
-	CNR(m_pForm, R_SKIPPED);
+	CNR(m_pDreamBrowserForm, R_SKIPPED);
 	CBR(m_fRespondToController, R_SKIPPED);
 
 	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
@@ -242,18 +242,18 @@ RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 	case UI_SELECT_BEGIN: {
 	//	CR(HideWebsiteTyping());
 		//CR(m_pFormView->HandleKeyboardDown());
-		CR(m_pForm->OnClick(ptContact, true));
+		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
 	} break;
 
 	case UI_SELECT_ENDED: {
-		CR(m_pForm->OnClick(ptContact, false));
+		CR(m_pDreamBrowserForm->OnClick(ptContact, false));
 	} break;
 
 	case UI_SELECT_MOVED: {
-		CR(m_pForm->OnMouseMove(ptContact));
+		CR(m_pDreamBrowserForm->OnMouseMove(ptContact));
 	} break;
 	case UI_SCROLL: {
-		CR(m_pForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
+		CR(m_pDreamBrowserForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
 	}
 	};
 
@@ -284,8 +284,8 @@ WebBrowserPoint DreamSettingsApp::GetRelativePointofContact(point ptContact) {
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
 	
-	ptRelative.x = posX * m_pForm->GetWidth();
-	ptRelative.y = posY * m_pForm->GetHeight();
+	ptRelative.x = posX * m_pDreamBrowserForm->GetWidth();
+	ptRelative.y = posY * m_pDreamBrowserForm->GetHeight();
 
 	return ptRelative;
 }
@@ -354,7 +354,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 		char chkey = (char)(pEvent->m_value);
 		CBR(chkey != 0x00, R_SKIPPED);	
 
-		CR(m_pForm->OnKeyPress(chkey, true));
+		CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 
 		if (chkey == SVK_RETURN) {
 			//CR(m_pFormView->HandleKeyboardDown());
