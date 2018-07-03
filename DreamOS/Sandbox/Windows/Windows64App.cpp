@@ -14,6 +14,7 @@
 
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
+#include "Win64GamePadController.h"
 
 #include <string>
 
@@ -138,6 +139,16 @@ RESULT Windows64App::InitializeMouse() {
 	// This effects the window responsiveness to drag, resize and focus event.
 	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
 	//CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeGamePad() {
+	RESULT r = R_PASS;
+
+	m_pSenseGamePad = new Win64GamePadController(this);
+	CNM(m_pSenseGamePad, "Failed to allocate gamepad");
 
 Error:
 	return r;
@@ -439,6 +450,8 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(InitializeMouse(), "Failed to initialize mouse");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
+	CRM(InitializeGamePad(), "Failed to initialize gamepad");
+
 	// This will only turn on Leap if connected at boot up
 	if (GetSandboxConfiguration().fUseLeap) {
 		CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
@@ -471,6 +484,10 @@ RESULT Windows64App::HandleMessages() {
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+	}
+
+	if (m_pSenseGamePad != nullptr) {
+		m_pSenseGamePad->UpdateGamePad();
 	}
 
 Error:

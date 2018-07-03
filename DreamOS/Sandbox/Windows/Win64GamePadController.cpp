@@ -1,6 +1,5 @@
 #include "Win64GamePadController.h"
 #include "Windows64App.h"
-#include "xinput.h"
 
 Win64GamePadController::Win64GamePadController(Windows64App *pWin64AppParent) :
 	SenseGamePadController(),
@@ -148,6 +147,6 @@ RESULT Win64GamePadController::ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad)
 		m_buttonState = xInputGamePad.wButtons;
 	}
 
-Error:
+//Error:
 	return r;
 }

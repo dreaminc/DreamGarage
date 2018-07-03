@@ -910,6 +910,12 @@
     <ClCompile Include="..\..\..\UI\UISurface.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseGamePadController.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64GamePadController.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2010,6 +2016,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\SkyboxScatterProgram.h">
       <Filter>HAL</Filter>
+    </ClInclude>  
+    <ClInclude Include="..\..\..\Sense\SenseGamePadController.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64GamePadController.h">
+      <Filter>Sandbox\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -35,6 +35,7 @@
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
 #include "Sense/SenseController.h"
+#include "Sense/SenseGamePadController.h"
 
 class light; 
 class quad;
@@ -132,6 +133,7 @@ public:
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
+	virtual RESULT InitializeGamePad() = 0;
 	virtual long GetTickCount();
 	virtual RESULT GetStackTrace() = 0;
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
@@ -410,8 +412,9 @@ protected:
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
-	SenseKeyboard *m_pSenseKeyboard;
-	SenseMouse *m_pSenseMouse;
+	SenseKeyboard *m_pSenseKeyboard = nullptr;
+	SenseMouse *m_pSenseMouse = nullptr;
+	SenseGamePadController *m_pSenseGamePad = nullptr;
 	HMD *m_pHMD;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these

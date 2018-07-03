@@ -58,6 +58,7 @@ public:
 	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();
 	RESULT InitializeMouse();
+	RESULT InitializeGamePad();
 	RESULT InitializeLeapMotion();
 
 private:

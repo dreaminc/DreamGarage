@@ -4,11 +4,10 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Sense/SenseMouse.h
-// Sense Mouse Device
 
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
+#include "Primitives/point.h"
 
 typedef enum SenseGamePadEventType {
 	SENSE_GAMEPAD_LEFTSTICK,
@@ -19,7 +18,7 @@ typedef enum SenseGamePadEventType {
 	SENSE_GAMEPAD_INVALID
 } SENSE_GAMEPAD_EVENT_TYPE;
 
-struct ButtonStruct {
+struct GamePadButtonStruct {
 	unsigned fDPAD_UP : 1;
 	unsigned fDPAD_DOWN : 1;
 	unsigned fDPAD_LEFT : 1;
@@ -39,7 +38,7 @@ struct ButtonStruct {
 typedef struct GamePadState {
 	float triggerRange;
 	point ptJoyStick;
-	ButtonStruct buttonStruct;
+	GamePadButtonStruct buttonStruct;
 } GAMEPAD_STATE;
 
 typedef struct SenseGamePadEvent : SenseDevice::SenseDeviceEvent {
@@ -53,7 +52,7 @@ typedef struct SenseGamePadEvent : SenseDevice::SenseDeviceEvent {
 	{
 		SenseEventSize = sizeof(SenseGamePadEvent);
 	}
-} SENSE_MOUSE_EVENT;
+} SENSE_GAMEPAD_EVENT;
 
 class SenseGamePadController : public SenseDevice, public Publisher<SenseGamePadEventType, SenseGamePadEvent> {
 
@@ -62,6 +61,8 @@ public:
 	~SenseGamePadController();
 	
 	RESULT SetGamePadState(SenseGamePadEventType eventType, GamePadState gpState);
-}
+
+	virtual RESULT UpdateGamePad() = 0;
+};
 
 #endif // ! SENSE_GAMEPAD_CONTROLLER_H_

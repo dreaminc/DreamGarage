@@ -891,6 +891,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64GamePadController.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
@@ -902,6 +903,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreNode.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseController.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseGamePadController.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
@@ -1247,6 +1249,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64GamePadController.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
@@ -1260,6 +1263,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Scene\ObjectStoreNode.h" />
     <ClInclude Include="..\..\..\Sense\SenseController.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
+    <ClInclude Include="..\..\..\Sense\SenseGamePadController.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />

@@ -2,7 +2,7 @@
 #define WIN64_GAMEPAD_CONTROLLER_H_
 
 #include <windows.h>
-
+#include <Xinput.h>
 #include "RESULT/EHM.h"
 
 // DREAM OS
@@ -12,13 +12,12 @@
 #include "Sense/SenseGamePadController.h"
 
 class Windows64App;
-class XINPUT_GAMEPAD;
 
 class Win64GamePadController : public SenseGamePadController {
 public:
 	Win64GamePadController(Windows64App *pWin64AppParent);
 
-	RESULT UpdateGamePad();
+	virtual RESULT UpdateGamePad() override;
 
 private:
 	RESULT GetGamePadState();
@@ -29,7 +28,7 @@ private:
 
 	DWORD m_dwPreviousPacketNumber = 0;
 	WORD m_buttonState = 0;
-	ButtonStruct m_buttonStruct = { 0 };
+	GamePadButtonStruct m_buttonStruct;
 };
 
-#endif // ! WIN64_KEYBOARD_H_
+#endif // ! WIN64_GAMEPAD_H_
