@@ -63,8 +63,9 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
-	//int pxWidth = 1024;
-	//int pxHeight = 1024;
+	//int pxWidth = 256*4;
+	//int pxHeight = 256*4;
+	m_frameBufferDivisionFactor = 4;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());

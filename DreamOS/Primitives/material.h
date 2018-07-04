@@ -9,6 +9,9 @@
 
 #include "color.h"
 
+#define DEFAULT_MATERIAL_AMBIENT_LEVEL 0.1f
+#define DEFUALT_MATERIAL_SHINE 100.0f
+
 class material {
 public:
 	material();

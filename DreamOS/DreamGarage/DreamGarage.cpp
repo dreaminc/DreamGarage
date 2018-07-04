@@ -126,15 +126,15 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pRefractionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRefractionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-		ProgramNode* pRefractionSkyboxProgram;
-		pRefractionSkyboxProgram = nullptr;
-		pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pRefractionSkyboxProgram);
-		CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
-		CR(pRefractionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
+		//ProgramNode* pRefractionSkyboxProgram;
+		//pRefractionSkyboxProgram = nullptr;
+		//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		//CN(pRefractionSkyboxProgram);
+		//CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		//CR(pRefractionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		//
+		//// Connect output as pass-thru to internal blend program
+		//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
 
 		// "Water"
 
@@ -147,8 +147,8 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// TODO: This is not particularly general yet
 		// Uncomment below to turn on water effects
-		//CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionSkyboxProgram->Output("output_framebuffer")));
-		//CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNode->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
 
 		// Standard shader
 
@@ -208,12 +208,13 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		//ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		//CN(pRenderScreenQuad);
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
 
 		//CR(pHAL->ReleaseCurrentContext());
 

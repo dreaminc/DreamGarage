@@ -209,8 +209,11 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 
 	auto matVP = matP * matV;
 
-	auto pxWidth = pCamera->GetViewWidth();
-	auto pxHeight = pCamera->GetViewHeight();
+	//auto pxWidth = pCamera->GetViewWidth();
+	//auto pxHeight = pCamera->GetViewHeight();
+
+	int pxWidth = m_pOGLFramebuffer->GetWidth();
+	int pxHeight = m_pOGLFramebuffer->GetHeight();
 
 	vector sunDirection = vector(0.0f, m_SunY, 0.5f);
 	sunDirection.Normalize();
@@ -235,9 +238,11 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVO = pStereoCamera->GetOrientationMatrix();
 
-	auto pxWidth = (pStereoCamera->GetViewWidth());
-	auto pxHeight = (pStereoCamera->GetViewHeight());
+	//auto pxWidth = (pStereoCamera->GetViewWidth());
+	//auto pxHeight = (pStereoCamera->GetViewHeight());
 
+	int pxWidth = m_pOGLFramebuffer->GetWidth();
+	int pxHeight = m_pOGLFramebuffer->GetHeight();
 	/*
 	point sunDirection = point(0.3f, sunY, -0.5f);
 	sunY += 0.0002f;

@@ -59,11 +59,13 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	// Frame buffer Output
-	int pxWidth = m_pParentImp->GetViewport().Width();
-	int pxHeight = m_pParentImp->GetViewport().Height();
+	//int pxWidth = m_pParentImp->GetViewport().Width();
+	//int pxHeight = m_pParentImp->GetViewport().Height();
 
-	//int pxWidth = 1024;
-	//int pxHeight = 1024;
+	int pxWidth = 256*2;
+	int pxHeight = 256*2;
+
+	//m_frameBufferDivisionFactor = 4;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
@@ -191,12 +193,13 @@ RESULT OGLProgramRefraction::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT32, GL_FLOAT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT32, GL_FLOAT);
 
 	UseProgram();
 
-	if (m_pOGLFramebuffer != nullptr)
+	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
+	}
 
 	//glEnable(GL_BLEND);
 	

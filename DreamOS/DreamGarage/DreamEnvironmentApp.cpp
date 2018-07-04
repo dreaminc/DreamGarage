@@ -23,7 +23,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 0.35f;
+	m_directionalIntensity = 0.5f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -39,25 +39,28 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	if (strEnvironmentPath == "default") {
 		auto pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, 1.0f));
 		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
-		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -1.0f));
+		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.25f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, 0.0f, -1.0f));
 
 		//pDirectionalLight->EnableShadows();
 
-		pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		//pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	}
 	else {
 		m_lightIntensity = 15.0f;
 	}
 
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 
 	if (strEnvironmentPath == "default") {
 		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
 		m_sceneScale = 0.1f;
+
+		//auto pModel = GetComposite()->AddModel(L"\\Cave\\cave_no_water_ib.fbx");
+		//CN(pModel);
 
 		//TODO: may need a way to load multiple files for the environment in a more general way
 		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");

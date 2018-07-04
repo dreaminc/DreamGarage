@@ -1,8 +1,9 @@
 #include "material.h"
+
 material::material() :
-	m_shine(100.0f),
+	m_shine(DEFUALT_MATERIAL_SHINE),
 	m_bump(0.0f),
-	m_ambient(0.03f),
+	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
 	reserved3(0.0f),
 	m_colorAmbient(COLOR_WHITE),
 	m_colorDiffuse(COLOR_WHITE),
@@ -14,7 +15,7 @@ material::material() :
 material::material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
 	m_shine(shine),
 	m_bump(0.0f),
-	m_ambient(0.0f),
+	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
 	reserved3(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),

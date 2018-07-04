@@ -31,7 +31,7 @@ public:
 	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
 
 private:
-	float m_SunY = 1.0f;
+	float m_SunY = 0.20f;
 	float m_theta = 0.0f;
 	float m_delta = 0.0f;	//0.00005f;
 

@@ -271,8 +271,8 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 RESULT OGLProgram::UpdateFramebufferToCamera(OGLFramebuffer*&pOGLFramebuffer, camera *pCamera, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
 	RESULT r = R_PASS;
 
-	int pxWidth = pCamera->GetViewWidth();
-	int pxHeight = pCamera->GetViewHeight();
+	int pxWidth = pCamera->GetViewWidth() / m_frameBufferDivisionFactor;
+	int pxHeight = pCamera->GetViewHeight() / m_frameBufferDivisionFactor;
 
 	CN(pOGLFramebuffer);
 

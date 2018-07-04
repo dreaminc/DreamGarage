@@ -77,6 +77,8 @@ vec4 IncreaseColorSaturation(vec4 color) {
 
 void main(void) {  
 
+	g_ambient = 0.2f;
+
 	if (u_fAREnabled) {
 		g_ambient += 0.35f;
 	}
@@ -102,7 +104,7 @@ void main(void) {
 		colorDiffuse = EnableRiverAnimation();	
 	}
 
-	vec4 lightColorAmbient = g_ambient * vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec4 lightColorAmbient = g_ambient * colorDiffuse;
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
@@ -123,8 +125,10 @@ void main(void) {
 	// max() is component-wise, and some alpha values currently default to one
 	
 	// opaque/fully transparent blending without reordering
-	EnableBlending(colorAmbient.a, colorDiffuse.a);
-	vec4 outColor = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
+	//EnableBlending(colorAmbient.a, colorDiffuse.a);
+
+	vec4 outColor = max(vec4LightValue, lightColorAmbient);
+	//vec4 outColor = lightColorAmbient;
 
 	// testing increasing the saturation
 	if (u_fAREnabled) {

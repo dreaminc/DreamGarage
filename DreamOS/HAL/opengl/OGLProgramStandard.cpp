@@ -207,16 +207,12 @@ RESULT OGLProgramStandard::SetObjectTextures(OGLObj *pOGLObj) {
 	SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
 	// Color texture
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
+	//SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
 
 	// Material textures
-	SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
 	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
 	SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
-
-	// bump texture
-	// TODO: add bump texture to shader
-	m_pUniformHasTextureBump->SetUniform(pOGLObj->GetOGLTextureBump() != nullptr);
 
 	//	Error:
 	return r;

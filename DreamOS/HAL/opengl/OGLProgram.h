@@ -217,6 +217,8 @@ protected:
 	RESULT InitializeUniformBlocks();
 
 	// TODO: Pipelines
+
+	int m_frameBufferDivisionFactor = 1;
 };
 
 #endif // ! OGL_PROGRAM_H_
