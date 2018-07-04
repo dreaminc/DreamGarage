@@ -266,7 +266,7 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	//auto matVP = matP * matV;
 
-	vector sunDirection = vector(0.0f, m_SunY, -1.0f);
+	vector sunDirection = vector(0.0f, m_SunY, 1.0f);
 	sunDirection.Normalize();
 	//sunY += 0.01f;
 	m_theta += m_delta;

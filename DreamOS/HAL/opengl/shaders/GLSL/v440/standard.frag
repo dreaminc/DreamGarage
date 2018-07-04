@@ -77,7 +77,7 @@ vec4 IncreaseColorSaturation(vec4 color) {
 
 void main(void) {  
 
-	g_ambient = 0.2f;
+	g_ambient = 0.1f;
 
 	if (u_fAREnabled) {
 		g_ambient += 0.35f;

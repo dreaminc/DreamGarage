@@ -116,15 +116,15 @@ void main(void) {
 	else {
 		vec2 pos = vec2(DataIn.uvCoord * 500.0);
 		
-		vec3 normalHHHF = getNoiseNormal(vec2(DataIn.uvCoord * 50000.0) + 0.5f * u_time);
+		vec3 normalHHHF = getNoiseNormal(vec2(DataIn.uvCoord * 500000.0) + 0.5f * u_time);
 		vec3 normalHHF = getNoiseNormal(vec2(DataIn.uvCoord * 5000.0) - 0.25f * u_time);
 		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
 		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
 		
 		
-		TBNNormal = 0.25f * normalHHHF + 0.45f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
+		TBNNormal = 0.45f * normalHHHF + 0.65f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
 		TBNNormal = normalize(TBNNormal);
-
+		
 		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(depthOfPoint)/150.0f, 0.0f, 1.0f));
 		TBNNormal = normalize(TBNNormal);
 	}
@@ -160,10 +160,21 @@ void main(void) {
 
 	float waterOpacity = 0.0f;
 
+	if(u_hasTextureReflection) {
+		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
+
+		// TODO: Need to add actual fresnel term and shit
+
+		// Blend with reflection 
+		vec4 colorReflection = texture(u_textureReflection, vTextureReflection);
+		colorDiffuse = mix(colorDiffuse, colorReflection, reflectionCoefficient);
+		//colorDiffuse = mix(colorDiffuse, colorReflection, min((1.0f - waterOpacity + 0.1f), reflectionCoefficient));
+	}
+
 	if(u_hasTextureRefraction) {	
 		// TODO: Need to add actual refractive index and shit
 	
-		vec4 colorRefraction = (texture(u_textureRefraction, vTextureRefraction));
+		vec4 colorRefraction = refractionCoefficient * (texture(u_textureRefraction, vTextureRefraction));
 		//colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 		//colorDiffuse = mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
 	
@@ -183,16 +194,7 @@ void main(void) {
 		colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 	}
 
-	if(u_hasTextureReflection) {
-		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
-
-		// TODO: Need to add actual fresnel term and shit
-
-		// Blend with reflection 
-		vec4 colorReflection = texture(u_textureReflection, vTextureReflection);
-		colorDiffuse = mix(colorDiffuse, colorReflection, reflectionCoefficient);
-		//colorDiffuse = mix(colorDiffuse, colorReflection, min((1.0f - waterOpacity + 0.1f), reflectionCoefficient));
-	}
+	
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
@@ -200,10 +202,12 @@ void main(void) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 	
 		if(dot(TBNNormal, directionLight) > 0.0f) {
-			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			// provide shine param
+			CalculateFragmentLightValue(lights[i].m_power, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
-			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+			//vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * vec4(1.0f);
 		}
 	}
 

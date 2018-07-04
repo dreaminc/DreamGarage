@@ -77,16 +77,16 @@ void main(void) {
 
 	vec4LightValue = colorDiffuse;
 
-	//for(int i = 0; i < numLights; i++) {
-	//	vec3 directionLight = normalize(DataIn.directionLight[i]);
-	//
-	//	if(dot(TBNNormal, directionLight) > 0.0f) {
-	//		CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
-	//		
-	//		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
-	//		vec4LightValue += specularValue * lights[i].m_colorSpecular * colorSpecular;
-	//	}
-	//}
+	for(int i = 0; i < numLights; i++) {
+		vec3 directionLight = normalize(DataIn.directionLight[i]);
+	
+		if(dot(TBNNormal, directionLight) > 0.0f) {
+			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			
+			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * colorSpecular;
+		}
+	}
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
 	//out_vec4Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
