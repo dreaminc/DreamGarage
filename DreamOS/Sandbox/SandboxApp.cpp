@@ -1661,6 +1661,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterSubscriber(SenseGamePadEventType gamePadEvent, Subscriber<SenseGamePadEvent>* pGamePadSubscriber) {
+	RESULT r = R_PASS;
+	
+	CNM(m_pSenseGamePad, "GamePad not initialized");
+	CR(m_pSenseGamePad->RegisterSubscriber(gamePadEvent, pGamePadSubscriber));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
 	RESULT r = R_PASS;
 

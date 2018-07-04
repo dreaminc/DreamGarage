@@ -15,6 +15,7 @@
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
+#include "DreamGarage\DreamGamePadApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
@@ -1684,23 +1685,13 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public Subscriber<InteractionObjectEvent> {
-		sphere *pSphere = nullptr;
+	struct TestContext {
+		sphere *pSphereGreen = nullptr;
+		sphere *pSphereBlue = nullptr;
+		sphere *pSphereRed = nullptr;
+		sphere *pSphereWhite = nullptr;
+
 		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
-
-		virtual RESULT Notify(InteractionObjectEvent *mEvent) override {
-			RESULT r = R_PASS;
-
-			CR(r);
-
-			DEBUG_LINEOUT("notify");
-
-			if (mEvent->m_numContacts > 0)
-				pSphere->SetPosition(mEvent->m_ptContact[0]);
-
-		Error:
-			return r;
-		}
 
 	} *pTestContext = new TestContext();
 
@@ -1723,14 +1714,29 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
-		pTestContext->pDreamUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
-		CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
+		m_pDreamOS->LaunchDreamApp<DreamGamePadApp>(this);
+		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Sphere test
-		pTestContext->pSphere = m_pDreamOS->AddSphere(0.1f, 10, 10);
-		CN(pTestContext->pSphere);
-		pTestContext->pSphere->SetMaterialColors(COLOR_GREEN);
-		pTestContext->pSphere->SetPosition(0, 0, 0);
+		pTestContext->pSphereGreen = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereBlue = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereRed = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereWhite = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		
+		CN(pTestContext->pSphereGreen);
+		CN(pTestContext->pSphereBlue);
+		CN(pTestContext->pSphereRed);
+		CN(pTestContext->pSphereWhite);
+		
+		pTestContext->pSphereGreen->SetMaterialColors(COLOR_GREEN);
+		pTestContext->pSphereBlue->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphereRed->SetMaterialColors(COLOR_RED);
+		pTestContext->pSphereWhite->SetMaterialColors(COLOR_WHITE);
+		
+		pTestContext->pSphereGreen->SetPosition(0, 0, 0);
+		pTestContext->pSphereGreen->SetPosition(0, 1, 0);
+		pTestContext->pSphereGreen->SetPosition(1, 0, 0);
+		pTestContext->pSphereGreen->SetPosition(-1, 0, 0);
 
 	Error:
 		return r;

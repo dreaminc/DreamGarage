@@ -363,6 +363,7 @@ public:
 	RESULT RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
+	RESULT RegisterSubscriber(SenseGamePadEventType mouseEvent, Subscriber<SenseGamePadEvent>* pGamePadSubscriber);
 
 public:
 	PathManager *GetPathManager();

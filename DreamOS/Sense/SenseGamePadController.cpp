@@ -14,7 +14,7 @@ SenseGamePadController::~SenseGamePadController()
 RESULT SenseGamePadController::SetGamePadState(SenseGamePadEventType eventType, GamePadState gpState) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("Sense Gamepad Event x:%f y:%f T:%f",
+	DEBUG_LINEOUT("Sense Gamepad Event x:%f y:%f T:%d",
 		gpState.ptJoyStick.x(), gpState.ptJoyStick.y(), gpState.triggerRange);
 
 	switch (eventType) {

@@ -26,6 +26,12 @@ private:
 private:
 	Windows64App* m_pWin64AppParent = nullptr;
 
+	point m_ptLeft;
+	point m_ptRight;
+
+	int m_triggerLeft;
+	int m_triggerRight;
+
 	DWORD m_dwPreviousPacketNumber = 0;
 	WORD m_buttonState = 0;
 	GamePadButtonStruct m_buttonStruct;

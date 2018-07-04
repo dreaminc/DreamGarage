@@ -19,24 +19,24 @@ typedef enum SenseGamePadEventType {
 } SENSE_GAMEPAD_EVENT_TYPE;
 
 struct GamePadButtonStruct {
-	unsigned fDPAD_UP : 1;
-	unsigned fDPAD_DOWN : 1;
-	unsigned fDPAD_LEFT : 1;
-	unsigned fDPAD_RIGHT : 1;
-	unsigned fGAMEPAD_START : 1;
-	unsigned fGAMEPAD_BACK : 1;
-	unsigned fGAMEPAD_LEFT_THUMB : 1;
-	unsigned fGAMEPAD_RIGHT_THUMB : 1;
-	unsigned fGAMEPAD_LEFT_SHOULDER : 1;
-	unsigned fGAMEPAD_RIGHT_SHOULDER : 1;
-	unsigned fGAMEPAD_A : 1;
-	unsigned fGAMEPAD_B : 1;
-	unsigned fGAMEPAD_X : 1;
-	unsigned fGAMEPAD_Y : 1;
+	unsigned fDpadUp : 1;
+	unsigned fDpadDown : 1;
+	unsigned fDpadLeft : 1;
+	unsigned fDpadRight : 1;
+	unsigned fStart : 1;
+	unsigned fSelect : 1;
+	unsigned fLeftThumb : 1;
+	unsigned fRightThumb : 1;
+	unsigned fLeftShoulder : 1;
+	unsigned fRightShoulder : 1;
+	unsigned fbuttonA : 1;	// Based on Xbox orientation
+	unsigned fbuttonB : 1;
+	unsigned fbuttonX : 1;
+	unsigned fbuttonY : 1;
 };
 
 typedef struct GamePadState {
-	float triggerRange;
+	int triggerRange = 0;
 	point ptJoyStick;
 	GamePadButtonStruct buttonStruct;
 } GAMEPAD_STATE;
@@ -47,7 +47,7 @@ typedef struct SenseGamePadEvent : SenseDevice::SenseDeviceEvent {
 
 	SenseGamePadEvent(SenseGamePadEventType gpEvent, GamePadState gpState) :
 		SenseDeviceEvent(),
-		eventType(eventType),
+		eventType(gpEvent),
 		gamepadState(gpState)
 	{
 		SenseEventSize = sizeof(SenseGamePadEvent);
