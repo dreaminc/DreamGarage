@@ -274,7 +274,7 @@ RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
 		
 		// Try to eliminate edge artifacts 
 		point ptReflectionPlanePosition = reflectionPlane.GetPosition();
-		ptReflectionPlanePosition.y() += 0.025f;
+		ptReflectionPlanePosition.y() += 0.1f;
 		reflectionPlane.SetPlanePosition(ptReflectionPlanePosition);
 
 		auto matReflection = ReflectionMatrix(reflectionPlane);
@@ -303,7 +303,7 @@ RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 
 		// Try to eliminate edge artifacts 
 		point ptReflectionPlanePosition = reflectionPlane.GetPosition();
-		ptReflectionPlanePosition.y() += 0.025f;
+		ptReflectionPlanePosition.y() += 0.1f;
 		reflectionPlane.SetPlanePosition(ptReflectionPlanePosition);
 	
 		auto matReflection = ReflectionMatrix(reflectionPlane);

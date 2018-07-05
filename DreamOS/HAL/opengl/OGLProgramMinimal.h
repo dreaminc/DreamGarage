@@ -41,6 +41,8 @@ protected:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
+
+	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_H_

@@ -23,6 +23,10 @@ out Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
+
+	vec4 reflectedVert;
+	vec4 refractedVert;
+	float vertDepth; 
 } DataOut;
 
 
@@ -31,8 +35,14 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
+uniform mat4 u_mat4Projection;
+uniform mat4 u_mat4Reflection;
 
-
+// TODO: Move to CPU side
+mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
+						 0.0f, -1.0f, 0.0f, 0.0f,
+						 0.0f, 0.0f, 1.0f, 0.0f,
+						 0.0f, 0.0f, 0.0f, 1.0f);
 
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
@@ -60,6 +70,10 @@ void main(void) {
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;
 	DataOut.uvCoord = inV_vec2UVCoord;
+
+	DataOut.reflectedVert = u_mat4Projection * xzFlipMatrix * (u_mat4Reflection - mat4(1.0f)) * u_mat4View * vertWorldSpace;
+	DataOut.refractedVert = u_mat4ViewProjection * vertWorldSpace;
+	DataOut.vertDepth = (u_mat4View * vertWorldSpace).z;
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

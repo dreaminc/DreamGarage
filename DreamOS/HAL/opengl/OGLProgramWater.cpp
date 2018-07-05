@@ -344,8 +344,15 @@ RESULT OGLProgramWater::SetObjectUniforms(DimObj *pDimObj) {
 
 		auto matReflection = ReflectionMatrix(reflectionPlane);
 
-		if (m_pUniformReflectionMatrix != nullptr)
+		//TODO: Get this to work
+		//auto matIdentity = matrix<float, 4, 4>();
+		//matIdentity.identity(1.0f);
+		//auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
+		//auto matR = matFlip * (matReflection - matIdentity);
+
+		if (m_pUniformReflectionMatrix != nullptr) {
 			m_pUniformReflectionMatrix->SetUniform(matReflection);
+		}
 
 		vector vReflectionPlane = reflectionPlane.GetNormal();
 		vReflectionPlane.w() = reflectionPlane.GetDValue();

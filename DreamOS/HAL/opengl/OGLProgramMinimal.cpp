@@ -43,23 +43,25 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT24, GL_INT));
 
 	///*
-	int pxWidth = m_pParentImp->GetViewport().Width();
-	int pxHeight = m_pParentImp->GetViewport().Height();
+	if (m_fPassThru == false) {
+		int pxWidth = m_pParentImp->GetViewport().Width();
+		int pxHeight = m_pParentImp->GetViewport().Height();
 
-	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
-	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->Bind());
+		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+		CR(m_pOGLFramebuffer->OGLInitialize());
+		CR(m_pOGLFramebuffer->Bind());
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+		CR(m_pOGLFramebuffer->SetSampleCount(4));
 
-	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		CR(m_pOGLFramebuffer->MakeColorAttachment());
+		CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+		CR(m_pOGLFramebuffer->MakeDepthAttachment());
+		CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 
-	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+	}
 	//*/
 
 Error:
@@ -75,7 +77,13 @@ RESULT OGLProgramMinimal::SetupConnections() {
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	if (m_fPassThru == true) {
+		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	}
+	else {
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	}
 
 Error:
 	return r;
@@ -98,7 +106,12 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	//glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
+		if (m_fPassThru) {
+			m_pOGLFramebuffer->Bind();
+		}
+		else {
+			BindToFramebuffer(m_pOGLFramebuffer);
+		}
 	}
 
 	glEnable(GL_BLEND);

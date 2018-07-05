@@ -29,15 +29,15 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestWaterShader());
+
 	CR(AddTestStandardShader());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
 	CR(AddTestBlinnPhongShader());
 
-	CR(AddTestBlinnPhongShaderTexture());
-	
-	CR(AddTestWaterShader());
+	CR(AddTestBlinnPhongShaderTexture());	
 
 	CR(AddTestHeightQuadObject());
 
@@ -945,100 +945,115 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 1.0f));
+		{
+			vector vLightDirection = vector(1.0f, -1.0f, 0.0f);
+			float lightIntensity = 1.0f;
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightDirection);
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.70f * lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f * vLightDirection));
 
-		texture *pColorTexture;
-		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-		texture *pBumpTexture;
-		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pBumpTextureWater;
 
-		texture *pBumpTextureWater;
-		
-		//pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		//pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		pBumpTextureWater = m_pDreamOS->MakeTexture(L"water_new_height.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			pBumpTextureWater = m_pDreamOS->MakeTexture(L"water_new_height.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-		/*
-		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
-		CN(pTestContext->pSphere);
-		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
-		pTestContext->pSphere->SetDiffuseTexture(pColorTexture);
-		pTestContext->pSphere->SetBumpTexture(pBumpTexture);
+			/*
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+			pTestContext->pSphere->SetDiffuseTexture(pColorTexture);
+			pTestContext->pSphere->SetBumpTexture(pBumpTexture);
 
-		pTestContext->pVolume = m_pDreamOS->AddVolume(0.5f);
-		CN(pTestContext->pVolume);
-		pTestContext->pVolume->SetPosition(point(0.0f, -0.5f, 0.0f));
-		CR(pTestContext->pVolume->SetVertexColor(COLOR_WHITE));
-		pTestContext->pVolume->SetDiffuseTexture(pColorTexture);
-		pTestContext->pVolume->SetBumpTexture(pBumpTexture);
-		*/
+			pTestContext->pVolume = m_pDreamOS->AddVolume(0.5f);
+			CN(pTestContext->pVolume);
+			pTestContext->pVolume->SetPosition(point(0.0f, -0.5f, 0.0f));
+			CR(pTestContext->pVolume->SetVertexColor(COLOR_WHITE));
+			pTestContext->pVolume->SetDiffuseTexture(pColorTexture);
+			pTestContext->pVolume->SetBumpTexture(pBumpTexture);
+			*/
 
-		//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
-		//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
-		pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(20.0f, 20.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal()) ;
-		CN(pTestContext->pWaterQuad);
-		//pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
-		pTestContext->pWaterQuad->SetPosition(0.0f, 0.0f, 0.0f);
-		//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
-		//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
-		//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
+			//pReflectionQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1);
+			//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
+			pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+			CN(pTestContext->pWaterQuad);
+			//pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
+			pTestContext->pWaterQuad->SetPosition(0.0f, -0.1f, 0.0f);
+			//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
+			//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
+			//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
-		texture *pLandColorTexture;
-		texture *pLandHeightTexture;
 
-		pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			point ptSceneOffset = point(90, -5.0, -25);
+			float sceneScale = 0.025f;
+			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
-		pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 500, 500, pLandHeightTexture);
-		CN(pTestContext->pLandQuad);
-		pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
-		pTestContext->pLandQuad->SetPosition(0.0f, -0.75f, 0.0f);
+			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave_no_water_ib.fbx");
+			//model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave_exported.fbx");
+			
+			CN(pCaveModel);
+			pCaveModel->SetScale(sceneScale);
 
-		if (pWaterProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pTestContext->pWaterQuad));
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, -5.0f);
+			//m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
+
+
+			//texture *pLandColorTexture;
+			//texture *pLandHeightTexture;
+
+			//pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//
+			//pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 500, 500, pLandHeightTexture);
+			//CN(pTestContext->pLandQuad);
+			//pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
+			//pTestContext->pLandQuad->SetPosition(0.0f, -0.75f, 0.0f);
+
+			if (pWaterProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pTestContext->pWaterQuad));
+			}
+
+			if (pReflectionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pTestContext->pWaterQuad));
+			}
+
+			if (pRefractionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pTestContext->pWaterQuad));
+			}
+
+			if (pReflectionSkyboxProgram != nullptr) {
+				CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pWaterQuad));
+			}
+
+			// NOTE: Refraction skybox needs no reflection plane - it's just looking through
+
+			// TOOD: Test clipping
+			//sphere *pSphere;
+			//pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
+			//CN(pSphere);
+			//pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
+
+			//m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
+
+			/*
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+			CR(pVolume->SetVertexColor(COLOR_GREEN));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			CR(pVolume->SetVertexColor(COLOR_RED));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			CR(pVolume->SetVertexColor(COLOR_BLUE));
+			*/
 		}
-	
-		if (pReflectionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pTestContext->pWaterQuad));
-		}
-
-		if (pRefractionProgramNode != nullptr) {
-			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pTestContext->pWaterQuad));
-		}
-
-		if (pReflectionSkyboxProgram != nullptr) {
-			CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pTestContext->pWaterQuad));
-		}
-
-		// NOTE: Refraction skybox needs no reflection plane - it's just looking through
-
-		// TOOD: Test clipping
-		//sphere *pSphere;
-		//pSphere = m_pDreamOS->AddSphere(0.125f, 10, 10);
-		//CN(pSphere);
-		//pSphere->SetPosition(point(0.0f, -1.15f, 0.0f));
-
-		//m_pDreamOS->GetCamera()->SetPosition(0.0f, -1.1f, 10.0f);
-		m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.1f, 10.0f);
-
-		/*
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetVertexColor(COLOR_GREEN));
-
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetVertexColor(COLOR_RED));
-
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetVertexColor(COLOR_BLUE));
-		*/
 
 	Error:
 		return r;

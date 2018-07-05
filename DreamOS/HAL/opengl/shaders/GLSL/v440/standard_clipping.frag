@@ -49,14 +49,11 @@ void main(void) {
 	// Clip fragments on our side of the plane
 	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ClippingPlane.xyz)) + u_vec4ClippingPlane.w;
     if (fragmentClipPosition < 0.0) {
-		//out_vec4Color = material.m_colorDiffuse;
-        //return;
 		discard;
     }
 
-	//vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	vec4 vec4LightValue = vec4(1.0f);
-	float diffuseValue = 1.0f;
+	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	float diffuseValue = 0.0f;
 	float specularValue = 0.0f;
 	
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
@@ -75,8 +72,6 @@ void main(void) {
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
-	vec4LightValue = colorDiffuse;
-
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 	
@@ -89,5 +84,4 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
-	//out_vec4Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

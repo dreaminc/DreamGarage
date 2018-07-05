@@ -16,6 +16,9 @@ in Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
+	vec4 reflectedVert;
+	vec4 refractedVert;
+	float vertDepth; 
 } DataIn;
 
 
@@ -51,6 +54,7 @@ uniform vec4 u_vec4ReflectionPlane;
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
 uniform vec4 u_vec4Eye;
+uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Reflection;
 
@@ -101,8 +105,6 @@ void main(void) {
 	float specularValue = 0.0f;
 	
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
-
-	float depthOfPoint = (u_mat4View * DataIn.vertWorldSpace).z;
 	
 	if(u_hasTextureNormal == true) {
 		// tiling
@@ -121,80 +123,58 @@ void main(void) {
 		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
 		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
 		
-		
 		TBNNormal = 0.45f * normalHHHF + 0.65f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
 		TBNNormal = normalize(TBNNormal);
 		
-		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(depthOfPoint)/150.0f, 0.0f, 1.0f));
+		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth)/150.0f, 0.0f, 1.0f));
+		TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal);
 	}
 	
 	// Reflection
-	mat4 mat4ReflectedView = xzFlipMatrix * (u_mat4Reflection - mat4(1.0f)) * u_mat4View;
-
-	vec4 vClipReflection = u_mat4Projection * mat4ReflectedView * DataIn.vertWorldSpace;
-	vec2 vDeviceReflection = vClipReflection.st / vClipReflection.q;
+	vec2 vDeviceReflection = DataIn.reflectedVert.st / DataIn.reflectedVert.q;
 	vec2 vTextureReflection = vec2(0.5f, 0.5f) + 0.5f * vDeviceReflection;
 
 	float reflectionCoefficient = GetFresnelReflectionCoefficient(-directionEye, TBNNormal);
-	//reflectionCoefficient = 1.0f;
-
 	float refractionCoefficient = 1.0f - reflectionCoefficient;
 
 	// Refraction
 
 	// We can do refraction entirely in the displacement map
-	vec4 vClipRefraction = u_mat4Projection * u_mat4View * DataIn.vertWorldSpace;
-	vec2 vDeviceRefraction = vClipRefraction.st / vClipRefraction.q;
+	vec2 vDeviceRefraction = DataIn.refractedVert.st / DataIn.refractedVert.q;
 	vec2 vTextureRefraction = vec2(0.5f, 0.5f) + 0.5f * vDeviceRefraction;
 
-	// Displace Normals for refraction 
-	vTextureRefraction.x += g_normalDisplacementFactor * TBNNormal.x;
-	vTextureRefraction.y += g_normalDisplacementFactor * TBNNormal.y;
-
-	// Displace Normals for reflection
-	vTextureReflection.x += g_normalDisplacementFactor * TBNNormal.x;
-	vTextureReflection.y += g_normalDisplacementFactor * TBNNormal.y;
+	// Displace Normals for refraction and reflection 
+	vTextureRefraction += g_normalDisplacementFactor * TBNNormal.xy;
+	vTextureReflection += g_normalDisplacementFactor * TBNNormal.xy;
 
 	vec4 colorDiffuse = material.m_colorDiffuse; 
 
 	float waterOpacity = 0.0f;
 
 	if(u_hasTextureReflection) {
-		//colorDiffuse = colorDiffuse * texture(u_textureReflection, DataIn.uvCoord * 1.0f);
-
-		// TODO: Need to add actual fresnel term and shit
-
 		// Blend with reflection 
 		vec4 colorReflection = texture(u_textureReflection, vTextureReflection);
 		colorDiffuse = mix(colorDiffuse, colorReflection, reflectionCoefficient);
-		//colorDiffuse = mix(colorDiffuse, colorReflection, min((1.0f - waterOpacity + 0.1f), reflectionCoefficient));
 	}
 
 	if(u_hasTextureRefraction) {	
-		// TODO: Need to add actual refractive index and shit
-	
 		vec4 colorRefraction = refractionCoefficient * (texture(u_textureRefraction, vTextureRefraction));
-		//colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
-		//colorDiffuse = mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
 	
-		float zRefractionDepth = u_mat4Projection[3].z / (texture(u_textureRefractionDepth, vTextureRefraction).x * -2.0 + 1.0 - u_mat4Projection[2].z);
-		//float depthOfPoint = (u_mat4View * DataIn.vertWorldSpace).z;
-		float waterDepth = depthOfPoint - zRefractionDepth;
+		float zRefractionDepth = u_mat4Projection[3].z / (texture(u_textureRefractionDepth, vTextureRefraction).x * -2.0f + 1.0f - u_mat4Projection[2].z);
+		float waterDepth = DataIn.vertDepth - zRefractionDepth;
 	
 		// Water Color / Opacity
 		// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
 	
-		float minWaterOpacity = 0.1f;
-		float depthOpaque = 1.0f;
+		float minWaterOpacity = 0.05f;
+		float depthOpaque = 3.0f;
 		
 		waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 		
 		colorRefraction = mix(vec4(0.0f, 0.0f, 0.15f, 1.0f), colorRefraction, 1.0f - waterOpacity);
 		colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 	}
-
-	
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
@@ -212,7 +192,4 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4LightValue; //, colorAmbient.xyz), colorDiffuse.a);// + vec4(0.1f, 0.1f, 0.1f, 1.0f);
-
-
-	//out_vec4Color = colorDiffuse;
 }
