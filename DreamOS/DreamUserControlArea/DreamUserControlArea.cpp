@@ -555,6 +555,9 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
 	else {
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+		CN(pKeyboard);
+		pKeyboard->ShowBrowserButtons();
 		CR(m_pControlView->HandleKeyboardUp(strInitial));
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());

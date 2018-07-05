@@ -119,7 +119,6 @@ public:
 
 private:
 	RESULT ReleaseKey(UIKey *pKey);
-	RESULT HideSurface();
 	UIKey* CollisionPointToKey(point ptCollision);
 
 //SenseKeyboard
@@ -176,6 +175,7 @@ public:
 	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
 	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
 	virtual RESULT ShowKeyboardTitleView() override;
+	RESULT ShowBrowserButtons();
 	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
 	RESULT UpdateComposite(float depth); // update position/orientation
 

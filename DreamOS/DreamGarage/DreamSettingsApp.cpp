@@ -208,7 +208,11 @@ RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
 	//*/
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pUserApp->SetEventApp(m_pFormView.get());
+		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+		CN(pKeyboard);
+		pKeyboard->ShowBrowserButtons();
 		CR(m_pFormView->HandleKeyboardUp(strInitial));
+		//pKeyboard->
 	//}
 
 Error:

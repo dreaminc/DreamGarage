@@ -153,7 +153,7 @@ RESULT UIControlBar::Initialize() {
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
 		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
 		CR(m_pTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnTabCallback));
-		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
+		CR(m_pBackTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
 	}
 
 Error:
@@ -287,20 +287,27 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 			m_pBackButton->SetVisible(false);
 			m_pForwardButton->SetVisible(false);
 		}
+
+		m_pBackTabButton->SetVisible(false);
+		m_pTabButton->SetVisible(false);
 	}
 	else if (m_barType == BarType::KEYBOARD) {
-		point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
+		point ptTab = point(-m_itemSide - m_itemSpacing, 0.0f, 0.0f);
+		m_pTabButton->SetPosition(ptTab);
 
-		ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
+		point ptBackTab = point(0.0f, 0.0f, 0.0f);
+		m_pBackTabButton->SetPosition(ptBackTab);
 
-		point ptTab = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
-		m_pBackButton->SetPosition(ptTab);
-
-		point ptBackTab = ptTab + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-		m_pForwardButton->SetPosition(ptBackTab);
-
-		point ptClose = ptBackTab + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		point ptClose = point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
 		m_pCloseButton->SetPosition(ptClose);
+
+		m_pKeyboardButton->SetVisible(false);
+		m_pBackButton->SetVisible(false);
+		m_pForwardButton->SetVisible(false);
+		m_pURLButton->SetVisible(false);
+		m_pShareToggleButton->SetVisible(false);
+		m_pOpenButton->SetVisible(false);
+		m_pToggleButton->SetVisible(false);
 	}
 //Error:
 	return r;
