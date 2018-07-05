@@ -32,11 +32,20 @@ public:
 	RESULT AddTestSkybox();
 
 	// Shader Tests
+	RESULT AddTestWaterShader();
 	RESULT AddTestGeometryShader();
 	RESULT AddTestIncludeShader();
+	RESULT AddTestToonShader();
+	RESULT AddTestBlinnPhongShader();
+	RESULT AddTestBlinnPhongShaderTexture();
+	RESULT AddTestBlinnPhongShaderTextureBump();
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestDepthPeelingShader();
 
 	// Environments
-	RESULT AddTestEnvironmentShader();
+	RESULT AddTestStandardShader();
 	RESULT AddTestEnvironments();
 
 	// Objects
@@ -46,6 +55,7 @@ public:
 	RESULT AddTestUserModel();
 	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
+	RESULT AddTestHeightQuadObject();
 	RESULT AddTestUIShaderStage();
 	RESULT AddTestFlatContextNesting();
 
@@ -53,23 +63,14 @@ public:
 
 	RESULT AddTestRotation();
 
-	// TODO: Consolidate the HMD tests 
-	// TODO: This should be easy as this is now supported by pipeline
-	RESULT AddTestMinimalShaderHMD();
-	RESULT AddTestBlinnPhongShader();
-	RESULT AddTestBlinnPhongShaderBlurHMD();
-	RESULT AddTestBlinnPhongShaderTextureHMD();
-	RESULT AddTestBlinnPhongShaderTextureCopy();
+	
 
 	RESULT AddTestMouseDrag();
-	RESULT AddTestMinimalShader();
-	RESULT AddTestMinimalTextureShader();
-	RESULT AddTestBlinnPhongShaderBlur();
-	RESULT AddTestBlinnPhongShaderTexture();
+	
 
 	RESULT AddTestSenseHaptics();
 
-	RESULT AddTestDepthPeelingShader();
+	
 
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();

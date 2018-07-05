@@ -8,6 +8,10 @@
     <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|x64'">
+    <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

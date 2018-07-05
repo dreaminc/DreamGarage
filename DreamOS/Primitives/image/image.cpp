@@ -45,8 +45,8 @@ Error:
 }
 
 double image::GetAverageValueAtUV(double uValue, double vValue) {
-	int pxValueX = static_cast<int>(uValue * m_width);
-	int pxValueY = static_cast<int>(vValue * m_height);
+	int pxValueX = static_cast<int>(uValue * (m_width - 1));
+	int pxValueY = static_cast<int>(vValue * (m_height - 1));
 
 	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
 

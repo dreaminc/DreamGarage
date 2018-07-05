@@ -21,25 +21,6 @@ float g_ambient = 0.01f;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
-	//float attenuation = 1 / pow(distanceLight, 2);
-	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
-	//float attenuation = 1.0f;
-
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
-	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-	
-	///*
-	if(diffuseValue > 0.0f) {
-		vec3 halfVector = normalize(directionLight + directionEye);
-		specularValue = pow(max(0.0f, dot(vectorNormal, halfVector)), material.m_shine) * attenuation;
-	}
-	else {
-		specularValue = 0.0f;
-	}
-	//*/
-}
-
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);

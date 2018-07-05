@@ -136,7 +136,10 @@ public:
 	RESULT AttachShader(OGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
-	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);
+	
+	RESULT BindToFramebuffer();
+	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer);
+
 	RESULT UnbindFramebuffer();
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
@@ -158,7 +161,8 @@ protected:
 
 	// OGL Framebuffer
 	// This can be used to render the program to a texture / framebuffer
-	OGLFramebuffer *m_pOGLFramebuffer;
+	OGLFramebuffer *m_pOGLFramebuffer = nullptr;
+
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
 	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
@@ -213,6 +217,8 @@ protected:
 	RESULT InitializeUniformBlocks();
 
 	// TODO: Pipelines
+
+	int m_frameBufferDivisionFactor = 1;
 };
 
 #endif // ! OGL_PROGRAM_H_

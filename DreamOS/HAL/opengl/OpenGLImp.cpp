@@ -562,7 +562,7 @@ Error:
 	return nullptr;
 }
 
-sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
 	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
@@ -1434,13 +1434,15 @@ Error:
 }
 
 RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBuffer(target, gluiBuffer);
-	CRM(CheckGLError(), "glBindBuffer failed");
+	//CRM(CheckGLError(), "glBindBuffer failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
@@ -1530,13 +1532,16 @@ Error:
 }
 
 RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBindBufferBase(target, bindingPointIndex, bufferIndex);
-	CRM(CheckGLError(), "glBindBufferBase failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glBindBufferBase failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
@@ -1550,15 +1555,17 @@ Error:
 }
 
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	*pLocation = m_OpenGLExtensions.glGetUniformLocation(program, name);
-	CRM(CheckGLError(), "glGetUniformLocation failed");
+	//CRM(CheckGLError(), "glGetUniformLocation failed");
 
-	return r;
-Error:
-	*pLocation = -1;
-	return r;
+	return R_PASS;
+
+//	return r;
+//Error:
+//	*pLocation = -1;
+//	return r;
 }
 
 RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
@@ -1572,33 +1579,42 @@ Error:
 }
 
 RESULT OpenGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1fv(location, count, value);
-	CRM(CheckGLError(), "glUniform1fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniform1fv failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform4fv(location, count, value);
-	CRM(CheckGLError(), "glUniform4fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniform4fv failed");
+//
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniformMatrix4fv(location, count, transpose, value);
-	CRM(CheckGLError(), "glUniformMatrix4fv failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//	CRM(CheckGLError(), "glUniformMatrix4fv failed");
+//
+//Error:
+//	return r;
 }
 
 // OpenGL Shaders
@@ -1677,13 +1693,15 @@ Error:
 }
 
 RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBufferData(target, size, data, usage);
-	CRM(CheckGLError(), "glBufferData failed");
+	//CRM(CheckGLError(), "glBufferData failed");
 
-Error:
-	return r;
+	return R_PASS;
+
+//Error:
+//	return r;
 }
 
 RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
@@ -1758,13 +1776,13 @@ Error:
 }
 
 RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	glBindTexture(target, texture);
-	CRM(CheckGLError(), "glBindTexture failed");
+	//CRM(CheckGLError(), "glBindTexture failed");
 
-Error:
-	return r;
+//Error:
+	return R_PASS;
 }
 
 RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {

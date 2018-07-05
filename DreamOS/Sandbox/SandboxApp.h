@@ -289,7 +289,7 @@ public:
 		return nullptr;
 	}
 
-	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 10, int numVerticalDivisions = 10, color c = color(COLOR_WHITE));
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
 	volume* AddVolume(double width, double length, double height, bool fTriangleBased = true);

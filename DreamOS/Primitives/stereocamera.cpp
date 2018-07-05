@@ -86,19 +86,42 @@ point stereocamera::GetPosition(bool fAbsolute) {
 ViewMatrix stereocamera::GetViewMatrix(EYE_TYPE eye) {
 	ViewMatrix mat;
 
-	point eyePos = GetEyePosition(eye);
+	point ptEyePosition = GetEyePosition(eye);
 
 	// TODO: Fix this
 	if (m_pHMD != nullptr) {
 		point offset = m_pHMD->GetHeadPointOrigin();
-		eyePos += offset;
+		ptEyePosition += offset;
 	}
 
 	// View Matrix requires the opposite of the camera's world position
-	eyePos.Reverse();
+	ptEyePosition.Reverse();
 	quaternion q = camera::GetOrientation();
 
-	mat = ViewMatrix(eyePos, q);
+	mat = ViewMatrix(ptEyePosition, q);
+	return mat;
+}
+
+ViewMatrix stereocamera::GetViewMatrix(EYE_TYPE eye, quaternion qAdjust) {
+	ViewMatrix mat;
+
+	point ptEyePosition = GetEyePosition(eye);
+
+	// TODO: Fix this
+	if (m_pHMD != nullptr) {
+		point offset = m_pHMD->GetHeadPointOrigin();
+		ptEyePosition += offset;
+	}
+
+	// View Matrix requires the opposite of the camera's world position
+	ptEyePosition.Reverse();
+	quaternion q = camera::GetOrientation();
+
+	auto matAdjustRotation = RotationMatrix(qAdjust);
+	//ptEyePosition = inverse(matAdjustRotation) * ptEyePosition;
+
+	//mat = matAdjustRotation * RotationMatrix(q) *  TranslationMatrix(ptEyePosition);
+	mat = RotationMatrix(q) *  TranslationMatrix(ptEyePosition) * matAdjustRotation;
 	return mat;
 }
 

@@ -136,22 +136,36 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::BindToFramebuffer() {
+	m_pOGLFramebuffer->Bind();
+	m_pOGLFramebuffer->SetAndClearViewport(true, true);
+
+	// Check framebuffer
+	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	return R_PASS;
+}
+
+// Critial path function
 RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
 
 	// Render to our framebuffer
 	// By default, uses the member framebuffer
-	OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
-	CR(pOGLFramebuffer->Bind());
-	CR(pOGLFramebuffer->SetAndClearViewport(true, true));
+	//OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
+	//CR(pOGLFramebuffer->Bind());
+	//CR(pOGLFramebuffer->SetAndClearViewport(true, true));
+
+	pFramebuffer->Bind();
+	pFramebuffer->SetAndClearViewport(true, true);
 
 	// Check framebuffer
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-Error:
-	return r;
+//Error:
+	return R_PASS;
 }
 
 RESULT OGLProgram::UnbindFramebuffer() {
@@ -257,8 +271,8 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 RESULT OGLProgram::UpdateFramebufferToCamera(OGLFramebuffer*&pOGLFramebuffer, camera *pCamera, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
 	RESULT r = R_PASS;
 
-	int pxWidth = pCamera->GetViewWidth();
-	int pxHeight = pCamera->GetViewHeight();
+	int pxWidth = pCamera->GetViewWidth() / m_frameBufferDivisionFactor;
+	int pxHeight = pCamera->GetViewHeight() / m_frameBufferDivisionFactor;
 
 	CN(pOGLFramebuffer);
 

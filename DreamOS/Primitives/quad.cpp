@@ -1,5 +1,6 @@
 #include "quad.h"
 #include "BoundingQuad.h"
+#include "plane.h"
 
 // copy ctor
 quad::quad(quad& q) :
@@ -206,6 +207,13 @@ float quad::GetHeight() {
 	return m_height;
 }
 
+// Note: Always in absolute space (vs composite)
+plane quad::GetPlane() {
+	plane retPlane(GetOrigin(true), GetNormal(true));
+
+	return retPlane;
+}
+
 RESULT quad::UpdateParams(float width, float height, vector vNormal) {
 	RESULT r = R_PASS;
 
@@ -319,8 +327,16 @@ Error:
 	return r;
 }
 
-vector quad::GetNormal() {
-	return m_vNormal;
+vector quad::GetNormal(bool fAbsolute) {
+	vector vNormal = m_vNormal;
+
+	if (fAbsolute) {
+		//vNormal = GetModelMatrix() * vNormal;
+		//vNormal.RotateByQuaternion(GetOrientation(true));
+		vNormal = RotationMatrix(GetOrientation(true)) * vNormal;
+	}
+
+	return vNormal;
 }
 
 // TODO: not supporting triangle based yet
@@ -333,6 +349,10 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 	m_width = width;
 	m_height = height;
 	m_vNormal = vNormal;
+
+	//m_heightMapScale = sqrt(m_width * m_width + m_height * m_height);
+
+	m_heightMapScale = 2.0f;
 
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
@@ -359,7 +379,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
 
 			if (m_pTextureHeight != nullptr) {
-				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, vValue);
+				yValue = m_pTextureHeight->GetAverageValueAtUV(uValue, 1.0f - vValue);
 				yValue *= m_heightMapScale;
 			}
 
@@ -369,8 +389,11 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 			// TODO: Calculate normal (based on geometry)
 
-			m_pVertices[vertCount].SetTangent(vector(-1.0f, 0.0f, 0.0f));
+			m_pVertices[vertCount].SetTangent(vector(1.0f, 0.0f, 0.0f));
 			m_pVertices[vertCount].SetBitangent(vector(0.0f, 0.0f, -1.0f));
+
+			//m_pVertices[vertCount].SetTangent(vector(0.0f, 0.0f, 1.0f));
+			//m_pVertices[vertCount].SetBitangent(vector(1.0f, 0.0f, 0.0f));
 
 			vertCount++;
 		}

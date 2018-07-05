@@ -6,6 +6,7 @@
 #include "Primitives/point.h"
 
 class DreamOS;
+class quad;
 
 class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	friend class DreamAppManager;
@@ -26,6 +27,7 @@ private:
 	point m_ptSceneOffset;
 	float m_sceneScale;
 	float m_lightIntensity;
+	float m_directionalIntensity;
 
 };
 

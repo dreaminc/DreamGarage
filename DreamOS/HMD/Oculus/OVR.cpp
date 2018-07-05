@@ -410,7 +410,7 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 		case ovrControllerType::ovrControllerType_RTouch: {
 			cState.type = CONTROLLER_RIGHT;
 		} break;
-
+			
 		default: {
 			return r;
 		} break;

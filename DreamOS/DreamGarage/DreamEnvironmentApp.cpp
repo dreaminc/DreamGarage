@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 
 #include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+#include "HAL/opengl/OGLProgramStandard.h"
 
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
@@ -23,6 +23,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
+	m_directionalIntensity = 1.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -36,40 +37,51 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	//TODO: environments probably won't all have the same lighting
 	if (strEnvironmentPath == "default") {
-		auto pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.0f, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
-		pDirectionalLight->EnableShadows();
+		
+		// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
+		vector vLightVector = vector(0.0f, -2.0f, -1.0f);
+		light *pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightVector);
+		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * vLightVector));
+		//pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.25f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, 0.0f, -1.0f));
 
-		pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+		//pDirectionalLight->EnableShadows();
+
+		//pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	}
 	else {
 		m_lightIntensity = 15.0f;
 	}
 
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 
 	if (strEnvironmentPath == "default") {
 		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
 		m_sceneScale = 0.1f;
 
+		//auto pModel = GetComposite()->AddModel(L"\\Cave\\cave_no_water_ib.fbx");
+		//CN(pModel);
+
 		//TODO: may need a way to load multiple files for the environment in a more general way
 		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
 		CN(pModel);
-		auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
-		CN(pRiver);
+
+		//auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
+		//CN(pRiver);
+
 		auto pClouds = GetComposite()->AddModel(L"\\FloatingIsland\\clouds.obj");
 		CN(pClouds);
 		pClouds->SetMaterialAmbient(0.8f);
 
-		pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+		//pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 		if (pOGLObj != nullptr) {
 			pOGLObj->SetOGLProgramPreCallback(
 				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff pre-render
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(true);
 				}
@@ -81,7 +93,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 				[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff post
 
-				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(false);
 				}

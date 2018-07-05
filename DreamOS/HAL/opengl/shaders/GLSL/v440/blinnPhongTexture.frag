@@ -1,12 +1,7 @@
-// minimal.vert
+// blinnPhongTexture.frag
 // shadertype=glsl
 
-// This is a minimal shader that simply displays
-// a vertex color and position (no lighting, no textures)
-
-#version 440 core
-
-#define MAX_TOTAL_LIGHTS 10
+// A blinn phong fragment shader supporting diffuse textures
 
 in vec3 inF_vec3Color;
 
@@ -25,62 +20,11 @@ in Data {
 uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
 
-// Light Structure
-struct Light {
-	int m_type;
-	float m_power;
-	float m_shine;
-	float m_reserved;
-
-	vec4 m_ptOrigin;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	vec4 m_vectorDirection; 
-};
-
-struct Material {
-	float m_shine;
-	float m_bump;
-	float m_ambient;
-	float reserved3;
-    vec4 m_colorAmbient;
-    vec4 m_colorDiffuse;
-    vec4 m_colorSpecular;
-};
-
-layout(std140) uniform ub_material {
-    Material material;
-};
-
-layout(std140) uniform ub_Lights {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
-
 layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
-
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
-	//float attenuation = 1 / pow(distanceLight, 2);
-	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
-	//float attenuation = 1.0f;
-
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
-	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-	
-	///*
-	if(diffuseValue > 0.0f) {
-		vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
-		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
-	}
-	else {
-		specularValue = 0.0f;
-	}
-	//*/
-}
 
 void main(void) {  
 	
@@ -88,13 +32,14 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
-	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
+		vec3 directionEye = normalize(DataIn.directionEye);
 
-		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
-			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
+		if(dot(TBNNormal, directionLight) > 0.0f) {
+			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 		}
@@ -110,7 +55,4 @@ void main(void) {
 	else {
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
-	
-	// DEBUG: 
-	//out_vec4Color = textureColor + (out_vec4Color * 0.0001f);
 }

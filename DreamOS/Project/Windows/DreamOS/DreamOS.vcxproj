@@ -41,6 +41,14 @@
       <Configuration>TestingRelease</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="TestingWithReleaseBinaries|Win32">
+      <Configuration>TestingWithReleaseBinaries</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TestingWithReleaseBinaries|x64">
+      <Configuration>TestingWithReleaseBinaries</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Testing|Win32">
       <Configuration>Testing</Configuration>
       <Platform>Win32</Platform>
@@ -58,6 +66,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -98,6 +112,12 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -148,10 +168,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">
@@ -202,6 +228,22 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>"Core/config.h";%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'">
     <ClCompile>
       <PrecompiledHeader>
@@ -227,6 +269,36 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedUsingFiles>
+      </ForcedUsingFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Debug\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MTd.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImaged.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeImagePlusd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <Manifest>
+      <AdditionalManifestFiles>manifest.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingWithReleaseBinaries|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -686,7 +758,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReflection.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramRefraction.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramStandard.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
@@ -695,8 +769,10 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramToon.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramWater.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
@@ -781,14 +857,17 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ReflectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ViewMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\model\mesh.cpp" />
     <ClCompile Include="..\..\..\Primitives\model\model.cpp" />
     <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
+    <ClCompile Include="..\..\..\Primitives\plane.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
@@ -992,7 +1071,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReflection.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramRefraction.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramStandard.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
@@ -1003,8 +1084,10 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramToon.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramVisualizeNormals.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramWater.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
@@ -1106,9 +1189,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\Manager.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\BasisMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ReflectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
@@ -1268,10 +1353,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\core440.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
@@ -1294,6 +1381,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\noiseCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
@@ -1320,6 +1408,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\toon.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\toon.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uiflatscroll.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
@@ -1327,6 +1417,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.geo" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\visualize_normals.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\water.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />

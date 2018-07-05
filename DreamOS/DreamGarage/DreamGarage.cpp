@@ -22,7 +22,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamSettingsApp.h"
 
 #include "HAL/opengl/OGLObj.h"
-#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+#include "HAL/opengl/OGLProgramStandard.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -80,6 +80,12 @@ RESULT DreamGarage::ConfigureSandbox() {
 	return r;
 }
 
+// Temp:
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramWater.h"
+#include "HAL/opengl/OGLProgramSkyboxScatter.h"
+
 RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
@@ -93,10 +99,65 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	{
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		// Reflection 
+
+		ProgramNode* pReflectionProgramNode;
+		pReflectionProgramNode = nullptr;
+		pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+		CN(pReflectionProgramNode);
+		CR(pReflectionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pReflectionSkyboxProgram;
+		pReflectionSkyboxProgram = nullptr;
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pReflectionSkyboxProgram);
+		CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+
+		// Refraction
+
+		ProgramNode* pRefractionProgramNode;
+		pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
+		CN(pRefractionProgramNode);
+		CR(pRefractionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pRefractionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		//ProgramNode* pRefractionSkyboxProgram;
+		//pRefractionSkyboxProgram = nullptr;
+		//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		//CN(pRefractionSkyboxProgram);
+		//CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		//CR(pRefractionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		//
+		//// Connect output as pass-thru to internal blend program
+		//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
+
+		// "Water"
+
+		ProgramNode* pWaterProgramNode;
+		pWaterProgramNode = nullptr;
+		pWaterProgramNode = pHAL->MakeProgramNode("water");
+		CN(pWaterProgramNode);
+		CR(pWaterProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pWaterProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		// TODO: This is not particularly general yet
+		// Uncomment below to turn on water effects
+		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNode->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+		// Standard shader
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 		// Reference Geometry Shader Program
 		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
@@ -147,14 +208,38 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		//ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		//CN(pRenderScreenQuad);
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
 
 		//CR(pHAL->ReleaseCurrentContext());
+
+
+		quad *pWaterQuad = MakeQuad(1000.0f, 1000.0f);
+		point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
+		pWaterQuad->SetPosition(ptQuadOffset);
+		pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 88.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+		CN(pWaterQuad);
+
+		if (pWaterProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+		}
+
+		if (pReflectionProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
+		}
+
+		if (pRefractionProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
+		}
+
+		if (pReflectionSkyboxProgram != nullptr) {
+			CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+		}
 
 	}
 

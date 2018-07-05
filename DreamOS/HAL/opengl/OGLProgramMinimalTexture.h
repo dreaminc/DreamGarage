@@ -43,6 +43,9 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor;
 
 	OGLMaterialBlock *m_pMaterialsBlock;
+
+	
+	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

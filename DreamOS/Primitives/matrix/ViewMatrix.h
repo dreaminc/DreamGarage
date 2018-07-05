@@ -16,6 +16,7 @@
 
 #include "RotationMatrix.h"
 #include "TranslationMatrix.h"
+#include "BasisMatrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float view_precision;
@@ -25,76 +26,28 @@
 
 class ViewMatrix : public matrix<view_precision, 4, 4> {
 public:
-	ViewMatrix() {
-		clear();
-	}
-	
-	ViewMatrix(point ptPosition) {
-		clear();
-		SetViewMatrixPitchYawRoll(ptPosition, 0.0f, 0.0f, 0.0f);
-	}
+	ViewMatrix();
+	ViewMatrix(point ptPosition);
 
 	// This will start with i, j, k vectors and effectively rotate them about the appropriate axes 
 	// pitch is about the x axis, yaw is about the y axis and roll is about the z axis
-	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
-		clear();
-		SetViewMatrixPitchYawRoll(ptPosition, pitch, yaw, roll);
-	}
+	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll);
+	ViewMatrix(point ptPosition, quaternion qLook);
+	ViewMatrix(point ptPosition, vector vLook);
 
-	ViewMatrix(point ptPosition, quaternion qLook) {
-		clear();
-		SetViewMatrixPointQuaternion(ptPosition, qLook);
-	}
+	~ViewMatrix();
 
-	RESULT SetViewMatrixPitchYawRoll(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
-		//m_ptPosition = ptPosition;
+	RESULT SetViewMatrixPitchYawRoll(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll);
+	RESULT SetViewMatrixPointQuaternion(point ptPosition, quaternion qLook);
+	RESULT SetViewMatrixPointVector(point ptPosition, vector vLook);
 
-		/*
-		m_vLook = matrixRotation * vector(0.0f, 0.0f, 1.0f);
-		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
-		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
-		*/
+	RotationMatrix GetRotationMatrix();
 
-		return SetMatrix(RotationMatrix(pitch, yaw, roll) * TranslationMatrix(ptPosition));
-		//return SetMatrix(TranslationMatrix(ptPosition));
-	}
+	point GetPosition();
 
-	RESULT SetViewMatrixPointQuaternion(point ptPosition, quaternion qLook) {
-		return SetMatrix(RotationMatrix(qLook) * TranslationMatrix(ptPosition));
-	}
+	quaternion GetOrientation();
 
-	~ViewMatrix() {
-		// empty stub
-	}
-
-	RotationMatrix GetRotationMatrix() {
-		RotationMatrix matRotation;
-
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				matRotation.element(i, j) = this->element(i, j);
-
-		return matRotation;
-	}
-
-	point GetPosition() {
-		view_precision x = this->element(0, 3);
-		view_precision y = this->element(1, 3);
-		view_precision z = this->element(2, 3);
-		//view_precision w = this->element(3, 3);
-		view_precision w = 1.0f;
-
-		return point(x, y, z, 1.0f);
-	}
-
-	quaternion GetOrientation() {
-		return GetRotationMatrix().GetQuaternion();
-	}
-
-	RESULT PrintMatrix() {
-		DEBUG_LINEOUT("View Matrix");
-		return matrix<view_precision, 4, 4>::PrintMatrix();
-	}	
+	RESULT PrintMatrix();
 
 	// Explicitly specializing the assignment operator
 	ViewMatrix& operator=(const matrix<view_precision, 4, 4> &arg) {
