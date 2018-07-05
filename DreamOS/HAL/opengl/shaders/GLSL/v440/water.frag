@@ -123,10 +123,10 @@ void main(void) {
 		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
 		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
 		
-		TBNNormal = 0.45f * normalHHHF + 0.65f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
+		TBNNormal = 0.45f * normalHHHF + 0.05f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
 		TBNNormal = normalize(TBNNormal);
 		
-		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth)/150.0f, 0.0f, 1.0f));
+		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth)/100.0f, 0.0f, 1.0f));
 		TBNNormal.z *= 2.0f;
 		TBNNormal = normalize(TBNNormal);
 	}
@@ -167,8 +167,8 @@ void main(void) {
 		// Water Color / Opacity
 		// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
 	
-		float minWaterOpacity = 0.05f;
-		float depthOpaque = 3.0f;
+		float minWaterOpacity = 0.1f;
+		float depthOpaque = 2.0f;
 		
 		waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 		
