@@ -364,6 +364,15 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 			//CR(m_pFormView->HandleKeyboardDown());
 			CR(Hide());
 		}
+		else if (chkey == SVK_TAB) {
+			
+		}
+		else if (chkey == SVK_SHIFTTAB) {
+
+		}
+		else if (chkey == SVK_CLOSE) {
+			CR(m_pFormView->HandleKeyboardDown());
+		}
 
 	} break;
 	}
