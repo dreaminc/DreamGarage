@@ -44,6 +44,10 @@ RESULT UIControlBar::Initialize() {
 	m_pShareTexture = m_pDreamOS->MakeTexture(k_wszShare, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pStopSharingTexture = m_pDreamOS->MakeTexture(k_wszStopSharing, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pKeyboardTexture = m_pDreamOS->MakeTexture(k_wszKeyboard, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pTabTexture = m_pDreamOS->MakeTexture(k_wszTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pCantTabTexture = m_pDreamOS->MakeTexture(k_wszCantTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackTabTexture = m_pDreamOS->MakeTexture(k_wszBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pCantBackTabTexture = m_pDreamOS->MakeTexture(k_wszCantBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
 
@@ -68,12 +72,18 @@ RESULT UIControlBar::Initialize() {
 	m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pShareToggleButton->GetSurface()->SetDiffuseTexture(m_pShareTexture);
 
+	m_pTabButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
+
+	m_pBackTabButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
+
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
 
 	// register all of the buttons (except for the URL button) for the selection event
 	// URL button has become less useful with the addition of the open button
-	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton/*, m_pURLButton*/ }) {
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pTabButton, m_pBackTabButton/*, m_pURLButton*/ }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
@@ -126,6 +136,12 @@ RESULT UIControlBar::Initialize() {
 		auto fnKeyboardCallback = [&](UIButton *pButtonContext, void *pContext) {
 			return KeyboardPressed(pButtonContext, pContext);
 		};
+		auto fnTabCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return TabPressed(pButtonContext, pContext);
+		};
+		auto fnBackTabCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return BackTabPressed(pButtonContext, pContext);
+		};
 
 		// update button trigger events to match the observer
 		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
@@ -136,6 +152,8 @@ RESULT UIControlBar::Initialize() {
 		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
 		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
 		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
+		CR(m_pTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnTabCallback));
+		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
 	}
 
 Error:
@@ -198,6 +216,22 @@ Error:
 	return r;
 }
 
+RESULT UIControlBar::TabPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleTabPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
+RESULT UIControlBar::BackTabPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleBackTabPressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
 RESULT UIControlBar::URLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
@@ -211,46 +245,62 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 	m_barType = type;
 
-	// set buttons positions based on spec
-	point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
+	if (m_barType == BarType::BROWSER || m_barType == BarType::DESKTOP) {
+		// set buttons positions based on spec
+		point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
 
-	ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
-	
-	//*
-	point ptBack = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
-	m_pBackButton->SetPosition(ptBack);
+		ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
 
-	point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pForwardButton->SetPosition(ptForward);
+		//*
+		point ptBack = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
+		m_pBackButton->SetPosition(ptBack);
 
-	point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pCloseButton->SetPosition(ptClose);
+		point ptForward = ptBack + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pForwardButton->SetPosition(ptForward);
 
-	point ptKeyboard = ptStart + point(m_itemSide + (m_itemSpacing / 2.0), 0.0f, 0.0f);
-	m_pKeyboardButton->SetPosition(ptKeyboard);
-	//*/
+		point ptClose = ptForward + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pCloseButton->SetPosition(ptClose);
 
-	point ptURL = point(0.0f, 0.0f, 0.0f);// ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
-	m_pURLButton->SetPosition(ptURL);
+		point ptKeyboard = ptStart + point(m_itemSide + (m_itemSpacing / 2.0), 0.0f, 0.0f);
+		m_pKeyboardButton->SetPosition(ptKeyboard);
+		//*/
 
-	point ptShare = ptURL + point(m_urlWidth / 2.0f + m_itemSide / 2.0f + m_itemSpacing, 0.0f, 0.0f);
-	m_pShareToggleButton->SetPosition(ptShare);
-	
-	point ptOpen = ptShare + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pOpenButton->SetPosition(ptOpen);
+		point ptURL = point(0.0f, 0.0f, 0.0f);// ptStart + point(m_urlWidth / 2.0f, 0.0f, 0.0f);
+		m_pURLButton->SetPosition(ptURL);
 
-	point ptHide = ptOpen + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-	m_pToggleButton->SetPosition(ptHide);
+		point ptShare = ptURL + point(m_urlWidth / 2.0f + m_itemSide / 2.0f + m_itemSpacing, 0.0f, 0.0f);
+		m_pShareToggleButton->SetPosition(ptShare);
 
-	if (m_barType == BarType::BROWSER) {
-		m_pKeyboardButton->SetVisible(false);
-		m_pBackButton->SetVisible(true);
-		m_pForwardButton->SetVisible(true);	
+		point ptOpen = ptShare + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pOpenButton->SetPosition(ptOpen);
+
+		point ptHide = ptOpen + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pToggleButton->SetPosition(ptHide);
+
+		if (m_barType == BarType::BROWSER) {
+			m_pKeyboardButton->SetVisible(false);
+			m_pBackButton->SetVisible(true);
+			m_pForwardButton->SetVisible(true);
+		}
+		else if (m_barType == BarType::DESKTOP) {
+			m_pKeyboardButton->SetVisible(true);
+			m_pBackButton->SetVisible(false);
+			m_pForwardButton->SetVisible(false);
+		}
 	}
-	else if (m_barType == BarType::DESKTOP) {
-		m_pKeyboardButton->SetVisible(true);
-		m_pBackButton->SetVisible(false);
-		m_pForwardButton->SetVisible(false);
+	else if (m_barType == BarType::KEYBOARD) {
+		point ptStart = point(-m_totalWidth / 2.0f, 0.0f, 0.0f);
+
+		ptStart = ptStart - point(m_itemSpacing, 0.0f, 0.0f);
+
+		point ptTab = ptStart + point(m_itemSide / 2.0f, 0.0f, 0.0f);
+		m_pBackButton->SetPosition(ptTab);
+
+		point ptBackTab = ptTab + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pForwardButton->SetPosition(ptBackTab);
+
+		point ptClose = ptBackTab + point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
+		m_pCloseButton->SetPosition(ptClose);
 	}
 //Error:
 	return r;
@@ -350,6 +400,14 @@ std::shared_ptr<UIButton> UIControlBar::GetStopButton() {
 	return m_pCloseButton;
 }
 
+std::shared_ptr<UIButton> UIControlBar::GetTabButton() {
+	return m_pTabButton;
+}
+
+std::shared_ptr<UIButton> UIControlBar::GetBackTabButton() {
+	return m_pBackTabButton;
+}
+
 std::shared_ptr<UIButton> UIControlBar::GetURLButton() {
 	return m_pURLButton;
 }
@@ -368,6 +426,22 @@ texture *UIControlBar::GetShareTexture() {
 
 texture *UIControlBar::GetStopTexture() {
 	return m_pStopSharingTexture;
+}
+
+texture *UIControlBar::GetTabTexture() {
+	return m_pTabTexture;
+}
+
+texture *UIControlBar::GetCantTabTexture() {
+	return m_pCantTabTexture;
+}
+
+texture *UIControlBar::GetBackTabTexture() {
+	return m_pBackTabTexture;
+}
+
+texture *UIControlBar::GetCantBackTabTexture() {
+	return m_pCantBackTabTexture;
 }
 
 RESULT UIControlBar::SetTotalWidth(float totalWidth) {
@@ -394,7 +468,7 @@ std::shared_ptr<text> UIControlBar::GetURLText() {
 	return m_pURLText;
 }
 
-RESULT UIControlBar::SetObserver(ControlBarObserver *pObserver) {
+RESULT UIControlBar::RegisterObserver(ControlBarObserver *pObserver) {
 	m_pObserver = pObserver;
 	return R_PASS;
 }

@@ -7,6 +7,8 @@
 
 #include "UIKey.h"
 
+#include "UI/UIButton.h"
+
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
@@ -227,6 +229,20 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 		m_pTitleText->SetPosition(point(m_pTitleIcon->GetWidth() + m_pParentApp->GetSpacingSize(), 0.0f, m_pTitleIcon->GetPosition().z()));
 		m_pHeaderContainer->AddObject(m_pTitleText);
 
+
+		auto pView = GetComposite()->AddUIView(GetDOS());
+		m_pUIControlBar = pView->AddUIControlBar();
+
+		float width = m_pParentApp->GetBaseWidth();
+		float buttonWidth = 0.0645f * width;
+		float spacingSize = m_pParentApp->GetSpacingSize() * width;
+
+		m_pUIControlBar->SetTotalWidth(width);
+		m_pUIControlBar->SetItemSide(0.0645f * width);
+		m_pUIControlBar->SetURLWidth(0.5484f * width);
+		m_pUIControlBar->SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
+
+		CR(m_pUIControlBar->Initialize());
 	}
 
 	InitializeQuadsWithLayout(pLayout);
@@ -999,4 +1015,52 @@ RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
 RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	m_keyReleaseThreshold = threshold;
 	return R_PASS;
+}
+
+RESULT UIKeyboard::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_CLOSE), 1));
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::HandleTabPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 1));
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::HandleBackTabPressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 1));
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateTabTextures(bool fCanTab, bool fCanBackTab) {
+	RESULT r = R_PASS;
+
+	if (fCanTab) {
+		m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture());
+	}
+	else {
+		m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture());
+	}
+
+	if (fCanBackTab) {
+		m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture());
+	}
+	else {
+		m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture());
+	}
 }

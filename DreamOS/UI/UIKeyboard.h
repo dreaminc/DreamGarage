@@ -11,6 +11,7 @@
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamControlView/UIControlBar.h"
 
 #include <vector>
 #include <string>
@@ -33,6 +34,10 @@
 #define ANIMATION_OFFSET_HEIGHT 0.25f
 
 #define AMBIENT_INTENSITY 0.75f
+
+// hack to allow the control bar buttons associated with the keyboard to send key codes
+#define SVK_SHIFTTAB 0x02
+#define SVK_CLOSE 0x03
 
 class quad;
 class sphere;
@@ -68,7 +73,8 @@ private:
 
 class UIKeyboard :	public DreamApp<UIKeyboard>, 
 					public UIKeyboardHandle, 
-					public SenseKeyboard {
+					public SenseKeyboard,
+					public ControlBarObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
@@ -141,6 +147,24 @@ public:
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
 	RESULT SetSurfaceOffset(point ptOffset);
+
+//ControlBarObserver
+public:
+	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
+
+	RESULT UpdateTabTextures(bool fCanTab, bool fCanBackTab);
+
+private:
+	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
 
 private:
 	RESULT UpdateViewQuad();

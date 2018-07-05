@@ -29,7 +29,7 @@ RESULT DreamControlBar::InitializeApp(void *pContext) {
 
 	m_pUIControlBar = m_pView->AddUIControlBar();
 	CN(m_pUIControlBar);
-	m_pUIControlBar->SetObserver(this);
+	m_pUIControlBar->RegisterObserver(this);
 
 	GetComposite()->SetVisible(true);
 
@@ -180,7 +180,7 @@ RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	
 	{
 		float width = m_pParentApp->GetBaseWidth();
-		float buttonWidth = m_buttonWidth * width;
+		float buttonWidth = 0.0645f * width;
 		float spacingSize = m_pParentApp->GetSpacingSize() * width;
 
 		m_pUIControlBar->SetTotalWidth(width);

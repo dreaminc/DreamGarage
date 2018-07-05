@@ -996,7 +996,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				}
 			}
 			
-			else {
+			else if (chkey != SVK_CONTROL && chkey != SVK_SHIFT) { // control and shift keycodes were being added to URLs
 				m_strURL += chkey;
 			}
 		}
