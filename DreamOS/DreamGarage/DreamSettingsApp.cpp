@@ -358,20 +358,23 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 		char chkey = (char)(pEvent->m_value);
 		CBR(chkey != 0x00, R_SKIPPED);	
 
-		CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 
 		if (chkey == SVK_RETURN) {
 			//CR(m_pFormView->HandleKeyboardDown());
 			CR(Hide());
+			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 		}
 		else if (chkey == SVK_TAB) {
-			
+			CR(m_pDreamBrowserForm->HandleTabEvent());
 		}
 		else if (chkey == SVK_SHIFTTAB) {
-
+			CR(m_pDreamBrowserForm->HandleBackTabEvent());
 		}
 		else if (chkey == SVK_CLOSE) {
 			CR(m_pFormView->HandleKeyboardDown());
+		}
+		else {
+			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 		}
 
 	} break;

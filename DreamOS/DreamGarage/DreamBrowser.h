@@ -126,6 +126,9 @@ public:
 	virtual RESULT HandleForwardEvent();
 	virtual RESULT HandleStopEvent();
 
+	RESULT HandleTabEvent();
+	RESULT HandleBackTabEvent();
+
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);

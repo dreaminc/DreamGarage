@@ -105,6 +105,9 @@ public:
 	virtual RESULT GoBack() override;
 	virtual RESULT GoForward() override;
 
+	virtual RESULT Tab() = 0;
+	virtual RESULT TabBack() = 0;
+
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
 

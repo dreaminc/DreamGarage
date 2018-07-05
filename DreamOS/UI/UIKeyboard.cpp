@@ -1062,6 +1062,13 @@ RESULT UIKeyboard::HandleBackTabPressed(UIButton* pButtonContext, void* pContext
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 0));
 	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFTTAB), 1));
 
+	/*
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFT), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 0));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_TAB), 1));
+	CR(UpdateKeyState((SenseVirtualKey)(SVK_SHIFT), 1));
+	//*/
+
 Error:
 	return r;
 }

@@ -16,7 +16,6 @@ RESULT CEFV8Handler::Initialize() {
 	CR(RegisterExtensionFunction("cancel", std::bind(&CEFV8Handler::HandleDreamFormCancel, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterExtensionFunction("setCredentials", std::bind(&CEFV8Handler::HandleDreamFormSetCredentials, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterExtensionFunction("setEnvironmentId", std::bind(&CEFV8Handler::HandleDreamFormSetEnvironmentId, this, std::placeholders::_1, std::placeholders::_2)));
-
 Error:
 	return r;
 }

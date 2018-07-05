@@ -216,7 +216,7 @@ int DreamBrowser::GetBrowserWidth() {
 
 RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 	RESULT r = R_PASS;
-	CBR(chKey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
+	//CBR(chKey != SVK_SHIFT, R_SKIPPED);		// don't send these key codes to browser (capital letters and such have different values already)
 	CBR(chKey != 0, R_SKIPPED);
 	CBR(chKey != SVK_CONTROL, R_SKIPPED);
 
@@ -412,6 +412,14 @@ RESULT DreamBrowser::HandleStopEvent() {
 Error:
 //*/
 	return r;
+}
+
+RESULT DreamBrowser::HandleTabEvent() {
+	return m_pWebBrowserController->Tab();
+}
+
+RESULT DreamBrowser::HandleBackTabEvent() {
+	return m_pWebBrowserController->TabBack();
 }
 
 // DreamApp Interface

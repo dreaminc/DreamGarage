@@ -571,6 +571,14 @@ bool CEFBrowserController::CanGoForward() {
 	return m_pCEFBrowser->CanGoForward();
 }
 
+RESULT CEFBrowserController::Tab() {
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::TabBack() {
+	return R_PASS;
+}
+
 RESULT CEFBrowserController::GoBack() {
 	m_pCEFBrowser->GoBack();
 	return R_PASS;
