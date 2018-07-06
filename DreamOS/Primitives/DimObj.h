@@ -127,6 +127,7 @@ public:
 	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
 	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
+	RESULT SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren = false);
 	
 
 	RESULT SetRandomColor();

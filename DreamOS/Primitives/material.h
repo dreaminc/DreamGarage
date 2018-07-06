@@ -30,14 +30,20 @@ public:
 	RESULT SetShininess(float shine);
 	RESULT SetBumpiness(float bumpiness);
 
+	RESULT SetUVTiling(float uTiling, float vTiling);
+
 private:
 	float m_shine;				// specular
-	float m_bump;				// bumpiness 
+	float m_bumpiness;				// bumpiness 
 	float m_ambient;
-	float reserved3;
+	float reserved0;
 	color m_colorAmbient;
 	color m_colorDiffuse;
 	color m_colorSpecular;
+	float m_tilingU;
+	float m_tilingV;
+	float reserved1;
+	float reserved2;
 };
 
 #endif // ! MATERIAL_H_

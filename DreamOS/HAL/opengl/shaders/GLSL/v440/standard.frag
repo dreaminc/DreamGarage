@@ -23,9 +23,6 @@ in Data {
 uniform	bool u_hasBumpTexture;
 uniform sampler2D u_textureBump;
 
-uniform bool	u_hasTextureColor;
-uniform sampler2D u_textureColor;
-
 uniform bool	u_hasTextureAmbient;
 uniform sampler2D u_textureAmbient;
 
@@ -86,25 +83,39 @@ void main(void) {
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
 	float specularValue = 0.0f;
+	vec2 uvCoord = DataIn.uvCoord;
 	
+	// tile the textures
+	uvCoord.x *= material.m_tilingU;
+	uvCoord.y *= material.m_tilingV;
+	uvCoord = mod(uvCoord, 1.0f);
+
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	
 	if(u_hasBumpTexture == true) {
-		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
+		TBNNormal = texture(u_textureBump, uvCoord).rgb;
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
+		TBNNormal.xy *= material.m_bumpiness; 
+		TBNNormal = normalize(TBNNormal);
 	}
 
-	// TODO: move this logic outside of the shader
-	vec4 colorAmbient = material.m_colorAmbient * ((u_hasTextureAmbient) ? texture(u_textureAmbient, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
-	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
-	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
+	// Generalize
+	vec4 colorDiffuse = material.m_colorDiffuse;
+	if(u_hasTextureDiffuse) 
+		colorDiffuse = texture(u_textureDiffuse, uvCoord); 
+
+	vec4 colorAmbient = material.m_colorAmbient; 
+	if (u_hasTextureAmbient) 
+		colorAmbient = texture(u_textureAmbient, uvCoord);
+
+	vec4 colorSpecular = material.m_colorSpecular; 
+	if(u_hasTextureSpecular) 
+		colorSpecular = texture(u_textureSpecular, uvCoord);
 
 	if (u_fRiverAnimation) {
 		colorAmbient = EnableRiverAnimation();	
 		colorDiffuse = EnableRiverAnimation();	
 	}
-
-	vec4 lightColorAmbient = g_ambient * colorDiffuse;
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
@@ -112,23 +123,22 @@ void main(void) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
 		if(dot(TBNNormal, directionLight) > 0.0f) {
-			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			CalculateFragmentLightValue(lights[i].m_power, material.m_shine, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * colorSpecular;
 		}
 	}
+	vec4LightValue[3] = 1.0f;
 
-	//out_vec4Color = vec4LightValue;
-
-	// keeping the alpha value outside max() helps with distance-mapped fonts;
+	// Keeping the alpha value outside max() helps with distance-mapped fonts;
 	// max() is component-wise, and some alpha values currently default to one
 	
 	// opaque/fully transparent blending without reordering
-	//EnableBlending(colorAmbient.a, colorDiffuse.a);
-
-	vec4 outColor = max(vec4LightValue, lightColorAmbient);
-	//vec4 outColor = lightColorAmbient;
+	// EnableBlending(colorAmbient.a, colorDiffuse.a);
+	
+	vec4 lightColorAmbient = material.m_ambient * colorAmbient;
+	vec4 outColor = max(vec4LightValue, lightColorAmbient);	
 
 	// testing increasing the saturation
 	if (u_fAREnabled) {

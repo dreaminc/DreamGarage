@@ -269,6 +269,23 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetUVTiling(uTiling, vTiling);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialUVTiling(uTiling, vTiling, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialBumpiness(float bumpiness, bool fSetChildren) {
 	RESULT r = R_PASS;
 

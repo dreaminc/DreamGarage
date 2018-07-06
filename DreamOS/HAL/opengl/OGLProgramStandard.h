@@ -87,7 +87,7 @@ private:
 
 	float m_deltaTime; 
 
-	bool m_fPassThru = true;
+	bool m_fPassThru = false;
 
 };
 

@@ -2,36 +2,42 @@
 
 material::material() :
 	m_shine(DEFUALT_MATERIAL_SHINE),
-	m_bump(0.0f),
+	m_bumpiness(1.0f),
 	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
-	reserved3(0.0f),
+	reserved0(0.0f),
 	m_colorAmbient(COLOR_WHITE),
 	m_colorDiffuse(COLOR_WHITE),
-	m_colorSpecular(COLOR_WHITE)
+	m_colorSpecular(COLOR_WHITE),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f)
 {
 	// empty
 }
 
 material::material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
 	m_shine(shine),
-	m_bump(0.0f),
+	m_bumpiness(1.0f),
 	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
-	reserved3(0.0f),
+	reserved0(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
-	m_colorSpecular(colorSpecular)
+	m_colorSpecular(colorSpecular),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f)
 {
 	// empty
 }
 
 material::material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular, float ambient) :
 	m_shine(shine),
-	m_bump(bump),
+	m_bumpiness(bump),
 	m_ambient(ambient),
-	reserved3(0.0f),
+	reserved0(1.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
-	m_colorSpecular(colorSpecular)
+	m_colorSpecular(colorSpecular),
+	m_tilingU(1.0f),
+	m_tilingV(1.0f)
 {
 	// empty
 }
@@ -77,6 +83,12 @@ RESULT material::SetShininess(float shine) {
 }
 
 RESULT material::SetBumpiness(float bumpiness) {
-	m_bump = bumpiness;
+	m_bumpiness = bumpiness;
+	return R_PASS;
+}
+
+RESULT material::SetUVTiling(float uTiling, float vTiling) {
+	m_tilingU = uTiling;
+	m_tilingV = vTiling;
 	return R_PASS;
 }
