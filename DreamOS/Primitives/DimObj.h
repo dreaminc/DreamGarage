@@ -120,7 +120,7 @@ public:
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialColors(color c, bool fSetChildren = false);
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
-	RESULT SetMaterialAmbient(float ambient);
+	RESULT SetMaterialAmbient(float ambient, bool fSetChildren = false);
 
 	RESULT SetMaterialDiffuseColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialSpecularColor(color c, bool fSetChildren = false);

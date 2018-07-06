@@ -29,6 +29,9 @@ uniform sampler2D u_textureAmbient;
 uniform bool	u_hasTextureDiffuse;
 uniform sampler2D u_textureDiffuse;
 
+uniform bool	u_hasTextureColor;
+uniform sampler2D u_textureColor;
+
 uniform bool	u_hasTextureSpecular;
 uniform sampler2D u_textureSpecular;
 
@@ -36,10 +39,6 @@ uniform bool	u_fRiverAnimation;
 uniform bool	u_fAREnabled;
 
 layout (location = 0) out vec4 out_vec4Color;
-
-float g_ambient = material.m_ambient;
-
-vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 void EnableBlending(float ambientAlpha, float diffuseAlpha) {
 	// Fakes blending by moving clear fragments behind the skybox
@@ -73,12 +72,6 @@ vec4 IncreaseColorSaturation(vec4 color) {
 }
 
 void main(void) {  
-
-	g_ambient = 0.1f;
-
-	if (u_fAREnabled) {
-		g_ambient += 0.35f;
-	}
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
@@ -101,21 +94,24 @@ void main(void) {
 
 	// Generalize
 	vec4 colorDiffuse = material.m_colorDiffuse;
-	if(u_hasTextureDiffuse) 
-		colorDiffuse = texture(u_textureDiffuse, uvCoord); 
+	if(u_hasTextureDiffuse) {
+		colorDiffuse *= texture(u_textureDiffuse, uvCoord);
+	}
 
 	vec4 colorAmbient = material.m_colorAmbient; 
-	if (u_hasTextureAmbient) 
-		colorAmbient = texture(u_textureAmbient, uvCoord);
+	if (u_hasTextureAmbient) {
+		colorAmbient *= texture(u_textureAmbient, uvCoord);
+	}
 
 	vec4 colorSpecular = material.m_colorSpecular; 
-	if(u_hasTextureSpecular) 
-		colorSpecular = texture(u_textureSpecular, uvCoord);
-
-	if (u_fRiverAnimation) {
-		colorAmbient = EnableRiverAnimation();	
-		colorDiffuse = EnableRiverAnimation();	
+	if(u_hasTextureSpecular) {
+		colorSpecular *= texture(u_textureSpecular, uvCoord);
 	}
+
+	//if (u_fRiverAnimation) {
+	//	colorAmbient = EnableRiverAnimation();	
+	//	colorDiffuse = EnableRiverAnimation();	
+	//}
 
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
@@ -137,10 +133,17 @@ void main(void) {
 	// opaque/fully transparent blending without reordering
 	// EnableBlending(colorAmbient.a, colorDiffuse.a);
 	
-	vec4 lightColorAmbient = material.m_ambient * colorAmbient;
+	float effectiveAmbient = material.m_ambient;
+	if (u_fAREnabled) {
+		effectiveAmbient += 0.35f;
+		effectiveAmbient = clamp(effectiveAmbient, 0.0f, 1.0f);
+	}
+
+	//vec4 lightColorAmbient = effectiveAmbient * colorAmbient;
+	vec4 lightColorAmbient = effectiveAmbient * colorDiffuse;
 	vec4 outColor = max(vec4LightValue, lightColorAmbient);	
 
-	// testing increasing the saturation
+	// Increasing the saturation
 	if (u_fAREnabled) {
 		out_vec4Color = IncreaseColorSaturation(outColor);
 	}

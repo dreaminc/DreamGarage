@@ -29,11 +29,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestObjectMaterials());
-
+	CR(AddTestStandardShader());
+	
 	CR(AddTestWaterShader());
 
-	CR(AddTestStandardShader());
+	CR(AddTestObjectMaterials());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
@@ -998,7 +998,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			CN(pCaveModel);
 			pCaveModel->SetScale(sceneScale);
 
-			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, -5.0f);
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, 10.0f);
 			//m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
 
 
@@ -1185,10 +1185,12 @@ RESULT HALTestSuite::AddTestStandardShader() {
 
 		
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
+#if 1
 		{
 			point ptSceneOffset = point(90, -5, -25);
-			float sceneScale = 0.025f;
+			//float sceneScale = 0.025f;
+			float sceneScale = 0.1f;
 			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
 			//model* pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
@@ -1201,16 +1203,17 @@ RESULT HALTestSuite::AddTestStandardShader() {
 			//pRiver->SetScale(sceneScale);
 			////pModel->SetEulerOrientation(vSceneEulerOrientation);
 			//
-			//model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
-			//pClouds->SetPosition(ptSceneOffset);
-			//pClouds->SetScale(sceneScale);
-			////pModel->SetEulerOrientation(vSceneEulerOrientation);
-			//
-			//pClouds->SetMaterialAmbient(0.8f);
+			model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
+			pClouds->SetPosition(ptSceneOffset);
+			pClouds->SetScale(sceneScale);
+			//pModel->SetEulerOrientation(vSceneEulerOrientation);
+			
+			// Need true for children on models (might want to override)
+			pClouds->SetMaterialAmbient(0.8f, true);
 
-			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.fbx");
-			CN(pCaveModel);
-			pCaveModel->SetScale(sceneScale);
+			//model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.fbx");
+			//CN(pCaveModel);
+			//pCaveModel->SetScale(sceneScale);
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.0f, -2.0f);
 			m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
