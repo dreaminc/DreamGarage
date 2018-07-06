@@ -99,6 +99,7 @@ public:
 	std::shared_ptr<text> GetURLText();
 
 	RESULT RegisterObserver(ControlBarObserver *pObserver);
+	RESULT UnregisterObserver(ControlBarObserver *pObserver);
 
 	static BarType ControlBarTypeFromString(const std::string& strContentType);
 
@@ -169,10 +170,6 @@ private:
 	BarType m_barType = BarType::DEFAULT;
 
 	ControlBarObserver *m_pObserver = nullptr;
-
-
-	//bool m_fCanTabNext = true;
-	//bool m_fC
 };
 
 #endif UI_CONTROL_BAR_H_

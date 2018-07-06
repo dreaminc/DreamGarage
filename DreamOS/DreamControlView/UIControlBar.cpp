@@ -504,8 +504,26 @@ std::shared_ptr<text> UIControlBar::GetURLText() {
 }
 
 RESULT UIControlBar::RegisterObserver(ControlBarObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pObserver), "Observer cannot be nullptr");
+	CBM((m_pObserver == nullptr), "Can't overwrite control bar observer");
 	m_pObserver = pObserver;
-	return R_PASS;
+
+Error:
+	return r;
+}
+
+RESULT UIControlBar::UnregisterObserver(ControlBarObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pObserver == pObserver), "Control Bar Observer is not set to this object");
+
+	m_pObserver = nullptr;
+
+Error:
+	return r;
 }
 
 BarType UIControlBar::ControlBarTypeFromString(const std::string& strContentType) {

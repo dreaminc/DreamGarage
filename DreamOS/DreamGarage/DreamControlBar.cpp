@@ -180,7 +180,7 @@ RESULT DreamControlBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	
 	{
 		float width = m_pParentApp->GetBaseWidth();
-		float buttonWidth = 0.0645f * width;
+		float buttonWidth = m_buttonWidth * width;
 		float spacingSize = m_pParentApp->GetSpacingSize() * width;
 
 		m_pUIControlBar->SetTotalWidth(width);

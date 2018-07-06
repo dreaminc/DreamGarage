@@ -198,22 +198,13 @@ RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
 
 	point ptLastEvent = m_pFormView->GetLastEvent();
 	
-	/*
-	if (ptLastEvent.x() == -1 && ptLastEvent.y() == -1) {
+	m_pUserApp->SetEventApp(m_pFormView.get());
 
-		m_pForm->OnClick(ptLastEvent, false);
-		m_pForm->OnClick(ptLastEvent, true);
-	}
-	else {
-	//*/
-		// TODO: this should probably be moved into the menu kb_enter
-		m_pUserApp->SetEventApp(m_pFormView.get());
-		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
-		CN(pKeyboard);
-		pKeyboard->ShowBrowserButtons();
-		CR(m_pFormView->HandleKeyboardUp(strInitial));
-		//pKeyboard->
-	//}
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+
+	CR(pKeyboard->ShowBrowserButtons());
+	CR(m_pFormView->HandleKeyboardUp(strInitial));
 
 Error:
 	return r;

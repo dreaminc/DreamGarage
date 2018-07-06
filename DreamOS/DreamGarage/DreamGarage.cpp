@@ -923,8 +923,9 @@ RESULT DreamGarage::OnSetSettings() {
 RESULT DreamGarage::OnSettings(std::string strURL) {
 	RESULT r = R_PASS;
 
-//	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
-	CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
+	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
+	// more complicated form for testing until signup exists
+	//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
 	CR(m_pDreamSettings->Show());
 
 Error:
