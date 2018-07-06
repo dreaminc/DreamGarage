@@ -56,6 +56,9 @@ public:
 	virtual RESULT HandleNodeFocusChanged(std::string strInitial) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
+
+	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 };
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
@@ -122,9 +125,15 @@ public:
 
 	virtual RESULT HandleDreamFormSuccess();
 
+	virtual RESULT HandleCanTabNext(bool fCanNext) override;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
 	virtual RESULT HandleBackEvent();
 	virtual RESULT HandleForwardEvent();
 	virtual RESULT HandleStopEvent();
+
+	RESULT HandleTabEvent();
+	RESULT HandleBackTabEvent();
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);

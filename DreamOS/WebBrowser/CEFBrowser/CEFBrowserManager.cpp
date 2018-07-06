@@ -251,6 +251,16 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 			// TODO:
 		}
 	}
+	else if (strType == "Browser") {
+		if (strMethod == "canTabNext") {
+			bool fTabNext = pMessageArguments->GetBool(2);
+			CR(pCEFBrowserController->HandleCanTabNext(fTabNext));
+		}
+		else if (strMethod == "canTabPrevious") {
+			bool fTabPrevious = pMessageArguments->GetBool(2);
+			CR(pCEFBrowserController->HandleCanTabPrevious(fTabPrevious));
+		}
+	}
 
 
 Error:

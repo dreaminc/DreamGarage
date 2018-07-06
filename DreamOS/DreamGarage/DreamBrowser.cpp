@@ -322,6 +322,11 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 			CR(m_pObserver->HandleNodeFocusChanged(strTextField));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
+
+		if (m_pWebBrowserController != nullptr) {
+			m_pWebBrowserController->CanTabNext();
+			m_pWebBrowserController->CanTabPrevious();
+		}
 	}
 
 	if (m_pDreamUserHandle != nullptr) {
@@ -381,6 +386,27 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleCanTabNext(fCanNext));
+
+Error:
+	return r;
+
+}
+
+RESULT DreamBrowser::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleCanTabPrevious(fCanPrevious));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::HandleBackEvent() {
 	RESULT r = R_PASS;
 
@@ -412,6 +438,14 @@ RESULT DreamBrowser::HandleStopEvent() {
 Error:
 //*/
 	return r;
+}
+
+RESULT DreamBrowser::HandleTabEvent() {
+	return m_pWebBrowserController->TabNext();
+}
+
+RESULT DreamBrowser::HandleBackTabEvent() {
+	return m_pWebBrowserController->TabPrevious();
 }
 
 // DreamApp Interface

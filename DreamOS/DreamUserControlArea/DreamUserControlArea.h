@@ -131,6 +131,8 @@ public:
 	bool IsContentVisible();
 
 	virtual RESULT HandleDreamFormSuccess() override;
+	virtual RESULT HandleCanTabNext(bool fCanNext) override;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
 // Dream Desktop
 public:

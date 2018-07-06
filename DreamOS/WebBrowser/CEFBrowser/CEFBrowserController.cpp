@@ -559,6 +559,28 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::HandleCanTabNext(bool fTabNext) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleCanTabNext(fTabNext));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleCanTabPrevious(bool fTabPrevious) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleCanTabPrevious(fTabPrevious));
+	}
+
+Error:
+	return r;
+}
+
 size_t CEFBrowserController::GetFrameCount() {
 	return m_pCEFBrowser->GetFrameCount();
 }
@@ -578,6 +600,34 @@ RESULT CEFBrowserController::GoBack() {
 
 RESULT CEFBrowserController::GoForward() {
 	m_pCEFBrowser->GoForward();
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::TabNext() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.tabNext();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::TabPrevious() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.tabPrevious();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::CanTabNext() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.canTabNext();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::CanTabPrevious() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.canTabPrevious();", pFrame->GetURL(), 0);
+
 	return R_PASS;
 }
 

@@ -84,6 +84,9 @@ public:
 
 	RESULT HandleDreamFormSuccess();
 
+	RESULT HandleCanTabNext(bool fTabNext);
+	RESULT HandleCanTabPrevious(bool fTabPrevious);
+
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
 	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;
@@ -104,6 +107,11 @@ public:
 	virtual bool CanGoForward() override;
 	virtual RESULT GoBack() override;
 	virtual RESULT GoForward() override;
+
+	virtual RESULT TabNext() override;
+	virtual RESULT TabPrevious() override;
+	virtual RESULT CanTabNext() override;
+	virtual RESULT CanTabPrevious() override;
 
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;

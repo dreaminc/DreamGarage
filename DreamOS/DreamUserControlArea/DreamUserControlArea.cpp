@@ -555,6 +555,9 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
 	else {
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+		CN(pKeyboard);
+		CR(pKeyboard->ShowBrowserButtons());
 		CR(m_pControlView->HandleKeyboardUp(strInitial));
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
@@ -571,6 +574,24 @@ bool DreamUserControlArea::IsContentVisible() {
 
 RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
+Error:
+	return r;
 }
 
 RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
@@ -972,16 +993,29 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		//*
 		if (m_fKeyboardUp) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
+			//CBR(!(chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE), R_SKIPPED);
 
-			CR(m_pActiveSource->OnKeyPress(chkey, true));
-
+			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 			if (chkey == SVK_RETURN) {
+				CR(m_pActiveSource->OnKeyPress(chkey, true));
 				if (m_pControlView->m_fIsShareURL) {
 					CR(SetActiveBrowserURI());
 				}
 				else {
 					CR(HideWebsiteTyping());
 				}
+			}
+			else if (chkey == SVK_TAB) {
+				CR(pBrowser->HandleTabEvent());
+			}
+			else if (chkey == SVK_SHIFTTAB) {
+				CR(pBrowser->HandleBackTabEvent());
+			}
+			else if (chkey == SVK_CLOSE) {
+				CR(m_pControlView->HandleKeyboardDown());
+			}
+			else {
+				CR(m_pActiveSource->OnKeyPress(chkey, true));
 			}
 		}
 		else {
@@ -996,7 +1030,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				}
 			}
 			
-			else {
+			else if (chkey != SVK_CONTROL && chkey != SVK_SHIFT) { // control and shift keycodes were being added to URLs
 				m_strURL += chkey;
 			}
 		}

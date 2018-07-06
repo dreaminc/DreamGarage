@@ -29,7 +29,7 @@ RESULT DreamControlBar::InitializeApp(void *pContext) {
 
 	m_pUIControlBar = m_pView->AddUIControlBar();
 	CN(m_pUIControlBar);
-	m_pUIControlBar->SetObserver(this);
+	m_pUIControlBar->RegisterObserver(this);
 
 	GetComposite()->SetVisible(true);
 

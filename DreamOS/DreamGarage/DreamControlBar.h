@@ -38,7 +38,7 @@ public:
 	DreamControlBar(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamControlBar();
 
-// DreamApp
+	// DreamApp
 public:
 	virtual RESULT InitializeApp(void *pContext) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
@@ -48,7 +48,7 @@ public:
 protected:
 	static DreamControlBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
-// ControlBarObserver
+	// ControlBarObserver
 public:
 	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override;
@@ -58,6 +58,9 @@ public:
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override;
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);

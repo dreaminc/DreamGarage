@@ -198,18 +198,13 @@ RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
 
 	point ptLastEvent = m_pFormView->GetLastEvent();
 	
-	/*
-	if (ptLastEvent.x() == -1 && ptLastEvent.y() == -1) {
+	m_pUserApp->SetEventApp(m_pFormView.get());
 
-		m_pForm->OnClick(ptLastEvent, false);
-		m_pForm->OnClick(ptLastEvent, true);
-	}
-	else {
-	//*/
-		// TODO: this should probably be moved into the menu kb_enter
-		m_pUserApp->SetEventApp(m_pFormView.get());
-		CR(m_pFormView->HandleKeyboardUp(strInitial));
-	//}
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+
+	CR(pKeyboard->ShowBrowserButtons());
+	CR(m_pFormView->HandleKeyboardUp(strInitial));
 
 Error:
 	return r;
@@ -221,6 +216,28 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
 	int a = 5;
 
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+	
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+	
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
+
+Error:
 	return r;
 }
 
@@ -354,11 +371,23 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 		char chkey = (char)(pEvent->m_value);
 		CBR(chkey != 0x00, R_SKIPPED);	
 
-		CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 
 		if (chkey == SVK_RETURN) {
 			//CR(m_pFormView->HandleKeyboardDown());
 			CR(Hide());
+			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
+		}
+		else if (chkey == SVK_TAB) {
+			CR(m_pDreamBrowserForm->HandleTabEvent());
+		}
+		else if (chkey == SVK_SHIFTTAB) {
+			CR(m_pDreamBrowserForm->HandleBackTabEvent());
+		}
+		else if (chkey == SVK_CLOSE) {
+			CR(m_pFormView->HandleKeyboardDown());
+		}
+		else {
+			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 		}
 
 	} break;
