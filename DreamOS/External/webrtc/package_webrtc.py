@@ -27,11 +27,11 @@ except shutil.Error as err:
 except OSError as err:
     errors.extend(err.args[0])
 
-print "Packaging Debug x64"
+print "Packaging Debug"
 ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-4:] != '.lib']
-shutil.copytree(src_dir + "/out/Debug_x64/", dest_dir + "/lib/x64/Debug/", ignore=ignore_func)
+shutil.copytree(src_dir + "/out/Debug/", dest_dir + "/lib/x64/Debug/", ignore=ignore_func)
 
-print "Packaging Release x64"
+print "Packaging Release"
 ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-4:] != '.lib']
 shutil.copytree(src_dir + "/out/Release_x64/", dest_dir + "/lib/x64/Release/", ignore=ignore_func)
 

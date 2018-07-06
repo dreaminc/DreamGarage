@@ -29,9 +29,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestStandardShader());
-	
 	CR(AddTestWaterShader());
+
+	CR(AddTestStandardShader());
 
 	CR(AddTestObjectMaterials());
 
@@ -998,8 +998,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			CN(pCaveModel);
 			pCaveModel->SetScale(sceneScale);
 
-			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, 10.0f);
-			//m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
+			m_pDreamOS->GetCamera()->SetPosition(-5.0f, 4.0f, -5.0f);
+			m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
 
 
 			//texture *pLandColorTexture;

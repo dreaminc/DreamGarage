@@ -32,9 +32,9 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestChromeMultiBrowser());
-
 	CR(AddTestWebRTCMultiPeer());
+
+	CR(AddTestChromeMultiBrowser());
 
 	CR(AddTestWebRTCAudio());
 
@@ -171,7 +171,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupSkyboxPipeline("standard"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -189,11 +189,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		CN(pCommandLineManager);
 
 		// Cloud Controller
+		DEBUG_LINEOUT("Initializing Cloud Controller");
 		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
 		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
-
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
 
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
 
@@ -221,8 +219,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	auto fnTest = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		// Cloud Controller
-		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CloudController *pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
 		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
@@ -737,13 +738,21 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupSkyboxPipeline("standard"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 		CN(m_pDreamOS);
 
+		// Initialize Cloud controller if not already initialized 
+		if (m_pDreamOS->GetSandboxConfiguration().fInitCloud == false) {
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			CRM(m_pDreamOS->InitializeCloudController(), "Failed to initialize cloud controller");
+			//CRM(m_pDreamOS->GetCloudController()->Initialize(), "Failed to initialize cloud controller");
+		}
+
 		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
+		
 
 		// Objects 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
@@ -754,12 +763,6 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 		// Cloud Controller
 		CN(pTestContext->pCloudController);
-
-		// Initialize Cloud controller if not already initialized 
-		if (m_pDreamOS->GetSandboxConfiguration().fInitCloud == false) {
-			DEBUG_LINEOUT("Initializing Cloud Controller");
-			CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
-		}
 
 		// Log in 
 		{
@@ -776,7 +779,7 @@ RESULT WebRTCTestSuite::AddTestChromeMultiBrowser() {
 
 			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
 
-			long environmentID = 170;
+			long environmentID = 168;
 
 			//CR(pCommandLineManager->SetParameterValue("environment", std::to_string(6)));
 			CR(pCommandLineManager->SetParameterValue("environment", std::to_string(environmentID)));

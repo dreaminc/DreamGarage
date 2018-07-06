@@ -65,7 +65,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 
 	//int pxWidth = 256*4;
 	//int pxHeight = 256*4;
-	m_frameBufferDivisionFactor = 4;
+	m_frameBufferDivisionFactor = 2;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
