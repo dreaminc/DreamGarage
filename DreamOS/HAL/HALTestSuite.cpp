@@ -3295,7 +3295,7 @@ RESULT HALTestSuite::AddTestObjectMaterials() {
 		HALImp *pHAL = m_pDreamOS->GetHALImp();
 		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 
-		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		SinkNode *pDestSinkNode = pPipeline->GetDestinationSinkNode();
 		CNM(pDestSinkNode, "Destination sink node isn't set");
 
 		CR(pHAL->MakeCurrentContext());
