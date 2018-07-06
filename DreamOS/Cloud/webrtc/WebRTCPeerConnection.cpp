@@ -447,6 +447,9 @@ WebRTCPeerConnectionProxy* WebRTCPeerConnection::GetProxy() {
 
 // PeerConnectionObserver Interface
 
+// TODO: remove this
+//#define _USE_TEST_APP
+
 // TODO: Add multiple streams (video vector, audio vector etc)
 // This is important if we want to multiple video streams as we will need to do soon (this is per peer connection)
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
