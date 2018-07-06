@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamOS", "DreamOS.vcxproj", "{E8896328-06EB-43A0-902C-59C3D2F3A3B5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamCef", "..\DreamCef\DreamCef.vcxproj", "{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E8896328-06EB-43A0-902C-59C3D2F3A3B5} = {E8896328-06EB-43A0-902C-59C3D2F3A3B5}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamLaunch", "..\DreamLaunch\DreamLaunch.csproj", "{72DE702F-CC98-4A96-B158-D6C718C4853F}"
 EndProject
@@ -29,9 +32,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamClient", "..\DreamClie
 	EndProjectSection
 EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -418,6 +418,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {77C11F67-4B42-4AF5-961D-BAE49242CFDB}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 	GlobalSection(CodealikeProperties) = postSolution
 		SolutionGuid = f168b851-1858-4a59-9cc5-1a383d85e5dd
