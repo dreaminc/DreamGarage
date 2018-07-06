@@ -269,6 +269,40 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetUVTiling(uTiling, vTiling);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialUVTiling(uTiling, vTiling, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialAmbient(float ambient, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetAmbientIntensity(ambient);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialAmbient(ambient, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialBumpiness(float bumpiness, bool fSetChildren) {
 	RESULT r = R_PASS;
 
@@ -326,11 +360,6 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 
 //Error:
 	return r;
-}
-
-RESULT DimObj::SetMaterialAmbient(float ambient) {
-	m_material.SetAmbientIntensity(ambient);
-	return R_PASS;
 }
 
 RESULT DimObj::SetDiffuseTexture(texture *pTexture) {

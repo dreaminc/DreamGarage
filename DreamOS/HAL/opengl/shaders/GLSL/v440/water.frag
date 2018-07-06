@@ -168,7 +168,7 @@ void main(void) {
 		// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
 	
 		float minWaterOpacity = 0.1f;
-		float depthOpaque = 2.0f;
+		float depthOpaque = 4.0f;
 		
 		waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 		

@@ -29,9 +29,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestStandardShader());
+	
 	CR(AddTestWaterShader());
 
-	CR(AddTestStandardShader());
+	CR(AddTestObjectMaterials());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
@@ -996,7 +998,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			CN(pCaveModel);
 			pCaveModel->SetScale(sceneScale);
 
-			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, -5.0f);
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 4.0f, 10.0f);
 			//m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
 
 
@@ -1183,10 +1185,12 @@ RESULT HALTestSuite::AddTestStandardShader() {
 
 		
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
+#if 1
 		{
 			point ptSceneOffset = point(90, -5, -25);
-			float sceneScale = 0.025f;
+			//float sceneScale = 0.025f;
+			float sceneScale = 0.1f;
 			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
 			//model* pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
@@ -1199,16 +1203,17 @@ RESULT HALTestSuite::AddTestStandardShader() {
 			//pRiver->SetScale(sceneScale);
 			////pModel->SetEulerOrientation(vSceneEulerOrientation);
 			//
-			//model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
-			//pClouds->SetPosition(ptSceneOffset);
-			//pClouds->SetScale(sceneScale);
-			////pModel->SetEulerOrientation(vSceneEulerOrientation);
-			//
-			//pClouds->SetMaterialAmbient(0.8f);
+			model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
+			pClouds->SetPosition(ptSceneOffset);
+			pClouds->SetScale(sceneScale);
+			//pModel->SetEulerOrientation(vSceneEulerOrientation);
+			
+			// Need true for children on models (might want to override)
+			pClouds->SetMaterialAmbient(0.8f, true);
 
-			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.fbx");
-			CN(pCaveModel);
-			pCaveModel->SetScale(sceneScale);
+			//model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.fbx");
+			//CN(pCaveModel);
+			//pCaveModel->SetScale(sceneScale);
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.0f, -2.0f);
 			m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
@@ -3269,6 +3274,112 @@ Error:
 	return r;
 }
 
+
+RESULT HALTestSuite::AddTestObjectMaterials() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float radius = 0.2f;
+	int numObjs = 10;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode *pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+	
+		{
+			light *pLight = m_pDreamOS->AddLight(LIGHT_POINT, 2.0f, point(-5.0f, 5.0f, 5.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+			
+			sphere *pSphere = nullptr;
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+
+			for (int i = 0; i < numObjs; i++) {
+				for (int j = 0; j < numObjs; j++) {
+					pSphere = m_pDreamOS->AddSphere(radius, 20, 20);
+					CN(pSphere);
+					float xPos = radius * 2.5f * (((float)(i)) - (float)(numObjs) / 2.0f);
+					float zPos = radius * 2.5f * (((float)(j)) - (float)(numObjs) / 2.0f);
+
+					pSphere->SetPosition(point(xPos, zPos, 0.0f));
+
+					float shineVal = (float)(i*numObjs + j + 1) / (float)((numObjs * numObjs));
+					shineVal *= 100.0f;
+
+					float ambientVal = 0.0f;
+
+					material tempMaterial = material(shineVal, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE), ambientVal);
+
+					pSphere->SetMaterial(tempMaterial);
+
+					pSphere->SetBumpTexture(pBumpTexture);
+
+					pSphere->SetMaterialBumpiness(0.5f);
+					pSphere->SetMaterialUVTiling(2.0f, 2.0f);
+				}
+			}
+
+			//m_pDreamOS->GetCamera()->RotateXByDeg(35.0f);
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Shader HMD");
+	pNewTest->SetTestDescription("Blinn phong shader HMD test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT HALTestSuite::AddTestBlinnPhongShader() {
 	RESULT r = R_PASS;

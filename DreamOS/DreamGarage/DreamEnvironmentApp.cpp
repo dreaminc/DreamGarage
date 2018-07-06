@@ -74,7 +74,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 		auto pClouds = GetComposite()->AddModel(L"\\FloatingIsland\\clouds.obj");
 		CN(pClouds);
-		pClouds->SetMaterialAmbient(0.8f);
+		pClouds->SetMaterialAmbient(0.8f, true);
+		pClouds->translateZ(-50.0f);
 
 		//pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 		if (pOGLObj != nullptr) {

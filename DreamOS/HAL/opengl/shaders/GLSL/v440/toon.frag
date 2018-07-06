@@ -40,7 +40,7 @@ void main(void) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
 		if(dot(normal, directionLight) > 0.0f) {
-			CalculateFragmentLightValueToon(lights[i].m_power, normal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue, outlineValue);
+			CalculateFragmentLightValueToon(lights[i].m_power, material.m_shine, normal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue, outlineValue);
 			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
