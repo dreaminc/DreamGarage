@@ -351,7 +351,6 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	m_pUIControlBar->SetTotalWidth(m_surfaceWidth);
 	//m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
 	m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
-	m_pUIControlBar->SetURLWidth(0.5484f * m_surfaceWidth);
 	m_pUIControlBar->SetItemSpacing(marginError);
 
 	//pLayout->SetVisible(false);
@@ -360,7 +359,6 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 
 	m_pUIControlBar->RotateXByDeg(-90.0f);
 	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
-	m_pUIControlBar->SetVisible(true, false);
 
 Error:
 	return r;

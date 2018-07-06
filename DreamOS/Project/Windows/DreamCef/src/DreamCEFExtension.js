@@ -4,6 +4,26 @@ if (!Dream) {
     Dream = {};
     Dream.Forms = {};
     Dream.Browser = {};
+    Dream.Browser.INPUT_SELECTOR = 'input[type=password], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], textarea';
+    Dream.Browser.FOCUSED_INPUT_SELECTOR = 'input[type=password]:focus, input[type=search]:focus, input[type=email]:focus, input[type=url]:focus, input[type=tel]:focus, input[type=number]:focus, textarea:focus';
+
+    (function() {
+        Dream.Browser.getFocusedInput = function () {
+            return document.querySelector(Dream.Browser.FOCUSED_INPUT_SELECTOR);
+        }
+    })();
+
+    (function () {
+        Dream.Browser.getFormInputs = function (input) {
+            var allInputs = input.form.querySelectorAll(Dream.Browser.INPUT_SELECTOR);
+
+            var visibleInputs = Array();
+            for (var i = 0; i < allInputs.length; i++) {
+                if (window.getComputedStyle(allInputs[i]).display !== 'none') visibleInputs.push(allInputs[i]);
+            }
+
+            return visibleInputs;        }
+    })();
 }
 
 (function() {
@@ -39,11 +59,11 @@ if (!Dream) {
 
         native function canTabNext(canNext);
 
-        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
+        var focusedInput = Dream.Browser.getFocusedInput();
 
         if (focusedInput == null || focusedInput.form === undefined) return canTabNext(false);
 
-        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+        var allInputs = Dream.Browser.getFormInputs(focusedInput);
 
         var foundFocused = false;
         for (var i = 0; i < allInputs.length; i++) {
@@ -60,11 +80,11 @@ if (!Dream) {
 
         native function canTabPrevious(canPrevious);
 
-        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
+        var focusedInput = Dream.Browser.getFocusedInput();
 
         if (focusedInput == null || focusedInput.form === undefined) return canTabPrevious(false);
 
-        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+        var allInputs = Dream.Browser.getFormInputs(focusedInput);
 
         var foundFocused = false;
         for (var i = allInputs.length - 1; i >= 0; i--) {
@@ -76,13 +96,14 @@ if (!Dream) {
 
     }
 })();
+
 (function () {
     Dream.Browser.tabNext = function () {
-        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
+        var focusedInput = Dream.Browser.getFocusedInput();
 
         if (focusedInput == null || focusedInput.form === undefined) return false;
 
-        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+        var allInputs = Dream.Browser.getFormInputs(focusedInput);
 
         var foundFocused = false;
         for (var i = 0; i < allInputs.length; i++) {
@@ -98,11 +119,11 @@ if (!Dream) {
 
 (function () {
     Dream.Browser.tabPrevious = function () {
-        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
+        var focusedInput = Dream.Browser.getFocusedInput();
 
         if (focusedInput == null || focusedInput.form === undefined) return false;
 
-        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+        var allInputs = Dream.Browser.getFormInputs(focusedInput);
 
         var foundFocused = false;
         for (var i = allInputs.length - 1; i >= 0; i--) {
