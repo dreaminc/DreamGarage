@@ -232,21 +232,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 		auto pView = m_pSurfaceContainer->AddUIView(GetDOS());
 		m_pUIControlBar = pView->AddUIControlBar();
 
-		//TODO: make these numbers visible to keyboard
-		float width = m_pParentApp->GetBaseWidth();
-		float buttonWidth = 0.0645f * width;
-
-		m_pUIControlBar->SetTotalWidth(width);
-		m_pUIControlBar->SetItemSide(buttonWidth);
-		m_pUIControlBar->SetURLWidth(0.5484f * width);
-		m_pUIControlBar->SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
-
-		CR(m_pUIControlBar->Initialize());
-		CR(m_pUIControlBar->UpdateButtonsWithType(BarType::KEYBOARD));
-
-		m_pUIControlBar->RotateXByDeg(-90.0f);
-		m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth + marginError) / 2.0f));
-		m_pUIControlBar->SetVisible(true, false);
 
 		m_pUIControlBar->RegisterObserver(this);
 		m_pUIControlBar->SetVisible(false, false);
@@ -358,8 +343,26 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 		colIndex = 0;
 		rowIndex++;
 	}
-	//pLayout->SetVisible(false);
+	//TODO: make these numbers visible to keyboard
+	float width = m_pParentApp->GetBaseWidth();
+	float marginError = keyDimension * (1 - m_keyScale);
+	float buttonWidth = keyDimension;
 
+	m_pUIControlBar->SetTotalWidth(m_surfaceWidth);
+	//m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
+	m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
+	m_pUIControlBar->SetURLWidth(0.5484f * m_surfaceWidth);
+	m_pUIControlBar->SetItemSpacing(marginError);
+
+	//pLayout->SetVisible(false);
+	CR(m_pUIControlBar->Initialize());
+	CR(m_pUIControlBar->UpdateButtonsWithType(BarType::KEYBOARD));
+
+	m_pUIControlBar->RotateXByDeg(-90.0f);
+	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
+	m_pUIControlBar->SetVisible(true, false);
+
+Error:
 	return r;
 }
 
@@ -1033,7 +1036,7 @@ RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	return R_PASS;
 }
 
-RESULT UIKeyboard::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
+RESULT UIKeyboard::HandleDonePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
@@ -1073,14 +1076,20 @@ Error:
 	return r;
 }
 
+std::shared_ptr<UIControlBar> UIKeyboard::GetControlBar() {
+	return m_pUIControlBar;
+}
+
 RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
+	m_fCanTabNext = fCanTabNext;
+	auto pButton = m_pUIControlBar->GetTabButton();
 	if (fCanTabNext) {
-		CR(m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture()));
+		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture()));
 	}
 	else {
-		CR(m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture()));
+		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture()));
 	}
 
 Error:
@@ -1089,11 +1098,13 @@ Error:
 RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
 	RESULT r = R_PASS;
 
+	m_fCanTabPrevious = fCanTabPrevious;
+	auto pButton = m_pUIControlBar->GetBackTabButton();
 	if (fCanTabPrevious) {
-		CR(m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture()));
+		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture()));
 	}
 	else {
-		CR(m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture()));
+		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture()));
 	}
 
 Error:

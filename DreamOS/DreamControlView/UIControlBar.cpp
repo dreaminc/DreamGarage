@@ -48,6 +48,7 @@ RESULT UIControlBar::Initialize() {
 	m_pCantTabTexture = m_pDreamOS->MakeTexture(k_wszCantTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pBackTabTexture = m_pDreamOS->MakeTexture(k_wszBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	m_pCantBackTabTexture = m_pDreamOS->MakeTexture(k_wszCantBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pDoneTexture = m_pDreamOS->MakeTexture(k_wszDone, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	// create buttons
 
@@ -72,18 +73,21 @@ RESULT UIControlBar::Initialize() {
 	m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
 	m_pShareToggleButton->GetSurface()->SetDiffuseTexture(m_pShareTexture);
 
-	m_pTabButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
 	m_pTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
 
-	m_pBackTabButton = AddUIButton(m_itemSide, m_itemSide);
+	m_pBackTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
 	m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pBackTabTexture);
+
+	m_pDoneButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
+	m_pDoneButton->GetSurface()->SetDiffuseTexture(m_pDoneTexture);
 
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
 
 	// register all of the buttons (except for the URL button) for the selection event
 	// URL button has become less useful with the addition of the open button
-	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pTabButton, m_pBackTabButton/*, m_pURLButton*/ }) {
+	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pTabButton, m_pBackTabButton, m_pDoneButton/*, m_pURLButton*/ }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
@@ -143,6 +147,10 @@ RESULT UIControlBar::Initialize() {
 			return BackTabPressed(pButtonContext, pContext);
 		};
 
+		auto fnDoneCallback = [&](UIButton *pButtonContext, void *pContext) {
+			return DonePressed(pButtonContext, pContext);
+		};
+
 		// update button trigger events to match the observer
 		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
 		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
@@ -154,6 +162,7 @@ RESULT UIControlBar::Initialize() {
 		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
 		CR(m_pTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnTabCallback));
 		CR(m_pBackTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
+		CR(m_pDoneButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnDoneCallback));
 	}
 
 Error:
@@ -232,6 +241,14 @@ Error:
 	return r;
 }
 
+RESULT UIControlBar::DonePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+	CN(m_pObserver);
+	CR(m_pObserver->HandleDonePressed(pButtonContext, pContext));
+Error:
+	return r;
+}
+
 RESULT UIControlBar::URLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);
@@ -290,16 +307,19 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 
 		m_pBackTabButton->SetVisible(false);
 		m_pTabButton->SetVisible(false);
+		m_pDoneButton->SetVisible(false);
 	}
 	else if (m_barType == BarType::KEYBOARD) {
-		point ptTab = point(-m_itemSide - m_itemSpacing, 0.0f, 0.0f);
-		m_pTabButton->SetPosition(ptTab);
-
-		point ptBackTab = point(0.0f, 0.0f, 0.0f);
+		point ptLeft = point(-m_totalWidth / 2.0f + m_itemSpacing / 2.0f, 0.0f, 0.0f);
+		point ptBackTab = ptLeft + point(m_pBackTabButton->GetSurface()->GetWidth()/2.0f, 0.0f, 0.0f);
 		m_pBackTabButton->SetPosition(ptBackTab);
 
-		point ptClose = point(m_itemSide + m_itemSpacing, 0.0f, 0.0f);
-		m_pCloseButton->SetPosition(ptClose);
+		point ptTab = ptBackTab + point(m_pTabButton->GetSurface()->GetWidth() + m_itemSpacing, 0.0f, 0.0f);
+		m_pTabButton->SetPosition(ptTab);
+
+		point ptRight = point(m_totalWidth / 2.0f - m_itemSpacing / 2.0f, 0.0f, 0.0f);
+		point ptClose = ptRight + point(-m_pDoneButton->GetSurface()->GetWidth()/2.0f, 0.0f, 0.0f);
+		m_pDoneButton->SetPosition(ptClose);
 
 		m_pKeyboardButton->SetVisible(false);
 		m_pBackButton->SetVisible(false);
@@ -308,6 +328,7 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 		m_pShareToggleButton->SetVisible(false);
 		m_pOpenButton->SetVisible(false);
 		m_pToggleButton->SetVisible(false);
+		m_pCloseButton->SetVisible(false);
 	}
 //Error:
 	return r;
@@ -349,6 +370,9 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	//TODO: this only works if these textures are used for no other purpose
 	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pBackDisabledTexture &&
 		pButtonContext->GetSurface()->GetTextureDiffuse() != m_pForwardDisabledTexture, R_SKIPPED);
+
+	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pCantBackTabTexture &&
+		pButtonContext->GetSurface()->GetTextureDiffuse() != m_pCantTabTexture, R_SKIPPED);
 
 	pSurface = pButtonContext->GetSurface();
 
@@ -413,6 +437,10 @@ std::shared_ptr<UIButton> UIControlBar::GetTabButton() {
 
 std::shared_ptr<UIButton> UIControlBar::GetBackTabButton() {
 	return m_pBackTabButton;
+}
+
+std::shared_ptr<UIButton> UIControlBar::GetDoneButton() {
+	return m_pDoneButton;
 }
 
 std::shared_ptr<UIButton> UIControlBar::GetURLButton() {

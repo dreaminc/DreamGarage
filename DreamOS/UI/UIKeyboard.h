@@ -71,10 +71,10 @@ private:
 	virtual RESULT SetPasswordFlag(bool fIsPassword) = 0;
 };
 
-class UIKeyboard :	public DreamApp<UIKeyboard>, 
-					public UIKeyboardHandle, 
-					public SenseKeyboard,
-					public ControlBarObserver {
+class UIKeyboard : public DreamApp<UIKeyboard>,
+	public UIKeyboardHandle,
+	public SenseKeyboard,
+	public ControlBarObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
@@ -94,7 +94,7 @@ private:
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
 
-//DreamApp
+	//DreamApp
 public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
@@ -107,7 +107,7 @@ public:
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
-//Animation
+	//Animation
 public:
 	virtual RESULT ShowKeyboard() override;
 	virtual RESULT HideKeyboard() override;
@@ -121,20 +121,20 @@ private:
 	RESULT ReleaseKey(UIKey *pKey);
 	UIKey* CollisionPointToKey(point ptCollision);
 
-//SenseKeyboard
+	//SenseKeyboard
 public:
 	RESULT UpdateKeyStates();
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
 	RESULT CheckKeyState(SenseVirtualKey key);
 
-//Active Keys
+	//Active Keys
 private:
 	bool IsActiveKey(UIKey *pKey);
 	RESULT AddActiveKey(UIKey *pKey);
 	RESULT RemoveActiveKey(UIKey *pKey);
 	RESULT ClearActiveKeys();
 
-//Dynamic Resizing
+	//Dynamic Resizing
 public:
 	float GetWidth();
 	RESULT SetWidth(float width);
@@ -147,24 +147,28 @@ public:
 	RESULT SetKeyReleaseThreshold(float threshold);
 	RESULT SetSurfaceOffset(point ptOffset);
 
-//ControlBarObserver
+	//ControlBarObserver
 public:
 	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override;
 
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
 
+	std::shared_ptr<UIControlBar> GetControlBar();
 private:
 	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
+	bool m_fCanTabNext = true;
+	bool m_fCanTabPrevious = true;
 
 private:
 	RESULT UpdateViewQuad();

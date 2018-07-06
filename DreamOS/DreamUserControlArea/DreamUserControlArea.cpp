@@ -578,18 +578,18 @@ RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 
 RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
-	auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
-	CNR(pBrowser, R_SKIPPED);
-	CR(pBrowser->HandleCanTabNext(fCanNext));
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
 Error:
 	return r;
 }
 
 RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
-	auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
-	CNR(pBrowser, R_SKIPPED);
-	CR(pBrowser->HandleCanTabPrevious(fCanPrevious));
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
 Error:
 	return r;
 }
@@ -993,6 +993,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		//*
 		if (m_fKeyboardUp) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
+			CBR(!(chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE), R_SKIPPED);
 
 			CR(m_pActiveSource->OnKeyPress(chkey, true));
 

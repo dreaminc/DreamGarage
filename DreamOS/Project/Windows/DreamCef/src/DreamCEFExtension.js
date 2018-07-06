@@ -38,31 +38,20 @@ if (!Dream) {
     Dream.Browser.canTabNext = function () {
 
         native function canTabNext(canNext);
-        var thisElement = document.querySelector(':focus');
 
-        var canNext = false;
-        //var thisElement = document.activeElement;
+        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
 
-        while (thisElement = thisElement.nextElementSibling) {
-            if (thisElement == null) {
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "text") {
-                canNext = true;
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "password") {
-                canNext = true;
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "textarea") {
-                canNext = true;
-                break;
-            }
+        if (focusedInput == null || focusedInput.form === undefined) return canTabNext(false);
+
+        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+
+        var foundFocused = false;
+        for (var i = 0; i < allInputs.length; i++) {
+            if (foundFocused === true) return canTabNext(true);
+            if (allInputs[i] === focusedInput) foundFocused = true;
         }
 
-//        return canTabNext(canNext);
-        return canNext;
+        return canTabNext(false);
     }
 })();
 
@@ -71,75 +60,58 @@ if (!Dream) {
 
         native function canTabPrevious(canPrevious);
 
-        var canPrevious = false;
-        var thisElement = document.activeElement;
+        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
 
-        while (thisElement = thisElement.previousElementSibling) {
-            if (thisElement == null) {
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "text") {
-                canPrevious = true;
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "password") {
-                canPrevious = true;
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "textarea") {
-                canPrevious = true;
-                break;
-            }
+        if (focusedInput == null || focusedInput.form === undefined) return canTabPrevious(false);
+
+        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+
+        var foundFocused = false;
+        for (var i = allInputs.length - 1; i >= 0; i--) {
+            if (foundFocused === true) return canTabPrevious(true);
+            if (allInputs[i] === focusedInput) foundFocused = true;
         }
 
-        return canTabPrevious(canPrevious);
+        return canTabPrevious(false);
+
     }
 })();
 (function () {
     Dream.Browser.tabNext = function () {
-        var thisElement = document.activeElement;
+        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
 
+        if (focusedInput == null || focusedInput.form === undefined) return false;
 
-        while (thisElement = thisElement.nextElementSibling) {
-            if (thisElement == null) {
+        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+
+        var foundFocused = false;
+        for (var i = 0; i < allInputs.length; i++) {
+            if (foundFocused === true) {
+                allInputs[i].focus();
                 break;
             }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "text") {
-                thisElement.focus();
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "password") {
-                thisElement.focus();
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "textarea") {
-                thisElement.focus();
-                break;
-            }
+
+            if (allInputs[i] === focusedInput) foundFocused = true;
         }
     }
 })();
 
 (function () {
     Dream.Browser.tabPrevious = function () {
-        var thisElement = document.activeElement;
+        var focusedInput = document.querySelector('input[type=text]:focus, input[type=password]:focus, textarea:focus');
 
-        while (thisElement = thisElement.previousElementSibling) {
-            if (thisElement == null) {
+        if (focusedInput == null || focusedInput.form === undefined) return false;
+
+        var allInputs = focusedInput.form.querySelectorAll('input[type=text], input[type=password], textarea');
+
+        var foundFocused = false;
+        for (var i = allInputs.length - 1; i >= 0; i--) {
+            if (foundFocused === true) {
+                allInputs[i].focus();
                 break;
             }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "text") {
-                thisElement.focus();
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "input" && thisElement.type.toLowerCase() === "password") {
-                thisElement.focus();
-                break;
-            }
-            if (thisElement.tagName.toLowerCase() === "textarea") {
-                thisElement.focus();
-                break;
-            }
+
+            if (allInputs[i] === focusedInput) foundFocused = true;
         }
     }
 })();

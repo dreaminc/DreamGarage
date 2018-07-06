@@ -60,6 +60,7 @@ public:
 	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
 
 	// Also updates the button texture
 	RESULT SetSharingFlag(bool fIsSharing);

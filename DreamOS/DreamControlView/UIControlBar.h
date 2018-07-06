@@ -38,6 +38,7 @@ public:
 	virtual RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) = 0;
 	virtual RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) = 0;
 	virtual RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) = 0;
+	virtual RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) = 0;
 };
 
 class UIControlBar : public UIView {
@@ -63,6 +64,7 @@ public:
 	std::shared_ptr<UIButton> GetKeyboardButton();
 	std::shared_ptr<UIButton> GetTabButton();
 	std::shared_ptr<UIButton> GetBackTabButton();
+	std::shared_ptr<UIButton> GetDoneButton();
 
 	// Wrappers for executing the observer methods
 	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
@@ -75,6 +77,7 @@ public:
 	RESULT KeyboardPressed(UIButton* pButtonContext, void* pContext);
 	RESULT TabPressed(UIButton* pButtonContext, void* pContext);
 	RESULT BackTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT DonePressed(UIButton* pButtonContext, void* pContext);
 
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
@@ -119,9 +122,10 @@ public:
 
 	//TODO: need new files
 	const wchar_t *k_wszTab = L"key-tab-next.png";
-	const wchar_t *k_wszCantTab = L"control-view-forward-disabled.png";
+	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
 	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
-	const wchar_t *k_wszCantBackTab = L"control-view-back-disabled.png";
+	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
+	const wchar_t *k_wszDone = L"key-done.png";
 
 private:
 	std::shared_ptr<UIButton> m_pBackButton = nullptr;
@@ -133,6 +137,7 @@ private:
 	std::shared_ptr<UIButton> m_pKeyboardButton = nullptr;
 	std::shared_ptr<UIButton> m_pTabButton = nullptr;
 	std::shared_ptr<UIButton> m_pBackTabButton = nullptr;
+	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
 
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
 	std::shared_ptr<text> m_pURLText = nullptr;
@@ -153,6 +158,7 @@ private:
 	texture *m_pCantTabTexture = nullptr;
 	texture *m_pBackTabTexture = nullptr;
 	texture *m_pCantBackTabTexture = nullptr;
+	texture *m_pDoneTexture = nullptr;
 
 	float m_totalWidth = TOTAL_WIDTH;
 	float m_itemSide = m_totalWidth * ITEM_SIDE;
@@ -164,6 +170,9 @@ private:
 
 	ControlBarObserver *m_pObserver = nullptr;
 
+
+	//bool m_fCanTabNext = true;
+	//bool m_fC
 };
 
 #endif UI_CONTROL_BAR_H_
