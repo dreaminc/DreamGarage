@@ -71,6 +71,7 @@ public:
 		virtual RESULT HandleDreamFormSuccess() = 0;
 
 		// Dream Browser Extensions
+		virtual RESULT HandleIsInputFocused(bool fInputFocused) = 0;
 		virtual RESULT HandleCanTabNext(bool fTabNext) = 0;
 		virtual RESULT HandleCanTabPrevious(bool fTabPrevious) = 0;
 	};

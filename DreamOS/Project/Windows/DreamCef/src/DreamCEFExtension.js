@@ -136,3 +136,15 @@ if (!Dream) {
         }
     }
 })();
+
+(function () {
+    Dream.Browser.isInputFocused = function () {
+        native function isInputFocused(inputFocused);
+
+        var focusedInput = Dream.Browser.getFocusedInput();
+
+        if (focusedInput == null) return isInputFocused(false);
+
+        return isInputFocused(true);
+    }
+})();

@@ -386,6 +386,12 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
+	RESULT r = R_PASS;
+
+	return r;
+}
+
 RESULT DreamBrowser::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 

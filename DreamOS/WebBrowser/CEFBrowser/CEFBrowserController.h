@@ -84,6 +84,8 @@ public:
 
 	RESULT HandleDreamFormSuccess();
 
+	RESULT HandleIsInputFocused(bool fInputFocused);
+
 	RESULT HandleCanTabNext(bool fTabNext);
 	RESULT HandleCanTabPrevious(bool fTabPrevious);
 

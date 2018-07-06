@@ -559,6 +559,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::HandleIsInputFocused(bool fInputFocused) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleIsInputFocused(fInputFocused));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::HandleCanTabNext(bool fTabNext) {
 	RESULT r = R_PASS;
 

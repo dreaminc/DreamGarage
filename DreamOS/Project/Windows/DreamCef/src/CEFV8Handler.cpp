@@ -17,6 +17,7 @@ RESULT CEFV8Handler::Initialize() {
 	CR(RegisterExtensionFunction("setCredentials", std::bind(&CEFV8Handler::HandleDreamFormSetCredentials, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterExtensionFunction("setEnvironmentId", std::bind(&CEFV8Handler::HandleDreamFormSetEnvironmentId, this, std::placeholders::_1, std::placeholders::_2)));
 
+	CR(RegisterExtensionFunction("isInputFocused", std::bind(&CEFV8Handler::HandleDreamFormIsInputFocused, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterExtensionFunction("canTabNext", std::bind(&CEFV8Handler::HandleDreamFormCanTabNext, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterExtensionFunction("canTabPrevious", std::bind(&CEFV8Handler::HandleDreamFormCanTabPrevious, this, std::placeholders::_1, std::placeholders::_2)));
 
@@ -159,6 +160,28 @@ RESULT CEFV8Handler::HandleDreamFormSetEnvironmentId(CefRefPtr<CefBrowser> brows
 
 Error:
 	return r;
+}
+
+RESULT CEFV8Handler::HandleDreamFormIsInputFocused(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
+	RESULT r = R_PASS;
+	CefRefPtr<CefProcessMessage> pCEFProcessMessage = CefProcessMessage::Create("DreamCEFApp::DreamExtension");
+
+	const CefString strType = "Browser";
+	const CefString strMethod = "isInputFocused";
+	CefRefPtr<CefListValue> cefProcessMessageArguments = pCEFProcessMessage->GetArgumentList();
+	cefProcessMessageArguments->SetSize(3);
+
+	cefProcessMessageArguments->SetString(0, strType);
+	cefProcessMessageArguments->SetString(1, strMethod);
+
+	CB(CefArguments.size() == 1);
+	cefProcessMessageArguments->SetBool(2, CefArguments[0]->GetBoolValue());
+
+	CB((browser->SendProcessMessage(PID_BROWSER, pCEFProcessMessage)));
+
+Error:
+	return r;
+
 }
 
 RESULT CEFV8Handler::HandleDreamFormCanTabNext(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments) {
