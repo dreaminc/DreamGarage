@@ -52,6 +52,9 @@ public:
 
 	RESULT HandleDreamFormSuccess() override;
 
+	RESULT HandleCanTabNext(bool fCanNext) override;
+	RESULT HandleCanTabPrevious(bool fCanPrevious) override;
+
 public:
 	virtual RESULT Notify(UIEvent *pUIEvent) override;
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;

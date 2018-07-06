@@ -66,7 +66,13 @@ public:
 		virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType, std::string strURL) = 0;
 		virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) = 0;
 		virtual RESULT SetTitle(std::string strTitle) = 0;
+
+		// Dream Form Extensions
 		virtual RESULT HandleDreamFormSuccess() = 0;
+
+		// Dream Browser Extensions
+		virtual RESULT HandleCanTabNext(bool fTabNext) = 0;
+		virtual RESULT HandleCanTabPrevious(bool fTabPrevious) = 0;
 	};
 
 public:
@@ -96,8 +102,11 @@ public:
 	virtual RESULT GoForward() = 0;
 	virtual bool CanGoBack() = 0;
 	virtual bool CanGoForward() = 0;	
-	virtual RESULT Tab() = 0;
-	virtual RESULT TabBack() = 0;
+
+	virtual RESULT TabNext() = 0;
+	virtual RESULT TabPrevious() = 0;
+	virtual RESULT CanTabNext() = 0;
+	virtual RESULT CanTabPrevious() = 0;
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.

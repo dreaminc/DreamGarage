@@ -1073,20 +1073,29 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateTabTextures(bool fCanTab, bool fCanBackTab) {
+RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
-	if (fCanTab) {
-		m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture());
+	if (fCanTabNext) {
+		CR(m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture()));
 	}
 	else {
-		m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture());
+		CR(m_pUIControlBar->GetTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture()));
 	}
 
-	if (fCanBackTab) {
-		m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture());
+Error:
+	return r;
+}
+RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
+	RESULT r = R_PASS;
+
+	if (fCanTabPrevious) {
+		CR(m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture()));
 	}
 	else {
-		m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture());
+		CR(m_pUIControlBar->GetBackTabButton()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture()));
 	}
+
+Error:
+	return r;
 }

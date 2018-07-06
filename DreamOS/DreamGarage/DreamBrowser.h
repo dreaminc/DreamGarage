@@ -56,6 +56,9 @@ public:
 	virtual RESULT HandleNodeFocusChanged(std::string strInitial) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
+
+	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 };
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
@@ -121,6 +124,9 @@ public:
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
 
 	virtual RESULT HandleDreamFormSuccess();
+
+	virtual RESULT HandleCanTabNext(bool fCanNext) override;
+	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
 	virtual RESULT HandleBackEvent();
 	virtual RESULT HandleForwardEvent();

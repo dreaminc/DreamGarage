@@ -228,6 +228,28 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	return r;
 }
 
+RESULT DreamSettingsApp::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+	
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+	
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
+
+Error:
+	return r;
+}
+
 RESULT DreamSettingsApp::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	

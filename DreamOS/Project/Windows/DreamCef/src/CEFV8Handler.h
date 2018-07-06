@@ -29,6 +29,8 @@ public:
 	RESULT HandleDreamFormSetCredentials(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
 	RESULT HandleDreamFormSetEnvironmentId(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
 
+	RESULT HandleDreamFormCanTabNext(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
+	RESULT HandleDreamFormCanTabPrevious(CefRefPtr<CefBrowser> browser, const CefV8ValueList& CefArguments);
 	// Provide the reference counting implementation for this class.
 	IMPLEMENT_REFCOUNTING(CEFV8Handler);
 

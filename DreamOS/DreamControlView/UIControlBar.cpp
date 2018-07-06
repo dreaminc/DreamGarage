@@ -76,7 +76,7 @@ RESULT UIControlBar::Initialize() {
 	m_pTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
 
 	m_pBackTabButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
+	m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pBackTabTexture);
 
 	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
 	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);

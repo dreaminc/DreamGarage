@@ -160,7 +160,8 @@ public:
 	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
 	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
 
-	RESULT UpdateTabTextures(bool fCanTab, bool fCanBackTab);
+	RESULT UpdateTabNextTexture(bool fCanTabNext);
+	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
 
 private:
 	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;

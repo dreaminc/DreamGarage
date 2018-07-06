@@ -118,9 +118,9 @@ public:
 	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
 
 	//TODO: need new files
-	const wchar_t *k_wszTab = L"control-view-forward.png";
+	const wchar_t *k_wszTab = L"key-tab-next.png";
 	const wchar_t *k_wszCantTab = L"control-view-forward-disabled.png";
-	const wchar_t *k_wszBackTab = L"control-view-back.png";
+	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
 	const wchar_t *k_wszCantBackTab = L"control-view-back-disabled.png";
 
 private:

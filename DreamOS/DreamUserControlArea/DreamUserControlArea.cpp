@@ -576,6 +576,24 @@ RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
+	RESULT r = R_PASS;
+	auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
+	CNR(pBrowser, R_SKIPPED);
+	CR(pBrowser->HandleCanTabNext(fCanNext));
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
+	RESULT r = R_PASS;
+	auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
+	CNR(pBrowser, R_SKIPPED);
+	CR(pBrowser->HandleCanTabPrevious(fCanPrevious));
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
 
