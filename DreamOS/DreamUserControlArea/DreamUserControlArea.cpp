@@ -993,17 +993,29 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		//*
 		if (m_fKeyboardUp) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
-			CBR(!(chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE), R_SKIPPED);
+			//CBR(!(chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE), R_SKIPPED);
 
-			CR(m_pActiveSource->OnKeyPress(chkey, true));
-
+			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 			if (chkey == SVK_RETURN) {
+				CR(m_pActiveSource->OnKeyPress(chkey, true));
 				if (m_pControlView->m_fIsShareURL) {
 					CR(SetActiveBrowserURI());
 				}
 				else {
 					CR(HideWebsiteTyping());
 				}
+			}
+			else if (chkey == SVK_TAB) {
+				CR(pBrowser->HandleTabEvent());
+			}
+			else if (chkey == SVK_SHIFTTAB) {
+				CR(pBrowser->HandleBackTabEvent());
+			}
+			else if (chkey == SVK_CLOSE) {
+				CR(m_pControlView->HandleKeyboardDown());
+			}
+			else {
+				CR(m_pActiveSource->OnKeyPress(chkey, true));
 			}
 		}
 		else {
