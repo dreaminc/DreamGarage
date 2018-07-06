@@ -16,12 +16,16 @@ uniform sampler2D u_textureColor;
 
 struct Material {
 	float m_shine;
-	float m_bump;
+	float m_bumpiness;
 	float m_ambient;
 	float reserved3;
-    vec4 m_colorAmbient;
-    vec4 m_colorDiffuse;
-    vec4 m_colorSpecular;
+	vec4 m_colorAmbient;
+	vec4 m_colorDiffuse;
+	vec4 m_colorSpecular;
+	float m_tilingU;
+	float m_tilingV;
+	float reserved1;
+	float reserved2;
 };
 
 layout(std140) uniform ub_material {
