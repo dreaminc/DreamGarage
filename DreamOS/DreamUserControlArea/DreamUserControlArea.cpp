@@ -547,12 +547,14 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());
 	point ptLastEvent = m_pControlView->GetLastEvent();
 	
+	/*
 	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) &&
 		m_pActiveSource != m_pDreamDesktop) {
 		OnClick(ptLastEvent, false);
 		OnClick(ptLastEvent, true);
 	}
 	else {
+	//*/
 		// TODO: this should probably be moved into the menu kb_enter
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
@@ -562,7 +564,7 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
-	}
+	//}
 
 Error:
 	return r;
@@ -776,7 +778,7 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 		m_pDreamTabView->Show();
 		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 		CNR(pBrowser, R_SKIPPED);
-		pBrowser;
+		CR(pBrowser->HandleUnfocusEvent());
 	}
 
 Error:
@@ -1004,9 +1006,11 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				if (m_pControlView->m_fIsShareURL) {
 					CR(SetActiveBrowserURI());
 				}
+				/*
 				else {
 					CR(HideWebsiteTyping());
 				}
+				//*/
 			}
 			else if (chkey == SVK_TAB) {
 				CR(pBrowser->HandleTabEvent());
@@ -1015,6 +1019,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				CR(pBrowser->HandleBackTabEvent());
 			}
 			else if (chkey == SVK_CLOSE) {
+				CR(pBrowser->HandleUnfocusEvent());
 				CR(m_pControlView->HandleKeyboardDown());
 			}
 			else {

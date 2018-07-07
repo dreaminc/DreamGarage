@@ -214,8 +214,10 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
-	int a = 5;
+	//int a = 5;
+	CR(Hide());
 
+Error:
 	return r;
 }
 
@@ -359,6 +361,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 	switch (pEvent->m_eventType) {
 	case INTERACTION_EVENT_MENU: {
 		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
 		else {
@@ -374,7 +377,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 
 		if (chkey == SVK_RETURN) {
 			//CR(m_pFormView->HandleKeyboardDown());
-			CR(Hide());
+			//CR(Hide());
 			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 		}
 		else if (chkey == SVK_TAB) {

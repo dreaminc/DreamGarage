@@ -306,6 +306,8 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 
 	if (m_pObserver != nullptr) {
 		CR(PendUpdateObjectTextures());
+		 
+		//CR(HandleUnfocusEvent());
 	}
 
 Error:
