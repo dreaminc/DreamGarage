@@ -774,6 +774,9 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 		CR(m_pControlView->HandleKeyboardDown());
 		m_pControlBar->Show();
 		m_pDreamTabView->Show();
+		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
+		CNR(pBrowser, R_SKIPPED);
+		pBrowser;
 	}
 
 Error:

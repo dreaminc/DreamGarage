@@ -454,6 +454,10 @@ RESULT DreamBrowser::HandleBackTabEvent() {
 	return m_pWebBrowserController->TabPrevious();
 }
 
+RESULT DreamBrowser::HandleUnfocusEvent() {
+	return m_pWebBrowserController->UnfocusInput();
+}
+
 // DreamApp Interface
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;

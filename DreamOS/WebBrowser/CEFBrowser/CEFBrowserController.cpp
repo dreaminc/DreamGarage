@@ -642,6 +642,13 @@ RESULT CEFBrowserController::CanTabPrevious() {
 	return R_PASS;
 }
 
+RESULT CEFBrowserController::UnfocusInput() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Brwoser.blurFocusedInput();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
 /*
 // TODO: Put this somewhere better
 class CEFDOMVisitor : public CefDOMVisitor {

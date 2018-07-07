@@ -520,7 +520,8 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	
 	CR(HideKeyboard());
 
-	m_pUISurface->ResetLastEvent();
+//	m_pUISurface->ResetLastEvent();
+//	m_pObser
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),

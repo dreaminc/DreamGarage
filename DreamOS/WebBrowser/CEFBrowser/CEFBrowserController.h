@@ -115,6 +115,8 @@ public:
 	virtual RESULT CanTabNext() override;
 	virtual RESULT CanTabPrevious() override;
 
+	virtual RESULT UnfocusInput() override;
+
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
 

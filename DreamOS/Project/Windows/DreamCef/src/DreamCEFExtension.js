@@ -4,8 +4,8 @@ if (!Dream) {
     Dream = {};
     Dream.Forms = {};
     Dream.Browser = {};
-    Dream.Browser.INPUT_SELECTOR = 'input[type=password], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], textarea';
-    Dream.Browser.FOCUSED_INPUT_SELECTOR = 'input[type=password]:focus, input[type=search]:focus, input[type=email]:focus, input[type=url]:focus, input[type=tel]:focus, input[type=number]:focus, textarea:focus';
+    Dream.Browser.INPUT_SELECTOR = 'input[type=text], input[type=password], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], textarea';
+    Dream.Browser.FOCUSED_INPUT_SELECTOR = 'input[type=text], input[type=password]:focus, input[type=search]:focus, input[type=email]:focus, input[type=url]:focus, input[type=tel]:focus, input[type=number]:focus, textarea:focus';
 
     (function() {
         Dream.Browser.getFocusedInput = function () {
@@ -146,5 +146,15 @@ if (!Dream) {
         if (focusedInput == null) return isInputFocused(false);
 
         return isInputFocused(true);
+    }
+})();
+
+(function () {
+    Dream.Browser.blurFocusedInput = function () {
+        var focusedInput = Dream.Browser.getFocusedInput();
+
+        if (focusedInput === null) return;
+
+        focusedInput.blur();
     }
 })();

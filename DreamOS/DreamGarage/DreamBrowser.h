@@ -135,6 +135,7 @@ public:
 
 	RESULT HandleTabEvent();
 	RESULT HandleBackTabEvent();
+	RESULT HandleUnfocusEvent();
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
