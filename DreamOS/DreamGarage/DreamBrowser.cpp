@@ -321,7 +321,7 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		if (m_pObserver != nullptr) {
 			std::string strTextField = pDOMNode->GetValue();
-			CR(m_pObserver->HandleNodeFocusChanged(strTextField));
+			CR(m_pObserver->HandleNodeFocusChanged(true, strTextField));
 		}
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 
@@ -391,6 +391,12 @@ Error:
 RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
 	RESULT r = R_PASS;
 
+	CNR(m_pObserver, R_SKIPPED);
+	if (!fInputFocused) {
+		CR(m_pObserver->HandleNodeFocusChanged(false, ""));
+	}
+
+Error:
 	return r;
 }
 

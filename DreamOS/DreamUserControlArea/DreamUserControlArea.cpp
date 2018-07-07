@@ -364,7 +364,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
-		HandleNodeFocusChanged("");
+		HandleNodeFocusChanged(true, "");
 	}
 	}
 
@@ -541,7 +541,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
+RESULT DreamUserControlArea::HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) {
 	RESULT r = R_PASS;
 
 	//CR(m_pDreamUserApp->GetKeyboard()->Show());

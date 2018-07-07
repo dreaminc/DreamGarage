@@ -109,6 +109,7 @@ public:
 	virtual RESULT CanTabNext() = 0;
 	virtual RESULT CanTabPrevious() = 0;
 
+	virtual RESULT IsInputFocused() = 0;
 	virtual RESULT UnfocusInput() = 0;
 
 	// Get the new dirty frames since last time they were polled.

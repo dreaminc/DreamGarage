@@ -127,7 +127,7 @@ public:
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
 
 	//TODO: present keyboard from browser::OnNodeFocusChanged
-	virtual RESULT HandleNodeFocusChanged(std::string strInitial) override;
+	virtual RESULT HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) override;
 	bool IsContentVisible();
 
 	virtual RESULT HandleDreamFormSuccess() override;

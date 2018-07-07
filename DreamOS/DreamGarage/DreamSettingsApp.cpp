@@ -193,7 +193,7 @@ Error:
 	return r;
 }
 
-RESULT DreamSettingsApp::HandleNodeFocusChanged(std::string strInitial) {
+RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) {
 	RESULT r = R_PASS;
 
 	point ptLastEvent = m_pFormView->GetLastEvent();

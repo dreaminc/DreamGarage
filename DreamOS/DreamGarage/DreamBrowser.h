@@ -53,7 +53,7 @@ public:
 
 	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
 
-	virtual RESULT HandleNodeFocusChanged(std::string strInitial) = 0;
+	virtual RESULT HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
 
