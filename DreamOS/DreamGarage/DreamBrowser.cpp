@@ -286,6 +286,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
+		CR(m_pWebBrowserController->IsInputFocused());
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -306,8 +307,6 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 
 	if (m_pObserver != nullptr) {
 		CR(PendUpdateObjectTextures());
-		 
-		//CR(HandleUnfocusEvent());
 	}
 
 Error:

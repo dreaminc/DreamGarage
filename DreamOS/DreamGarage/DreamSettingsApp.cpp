@@ -196,15 +196,19 @@ Error:
 RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) {
 	RESULT r = R_PASS;
 
-	point ptLastEvent = m_pFormView->GetLastEvent();
-	
-	m_pUserApp->SetEventApp(m_pFormView.get());
+	if (fIsFocused) {
+		m_pUserApp->SetEventApp(m_pFormView.get());
 
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
-	CN(pKeyboard);
+		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+		CN(pKeyboard);
 
-	CR(pKeyboard->ShowBrowserButtons());
-	CR(m_pFormView->HandleKeyboardUp(strInitial));
+		CR(pKeyboard->ShowBrowserButtons());
+		CR(m_pFormView->HandleKeyboardUp(strInitial));
+	}
+	else {
+		CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+		CR(m_pFormView->HandleKeyboardDown());
+	}
 
 Error:
 	return r;
@@ -214,7 +218,6 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
-	//int a = 5;
 	CR(Hide());
 
 Error:
@@ -376,8 +379,6 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 
 
 		if (chkey == SVK_RETURN) {
-			//CR(m_pFormView->HandleKeyboardDown());
-			//CR(Hide());
 			CR(m_pDreamBrowserForm->OnKeyPress(chkey, true));
 		}
 		else if (chkey == SVK_TAB) {
@@ -387,6 +388,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 			CR(m_pDreamBrowserForm->HandleBackTabEvent());
 		}
 		else if (chkey == SVK_CLOSE) {
+			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
 		else {
