@@ -406,6 +406,22 @@ struct AVFilterContext {
      * a higher value suggests a more urgent activation.
      */
     unsigned ready;
+
+    /**
+     * Sets the number of extra hardware frames which the filter will
+     * allocate on its output links for use in following filters or by
+     * the caller.
+     *
+     * Some hardware filters require all frames that they will use for
+     * output to be defined in advance before filtering starts.  For such
+     * filters, any hardware frame pools used for output must therefore be
+     * of fixed size.  The extra frames set here are on top of any number
+     * that the filter needs internally in order to operate normally.
+     *
+     * This field must be set before the graph containing this filter is
+     * configured.
+     */
+    int extra_hw_frames;
 };
 
 /**
@@ -647,10 +663,14 @@ int avfilter_link(AVFilterContext *src, unsigned srcpad,
  */
 void avfilter_link_free(AVFilterLink **link);
 
+#if FF_API_FILTER_GET_SET
 /**
  * Get the number of channels of a link.
+ * @deprecated Use av_buffersink_get_channels()
  */
+attribute_deprecated
 int avfilter_link_get_channels(AVFilterLink *link);
+#endif
 
 /**
  * Set the closed field of a link.

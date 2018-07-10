@@ -757,7 +757,7 @@ OPENSSL_EXPORT void EVP_MD_do_all_sorted(void (*callback)(const EVP_MD *cipher,
 // RSA keys are serialized as a DER-encoded RSAPublicKey (RFC 3447) structure.
 // EC keys are serialized as a DER-encoded ECPrivateKey (RFC 5915) structure.
 //
-// Use |RSA_marshal_private_key| or |EC_marshal_private_key| instead.
+// Use |RSA_marshal_private_key| or |EC_KEY_marshal_private_key| instead.
 OPENSSL_EXPORT int i2d_PrivateKey(const EVP_PKEY *key, uint8_t **outp);
 
 // i2d_PublicKey marshals a public key from |key| to a type-specific format.
@@ -795,6 +795,16 @@ OPENSSL_EXPORT EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **out, const uint8_t **inp,
 
 // EVP_PKEY_get0_DH returns NULL.
 OPENSSL_EXPORT DH *EVP_PKEY_get0_DH(EVP_PKEY *pkey);
+
+
+// Preprocessor compatibility section (hidden).
+//
+// Historically, a number of APIs were implemented in OpenSSL as macros and
+// constants to 'ctrl' functions. To avoid breaking #ifdefs in consumers, this
+// section defines a number of legacy macros.
+
+#define EVP_PKEY_CTX_set_rsa_oaep_md EVP_PKEY_CTX_set_rsa_oaep_md
+#define EVP_PKEY_CTX_set0_rsa_oaep_label EVP_PKEY_CTX_set0_rsa_oaep_label
 
 
 // Private structures.

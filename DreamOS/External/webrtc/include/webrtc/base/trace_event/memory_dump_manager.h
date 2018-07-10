@@ -50,7 +50,7 @@ enum HeapProfilingMode {
 class BASE_EXPORT MemoryDumpManager {
  public:
   using RequestGlobalDumpFunction =
-      RepeatingCallback<void(const GlobalMemoryDumpRequestArgs& args)>;
+      RepeatingCallback<void(MemoryDumpType, MemoryDumpLevelOfDetail)>;
 
   static const char* const kTraceCategory;
 
@@ -131,15 +131,6 @@ class BASE_EXPORT MemoryDumpManager {
   void CreateProcessDump(const MemoryDumpRequestArgs& args,
                          const ProcessMemoryDumpCallback& callback);
 
-  // Returns the heap profiling mode configured on the command-line, if any.
-  // If heap profiling is configured but not supported by this binary, or if an
-  // invalid mode is specified, then kHeapProfilingInvalid is returned.
-  static HeapProfilingMode GetHeapProfilingModeFromCommandLine();
-
-  // Enable heap profiling if supported, and kEnableHeapProfiling command line
-  // is specified.
-  void EnableHeapProfilingIfNeeded();
-
   // Enable heap profiling with specified |profiling_mode|.
   // Use kHeapProfilingModeDisabled to disable, but it can't be re-enabled then.
   // Returns true if mode has been *changed* to the desired |profiling_mode|.
@@ -180,6 +171,8 @@ class BASE_EXPORT MemoryDumpManager {
   friend std::default_delete<MemoryDumpManager>;  // For the testing instance.
   friend struct DefaultSingletonTraits<MemoryDumpManager>;
   friend class MemoryDumpManagerTest;
+  FRIEND_TEST_ALL_PREFIXES(MemoryDumpManagerTest,
+                           NoStackOverflowWithTooManyMDPs);
 
   // Holds the state of a process memory dump that needs to be carried over
   // across task runners in order to fulfill an asynchronous CreateProcessDump()
@@ -238,24 +231,24 @@ class BASE_EXPORT MemoryDumpManager {
   virtual ~MemoryDumpManager();
 
   static void SetInstanceForTesting(MemoryDumpManager* instance);
-  static uint32_t GetDumpsSumKb(const std::string&, const ProcessMemoryDump*);
-
-  void FinishAsyncProcessDump(
-      std::unique_ptr<ProcessMemoryDumpAsyncState> pmd_async_state);
 
   // Lazily initializes dump_thread_ and returns its TaskRunner.
   scoped_refptr<base::SequencedTaskRunner> GetOrCreateBgTaskRunnerLocked();
 
-  // Calls InvokeOnMemoryDump() for the next MDP on the task runner specified by
-  // the MDP while registration. On failure to do so, skips and continues to
-  // next MDP.
-  void SetupNextMemoryDump(
-      std::unique_ptr<ProcessMemoryDumpAsyncState> pmd_async_state);
+  // Calls InvokeOnMemoryDump() for the each MDP that belongs to the current
+  // task runner and switches to the task runner of the next MDP. Handles
+  // failures in MDP and thread hops, and always calls FinishAsyncProcessDump()
+  // at the end.
+  void ContinueAsyncProcessDump(
+      ProcessMemoryDumpAsyncState* owned_pmd_async_state);
 
-  // Invokes OnMemoryDump() of the next MDP and calls SetupNextMemoryDump() at
-  // the end to continue the ProcessMemoryDump. Should be called on the MDP task
+  // Invokes OnMemoryDump() of the given MDP. Should be called on the MDP task
   // runner.
-  void InvokeOnMemoryDump(ProcessMemoryDumpAsyncState* owned_pmd_async_state);
+  void InvokeOnMemoryDump(MemoryDumpProviderInfo* mdpinfo,
+                          ProcessMemoryDump* pmd);
+
+  void FinishAsyncProcessDump(
+      std::unique_ptr<ProcessMemoryDumpAsyncState> pmd_async_state);
 
   // Helper for RegierDumpProvider* functions.
   void RegisterDumpProviderInternal(

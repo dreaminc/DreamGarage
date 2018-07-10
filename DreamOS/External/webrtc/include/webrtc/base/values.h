@@ -150,7 +150,6 @@ class BASE_EXPORT Value {
   Type type() const { return type_; }
 
   // Returns true if the current object represents a given type.
-  bool IsType(Type type) const { return type == type_; }
   bool is_none() const { return type() == Type::NONE; }
   bool is_bool() const { return type() == Type::BOOLEAN; }
   bool is_int() const { return type() == Type::INTEGER; }
@@ -296,6 +295,11 @@ class BASE_EXPORT Value {
   // Note: This fatally asserts if type() is not Type::DICTIONARY.
   dict_iterator_proxy DictItems();
   const_dict_iterator_proxy DictItems() const;
+
+  // Returns the size of the dictionary, and if the dictionary is empty.
+  // Note: This fatally asserts if type() is not Type::DICTIONARY.
+  size_t DictSize() const;
+  bool DictEmpty() const;
 
   // These methods allow the convenient retrieval of the contents of the Value.
   // If the current object can be converted into the given type, the value is

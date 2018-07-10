@@ -86,12 +86,12 @@ public:
 		int64_t* elapsed_time_ms,
 		int64_t* ntp_time_ms) override;
 
-	void PushCaptureData(int voe_channel,
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	//void PushCaptureData(int voe_channel,
+	//	const void* audio_data,
+	//	int bits_per_sample,
+	//	int sample_rate,
+	//	size_t number_of_channels,
+	//	size_t number_of_frames) override;
 
 	void PullRenderData(int bits_per_sample,
 		int sample_rate,
@@ -150,8 +150,8 @@ public:
 	int32_t StopRecording() override;
 	bool Recording() const override;
 
-	int32_t SetAGC(bool enable) override;
-	bool AGC() const override;
+	//int32_t SetAGC(bool enable) override;
+	//bool AGC() const override;
 
 	//int32_t SetWaveOutVolume(uint16_t volume_left, uint16_t volume_right) override;
 	//int32_t WaveOutVolume(uint16_t* volume_left, uint16_t* volume_right) const override;

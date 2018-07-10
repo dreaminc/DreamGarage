@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 2001-2008, by Cisco Systems, Inc. All rights reserved.
  * Copyright (c) 2008-2012, by Randall Stewart. All rights reserved.
  * Copyright (c) 2008-2012, by Michael Tuexen. All rights reserved.
@@ -417,7 +419,11 @@ void sctp_input __P((struct mbuf *, int));
 #endif
 void sctp_pathmtu_adjustment __P((struct sctp_tcb *, uint16_t));
 #else
+#if defined(__APPLE__) && !defined(APPLE_LEOPARD) && !defined(APPLE_SNOWLEOPARD) && !defined(APPLE_LION) && !defined(APPLE_MOUNTAINLION) && !defined(APPLE_ELCAPITAN)
+void sctp_ctlinput(int, struct sockaddr *, void *, struct ifnet * SCTP_UNUSED);
+#else
 void sctp_ctlinput(int, struct sockaddr *, void *);
+#endif
 int sctp_ctloutput(struct socket *, struct sockopt *);
 #ifdef INET
 void sctp_input_with_port(struct mbuf *, int, uint16_t);

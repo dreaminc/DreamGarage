@@ -13,6 +13,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "api/peerconnectioninterface.h"
 #include "api/test/fakeconstraints.h"
@@ -48,10 +49,10 @@ class PeerConnectionTestWrapper
   // Implements PeerConnectionObserver.
   void OnSignalingChange(
      webrtc::PeerConnectionInterface::SignalingState new_state) override {}
-  void OnAddStream(
-      rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
-  void OnRemoveStream(
-      rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override {}
+  void OnAddTrack(
+      rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+      const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&
+          streams) override;
   void OnDataChannel(
       rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) override;
   void OnRenegotiationNeeded() override {}
@@ -63,7 +64,7 @@ class PeerConnectionTestWrapper
 
   // Implements CreateSessionDescriptionObserver.
   void OnSuccess(webrtc::SessionDescriptionInterface* desc) override;
-  void OnFailure(const std::string& error) override {}
+  void OnFailure(webrtc::RTCError) override {}
 
   void CreateOffer(const webrtc::MediaConstraintsInterface* constraints);
   void CreateAnswer(const webrtc::MediaConstraintsInterface* constraints);
@@ -106,6 +107,7 @@ class PeerConnectionTestWrapper
       peer_connection_factory_;
   rtc::scoped_refptr<FakeAudioCaptureModule> fake_audio_capture_module_;
   std::unique_ptr<webrtc::FakeVideoTrackRenderer> renderer_;
+  int num_get_user_media_calls_ = 0;
 };
 
 #endif  // PC_TEST_PEERCONNECTIONTESTWRAPPER_H_
