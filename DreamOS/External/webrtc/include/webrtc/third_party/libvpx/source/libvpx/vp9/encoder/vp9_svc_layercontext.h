@@ -19,6 +19,19 @@
 extern "C" {
 #endif
 
+typedef enum {
+  // Inter-layer prediction is on on all frames.
+  INTER_LAYER_PRED_ON,
+  // Inter-layer prediction is off on all frames.
+  INTER_LAYER_PRED_OFF,
+  // Inter-layer prediction is off on non-key frames.
+  INTER_LAYER_PRED_OFF_NONKEY,
+  // Inter-layer prediction is on on all frames, but constrained such
+  // that any layer S (> 0) can only predict from previous spatial
+  // layer S-1, from the same superframe.
+  INTER_LAYER_PRED_ON_CONSTRAINED
+} INTER_LAYER_PRED;
+
 typedef struct {
   RATE_CONTROL rc;
   int target_bandwidth;
@@ -49,7 +62,7 @@ typedef struct {
   uint8_t speed;
 } LAYER_CONTEXT;
 
-typedef struct {
+typedef struct SVC {
   int spatial_layer_id;
   int temporal_layer_id;
   int number_spatial_layers;
@@ -57,7 +70,6 @@ typedef struct {
 
   int spatial_layer_to_encode;
   int first_spatial_layer_to_encode;
-  int rc_drop_superframe;
 
   // Workaround for multiple frame contexts
   enum { ENCODED = 0, ENCODING, NEED_TO_ENCODE } encode_empty_frame_state;
@@ -81,14 +93,14 @@ typedef struct {
   // Frame flags and buffer indexes for each spatial layer, set by the
   // application (external settings).
   int ext_frame_flags[VPX_MAX_LAYERS];
-  int ext_lst_fb_idx[VPX_MAX_LAYERS];
-  int ext_gld_fb_idx[VPX_MAX_LAYERS];
-  int ext_alt_fb_idx[VPX_MAX_LAYERS];
-  int ref_frame_index[REF_FRAMES];
+  int lst_fb_idx[VPX_MAX_LAYERS];
+  int gld_fb_idx[VPX_MAX_LAYERS];
+  int alt_fb_idx[VPX_MAX_LAYERS];
   int force_zero_mode_spatial_ref;
   int current_superframe;
   int non_reference_frame;
   int use_base_mv;
+  int use_partition_reuse;
   // Used to control the downscaling filter for source scaling, for 1 pass CBR.
   // downsample_filter_phase: = 0 will do sub-sampling (no weighted average),
   // = 8 will center the target pixel and get a symmetric averaging filter.
@@ -99,6 +111,41 @@ typedef struct {
 
   BLOCK_SIZE *prev_partition_svc;
   int mi_stride[VPX_MAX_LAYERS];
+
+  int first_layer_denoise;
+
+  int skip_enhancement_layer;
+
+  int lower_layer_qindex;
+
+  int last_layer_dropped[VPX_MAX_LAYERS];
+  int drop_spatial_layer[VPX_MAX_LAYERS];
+  int framedrop_thresh[VPX_MAX_LAYERS];
+  SVC_LAYER_DROP_MODE framedrop_mode;
+
+  INTER_LAYER_PRED disable_inter_layer_pred;
+
+  // Flag to indicate scene change at current superframe, scene detection is
+  // currently checked for each superframe prior to encoding, on the full
+  // resolution source.
+  int high_source_sad_superframe;
+
+  // Flags used to get SVC pattern info.
+  uint8_t update_last[VPX_SS_MAX_LAYERS];
+  uint8_t update_golden[VPX_SS_MAX_LAYERS];
+  uint8_t update_altref[VPX_SS_MAX_LAYERS];
+  uint8_t reference_last[VPX_SS_MAX_LAYERS];
+  uint8_t reference_golden[VPX_SS_MAX_LAYERS];
+  uint8_t reference_altref[VPX_SS_MAX_LAYERS];
+
+  // Keep track of the frame buffer index updated/refreshed on the base
+  // temporal superframe.
+  uint8_t fb_idx_upd_tl0[VPX_SS_MAX_LAYERS];
+
+  // Keep track of the spatial and temporal layer id of the frame that last
+  // updated the frame buffer index.
+  uint8_t fb_idx_spatial_layer_id[REF_FRAMES];
+  uint8_t fb_idx_temporal_layer_id[REF_FRAMES];
 } SVC;
 
 struct VP9_COMP;
@@ -128,6 +175,10 @@ void vp9_save_layer_context(struct VP9_COMP *const cpi);
 // Initialize second pass rc for spatial svc.
 void vp9_init_second_pass_spatial_svc(struct VP9_COMP *cpi);
 
+void get_layer_resolution(const int width_org, const int height_org,
+                          const int num, const int den, int *width_out,
+                          int *height_out);
+
 // Increment number of video frames in layer
 void vp9_inc_frame_in_layer(struct VP9_COMP *const cpi);
 
@@ -142,11 +193,19 @@ struct lookahead_entry *vp9_svc_lookahead_pop(struct VP9_COMP *const cpi,
 // Start a frame and initialize svc parameters
 int vp9_svc_start_frame(struct VP9_COMP *const cpi);
 
+void vp9_copy_flags_ref_update_idx(struct VP9_COMP *const cpi);
+
 int vp9_one_pass_cbr_svc_start_layer(struct VP9_COMP *const cpi);
 
 void vp9_free_svc_cyclic_refresh(struct VP9_COMP *const cpi);
 
 void vp9_svc_reset_key_frame(struct VP9_COMP *const cpi);
+
+void vp9_svc_check_reset_layer_rc_flag(struct VP9_COMP *const cpi);
+
+void vp9_svc_constrain_inter_layer_pred(struct VP9_COMP *const cpi);
+
+void vp9_svc_assert_constraints_pattern(struct VP9_COMP *const cpi);
 
 #ifdef __cplusplus
 }  // extern "C"

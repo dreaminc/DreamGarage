@@ -93,8 +93,6 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
       AudioDeviceModule::AudioLayer& audioLayer) const override;
   int32_t PlayoutIsAvailable(bool& available) override;
   int32_t RecordingIsAvailable(bool& available) override;
-  int32_t SetAGC(bool enable) override;
-  bool AGC() const override;
   int16_t PlayoutDevices() override;
   int16_t RecordingDevices() override;
   int32_t PlayoutDeviceName(uint16_t index,
@@ -248,7 +246,7 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   // On real iOS devices, the size will be fixed and set once. For iOS
   // simulators, the size can vary from callback to callback and the size
   // will be changed dynamically to account for this behavior.
-  rtc::BufferT<int8_t> record_audio_buffer_;
+  rtc::BufferT<int16_t> record_audio_buffer_;
 
   // Set to 1 when recording is active and 0 otherwise.
   volatile int recording_;
@@ -257,7 +255,7 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   volatile int playing_;
 
   // Set to true after successful call to Init(), false otherwise.
-  bool initialized_ RTC_ACCESS_ON(thread_checker_);
+  bool initialized_ RTC_GUARDED_BY(thread_checker_);
 
   // Set to true after successful call to InitRecording() or InitPlayout(),
   // false otherwise.
@@ -268,14 +266,14 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
 
   // Audio interruption observer instance.
   RTCAudioSessionDelegateAdapter* audio_session_observer_
-      RTC_ACCESS_ON(thread_checker_);
+      RTC_GUARDED_BY(thread_checker_);
 
   // Set to true if we've activated the audio session.
-  bool has_configured_session_ RTC_ACCESS_ON(thread_checker_);
+  bool has_configured_session_ RTC_GUARDED_BY(thread_checker_);
 
   // Counts number of detected audio glitches on the playout side.
-  int64_t num_detected_playout_glitches_ RTC_ACCESS_ON(thread_checker_);
-  int64_t last_playout_time_ RTC_ACCESS_ON(io_thread_checker_);
+  int64_t num_detected_playout_glitches_ RTC_GUARDED_BY(thread_checker_);
+  int64_t last_playout_time_ RTC_GUARDED_BY(io_thread_checker_);
 
   // Counts number of playout callbacks per call.
   // The value isupdated on the native I/O thread and later read on the
@@ -284,7 +282,7 @@ class AudioDeviceIOS : public AudioDeviceGeneric,
   int64_t num_playout_callbacks_;
 
   // Contains the time for when the last output volume change was detected.
-  int64_t last_output_volume_change_time_ RTC_ACCESS_ON(thread_checker_);
+  int64_t last_output_volume_change_time_ RTC_GUARDED_BY(thread_checker_);
 
   // Exposes private members for testing purposes only.
   FRIEND_TEST_ALL_PREFIXES(AudioDeviceTest, testInterruptedAudioSession);

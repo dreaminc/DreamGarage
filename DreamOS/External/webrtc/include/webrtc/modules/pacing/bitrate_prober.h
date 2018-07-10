@@ -14,7 +14,6 @@
 #include <queue>
 
 #include "modules/include/module_common_types.h"
-#include "rtc_base/basictypes.h"
 #include "typedefs.h"  // NOLINT(build/include)
 
 namespace webrtc {
@@ -85,9 +84,6 @@ class BitrateProber {
     int64_t time_started_ms = -1;
     int retries = 0;
   };
-
-  // Resets the state of the prober and clears any cluster/timing data tracked.
-  void ResetState(int64_t now_ms);
 
   int64_t GetNextProbeTime(const ProbeCluster& cluster);
 

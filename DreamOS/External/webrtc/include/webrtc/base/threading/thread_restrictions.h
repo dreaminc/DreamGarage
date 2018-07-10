@@ -18,6 +18,7 @@ class KeyStorageLinux;
 namespace android_webview {
 class AwFormDatabaseService;
 class CookieManager;
+class ScopedAllowInitGLBindings;
 }
 
 namespace cc {
@@ -37,6 +38,7 @@ namespace content {
 class BrowserGpuChannelHostFactory;
 class BrowserGpuMemoryBufferManager;
 class BrowserMainLoop;
+class BrowserProcessSubThread;
 class BrowserShutdownProfileDumper;
 class BrowserSurfaceViewManager;
 class BrowserTestBase;
@@ -44,15 +46,16 @@ class CategorizedWorkerPool;
 class NestedMessagePumpAndroid;
 class ScopedAllowWaitForAndroidLayoutTests;
 class ScopedAllowWaitForDebugURL;
+class SessionStorageDatabase;
 class SoftwareOutputDeviceMus;
 class SynchronousCompositor;
-class SynchronousCompositorBrowserFilter;
 class SynchronousCompositorHost;
+class SynchronousCompositorSyncCallBridge;
 class TextInputClientMac;
 }  // namespace content
 namespace cronet {
 class CronetPrefsManager;
-class CronetURLRequestContextAdapter;
+class CronetURLRequestContext;
 }  // namespace cronet
 namespace dbus {
 class Bus;
@@ -61,6 +64,9 @@ namespace disk_cache {
 class BackendImpl;
 class InFlightIO;
 }
+namespace functions {
+class ExecScriptScopedAllowBaseSyncPrimitives;
+}
 namespace gpu {
 class GpuChannelHost;
 }
@@ -68,9 +74,14 @@ namespace leveldb {
 class LevelDBMojoProxy;
 }
 namespace media {
+class AudioInputDevice;
 class BlockingUrlProtocol;
 }
+namespace midi {
+class TaskService;  // https://crbug.com/796830
+}
 namespace mojo {
+class CoreLibraryInitializer;
 class SyncCallRestrictions;
 namespace edk {
 class ScopedIPCSupport;
@@ -83,6 +94,7 @@ namespace ui {
 class CommandBufferClientImpl;
 class CommandBufferLocal;
 class GpuState;
+class MaterialDesignController;
 }
 namespace net {
 class MultiThreadedCertVerifierScopedAllowBaseSyncPrimitives;
@@ -98,6 +110,10 @@ class AutoThread;
 
 namespace resource_coordinator {
 class TabManagerDelegate;
+}
+
+namespace service_manager {
+class ServiceProcessLauncher;
 }
 
 namespace shell_integration {
@@ -116,6 +132,10 @@ namespace viz {
 class ServerGpuMemoryBufferManager;
 }
 
+namespace webrtc {
+class DesktopConfigurationMonitor;
+}
+
 namespace base {
 
 namespace android {
@@ -127,7 +147,6 @@ class TaskTracker;
 }
 
 class GetAppOutputScopedAllowBaseSyncPrimitives;
-class SequencedWorkerPool;
 class SimpleThread;
 class StackSamplingProfiler;
 class Thread;
@@ -199,10 +218,16 @@ class BASE_EXPORT ScopedAllowBlocking {
   // This can only be instantiated by friends. Use ScopedAllowBlockingForTesting
   // in unit tests to avoid the friend requirement.
   FRIEND_TEST_ALL_PREFIXES(ThreadRestrictionsTest, ScopedAllowBlocking);
+  friend class android_webview::ScopedAllowInitGLBindings;
+  friend class content::BrowserProcessSubThread;
   friend class cronet::CronetPrefsManager;
-  friend class cronet::CronetURLRequestContextAdapter;
+  friend class cronet::CronetURLRequestContext;
+  friend class media::AudioInputDevice;
+  friend class mojo::CoreLibraryInitializer;
   friend class resource_coordinator::TabManagerDelegate;  // crbug.com/778703
+  friend class ui::MaterialDesignController;
   friend class ScopedAllowBlockingForTesting;
+  friend class StackSamplingProfiler;
 
   ScopedAllowBlocking() EMPTY_BODY_IF_DCHECK_IS_OFF;
   ~ScopedAllowBlocking() EMPTY_BODY_IF_DCHECK_IS_OFF;
@@ -262,11 +287,14 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitives {
   FRIEND_TEST_ALL_PREFIXES(ThreadRestrictionsTest,
                            ScopedAllowBaseSyncPrimitivesWithBlockingDisallowed);
   friend class base::GetAppOutputScopedAllowBaseSyncPrimitives;
+  friend class content::SessionStorageDatabase;
+  friend class functions::ExecScriptScopedAllowBaseSyncPrimitives;
   friend class leveldb::LevelDBMojoProxy;
   friend class media::BlockingUrlProtocol;
   friend class net::MultiThreadedCertVerifierScopedAllowBaseSyncPrimitives;
   friend class rlz_lib::FinancialPing;
   friend class shell_integration::LaunchXdgUtilityScopedAllowBaseSyncPrimitives;
+  friend class webrtc::DesktopConfigurationMonitor;
 
   ScopedAllowBaseSyncPrimitives() EMPTY_BODY_IF_DCHECK_IS_OFF;
   ~ScopedAllowBaseSyncPrimitives() EMPTY_BODY_IF_DCHECK_IS_OFF;
@@ -290,6 +318,12 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitivesOutsideBlockingScope {
       ThreadRestrictionsTest,
       ScopedAllowBaseSyncPrimitivesOutsideBlockingScopeResetsState);
   friend class ::KeyStorageLinux;
+  friend class content::SynchronousCompositor;
+  friend class content::SynchronousCompositorHost;
+  friend class content::SynchronousCompositorSyncCallBridge;
+  friend class midi::TaskService;  // https://crbug.com/796830
+  // Not used in production yet, https://crbug.com/844078.
+  friend class service_manager::ServiceProcessLauncher;
 
   ScopedAllowBaseSyncPrimitivesOutsideBlockingScope()
       EMPTY_BODY_IF_DCHECK_IS_OFF;
@@ -339,11 +373,13 @@ class BASE_EXPORT ThreadRestrictions {
   // DEPRECATED. Use ScopedAllowBlocking(ForTesting).
   class BASE_EXPORT ScopedAllowIO {
    public:
-    ScopedAllowIO() { previous_value_ = SetIOAllowed(true); }
-    ~ScopedAllowIO() { SetIOAllowed(previous_value_); }
+    ScopedAllowIO() EMPTY_BODY_IF_DCHECK_IS_OFF;
+    ~ScopedAllowIO() EMPTY_BODY_IF_DCHECK_IS_OFF;
+
    private:
-    // Whether IO is allowed when the ScopedAllowIO was constructed.
-    bool previous_value_;
+#if DCHECK_IS_ON()
+    const bool was_allowed_;
+#endif
 
     DISALLOW_COPY_AND_ASSIGN(ScopedAllowIO);
   };
@@ -391,9 +427,6 @@ class BASE_EXPORT ThreadRestrictions {
   friend class content::NestedMessagePumpAndroid;
   friend class content::ScopedAllowWaitForAndroidLayoutTests;
   friend class content::ScopedAllowWaitForDebugURL;
-  friend class content::SynchronousCompositor;
-  friend class content::SynchronousCompositorBrowserFilter;
-  friend class content::SynchronousCompositorHost;
   friend class ::HistogramSynchronizer;
   friend class internal::TaskTracker;
   friend class cc::CompletionEvent;
@@ -402,7 +435,6 @@ class BASE_EXPORT ThreadRestrictions {
   friend class remoting::AutoThread;
   friend class ui::WindowResizeHelperMac;
   friend class MessagePumpDefault;
-  friend class SequencedWorkerPool;
   friend class SimpleThread;
   friend class Thread;
   friend class ThreadTestHelper;
@@ -454,12 +486,13 @@ class BASE_EXPORT ThreadRestrictions {
   // DEPRECATED. Use ScopedAllowBaseSyncPrimitives.
   class BASE_EXPORT ScopedAllowWait {
    public:
-    ScopedAllowWait() { previous_value_ = SetWaitAllowed(true); }
-    ~ScopedAllowWait() { SetWaitAllowed(previous_value_); }
+    ScopedAllowWait() EMPTY_BODY_IF_DCHECK_IS_OFF;
+    ~ScopedAllowWait() EMPTY_BODY_IF_DCHECK_IS_OFF;
+
    private:
-    // Whether singleton use is allowed when the ScopedAllowWait was
-    // constructed.
-    bool previous_value_;
+#if DCHECK_IS_ON()
+    const bool was_allowed_;
+#endif
 
     DISALLOW_COPY_AND_ASSIGN(ScopedAllowWait);
   };

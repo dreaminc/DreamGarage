@@ -53,6 +53,7 @@ class OwnedFactoryAndThreads {
   ~OwnedFactoryAndThreads();
 
   PeerConnectionFactoryInterface* factory() { return factory_; }
+  Thread* network_thread() { return network_thread_.get(); }
   Thread* signaling_thread() { return signaling_thread_.get(); }
   Thread* worker_thread() { return worker_thread_.get(); }
   WebRtcVideoEncoderFactory* legacy_encoder_factory() {
@@ -68,8 +69,6 @@ class OwnedFactoryAndThreads {
   void InvokeJavaCallbacksOnFactoryThreads();
 
  private:
-  void JavaCallbackOnFactoryThreads();
-
   const std::unique_ptr<Thread> network_thread_;
   const std::unique_ptr<Thread> worker_thread_;
   const std::unique_ptr<Thread> signaling_thread_;

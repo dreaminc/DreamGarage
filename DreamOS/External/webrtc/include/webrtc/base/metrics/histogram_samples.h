@@ -159,6 +159,11 @@ class BASE_EXPORT HistogramSamples {
     return subtle::NoBarrier_Load(&meta_->redundant_count);
   }
 
+  // Temporarily visible for crash debugging. Should be protected.
+  // TODO(bcwhite): Move this back where it belongs.
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=836875
+  Metadata* meta() { return meta_; }
+
  protected:
   enum NegativeSampleReason {
     SAMPLES_HAVE_LOGGED_BUT_NOT_SAMPLE,
@@ -196,9 +201,10 @@ class BASE_EXPORT HistogramSamples {
     return meta_->single_sample;
   }
 
-  Metadata* meta() { return meta_; }
-
  private:
+  // Depending on derived class meta values can come from local stoarge or
+  // external storage in which case HistogramSamples class cannot take ownership
+  // of Metadata*.
   Metadata* meta_;
 
   DISALLOW_COPY_AND_ASSIGN(HistogramSamples);
