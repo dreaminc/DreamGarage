@@ -10,6 +10,7 @@
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "WebBrowser/DOMNode.h"
 #include "Cloud/Environment/EnvironmentAsset.h"	
 
 #include "InteractionEngine/InteractionObjectEvent.h"
@@ -364,7 +365,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
-		HandleNodeFocusChanged("");
+		//HandleNodeFocusChanged(true, m_pActiveSource.get());
 	}
 	}
 
@@ -541,27 +542,56 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleNodeFocusChanged(std::string strInitial) {
+RESULT DreamUserControlArea::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
-	//CR(m_pDreamUserApp->GetKeyboard()->Show());
-	point ptLastEvent = m_pControlView->GetLastEvent();
-	
-	if ((ptLastEvent.x() == -1 && ptLastEvent.y() == -1) &&
-		m_pActiveSource != m_pDreamDesktop) {
-		OnClick(ptLastEvent, false);
-		OnClick(ptLastEvent, true);
+	bool fMaskPasswordEnabled = false;
+
+	UIKeyboard* pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	CN(pKeyboard);
+
+	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
+	CN(pDOMNode);
+
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable() && !m_fKeyboardUp) {
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		fMaskPasswordEnabled = pDOMNode->IsPassword();
+
+		CR(pKeyboard->ShowBrowserButtons());
+		CR(m_pControlView->HandleKeyboardUp());
+		CR(m_pControlBar->Hide());
+		CR(m_pDreamTabView->Hide());
+
+		std::string strTextField = pDOMNode->GetValue();
+		pKeyboard->PopulateKeyboardTextBox(strTextField);
+
+		m_fKeyboardUp = true;
 	}
-	else {
-		// TODO: this should probably be moved into the menu kb_enter
+
+	pKeyboard->SetPasswordFlag(fMaskPasswordEnabled);
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
+	CBR(!m_pControlView->m_fIsShareURL, R_SKIPPED);
+
+	if (fIsFocused) {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 		CN(pKeyboard);
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pControlView->HandleKeyboardUp(strInitial));
+		CR(m_pControlView->HandleKeyboardUp());
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
+	}
+	else {
+		CR(HideWebsiteTyping());
 	}
 
 Error:
@@ -774,6 +804,9 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 		CR(m_pControlView->HandleKeyboardDown());
 		m_pControlBar->Show();
 		m_pDreamTabView->Show();
+		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
+		CNR(pBrowser, R_SKIPPED);
+		CR(pBrowser->HandleUnfocusEvent());
 	}
 
 Error:
@@ -1001,9 +1034,11 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				if (m_pControlView->m_fIsShareURL) {
 					CR(SetActiveBrowserURI());
 				}
+				/*
 				else {
 					CR(HideWebsiteTyping());
 				}
+				//*/
 			}
 			else if (chkey == SVK_TAB) {
 				CR(pBrowser->HandleTabEvent());
@@ -1012,7 +1047,9 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 				CR(pBrowser->HandleBackTabEvent());
 			}
 			else if (chkey == SVK_CLOSE) {
-				CR(m_pControlView->HandleKeyboardDown());
+				//CR(pBrowser->HandleUnfocusEvent());
+				//CR(m_pControlView->HandleKeyboardDown());
+				CR(HideWebsiteTyping());
 			}
 			else {
 				CR(m_pActiveSource->OnKeyPress(chkey, true));

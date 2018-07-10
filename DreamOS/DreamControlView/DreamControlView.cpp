@@ -520,8 +520,6 @@ RESULT DreamControlView::HandleKeyboardDown() {
 	
 	CR(HideKeyboard());
 
-	m_pUISurface->ResetLastEvent();
-
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
 		m_ptVisiblePosition,	
@@ -536,7 +534,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardUp(std::string strTextField) {
+RESULT DreamControlView::HandleKeyboardUp() {
 	RESULT r = R_PASS;
 
 	point ptTypingPosition;
@@ -560,7 +558,6 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField) {
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
-		CR(m_pKeyboardHandle->PopulateTextBox(strTextField));
 	}
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(

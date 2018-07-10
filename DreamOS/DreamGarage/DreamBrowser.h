@@ -53,7 +53,8 @@ public:
 
 	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
 
-	virtual RESULT HandleNodeFocusChanged(std::string strInitial) = 0;
+	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
 
@@ -125,6 +126,7 @@ public:
 
 	virtual RESULT HandleDreamFormSuccess();
 
+	virtual RESULT HandleIsInputFocused(bool fInputFocused) override;
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
@@ -134,6 +136,7 @@ public:
 
 	RESULT HandleTabEvent();
 	RESULT HandleBackTabEvent();
+	RESULT HandleUnfocusEvent();
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);

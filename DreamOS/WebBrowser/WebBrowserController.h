@@ -71,6 +71,7 @@ public:
 		virtual RESULT HandleDreamFormSuccess() = 0;
 
 		// Dream Browser Extensions
+		virtual RESULT HandleIsInputFocused(bool fInputFocused) = 0;
 		virtual RESULT HandleCanTabNext(bool fTabNext) = 0;
 		virtual RESULT HandleCanTabPrevious(bool fTabPrevious) = 0;
 	};
@@ -107,6 +108,9 @@ public:
 	virtual RESULT TabPrevious() = 0;
 	virtual RESULT CanTabNext() = 0;
 	virtual RESULT CanTabPrevious() = 0;
+
+	virtual RESULT IsInputFocused() = 0;
+	virtual RESULT UnfocusInput() = 0;
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.

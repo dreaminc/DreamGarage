@@ -559,6 +559,17 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::HandleIsInputFocused(bool fInputFocused) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleIsInputFocused(fInputFocused));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::HandleCanTabNext(bool fTabNext) {
 	RESULT r = R_PASS;
 
@@ -627,6 +638,20 @@ RESULT CEFBrowserController::CanTabNext() {
 RESULT CEFBrowserController::CanTabPrevious() {
 	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
 	pFrame->ExecuteJavaScript("Dream.Browser.canTabPrevious();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::IsInputFocused() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.isInputFocused();", pFrame->GetURL(), 0);
+
+	return R_PASS;
+}
+
+RESULT CEFBrowserController::UnfocusInput() {
+	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+	pFrame->ExecuteJavaScript("Dream.Browser.blurFocusedInput();", pFrame->GetURL(), 0);
 
 	return R_PASS;
 }

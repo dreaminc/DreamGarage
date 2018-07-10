@@ -260,6 +260,10 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 			bool fTabPrevious = pMessageArguments->GetBool(2);
 			CR(pCEFBrowserController->HandleCanTabPrevious(fTabPrevious));
 		}
+		else if (strMethod == "isInputFocused") {
+			bool fInputFocused = pMessageArguments->GetBool(2);
+			CR(pCEFBrowserController->HandleIsInputFocused(fInputFocused));
+		}
 	}
 
 

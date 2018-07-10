@@ -84,6 +84,8 @@ public:
 
 	RESULT HandleDreamFormSuccess();
 
+	RESULT HandleIsInputFocused(bool fInputFocused);
+
 	RESULT HandleCanTabNext(bool fTabNext);
 	RESULT HandleCanTabPrevious(bool fTabPrevious);
 
@@ -112,6 +114,9 @@ public:
 	virtual RESULT TabPrevious() override;
 	virtual RESULT CanTabNext() override;
 	virtual RESULT CanTabPrevious() override;
+
+	virtual RESULT IsInputFocused() override;
+	virtual RESULT UnfocusInput() override;
 
 	// Get Focused DOM element
 	//virtual RESULT GetFocusedNode() override;
