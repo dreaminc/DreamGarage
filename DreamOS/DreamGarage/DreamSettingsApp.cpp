@@ -193,7 +193,7 @@ Error:
 	return r;
 }
 
-RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) {
+RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	if (fIsFocused) {
@@ -203,7 +203,7 @@ RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, std::string str
 		CN(pKeyboard);
 
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pFormView->HandleKeyboardUp(strInitial));
+		CR(m_pFormView->HandleKeyboardUp());
 	}
 	else {
 		CR(m_pDreamBrowserForm->HandleUnfocusEvent());

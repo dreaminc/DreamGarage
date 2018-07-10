@@ -534,7 +534,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardUp(std::string strTextField) {
+RESULT DreamControlView::HandleKeyboardUp() {
 	RESULT r = R_PASS;
 
 	point ptTypingPosition;
@@ -558,7 +558,6 @@ RESULT DreamControlView::HandleKeyboardUp(std::string strTextField) {
 
 	if (m_pKeyboardHandle == nullptr) {
 		CR(ShowKeyboard());
-		CR(m_pKeyboardHandle->PopulateTextBox(strTextField));
 	}
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(

@@ -67,7 +67,7 @@ public:
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
 
-	RESULT HandleKeyboardUp(std::string strTextField);
+	RESULT HandleKeyboardUp();
 	virtual RESULT HandleKeyboardDown();
 
 	RESULT ResetAppComposite();

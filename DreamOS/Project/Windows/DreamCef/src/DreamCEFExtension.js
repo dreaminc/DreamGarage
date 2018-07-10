@@ -5,21 +5,24 @@ if (!Dream) {
     Dream.Forms = {};
     Dream.Browser = {};
     Dream.Browser.INPUT_SELECTOR = 'input[type=text], input[type=password], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], textarea';
-    Dream.Browser.FOCUSED_INPUT_SELECTOR = 'input[type=text], input[type=password]:focus, input[type=search]:focus, input[type=email]:focus, input[type=url]:focus, input[type=tel]:focus, input[type=number]:focus, textarea:focus';
+    Dream.Browser.FOCUSED_INPUT_SELECTOR = 'input[type=text]:focus, input[type=password]:focus, input[type=search]:focus, input[type=email]:focus, input[type=url]:focus, input[type=tel]:focus, input[type=number]:focus, textarea:focus';
 
     (function() {
         Dream.Browser.getFocusedInput = function () {
-            return document.querySelector(Dream.Browser.FOCUSED_INPUT_SELECTOR);
+            var input = document.querySelector(Dream.Browser.FOCUSED_INPUT_SELECTOR);
+            if (input !== null && input.offsetHeight > 0 && input.offsetWidth > 0) return input;
+            return null;
         }
     })();
 
     (function () {
         Dream.Browser.getFormInputs = function (input) {
-            var allInputs = input.form.querySelectorAll(Dream.Browser.INPUT_SELECTOR);
+            //var allInputs = input.form.querySelectorAll(Dream.Browser.INPUT_SELECTOR);
+            var allInputs = document.querySelectorAll(Dream.Browser.INPUT_SELECTOR);
 
             var visibleInputs = Array();
             for (var i = 0; i < allInputs.length; i++) {
-                if (window.getComputedStyle(allInputs[i]).display !== 'none') visibleInputs.push(allInputs[i]);
+                if (allInputs[i].offsetHeight > 0 && allInputs[i].offsetWidth > 0) visibleInputs.push(allInputs[i]);
             }
 
             return visibleInputs;        }

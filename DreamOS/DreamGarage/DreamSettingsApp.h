@@ -48,7 +48,7 @@ public:
 
 	RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override;
 
-	RESULT HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) override;
+	RESULT HandleNodeFocusChanged(bool fIsFocused, DreamContentSource *pContext) override;
 
 	RESULT HandleDreamFormSuccess() override;
 

@@ -364,7 +364,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		float yValue = (DEFAULT_PX_HEIGHT) + (DEFAULT_PX_HEIGHT * SPACING_SIZE);
-		HandleNodeFocusChanged(true, "");
+		HandleNodeFocusChanged(true, m_pActiveSource.get());
 	}
 	}
 
@@ -541,22 +541,23 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleNodeFocusChanged(bool fIsFocused, std::string strInitial) {
+RESULT DreamUserControlArea::HandleNodeFocusChanged(bool fIsFocused, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
+
+	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
 
 	if (fIsFocused) {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 		CN(pKeyboard);
 		CR(pKeyboard->ShowBrowserButtons());
-		CR(m_pControlView->HandleKeyboardUp(strInitial));
+		CR(m_pControlView->HandleKeyboardUp());
 		CR(m_pControlBar->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
 	}
 	else {
 		CR(HideWebsiteTyping());
-		m_fKeyboardUp = true;
 	}
 
 Error:
