@@ -318,33 +318,13 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	UIKeyboardHandle *pKeyboardHandle = nullptr;
 
-	if (m_pDreamUserHandle != nullptr) {
-		pKeyboardHandle = m_pDreamUserHandle->RequestKeyboard();
-	}
-
-	bool fMaskPasswordEnabled = false;
+	CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		if (m_pObserver != nullptr) {
-			std::string strTextField = pDOMNode->GetValue();
-			CR(m_pObserver->HandleNodeFocusChanged(true, this));
-			CR(pKeyboardHandle->PopulateTextBox(strTextField));
-		}
-		fMaskPasswordEnabled = pDOMNode->IsPassword();
-
 		if (m_pWebBrowserController != nullptr) {
-			m_pWebBrowserController->CanTabNext();
-			m_pWebBrowserController->CanTabPrevious();
+			CR(m_pWebBrowserController->CanTabNext());
+			CR(m_pWebBrowserController->CanTabPrevious());
 		}
 	}
-		
-	if (m_pDreamUserHandle != nullptr) {
-		if (pKeyboardHandle != nullptr) {
-			CR(pKeyboardHandle->SendPasswordFlag(fMaskPasswordEnabled));
-		}
-		m_pDreamUserHandle->SendReleaseKeyboard();
-		pKeyboardHandle = nullptr;
-	}
-
 
 Error:
 	return r;
@@ -399,7 +379,7 @@ RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
 
 	CNR(m_pObserver, R_SKIPPED);
 
-	CR(m_pObserver->HandleNodeFocusChanged(fInputFocused, this));
+	CR(m_pObserver->HandleIsInputFocused(fInputFocused, this));
 
 Error:
 	return r;

@@ -53,7 +53,8 @@ public:
 
 	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
 
-	virtual RESULT HandleNodeFocusChanged(bool fIsFocused, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
 

@@ -10,6 +10,7 @@
 
 #include "UI/UISurface.h"
 
+#include "WebBrowser/DOMNode.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 
 
@@ -193,7 +194,34 @@ Error:
 	return r;
 }
 
-RESULT DreamSettingsApp::HandleNodeFocusChanged(bool fIsFocused, DreamContentSource *pContext) {
+RESULT DreamSettingsApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) {
+	RESULT r = R_PASS;
+
+	bool fMaskPasswordEnabled = false;
+
+	UIKeyboard* pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	CN(pKeyboard);
+
+	CN(pDOMNode);
+
+	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
+		m_pUserApp->SetEventApp(m_pFormView.get());
+		fMaskPasswordEnabled = pDOMNode->IsPassword();
+
+		CR(pKeyboard->ShowBrowserButtons());
+		CR(m_pFormView->HandleKeyboardUp());
+
+		std::string strTextField = pDOMNode->GetValue();
+		pKeyboard->PopulateKeyboardTextBox(strTextField);
+	}
+
+	pKeyboard->SetPasswordFlag(fMaskPasswordEnabled);
+
+Error:
+	return r;
+}
+
+RESULT DreamSettingsApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	if (fIsFocused) {
