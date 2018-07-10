@@ -16,8 +16,8 @@ dest_dir = sys.argv[2]
 
 errors = []
 
-print "Packaging includes"
-ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-2:] != '.h']
+print("Packaging includes")
+ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and not f.endswith('.h')]
 
 # TODO: Move into function
 try:
@@ -27,18 +27,18 @@ except shutil.Error as err:
 except OSError as err:
     errors.extend(err.args[0])
 
-print "Packaging Debug"
-ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-4:] != '.lib']
-shutil.copytree(src_dir + "/out/Debug/", dest_dir + "/lib/x64/Debug/", ignore=ignore_func)
+print("Packaging Debug")
+ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and  not f.endswith('.lib')]
+shutil.copytree(src_dir + "/out/Debug_x64/", dest_dir + "/lib/x64/Debug/", ignore=ignore_func)
 
-print "Packaging Release"
-ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-4:] != '.lib']
+print("Packaging Release")
+ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and not f.endswith('.lib')]
 shutil.copytree(src_dir + "/out/Release_x64/", dest_dir + "/lib/x64/Release/", ignore=ignore_func)
 
-print "Packaging json"
+print("Packaging json")
 #ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-2:] != '.h']
 #copytree(src_dir + "/third_party/jsoncpp/overrides/include/", dest_dir + "/include/jsoncpp/", ignore=ignore_func)
-ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and f[-2:] != '.h']
+ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and not f.endswith('.h')]
 shutil.copytree(src_dir + "/third_party/jsoncpp/source/include/", dest_dir + "/include/jsoncpp/", ignore=ignore_func)
 
 # Print out errors

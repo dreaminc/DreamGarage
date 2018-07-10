@@ -152,7 +152,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	}
 
 	// Insert it into our local active streams (referenced in OnAddStream
-	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
+	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
 
 	// Chrome Media Stream
 	CB((m_WebRTCLocalActiveStreams.find(kChromeStreamLabel) == m_WebRTCLocalActiveStreams.end()));
@@ -448,7 +448,7 @@ WebRTCPeerConnectionProxy* WebRTCPeerConnection::GetProxy() {
 // PeerConnectionObserver Interface
 
 // TODO: remove this
-//#define _USE_TEST_APP
+#define _USE_TEST_APP
 
 // TODO: Add multiple streams (video vector, audio vector etc)
 // This is important if we want to multiple video streams as we will need to do soon (this is per peer connection)
@@ -456,12 +456,12 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	
 	// TODO: do we add to a map like out going? Or check existing ?
 
-	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
+	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->id().c_str());
 
 	// Add to remote streams
-	if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->label()) == m_WebRTCRemoteActiveStreams.end()) {
+	if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->id()) == m_WebRTCRemoteActiveStreams.end()) {
 		typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-		m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
+		m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
 	}
 
 	if (!pMediaStreamInterface) {
@@ -558,7 +558,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 }
 
 void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
-	DEBUG_LINEOUT("OnRemoveStream: %s", pMediaStreamInterface->label().c_str());
+	DEBUG_LINEOUT("OnRemoveStream: %s", pMediaStreamInterface->id().c_str());
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnRemoveStream(m_peerConnectionID, pMediaStreamInterface);

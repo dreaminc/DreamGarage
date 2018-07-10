@@ -74,6 +74,7 @@
 
 #include "base/base_export.h"
 #include "base/compiler_specific.h"
+#include "base/containers/span.h"
 #include "base/gtest_prod_util.h"
 #include "base/logging.h"
 #include "base/macros.h"
@@ -208,14 +209,9 @@ class BASE_EXPORT Histogram : public HistogramBase {
   void WriteHTMLGraph(std::string* output) const override;
   void WriteAscii(std::string* output) const override;
 
-  // Validates the histogram contents. If |crash_if_invalid| is true and the
-  // histogram is invalid, this will trigger a CHECK. Otherwise, it will return
-  // a bool indicating if the histogram is valid. |corrupted_count| is extra
-  // information the caller can provide about the number of corrupt histograms
-  // if available.
-  // TODO(bcwhite): Remove this after crbug/736675.
-  bool ValidateHistogramContents(bool crash_if_invalid,
-                                 int identifier) const override;
+  // Validates the histogram contents and CHECKs on errors.
+  // TODO(bcwhite): Remove this after https://crbug/836875.
+  void ValidateHistogramContents() const override;
 
  protected:
   // This class, defined entirely within the .cc file, contains all the
@@ -317,13 +313,6 @@ class BASE_EXPORT Histogram : public HistogramBase {
 
   // Accumulation of all samples that have been logged with SnapshotDelta().
   std::unique_ptr<SampleVectorBase> logged_samples_;
-
-  // This is a dummy field placed where corruption is frequently seen on
-  // current Android builds. The hope is that it will mitigate the problem
-  // sufficiently to continue with the M61 beta branch while investigation
-  // into the true problem continues.
-  // TODO(bcwhite): Remove this once crbug/736675 is fixed.
-  const uintptr_t dummy_;
 
 #if DCHECK_IS_ON()  // Don't waste memory if it won't be used.
   // Flag to indicate if PrepareFinalDelta has been previously called. It is
@@ -525,9 +514,9 @@ class BASE_EXPORT CustomHistogram : public Histogram {
   // This function ensures that a guard bucket exists right after any
   // valid sample value (unless the next higher sample is also a valid value),
   // so that invalid samples never fall into the same bucket as valid samples.
-  // TODO(kaiwang): Change name to ArrayToCustomEnumRanges.
-  static std::vector<Sample> ArrayToCustomRanges(const Sample* values,
-                                                 uint32_t num_values);
+  static std::vector<Sample> ArrayToCustomEnumRanges(
+      base::span<const Sample> values);
+
  protected:
   class Factory;
 

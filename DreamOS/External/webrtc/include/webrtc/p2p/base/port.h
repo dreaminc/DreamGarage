@@ -19,8 +19,12 @@
 
 #include "api/candidate.h"
 #include "api/optional.h"
+#include "api/rtcerror.h"
+#include "logging/rtc_event_log/events/rtc_event_ice_candidate_pair.h"
+#include "logging/rtc_event_log/events/rtc_event_ice_candidate_pair_config.h"
+#include "logging/rtc_event_log/icelogger.h"
 #include "p2p/base/candidatepairinterface.h"
-#include "p2p/base/jseptransport.h"
+#include "p2p/base/p2pconstants.h"
 #include "p2p/base/packetlossestimator.h"
 #include "p2p/base/packetsocketfactory.h"
 #include "p2p/base/portinterface.h"
@@ -52,32 +56,6 @@ extern const char TCPTYPE_ACTIVE_STR[];
 extern const char TCPTYPE_PASSIVE_STR[];
 extern const char TCPTYPE_SIMOPEN_STR[];
 
-// The minimum time we will wait before destroying a connection after creating
-// it.
-static const int MIN_CONNECTION_LIFETIME = 10 * 1000;  // 10 seconds.
-
-// A connection will be declared dead if it has not received anything for this
-// long.
-static const int DEAD_CONNECTION_RECEIVE_TIMEOUT = 30 * 1000;  // 30 seconds.
-
-// The timeout duration when a connection does not receive anything.
-static const int WEAK_CONNECTION_RECEIVE_TIMEOUT = 2500;  // 2.5 seconds
-
-// The length of time we wait before timing out writability on a connection.
-static const int CONNECTION_WRITE_TIMEOUT = 15 * 1000;  // 15 seconds
-
-// The length of time we wait before we become unwritable.
-static const int CONNECTION_WRITE_CONNECT_TIMEOUT = 5 * 1000;  // 5 seconds
-
-// This is the length of time that we wait for a ping response to come back.
-// There is no harm to keep this value high other than a small amount
-// of increased memory.  But in some networks (2G),
-// we observe up to 60s RTTs.
-static const int CONNECTION_RESPONSE_TIMEOUT = 60 * 1000;  // 60 seconds
-
-// The number of pings that must fail to respond before we become unwritable.
-static const uint32_t CONNECTION_WRITE_CONNECT_FAILURES = 5;
-
 enum RelayType {
   RELAY_GTURN,   // Legacy google relay service.
   RELAY_TURN     // Standard (TURN) relay service.
@@ -103,6 +81,82 @@ enum class IceCandidatePairState {
   // According to spec there should also be a frozen state, but nothing is ever
   // frozen because we have not implemented ICE freezing logic.
 };
+
+// Stats that we can return about the port of a STUN candidate.
+class StunStats {
+ public:
+  StunStats() = default;
+  StunStats(const StunStats&) = default;
+  ~StunStats() = default;
+
+  StunStats& operator=(const StunStats& other) = default;
+
+  int stun_binding_requests_sent = 0;
+  int stun_binding_responses_received = 0;
+  double stun_binding_rtt_ms_total = 0;
+  double stun_binding_rtt_ms_squared_total = 0;
+};
+
+// Stats that we can return about a candidate.
+class CandidateStats {
+ public:
+  CandidateStats();
+  explicit CandidateStats(Candidate candidate);
+  CandidateStats(const CandidateStats&);
+  ~CandidateStats();
+
+  Candidate candidate;
+  // STUN port stats if this candidate is a STUN candidate.
+  rtc::Optional<StunStats> stun_stats;
+};
+
+typedef std::vector<CandidateStats> CandidateStatsList;
+
+// Stats that we can return about the connections for a transport channel.
+// TODO(hta): Rename to ConnectionStats
+struct ConnectionInfo {
+  ConnectionInfo();
+  ConnectionInfo(const ConnectionInfo&);
+  ~ConnectionInfo();
+
+  bool best_connection;      // Is this the best connection we have?
+  bool writable;             // Has this connection received a STUN response?
+  bool receiving;            // Has this connection received anything?
+  bool timeout;              // Has this connection timed out?
+  bool new_connection;       // Is this a newly created connection?
+  size_t rtt;                // The STUN RTT for this connection.
+  size_t sent_total_bytes;   // Total bytes sent on this connection.
+  size_t sent_bytes_second;  // Bps over the last measurement interval.
+  size_t sent_discarded_packets;  // Number of outgoing packets discarded due to
+                                  // socket errors.
+  size_t sent_total_packets;  // Number of total outgoing packets attempted for
+                              // sending.
+  size_t sent_ping_requests_total;  // Number of STUN ping request sent.
+  size_t sent_ping_requests_before_first_response;  // Number of STUN ping
+  // sent before receiving the first response.
+  size_t sent_ping_responses;  // Number of STUN ping response sent.
+
+  size_t recv_total_bytes;     // Total bytes received on this connection.
+  size_t recv_bytes_second;    // Bps over the last measurement interval.
+  size_t recv_ping_requests;   // Number of STUN ping request received.
+  size_t recv_ping_responses;  // Number of STUN ping response received.
+  Candidate local_candidate;   // The local candidate for this connection.
+  Candidate remote_candidate;  // The remote candidate for this connection.
+  void* key;                   // A static value that identifies this conn.
+  // https://w3c.github.io/webrtc-stats/#dom-rtcicecandidatepairstats-state
+  IceCandidatePairState state;
+  // https://w3c.github.io/webrtc-stats/#dom-rtcicecandidatepairstats-priority
+  uint64_t priority;
+  // https://w3c.github.io/webrtc-stats/#dom-rtcicecandidatepairstats-nominated
+  bool nominated;
+  // https://w3c.github.io/webrtc-stats/#dom-rtcicecandidatepairstats-totalroundtriptime
+  uint64_t total_round_trip_time_ms;
+  // https://w3c.github.io/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime
+  rtc::Optional<uint32_t> current_round_trip_time_ms;
+};
+
+// Information about all the candidate pairs of a channel.
+typedef std::vector<ConnectionInfo> ConnectionInfos;
 
 const char* ProtoToString(ProtocolType proto);
 bool StringToProto(const char* value, ProtocolType* proto);
@@ -158,6 +212,11 @@ class Port : public PortInterface, public rtc::MessageHandler,
        const std::string& password);
   ~Port() override;
 
+  // Note that the port type does NOT uniquely identify different subclasses of
+  // Port. Use the 2-tuple of the port type AND the protocol (GetProtocol()) to
+  // uniquely identify subclasses. Whenever a new subclass of Port introduces a
+  // conflit in the value of the 2-tuple, make sure that the implementation that
+  // relies on this 2-tuple for RTTI is properly changed.
   const std::string& Type() const override;
   rtc::Network* Network() const override;
 
@@ -254,6 +313,11 @@ class Port : public PortInterface, public rtc::MessageHandler,
                                     const rtc::SocketAddress& remote_addr,
                                     const rtc::PacketTime& packet_time);
 
+  // Shall the port handle packet from this |remote_addr|.
+  // This method is overridden by TurnPort.
+  virtual bool CanHandleIncomingPacketsFrom(
+      const rtc::SocketAddress& remote_addr) const;
+
   // Sends a response message (normal or error) to the given request.  One of
   // these methods should be called as a response to SignalUnknownAddress.
   // NOTE: You MUST call CreateConnection BEFORE SendBindingResponse.
@@ -314,6 +378,8 @@ class Port : public PortInterface, public rtc::MessageHandler,
   size_t AddPrflxCandidate(const Candidate& local);
 
   int16_t network_cost() const { return network_cost_; }
+
+  void GetStunStats(rtc::Optional<StunStats>* stats) override{};
 
  protected:
   enum { MSG_DESTROY_IF_DEAD = 0, MSG_FIRST_AVAILABLE };
@@ -381,6 +447,8 @@ class Port : public PortInterface, public rtc::MessageHandler,
 
   // Extra work to be done in subclasses when a connection is destroyed.
   virtual void HandleConnectionDestroyed(Connection* conn) {}
+
+  void CopyPortInformationToPacketInfo(rtc::PacketInfo* info) const;
 
  private:
   void Construct();
@@ -485,6 +553,15 @@ class Connection : public CandidatePairInterface,
   // Estimate of the round-trip time over this connection.
   int rtt() const { return rtt_; }
 
+  int unwritable_timeout() const;
+  void set_unwritable_timeout(const rtc::Optional<int>& value_ms) {
+    unwritable_timeout_ = value_ms;
+  }
+  int unwritable_min_checks() const;
+  void set_unwritable_min_checks(const rtc::Optional<int>& value) {
+    unwritable_min_checks_ = value;
+  }
+
   // Gets the |ConnectionInfo| stats, where |best_connection| has not been
   // populated (default value false).
   ConnectionInfo stats();
@@ -548,7 +625,8 @@ class Connection : public CandidatePairInterface,
     remote_ice_mode_ = mode;
   }
 
-  void set_receiving_timeout(int receiving_timeout_ms) {
+  int receiving_timeout() const;
+  void set_receiving_timeout(rtc::Optional<int> receiving_timeout_ms) {
     receiving_timeout_ = receiving_timeout_ms;
   }
 
@@ -589,11 +667,23 @@ class Connection : public CandidatePairInterface,
   std::string ToDebugId() const;
   std::string ToString() const;
   std::string ToSensitiveString() const;
+  // Structured description of this candidate pair.
+  const webrtc::IceCandidatePairDescription& ToLogDescription();
+  // Integer typed hash value of this candidate pair.
+  uint32_t hash() { return hash_; }
+  void set_ice_event_log(webrtc::IceEventLog* ice_event_log) {
+    ice_event_log_ = ice_event_log;
+  }
   // Prints pings_since_last_response_ into a string.
   void PrintPingsSinceLastResponse(std::string* pings, size_t max);
 
   bool reported() const { return reported_; }
   void set_reported(bool reported) { reported_ = reported;}
+  // The following two methods are only used for logging in ToString above, and
+  // this flag is set true by P2PTransportChannel for its selected candidate
+  // pair.
+  bool selected() const { return selected_; }
+  void set_selected(bool selected) { selected_ = selected; }
 
   // This signal will be fired if this connection is nominated by the
   // controlling side.
@@ -678,10 +768,13 @@ class Connection : public CandidatePairInterface,
   void MaybeUpdateLocalCandidate(ConnectionRequest* request,
                                  StunMessage* response);
 
+  void LogCandidatePairEvent(webrtc::IceCandidatePairEventType type);
+
   WriteState write_state_;
   bool receiving_;
   bool connected_;
   bool pruned_;
+  bool selected_ = false;
   // By default |use_candidate_attr_| flag will be true,
   // as we will be using aggressive nomination.
   // But when peer is ice-lite, this flag "must" be initialized to false and
@@ -718,12 +811,19 @@ class Connection : public CandidatePairInterface,
 
   PacketLossEstimator packet_loss_estimator_;
 
+  rtc::Optional<int> unwritable_timeout_;
+  rtc::Optional<int> unwritable_min_checks_;
+
   bool reported_;
   IceCandidatePairState state_;
   // Time duration to switch from receiving to not receiving.
-  int receiving_timeout_;
+  rtc::Optional<int> receiving_timeout_;
   int64_t time_created_ms_;
   int num_pings_sent_ = 0;
+
+  rtc::Optional<webrtc::IceCandidatePairDescription> log_description_;
+  uint32_t hash_;
+  webrtc::IceEventLog* ice_event_log_ = nullptr;
 
   friend class Port;
   friend class ConnectionRequest;

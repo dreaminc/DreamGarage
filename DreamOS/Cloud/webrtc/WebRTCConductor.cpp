@@ -29,6 +29,10 @@
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
+#include "api/video_codecs/builtin_video_decoder_factory.h"
+#include "api/video_codecs/builtin_video_encoder_factory.h"
+
+#include "modules/audio_processing/include/audio_processing.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -375,16 +379,22 @@ RESULT WebRTCConductor::Initialize() {
 	m_pWebRTCPeerConnectionFactory =
 		m_signalingThread->Invoke<rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>>(RTC_FROM_HERE, [&]()
 	{
-		return webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+		return webrtc::CreatePeerConnectionFactory(
+			m_networkThread.get(),	// network thread
 			m_workerThread.get(),	// worker thread
 			//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
 			m_signalingThread.get(),
 			m_pAudioDeviceModule.get(),	// TODO: Default ADM
+			
 			//m_pAudioDeviceDummyModule,		// Dummy ADM
-			webrtc::CreateBuiltinAudioEncoderFactory(),	// Audio Encoder Factory
-			webrtc::CreateBuiltinAudioDecoderFactory(),	// Audio Decoder Factory
-			nullptr,	// Video Encoder Factory
-			nullptr		// Video Decoder Factory
+
+			webrtc::CreateBuiltinAudioEncoderFactory(),
+			webrtc::CreateBuiltinAudioDecoderFactory(),
+			webrtc::CreateBuiltinVideoEncoderFactory(),
+			webrtc::CreateBuiltinVideoDecoderFactory(), 
+
+			nullptr, // audio_mixer
+			nullptr // audio_processing
 		);
 	});
 
