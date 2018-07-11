@@ -9,16 +9,34 @@
 #include "Primitives/Publisher.h"
 #include "Primitives/point.h"
 
-typedef enum SenseGamePadEventType {
-	SENSE_GAMEPAD_LEFTSTICK,
-	SENSE_GAMEPAD_RIGHTSTICK,
-	SENSE_GAMEPAD_BUTTONS,
+typedef enum SenseGamepadEventType {
+	SENSE_GAMEPAD_JOYSTICK_LEFT,
+	SENSE_GAMEPAD_JOYSTICK_RIGHT,
 	SENSE_GAMEPAD_TRIGGER_LEFT,
 	SENSE_GAMEPAD_TRIGGER_RIGHT,
+	SENSE_GAMEPAD_BUTTON_UP,
+	SENSE_GAMEPAD_BUTTON_DOWN,
 	SENSE_GAMEPAD_INVALID
 } SENSE_GAMEPAD_EVENT_TYPE;
 
-struct GamePadButtonStruct {
+typedef enum SenseGamepadButtonType {
+	SENSE_GAMEPAD_DPAD_UP,
+	SENSE_GAMEPAD_DPAD_DOWN,
+	SENSE_GAMEPAD_DPAD_LEFT,
+	SENSE_GAMEPAD_DPAD_RIGHT,
+	SENSE_GAMEPAD_START,
+	SENSE_GAMEPAD_SELECT,
+	SENSE_GAMEPAD_BUTTON_JOYSTICK_LEFT,
+	SENSE_GAMEPAD_BUTTON_JOYSTICK_RIGHT,
+	SENSE_GAMEPAD_SHOULDER_LEFT,
+	SENSE_GAMEPAD_SHOULDER_RIGHT,
+	SENSE_GAMEPAD_A,	// using Xbox orientation
+	SENSE_GAMEPAD_B,
+	SENSE_GAMEPAD_X,
+	SENSE_GAMEPAD_Y
+} SENSE_GAMEPAD_BUTTON_TYPE;
+
+struct SenseGamepadButtonStruct {
 	unsigned fDpadUp : 1;
 	unsigned fDpadDown : 1;
 	unsigned fDpadLeft : 1;
@@ -35,34 +53,49 @@ struct GamePadButtonStruct {
 	unsigned fbuttonY : 1;
 };
 
-typedef struct GamePadState {
-	int triggerRange = 0;
-	point ptJoyStick;
-	GamePadButtonStruct buttonStruct;
-} GAMEPAD_STATE;
+typedef struct SenseGamepadState {
+	int leftTriggerRange = 0;
+	int rightTriggerRange = 0;
+	point2D leftJoystick;
+	point2D rightJoystick;
+	SenseGamepadButtonStruct buttonStruct;
+} SENSE_GAMEPAD_STATE;
 
-typedef struct SenseGamePadEvent : SenseDevice::SenseDeviceEvent {
-	SenseGamePadEventType eventType;
-	GamePadState gamepadState;
+typedef struct SenseGamepadEvent : SenseDevice::SenseDeviceEvent {
+	SenseGamepadEventType gamepadEventType;
+	SenseGamepadButtonType gamepadButtonType;
+	point2D eventData;
 
-	SenseGamePadEvent(SenseGamePadEventType gpEvent, GamePadState gpState) :
+	SenseGamepadEvent(SenseGamepadEventType gpEventType, point2D gpEventData) :
 		SenseDeviceEvent(),
-		eventType(gpEvent),
-		gamepadState(gpState)
+		gamepadEventType(gpEventType),
+		eventData(gpEventData)
 	{
-		SenseEventSize = sizeof(SenseGamePadEvent);
+		SenseEventSize = sizeof(SenseGamepadEvent);
 	}
+
+	SenseGamepadEvent(SenseGamepadEventType gpEventType, SenseGamepadButtonType gpButtonType) :
+		SenseDeviceEvent(),
+		gamepadEventType(gpEventType),
+		gamepadButtonType(gpButtonType)
+	{
+		SenseEventSize = sizeof(SenseGamepadEvent);
+	}
+
 } SENSE_GAMEPAD_EVENT;
 
-class SenseGamePadController : public SenseDevice, public Publisher<SenseGamePadEventType, SenseGamePadEvent> {
+class SenseGamepadController : public SenseDevice, public Publisher<SenseGamepadEventType, SenseGamepadEvent> {
 
 public:
-	SenseGamePadController();
-	~SenseGamePadController();
+	SenseGamepadController();
+	~SenseGamepadController();
 	
-	RESULT SetGamePadState(SenseGamePadEventType eventType, GamePadState gpState);
+	RESULT SetGamepadState(SenseGamepadState gpState);
 
-	virtual RESULT UpdateGamePad() = 0;
+	virtual RESULT UpdateGamepad() = 0;
+
+private:
+	SenseGamepadState m_currentGamepadState;
 };
 
 #endif // ! SENSE_GAMEPAD_CONTROLLER_H_

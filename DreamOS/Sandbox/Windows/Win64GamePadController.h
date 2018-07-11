@@ -9,32 +9,33 @@
 // DreamOS/Sandbox/Windows/Win64Mouse.h
 // Sense Windows 64 Mouse Device
 
-#include "Sense/SenseGamePadController.h"
+#include "Sense/SenseGamepadController.h"
 
 class Windows64App;
 
-class Win64GamePadController : public SenseGamePadController {
+class Win64GamepadController : public SenseGamepadController {
 public:
-	Win64GamePadController(Windows64App *pWin64AppParent);
+	Win64GamepadController(Windows64App *pWin64AppParent);
 
-	virtual RESULT UpdateGamePad() override;
+	virtual RESULT UpdateGamepad() override;
 
 private:
-	RESULT GetGamePadState();
-	RESULT ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad);
+	RESULT GetGamepadState();
+	RESULT ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad);
 
 private:
 	Windows64App* m_pWin64AppParent = nullptr;
 
-	point m_ptLeft;
-	point m_ptRight;
+	point2D m_leftJoystick;
+	point2D m_rightJoystick;
 
 	int m_triggerLeft;
 	int m_triggerRight;
 
-	DWORD m_dwPreviousPacketNumber = 0;
-	WORD m_buttonState = 0;
-	GamePadButtonStruct m_buttonStruct;
+	unsigned long m_dwPreviousPacketNumber = 0;
+	unsigned short m_previousButtonState = 0;
+
+	SenseGamepadState m_currentGamepadState;
 };
 
 #endif // ! WIN64_GAMEPAD_H_

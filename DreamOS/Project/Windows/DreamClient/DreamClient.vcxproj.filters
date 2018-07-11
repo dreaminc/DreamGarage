@@ -64,7 +64,7 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamSettingsApp.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamGamePadApp.cpp">
+    <ClCompile Include="..\..\..\DreamGarage\DreamGamepadCameraApp.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
   </ItemGroup>
@@ -130,7 +130,7 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamSettingsApp.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamGamePadApp.h">
+    <ClInclude Include="..\..\..\DreamGarage\DreamGamepadCameraApp.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>

@@ -15,7 +15,7 @@
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
-#include "DreamGarage\DreamGamePadApp.h"
+#include "DreamGarage\DreamGamepadCameraApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
@@ -41,7 +41,7 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTest2DCamera());
+	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
 
@@ -1679,7 +1679,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOSTestSuite::AddTest2DCamera() {
+RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 3000.0f;
@@ -1693,7 +1693,8 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 
 		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
 
-	} *pTestContext = new TestContext();
+	};
+	TestContext *pTestContext = new TestContext();
 
 	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
@@ -1704,7 +1705,101 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
+		//CR(SetupDreamAppPipeline());
+		{
+			m_pDreamOS->SetGravityState(false);
+
+			// Set up the pipeline
+			HALImp *pHAL = m_pDreamOS->GetHALImp();
+			Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+			SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+			CNM(pDestSinkNode, "Destination sink node isn't set");
+
+			CR(pHAL->MakeCurrentContext());
+
+			// Reflection 
+
+			ProgramNode* pReflectionProgramNode;
+			pReflectionProgramNode = nullptr;
+			pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+			CN(pReflectionProgramNode);
+			CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			ProgramNode* pReflectionSkyboxProgram;
+			pReflectionSkyboxProgram = nullptr;
+			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pReflectionSkyboxProgram);
+			CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+
+			// Refraction
+
+			ProgramNode* pRefractionProgramNode;
+			pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
+			CN(pRefractionProgramNode);
+			CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRefractionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			ProgramNode* pRefractionSkyboxProgram;
+			pRefractionSkyboxProgram = nullptr;
+			pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pRefractionSkyboxProgram);
+			CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRefractionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
+
+			// "Water"
+
+			ProgramNode* pWaterProgramNode;
+			pWaterProgramNode = nullptr;
+			pWaterProgramNode = pHAL->MakeProgramNode("water");
+			CN(pWaterProgramNode);
+			CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// TODO: This is not particularly general yet
+			CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionSkyboxProgram->Output("output_framebuffer")));
+			CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+			// Standard Shader
+
+			ProgramNode* pRenderProgramNode;
+			pRenderProgramNode = pHAL->MakeProgramNode("standard");
+			CN(pRenderProgramNode);
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+
+			//// Skybox
+			ProgramNode* pSkyboxProgram;
+			pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pSkyboxProgram);
+			CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+			// Screen Quad Shader (opt - we could replace this if we need to)
+			ProgramNode *pRenderScreenQuad;
+			pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+			CN(pRenderScreenQuad);
+
+			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+			// Connect Program to Display
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+			CR(pHAL->ReleaseCurrentContext());
+		}
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1714,7 +1809,7 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		// Create the Shared View App
-		m_pDreamOS->LaunchDreamApp<DreamGamePadApp>(this);
+		m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Sphere test
@@ -1733,10 +1828,10 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 		pTestContext->pSphereRed->SetMaterialColors(COLOR_RED);
 		pTestContext->pSphereWhite->SetMaterialColors(COLOR_WHITE);
 		
-		pTestContext->pSphereGreen->SetPosition(0, 0, 0);
-		pTestContext->pSphereGreen->SetPosition(0, 1, 0);
-		pTestContext->pSphereGreen->SetPosition(1, 0, 0);
-		pTestContext->pSphereGreen->SetPosition(-1, 0, 0);
+		pTestContext->pSphereGreen->SetPosition(0, -1, 0);
+		pTestContext->pSphereBlue->SetPosition(0, 2, 0);
+		pTestContext->pSphereRed->SetPosition(2, 0, 0);
+		pTestContext->pSphereWhite->SetPosition(-2, 0, 0);
 
 	Error:
 		return r;
@@ -1753,9 +1848,9 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
-		CN(pTestContext);
+		//CN(pTestContext);
 
-	Error:
+	//Error:
 		return r;
 	};
 
@@ -1783,8 +1878,8 @@ RESULT DreamOSTestSuite::AddTest2DCamera() {
 	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pUITest);
 
-	pUITest->SetTestName("Local Shared Content View Test");
-	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestName("2D camera test");
+	pUITest->SetTestDescription("Basic test moving camera with gamepad");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

@@ -1,23 +1,23 @@
-#include "Win64GamePadController.h"
+#include "Win64GamepadController.h"
 #include "Windows64App.h"
 
-Win64GamePadController::Win64GamePadController(Windows64App *pWin64AppParent) :
-	SenseGamePadController(),
+Win64GamepadController::Win64GamepadController(Windows64App *pWin64AppParent) :
+	SenseGamepadController(),
 	m_pWin64AppParent(pWin64AppParent)
 {
 	// empty for now
 }
 
-RESULT Win64GamePadController::UpdateGamePad() {
+RESULT Win64GamepadController::UpdateGamepad() {
 	RESULT r = R_PASS;
 	
-	CR(GetGamePadState());
+	CR(GetGamepadState());
 
 Error:
 	return r;
 }
 
-RESULT Win64GamePadController::GetGamePadState() {
+RESULT Win64GamepadController::GetGamepadState() {
 	RESULT r = R_PASS;
 
 	XINPUT_STATE xInputState;
@@ -30,23 +30,21 @@ RESULT Win64GamePadController::GetGamePadState() {
 	CBR(xInputState.dwPacketNumber != m_dwPreviousPacketNumber, R_SKIPPED);
 	m_dwPreviousPacketNumber = xInputState.dwPacketNumber;
 
-	ProcessGamePadState(xInputState.Gamepad);
+	ProcessGamepadState(xInputState.Gamepad);
 
 Error:
 	return r;
 }
 
-RESULT Win64GamePadController::ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad) {
+RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad) {
 	RESULT r = R_PASS;
 
 	// joystick values are signed 32767, triggers are 0-255
 
-	GamePadState gpState;
-
-	float leftStickX = xInputGamePad.sThumbLX;
-	float leftStickY = xInputGamePad.sThumbLY;
-	float rightStickX = xInputGamePad.sThumbRX;
-	float rightStickY = xInputGamePad.sThumbRY;
+	float leftStickX = xInputGamepad.sThumbLX;
+	float leftStickY = xInputGamepad.sThumbLY;
+	float rightStickX = xInputGamepad.sThumbRX;
+	float rightStickY = xInputGamepad.sThumbRY;
 
 	//determine how far the controller is pushed
 	float leftMagnitude = sqrt(leftStickX * leftStickX + leftStickY * leftStickY);
@@ -81,10 +79,10 @@ RESULT Win64GamePadController::ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad)
 		normalizedLX = 0;
 		normalizedLY = 0;
 	}
-	if (m_ptLeft.x() != normalizedLX && m_ptLeft.y() != normalizedLY) {
-		m_ptLeft = point(normalizedLX, normalizedLY, 0);
-		gpState.ptJoyStick = m_ptLeft;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_LEFTSTICK, gpState);
+	if (m_leftJoystick(0,0) != normalizedLX && m_leftJoystick(0,1) != normalizedLY) {
+		m_leftJoystick(0,0) = normalizedLX;
+		m_leftJoystick(0,1) = normalizedLY;
+		m_currentGamepadState.leftJoystick = m_leftJoystick;
 	}
 	
 	// repeat for right stick
@@ -101,33 +99,29 @@ RESULT Win64GamePadController::ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad)
 		normalizedRX = 0;
 		normalizedRY = 0;
 	}
-	if (m_ptRight.x() != normalizedRX && m_ptRight.y() != normalizedRY) {
-		m_ptRight = point(normalizedRX, normalizedRY, 0);
-		gpState.ptJoyStick = m_ptRight;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_RIGHTSTICK, gpState);
+	if (m_rightJoystick(0,0) != normalizedRX && m_rightJoystick(0,1) != normalizedRY) {
+		m_rightJoystick(0,0) = normalizedRX;
+		m_rightJoystick(0,1) = normalizedRY;
+		m_currentGamepadState.rightJoystick = m_rightJoystick;
 	}
 
 	// Triggers
-	if (xInputGamePad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && xInputGamePad.bLeftTrigger != m_triggerLeft) {
-		m_triggerLeft = xInputGamePad.bLeftTrigger;
-		gpState.triggerRange = m_triggerLeft;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_TRIGGER_LEFT, gpState);
+	if (xInputGamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && xInputGamepad.bLeftTrigger != m_triggerLeft) {
+		m_triggerLeft = xInputGamepad.bLeftTrigger;
+		m_currentGamepadState.leftTriggerRange = m_triggerLeft;
 	}
-	else if (m_triggerLeft != 0) {	// inside of threshold but we haven't send the 0 yet
+	else if (m_triggerLeft != 0 && xInputGamepad.bLeftTrigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD) {	// inside of threshold but we haven't send the 0 yet
 		m_triggerLeft = 0;
-		gpState.triggerRange = m_triggerLeft;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_TRIGGER_LEFT, gpState);
+		m_currentGamepadState.leftTriggerRange = m_triggerLeft;
 	}
 
-	if (xInputGamePad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && xInputGamePad.bRightTrigger != m_triggerRight) {
-		m_triggerRight = xInputGamePad.bRightTrigger;
-		gpState.triggerRange = m_triggerRight;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_TRIGGER_RIGHT, gpState);
+	if (xInputGamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD && xInputGamepad.bRightTrigger != m_triggerRight) {
+		m_triggerRight = xInputGamepad.bRightTrigger;
+		m_currentGamepadState.rightTriggerRange = m_triggerRight;
 	}
-	else if (m_triggerRight != 0) {
+	else if (m_triggerRight != 0 && xInputGamepad.bRightTrigger < XINPUT_GAMEPAD_TRIGGER_THRESHOLD) {
 		m_triggerRight = 0;
-		gpState.triggerRange = m_triggerRight;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_TRIGGER_RIGHT, gpState);
+		m_currentGamepadState.rightTriggerRange = m_triggerRight;
 	}
 
 	// Buttons (including DPad)
@@ -145,25 +139,26 @@ RESULT Win64GamePadController::ProcessGamePadState(XINPUT_GAMEPAD xInputGamePad)
 	// XINPUT_GAMEPAD_B				0x2000
 	// XINPUT_GAMEPAD_X				0x4000
 	// XINPUT_GAMEPAD_Y				0x8000
-	if (m_buttonState != xInputGamePad.wButtons) {
-		m_buttonStruct.fDpadUp = ((xInputGamePad.wButtons & 1 << 0) != 0);
-		m_buttonStruct.fDpadDown = ((xInputGamePad.wButtons & 1 << 1) != 0);
-		m_buttonStruct.fDpadLeft = ((xInputGamePad.wButtons & 1 << 2) != 0);
-		m_buttonStruct.fDpadRight = ((xInputGamePad.wButtons & 1 << 3) != 0);
-		m_buttonStruct.fStart = ((xInputGamePad.wButtons & 1 << 4) != 0);
-		m_buttonStruct.fSelect = ((xInputGamePad.wButtons & 1 << 5) != 0);
-		m_buttonStruct.fLeftThumb = ((xInputGamePad.wButtons & 1 << 6) != 0);
-		m_buttonStruct.fRightThumb = ((xInputGamePad.wButtons & 1 << 7) != 0);
-		m_buttonStruct.fLeftShoulder = ((xInputGamePad.wButtons & 1 << 8) != 0);
-		m_buttonStruct.fRightShoulder = ((xInputGamePad.wButtons & 1 << 9) != 0);
-		m_buttonStruct.fbuttonA = ((xInputGamePad.wButtons & 1 << 10) != 0);
-		m_buttonStruct.fbuttonB = ((xInputGamePad.wButtons & 1 << 11) != 0);
-		m_buttonStruct.fbuttonX = ((xInputGamePad.wButtons & 1 << 12) != 0);
-		m_buttonStruct.fbuttonY = ((xInputGamePad.wButtons & 1 << 13) != 0);
+	if (m_previousButtonState != xInputGamepad.wButtons) {
+		m_currentGamepadState.buttonStruct.fDpadUp = ((xInputGamepad.wButtons & 1 << 0) != 0);
+		m_currentGamepadState.buttonStruct.fDpadDown = ((xInputGamepad.wButtons & 1 << 1) != 0);
+		m_currentGamepadState.buttonStruct.fDpadLeft = ((xInputGamepad.wButtons & 1 << 2) != 0);
+		m_currentGamepadState.buttonStruct.fDpadRight = ((xInputGamepad.wButtons & 1 << 3) != 0);
+		m_currentGamepadState.buttonStruct.fStart = ((xInputGamepad.wButtons & 1 << 4) != 0);
+		m_currentGamepadState.buttonStruct.fSelect = ((xInputGamepad.wButtons & 1 << 5) != 0);
+		m_currentGamepadState.buttonStruct.fLeftThumb = ((xInputGamepad.wButtons & 1 << 6) != 0);
+		m_currentGamepadState.buttonStruct.fRightThumb = ((xInputGamepad.wButtons & 1 << 7) != 0);
+		m_currentGamepadState.buttonStruct.fLeftShoulder = ((xInputGamepad.wButtons & 1 << 8) != 0);
+		m_currentGamepadState.buttonStruct.fRightShoulder = ((xInputGamepad.wButtons & 1 << 9) != 0);
+		m_currentGamepadState.buttonStruct.fbuttonA = ((xInputGamepad.wButtons & 1 << 12) != 0);
+		m_currentGamepadState.buttonStruct.fbuttonB = ((xInputGamepad.wButtons & 1 << 13) != 0);
+		m_currentGamepadState.buttonStruct.fbuttonX = ((xInputGamepad.wButtons & 1 << 14) != 0);
+		m_currentGamepadState.buttonStruct.fbuttonY = ((xInputGamepad.wButtons & 1 << 15) != 0);
 		
-		m_buttonState = xInputGamePad.wButtons;
-		SetGamePadState(SenseGamePadEventType::SENSE_GAMEPAD_BUTTONS, gpState);
+		m_previousButtonState = xInputGamepad.wButtons;
 	}
+
+	SetGamepadState(m_currentGamepadState);
 
 //Error:
 	return r;

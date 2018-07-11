@@ -1661,11 +1661,11 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterSubscriber(SenseGamePadEventType gamePadEvent, Subscriber<SenseGamePadEvent>* pGamePadSubscriber) {
+RESULT SandboxApp::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
 	RESULT r = R_PASS;
 	
-	CNM(m_pSenseGamePad, "GamePad not initialized");
-	CR(m_pSenseGamePad->RegisterSubscriber(gamePadEvent, pGamePadSubscriber));
+	CNM(m_pSenseGamepad, "Gamepad not initialized");
+	CR(m_pSenseGamepad->RegisterSubscriber(gamePadEvent, pGamepadSubscriber));
 
 Error:
 	return r;

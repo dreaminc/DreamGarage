@@ -1092,8 +1092,8 @@ RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Sub
 	return m_pSandbox->RegisterSubscriber(controllerEvent, pControllerSubscriber);
 }
 
-RESULT DreamOS::RegisterSubscriber(SenseGamePadEventType gamePadEvent, Subscriber<SenseGamePadEvent>* pGamePadSubscriber) {
-	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamePadSubscriber);
+RESULT DreamOS::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamepadSubscriber);
 }
 
 long DreamOS::GetTickCount() {
