@@ -79,6 +79,11 @@ public:
 	color GetDiffuseColor() { return m_colorDiffuse; }
 	color GetSpecularColor() { return m_colorSpecular; }
 	vector GetLightDirection() { return m_vectorDirection; }
+	RESULT SetLightDirection(vector vDirection) { 
+		m_vectorDirection = vDirection;
+		m_vectorDirection.Normalize();
+		return R_PASS;
+	}
 
 	RESULT EnableShadows() { m_fShadowEmitter = true; return R_FAIL; }
 	RESULT DisableShadows() { m_fShadowEmitter = false; return R_FAIL; }

@@ -3,11 +3,10 @@
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
+#include "HAL/SkyboxScatterProgram.h"
 
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
-
-
 
 DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamEnvironmentApp>(pDreamOS, pContext)
@@ -23,7 +22,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 1.0f;
+	m_directionalIntensity = 2.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -39,10 +38,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	if (strEnvironmentPath == "default") {
 		
 		// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
-		vector vLightVector = vector(0.0f, -2.0f, -1.0f);
-		light *pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightVector);
-		pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * vLightVector));
-		//pDirectionalLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.25f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, 0.0f, -1.0f));
+		m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * m_vSunDirection));
+		m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), m_vSunDirection);
 
 		//pDirectionalLight->EnableShadows();
 
@@ -108,7 +105,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 		pModel->RotateXByDeg(-90.0f);
 		pModel->RotateYByDeg(90.0f);
 		//TODO: in theory this should be 1.0f if the models we get are in meters
-		m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
+		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
 	}
 	//*/
 
@@ -124,6 +121,11 @@ RESULT DreamEnvironmentApp::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamEnvironmentApp::Update(void *pContext) {
+
+	for (auto pProgram : m_skyboxPrograms) {
+		pProgram->SetSunDirection(m_vSunDirection);
+	}
+
 	return R_PASS;
 }
 
@@ -134,4 +136,9 @@ RESULT DreamEnvironmentApp::Shutdown(void *pContext) {
 DreamEnvironmentApp* DreamEnvironmentApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamEnvironmentApp *pDreamApp = new DreamEnvironmentApp(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
+	m_skyboxPrograms = pPrograms;
+	return R_PASS;
 }

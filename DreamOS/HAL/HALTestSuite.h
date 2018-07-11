@@ -27,7 +27,7 @@ public:
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
-	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "environment");
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName = "standard");
 
 	RESULT AddTestSkybox();
 

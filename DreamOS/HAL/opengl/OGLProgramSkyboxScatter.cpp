@@ -71,8 +71,6 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize(version versionOGL) {
 
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
-	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"skyboxScatter.vert"), "Failed to create vertex shader");
@@ -115,6 +113,14 @@ RESULT OGLProgramSkyboxScatter::SetReflectionObject(VirtualObj *pReflectionObjec
 
 Error:
 	return r;
+}
+
+RESULT OGLProgramSkyboxScatter::SetSunDirection(vector vSunDirection) {
+	RESULT r = R_PASS;
+	
+	m_sunDirection = vSunDirection;
+
+	return R_PASS;
 }
 
 RESULT OGLProgramSkyboxScatter::SetupConnections() {
@@ -215,14 +221,16 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 	int pxWidth = m_pOGLFramebuffer->GetWidth();
 	int pxHeight = m_pOGLFramebuffer->GetHeight();
 
-	vector sunDirection = vector(0.0f, m_SunY, 0.5f);
-	sunDirection.Normalize();
+	/*
+	m_sunDirection = vector(0.0f, m_SunY, 0.5f);
+	m_sunDirection.Normalize();
 	//sunY += 0.01f;
 	m_theta += m_delta;
-	sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
-	sunDirection.Normalize();
+	m_sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
+	m_sunDirection.Normalize();
+	//*/
 
-	m_pUniformSunDirection->SetUniform(sunDirection);
+	m_pUniformSunDirection->SetUniform(m_sunDirection);
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);
 	m_pUniformViewOrientationMatrix->SetUniform(matVO);
@@ -266,14 +274,16 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	//auto matVP = matP * matV;
 
+	/*
 	vector sunDirection = vector(1.0f, m_SunY, -0.4f);
 	sunDirection.Normalize();
 	//sunY += 0.01f;
 	m_theta += m_delta;
 	sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, m_theta) * sunDirection;
 	sunDirection.Normalize();
+	//*/
 
-	m_pUniformSunDirection->SetUniform(sunDirection);
+	m_pUniformSunDirection->SetUniform(m_sunDirection);
 
 	m_pUniformViewMatrix->SetUniform(matV);
 	m_pUniformProjectionMatrix->SetUniform(matP);

@@ -29,6 +29,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestSkybox());
+
 	CR(AddTestWaterShader());
 
 	CR(AddTestStandardShader());
@@ -70,8 +72,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestModelOrientation());
 
 	CR(AddTestUIShaderStage());
-
-	CR(AddTestSkybox());
 
 	CR(AddTestRenderToTextureQuad());
 
@@ -402,7 +402,7 @@ RESULT HALTestSuite::AddTestSkybox() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupSkyboxPipeline());
+		CR(SetupSkyboxPipeline("standard"));
 		CR(Initialize());
 		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
 

@@ -7,6 +7,8 @@
 
 class DreamOS;
 class quad;
+class light;
+class SkyboxScatterProgram;
 
 class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	friend class DreamAppManager;
@@ -23,12 +25,20 @@ public:
 protected:
 	static DreamEnvironmentApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
+public:
+	RESULT SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms);
+
 private:
 	point m_ptSceneOffset;
 	float m_sceneScale;
 	float m_lightIntensity;
 	float m_directionalIntensity;
 
+	vector m_vSunDirection = vector(1.0f, 0.75f, -0.5f);
+	light *m_pDirectionalSunLight = nullptr;
+	light *m_pDirectionalAmbientLight = nullptr;
+
+	std::vector<SkyboxScatterProgram*> m_skyboxPrograms;
 };
 
 #endif // ! DREAM_ENVIRONMENT_H_

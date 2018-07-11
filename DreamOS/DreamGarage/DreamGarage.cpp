@@ -190,6 +190,11 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// save interface for UI apps
 		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+
+		// save interfaces to skybox nodes
+		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
+		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
+
 		auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
 		if (GetHMD() != nullptr) {
@@ -331,8 +336,8 @@ RESULT DreamGarage::LoadScene() {
 	}
 
 	if (fShowModels) {
-		auto pEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
-		CN(pEnvironmentApp);
+		m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
+		CN(m_pDreamEnvironmentApp);
 	}
 
 #endif
@@ -362,6 +367,8 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
+
+	m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 	CN(m_pDreamShareView);

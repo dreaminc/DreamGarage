@@ -1122,6 +1122,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\Pipeline\SinkNode.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
+    <ClInclude Include="..\..\..\HAL\SkyboxScatterProgram.h" />
     <ClInclude Include="..\..\..\HAL\UIStageProgram.h" />
     <ClInclude Include="..\..\..\HMD\HMD.h" />
     <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
