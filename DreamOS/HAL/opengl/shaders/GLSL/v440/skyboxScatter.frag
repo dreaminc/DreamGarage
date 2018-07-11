@@ -104,6 +104,8 @@ vec3 Atmosphere(vec3 vRayDirection,
 		primaryRayTime += primaryStepSize;
 	}
 
+//	accumulatedRayleigh *= 2;
+
 	return sunIntensity * (phaseRayleigh * vRayleighScattering * accumulatedRayleigh + phaseMie * mieScattering * accumulatedMie);
 	//return sunIntensity * (phaseRayleigh * vRayleighScattering * accumulatedRayleigh);// + phaseMie * mieScattering * accumulatedMie);
 }
@@ -290,11 +292,12 @@ void main(void) {
 	//float mieScattering = 0e-6;
 	float mieScattering = 21e-6;
 	float rayleighScaleHeight = 8e3;
-	float mieScaleHeight = 1.2e3;
-	float mieDirection = 0.758;
+	float mieScaleHeight = 1.7e3;
+	float mieDirection = 0.9995;
 
 	//vec3 sunDirection = vec3(0,0.1,-0.9);
-	vec3 sunDirection = vec3(0,0.5,-0.5);
+	//vec3 sunDirection = vec3(0,0.5,-0.5);
+	vec3 sunDirection = lightDirection;
 
 	vec4 atmColor = vec4(Atmosphere(eyeDirection,
 		eyeOrigin,

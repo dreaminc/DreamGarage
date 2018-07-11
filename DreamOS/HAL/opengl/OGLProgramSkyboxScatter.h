@@ -33,7 +33,7 @@ public:
 private:
 	float m_SunY = 0.25f;
 	float m_theta = 0.0f;
-	float m_delta = 0.0f;	//0.00005f;
+	float m_delta = 0.001f;	//0.00005f;
 
 	VirtualObj *m_pReflectionObject = nullptr;
 
