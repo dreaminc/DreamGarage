@@ -3,6 +3,10 @@
 
 // A scattering skybox fragment shader
 
+// References
+// https://github.com/wwwtyro/glsl-atmosphere
+// https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter16.html
+
 #define PRIMARY_RAY_STEPS 16
 #define SECONDARY_RAY_STEPS 8
 
@@ -53,8 +57,8 @@ vec3 Atmosphere(vec3 vRayDirection,
 	vec3 accumulatedRayleigh = vec3(0, 0, 0);
 	vec3 accumulatedMie = vec3(0, 0, 0);
 
-	float accumulatedOpticalDepthRayleigh = 0.0;
-	float accumulatedOpticalDepthMie = 0.0;
+	float accumulatedPrimaryRayleigh = 0.0;
+	float accumulatedPrimaryMie = 0.0;
 
 	float mu = dot(vRayDirection, ptSunOrigin);
 	float muSquared = mu * mu;
@@ -64,41 +68,42 @@ vec3 Atmosphere(vec3 vRayDirection,
 	float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + muSquared);
 	float phaseMie = 3.0 / (8.0 * PI) * ((1.0 - gSquared) * (muSquared + 1.0)) / (pow(1.0 + gSquared - 2.0 * mu * mieScatteringDirection, 1.5) * (2.0 + gSquared));
 
+	// primary loop accumulates light along the gaze of the eye
 	for (int i = 0; i < PRIMARY_RAY_STEPS; i++) {
 		vec3 stepPosition = ptRayOrigin + vRayDirection * (primaryRayTime + primaryStepSize * 0.5);
 
 		float stepHeight = length(stepPosition) - radiusPlanet;
 
-		float odStepRayleigh = exp(-stepHeight / rayleighScaleHeight) * primaryStepSize;
-		float odStepMie = exp(-stepHeight / mieScaleHeight) * primaryStepSize;
+		float primaryStepRayleigh = exp(-stepHeight / rayleighScaleHeight) * primaryStepSize;
+		float primaryStepMie = exp(-stepHeight / mieScaleHeight) * primaryStepSize;
 
-		accumulatedOpticalDepthRayleigh += odStepRayleigh;
-		accumulatedOpticalDepthMie += odStepMie;
+		accumulatedPrimaryRayleigh += primaryStepRayleigh;
+		accumulatedPrimaryMie += primaryStepMie;
 
+		// secondary loop accumulates light along the primary ray towards the sun
 		float secondaryStepSize = RaySphereIntersection(stepPosition, ptSunOrigin, radiusAtmosphere).y / float(SECONDARY_RAY_STEPS);
 
-		float secondaryTime = 0.0;
+		float secondaryRayTime = 0.0;
 
-		float secondaryOpticalDepthRayleigh = 0.0;
-		float secondaryOpticalDepthMie = 0.0;
+		float accumulatedSecondaryRayleigh = 0.0;
+		float accumulatedSecondaryMie = 0.0;
 
 		for (int j = 0; j < SECONDARY_RAY_STEPS; j++) {
-			vec3 secondaryPosition = stepPosition + ptSunOrigin * (secondaryTime + secondaryStepSize * 0.5);
+			vec3 secondaryPosition = stepPosition + ptSunOrigin * (secondaryRayTime + secondaryStepSize * 0.5);
 
 			float secondaryHeight = length(secondaryPosition) - radiusPlanet;
 
-			secondaryOpticalDepthRayleigh += exp(-secondaryHeight / rayleighScaleHeight) * secondaryStepSize;
-			secondaryOpticalDepthMie += exp(-secondaryHeight / mieScaleHeight) * secondaryStepSize;
+			accumulatedSecondaryRayleigh += exp(-secondaryHeight / rayleighScaleHeight) * secondaryStepSize;
+			accumulatedSecondaryMie += exp(-secondaryHeight / mieScaleHeight) * secondaryStepSize;
 
-			secondaryTime += secondaryStepSize;
+			secondaryRayTime += secondaryStepSize;
 		}
 
-		vec3 attenuation = exp(-(mieScattering * (accumulatedOpticalDepthMie + secondaryOpticalDepthMie) + vRayleighScattering * (accumulatedOpticalDepthRayleigh + secondaryOpticalDepthRayleigh)));
-		vec3 attenuationR = exp(-(vRayleighScattering * (accumulatedOpticalDepthRayleigh + secondaryOpticalDepthRayleigh)));
-		vec3 attenuationM = vec3(1,1,1)*exp(-(mieScattering * (accumulatedOpticalDepthMie + secondaryOpticalDepthMie)));
+		// apply scattering to the accumulated values
+		vec3 attenuation = exp(-(mieScattering * (accumulatedPrimaryMie + accumulatedSecondaryMie) + vRayleighScattering * (accumulatedPrimaryRayleigh + accumulatedSecondaryRayleigh)));
 
-		accumulatedRayleigh += odStepRayleigh * attenuation;
-		accumulatedMie += odStepMie * attenuation;
+		accumulatedRayleigh += primaryStepRayleigh * attenuation;
+		accumulatedMie += primaryStepMie * attenuation;
 
 		primaryRayTime += primaryStepSize;
 	}
@@ -165,5 +170,6 @@ void main(void) {
 		mieScaleHeight,
 		mieDirection).xyz, 1.0);
 
+	// clamp the color values to [0,1] with high dynamic range
 	out_vec4Color = 1.0 - exp(-2.5*atmColor);
 }
