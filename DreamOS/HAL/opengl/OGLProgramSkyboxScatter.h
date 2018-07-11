@@ -8,10 +8,11 @@
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
+#include "../SkyboxScatterProgram.h"
 
 #include "Primitives/matrix/RotationMatrix.h"
 
-class OGLProgramSkyboxScatter : public OGLProgram {
+class OGLProgramSkyboxScatter : public OGLProgram, public SkyboxScatterProgram {
 public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp);
 
@@ -30,6 +31,10 @@ public:
 public:
 	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
 
+// SkyboxScatterProgram
+public:
+	RESULT SetSunDirection(vector vSunDirection) override;
+
 private:
 	float m_SunY = 0.25f;
 	float m_theta = 0.0f;
@@ -41,6 +46,8 @@ private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 	OGLFramebuffer* m_pOGLFramebuffer = nullptr;
+
+	vector m_sunDirection = vector(0.0f, 1.0f, 0.0f);
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

@@ -2008,6 +2008,9 @@
     <ClInclude Include="..\..\..\UI\UISurface.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\SkyboxScatterProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

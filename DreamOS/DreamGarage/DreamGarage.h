@@ -20,8 +20,10 @@ class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
 class DreamDesktopApp;
+class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
+class SkyboxScatterProgram;
 
 #define MAX_PEERS 8
 
@@ -140,7 +142,9 @@ private:
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
+	std::vector<SkyboxScatterProgram*> m_skyboxProgramNodes;
 
+	std::shared_ptr<DreamEnvironmentApp> m_pDreamEnvironmentApp = nullptr;
 	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
 	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar = nullptr;
