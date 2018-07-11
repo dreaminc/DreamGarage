@@ -135,22 +135,27 @@ void main(void) {
 	vec3 lightDirection = normalize(u_vecSunDirection.xyz);
 	vec3 eyeDirection = getWorldNormal();
 
-	//vec3 eyeOrigin = vec3(0,6371002,0);
-	vec3 eyeOrigin = vec3(0,6372e3,0);
 	float sunIntensity = 22.0;
+
+	// position of the planet, sky, and eye
 	float radiusPlanet = 6371e3;
+	vec3 eyeOrigin = vec3(0,radiusPlanet + 5e3,0); // meters above the ground
 	float radiusAtmosphere = 6471e3;
+
+	// color of rayleigh and mie scattering (mie is gray)
 	vec3 vRayleighScattering = vec3(5.5e-6,13.0e-6,22.4e-6);
 	float mieScattering = 21e-6;
+
+	// height with the average density of scattering
 	float rayleighScaleHeight = 8e3;
 	float mieScaleHeight = 1.7e3;
-	float mieDirection = 0.9995;
 
-	vec3 sunDirection = lightDirection;
+	// mieDirection relates to the size of the sun
+	float mieDirection = 0.9995;
 
 	vec4 atmColor = vec4(Atmosphere(eyeDirection,
 		eyeOrigin,
-		sunDirection,
+		lightDirection,
 		sunIntensity,
 		radiusPlanet,
 		radiusAtmosphere,

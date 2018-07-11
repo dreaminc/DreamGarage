@@ -22,7 +22,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 1.0f;
+	m_directionalIntensity = 2.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 
@@ -38,10 +38,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	if (strEnvironmentPath == "default") {
 		
 		// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
-		vector vLightVector = m_vSunDirection;
-
-		m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * vLightVector));
-		m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightVector);
+		m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * m_vSunDirection));
+		m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), m_vSunDirection);
 
 		//pDirectionalLight->EnableShadows();
 

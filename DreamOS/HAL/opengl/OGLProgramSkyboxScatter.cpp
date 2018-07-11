@@ -71,9 +71,6 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize(version versionOGL) {
 
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
-	//CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	//CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
-	//CRM(AddSharedShaderFilename(L"skyboxScatterCommon.shader"), "Failed to add shared vertex shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"skyboxScatter.vert"), "Failed to create vertex shader");
