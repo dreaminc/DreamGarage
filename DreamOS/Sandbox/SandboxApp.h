@@ -35,6 +35,7 @@
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
 #include "Sense/SenseController.h"
+#include "Sense/SenseGamepadController.h"
 
 class light; 
 class quad;
@@ -70,6 +71,7 @@ public:
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
 		unsigned fMouseLook : 1;
+		unsigned fUseGamepad : 1;
 		unsigned fInitCloud : 1;
 	};
 
@@ -132,6 +134,7 @@ public:
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
+	virtual RESULT InitializeGamepad() = 0;
 	virtual long GetTickCount();
 	virtual RESULT GetStackTrace() = 0;
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
@@ -361,6 +364,7 @@ public:
 	RESULT RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
+	RESULT RegisterSubscriber(SenseGamepadEventType mouseEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
 
 public:
 	PathManager *GetPathManager();
@@ -410,8 +414,9 @@ protected:
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
-	SenseKeyboard *m_pSenseKeyboard;
-	SenseMouse *m_pSenseMouse;
+	SenseKeyboard *m_pSenseKeyboard = nullptr;
+	SenseMouse *m_pSenseMouse = nullptr;
+	SenseGamepadController *m_pSenseGamepad = nullptr;
 	HMD *m_pHMD;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these

@@ -15,6 +15,7 @@
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
+#include "DreamGarage\DreamGamepadCameraApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
@@ -40,7 +41,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-//	CR(AddTestDreamLogger());
+	CR(AddTestGamepadCamera());
+
+	CR(AddTestDreamLogger());
 
 //	CR(AddTestMeta());
 
@@ -1671,6 +1674,120 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 	pUITest->SetTestDescription("Dream Desktop working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestGamepadCamera() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		sphere *pSphereGreen = nullptr;
+		sphere *pSphereBlue = nullptr;
+		sphere *pSphereRed = nullptr;
+		sphere *pSphereWhite = nullptr;
+
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
+	};
+	TestContext *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// TODO:
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
+		CN(m_pDreamOS);
+
+		CR(SetupDreamAppPipeline());
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		// Create the Shared View App
+		m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
+
+		// Sphere test
+		pTestContext->pSphereGreen = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereBlue = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereRed = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereWhite = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		
+		CN(pTestContext->pSphereGreen);
+		CN(pTestContext->pSphereBlue);
+		CN(pTestContext->pSphereRed);
+		CN(pTestContext->pSphereWhite);
+		
+		pTestContext->pSphereGreen->SetMaterialColors(COLOR_GREEN);
+		pTestContext->pSphereBlue->SetMaterialColors(COLOR_BLUE);
+		pTestContext->pSphereRed->SetMaterialColors(COLOR_RED);
+		pTestContext->pSphereWhite->SetMaterialColors(COLOR_WHITE);
+		
+		pTestContext->pSphereGreen->SetPosition(0, -1, 0);
+		pTestContext->pSphereBlue->SetPosition(0, 2, 0);
+		pTestContext->pSphereRed->SetPosition(2, 0, 0);
+		pTestContext->pSphereWhite->SetPosition(-2, 0, 0);
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		//CN(pTestContext);
+
+	//Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps as needed
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("2D camera test");
+	pUITest->SetTestDescription("Basic test moving camera with gamepad");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

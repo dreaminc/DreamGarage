@@ -23,6 +23,8 @@ class vector;
 // Difference between two points will be a vector
 //vector operator-(const point &lhs, const point &rhs);
 
+typedef matrix<float, 2, 1> point2D;
+
 class point : public matrix <point_precision, 4, 1> {
 public:
 	enum component {
