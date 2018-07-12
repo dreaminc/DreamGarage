@@ -7,12 +7,13 @@
 #include "DreamOS.h"
 #include "Primitives/Subscriber.h"
 #include "DreamGarage/DreamBrowser.h"
+#include "DreamGarage/DreamFormApp.h"
 
 class DreamUserHandle;
 class DreamControlView;
 struct UIEvent;
 
-class DreamSettingsApp : public DreamApp<DreamSettingsApp>, 
+class DreamSettingsApp : public DreamApp<DreamFormApp>, 
 						public Subscriber<UIEvent>, 
 						public Subscriber<SenseControllerEvent>,
 						public Subscriber<InteractionObjectEvent>,

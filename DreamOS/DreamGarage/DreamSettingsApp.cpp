@@ -15,7 +15,7 @@
 
 
 DreamSettingsApp::DreamSettingsApp(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamSettingsApp>(pDreamOS, pContext)
+	DreamApp<DreamFormApp>(pDreamOS, pContext)
 {
 	// empty
 }
