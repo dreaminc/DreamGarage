@@ -156,7 +156,7 @@ void main(void) {
 	float mieScaleHeight = 1.7e3;
 
 	// mieDirection relates to the size of the sun
-	float mieDirection = 0.9995;
+	float mieDirection = 0.995;
 
 	vec4 atmColor = vec4(Atmosphere(eyeDirection,
 		eyeOrigin,

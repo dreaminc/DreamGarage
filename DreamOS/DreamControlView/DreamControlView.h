@@ -22,7 +22,7 @@
 #define VIEW_WIDTH 0.60f // This is 1080p scaled down (2000x) - may want to use browser aspect ratio though
 #define VIEW_HEIGHT (VIEW_WIDTH * 9.0f / 16.0f) //0.3375f
 
-#define TYPING_ANGLE (58.0f * M_PI / 180.0f)
+#define TYPING_ANGLE (42.0f * M_PI / 180.0f)
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 #define SQUARED_DRAG_THRESHOLD 0.001f;
 
