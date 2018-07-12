@@ -40,12 +40,18 @@ RESULT CEFExtension::Initialize() {
 		//	"  };"
 		//	"})();";
 
-		//TODO: remove absolute path once path manager code is available here
-		std::ifstream ifstreamExtensionFile("C:\\Users\\jason\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js");
+		char *pszDreamPath = NULL;
+		size_t pszDreamPath_n = 0;
+
+		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
+		std::string strPath(pszDreamPath);
+		strPath += "\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js";
+
+		std::ifstream ifstreamExtensionFile(strPath);
 		std::stringstream bufferExtensionCode;
 		bufferExtensionCode << ifstreamExtensionFile.rdbuf();
 		CefString cefStrExtensionCode = bufferExtensionCode.str();
-
+		
 		CBM((CefRegisterExtension("v8/dreamos", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
 		//CBM((CefRegisterExtension("v8/Dream.Form", cefStrExtensionCode, m_pCEFV8Handler)), "Failed to register extension code");
 	}
