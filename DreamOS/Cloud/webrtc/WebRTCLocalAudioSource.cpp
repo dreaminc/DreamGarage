@@ -91,6 +91,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 
 			for (int j = 0; j < channels; j++) {
 				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
+				//pDataBuffer[i + j] = (int16_t)(5);
 			}
 
 			// increment theta

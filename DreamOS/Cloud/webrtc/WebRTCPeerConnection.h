@@ -85,9 +85,9 @@ public:
 	// TODO: Generalize this when we add renegotiation 
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
-	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
-	RESULT AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddVideoStream();
+	RESULT AddAudioStream(const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
@@ -110,6 +110,14 @@ protected:
 	virtual void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
 	virtual void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+
+	// TODO: Migrate to unified API
+	virtual void OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+		const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&streams) override;
+
+	virtual void OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
+
+
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
@@ -226,10 +234,10 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
