@@ -42,11 +42,22 @@ RESULT CEFExtension::Initialize() {
 
 		char *pszDreamPath = NULL;
 		size_t pszDreamPath_n = 0;
+#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+		HMODULE hModule = GetModuleHandleW(NULL);
+		WCHAR wszCurrentExePath[MAX_PATH];
+		std::wstring wstrCurrentExeFolder;
 
+		CB(GetModuleFileName(hModule, wszCurrentExePath, MAX_PATH) != 0);
+		wstrCurrentExeFolder = std::wstring(wszCurrentExePath);
+		wstrCurrentExeFolder = wstrCurrentExeFolder.substr(0, wstrCurrentExeFolder.rfind('\\'));
+
+		std::copy(wstrCurrentExeFolder.begin(), wstrCurrentExeFolder.end(), pszDreamPath);
+		std::string strPath(pszDreamPath);
+#else		
 		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 		std::string strPath(pszDreamPath);
 		strPath += "\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js";
-
+#endif
 		std::ifstream ifstreamExtensionFile(strPath);
 		std::stringstream bufferExtensionCode;
 		bufferExtensionCode << ifstreamExtensionFile.rdbuf();

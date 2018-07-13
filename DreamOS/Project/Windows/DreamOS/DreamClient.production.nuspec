@@ -30,6 +30,7 @@
     <file src="x64\Production\*.bin" target="\lib\net45\" />
     <file src="x64\Production\*.dat" target="\lib\net45\" />
     <file src="x64\Production\*.pak" target="\lib\net45\" />
+    <file src="x64\Production\*.js" target="\lib\net45\" />
 
     <file src=".\..\..\..\dreampaths.txt" target="\lib\net45\dreampaths.txt" />
     <file src=".\..\..\..\HAL\**" target="\lib\net45\HAL\" />
