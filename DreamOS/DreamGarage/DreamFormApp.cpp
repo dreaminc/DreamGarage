@@ -55,7 +55,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 
 		m_pFormView->Hide();
 
-		//TODO: temporary
+		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
 
 		float viewAngleRad = m_pUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
@@ -302,16 +302,12 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 	CNR(m_pFormView, R_SKIPPED);
 	CBR(pUIEvent->m_pObj == m_pFormView->GetViewQuad().get(), R_SKIPPED);
 	CNR(m_pDreamBrowserForm, R_SKIPPED);
-	//TODO: is this a problem?
-//	CBR(m_fRespondToController, R_SKIPPED);
 
 	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
 	ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
-	//	CR(HideWebsiteTyping());
-		//CR(m_pFormView->HandleKeyboardDown());
 		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
 	} break;
 
@@ -337,10 +333,7 @@ RESULT DreamFormApp::Show() {
 	CNR(m_pFormView, R_SKIPPED);
 
 	CR(m_pFormView->Show());
-	//CR(m_pFormView->HandleKeyboardUp("", point(0.0f, 0.0f, 0.0f)));
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
-
-	//m_fRespondToController = true;
 
 Error:
 	return r;
@@ -356,8 +349,6 @@ RESULT DreamFormApp::Hide() {
 	CR(m_pFormView->HandleKeyboardDown());
 	CR(m_pUserApp->SetEventApp(nullptr));
 	CR(m_pUserApp->SetHasOpenApp(false));
-
-	//m_fRespondToController = false;
 
 Error:
 	return r;
