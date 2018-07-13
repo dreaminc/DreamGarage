@@ -1013,6 +1013,7 @@ RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
 
+/*
 RESULT DreamGarage::OnSettings(std::string strURL) {
 	RESULT r = R_PASS;
 
@@ -1024,6 +1025,7 @@ RESULT DreamGarage::OnSettings(std::string strURL) {
 Error:
 	return r;
 }
+//*/
 
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
@@ -1088,6 +1090,24 @@ RESULT DreamGarage::OnStopReceiving() {
 	CR(m_pDreamShareView->StopReceiving());
 
 	m_pendingAssetReceiveUserID = -1;
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (strTitle == "Settings") {
+		CR(m_pDreamSettings->InitializeForm(strURL));
+
+		// more complicated form for testing until signup exists
+		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
+		CR(m_pDreamSettings->Show());
+	}
+	else {
+		// TODO: general form
+	}
 
 Error:
 	return r;

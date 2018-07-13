@@ -25,7 +25,6 @@ public:
 
 	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) = 0;
 	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) = 0;
-	virtual RESULT RequestSettingsForm(std::string key) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -80,7 +79,6 @@ public:
 
 	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) override;
 	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) override;
-	virtual RESULT RequestSettingsForm(std::string key) override;
 
 
 // TODO: Move to private when CommandLineManager is brought in from WebRTC branch

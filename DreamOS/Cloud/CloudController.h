@@ -87,6 +87,7 @@ public:
 		virtual RESULT OnStopSending() = 0;
 		virtual RESULT OnStopReceiving() = 0;
 		virtual RESULT OnCloseAsset() = 0;
+		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnShareAsset() = 0;
 	};
 
@@ -192,6 +193,8 @@ public:
 
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
 	// UserControllerObserver
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;

@@ -160,6 +160,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	//User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;

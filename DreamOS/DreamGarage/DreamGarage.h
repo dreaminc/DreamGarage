@@ -82,6 +82,8 @@ public:
 	virtual RESULT OnStopSending() override;
 	virtual RESULT OnStopReceiving() override;
 
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+
 	// Desktop Sharing
 	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
@@ -90,7 +92,7 @@ public:
 	// User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
-	virtual RESULT OnSettings(std::string strURL) override;
+	//virtual RESULT OnSettings(std::string strURL) override;
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;

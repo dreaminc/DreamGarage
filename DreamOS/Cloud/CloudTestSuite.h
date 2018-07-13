@@ -67,6 +67,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 private:
 	CloudController *GetCloudController();
 
