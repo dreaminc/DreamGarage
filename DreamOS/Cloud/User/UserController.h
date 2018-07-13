@@ -75,7 +75,6 @@ public:
 
 	RESULT OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnSetSettings(std::shared_ptr<CloudMessage> pCloudMessage);
-	RESULT OnSettingsForm(std::shared_ptr<CloudMessage> pCloudMessage);
 
 	virtual RESULT RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) override;
 	virtual RESULT RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) override;
@@ -98,7 +97,6 @@ public:
 	public:
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
-		virtual RESULT OnSettings(std::string strURL) = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
 	};

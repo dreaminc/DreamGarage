@@ -173,10 +173,6 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnSettings(std::string strURL) override {
-		return R_NOT_IMPLEMENTED;
-	}
-
 	virtual RESULT OnLogin() override {
 		return R_NOT_IMPLEMENTED;
 	}

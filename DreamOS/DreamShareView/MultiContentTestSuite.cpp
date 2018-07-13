@@ -942,6 +942,9 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		virtual RESULT OnSetSettings() override {
 			return R_PASS;
 		}
+
+		//TODO: to update this, extend environment controller observer
+		/*
 		virtual RESULT OnSettings(std::string strURL) override {
 			RESULT r = R_PASS;
 
@@ -952,6 +955,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 //		Error:
 			return r;
 		}
+		//*/
 		virtual RESULT OnLogin() override {
 			return R_NOT_IMPLEMENTED;
 		}

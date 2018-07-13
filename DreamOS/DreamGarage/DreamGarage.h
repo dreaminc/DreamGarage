@@ -92,7 +92,6 @@ public:
 	// User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
-	//virtual RESULT OnSettings(std::string strURL) override;
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;

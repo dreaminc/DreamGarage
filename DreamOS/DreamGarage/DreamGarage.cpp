@@ -1013,20 +1013,6 @@ RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
 
-/*
-RESULT DreamGarage::OnSettings(std::string strURL) {
-	RESULT r = R_PASS;
-
-	CR(m_pDreamSettings->InitializeForm(strURL));
-	// more complicated form for testing until signup exists
-	//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
-	CR(m_pDreamSettings->Show());
-
-Error:
-	return r;
-}
-//*/
-
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 

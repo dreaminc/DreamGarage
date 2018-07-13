@@ -476,17 +476,6 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnSettings(std::string strURL) {
-	RESULT r = R_PASS;
-
-	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnSettings(strURL));
-	}
-
-Error:
-	return r;
-}
-
 RESULT CloudController::OnLogin() {
 	RESULT r = R_PASS;
 

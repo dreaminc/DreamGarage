@@ -95,7 +95,6 @@ public:
 	public:
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
-		virtual RESULT OnSettings(std::string strURL) = 0;
 
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
@@ -199,7 +198,6 @@ public:
 	// UserControllerObserver
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
-	virtual RESULT OnSettings(std::string strURL) override;
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
