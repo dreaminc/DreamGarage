@@ -377,6 +377,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 	CN(m_pDreamSettings);
 
+	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
+	CN(m_pDreamSettings);
+
 Error:
 	return r;
 }
@@ -1085,7 +1088,7 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	RESULT r = R_PASS;
 
 	if (strTitle == "Settings") {
-		CR(m_pDreamSettings->InitializeForm(strURL));
+		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 
 		// more complicated form for testing until signup exists
 		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
@@ -1093,6 +1096,8 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	}
 	else {
 		// TODO: general form
+		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
+		CR(m_pDreamGeneralForm->Show());
 	}
 
 Error:

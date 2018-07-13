@@ -93,12 +93,15 @@ DreamFormApp* DreamFormApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	return pDreamApp;
 }
 
-RESULT DreamFormApp::InitializeForm(std::string strURL) {
+RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	RESULT r = R_PASS;
 
 	if (m_pDreamBrowserForm == nullptr) {
 		m_strURL = strURL;
 		m_fInitBrowser = true;
+	}
+	else {
+		m_pDreamBrowserForm->SetURI(m_strURL);
 	}
 
 	return r;

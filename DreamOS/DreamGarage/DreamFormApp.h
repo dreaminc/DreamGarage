@@ -30,7 +30,7 @@ protected:
 	static DreamFormApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeForm(std::string strURL);
+	RESULT UpdateWithNewForm(std::string strURL);
 
 // Dream Browser observer
 public:
