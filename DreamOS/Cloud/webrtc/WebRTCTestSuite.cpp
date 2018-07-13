@@ -145,7 +145,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		}
 
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-			//DEVENV_LINEOUT(L"OnAudioData");
+			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
 			return R_NOT_HANDLED;
 		}
@@ -153,7 +153,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
 			DEVENV_LINEOUT("OnDataChannel");
 
-			return R_NOT_HANDLED;
+return R_NOT_HANDLED;
 		}
 
 		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
@@ -244,6 +244,37 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		CloudController *pCloudController = pTestContext->pCloudController;
+		CN(pCloudController);
+
+		// Every 20 ms
+
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		{
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 20) {
+
+				lastUpdateTime = timeNow;
+
+				if (pCloudController != nullptr) {
+					// TODO: Retrieve audio packet from capture buffer (might need copy
+					// or convert to correct packet format
+					//pCaptureBuffer->IncrementBuffer(numFrames);
+					//AudioPacket pendingAudioPacket = pCaptureBuffer->GetAudioPacket(numFrames);
+
+					// Send a dummy audio packet (generating audio right now)
+					int nChannels = 1;
+					int samplingFrequency = 44100;
+					int numFrames = (nChannels * samplingFrequency) * 0.01f;
+					AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
+					//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+					pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+					//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+				}
+			}
+		}
 
 	Error:
 		return r;
