@@ -32,9 +32,11 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestFadeShader());
 
-//	CR(AddTestSkybox());
+	CR(AddTestSkybox());
 
-//	CR(AddTestWaterShader());
+	CR(AddTestToonShader());
+
+	CR(AddTestWaterShader());
 
 	CR(AddTestStandardShader());
 
@@ -47,8 +49,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTexture());	
 
 	CR(AddTestHeightQuadObject());
-
-	CR(AddTestToonShader());
 
 	CR(AddTestIncludeShader());
 
@@ -612,6 +612,11 @@ RESULT HALTestSuite::AddTestToonShader() {
 	double sTestTime = 40.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		model *pModel = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
@@ -650,11 +655,18 @@ RESULT HALTestSuite::AddTestToonShader() {
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.35f, -1.0f, -1.0f));
 
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		{
-			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
-			CN(pModel);
-			pModel->SetPosition(point(0.0f, -2.0f, 0.0f));
-			pModel->SetScale(0.1f);
+			//auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\head_01_color\\head_01.fbx");
+			CN(pTestContext->pModel);
+
+			pTestContext->pModel->SetPosition(point(0.0f, -2.0f, -2.0f));
+			pTestContext->pModel->SetScale(0.1f);
+			pTestContext->pModel->RotateXByDeg(-90.0f);
 		}
 
 	Error:
@@ -668,7 +680,17 @@ RESULT HALTestSuite::AddTestToonShader() {
 
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pModel);
+		pTestContext->pModel->RotateYByDeg(0.01f);
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
@@ -677,7 +699,7 @@ RESULT HALTestSuite::AddTestToonShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Include Shader");
