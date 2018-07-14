@@ -88,7 +88,7 @@ public:
 	RESULT AddStreams(bool fAddDataChannel = true);
 	RESULT AddVideoStream();
 	RESULT AddAudioStream(const std::string &strAudioTrackLabel);
-	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
