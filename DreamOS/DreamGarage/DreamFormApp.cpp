@@ -108,15 +108,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 }
 
 RESULT DreamFormApp::HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) {
-	RESULT r = R_PASS;
-
-	auto pCloudController = GetDOS()->GetCloudController();
-	if (pCloudController != nullptr) {
-		CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
-	}
-
-Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamFormApp::UpdateControlBarText(std::string& strTitle) {
@@ -318,9 +310,10 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 	case UI_SELECT_MOVED: {
 		CR(m_pDreamBrowserForm->OnMouseMove(ptContact));
 	} break;
+
 	case UI_SCROLL: {
 		CR(m_pDreamBrowserForm->OnScroll(pUIEvent->m_vDelta.x(), pUIEvent->m_vDelta.y(), ptContact));
-	}
+	} break;
 	};
 
 Error:

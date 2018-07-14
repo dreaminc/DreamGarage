@@ -34,7 +34,7 @@ public:
 	virtual RESULT RequestShareAsset(long assetID) = 0;
 	virtual RESULT RequestStopSharing(long assetID) = 0;
 
-	virtual RESULT RequestForm(std::string key) = 0;
+	virtual RESULT RequestForm(std::string strKey) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -146,7 +146,7 @@ public:
 	virtual RESULT RequestShareAsset(long assetID) override;
 	virtual RESULT RequestStopSharing(long assetID) override;
 
-	virtual RESULT RequestForm(std::string key) override;
+	virtual RESULT RequestForm(std::string strKey) override;
 
 	virtual RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage);
