@@ -76,8 +76,9 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 	static double theta = 0.0f;
 	double freq = 440.0f;
 
-	if (m_strAudioTrackLabel == "chrome_audio_label")
-		freq *= 2.0f;
+	if (m_strAudioTrackLabel == "chrome_audio_label") {
+		freq *= 4.0f;
+	}
 
 	int16_t *pDataBuffer = nullptr;  
 	

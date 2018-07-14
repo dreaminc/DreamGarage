@@ -273,8 +273,10 @@ return R_NOT_HANDLED;
 					int numFrames = (nChannels * samplingFrequency) * 0.01f;
 					AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
 					//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+
+					// DO BOTH
 					pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
-					//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+					pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
 				}
 			}
 		}

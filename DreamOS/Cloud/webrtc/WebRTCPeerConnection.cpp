@@ -141,9 +141,10 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// User audio stream
 	//CR(AddAudioStream(kUserAudioLabel));
+	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 
 	// Chrome Audio Source
-	CR(AddLocalAudioSource(kChromeAudioLabel));
+	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 
 	// Chrome Video
 	//CR(AddVideoStream());
@@ -274,7 +275,7 @@ Error:
 }
 
 // TODO:
-RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrackLabel) {
+RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pLocalAudioTrack = nullptr;
@@ -325,7 +326,7 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrac
 		pLocalAudioTrack->AddRef();
 
 		//pMediaStreamInterface->AddTrack(pAudioTrack);
-		auto pRTPSender = m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {kChromeStreamLabel});
+		auto pRTPSender = m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {strMediaStreamLabel});
 		
 		//std::string strTrackID = pRTPSender.value()->id();
 
