@@ -900,7 +900,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\matrix\ViewMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVRPlatform.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
@@ -909,6 +909,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UISurface.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.cpp">
+      <Filter>Cloud\webrtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2001,12 +2004,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\matrix\BasisMatrix.h">
       <Filter>Primitives\matrix</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRPlatform.h">
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UISurface.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2099,15 +2105,6 @@
     </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
-    </None>
-    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
-      <Filter>Scripts</Filter>
-	</None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\Scripts\make_production.py">
       <Filter>Scripts</Filter>

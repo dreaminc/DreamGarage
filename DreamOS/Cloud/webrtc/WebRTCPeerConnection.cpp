@@ -36,6 +36,7 @@
 #include "WebRTCCustomVideoCapturer.h"
 #include "WebRTCLocalAudioSource.h"
 #include "WebRTCLocalAudioTrack.h"
+#include "WebRTCAudioTrackSink.h"
 
 #include "Primitives/texture.h"
 
@@ -324,8 +325,12 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrac
 		pLocalAudioTrack->AddRef();
 
 		//pMediaStreamInterface->AddTrack(pAudioTrack);
-		m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {kChromeStreamLabel});
+		auto pRTPSender = m_pWebRTCPeerConnectionInterface->AddTrack(pLocalAudioTrack, {kChromeStreamLabel});
+		
+		//std::string strTrackID = pRTPSender.value()->id();
+
 	}
+
 
 Error:
 	return r;
@@ -474,113 +479,127 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 	int a = 5;
 
-	//// Add to remote streams
-	//// TODO: This is done with local_stream/remote_stream now
-	////if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->id()) == m_WebRTCRemoteActiveStreams.end()) {
-	////	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-	////	m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
-	////}
-	//
-	//if (!pMediaStreamInterface) {
-	//	DEBUG_LINEOUT("Cannot add stream");
-	//	return;
+	// Add to remote streams
+	// TODO: This is done with local_stream/remote_stream now
+	//if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->id()) == m_WebRTCRemoteActiveStreams.end()) {
+	//	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+	//	m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->id(), pMediaStreamInterface));
 	//}
-	//
-	//// User
-	//// Audio track
-	////auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
-	//
-	//auto pMediaStreamTrack = m_pWebRTCPeerConnectionInterface->GetReceivers();
-	//	
-	//	//->remote_streams()->FindAudioTrack(kUserAudioLabel);
-	//auto pUserAudioTrack = dynamic_cast<webrtc::AudioTrackInterface*>(pMediaStreamTrack);
-	//if (pUserAudioTrack != nullptr) {
-	//	auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
-	//
-	//	if (pUserAudioTrackSource != nullptr) {
-	//		DEBUG_LINEOUT("Found AudioTrackSourceInterface");
-	//
-	//		// Not currently using this as previous for mouth size
-	//		// We'll want to put this back in when we go to localaudiosource though
-	//		//pUserAudioTrackSource->AddSink(this);
-	//
+	
+	if (!pMediaStreamInterface) {
+		DEBUG_LINEOUT("Cannot add stream");
+		return;
+	}
+	
+	auto audioTracks = pMediaStreamInterface->GetAudioTracks();
+
+	// User Audio track	
+	auto pUserAudioTrack = pMediaStreamInterface->FindAudioTrack(kUserAudioLabel);
+	if (pUserAudioTrack != nullptr) {
+		if (pUserAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+
+			std::string strTrackName = pUserAudioTrack->id();
+
+			DEBUG_LINEOUT("OnAddStream: %s", strTrackName.c_str());
+
+			webrtc::AudioSourceInterface* pUserAudioTrackSource = pUserAudioTrack->GetSource();
+
+			if (pUserAudioTrackSource != nullptr) {
+				std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+				m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+
+				pUserAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+			}
+		}
+
+		// TODO: Volume stuff
+		/*
+		auto pUserAudioTrackSource = pUserAudioTrack->GetSource();
+	
+		if (pUserAudioTrackSource != nullptr) {
+			DEBUG_LINEOUT("Found AudioTrackSourceInterface");
+	
+			// Not currently using this as previous for mouth size
+			// We'll want to put this back in when we go to localaudiosource though
+			//pUserAudioTrackSource->AddSink(this);
+	
 #ifndef _USE_TEST_APP
-	//		// Turn off audio for non-testing
-	//		SetAudioVolume(0.0f);
+			// Turn off audio for non-testing
+			SetAudioVolume(0.0f);
 #endif
-	//
-	//		DEBUG_LINEOUT("Added user audio sink");
-	//	}
-	//	else {
-	//		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
-	//	}
-	//}
-	//
-	//// Chrome
-	////auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
-	//pMediaStreamTrack = m_pWebRTCPeerConnectionInterface->remote_streams()->FindAudioTrack(kChromeAudioLabel);
-	//auto pChromeAudioTrack = dynamic_cast<webrtc::AudioTrackInterface*>(pMediaStreamTrack);
-	//if (pChromeAudioTrack != nullptr) {
-	//	auto pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
-	//
-	//	if (pChromeAudioTrackSource != nullptr) {
-	//		DEBUG_LINEOUT("Found AudioTrackSourceInterface");
-	//
-	//		pChromeAudioTrackSource->AddSink(this);
-	//
-	//		//SetAudioVolume(0.0f);
-	//
-	//		DEBUG_LINEOUT("Added chrome audio sink");
-	//	}
-	//	else {
-	//		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
-	//	}
-	//}
-	//
-	//// Video track
-	////auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
-	//pMediaStreamTrack = m_pWebRTCPeerConnectionInterface->remote_streams()->FindVideoTrack(kChromeVideoLabel);
-	//auto pVideoTrack = dynamic_cast<webrtc::VideoTrackInterface*>(pMediaStreamTrack);
-	//if (pVideoTrack != nullptr) {
-	//	DEBUG_LINEOUT("Found VideoTrackSourceInterface");
-	//
-	//	auto pVideoTrackSource = pVideoTrack->GetSource();
-	//
-	//	if (pVideoTrackSource != nullptr) {
-	//		// Get some information
-	//		webrtc::VideoTrackSourceInterface::Stats stats;
-	//		pVideoTrackSource->GetStats(&stats);
-	//
-	//		// This object informs the source of the format requirements of the sink
-	//		rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
-	//
-	//		pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
-	//		//bool res = track->GetSource()->is_screencast();
-	//		
-	//		//const int64_t interval = 1000000000;//33333333
-	//		//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
-	//		//g_capturer->Start(format);
-	//		
-	//		//track->GetSource()->Restart();
-	//
-	//		// Kick off our capturer (testing)
-	//		///*
-	//		if (m_pCricketVideoCapturer != nullptr) {
-	//			cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
-	//			m_pCricketVideoCapturer->Start(videoCaptureFormat);
-	//		}
-	//		//*/
-	//
-	//	}
-	//	else {
-	//		DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
-	//	}
-	//
-	//}	
-	//
-	//if (m_pParentObserver != nullptr) {
-	//	m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
-	//}
+	
+			DEBUG_LINEOUT("Added user audio sink");
+		}
+		else {
+			DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
+		}
+		*/
+	}
+	
+	// TODO: Turn this shit into a function bruh
+
+	// Chrome Audio Track
+	//auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
+	auto pChromeAudioTrack = pMediaStreamInterface->FindAudioTrack(kChromeAudioLabel);
+	if (pChromeAudioTrack != nullptr && pChromeAudioTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
+
+		std::string strTrackName = pChromeAudioTrack->id();
+
+		DEBUG_LINEOUT("OnAddStream: %s", strTrackName.c_str());
+
+		webrtc::AudioSourceInterface* pChromeAudioTrackSource = pChromeAudioTrack->GetSource();
+
+		if (pChromeAudioTrackSource != nullptr) {
+
+			std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+			m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+
+			pChromeAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+		}
+	}
+	
+	// Video track
+	auto pVideoTrack = pMediaStreamInterface->FindVideoTrack(kChromeVideoLabel);
+	if (pVideoTrack != nullptr) {
+		DEBUG_LINEOUT("Found VideoTrackSourceInterface");
+	
+		auto pVideoTrackSource = pVideoTrack->GetSource();
+	
+		if (pVideoTrackSource != nullptr) {
+			// Get some information
+			webrtc::VideoTrackSourceInterface::Stats stats;
+			pVideoTrackSource->GetStats(&stats);
+	
+			// This object informs the source of the format requirements of the sink
+			rtc::VideoSinkWants videoSinkWants = rtc::VideoSinkWants();
+	
+			pVideoTrackSource->AddOrUpdateSink(this, videoSinkWants);
+			//bool res = track->GetSource()->is_screencast();
+			
+			//const int64_t interval = 1000000000;//33333333
+			//cricket::VideoFormat format(512, 512, 1000000000, cricket::FOURCC_RGBA);
+			//g_capturer->Start(format);
+			
+			//track->GetSource()->Restart();
+	
+			// Kick off our capturer (testing)
+			///*
+			if (m_pCricketVideoCapturer != nullptr) {
+				cricket::VideoFormat videoCaptureFormat(1280, 960, cricket::VideoFormat::FpsToInterval(30), cricket::FOURCC_ARGB);
+				m_pCricketVideoCapturer->Start(videoCaptureFormat);
+			}
+			//*/
+	
+		}
+		else {
+			DEBUG_LINEOUT("Cannot VideoTrackInterface::GetSource");
+		}
+	
+	}	
+	
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
+	}
 }
 
 void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
@@ -591,29 +610,35 @@ void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStream
 	}
 }
 
+// TODO: We want to move to these when unified is fully baked
 void WebRTCPeerConnection::OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> pReceiver,
 	const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&streams)
 {
-	DEBUG_LINEOUT("OnAddTrack: %s", pReceiver->track()->id().c_str());
-
 	rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> pTrack = pReceiver->track();
-
+	
+	std::string strMediaStreamName = streams[0]->id();
+	
 	if (pTrack->kind() == webrtc::MediaStreamTrackInterface::kAudioKind) {
-		// Add sink here etc		
+		
 		webrtc::AudioTrackInterface* pAudioTrack = static_cast<webrtc::AudioTrackInterface*>(pTrack.get());
-
-		pAudioTrack->AddSink(this);
-
-		//auto pAudioTrackSource = pAudioTrack->GetSource();
-		//pAudioTrackSource->AddSink(this);
+		std::string strAudioTrackName = pAudioTrack->id();
+	
+		DEBUG_LINEOUT("OnAddTrack: %s", strAudioTrackName.c_str());
+	//
+	//	// TODO: get the actual stupid name
+	//	//m_webRTCAudioTrackSinks
+	//	std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strAudioTrackName);
+	//	m_webRTCAudioTrackSinks[strAudioTrackName] = pWebRTCAudioTrackSink;
+	//
+	//	pAudioTrack->AddSink(pWebRTCAudioTrackSink.get());
+	//
+	//	//auto pAudioTrackSource = pAudioTrack->GetSource();
+	//	//pAudioTrackSource->AddSink(this);
 	}
 }
 
 void WebRTCPeerConnection::OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) {
-
 	DEBUG_LINEOUT("OnRemoveTrack: %s", receiver->track()->id().c_str());
-
-	int a = 5;
 }
 
 void WebRTCPeerConnection::OnRenegotiationNeeded() {
@@ -651,17 +676,17 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	}
 }
 
-void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-	
-	// TODO: Register local source as sink or something
-	std::string strAudioTrackLabel = "tempTrack";
-
-	DEBUG_LINEOUT("OnAudioData: %s %d samples", strAudioTrackLabel.c_str(), (int)frames);
-	
-	if (m_pParentObserver != nullptr) {
-		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
-	}
-}
+//void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+//	
+//	// TODO: Register local source as sink or something
+//	std::string strAudioTrackLabel = "tempTrack";
+//
+//	DEBUG_LINEOUT("OnAudioData: %s %d samples", strAudioTrackLabel.c_str(), (int)frames);
+//	
+//	if (m_pParentObserver != nullptr) {
+//		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
+//	}
+//}
 
 // TODO: Update WebRTC version and move to webrtc::video_frame since 
 // I'm not sure what the hell cricket is all about
@@ -1054,7 +1079,8 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
 	rtcConfiguration.dscp();
 
-	rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
+	// Not really working?
+	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
 
 	webrtc::PeerConnectionInterface::IceServer iceServer;
 	webrtc::FakeConstraints webrtcConstraints;

@@ -28,6 +28,7 @@
 class WebRTConductor;
 class WebRTCLocalAudioSource;
 class WebRTCLocalAudioTrack;
+class WebRTCAudioTrackSink;
 class User;
 class TwilioNTSInformation;
 class AudioPacket;
@@ -41,7 +42,7 @@ class WebRTCPeerConnection :
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::AudioTrackSinkInterface,
+	//public webrtc::AudioTrackSinkInterface,
 	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
 	public WebRTCPeerConnectionProxy
 {
@@ -134,9 +135,6 @@ protected:
 	// CreateSessionDescriptionObserver implementation.
 	virtual void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) override;
 	virtual void OnFailure(const std::string& error) override;
-
-	// webrtc::AudioTrackSinkInterface
-	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
 	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
@@ -240,9 +238,11 @@ private:
 	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
 
+	// Sinks
+	std::map<std::string, std::shared_ptr<WebRTCAudioTrackSink>> m_webRTCAudioTrackSinks;
+
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
-
 
 	// local audio sources
 	std::map<std::string, rtc::scoped_refptr<WebRTCLocalAudioSource>> m_pWebRTCLocalAudioSources;

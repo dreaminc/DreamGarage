@@ -112,6 +112,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	struct TestContext : public CloudController::PeerConnectionObserver {
 
 		CloudController *pCloudController = nullptr;
+		int testUserNum = 0;
 
 		// PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
@@ -207,6 +208,8 @@ return R_NOT_HANDLED;
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
 
+			pTestContext->testUserNum = std::stoi(pCommandLineManager->GetParameterValue("testval"));
+
 			long environmentID = 170;
 			std::string strPassword = "nightmare";
 
@@ -258,7 +261,7 @@ return R_NOT_HANDLED;
 
 				lastUpdateTime = timeNow;
 
-				if (pCloudController != nullptr) {
+				if (pCloudController != nullptr && pTestContext->testUserNum == 2) {
 					// TODO: Retrieve audio packet from capture buffer (might need copy
 					// or convert to correct packet format
 					//pCaptureBuffer->IncrementBuffer(numFrames);

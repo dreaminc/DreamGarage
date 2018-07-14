@@ -65,8 +65,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 	//	pendingAudioPacket.GetNumFrames()
 	//);
 
-	int samples_per_sec = 44100
-		;
+	int samples_per_sec = 44100;
 	//int nSamples = pendingAudioPacket.GetNumFrames();
 	int nSamples = pendingAudioPacket.GetNumFrames();
 	
