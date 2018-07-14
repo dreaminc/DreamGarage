@@ -61,6 +61,8 @@ RESULT EnvironmentController::Initialize() {
 	CR(RegisterMethod("receive", std::bind(&EnvironmentController::OnReceiveAsset, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_sending", std::bind(&EnvironmentController::OnStopSending, this, std::placeholders::_1)));
 	CR(RegisterMethod("stop_receiving", std::bind(&EnvironmentController::OnStopReceiving, this, std::placeholders::_1)));
+
+	CR(RegisterMethod("get_form", std::bind(&EnvironmentController::OnGetForm, this, std::placeholders::_1)));
 	//TODO: no method currently for a stop_sharing response, but could potentially be used for error handling
 
 Error:
@@ -519,6 +521,29 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RequestForm(std::string key) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	CloudController *pParentCloudController = GetCloudController();
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["form"] = nlohmann::json::object();
+	jsonPayload["form"]["key"] = key;
+
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("form.get_form"));
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentController);
+	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::FORM_GET_FORM));
+
+Error:
+	return r;
+
+}
+
 RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	DEBUG_LINEOUT("%d Peers Environment: %d", (int)(m_environmentPeers.size()), (int)(m_environment.GetEnvironmentID()));
 	for (auto &peer : m_environmentPeers)
@@ -764,6 +789,27 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonForm = jsonPayload["/form"_json_pointer];
+
+	// TODO: potentially build this out into a class similar to EnvironmentAsset
+	CBR(!jsonForm.is_null(), R_SKIPPED);
+
+	CBR(jsonForm["/key"_json_pointer].is_string(), R_SKIPPED);
+	CBR(jsonForm["/title"_json_pointer].is_string(), R_SKIPPED);
+	CBR(jsonForm["/url"_json_pointer].is_string(), R_SKIPPED);
+
+	CR(m_pEnvironmentControllerObserver->OnGetForm(jsonForm["/key"_json_pointer].get<std::string>(),
+												jsonForm["/title"_json_pointer].get<std::string>(),
+												jsonForm["/url"_json_pointer].get<std::string>()));
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
@@ -850,8 +896,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	}
 
 	else if (pCloudMessage->GetController() == "form") {
-		auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-		pUserController->HandleEnvironmentSocketMessage(pCloudMessage);
+		RESULT r = HandleOnMethodCallback(pCloudMessage);
 	}
 
 

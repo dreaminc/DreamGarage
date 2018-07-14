@@ -39,9 +39,6 @@ RESULT UserController::Initialize() {
 	CR(RegisterMethod("get_settings", std::bind(&UserController::OnGetSettings, this, std::placeholders::_1)));
 	CR(RegisterMethod("set_settings", std::bind(&UserController::OnSetSettings, this, std::placeholders::_1)));
 
-	//form
-	CR(RegisterMethod("get_form", std::bind(&UserController::OnSettingsForm, this, std::placeholders::_1)));
-
 Error:
 	return r;
 }
@@ -451,7 +448,12 @@ RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 		}
 	}
 	else {
-		RequestSettingsForm("FormKey.Settings");
+		//TODO: is this the right place to request the settings form?
+		auto pCloudController = GetCloudController();
+		CN(pCloudController);
+		auto pEnvironmentControllerProxy = dynamic_cast<EnvironmentControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		CN(pEnvironmentControllerProxy);
+		pEnvironmentControllerProxy->RequestForm("FormKey.Settings");
 	}
 
 Error:
@@ -467,32 +469,6 @@ RESULT UserController::OnSetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 		if (m_pUserControllerObserver != nullptr) {
 			// Moving to Send/Receive paradigm
 			CR(m_pUserControllerObserver->OnSetSettings());
-		}
-	}
-
-Error:
-	return r;
-}
-
-RESULT UserController::OnSettingsForm(std::shared_ptr<CloudMessage> pCloudMessage) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonForm = jsonPayload["/form"_json_pointer];
-
-	// TODO: potentially build this out into a class similar to EnvironmentAsset
-	if (!jsonForm.is_null()) {
-		if (m_pUserControllerObserver != nullptr) {
-			if (jsonForm["/key"_json_pointer].is_string()) {
-				/*TODO*/
-			}
-			if (jsonForm["/title"_json_pointer].is_string()) {
-				/*TODO*/
-			}
-			if (jsonForm["/url"_json_pointer].is_string()) {
-				CR(m_pUserControllerObserver->OnSettings(jsonForm["/url"_json_pointer].get<std::string>()));
-			}
-			// Moving to Send/Receive paradigm
 		}
 	}
 
@@ -546,30 +522,6 @@ RESULT UserController::RequestSetSettings(std::wstring wstrHardwareID, std::stri
 	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CN(pEnvironmentController);
 	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::USER_SET_SETTINGS));
-
-Error:
-	return r;
-}
-
-//TODO: this needs to be moved to EnvironmentController (or possibly Controller)
-// so that forms are requested in the same way across all sockets
-RESULT UserController::RequestSettingsForm(std::string key) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload;
-	CloudController *pParentCloudController = GetCloudController();
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
-
-	jsonPayload["form"] = nlohmann::json::object();
-	jsonPayload["form"]["key"] = key;
-
-	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
-	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("form.get_form"));
-
-	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CN(pEnvironmentController);
-	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::FORM_SETTINGS));
 
 Error:
 	return r;

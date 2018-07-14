@@ -443,6 +443,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnGetForm(strKey, strTitle, strURL));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
@@ -459,17 +470,6 @@ RESULT CloudController::OnSetSettings() {
 
 	if (m_pUserObserver != nullptr) {
 		CR(m_pUserObserver->OnSetSettings());
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::OnSettings(std::string strURL) {
-	RESULT r = R_PASS;
-
-	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnSettings(strURL));
 	}
 
 Error:

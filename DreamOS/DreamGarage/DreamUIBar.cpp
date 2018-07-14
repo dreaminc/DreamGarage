@@ -441,14 +441,14 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 					CN(m_pKeyboardHandle);
 					CR(m_pKeyboardHandle->Show());
-					ClearMenuWaitingFlag();
 				}
-				else if (strTitle == "Settings") {
-					m_pUserControllerProxy->RequestSettingsForm(strPath);
-					m_pathStack = std::stack<std::shared_ptr<MenuNode>>(); // clear stack
-					ClearMenuWaitingFlag();
+				else if (strScope == "FormScope.Form") {
+					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+					CR(pEnvironmentControllerProxy->RequestForm(strPath));
 				}
-
+				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+				ClearMenuWaitingFlag();
 			}
 //*/
 		}

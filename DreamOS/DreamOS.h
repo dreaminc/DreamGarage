@@ -160,16 +160,16 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	//User Observer
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
 	virtual RESULT OnSetSettings() override {
-		return R_NOT_IMPLEMENTED;
-	}
-
-	virtual RESULT OnSettings(std::string strURL) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
@@ -440,6 +440,7 @@ protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 	std::shared_ptr<DreamShareView> m_pDreamShareView;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
+	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;
 
 private:
 	version m_versionDreamOS;

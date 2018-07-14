@@ -123,6 +123,7 @@ class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, publ
 	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
 	friend class DreamSettingsApp;
+	friend class DreamFormApp;
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);

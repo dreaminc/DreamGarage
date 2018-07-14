@@ -377,6 +377,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 	CN(m_pDreamSettings);
 
+	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
+	CN(m_pDreamSettings);
+
 Error:
 	return r;
 }
@@ -1013,18 +1016,6 @@ RESULT DreamGarage::OnSetSettings() {
 	return R_PASS;
 }
 
-RESULT DreamGarage::OnSettings(std::string strURL) {
-	RESULT r = R_PASS;
-
-	CR(m_pDreamSettings->InitializeSettingsForm(strURL));
-	// more complicated form for testing until signup exists
-	//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
-	CR(m_pDreamSettings->Show());
-
-Error:
-	return r;
-}
-
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 
@@ -1088,6 +1079,26 @@ RESULT DreamGarage::OnStopReceiving() {
 	CR(m_pDreamShareView->StopReceiving());
 
 	m_pendingAssetReceiveUserID = -1;
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (strTitle == "Settings") {
+		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
+
+		// more complicated form for testing until signup exists
+		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
+		CR(m_pDreamSettings->Show());
+	}
+	else {
+		// TODO: general form
+		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
+		CR(m_pDreamGeneralForm->Show());
+	}
 
 Error:
 	return r;

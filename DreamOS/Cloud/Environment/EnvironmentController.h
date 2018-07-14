@@ -33,6 +33,8 @@ public:
 	virtual RESULT RequestCloseAsset(long assetID) = 0;
 	virtual RESULT RequestShareAsset(long assetID) = 0;
 	virtual RESULT RequestStopSharing(long assetID) = 0;
+
+	virtual RESULT RequestForm(std::string strKey) = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -76,6 +78,7 @@ public:
 
 		// Forms
 		FORM_SETTINGS,
+		FORM_GET_FORM,
 
 		INVALID
 	};
@@ -108,6 +111,8 @@ public:
 		virtual RESULT OnStopReceiving() = 0;;
 		virtual RESULT OnShareAsset() = 0;
 		virtual RESULT OnCloseAsset() = 0;
+
+		virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
@@ -140,6 +145,9 @@ public:
 	virtual RESULT RequestCloseAsset(long assetID) override;
 	virtual RESULT RequestShareAsset(long assetID) override;
 	virtual RESULT RequestStopSharing(long assetID) override;
+
+	virtual RESULT RequestForm(std::string strKey) override;
+
 	virtual RESULT OnOpenAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnCloseAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
@@ -147,6 +155,9 @@ public:
 	RESULT OnReceiveAsset(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopSending(std::shared_ptr<CloudMessage> pCloudMessage);
 	RESULT OnStopReceiving(std::shared_ptr<CloudMessage> pCloudMessage);
+
+	RESULT OnGetForm(std::shared_ptr<CloudMessage> pCloudMessage);
+
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	long GetUserID();

@@ -41,6 +41,7 @@ class DreamControlView : public DreamApp<DreamControlView>,
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 	friend class DreamSettingsApp;
+	friend class DreamFormApp;
 
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
