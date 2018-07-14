@@ -921,6 +921,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp">
       <Filter>HAL\opengl</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.cpp">
+      <Filter>Cloud\webrtc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2037,6 +2040,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenFade.h">
       <Filter>HAL\opengl</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
