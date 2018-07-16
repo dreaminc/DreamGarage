@@ -26,6 +26,7 @@
 
 #include <windows.h>
 #include <windowsx.h>
+#include <wincred.h>
 #include "DDCIPCMessage.h"
 
 DreamOSTestSuite::DreamOSTestSuite(DreamOS *pDreamOS) :
@@ -40,6 +41,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestCredentialStorage());
 
 	CR(AddTestGamepadCamera());
 
@@ -155,7 +158,7 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	//CR(pHAL->MakeCurrentContext());
 
 	ProgramNode* pRenderProgramNode;
-	pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	pRenderProgramNode = pHAL->MakeProgramNode("standard");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1786,6 +1789,76 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 
 	pUITest->SetTestName("2D camera test");
 	pUITest->SetTestDescription("Basic test moving camera with gamepad");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT DreamOSTestSuite::AddTestCredentialStorage() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		//CN(m_pDreamOS);
+
+		//CR(SetupDreamAppPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		std::wstring wstrKey = L"key";
+		std::string strField = "field";
+		std::string strOut;
+		{
+			m_pDreamOS->SaveCredential(wstrKey, strField);
+			m_pDreamOS->GetCredential(wstrKey, strOut);
+
+			m_pDreamOS->RemoveCredential(wstrKey);
+		}
+
+	//Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		//Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps as needed
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset);
+	CN(pUITest);
+
+	pUITest->SetTestName("Credential Manager Test");
+	pUITest->SetTestDescription("Basic test of using password vault");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

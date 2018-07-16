@@ -15,6 +15,7 @@
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 #include "Win64GamepadController.h"
+#include "Win64CredentialManager.h"
 
 #include <string>
 
@@ -164,6 +165,43 @@ RESULT Windows64App::InitializeLeapMotion() {
 		// Leap Motion successfully initialized
 		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
 	}
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeCredentialManager() {
+	RESULT r = R_PASS;
+
+	m_pCredentialManager = new Win64CredentialManager();
+	CN(m_pCredentialManager);
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::SaveCredential(std::wstring wstrKey, std::string strCred) {
+	RESULT r = R_PASS;
+
+	CR(m_pCredentialManager->SaveCredential(wstrKey, strCred));
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::GetCredential(std::wstring wstrKey, std::string& strOut) {
+	RESULT r = R_PASS;
+
+	CR(m_pCredentialManager->GetCredential(wstrKey, strOut));
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::RemoveCredential(std::wstring wstrKey) {
+	RESULT r = R_PASS;
+
+	CR(m_pCredentialManager->RemoveCredential(wstrKey));
 
 Error:
 	return r;
@@ -462,6 +500,8 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpControllerEvents(), "Failed to register vive controller events");
 
 	CRM(ResizeViewport(m_viewport), "Failed to resize OpenGL Implemenation");
+
+	CBM(InitializeCredentialManager(), "Failed to initialize Credential Manager");
 
 Error:
 	return r;

@@ -408,6 +408,10 @@ public:
 	RESULT RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
 
+	RESULT SaveCredential(std::wstring wstrKey, std::string strValue);
+	RESULT GetCredential(std::wstring wstrKey, std::string &strOut);
+	RESULT RemoveCredential(std::wstring wstrKey);
+
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();

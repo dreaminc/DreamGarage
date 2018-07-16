@@ -55,6 +55,7 @@ class DreamAppMessage;
 class UIKeyboardLayout;
 
 class DreamAppManager;
+class CredentialManager;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
@@ -129,6 +130,7 @@ public:
 
 public:
 	virtual RESULT InitializePathManager() = 0;
+	virtual RESULT InitializeCredentialManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
@@ -205,7 +207,9 @@ public:
 	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 
-	
+	virtual RESULT GetCredential(std::wstring wstrKey, std::string &strOut) = 0;
+	virtual RESULT SaveCredential(std::wstring wstrKey, std::string strCred) = 0;
+	virtual RESULT RemoveCredential(std::wstring wstrKey) = 0;
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
@@ -423,6 +427,7 @@ protected:
 	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
+	CredentialManager* m_pCredentialManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

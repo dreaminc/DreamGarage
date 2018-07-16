@@ -1096,6 +1096,18 @@ RESULT DreamOS::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscribe
 	return m_pSandbox->RegisterSubscriber(gamePadEvent, pGamepadSubscriber);
 }
 
+RESULT DreamOS::GetCredential(std::wstring wstrKey, std::string &strOut) {
+	return m_pSandbox->GetCredential(wstrKey, strOut);
+}
+
+RESULT DreamOS::SaveCredential(std::wstring wstrKey, std::string strValue) {
+	return m_pSandbox->SaveCredential(wstrKey, strValue);
+}
+
+RESULT DreamOS::RemoveCredential(std::wstring wstrKey) {
+	return m_pSandbox->RemoveCredential(wstrKey);
+}
+
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }
