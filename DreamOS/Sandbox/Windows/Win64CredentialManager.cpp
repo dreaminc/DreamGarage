@@ -2,8 +2,7 @@
 
 #include <wincred.h>
 
-Win64CredentialManager::Win64CredentialManager() :
-	CredentialManager()	// Call super
+Win64CredentialManager::Win64CredentialManager()
 {
 	// empty
 }

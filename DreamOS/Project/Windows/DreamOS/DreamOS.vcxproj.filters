@@ -916,9 +916,6 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64GamepadController.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\CredentialManager.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64CredentialManager.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>

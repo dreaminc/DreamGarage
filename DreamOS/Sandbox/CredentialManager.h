@@ -10,10 +10,6 @@
 class CredentialManager {
 
 public:
-	CredentialManager();
-	~CredentialManager();
-
-public:
 	// virtuals
 	virtual RESULT SaveCredential(std::wstring wstrKey, std::string strField) = 0;
 	virtual RESULT GetCredential(std::wstring wstrKey, std::string &strOut) = 0;

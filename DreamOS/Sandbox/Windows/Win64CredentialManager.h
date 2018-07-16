@@ -17,7 +17,7 @@ public:
 protected:
 	virtual RESULT SaveCredential(std::wstring wstrKey, std::string strField) override;
 	virtual RESULT GetCredential(std::wstring wstrKey, std::string &strOut) override;
-	virtual RESULT RemoveCredential(std::wstring wstrKey);
+	virtual RESULT RemoveCredential(std::wstring wstrKey) override;
 
 private:
 
