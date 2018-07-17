@@ -24,11 +24,12 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
-	CR(AddTestSpatialSound());
-
 	CR(AddTestCaptureSound());
 
+	CR(AddTestSpatialSound());
+
 	CR(AddTestSoundClient());
+
 	CR(AddTestEnumerateDevices());
 
 Error:
@@ -230,7 +231,7 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("environment"));
+		CR(SetupPipeline("standard"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
