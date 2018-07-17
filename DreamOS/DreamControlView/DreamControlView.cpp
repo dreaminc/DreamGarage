@@ -539,6 +539,7 @@ RESULT DreamControlView::HandleKeyboardUp() {
 
 	point ptTypingPosition;
 	float textBoxYOffset;
+	float verticalAngle;
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
 	point ptTypingOffset;
 
@@ -551,6 +552,12 @@ RESULT DreamControlView::HandleKeyboardUp() {
 
 	// currently always fully shown
 	textBoxYOffset = viewHeight/2.0f;
+	//textBoxYOffset *= 0.8f;
+
+	// 58 degrees is the old typing angle (straight up), move the y offset down to accomodate
+	// tilting the screen up
+	verticalAngle = (90.0f - m_pDreamUserApp->GetViewAngle()) * M_PI / 180.0;
+	textBoxYOffset *= 1.0f - sin(verticalAngle - TYPING_ANGLE); 
 
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad
 

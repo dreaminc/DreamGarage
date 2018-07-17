@@ -695,7 +695,7 @@ RESULT DreamUIBar::ShowApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
-	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pComposite->SetPosition(point(0.0f, 0.1f, 0.0f));
 	//m_pScrollView->Show();
 //*
 	auto fnStartCallback = [&](void *pContext) {
