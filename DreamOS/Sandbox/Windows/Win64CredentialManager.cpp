@@ -8,12 +8,12 @@ Win64CredentialManager::Win64CredentialManager()
 }
 
 
-RESULT Win64CredentialManager::GetCredential(std::wstring wstrKey, std::string &strOut) {
+RESULT Win64CredentialManager::GetCredential(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType) {
 	RESULT r = R_PASS;
 
 	PCREDENTIALW pcred;
-	CBM(CredReadW(wstrKey.c_str(), CRED_TYPE_GENERIC, 0, &pcred), "Error finding credential");	// flags must be 0
-	//DWORD dwError = GetLastError();	// Not found with targetname, no such logon session, invalid flags - must be 0
+	CBM(CredReadW(wstrKey.c_str(), credType, 0, &pcred), "Error getting credential: 0x%x", GetLastError());
+	// Not found with TargetName, no such logon session, invalid flags - must be 0
 
 	strOut = (char*)pcred->CredentialBlob;
 		
@@ -22,29 +22,34 @@ Error:
 	return r;
 }
 
-RESULT Win64CredentialManager::SaveCredential(std::wstring wstrKey, std::string strField) {
+RESULT Win64CredentialManager::SaveCredential(std::wstring wstrKey, std::string strField, CREDENTIAL_TYPE credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
-	DWORD cbCreds = (unsigned long)strField.length();	// This is fine since we're storing wchar_t entities
+	PCREDENTIALW pcred;
+	bool fAlreadyExists = CredReadW(wstrKey.c_str(), credType, 0, &pcred);
+	
+	if (fOverwrite || !fAlreadyExists) {	// only write cred if it doesn't already exist, or we want to overwrite it
+		DWORD cbCreds = (unsigned long)strField.length();	// This is fine since we're storing wchar_t entities
 
-	CREDENTIALW cred = { 0 };
-	cred.Type = CRED_TYPE_GENERIC;
-	cred.TargetName = (LPWSTR)wstrKey.c_str();
-	cred.CredentialBlobSize = cbCreds;
-	cred.CredentialBlob = (LPBYTE)strField.c_str();
-	cred.Persist = CRED_PERSIST_LOCAL_MACHINE;
-	//cred.UserName = (LPWSTR)L"user";	// this is stored as plain text, but it can be blank
+		CREDENTIALW cred = { 0 };
+		cred.Type = credType;
+		cred.TargetName = (LPWSTR)wstrKey.c_str();
+		cred.CredentialBlobSize = cbCreds;
+		cred.CredentialBlob = (LPBYTE)strField.c_str();
+		cred.Persist = CRED_PERSIST_LOCAL_MACHINE;
+		//cred.UserName = (LPWSTR)L"user";	// this is stored as plain text, but it can be blank
 
-	CBM(CredWriteW(&cred, 0), "Failed to save credential");
+		CBM(CredWriteW(&cred, 0), "Failed to save credential: 0x%x", GetLastError());
+	}
 	
 Error:
 	return r;
 }
 
-RESULT Win64CredentialManager::RemoveCredential(std::wstring wstrKey) {
+RESULT Win64CredentialManager::RemoveCredential(std::wstring wstrKey, CREDENTIAL_TYPE credType) {
 	RESULT r = R_PASS;
 
-	CBM(CredDeleteW(wstrKey.c_str(), CRED_TYPE_GENERIC, 0), "Error removing credential");
+	CBM(CredDeleteW(wstrKey.c_str(), credType, 0), "Error removing credential: 0x%x", GetLastError());
 
 Error:
 	return r;

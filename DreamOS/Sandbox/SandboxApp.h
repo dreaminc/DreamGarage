@@ -15,6 +15,7 @@
 #include "HAL/HALImp.h"
 
 #include "Sandbox/PathManager.h"
+#include "Sandbox/CredentialManager.h"
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
@@ -55,7 +56,6 @@ class DreamAppMessage;
 class UIKeyboardLayout;
 
 class DreamAppManager;
-class CredentialManager;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
@@ -207,9 +207,9 @@ public:
 	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 
-	virtual RESULT GetCredential(std::wstring wstrKey, std::string &strOut) = 0;
-	virtual RESULT SaveCredential(std::wstring wstrKey, std::string strCred) = 0;
-	virtual RESULT RemoveCredential(std::wstring wstrKey) = 0;
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CREDENTIAL_TYPE credType, bool fOverwrite) = 0;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType) = 0;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CREDENTIAL_TYPE credType) = 0;
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
@@ -427,7 +427,7 @@ protected:
 	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
-	CredentialManager* m_pCredentialManager = nullptr;
+	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

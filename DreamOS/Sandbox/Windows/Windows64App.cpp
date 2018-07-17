@@ -173,35 +173,35 @@ Error:
 RESULT Windows64App::InitializeCredentialManager() {
 	RESULT r = R_PASS;
 
-	m_pCredentialManager = new Win64CredentialManager();
+	m_pCredentialManager = std::unique_ptr<Win64CredentialManager>(new Win64CredentialManager());
 	CN(m_pCredentialManager);
 
 Error:
 	return r;
 }
 
-RESULT Windows64App::SaveCredential(std::wstring wstrKey, std::string strCred) {
+RESULT Windows64App::SetKeyValue(std::wstring wstrKey, std::string strCred, CREDENTIAL_TYPE credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->SaveCredential(wstrKey, strCred));
+	CR(m_pCredentialManager->SaveCredential(wstrKey, strCred, credType, fOverwrite));
 
 Error:
 	return r;
 }
 
-RESULT Windows64App::GetCredential(std::wstring wstrKey, std::string& strOut) {
+RESULT Windows64App::GetKeyValue(std::wstring wstrKey, std::string& strOut, CREDENTIAL_TYPE credType) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->GetCredential(wstrKey, strOut));
+	CR(m_pCredentialManager->GetCredential(wstrKey, strOut, credType));
 
 Error:
 	return r;
 }
 
-RESULT Windows64App::RemoveCredential(std::wstring wstrKey) {
+RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CREDENTIAL_TYPE credType) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->RemoveCredential(wstrKey));
+	CR(m_pCredentialManager->RemoveCredential(wstrKey, credType));
 
 Error:
 	return r;
