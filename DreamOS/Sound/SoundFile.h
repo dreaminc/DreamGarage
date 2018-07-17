@@ -15,6 +15,7 @@ class SoundFile {
 public:
 	enum class type {
 		WAVE,
+		MP3,
 		INVALID
 	};
 
