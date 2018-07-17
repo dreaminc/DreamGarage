@@ -1817,19 +1817,19 @@ RESULT DreamOSTestSuite::AddTestCredentialStorage() {
 		std::string strField = "field";
 		std::string strOut;
 		{
-			m_pDreamOS->GetCredential(wstrKey, strOut, CREDENTIAL_TYPE::CREDENTIAL_GENERIC);
+			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
 
-			m_pDreamOS->SaveCredential(wstrKey, strField, CREDENTIAL_TYPE::CREDENTIAL_GENERIC, true);
+			m_pDreamOS->SaveCredential(wstrKey, strField, CredentialManager::type::CREDENTIAL_GENERIC, true);
 
-			m_pDreamOS->GetCredential(wstrKey, strOut, CREDENTIAL_TYPE::CREDENTIAL_GENERIC);
+			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
 			DEBUG_LINEOUT("cred: %s", strOut.c_str());
 
-			m_pDreamOS->SaveCredential(wstrKey, "field2", CREDENTIAL_TYPE::CREDENTIAL_GENERIC, false);
+			m_pDreamOS->SaveCredential(wstrKey, "field2", CredentialManager::type::CREDENTIAL_GENERIC, false);
 
-			m_pDreamOS->GetCredential(wstrKey, strOut, CREDENTIAL_TYPE::CREDENTIAL_GENERIC);
+			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
 			DEBUG_LINEOUT("cred: %s", strOut.c_str());
 
-			m_pDreamOS->RemoveCredential(wstrKey, CREDENTIAL_TYPE::CREDENTIAL_GENERIC);
+			m_pDreamOS->RemoveCredential(wstrKey, CredentialManager::type::CREDENTIAL_GENERIC);
 		}
 
 	//Error:

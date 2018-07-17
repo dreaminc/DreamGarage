@@ -180,28 +180,28 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::SetKeyValue(std::wstring wstrKey, std::string strCred, CREDENTIAL_TYPE credType, bool fOverwrite) {
+RESULT Windows64App::SetKeyValue(std::wstring wstrKey, std::string strCred, CredentialManager::type credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->SaveCredential(wstrKey, strCred, credType, fOverwrite));
+	CR(m_pCredentialManager->SetKeyValue(wstrKey, strCred, credType, fOverwrite));
 
 Error:
 	return r;
 }
 
-RESULT Windows64App::GetKeyValue(std::wstring wstrKey, std::string& strOut, CREDENTIAL_TYPE credType) {
+RESULT Windows64App::GetKeyValue(std::wstring wstrKey, std::string& strOut, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->GetCredential(wstrKey, strOut, credType));
+	CR(m_pCredentialManager->GetKeyValue(wstrKey, strOut, credType));
 
 Error:
 	return r;
 }
 
-RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CREDENTIAL_TYPE credType) {
+RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
-	CR(m_pCredentialManager->RemoveCredential(wstrKey, credType));
+	CR(m_pCredentialManager->RemoveKeyValue(wstrKey, credType));
 
 Error:
 	return r;

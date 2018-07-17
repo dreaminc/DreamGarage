@@ -408,9 +408,9 @@ public:
 	RESULT RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
 
-	RESULT SaveCredential(std::wstring wstrKey, std::string strValue, CREDENTIAL_TYPE credType, bool fOverwrite);
-	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType);
-	RESULT RemoveCredential(std::wstring wstrKey, CREDENTIAL_TYPE credType);
+	RESULT SaveCredential(std::wstring wstrKey, std::string strValue, CredentialManager::type credType, bool fOverwrite);
+	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
+	RESULT RemoveCredential(std::wstring wstrKey, CredentialManager::type credType);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

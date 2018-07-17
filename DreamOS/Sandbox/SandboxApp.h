@@ -207,9 +207,9 @@ public:
 	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 
-	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CREDENTIAL_TYPE credType, bool fOverwrite) = 0;
-	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType) = 0;
-	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CREDENTIAL_TYPE credType) = 0;
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) = 0;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) = 0;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) = 0;
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 

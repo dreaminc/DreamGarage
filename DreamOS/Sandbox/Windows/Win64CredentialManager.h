@@ -15,9 +15,9 @@ public:
 	Win64CredentialManager();
 
 protected:
-	virtual RESULT SaveCredential(std::wstring wstrKey, std::string strField, CREDENTIAL_TYPE credType, bool fOverwrite) override;
-	virtual RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType) override;
-	virtual RESULT RemoveCredential(std::wstring wstrKey, CREDENTIAL_TYPE credType) override;
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) override;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) override;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) override;
 
 private:
 

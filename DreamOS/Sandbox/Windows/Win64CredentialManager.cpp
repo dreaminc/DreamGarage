@@ -8,7 +8,7 @@ Win64CredentialManager::Win64CredentialManager()
 }
 
 
-RESULT Win64CredentialManager::GetCredential(std::wstring wstrKey, std::string &strOut, CREDENTIAL_TYPE credType) {
+RESULT Win64CredentialManager::GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
 	PCREDENTIALW pcred;
@@ -22,7 +22,7 @@ Error:
 	return r;
 }
 
-RESULT Win64CredentialManager::SaveCredential(std::wstring wstrKey, std::string strField, CREDENTIAL_TYPE credType, bool fOverwrite) {
+RESULT Win64CredentialManager::SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
 	PCREDENTIALW pcred;
@@ -46,7 +46,7 @@ Error:
 	return r;
 }
 
-RESULT Win64CredentialManager::RemoveCredential(std::wstring wstrKey, CREDENTIAL_TYPE credType) {
+RESULT Win64CredentialManager::RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
 	CBM(CredDeleteW(wstrKey.c_str(), credType, 0), "Error removing credential: 0x%x", GetLastError());
