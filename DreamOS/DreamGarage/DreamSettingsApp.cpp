@@ -75,6 +75,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 
 	//TODO: unregister/register instead of this flag?
 	CBR(m_fRespondToController, R_SKIPPED);
+	CNR(m_pUserApp, R_SKIPPED);
 
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
 		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));

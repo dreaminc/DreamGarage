@@ -80,6 +80,8 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestLoginForms());
+
 	CR(AddTestDreamSettingsApp());
 
 	CR(AddTestChangeUIWidth());
@@ -113,6 +115,7 @@ Error:
 RESULT MultiContentTestSuite::SetupPipeline() {
 	RESULT r = R_PASS;
 
+	// Set up the pipeline
 	HALImp *pHAL = m_pDreamOS->GetHALImp();
 	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 
@@ -122,26 +125,28 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 
 	ProgramNode* pRenderProgramNode;
-	pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	pRenderProgramNode = pHAL->MakeProgramNode("standard");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-//*
+
 	// Reference Geometry Shader Program
 	ProgramNode* pReferenceGeometryProgram;
 	pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-//*/
+
 	// Skybox
 	ProgramNode* pSkyboxProgram;
 	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Connect output as pass-thru to internal blend program
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	ProgramNode* pUIProgramNode;
@@ -154,13 +159,24 @@ RESULT MultiContentTestSuite::SetupPipeline() {
 
 	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
+	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad;
 	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+	
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
+	// Connect Program to Display
+
+	// Connected in parallel (order matters)
+	// NOTE: Right now this won't work with mixing for example
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+	//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
 
@@ -652,6 +668,94 @@ RESULT MultiContentTestSuite::AddTestRemoveObjects2() {
 
 	pNewTest->SetTestName("Remove Test");
 	pNewTest->SetTestDescription("remove");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT MultiContentTestSuite::AddTestLoginForms() {
+	RESULT r = R_PASS;
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		std::shared_ptr<DreamFormApp> pFormApp = nullptr;
+		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+		bool fFirst = true;
+	} *pTestContext = new TestContext();
+
+
+	auto fnInitialize = [&](void *pContext) {
+
+		RESULT r = R_PASS;
+
+		CR(SetupPipeline());
+
+		light *pLight;
+		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+		m_pDreamOS->AddQuad(1.0f, 1.0f);
+
+		/*
+		pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+		pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 0.5f, -0.5f));
+		pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
+		pTestContext->pFormApp->UpdateWithNewForm("https://twitch.tv");
+		pTestContext->pFormApp->Show();
+		//*/
+
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		//*
+		if (pTestContext->pUserControlArea == nullptr) {
+			pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
+			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
+			//pTestContext->pFormApp->UpdateWithNewForm("https://twitch.tv");
+			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
+			//pTestContext->pFormApp->Show();
+			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
+
+		}
+		//*/
+
+		if (pTestContext->pFormApp != nullptr) {
+			auto pForm = pTestContext->pFormApp;
+			if (pForm->m_pFormView != nullptr) {
+				//pForm->m_pFormView->SetVisible(true, false);
+				pForm->GetComposite()->SetVisible(true, false);
+				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
+					pTestContext->pFormApp->Show();
+				}
+			}
+		}
+
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

@@ -15,6 +15,7 @@ class DreamFormApp : public DreamApp<DreamFormApp>,
 					public Subscriber<InteractionObjectEvent>
 {
 	friend class DreamAppManager;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamFormApp(DreamOS *pDreamOS, void *pContext = nullptr);
