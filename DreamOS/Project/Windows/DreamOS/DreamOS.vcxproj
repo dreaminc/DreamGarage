@@ -891,6 +891,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64CredentialManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64GamepadController.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
@@ -1244,11 +1245,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
     <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\CredentialManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64CredentialManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64GamepadController.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />

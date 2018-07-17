@@ -15,6 +15,7 @@
 #include "HAL/HALImp.h"
 
 #include "Sandbox/PathManager.h"
+#include "Sandbox/CredentialManager.h"
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
@@ -129,6 +130,7 @@ public:
 
 public:
 	virtual RESULT InitializePathManager() = 0;
+	virtual RESULT InitializeCredentialManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
@@ -205,7 +207,9 @@ public:
 	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 
-	
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) = 0;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) = 0;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) = 0;
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
@@ -423,6 +427,7 @@ protected:
 	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
+	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

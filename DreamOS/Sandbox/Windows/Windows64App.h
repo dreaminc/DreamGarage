@@ -25,6 +25,7 @@
 class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
+class Win64CredentialManager;
 
 class Windows64App : public SandboxApp {
 public:
@@ -50,16 +51,21 @@ public:	// Sandbox Interface
 
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) override;
 
+	virtual RESULT InitializeCredentialManager() override;
+
+	virtual RESULT SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) override;
+	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) override;
+	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) override;
 
 public:
-	RESULT InitializePathManager();
+	RESULT InitializePathManager();	
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
 	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();
 	RESULT InitializeMouse();
 	RESULT InitializeGamepad();
-	RESULT InitializeLeapMotion();
+	RESULT InitializeLeapMotion();	
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);

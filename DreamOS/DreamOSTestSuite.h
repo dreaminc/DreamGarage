@@ -53,6 +53,8 @@ public:
 	RESULT AddTestDreamShareView();
 	RESULT AddTestBasicBrowserCast();
 
+	RESULT AddTestCredentialStorage();
+
 private:
 	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
 	RESULT SetupDreamAppPipeline();

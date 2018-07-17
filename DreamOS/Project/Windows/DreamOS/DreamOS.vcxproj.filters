@@ -916,6 +916,9 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64GamepadController.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64CredentialManager.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2016,11 +2019,17 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\SkyboxScatterProgram.h">
       <Filter>HAL</Filter>
-    </ClInclude>  
+    </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseGamepadController.h">
       <Filter>Sense</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64GamepadController.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\CredentialManager.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64CredentialManager.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
   </ItemGroup>
