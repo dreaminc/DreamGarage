@@ -164,6 +164,9 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound\WASAPI">
+      <UniqueIdentifier>{958ee80b-50a2-4584-bf58-d29525f855b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
@@ -769,9 +772,6 @@
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -924,6 +924,9 @@
 	</ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.cpp">
       <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISoundClient.cpp">
+      <Filter>Sound\WASAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1921,9 +1924,6 @@
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sound\AudioPacket.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -2043,6 +2043,9 @@
 	</ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.h">
       <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISoundClient.h">
+      <Filter>Sound\WASAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
