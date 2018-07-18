@@ -187,6 +187,15 @@ Error:
 	return r;
 }
 
+RESULT DreamFormApp::HandleDreamFormCancel() {
+	RESULT r = R_PASS;
+
+	CR(Hide());
+
+Error:
+	return r;
+}
+
 RESULT DreamFormApp::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 	

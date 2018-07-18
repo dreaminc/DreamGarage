@@ -15,6 +15,11 @@ public:
 	DreamLoginApp(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamLoginApp();
 
+	// main purpose of DreamLoginApp is to handle login-associated form events
+public:
+	RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override;
+	RESULT HandleDreamFormSetEnvironmentId(int environmentId) override;
+
 protected:
 	static DreamLoginApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 };

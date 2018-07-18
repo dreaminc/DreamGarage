@@ -83,6 +83,9 @@ public:
 	RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL);
 
 	RESULT HandleDreamFormSuccess();
+	RESULT HandleDreamFormCancel();
+	RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken);
+	RESULT HandleDreamFormSetEnvironmentId(int environmentId);
 
 	RESULT HandleIsInputFocused(bool fInputFocused);
 

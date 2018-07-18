@@ -559,6 +559,39 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::HandleDreamFormCancel() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormCancel());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSetCredentials(strRefreshToken, strAccessToken));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::HandleDreamFormSetEnvironmentId(int environmentId) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		CR(m_pWebBrowserControllerObserver->HandleDreamFormSetEnvironmentId(environmentId));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::HandleIsInputFocused(bool fInputFocused) {
 	RESULT r = R_PASS;
 

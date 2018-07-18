@@ -374,6 +374,36 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::HandleDreamFormCancel() {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormCancel());
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSetCredentials(strRefreshToken, strAccessToken));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::HandleDreamFormSetEnvironmentId(int environmentId) {
+	RESULT r = R_PASS;
+
+	CNR(m_pObserver, R_SKIPPED);
+	CR(m_pObserver->HandleDreamFormSetEnvironmentId(environmentId));
+
+Error:
+	return r;
+}
+
 RESULT DreamBrowser::HandleIsInputFocused(bool fInputFocused) {
 	RESULT r = R_PASS;
 
