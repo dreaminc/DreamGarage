@@ -20,6 +20,7 @@ DreamSettingsApp::~DreamSettingsApp()
 {
 	RESULT r = R_PASS;
 
+	CR(DreamFormApp::Shutdown());
 	CR(Shutdown());
 
 Error:

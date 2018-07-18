@@ -15,6 +15,7 @@
 #include "DreamGarage/DreamTabView.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamSettingsApp.h"
+#include "DreamGarage/DreamLoginApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
@@ -681,7 +682,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 	int nRepeats = 1;
 
 	struct TestContext {
-		std::shared_ptr<DreamFormApp> pFormApp = nullptr;
+		std::shared_ptr<DreamLoginApp> pFormApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
 		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
 		bool fFirst = true;
@@ -699,15 +700,6 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 		m_pDreamOS->AddQuad(1.0f, 1.0f);
 
-		/*
-		pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
-		pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 0.5f, -0.5f));
-		pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
-		pTestContext->pFormApp->UpdateWithNewForm("https://twitch.tv");
-		pTestContext->pFormApp->Show();
-		//*/
-
-
 	Error:
 		return r;
 	};
@@ -721,8 +713,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		if (pTestContext->pUserControlArea == nullptr) {
 			pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
-			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
-			//pTestContext->pFormApp->UpdateWithNewForm("https://twitch.tv");
+			pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUserApp);
+			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
 			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
 			//pTestContext->pFormApp->Show();
 			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
