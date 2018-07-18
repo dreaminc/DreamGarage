@@ -6,10 +6,13 @@
 // DREAM OS
 // DreamOS/Sound/WASAPISoundClient.h
 
-#include "SoundClient.h"
+#include "Sound/SoundClient.h"
 
 #include <Windows.h>
 #include <AudioClient.h>
+#include <SpatialAudioClient.h>
+#include <SpatialAudioHrtf.h>
+
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <avrt.h>
@@ -33,6 +36,7 @@ public:
 private:
 	RESULT InitializeRenderAudioClient();
 	RESULT InitializeCaptureAudioClient();
+	RESULT InitializeSpatialAudioClient();
 
 	RESULT EnumerateWASAPIDevices();
 	RESULT EnumerateWASAPISessions();
@@ -43,6 +47,12 @@ private:
 private:
 	IMMDeviceEnumerator *m_pDeviceEnumerator = nullptr;
 	IAudioSessionManager2* m_pSessionManager = nullptr;
+
+	// Spatial 
+	IMMDevice *m_pAudioEndpointSpatialDevice = nullptr;
+	ISpatialAudioClient *m_pAudioSpatialClient = nullptr;
+	ISpatialAudioObjectRenderStreamForHrtf* m_spatialAudioStreamForHrtf;
+	HANDLE m_hSpatialBufferCompletionEvent = nullptr;
 
 	// Render
 	IMMDevice *m_pAudioEndpointRenderDevice = nullptr;

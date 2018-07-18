@@ -552,6 +552,31 @@ Error:
 	return r;
 }
 
+RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
+	RESULT r = R_PASS;
+
+	// Default Render Endpoint
+	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &m_pAudioEndpointSpatialDevice), 
+		"Failed to get default audio spatial endpoint");
+	CN(m_pAudioEndpointSpatialDevice);
+
+	CRM((RESULT)m_pAudioEndpointSpatialDevice->Activate(__uuidof(ISpatialAudioClient), CLSCTX_INPROC_SERVER, nullptr, (void**)&m_pAudioSpatialClient), 
+		"Failed to activate spatial audio client");
+	CN(m_pAudioSpatialClient);
+
+	//CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&amp; format)), "Audio format not supported");
+
+	CRM((RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_spatialAudioStreamForHrtf), NULL),
+		"Spatial audio stream not available");
+
+	// Create the event that will be used to signal the client for more data
+	m_hSpatialBufferCompletionEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	CN(m_hSpatialBufferCompletionEvent);
+
+Error:
+	return r;
+}
+
 RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	RESULT r = R_PASS;
 
@@ -659,16 +684,16 @@ RESULT WASAPISoundClient::Initialize() {
 	
 	//CR(EnumerateWASAPISessions(pSessionManager));
 
-	// Initialize the render audio client
-	CR(InitializeRenderAudioClient());
-	
-	// Initialize the capture audio client
-	CR(InitializeCaptureAudioClient());
+	//// Initialize the render audio client
+	//CR(InitializeRenderAudioClient());
+	//
+	//// Initialize the capture audio client
+	//CR(InitializeCaptureAudioClient());
 
+	// Spatial Audio Client
+	CR(InitializeSpatialAudioClient());
 
 	// Test: Try to play something
-
-
 
 	/*
 	// This is for recording stuff

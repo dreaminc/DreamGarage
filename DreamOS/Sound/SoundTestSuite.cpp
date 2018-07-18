@@ -24,9 +24,15 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestSpatialSound());
+	
 	CR(AddTestCaptureSound());
 
-	CR(AddTestSpatialSound());
+	// Add: Play a simple sound
+
+	// Add: Play a looping sound
+
+	// Add: MP3 and shits
 
 	CR(AddTestSoundClient());
 
@@ -126,7 +132,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline("environment"));
+		CR(SetupPipeline("standard"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -146,7 +152,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 		pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
 		CN(pTestContext->pSoundClient);
 
-		//CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
+		CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
 		//CR(pTestContext->pSoundClient->Start());
 
 		//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));

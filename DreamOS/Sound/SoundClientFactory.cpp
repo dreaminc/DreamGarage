@@ -16,7 +16,7 @@
 	#include "./Sandbox/Linux/LinuxApp.h"
 #endif
 
-#include "WASAPISoundClient.h"
+#include "WASAPI/WASAPISoundClient.h"
 
 SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type) {
 	RESULT r = R_PASS;
