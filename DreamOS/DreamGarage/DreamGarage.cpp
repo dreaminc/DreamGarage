@@ -1087,13 +1087,16 @@ Error:
 RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
-	if (strTitle == "Settings") {
+	//TODO: enum to string dictionary
+	if (strKey == "FormKey.UsersSettings") {
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 
 		// more complicated form for testing until signup exists
 		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
 		CR(m_pDreamSettings->Show());
 	}
+	// FormKey.UsersSignUp
+	// FormKey.UsersSignIn
 	else {
 		// TODO: general form
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));

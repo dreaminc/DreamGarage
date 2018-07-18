@@ -683,9 +683,17 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 	struct TestContext {
 		std::shared_ptr<DreamLoginApp> pFormApp = nullptr;
+		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
 		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
 		bool fFirst = true;
+
+		// login logic information
+		bool fFirstLogin = true;
+		bool fHasCreds = false;
+		std::string strRefreshToken;
+		std::string	strAccessToken;
+
 	} *pTestContext = new TestContext();
 
 
@@ -715,10 +723,11 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
 			pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUserApp);
 			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
-			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
+			//pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
 			//pTestContext->pFormApp->Show();
 			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 
+			//pTestContext->pFormApp->SetLaunchDate();
 		}
 		//*/
 
@@ -726,9 +735,16 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			auto pForm = pTestContext->pFormApp;
 			if (pForm->m_pFormView != nullptr) {
 				//pForm->m_pFormView->SetVisible(true, false);
+				/*
 				pForm->GetComposite()->SetVisible(true, false);
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
 					pTestContext->pFormApp->Show();
+				}
+				//*/
+
+				pTestContext->fFirstLogin = pForm->IsFirstLaunch();
+				if (!pTestContext->fFirstLogin) {
+					pTestContext->fHasCreds = pForm->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
 				}
 			}
 		}
