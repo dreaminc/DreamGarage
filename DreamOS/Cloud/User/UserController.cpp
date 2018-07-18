@@ -65,7 +65,7 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		} break;
 
 		case UserMethod::LOAD_TWILIO_NTS_INFO: {
-			strURI = strAPIURL + "/twilio/nts/token/";
+			strURI = strAPIURL + "/webrtc/token/";
 		} break;
 	}
 
@@ -453,7 +453,7 @@ RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 		CN(pCloudController);
 		auto pEnvironmentControllerProxy = dynamic_cast<EnvironmentControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CN(pEnvironmentControllerProxy);
-		pEnvironmentControllerProxy->RequestForm("FormKey.Settings");
+		pEnvironmentControllerProxy->RequestForm("FormKey.UsersSettings");
 	}
 
 Error:
