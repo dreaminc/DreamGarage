@@ -84,26 +84,20 @@ Error:
 	return r;
 }
 
-std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
+std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 	RESULT r = R_PASS;
 
-	IMMDevice *pDevice;
 	LPWSTR deviceId;
 	std::wstring wstrResult = L"";
-
-	CR((RESULT)pDeviceCollection->Item(DeviceIndex, &pDevice));
-	CN(pDevice);
 
 	CR((RESULT)pDevice->GetId(&deviceId));
 
 	IPropertyStore *pPropertyStore;
 	CR((RESULT)pDevice->OpenPropertyStore(STGM_READ, &pPropertyStore));
-	
-	SafeRelease(&pDevice);
 
 	PROPVARIANT propVariantFriendlyName;
 	PropVariantInit(&propVariantFriendlyName);
-	
+
 	CR((RESULT)pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propVariantFriendlyName));
 
 	SafeRelease(&pPropertyStore);
@@ -114,6 +108,26 @@ std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollec
 	CoTaskMemFree(deviceId);
 
 Error:
+	return wstrResult;
+}
+
+std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
+	RESULT r = R_PASS;
+
+	IMMDevice *pDevice = nullptr;
+	std::wstring wstrResult = L"";
+
+	CR((RESULT)pDeviceCollection->Item(DeviceIndex, &pDevice));
+	CN(pDevice);
+
+	wstrResult = GetDeviceName(pDevice);
+
+Error:
+	if (pDevice != nullptr) {
+		SafeRelease(&pDevice);
+		pDevice = nullptr;
+	}
+
 	return wstrResult;
 }
 
@@ -552,26 +566,101 @@ Error:
 	return r;
 }
 
+#include <wrl/client.h>
+
 RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	RESULT r = R_PASS;
 
 	// Default Render Endpoint
-	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &m_pAudioEndpointSpatialDevice), 
+	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pAudioEndpointSpatialDevice),
 		"Failed to get default audio spatial endpoint");
 	CN(m_pAudioEndpointSpatialDevice);
-
-	CRM((RESULT)m_pAudioEndpointSpatialDevice->Activate(__uuidof(ISpatialAudioClient), CLSCTX_INPROC_SERVER, nullptr, (void**)&m_pAudioSpatialClient), 
+	
+	{
+		std::wstring wstrDeviceName = GetDeviceName(m_pAudioEndpointSpatialDevice);
+		DEBUG_LINEOUT("Spatial Device: %S", wstrDeviceName.c_str());
+	}
+	
+	CRM((RESULT)m_pAudioEndpointSpatialDevice->Activate(__uuidof(ISpatialAudioClient), CLSCTX_ALL, nullptr, (void**)&m_pAudioSpatialClient),
 		"Failed to activate spatial audio client");
 	CN(m_pAudioSpatialClient);
+	
 
-	//CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&amp; format)), "Audio format not supported");
+	// Move this to member etc
+	WAVEFORMATEX format;
+	format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+	format.wBitsPerSample = 32;
+	format.nChannels = 1;
+	format.nSamplesPerSec = 48000;
+	format.nBlockAlign = (format.wBitsPerSample >> 3) * format.nChannels;
+	format.nAvgBytesPerSec = format.nBlockAlign * format.nSamplesPerSec;
+	format.cbSize = 0;
 
+	CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&format)), "Audio format not supported");
+	
+	// This doesn't actually work...
 	CRM((RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_spatialAudioStreamForHrtf), NULL),
 		"Spatial audio stream not available");
+
 
 	// Create the event that will be used to signal the client for more data
 	m_hSpatialBufferCompletionEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	CN(m_hSpatialBufferCompletionEvent);
+
+
+	UINT32 maxDynamicObjectCount;
+	CRM((RESULT)m_pAudioSpatialClient->GetMaxDynamicObjectCount(&maxDynamicObjectCount), "Failed to get max dynamic object count");
+	CBM((maxDynamicObjectCount > 0), "Spatial audio doesn't support any dynamic objects");
+
+	SpatialAudioHrtfActivationParams streamParams;
+	streamParams.ObjectFormat = &format;
+	streamParams.StaticObjectTypeMask = AudioObjectType_None;
+	streamParams.MinDynamicObjectCount = 0;
+	streamParams.MaxDynamicObjectCount = (maxDynamicObjectCount < 4) ? maxDynamicObjectCount : 4;
+	streamParams.Category = AudioCategory_GameEffects;
+	streamParams.EventHandle = m_hSpatialBufferCompletionEvent;
+	streamParams.NotifyObject = NULL;
+
+	SpatialAudioHrtfDistanceDecay decayModel;
+	decayModel.CutoffDistance = 100.0f;
+	decayModel.MaxGain = 3.98f;
+	decayModel.MinGain = float(1.58439f * pow(10.0f, -5.0f));
+	decayModel.Type = SpatialAudioHrtfDistanceDecayType::SpatialAudioHrtfDistanceDecay_NaturalDecay;
+	decayModel.UnityGainDistance = 1.0f;
+
+	streamParams.DistanceDecay = &decayModel;
+
+	SpatialAudioHrtfDirectivity directivity;
+	directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cone;
+	directivity.Scaling = 1.0f;
+
+	SpatialAudioHrtfDirectivityCone cone;
+	cone.directivity = directivity;
+	cone.InnerAngle = 0.1f;
+	cone.OuterAngle = 0.2f;
+
+	SpatialAudioHrtfDirectivityUnion directivityUnion;
+	directivityUnion.Cone = cone;
+	streamParams.Directivity = &directivityUnion;
+
+	SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Large;
+	streamParams.Environment = &environment;
+
+	// identity matrix
+	SpatialAudioHrtfOrientation orientation = { 1.0f, 0.0f, 0.0f, 
+												0.0f, 1.0f, 0.0f, 
+												0.0f, 0.0f, 1.0f }; 
+	streamParams.Orientation = &orientation;
+
+	PROPVARIANT pv;
+	PropVariantInit(&pv);
+	pv.vt = VT_BLOB;
+	pv.blob.cbSize = sizeof(streamParams);
+	pv.blob.pBlobData = (BYTE*)&streamParams;
+
+	CRM((RESULT)m_pAudioSpatialClient->ActivateSpatialAudioStream(&pv, __uuidof(m_spatialAudioStreamForHrtf), (void**)&m_spatialAudioStreamForHrtf),
+			"Failed to activate spatial audio stream");
+
 
 Error:
 	return r;
