@@ -696,6 +696,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
 			if (strMessage == "DreamSettingsApp.OnSuccess") {
+				fFirst = false;
 				if (fFirstLogin) {
 					// TODO: Show sign up form
 				//	pFormApp->UpdateWithNewForm();
@@ -717,12 +718,16 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 		RESULT r = R_PASS;
 
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
 		CR(SetupPipeline());
 
 		light *pLight;
 		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 		m_pDreamOS->AddQuad(1.0f, 1.0f);
+
+		m_pDreamOS->RegisterDOSObserver(pTestContext);
 
 	Error:
 		return r;
@@ -746,10 +751,11 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 
 			//pTestContext->pFormApp->GetComposite()->SetVisible(true, false);
-			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
+			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/signup");
 			//pTestContext->pFormApp->Show();
 			//pTestContext->pSettingsApp->GetComposite()->SetVisible(true, false);
-			pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/settings");
+			pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/settings");
+			//pTestContext->pSettingsApp->UpdateWithNewForm("https://twitch.tv");
 			pTestContext->pSettingsApp->GetComposite()->SetVisible(false, false);
 			//pTestContext->pSettingsApp->Show();
 
@@ -773,7 +779,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				}
 				//*/
 
-				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
+				if (!pForm->m_pFormView->GetViewQuad()->IsVisible() && pTestContext->fFirst) {
 					pForm->Show();
 				}
 			}
