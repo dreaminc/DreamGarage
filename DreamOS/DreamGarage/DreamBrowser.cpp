@@ -663,7 +663,7 @@ RESULT DreamBrowser::RegisterObserver(DreamBrowserObserver *pObserver) {
 	m_pObserver = pObserver;
 
 Error:
-	return R_PASS;
+	return r;
 }
 
 RESULT DreamBrowser::UnregisterObserver(DreamBrowserObserver *pObserver) {

@@ -285,6 +285,41 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::RegisterDOSObserver(DOSObserver *pDOSObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pDOSObserver), "Observer cannot be nullptr");
+	CBM((m_pDOSObserver == nullptr), "Can't overwrite DOS observer");
+
+	m_pDOSObserver = pDOSObserver;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterDOSObserver(DOSObserver *pDOSObserver) {
+	RESULT r = R_PASS;
+
+	CN(pDOSObserver);
+	CBM((m_pDOSObserver == pDOSObserver), "DOS Observer is not set to this object");
+
+	m_pDOSObserver = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::SendDOSMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CNR(m_pDOSObserver, R_SKIPPED);
+
+	CR(m_pDOSObserver->HandleDOSMessage(strMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 

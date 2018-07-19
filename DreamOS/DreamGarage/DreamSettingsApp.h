@@ -28,6 +28,11 @@ protected:
 	static DreamSettingsApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
+	RESULT HandleDreamFormSuccess() override;
+private:
+	std::string m_strSuccess = "DreamSettingsApp.OnSuccess";
+
+public:
 	RESULT Show();
 	RESULT Hide();
 

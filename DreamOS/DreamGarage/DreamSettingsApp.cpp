@@ -115,6 +115,16 @@ Error:
 	return r;
 }
 
+RESULT DreamSettingsApp::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	CR(DreamFormApp::HandleDreamFormSuccess());
+	CR(GetDOS()->SendDOSMessage(m_strSuccess));
+
+Error:
+	return r;
+}
+
 RESULT DreamSettingsApp::Show() {
 	RESULT r = R_PASS;
 

@@ -681,7 +681,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
+	struct TestContext : public DOSObserver {
 		std::shared_ptr<DreamLoginApp> pFormApp = nullptr;
 		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
@@ -693,6 +693,22 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		bool fHasCreds = false;
 		std::string strRefreshToken;
 		std::string	strAccessToken;
+
+		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
+			if (strMessage == "DreamSettingsApp.OnSuccess") {
+				if (fFirstLogin) {
+					// TODO: Show sign up form
+				//	pFormApp->UpdateWithNewForm();
+					pFormApp->Show();
+				}
+				else {
+					// TOSO: Show sign in form
+					pFormApp->Show();
+				}
+			}
+
+			return R_PASS;
+		}
 
 	} *pTestContext = new TestContext();
 
@@ -722,29 +738,43 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pUserApp = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
 			pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUserApp);
+
 			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
-			//pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
-			//pTestContext->pFormApp->Show();
+			pTestContext->pSettingsApp = m_pDreamOS->LaunchDreamApp<DreamSettingsApp>(this, false);
+
 			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
+
+
+			//pTestContext->pFormApp->GetComposite()->SetVisible(true, false);
+			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/account/signup");
+			//pTestContext->pFormApp->Show();
+			//pTestContext->pSettingsApp->GetComposite()->SetVisible(true, false);
+			pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/settings");
+			pTestContext->pSettingsApp->GetComposite()->SetVisible(false, false);
+			//pTestContext->pSettingsApp->Show();
 
 			//pTestContext->pFormApp->SetLaunchDate();
 		}
 		//*/
 
 		if (pTestContext->pFormApp != nullptr) {
-			auto pForm = pTestContext->pFormApp;
+			auto pForm = pTestContext->pSettingsApp;
 			if (pForm->m_pFormView != nullptr) {
-				//pForm->m_pFormView->SetVisible(true, false);
+				pForm->GetComposite()->SetVisible(true, false);
 				/*
 				pForm->GetComposite()->SetVisible(true, false);
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
 					pTestContext->pFormApp->Show();
 				}
-				//*/
 
 				pTestContext->fFirstLogin = pForm->IsFirstLaunch();
 				if (!pTestContext->fFirstLogin) {
 					pTestContext->fHasCreds = pForm->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
+				}
+				//*/
+
+				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
+					pForm->Show();
 				}
 			}
 		}

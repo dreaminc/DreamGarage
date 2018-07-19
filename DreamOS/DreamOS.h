@@ -58,6 +58,11 @@ class PeerHandshakeMessage;
 
 #include "DreamVideoStreamSubscriber.h"
 
+class DOSObserver {
+public:
+	virtual RESULT HandleDOSMessage(std::string& strMessage) = 0;
+};
+
 class DreamOS :
 	public Subscriber<CollisionObjectEvent>,
 	public valid,
@@ -184,6 +189,15 @@ public:
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 
+	// DOSObserver
+	RESULT RegisterDOSObserver(DOSObserver *pDOSObserver);
+	RESULT UnregisterDOSObserver(DOSObserver *pDOSObserver);
+	RESULT SendDOSMessage(std::string& strMessage);
+
+private:
+	DOSObserver * m_pDOSObserver = nullptr;
+
+public:
 	// Cloud Controller Hooks
 	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) = 0;
 	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) = 0;
