@@ -31,10 +31,17 @@ public:
 class UserController : public Controller, public UserControllerProxy {
 public:
 	enum class UserMethod {
+		// old
 		LOGIN,
 		OTK_LOGIN,
 		LOAD_PROFILE,
 		LOAD_TWILIO_NTS_INFO,
+
+		// new
+		GET_FORM,
+		GET_ACCESS_TOKEN,
+		GET_SETTINGS,
+		SET_SETTINGS,
 		INVALID
 	};
 
@@ -91,6 +98,10 @@ public:
 	TwilioNTSInformation GetTwilioNTSInformation();
 
 	long GetUserID() { return m_user.GetUserID(); }
+
+// new login flow api calls
+public:
+	RESULT GetForm(std::string& strFormKey, std::string& strURL);
 
 public:
 	class UserControllerObserver {

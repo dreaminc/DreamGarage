@@ -67,6 +67,23 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		case UserMethod::LOAD_TWILIO_NTS_INFO: {
 			strURI = strAPIURL + "/webrtc/token/";
 		} break;
+
+		case UserMethod::GET_FORM: {
+			strURI = strAPIURL + "/forms/";
+		} break;
+
+		case UserMethod::GET_ACCESS_TOKEN: {
+			strURI = strAPIURL + "/access_token/";
+		} break;
+		
+		//TODO: get and set settings need to be confirmed with doug
+		case UserMethod::GET_SETTINGS: {
+			strURI = strAPIURL + "/users/get_settings";
+		} break;
+
+		case UserMethod::SET_SETTINGS: {
+			strURI = strAPIURL + "/users/set_settings";
+		} break;
 	}
 
 	return strURI;
@@ -324,6 +341,29 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 		
 		DEBUG_LINEOUT("User Profile Loaded");
 	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::GetForm(std::string& strFormKey, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::GET_FORM) + strFormKey;
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
+
+	DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+	
+	std::string strHttpResponse(httpResponse.PullResponse());
+	strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+	nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
 
 Error:
 	return r;
