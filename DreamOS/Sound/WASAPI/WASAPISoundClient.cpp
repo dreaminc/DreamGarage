@@ -100,6 +100,24 @@ std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 
 	CR((RESULT)pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propVariantFriendlyName));
 
+	//DWORD numProps;
+	//pPropertyStore->GetCount(&numProps);
+	//
+	//for (int i = 0; i < (int)numProps; i++) {
+	//	PROPERTYKEY propKeyTemp;
+	//
+	//	CR((RESULT)pPropertyStore->GetAt((DWORD)(i), &propKeyTemp));
+	//
+	//	PROPVARIANT propVariantTemp;
+	//	PropVariantInit(&propVariantTemp);
+	//
+	//	CR((RESULT)pPropertyStore->GetValue(propKeyTemp, &propVariantTemp));
+	//
+	//	if(propVariantTemp.vt == 31 && propVariantTemp.pwszVal != nullptr) {
+	//		DEBUG_LINEOUT("%d: %S", i, propVariantTemp.pwszVal);
+	//	}
+	//}
+
 	SafeRelease(&pPropertyStore);
 
 	wstrResult = std::wstring(propVariantFriendlyName.pwszVal);
@@ -611,6 +629,8 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	UINT32 maxDynamicObjectCount;
 	CRM((RESULT)m_pAudioSpatialClient->GetMaxDynamicObjectCount(&maxDynamicObjectCount), "Failed to get max dynamic object count");
 	CBM((maxDynamicObjectCount > 0), "Spatial audio doesn't support any dynamic objects");
+
+	// TODO: Move all of this into user etc 
 
 	SpatialAudioHrtfActivationParams streamParams;
 	streamParams.ObjectFormat = &format;
