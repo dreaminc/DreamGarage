@@ -45,14 +45,14 @@ public:
 	RESULT SetLaunchDate(); // always set to now
 
 public:
-	std::wstring wstrAppName = L"Dream";
-	std::wstring wstrDevelop = L"Develop";
-	std::wstring wstrClient = L".Client.";
+	std::wstring m_wstrAppName = L"Dream";
+	std::wstring m_wstrDevelop = L"Develop";
+	std::wstring m_wstrClient = L".Client.";
 
-	std::wstring wstrRefreshToken = L"RefreshToken";
-	std::wstring wstrAccessToken = L"AccessToken";
-	std::wstring wstrLastLogin = L"LastLogin";
-	std::wstring wstrEnvironmentId = L"EnvironmentID";
+	std::wstring m_wstrRefreshToken = L"RefreshToken";
+	std::wstring m_wstrAccessToken = L"AccessToken";
+	std::wstring m_wstrLastLogin = L"LastLogin";
+	std::wstring m_wstrEnvironmentId = L"EnvironmentID";
 
 protected:
 	static DreamLoginApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

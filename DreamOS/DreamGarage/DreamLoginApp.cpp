@@ -34,11 +34,10 @@ CredentialManager::type DreamLoginApp::GetCredentialManagerType(CredentialType t
 
 	CredentialManager::type credentialType = CredentialManager::CREDENTIAL_INVALID;
 
+	//TODO: none of the other CredentialManager types are used for now
 	switch (type) {
 	case CREDENTIAL_REFRESH_TOKEN:
 	case CREDENTIAL_ACCESS_TOKEN:
-		credentialType = CredentialManager::CREDENTIAL_DOMAIN_PASSWORD;
-		break;
 	case CREDENTIAL_LAST_LOGIN:
 	case CREDENTIAL_LAST_ENVIRONMENT:
 		credentialType = CredentialManager::CREDENTIAL_GENERIC;
@@ -53,26 +52,26 @@ std::wstring DreamLoginApp::GetCredentialManagerString(CredentialType type) {
 	// the keys for the credential manager have the form:
 	// "Dream.Client.<field>" in a production build
 	// "DreamDevelop.Client.<field>" in a development build
-	std::wstring wstrCredential = wstrAppName;
+	std::wstring wstrCredential = m_wstrAppName;
 	
 #ifndef PRODUCTION_BUILD
-	wstrCredential += wstrDevelop;
+	wstrCredential += m_wstrDevelop;
 #endif
 
-	wstrCredential += wstrClient;
+	wstrCredential += m_wstrClient;
 
 	switch (type) {
 	case CREDENTIAL_ACCESS_TOKEN: 
-		wstrCredential += wstrAccessToken; 
+		wstrCredential += m_wstrAccessToken; 
 		break;
 	case CREDENTIAL_REFRESH_TOKEN: 
-		wstrCredential += wstrRefreshToken; 
+		wstrCredential += m_wstrRefreshToken; 
 		break;
 	case CREDENTIAL_LAST_LOGIN: 
-		wstrCredential += wstrLastLogin; 
+		wstrCredential += m_wstrLastLogin; 
 		break;
 	case CREDENTIAL_LAST_ENVIRONMENT: 
-		wstrCredential += wstrEnvironmentId; 
+		wstrCredential += m_wstrEnvironmentId; 
 		break;
 	}
 
