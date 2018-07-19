@@ -41,6 +41,7 @@ private:
 	RESULT EnumerateWASAPIDevices();
 	RESULT EnumerateWASAPISessions();
 	std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex);
+	std::wstring GetDeviceName(IMMDevice *pDevice);
 
 	RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
 
@@ -50,7 +51,7 @@ private:
 
 	// Spatial 
 	IMMDevice *m_pAudioEndpointSpatialDevice = nullptr;
-	ISpatialAudioClient *m_pAudioSpatialClient = nullptr;
+	ISpatialAudioClient *m_pAudioSpatialClient;
 	ISpatialAudioObjectRenderStreamForHrtf* m_spatialAudioStreamForHrtf;
 	HANDLE m_hSpatialBufferCompletionEvent = nullptr;
 
