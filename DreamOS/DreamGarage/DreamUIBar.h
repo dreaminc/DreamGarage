@@ -84,6 +84,8 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
+	RESULT MakeNextButtons();
+
 	RESULT PopPath();
 	RESULT RequestMenu();
 	RESULT ResetAppComposite();
@@ -133,6 +135,9 @@ private:
 	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
 	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
+	std::vector<std::shared_ptr<UIButton>> m_pButtons;
+
+	int m_menuNode_n = 0;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
 

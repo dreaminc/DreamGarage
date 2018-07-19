@@ -145,8 +145,11 @@ RESULT UISpatialScrollView::Update() {
 	}
 
 	for (int i = minIndex; i <= maxIndex; i++) {
-		auto pObj = dynamic_cast<DimObj*>(pChildren[i].get());
-		pObj->SetVisible(true);
+		auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
+		if (!pObj->IsVisible()) {
+			pObj->SetVisible(true);
+			pObj->RegisterToInteractionEngine(m_pDreamOS);
+		}
 	}
 
 	// Hide items that are far enough from the view
@@ -376,7 +379,10 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 	for (auto& pButton : pButtons) {
 
 		CN(pButton);
-		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+
+		if (i < m_maxElements) {
+			CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		}
 
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
@@ -459,6 +465,8 @@ RESULT UISpatialScrollView::Snap() {
 			if (index < startIndex || index >= startIndex + m_maxElements) {
 				auto pButton = dynamic_cast<UIButton*>(pChild.get());
 				pButton->SetVisible(false);
+				m_pDreamOS->UnregisterInteractionObject(pButton);
+				m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
 			}
 			index++;
 		}
