@@ -15,6 +15,7 @@ class DreamFormApp : public DreamApp<DreamFormApp>,
 					public Subscriber<InteractionObjectEvent>
 {
 	friend class DreamAppManager;
+	friend class MultiContentTestSuite;
 
 public:
 	DreamFormApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -45,6 +46,9 @@ public:
 	RESULT HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) override;
 
 	RESULT HandleDreamFormSuccess() override;
+	RESULT HandleDreamFormCancel() override;
+	RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_IMPLEMENTED; };
+	RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_IMPLEMENTED; };
 
 	RESULT HandleCanTabNext(bool fCanNext) override;
 	RESULT HandleCanTabPrevious(bool fCanPrevious) override;

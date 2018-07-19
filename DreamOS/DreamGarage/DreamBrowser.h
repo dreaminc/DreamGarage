@@ -57,6 +57,9 @@ public:
 	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
+	virtual RESULT HandleDreamFormCancel() = 0;
+	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) = 0;
+	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) = 0;
 
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
@@ -119,12 +122,14 @@ public:
 	virtual RESULT OnLoadStart() override;
 	virtual RESULT OnLoadEnd(int httpStatusCode, std::string strCurrentURL) override;
 	virtual RESULT OnNodeFocusChanged(DOMNode *pDOMNode) override;
-	virtual RESULT SetTitle(std::string strTitle) override;
-
 	virtual RESULT GetResourceHandlerType(ResourceHandlerType &resourceHandlerType,std::string strURL) override;
 	virtual RESULT CheckForHeaders(std::multimap<std::string, std::string> &headermap, std::string strURL) override;
+	virtual RESULT SetTitle(std::string strTitle) override;
 
-	virtual RESULT HandleDreamFormSuccess();
+	virtual RESULT HandleDreamFormSuccess() override;
+	virtual RESULT HandleDreamFormCancel() override;
+	virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) override;
+	virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override;
 
 	virtual RESULT HandleIsInputFocused(bool fInputFocused) override;
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;

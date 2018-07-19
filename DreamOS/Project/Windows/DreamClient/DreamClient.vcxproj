@@ -598,6 +598,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClCompile Include="..\..\..\DreamGarage\DreamFormApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamGamepadCameraApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamLoginApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamSettingsApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
@@ -619,6 +620,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClInclude Include="..\..\..\DreamGarage\DreamGamepadCameraApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamLoginApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamSettingsApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />

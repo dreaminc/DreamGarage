@@ -69,6 +69,9 @@ public:
 
 		// Dream Form Extensions
 		virtual RESULT HandleDreamFormSuccess() = 0;
+		virtual RESULT HandleDreamFormCancel() = 0;
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) = 0;
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) = 0;
 
 		// Dream Browser Extensions
 		virtual RESULT HandleIsInputFocused(bool fInputFocused) = 0;

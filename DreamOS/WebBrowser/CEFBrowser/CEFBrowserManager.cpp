@@ -242,7 +242,7 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 			CR(pCEFBrowserController->HandleDreamFormSuccess());
 		}
 		else if (strMethod == "cancel") {
-			// TODO:
+			CR(pCEFBrowserController->HandleDreamFormCancel());
 		}
 		else if (strMethod == "setCredentials") {
 			// TODO:

@@ -32,6 +32,9 @@ public:
 
 public:
 
+	// forms
+	RESULT AddTestLoginForms();
+
 	// test to fix ui clipping shader
 	RESULT AddTestMenuShader();
 

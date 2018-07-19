@@ -29,9 +29,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSkybox());
+//	CR(AddTestSkybox());
 
-	CR(AddTestWaterShader());
+//	CR(AddTestWaterShader());
 
 	CR(AddTestStandardShader());
 
