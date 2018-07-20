@@ -42,12 +42,15 @@ public:
 protected:
 	virtual RESULT AudioRenderProcess() = 0;
 	virtual RESULT AudioCaptureProcess() = 0;
+	virtual RESULT AudioSpatialProcess() = 0;
 
 	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
 	SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
+	SoundClient::state m_spatialState = SoundClient::state::UNINITIALIZED;
 
 	RESULT InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType);
 	RESULT InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	RESULT InitializeSpatialSoundBuffer(int numChannels, SoundBuffer::type bufferType);
 
 	RESULT HandleAudioDataCaptured(int numFrames);
 
@@ -63,6 +66,9 @@ public:
 	RESULT StartRender();
 	RESULT StopRender();
 
+	RESULT StartSpatial();
+	RESULT StopSpatial();
+
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
 	RESULT PlaySoundFile(SoundFile *pSoundFile);
@@ -70,10 +76,12 @@ public:
 private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
+	std::thread	m_audioSpatialProcessingThread;
 
 protected:
 	SoundBuffer *m_pCaptureSoundBuffer = nullptr;
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	SoundBuffer *m_pSpatialSoundBuffer = nullptr;
 
 };
 

@@ -39,6 +39,20 @@ Error:
 	return r;
 }
 
+// TODO: This might not be needed 
+RESULT SoundClient::InitializeSpatialSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pSpatialSoundBuffer == nullptr));
+
+	m_pSpatialSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	CN(m_pSpatialSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Spatial Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
 
 bool SoundClient::IsRunning() {
 	return (m_renderState == state::RUNNING);
@@ -85,6 +99,29 @@ RESULT SoundClient::StopRender() {
 	// Join thread
 	if (m_audioRenderProcessingThread.joinable()) {
 		m_audioRenderProcessingThread.join();
+	}
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StartSpatial() {
+	DEBUG_LINEOUT("SoundClient::StartSpatial");
+
+	// This will kick off the audio spatial process defined in the sound client implementation
+	m_spatialState = state::RUNNING;
+	m_audioSpatialProcessingThread = std::thread(&SoundClient::AudioSpatialProcess, this);
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StopSpatial() {
+	DEBUG_LINEOUT("SoundClient::StopSpatial");
+
+	m_spatialState = state::STOPPED;
+
+	// Join thread
+	if (m_audioSpatialProcessingThread.joinable()) {
+		m_audioSpatialProcessingThread.join();
 	}
 
 	return R_PASS;
