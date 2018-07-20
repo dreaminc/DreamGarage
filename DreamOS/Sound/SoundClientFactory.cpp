@@ -17,6 +17,7 @@
 #endif
 
 #include "WASAPI/WASAPISoundClient.h"
+#include "WASAPI/XAudioSoundClient.h"
 
 SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type) {
 	RESULT r = R_PASS;
@@ -31,6 +32,15 @@ SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type) {
 			pSoundClient = nullptr;
 			DEBUG_LINEOUT("Sound Client type %d not supported on this platform!", type);
 	#endif
+		} break;
+
+		case SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO: {
+#if defined(_WIN32)
+			pSoundClient = new XAudioSoundClient();
+#else
+			pSoundClient = nullptr;
+			DEBUG_LINEOUT("Sound Client type %d not supported on this platform!", type);
+#endif
 		} break;
 	}
 

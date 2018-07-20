@@ -230,6 +230,23 @@ const char* GetAudioClientErrorCodeString(HRESULT hr) {
 	return "Non-handled HR value";
 }
 
+RESULT WASAPISoundClient::AudioSpatialProcess() {
+	RESULT r = R_PASS;
+
+	DWORD audioDeviceFlags = 0;
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Start");
+
+	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
+
+	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+		// do stuff
+	}
+
+Error:
+	return r;
+}
+
 RESULT WASAPISoundClient::AudioCaptureProcess() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
@@ -245,7 +262,6 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 	BYTE *pAudioCaptureBufferData = nullptr;
 	UINT32 packetLength = 0;
 	UINT32 numFramesAvailable;
-
 
 	DEBUG_LINEOUT("WASAPISoundClient::AudioCaptureProcess Start");
 
