@@ -16,6 +16,8 @@
 
 #include "Cloud/ControllerProxy.h"
 
+#include "json.hpp"
+
 class UserControllerObserver;
 
 class UserControllerProxy : public ControllerProxy {
@@ -101,15 +103,25 @@ public:
 
 // new login flow api calls
 public:
-	RESULT GetForm(std::string& strFormKey, std::string& strURL);
+//	RESULT GetForm(std::string& strFormKey, std::string& strURL);
+	RESULT GetFormURL(std::string& strFormKey, std::string& strURL);
+	void OnFormURL(std::string&& strResponse);
+
+// basic http error handling
+private:
+	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse);
 
 public:
 	class UserControllerObserver {
 	public:
+		// socket methods
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+
+		// api methods
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

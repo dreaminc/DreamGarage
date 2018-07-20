@@ -186,6 +186,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 

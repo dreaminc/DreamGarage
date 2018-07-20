@@ -681,7 +681,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public DOSObserver {
+	struct TestContext : public DOSObserver,
+		public CloudController::UserObserver {
 		std::shared_ptr<DreamLoginApp> pFormApp = nullptr;
 		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
@@ -711,6 +712,29 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return R_PASS;
 		}
 
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			return R_PASS;
+		}
+		virtual RESULT OnSetSettings() override {
+			return R_PASS;
+		}
+
+		virtual RESULT OnLogin() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+
+
+
+			pFormApp->UpdateWithNewForm(strURL);
+			return R_NOT_IMPLEMENTED;
+		}
+
 	} *pTestContext = new TestContext();
 
 
@@ -728,7 +752,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		m_pDreamOS->AddQuad(1.0f, 1.0f);
 
 		m_pDreamOS->RegisterDOSObserver(pTestContext);
-
+		m_pDreamOS->InitializeCloudController();
+		m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext);
 	Error:
 		return r;
 	};
@@ -754,7 +779,13 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/signup");
 			//pTestContext->pFormApp->Show();
 			//pTestContext->pSettingsApp->GetComposite()->SetVisible(true, false);
-			pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/settings");
+
+			auto pUserController = dynamic_cast<UserController*>(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			std::string strURL;
+			std::string strKey = "FormKey.UsersSettings";
+			pUserController->GetFormURL(strKey, strURL);
+			//pUserController->GetUser();
+			//pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/settings");
 			//pTestContext->pSettingsApp->UpdateWithNewForm("https://twitch.tv");
 			pTestContext->pSettingsApp->GetComposite()->SetVisible(false, false);
 			//pTestContext->pSettingsApp->Show();
@@ -1109,6 +1140,10 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
 			return R_NOT_IMPLEMENTED;
 		}
 

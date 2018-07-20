@@ -98,6 +98,8 @@ public:
 
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
@@ -201,6 +203,8 @@ public:
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
+
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
