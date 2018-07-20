@@ -32,6 +32,7 @@ public:
 
 	virtual RESULT AudioRenderProcess() override;
 	virtual RESULT AudioCaptureProcess() override;
+	virtual RESULT AudioSpatialProcess() override;
 
 private:
 	RESULT InitializeRenderAudioClient();
