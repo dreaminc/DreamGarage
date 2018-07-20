@@ -346,7 +346,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::GetFormURL(std::string& strFormKey, std::string& strURL) {
+RESULT UserController::GetFormURL(std::string& strFormKey) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;

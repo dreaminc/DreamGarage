@@ -93,6 +93,40 @@ DreamFormApp* DreamFormApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	return pDreamApp;
 }
 
+std::string DreamFormApp::StringFromType(FormType type) {
+
+	std::string strType;
+
+	if (type == FormType::SIGN_IN) {
+		strType = "FormKey.UsersSignIn";
+	}
+	else if (type == FormType::SIGN_UP) {
+		strType = "FormKey.UsersSignUp";
+	}
+	else if (type == FormType::SETTINGS) {
+		strType = "FormKey.UsersSettings";
+	}
+
+	return strType;
+}
+
+FormType DreamFormApp::TypeFromString(std::string& strType) {
+
+	FormType type = FormType::DEFAULT;
+
+	if (strType == "FormKey.UsersSignIn") {
+		type = FormType::SIGN_IN;
+	}
+	else if (strType == "FormKey.UsersSignUp") {
+		type = FormType::SIGN_UP;
+	}
+	else if (strType == "FormKey.UsersSettings") {
+		type = FormType::SETTINGS;
+	}
+
+	return type;
+}
+
 RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	RESULT r = R_PASS;
 
@@ -239,6 +273,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 
 		char chkey = (char)(pEvent->m_value);
 		CBR(chkey != 0x00, R_SKIPPED);	
+		CNR(m_pDreamBrowserForm, R_SKIPPED);
 
 
 		if (chkey == SVK_RETURN) {

@@ -104,7 +104,7 @@ public:
 // new login flow api calls
 public:
 //	RESULT GetForm(std::string& strFormKey, std::string& strURL);
-	RESULT GetFormURL(std::string& strFormKey, std::string& strURL);
+	RESULT GetFormURL(std::string& strFormKey);
 	void OnFormURL(std::string&& strResponse);
 
 // basic http error handling

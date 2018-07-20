@@ -683,10 +683,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 	struct TestContext : public DOSObserver,
 		public CloudController::UserObserver {
-		std::shared_ptr<DreamLoginApp> pFormApp = nullptr;
+		std::shared_ptr<DreamLoginApp> pLoginApp = nullptr;
 		std::shared_ptr<DreamSettingsApp> pSettingsApp = nullptr;
 		std::shared_ptr<DreamUserApp> pUserApp = nullptr;
 		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+
+		UserController *pUserController;
 		bool fFirst = true;
 
 		// login logic information
@@ -698,14 +700,19 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
 			if (strMessage == "DreamSettingsApp.OnSuccess") {
 				fFirst = false;
+				std::string strFormType;
 				if (fFirstLogin) {
 					// TODO: Show sign up form
 				//	pFormApp->UpdateWithNewForm();
-					pFormApp->Show();
+					strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+					pUserController->GetFormURL(strFormType);
+					pLoginApp->Show();
 				}
 				else {
-					// TOSO: Show sign in form
-					pFormApp->Show();
+					// TODO: Show sign in form
+					strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+					pUserController->GetFormURL(strFormType);
+					pLoginApp->Show();
 				}
 			}
 
@@ -728,11 +735,23 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			RESULT r = R_PASS;
 
+			FormType type = DreamFormApp::TypeFromString(strKey);
 
+			if (type == FormType::SETTINGS) {
+				pSettingsApp->GetComposite()->SetVisible(true, false);
+				CR(pSettingsApp->UpdateWithNewForm(strURL));
+				CR(pSettingsApp->Show());
+			}
+			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP) {
+				pLoginApp->GetComposite()->SetVisible(true, false);
+				CR(pLoginApp->UpdateWithNewForm(strURL));
+				CR(pLoginApp->Show());
+			}
 
-			pFormApp->UpdateWithNewForm(strURL);
-			return R_NOT_IMPLEMENTED;
+		Error:
+			return r;
 		}
 
 	} *pTestContext = new TestContext();
@@ -769,21 +788,20 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
 			pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUserApp);
 
-			pTestContext->pFormApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
+			pTestContext->pLoginApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
 			pTestContext->pSettingsApp = m_pDreamOS->LaunchDreamApp<DreamSettingsApp>(this, false);
 
 			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 
 
 			//pTestContext->pFormApp->GetComposite()->SetVisible(true, false);
-			pTestContext->pFormApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/signup");
+			//pTestContext->pLoginApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/signup");
 			//pTestContext->pFormApp->Show();
 			//pTestContext->pSettingsApp->GetComposite()->SetVisible(true, false);
 
-			auto pUserController = dynamic_cast<UserController*>(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-			std::string strURL;
-			std::string strKey = "FormKey.UsersSettings";
-			pUserController->GetFormURL(strKey, strURL);
+			pTestContext->pUserController = dynamic_cast<UserController*>(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			std::string strKey = DreamFormApp::StringFromType(FormType::SETTINGS);
+			pTestContext->pUserController->GetFormURL(strKey);
 			//pUserController->GetUser();
 			//pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/settings");
 			//pTestContext->pSettingsApp->UpdateWithNewForm("https://twitch.tv");
@@ -794,7 +812,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		}
 		//*/
 
-		if (pTestContext->pFormApp != nullptr) {
+		if (pTestContext->pLoginApp != nullptr) {
 			auto pForm = pTestContext->pSettingsApp;
 			if (pForm->m_pFormView != nullptr) {
 				pForm->GetComposite()->SetVisible(true, false);
@@ -808,8 +826,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				if (!pTestContext->fFirstLogin) {
 					pTestContext->fHasCreds = pForm->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
 				}
-				//*/
 
+				//*/
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible() && pTestContext->fFirst) {
 					pForm->Show();
 				}
