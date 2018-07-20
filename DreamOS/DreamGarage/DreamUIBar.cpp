@@ -534,8 +534,52 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 	CR(m_pScrollView->Update());
 	
-	if (m_pMenuNode) {//&& m_pMenuNode->IsDirty()) {
+	if (m_pMenuNode && m_pMenuNode->IsDirty()) {
 		CR(MakeNextButtons());
+	}
+
+	if (!m_downloadQueue.empty() && (int)m_pScrollView->GetMenuItemsView()->GetChildren().size() == m_menuNode_n) {
+		//int elements = (m_downloadQueue.size() > (int)m_pScrollView->GetMenuItemsView()->GetChildren().size() ? 8 : ;
+
+		//for (int i = m_menuNode_n; i < elements + m_menuNode_n; i++) {
+		for (int i = 0; i < m_downloadQueue.size(); i++) {
+			auto pQueueObj = m_downloadQueue[i];
+			auto pMenuNodeTitle = pQueueObj.first;
+			auto pBufferVector = pQueueObj.second;
+			auto pChildren = m_pScrollView->GetMenuItemsView()->GetChildren();
+
+			texture *pTexture = nullptr;
+
+			CN(pBufferVector);
+			uint8_t* pBuffer = &(pBufferVector->operator[](0));
+			size_t pBuffer_n = pBufferVector->size();
+
+			pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			CN(pTexture);
+
+			for (auto& pChild : pChildren) {
+				auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
+				if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
+					pObj->GetSurface()->SetDiffuseTexture(pTexture);
+				}
+			}
+
+			if (pMenuNodeTitle == "root_menu_title") {
+				//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
+				m_pPendingIconTexture = pTexture;
+				//TODO: May want to move downloading outside of DreamUIBar
+				//TODO: the only time the title view is used is to show the chrome icon and "Website" title
+				if (m_pKeyboardHandle != nullptr) {
+					m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+				}
+			}
+
+			if (pBufferVector != nullptr) {
+				pBufferVector = nullptr;
+			}
+
+			m_downloadQueue.pop_back();
+		}
 	}
 
 Error:
@@ -584,7 +628,7 @@ RESULT DreamUIBar::MakeNextButtons() {
 			m_pButtons.emplace_back(pButton);
 		}
 
-		if (m_pMenuNode->IsDirty() && (m_menuNode_n == (int)m_pMenuNode->NumSubMenuNodes())) {
+		{
 			m_pMenuNode->CleanDirty();
 			if (m_pMenuNode->GetNodeType() != MenuNode::type::ACTION) {
 
@@ -598,50 +642,7 @@ RESULT DreamUIBar::MakeNextButtons() {
 				}
 			}
 			CR(ShowApp());
-		}
-
-		if (!m_downloadQueue.empty() && m_pScrollView->GetMenuItemsView()->HasChildren()) {			
-
-			//for (int i = m_menuNode_n; i < elements + m_menuNode_n; i++) {
-			for (int i = 0; i < elements; i++) {
-				auto pQueueObj = m_downloadQueue[i];
-				auto pMenuNodeTitle = pQueueObj.first;
-				auto pBufferVector = pQueueObj.second;
-				auto pChildren = m_pScrollView->GetMenuItemsView()->GetChildren();
-
-				texture *pTexture = nullptr;
-
-				CN(pBufferVector);
-				uint8_t* pBuffer = &(pBufferVector->operator[](0));
-				size_t pBuffer_n = pBufferVector->size();
-
-				pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-				CN(pTexture);
-
-				for (auto& pChild : pChildren) {
-					auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
-					if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
-						pObj->GetSurface()->SetDiffuseTexture(pTexture);
-					}
-				}
-
-				if (pMenuNodeTitle == "root_menu_title") {
-					//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-					m_pPendingIconTexture = pTexture;
-					//TODO: May want to move downloading outside of DreamUIBar
-					//TODO: the only time the title view is used is to show the chrome icon and "Website" title
-					if (m_pKeyboardHandle != nullptr) {
-						m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
-					}
-				}
-
-				if (pBufferVector != nullptr) {
-					pBufferVector = nullptr;
-				}
-
-				m_downloadQueue.pop_back();
-			}
-		}
+		}	
 
 		m_menuNode_n += elements;
 	}
