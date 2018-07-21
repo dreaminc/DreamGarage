@@ -702,18 +702,19 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				fFirst = false;
 				std::string strFormType;
 				if (fFirstLogin) {
-					// TODO: Show sign up form
-				//	pFormApp->UpdateWithNewForm();
 					strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
 					pUserController->GetFormURL(strFormType);
 					pLoginApp->Show();
 				}
 				else {
-					// TODO: Show sign in form
 					strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
 					pUserController->GetFormURL(strFormType);
 					pLoginApp->Show();
 				}
+			}
+			else if (strMessage == "DreamLoginApp.OnSuccess") {
+				// TODO:
+				pLoginApp->SetLaunchDate();
 			}
 
 			return R_PASS;
@@ -773,6 +774,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		m_pDreamOS->RegisterDOSObserver(pTestContext);
 		m_pDreamOS->InitializeCloudController();
 		m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext);
+
 	Error:
 		return r;
 	};
@@ -808,6 +810,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pSettingsApp->GetComposite()->SetVisible(false, false);
 			//pTestContext->pSettingsApp->Show();
 
+			pTestContext->fFirstLogin = pTestContext->pLoginApp->IsFirstLaunch();
+			if (!pTestContext->fFirstLogin) {
+				pTestContext->fHasCreds = pTestContext->pLoginApp->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
+			}
+
+
 			//pTestContext->pFormApp->SetLaunchDate();
 		}
 		//*/
@@ -821,13 +829,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible()) {
 					pTestContext->pFormApp->Show();
 				}
-
-				pTestContext->fFirstLogin = pForm->IsFirstLaunch();
-				if (!pTestContext->fFirstLogin) {
-					pTestContext->fHasCreds = pForm->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
-				}
-
 				//*/
+
+
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible() && pTestContext->fFirst) {
 					pForm->Show();
 				}

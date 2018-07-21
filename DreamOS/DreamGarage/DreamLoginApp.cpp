@@ -22,6 +22,15 @@ DreamLoginApp* DreamLoginApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	return pDreamApp;
 }
 
+RESULT DreamLoginApp::HandleDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	CR(DreamFormApp::HandleDreamFormSuccess());
+	CR(GetDOS()->SendDOSMessage(m_strSuccess));
+
+Error:
+	return r;
+}
 RESULT DreamLoginApp::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) {
 	return R_PASS;
 }
