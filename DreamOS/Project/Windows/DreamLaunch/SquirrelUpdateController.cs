@@ -172,6 +172,7 @@ namespace DreamLaunch {
             // Figure out where to look for RELEASES
 
 #if (_PROD_RELEASE)
+            // TODO: update this when the bucket has something
             m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/Releases/";
 #else
             m_strReleasesURI = "https://dream-client-build-develop.s3-accelerate.amazonaws.com";
