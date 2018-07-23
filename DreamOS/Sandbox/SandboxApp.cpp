@@ -426,13 +426,13 @@ RESULT SandboxApp::RunAppLoop() {
 		SwapDisplayBuffers();
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
-
 		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
 	}
 
 Error:
+	DreamLogger::instance()->Flush();
 	return r;
 }
 
