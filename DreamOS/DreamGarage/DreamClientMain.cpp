@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include "RESULT/EHM.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "DreamGarage.h"
 
@@ -46,6 +47,7 @@
 		return (int)(r);
 
 	Error:
+		DreamLogger::instance()->Flush();
 		DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
 		DEBUG_SYSTEM_PAUSE();
 

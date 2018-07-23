@@ -132,9 +132,9 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Ensures that condition evaluates to true
 #define CB(condition) do{if(!(condition)) {r = R_FAIL; DOSLogError(ERR, "CB", r);goto Error;}}while(0);
 #define WCB(condition) do{if(!(condition)) {r = R_WARNING; DOSLogError(ERR, "WCB", r);goto Error;}}while(0);
-#define CBR(condition, failCode) do{if(!(condition)) {r = failCode; DOSLogError(ERR, "CBR", r); goto Error;}}while(0);
+#define CBR(condition, failCode) do{if(!(condition)) {r = failCode; if(r&0x80000000){DOSLogError(ERR, "CBR", r);} goto Error;}}while(0);
 #define CBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage(ERR, "CBM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
-#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) { DOSLogErrorMessage(ERR, "CBRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage(ERR, "CBRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode;} goto Error; }}while(0);
 
 #define ACBM(condition, msg, ...) do{if(!condition){DOSLogErrorMessage(ERR, "ACBM", msg, R_FAIL); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACB(condition) do{if(!condition){DOSLogError(ERR, "ACB", R_FAIL); assert(0);}}while(0);
@@ -146,10 +146,10 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Ensures that the pointer is not a NULL
 #define CN(pointer) do{if((pointer) == NULL) {r = R_ERROR; DOSLogError(ERR, "CN", r); goto Error;}}while(0);
 #define WCN(pointer) do{if((pointer) == NULL) {r = R_WARNING; DOSLogError(WARN, "WCN", r); goto Error;}}while(0);
-#define CNR(pointer, failCode) do{if((pointer) == NULL) {r = failCode; DOSLogError(ERR, "CNR", r);goto Error;}}while(0);
+#define CNR(pointer, failCode) do{if((pointer) == NULL) {r = failCode; if(r&0x80000000){ DOSLogError(ERR, "CNR", r);}goto Error;}}while(0);
 #define CNM(pointer, msg, ...) do{if((pointer) == NULL) {r = R_ERROR; DOSLogErrorMessage(ERR, "CNM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); goto Error; }}while(0);
 #define WCNM(pointer, msg, ...) do{if((pointer) == NULL) { r = R_WARNING; DOSLogErrorMessage(WARN, "WCNM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n");  }}while(0);
-#define CNRM(pointer, failCode, msg, ...) do{if((pointer) == NULL) { r = failCode; DOSLogErrorMessage(ERR, "CNRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); goto Error; }}while(0);
+#define CNRM(pointer, failCode, msg, ...) do{if((pointer) == NULL) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage(ERR, "CNRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n");} goto Error; }}while(0);
 
 #define ACNM(pointer, msg, ...) do{if((pointer) == NULL){DOSLogErrorMessage(ERR, "ACNM", msg, R_FAIL); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACN(pointer) do{if((pointer) == NULL){DOSLogError(ERR, "ACN", R_FAIL); assert(0);}}while(0);
@@ -158,10 +158,10 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Ensures that the pointer IS NULL
 #define CBN(pointer) do{if((pointer) != NULL) {r = R_ERROR; DOSLogError(ERR, "CBM", r); goto Error;}}while(0);
 #define WCBN(pointer) do{if((pointer) != NULL) {r = R_WARNING; DOSLogError(WARN, "WCBN", r); goto Error;}}while(0);
-#define CBNR(pointer, failCode) do{if((pointer) != NULL) {r = failCode; DOSLogError(ERR, "CBNR", r);goto Error;}}while(0);
+#define CBNR(pointer, failCode) do{if((pointer) != NULL) { r = failCode; if(r&0x80000000){ DOSLogError(ERR, "CBNR", r);}goto Error;}}while(0);
 #define CBNM(pointer, msg, ...) do{if((pointer) != NULL) { r = R_ERROR; DOSLogErrorMessage(ERR, "CBNM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n");  goto Error; }}while(0);
 #define WCBNM(pointer, msg, ...) do{if((pointer) != NULL) { r = R_WARNING; DOSLogErrorMessage(WARN, "CBNMW", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); }}while(0);
-#define CBNRM(pointer, failCode, msg, ...) do{if((pointer) != NULL) { r = failCode; DOSLogErrorMessage(ERR, "CBNRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); goto Error; }}while(0);
+#define CBNRM(pointer, failCode, msg, ...) do{if((pointer) != NULL) { r = failCode; if(r&0x80000000){ DOSLogErrorMessage(ERR, "CBNRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n");} goto Error; }}while(0);
 
 #define ABCNM(pointer, msg, ...) do{if((pointer) != NULL){DOSLogErrorMessage(ERR, "ABCNM", msg, r); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ABCN(pointer) do{if((pointer) != NULL){DOSLogError(ERR, "ABCN", r); assert(0);}}while(0);

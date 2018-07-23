@@ -174,7 +174,7 @@ namespace DreamLaunch {
 #if (_PROD_RELEASE)
             m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/Releases/";
 #else
-            m_strReleasesURI = "https://github.com/dreaminc/Dream/releases/download/DevReleases/";
+            m_strReleasesURI = "https://dream-client-build-develop.s3-accelerate.amazonaws.com";
 #endif
 
             if (m_squirrelUpdateManager == null) {
