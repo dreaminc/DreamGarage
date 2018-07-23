@@ -426,7 +426,6 @@ RESULT SandboxApp::RunAppLoop() {
 		SwapDisplayBuffers();
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
-		CRM(R_FAIL, "flush?");
 		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
