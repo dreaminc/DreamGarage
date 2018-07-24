@@ -34,6 +34,7 @@ public:
 public:
 	RESULT GetCredential(CredentialType type, std::string& strCredentialValue);
 	RESULT SetCredential(CredentialType type, std::string& strCredentialValue);
+	RESULT ClearCredential(CredentialType type);
 
 private:
 	CredentialManager::type GetCredentialManagerType(CredentialType type);
@@ -45,6 +46,7 @@ public:
 
 	RESULT SetLaunchDate(); // always set to now
 	RESULT SaveTokens();
+	RESULT ClearTokens();
 
 public:
 	std::string m_strSuccess = "DreamLoginApp.OnSuccess";

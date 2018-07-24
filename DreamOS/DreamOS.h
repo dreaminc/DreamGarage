@@ -190,6 +190,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 

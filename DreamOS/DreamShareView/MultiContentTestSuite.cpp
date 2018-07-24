@@ -759,6 +759,19 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return r;
 		}
 
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			if (!fSuccess) {
+				pLoginApp->ClearTokens();
+			}
+			else {
+			//	pLoginApp->
+			}
+
+			return R_PASS;
+		}
+
 	} *pTestContext = new TestContext();
 
 
@@ -817,6 +830,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->fFirstLogin = pTestContext->pLoginApp->IsFirstLaunch();
 			if (!pTestContext->fFirstLogin) {
 				pTestContext->fHasCreds = pTestContext->pLoginApp->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
+				if (pTestContext->fHasCreds) {
+					pTestContext->pUserController->GetAccessToken(pTestContext->strRefreshToken);
+				}
 			}
 
 
@@ -1170,6 +1186,10 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
 			return R_NOT_IMPLEMENTED;
 		}
 

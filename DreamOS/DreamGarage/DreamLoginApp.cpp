@@ -123,6 +123,15 @@ Error:
 	return r;
 }
 
+RESULT DreamLoginApp::ClearCredential(CredentialType type) {
+	RESULT r = R_PASS;
+
+	CR(GetDOS()->RemoveCredential(GetCredentialManagerString(type), GetCredentialManagerType(type)));
+
+Error:
+	return r;
+}
+
 bool DreamLoginApp::IsFirstLaunch() {
 
 	RESULT r = R_PASS;
@@ -171,6 +180,19 @@ RESULT DreamLoginApp::SaveTokens() {
 	// probably don't need to save access token, because the app should always try to get a new one
 	// with the saved refresh token
 	CR(SetCredential(CREDENTIAL_REFRESH_TOKEN, m_strRefreshToken));
+
+Error:
+	return r;
+}
+
+RESULT DreamLoginApp::ClearTokens() {
+	RESULT r = R_PASS;
+
+	m_strRefreshToken = "";
+	m_strAccessToken = "";
+
+	CR(ClearCredential(CREDENTIAL_REFRESH_TOKEN));
+//	CR(ClearCredential(CREDENTIAL_ACCESS_TOKEN));
 
 Error:
 	return r;

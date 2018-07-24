@@ -107,6 +107,9 @@ public:
 	RESULT GetFormURL(std::string& strFormKey);
 	void OnFormURL(std::string&& strResponse);
 
+	RESULT GetAccessToken(std::string& strRefreshToken);
+	void OnAccessToken(std::string&& strResponse);
+
 // basic http error handling
 private:
 	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse);
@@ -122,6 +125,7 @@ public:
 
 		// api methods
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

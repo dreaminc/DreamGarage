@@ -400,6 +400,48 @@ Error:
 	return;
 }
 
+RESULT UserController::GetAccessToken(std::string& strRefreshToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::GET_ACCESS_TOKEN);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	nlohmann::json jsonData = nlohmann::json::object();
+	jsonData["refresh_token"] = nlohmann::json::object();
+	jsonData["refresh_token"]["token"] = strRefreshToken;
+
+	CB(pHTTPController->APOST(strURI, headers, jsonData.dump(-1), std::bind(&UserController::OnAccessToken, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+void UserController::OnAccessToken(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	std::string strAccessToken;
+
+	CR(GetResponseData(jsonData, jsonResponse));
+
+	// if the json data is null we know that we got an expected error in GetResponseData
+	// right now, that is only a 401 bad access
+	if (jsonData.is_null()) {
+		CR(m_pUserControllerObserver->OnAccessToken(false, strAccessToken));
+	}
+	else {
+		
+	}
+
+Error:
+	return;
+}
+
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse) {
 	RESULT r = R_PASS;
 
@@ -420,13 +462,20 @@ RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json 
 
 	//TODO: more advanced handling of different codes
 	//TODO: extract message out of errors list
-	CBM(statusCode == 200, "website returned bad status code: %d", statusCode);
+	CBM(statusCode == 200 || statusCode == 401, "website returned unhandled status code: %d", statusCode);
+	
+	if (statusCode == 200) {
+		CBM(!jsonResponse["/data"_json_pointer].is_null(), "HTTP json data is malformed");
 
-	CBM(!jsonResponse["/data"_json_pointer].is_null(), "HTTP json data is malformed");
+		jsonData = jsonResponse["/data"_json_pointer];
 
-	jsonData = jsonResponse["/data"_json_pointer];
+		//	jsonResponse["/errors"_json_pointer][0];
 
-//	jsonResponse["/errors"_json_pointer][0];
+	}
+	else if (statusCode == 401) {
+		
+		jsonData = jsonResponse["/data"_json_pointer];
+	}
 
 Error:
 	return r;
