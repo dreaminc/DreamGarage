@@ -167,6 +167,9 @@
     <Filter Include="Sound\WASAPI">
       <UniqueIdentifier>{958ee80b-50a2-4584-bf58-d29525f855b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound\XAudio2">
+      <UniqueIdentifier>{72210ad1-c585-4056-9ecc-88d0fd79c9df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
@@ -927,6 +930,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISoundClient.cpp">
       <Filter>Sound\WASAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp">
+      <Filter>Sound\XAudio2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2046,6 +2052,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISoundClient.h">
       <Filter>Sound\WASAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h">
+      <Filter>Sound\XAudio2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
