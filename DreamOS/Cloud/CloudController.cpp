@@ -76,6 +76,7 @@ RESULT CloudController::CloudThreadProcessParams(std::string strUsername, std::s
 
 	DEBUG_LINEOUT("CloudThreadProcess start");
 
+	//TODO: this code is going to have to be changed further to have the correct login flow
 	if (m_fLoginOnStart) {
 		DEBUG_LINEOUT("Logging into server with user credentials");
 
@@ -492,6 +493,17 @@ RESULT CloudController::OnLogout() {
 
 	if (m_pUserObserver != nullptr) {
 		CR(m_pUserObserver->OnLogout());
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnFormURL(strKey, strTitle, strURL));
 	}
 
 Error:

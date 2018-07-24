@@ -9,6 +9,14 @@
 class DreamControlView;
 struct UIEvent;
 
+enum class FormType {
+	SIGN_IN,
+	SIGN_UP,
+	SETTINGS,
+	DEFAULT,
+	INVALID
+};
+
 class DreamFormApp : public DreamApp<DreamFormApp>,
 					public DreamBrowserObserver,
 					public Subscriber<UIEvent>, 
@@ -29,6 +37,11 @@ public:
 
 protected:
 	static DreamFormApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
+// form key string/type converters
+public:
+	static std::string StringFromType(FormType type);
+	static FormType TypeFromString(std::string& strType);
 
 public:
 	RESULT UpdateWithNewForm(std::string strURL);

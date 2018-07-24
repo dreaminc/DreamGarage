@@ -16,6 +16,8 @@
 
 #include "Cloud/ControllerProxy.h"
 
+#include "json.hpp"
+
 class UserControllerObserver;
 
 class UserControllerProxy : public ControllerProxy {
@@ -31,10 +33,17 @@ public:
 class UserController : public Controller, public UserControllerProxy {
 public:
 	enum class UserMethod {
+		// old
 		LOGIN,
 		OTK_LOGIN,
 		LOAD_PROFILE,
 		LOAD_TWILIO_NTS_INFO,
+
+		// new
+		GET_FORM,
+		GET_ACCESS_TOKEN,
+		GET_SETTINGS,
+		SET_SETTINGS,
 		INVALID
 	};
 
@@ -92,13 +101,27 @@ public:
 
 	long GetUserID() { return m_user.GetUserID(); }
 
+// new login flow api calls
+public:
+//	RESULT GetForm(std::string& strFormKey, std::string& strURL);
+	RESULT GetFormURL(std::string& strFormKey);
+	void OnFormURL(std::string&& strResponse);
+
+// basic http error handling
+private:
+	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse);
+
 public:
 	class UserControllerObserver {
 	public:
+		// socket methods
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+
+		// api methods
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

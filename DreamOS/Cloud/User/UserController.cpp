@@ -67,6 +67,23 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		case UserMethod::LOAD_TWILIO_NTS_INFO: {
 			strURI = strAPIURL + "/webrtc/token/";
 		} break;
+
+		case UserMethod::GET_FORM: {
+			strURI = strAPIURL + "/forms/";
+		} break;
+
+		case UserMethod::GET_ACCESS_TOKEN: {
+			strURI = strAPIURL + "/access_token/";
+		} break;
+		
+		//TODO: get and set settings need to be confirmed with doug
+		case UserMethod::GET_SETTINGS: {
+			strURI = strAPIURL + "/users/get_settings";
+		} break;
+
+		case UserMethod::SET_SETTINGS: {
+			strURI = strAPIURL + "/users/set_settings";
+		} break;
 	}
 
 	return strURI;
@@ -324,6 +341,92 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 		
 		DEBUG_LINEOUT("User Profile Loaded");
 	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::GetFormURL(std::string& strFormKey) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::GET_FORM) + strFormKey;
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnFormURL, this, std::placeholders::_1)));
+
+	/*
+	DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+	{
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+	}
+	//*/
+
+Error:
+	return r;
+}
+
+void UserController::OnFormURL(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	//std::string strHttpResponse = strHttpResponse.substr(0, strResponse.find('\r'));
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	nlohmann::json jsonForm;
+
+
+	//TODO: these function are void instead of RESULT
+	CR(GetResponseData(jsonData, jsonResponse));
+
+	CBM(!jsonData["/form"_json_pointer].is_null(), "form object is malformed");
+
+	jsonForm = jsonData["/form"_json_pointer];
+
+	CBM(jsonForm["/key"_json_pointer].is_string(), "form key is malformed");
+	CBM(jsonForm["/title"_json_pointer].is_string(), "form title is malformed");
+	CBM(jsonForm["/url"_json_pointer].is_string(), "form url is malformed");
+
+	CNM(m_pUserControllerObserver, "user observer is nullptr");
+	CR(m_pUserControllerObserver->OnFormURL(jsonForm["/key"_json_pointer].get<std::string>(),
+		jsonForm["/title"_json_pointer].get<std::string>(),
+		jsonForm["/url"_json_pointer].get<std::string>()));
+
+Error:
+	return;
+}
+
+RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse) {
+	RESULT r = R_PASS;
+
+	//{"errors":[],"meta":{"status_code":200},"data":{
+	//"form":{"key":"FormKey.UsersSettings","title":"Settings","url":"https://www.develop.dreamos.com/forms/users/settings"}}}
+	nlohmann::json jsonMeta;
+	int statusCode = -1;
+	
+	CBM(!jsonResponse.is_null(), "HTTP json response is null");
+
+	CBM(!jsonResponse["/meta"_json_pointer].is_null(), "HTTP json response is malformed");
+	jsonMeta = jsonResponse["/meta"_json_pointer];
+
+	bool fNumber = jsonMeta["/status_code"_json_pointer].is_number_unsigned();
+
+	CBM(jsonMeta["/status_code"_json_pointer].is_number_unsigned(), "HTTP json status code is malformed");
+	statusCode = jsonMeta["/status_code"_json_pointer].get<int>();
+
+	//TODO: more advanced handling of different codes
+	//TODO: extract message out of errors list
+	CBM(statusCode == 200, "website returned bad status code: %d", statusCode);
+
+	CBM(!jsonResponse["/data"_json_pointer].is_null(), "HTTP json data is malformed");
+
+	jsonData = jsonResponse["/data"_json_pointer];
+
+//	jsonResponse["/errors"_json_pointer][0];
 
 Error:
 	return r;
