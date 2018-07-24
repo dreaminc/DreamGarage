@@ -153,7 +153,8 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 		CN(pTestContext->pSoundClient);
 
 		CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
-		//CR(pTestContext->pSoundClient->Start());
+		
+		CR(pTestContext->pSoundClient->StartSpatial());
 
 		//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
 
