@@ -435,7 +435,10 @@ void UserController::OnAccessToken(std::string&& strResponse) {
 		CR(m_pUserControllerObserver->OnAccessToken(false, strAccessToken));
 	}
 	else {
-		
+		CBM(!jsonData["/access_token"_json_pointer].is_null(), "access token is malformed");
+		strAccessToken = jsonData["/access_token"_json_pointer].get<std::string>();
+
+		CR(m_pUserControllerObserver->OnAccessToken(true, strAccessToken))
 	}
 
 Error:

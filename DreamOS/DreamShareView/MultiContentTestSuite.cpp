@@ -697,6 +697,10 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		std::string strRefreshToken;
 		std::string	strAccessToken;
 
+		//TODO: removed from settings(?)
+		std::wstring wstrHardwareId;
+		std::string strHMDType;
+
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
 			RESULT r = R_PASS;
 
@@ -717,6 +721,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			else if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
 				CR(pLoginApp->SetLaunchDate());
+
+				CR(pUserController->RequestSetSettings(wstrHardwareId,
+					strHMDType,
+					pUserApp->GetHeight(),
+					pUserApp->GetDepth(),
+					pUserApp->GetScale()));
 //				CR(pLoginApp->SaveTokens());
 			}
 
@@ -788,6 +798,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 		m_pDreamOS->AddQuad(1.0f, 1.0f);
 
+		pTestContext->wstrHardwareId = m_pDreamOS->GetHardwareID();
+		pTestContext->strHMDType = m_pDreamOS->GetHMDTypeString();
+
 		m_pDreamOS->RegisterDOSObserver(pTestContext);
 		m_pDreamOS->InitializeCloudController();
 		m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext);
@@ -810,7 +823,6 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pLoginApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
 			pTestContext->pSettingsApp = m_pDreamOS->LaunchDreamApp<DreamSettingsApp>(this, false);
 
-			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 
 
 			//pTestContext->pFormApp->GetComposite()->SetVisible(true, false);
@@ -831,6 +843,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			if (!pTestContext->fFirstLogin) {
 				pTestContext->fHasCreds = pTestContext->pLoginApp->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
 				if (pTestContext->fHasCreds) {
+					//TODO: remove when encoding bug is fixed
+					pTestContext->strRefreshToken.pop_back();
 					pTestContext->pUserController->GetAccessToken(pTestContext->strRefreshToken);
 				}
 			}
@@ -853,6 +867,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible() && pTestContext->fFirst) {
+					pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 					pForm->Show();
 				}
 			}

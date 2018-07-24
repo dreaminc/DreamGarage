@@ -193,6 +193,8 @@ public:
 	float GetViewAngle();
 	float GetAnimationDuration();
 	float GetSpacingSize();
+	float GetHeight();
+	float GetDepth();
 	float GetScale();
 	RESULT SetScale(float widthScale);
 
@@ -240,6 +242,8 @@ public:
 		float m_animationDuration = ANIMATION_DURATION_SECONDS;
 
 		float m_scale = 1.0f;
+		float m_height = 0.0f;
+		float m_depth = 0.0f;
 	};
 
 private:
