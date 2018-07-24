@@ -698,6 +698,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		std::string	strAccessToken;
 
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
+			RESULT r = R_PASS;
+
 			if (strMessage == "DreamSettingsApp.OnSuccess") {
 				fFirst = false;
 				std::string strFormType;
@@ -714,10 +716,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			}
 			else if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
-				pLoginApp->SetLaunchDate();
+				CR(pLoginApp->SetLaunchDate());
+//				CR(pLoginApp->SaveTokens());
 			}
 
-			return R_PASS;
+		Error:
+			return r;
 		}
 
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {

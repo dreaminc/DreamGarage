@@ -245,10 +245,13 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 			CR(pCEFBrowserController->HandleDreamFormCancel());
 		}
 		else if (strMethod == "setCredentials") {
-			// TODO:
+			std::string strRefresh = pMessageArguments->GetString(2);
+			std::string strAccess = pMessageArguments->GetString(3);
+			CR(pCEFBrowserController->HandleDreamFormSetCredentials(strRefresh, strAccess));
 		}
 		else if (strMethod == "setEnvironmentId") {
-			// TODO:
+			int environmentId = pMessageArguments->GetInt(2);
+			CR(pCEFBrowserController->HandleDreamFormSetEnvironmentId(environmentId));
 		}
 	}
 	else if (strType == "Browser") {

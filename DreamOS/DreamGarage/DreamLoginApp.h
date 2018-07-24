@@ -28,7 +28,7 @@ public:
 	// main purpose of DreamLoginApp is to handle login-associated form events
 public:
 	RESULT HandleDreamFormSuccess() override;
-	RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override;
+	RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) override;
 	RESULT HandleDreamFormSetEnvironmentId(int environmentId) override;
 
 public:
@@ -44,6 +44,7 @@ public:
 	bool HasStoredCredentials(std::string& strRefreshToken, std::string& strAccessToken);
 
 	RESULT SetLaunchDate(); // always set to now
+	RESULT SaveTokens();
 
 public:
 	std::string m_strSuccess = "DreamLoginApp.OnSuccess";
@@ -56,6 +57,11 @@ public:
 	std::wstring m_wstrAccessToken = L"AccessToken";
 	std::wstring m_wstrLastLogin = L"LastLogin";
 	std::wstring m_wstrEnvironmentId = L"EnvironmentID";
+
+private:
+	std::string m_strRefreshToken;
+	std::string m_strAccessToken;
+	std::string m_strLastEnvironmentId;
 
 protected:
 	static DreamLoginApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
