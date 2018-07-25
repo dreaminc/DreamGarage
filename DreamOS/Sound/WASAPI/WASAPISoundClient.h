@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Sound/WASAPISoundClient.h
+// DreamOS/Sound/WASAPI/WASAPISoundClient.h
 
 #include "Sound/SoundClient.h"
 
@@ -17,6 +17,8 @@
 #include <audiopolicy.h>
 #include <avrt.h>
 #include <functiondiscoverykeys.h>
+
+#include <wrl/client.h>
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
@@ -52,9 +54,9 @@ private:
 
 	// Spatial 
 	IMMDevice *m_pAudioEndpointSpatialDevice = nullptr;
-	ISpatialAudioClient *m_pAudioSpatialClient;
-	ISpatialAudioObjectRenderStreamForHrtf* m_spatialAudioStreamForHrtf;
-	HANDLE m_hSpatialBufferCompletionEvent = nullptr;
+	ISpatialAudioClient *m_pAudioSpatialClient = nullptr;
+	ISpatialAudioObjectRenderStreamForHrtf* m_pSpatialAudioStreamForHrtf = nullptr;
+	HANDLE m_hSpatialBufferEvent = nullptr;
 
 	// Render
 	IMMDevice *m_pAudioEndpointRenderDevice = nullptr;
