@@ -403,8 +403,18 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 
 			// Need to set up the audio object position
 			// TODO: This is super hacky looking code - note that SetPosition is overridden and GetPosition is from VObj
+			static float rotationTheta = 0.0f;
+			
+			point ptPosition = point(0.0f, 0.0f, 4.0f);
+			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, rotationTheta) * ptPosition;
+			vector vEmitterDirection = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vEmitterDirection.Normalize();
+			rotationTheta += 0.01f;
+
+			pSpatialSoundObject->SetPosition(ptPosition);
+
 			CR(pSpatialSoundObject->SetSpatialObjectPosition(pSpatialSoundObject->GetPosition(true)));
-			CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, 1.0f)));
+			CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vEmitterDirection, vector(0.0f, 0.0f, 1.0f)));
 
 			// Let the audio-engine know that the object data are available for processing now
 			CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
@@ -702,7 +712,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	streamParams.ObjectFormat = &format;
 	streamParams.StaticObjectTypeMask = AudioObjectType_None;
 	streamParams.MinDynamicObjectCount = 0;
-	streamParams.MaxDynamicObjectCount = (maxDynamicObjectCount < 4) ? maxDynamicObjectCount : 4;
+	streamParams.MaxDynamicObjectCount = (maxDynamicObjectCount < 20) ? maxDynamicObjectCount : 20;
 	streamParams.Category = AudioCategory_GameEffects;
 	streamParams.EventHandle = m_hSpatialBufferEvent;
 	streamParams.NotifyObject = NULL;
@@ -718,6 +728,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 
 	SpatialAudioHrtfDirectivity directivity;
 	directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cone;
+	//directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_OmniDirectional;
 	directivity.Scaling = 1.0f;
 
 	SpatialAudioHrtfDirectivityCone cone;
@@ -729,7 +740,8 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	directivityUnion.Cone = cone;
 	streamParams.Directivity = &directivityUnion;
 
-	SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Large;
+	//SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Large;
+	SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Outdoors;
 	streamParams.Environment = &environment;
 
 	// identity matrix
