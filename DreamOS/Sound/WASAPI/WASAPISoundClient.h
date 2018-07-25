@@ -48,6 +48,8 @@ private:
 
 	RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
 
+	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition) override;
+
 private:
 	IMMDeviceEnumerator *m_pDeviceEnumerator = nullptr;
 	IAudioSessionManager2* m_pSessionManager = nullptr;

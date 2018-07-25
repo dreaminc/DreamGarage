@@ -360,6 +360,30 @@ Error:
 	return r;
 }
 
+std::shared_ptr<SpatialSoundObject> WASAPISoundClient::MakeSpatialAudioObject(point ptPosition) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
+
+	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
+	CNM(m_pSpatialAudioStreamForHrtf, "Audio Spatial HRTF not initialized");
+
+	pSpatialSoundObject =
+		std::make_shared<WASAPISpatialSoundObject>(ptPosition, m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
+	CNM(pSpatialSoundObject, "Failed to allocate wasapi spatial sound object");
+
+	CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
+
+	return pSpatialSoundObject;
+
+Error:
+	if (pSpatialSoundObject != nullptr) {
+		pSpatialSoundObject = nullptr;
+	}
+
+	return nullptr;
+}
+
 RESULT WASAPISoundClient::AudioSpatialProcess() {
 	RESULT r = R_PASS;
 
@@ -705,6 +729,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	UINT32 maxDynamicObjectCount;
 	CRM((RESULT)m_pAudioSpatialClient->GetMaxDynamicObjectCount(&maxDynamicObjectCount), "Failed to get max dynamic object count");
 	CBM((maxDynamicObjectCount > 0), "Spatial audio doesn't support any dynamic objects");
+	m_maxSpatialSoundObjects = maxDynamicObjectCount;
 
 	// TODO: Move all of this into user etc 
 
@@ -712,7 +737,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	streamParams.ObjectFormat = &format;
 	streamParams.StaticObjectTypeMask = AudioObjectType_None;
 	streamParams.MinDynamicObjectCount = 0;
-	streamParams.MaxDynamicObjectCount = (maxDynamicObjectCount < 20) ? maxDynamicObjectCount : 20;
+	streamParams.MaxDynamicObjectCount = maxDynamicObjectCount;
 	streamParams.Category = AudioCategory_GameEffects;
 	streamParams.EventHandle = m_hSpatialBufferEvent;
 	streamParams.NotifyObject = NULL;
