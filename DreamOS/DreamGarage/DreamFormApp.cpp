@@ -106,8 +106,8 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::SETTINGS) {
 		strType = "FormKey.UsersSettings";
 	}
-	else if (type == FormType::TEAMS_CREATE) {
-		strType = "FormKey.TeamsCreate";
+	else if (type == FormType::TEAMS_MISSING) {
+		strType = "FormKey.TeamsMissing";
 	}
 
 	return strType;
@@ -126,8 +126,8 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	else if (strType == "FormKey.UsersSettings") {
 		type = FormType::SETTINGS;
 	}
-	else if (strType == "FormKey.TeamsCreate") {
-		type = FormType::TEAMS_CREATE;
+	else if (strType == "FormKey.TeamsMissing") {
+		type = FormType::TEAMS_MISSING;
 	}
 
 	return type;

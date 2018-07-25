@@ -29,7 +29,8 @@ class SkyboxScatterProgram;
 
 class DreamGarage : public DreamOS,
 				    public Subscriber<SenseKeyboardEvent>,
-					public Subscriber<SenseTypingEvent>
+					public Subscriber<SenseTypingEvent>,
+					public DOSObserver
 {
 public:
 
@@ -95,6 +96,14 @@ public:
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
+
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId);
+
+
+	// DOS Observer
+	virtual RESULT HandleDOSMessage(std::string& strMessage) override;
 
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);

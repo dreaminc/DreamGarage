@@ -144,3 +144,7 @@ RESULT DreamSettingsApp::Hide() {
 Error:
 	return r;
 }
+
+std::string DreamSettingsApp::GetSuccessString() {
+	return m_strSuccess;
+}

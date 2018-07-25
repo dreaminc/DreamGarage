@@ -709,7 +709,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				std::string strFormType;
 				// this specific case is only when: not first login, has credentials, has no settings, has no team
 				if (!fFirstLogin && fHasCreds) {
-					strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+					strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
 					pUserController->GetFormURL(strFormType);
 				}
 				else if (fFirstLogin) {
@@ -780,7 +780,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			// the behavior of sign in, sign up, and teams create should be executed the same
 			// way with regards to the functions that they use
 			// TODO: potentially, the teams form will do other stuff later
-			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_CREATE) {
+			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
 				pLoginApp->GetComposite()->SetVisible(true, false);
 				CR(pLoginApp->UpdateWithNewForm(strURL));
 				CR(pLoginApp->Show());
@@ -812,7 +812,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 			if (!fSuccess) {
 				// need to create a team, since the user has no teams
-				std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+				std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
 				CR(pUserController->GetFormURL(strFormType));
 			}
 			else {

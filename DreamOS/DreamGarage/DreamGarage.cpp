@@ -20,6 +20,7 @@ light *g_pLight = nullptr;
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
+#include "DreamGarage/DreamLoginApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -1003,13 +1004,55 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+	//TODO: populate these
+	bool fFirstLogin = true;
+	bool fHasCreds = false;
+
+	if (strMessage == "DreamSettingsApp.OnSuccess") {
+		std::string strFormType;
+		// this specific case is only when: not first login, has credentials, has no settings, has no team
+		if (!fFirstLogin && fHasCreds) {
+			//strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+			//pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+		else if (fFirstLogin) {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+			//pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+		else {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+			//pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+	}
+	else if (strMessage == "DreamLoginApp.OnSuccess") {
+		// TODO:
+		CR(m_pDreamLoginApp->SetLaunchDate());
+//		CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
+	RESULT r = R_PASS;
 
-	m_pDreamUserApp->UpdateHeight(height);
-	m_pDreamUserApp->UpdateDepth(depth);
-	m_pDreamUserApp->UpdateScale(scale);
+	CR(m_pDreamUserApp->UpdateHeight(height));
+	CR(m_pDreamUserApp->UpdateDepth(depth));
+	CR(m_pDreamUserApp->UpdateScale(scale));
 
-	return R_PASS;
+	//TODO: needs different route.  environment socket path does not need to get team
+
+	//pUserController->GetTeam(pLoginApp->GetAccessToken());
+
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnSetSettings() {
@@ -1033,6 +1076,46 @@ RESULT DreamGarage::OnLogout() {
 	return R_PASS;
 }
 
+RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	FormType type = DreamFormApp::TypeFromString(strKey);
+
+	if (type == FormType::SETTINGS) {
+	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
+		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
+		CR(m_pDreamSettings->Show());
+	}
+	// the behavior of sign in, sign up, and teams create should be executed the same
+	// way with regards to the functions that they use
+	// TODO: potentially, the teams form will do other stuff later
+	else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
+	//	m_pDreamLoginApp->GetComposite()->SetVisible(true, false);
+		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
+		CR(m_pDreamLoginApp->Show());
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	if (!fSuccess) {
+		CR(m_pDreamLoginApp->ClearTokens());
+	}
+	else {
+	//	pLoginApp->Set
+	//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
+		CR(m_pDreamLoginApp->SetAccessToken(strAccessToken));
+	//	CR(pUserController->GetSettings(strAccessToken));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::OnShareAsset() {
 	RESULT r = R_PASS;
 
@@ -1042,6 +1125,22 @@ RESULT DreamGarage::OnShareAsset() {
 	CR(m_pDreamShareView->ShowCastingTexture());
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
+	RESULT r = R_PASS;
+
+	if (!fSuccess) {
+		// need to create a team, since the user has no teams
+		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+		//CR(pUserController->GetFormURL(strFormType));
+	}
+	else {
+		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
+	}
 
 Error:
 	return r;

@@ -213,3 +213,7 @@ RESULT DreamLoginApp::ClearTokens() {
 Error:
 	return r;
 }
+
+std::string DreamLoginApp::GetSuccessString() {
+	return m_strSuccess;
+}

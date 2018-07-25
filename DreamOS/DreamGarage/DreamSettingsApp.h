@@ -37,6 +37,9 @@ public:
 	RESULT Hide();
 
 public:
+	std::string GetSuccessString();
+
+public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 private:
