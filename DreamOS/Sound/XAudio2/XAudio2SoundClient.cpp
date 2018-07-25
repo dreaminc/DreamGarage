@@ -2,6 +2,9 @@
 
 #include <string>
 
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+
 XAudio2SoundClient::XAudio2SoundClient() {
 	// empty
 }
@@ -35,4 +38,9 @@ RESULT XAudio2SoundClient::Initialize() {
 
 //Error:
 	return R_NOT_IMPLEMENTED;
+}
+
+// TODO:
+std::shared_ptr<SpatialSoundObject> XAudio2SoundClient::MakeSpatialAudioObject(point ptPosition) {
+	return nullptr;
 }

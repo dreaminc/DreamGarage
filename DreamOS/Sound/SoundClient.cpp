@@ -1,6 +1,8 @@
 #include "SoundClient.h"
 
 #include "SoundFile.h"
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
 
 SoundClient::SoundClient() {
 	// empty
@@ -238,4 +240,45 @@ Error:
 		pFloatAudioBuffer = nullptr;
 	}
 	return r;
+}
+
+// Spatial Sound Objects
+std::shared_ptr<SpatialSoundObject> SoundClient::AddSpatialSoundObject(point ptPosition) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<SpatialSoundObject>	pSpatialSoundObject = nullptr;
+
+	CBM((m_spatialSoundObjects.size() < m_maxSpatialSoundObjects), "Cannot add another spatial audio object");
+
+	pSpatialSoundObject = MakeSpatialAudioObject(ptPosition);
+	CNM(pSpatialSoundObject, "Failed to create spatial sound object");
+
+	// Add to our storage
+
+	m_spatialSoundObjects.push_back(pSpatialSoundObject);
+
+	return pSpatialSoundObject;
+
+Error:
+	if (pSpatialSoundObject != nullptr) {
+		pSpatialSoundObject = nullptr;
+	}
+
+	return nullptr;
+}
+
+bool SoundClient::FindSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject) {
+	auto it = std::find(m_spatialSoundObjects.begin(), m_spatialSoundObjects.end(), pSpatialSoundObject);
+	
+	if (it == m_spatialSoundObjects.end()) 
+		return false;
+	else 
+		return true;
+}
+
+RESULT SoundClient::ClearSpatialSoundObjects() {
+	
+	m_spatialSoundObjects.clear();
+
+	return R_PASS;
 }
