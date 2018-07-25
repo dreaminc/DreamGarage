@@ -2,6 +2,8 @@
 
 #include <string>
 
+// TODO: This should get moved up to SoundClient
+#include "WASAPISpatialSoundObject.h"
 
 // File specific utilities
 template <class T> RESULT SafeRelease(T **ppT) {
@@ -26,6 +28,8 @@ WASAPISoundClient::~WASAPISoundClient() {
 	SafeRelease<IMMDeviceEnumerator>(&m_pDeviceEnumerator);
 	SafeRelease<IMMDevice>(&m_pAudioEndpointRenderDevice);
 	SafeRelease<IAudioClient>(&m_pAudioRenderClient);
+	
+	// TODO: Release spatial shits
 }
 
 RESULT WASAPISoundClient::EnumerateWASAPISessions() {
@@ -230,23 +234,6 @@ const char* GetAudioClientErrorCodeString(HRESULT hr) {
 	return "Non-handled HR value";
 }
 
-RESULT WASAPISoundClient::AudioSpatialProcess() {
-	RESULT r = R_PASS;
-
-	DWORD audioDeviceFlags = 0;
-
-	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Start");
-
-	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
-
-	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
-		// do stuff
-	}
-
-Error:
-	return r;
-}
-
 RESULT WASAPISoundClient::AudioCaptureProcess() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
@@ -368,6 +355,69 @@ Error:
 
 	if (pCaptureClient != nullptr) {
 		SafeRelease<IAudioCaptureClient>(&pCaptureClient);
+	}
+
+	return r;
+}
+
+RESULT WASAPISoundClient::AudioSpatialProcess() {
+	RESULT r = R_PASS;
+
+	DWORD audioDeviceFlags = 0;
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Start");
+
+	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
+	CNM(m_pSpatialAudioStreamForHrtf, "Audio Spatial HRTF not initialized");
+
+	CRM((RESULT)m_pSpatialAudioStreamForHrtf->Start(), "Failed to start spatial audio HRTF stream");
+
+	
+	{
+		// Temp shit
+		auto pSpatialSoundObject =
+			std::make_shared<WASAPISpatialSoundObject>(point(0.0f, 0.0f, 1.0f), m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
+		CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
+
+		while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+
+			// Wait for next buffer event to be signaled.
+			DWORD retval = WaitForSingleObject(m_hSpatialBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
+
+			// Event handle timed out after the default time out
+			if (retval != WAIT_OBJECT_0) {
+				//m_pAudioSpatialClient->Stop();
+				CRM((RESULT)(ERROR_TIMEOUT), "Spatial audio thread is hung and exited");
+			}
+
+			UINT32 availableDynamicObjectCount;
+			UINT32 frameCount;
+
+			// Begin the process of sending object data and metadata
+			// Get the number of active objects that can be used to send object-data
+			// Get the frame count that each buffer will be filled with 
+			CRM((RESULT)m_pSpatialAudioStreamForHrtf->BeginUpdatingAudioObjects(&availableDynamicObjectCount, &frameCount),
+				"Failed to begin updating audio objects");
+
+			// implied 48K sampling, 440 hz freq
+			pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);
+
+			pSpatialSoundObject->SetSpatialSoundObjectOrientation(vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, 1.0f));
+
+			// Let the audio-engine know that the object data are available for processing now
+			CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
+		}
+	}
+
+	//CRM((RESULT)m_pAudioSpatialClient->Stop(), "Failed to stop audio spatial client");
+
+Error:
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Finish");
+
+	if (m_hSpatialBufferEvent != nullptr) {
+		CloseHandle(m_hSpatialBufferEvent);
+		m_hSpatialBufferEvent = nullptr;
 	}
 
 	return r;
@@ -600,8 +650,6 @@ Error:
 	return r;
 }
 
-#include <wrl/client.h>
-
 RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	RESULT r = R_PASS;
 
@@ -633,13 +681,13 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&format)), "Audio format not supported");
 	
 	// This doesn't actually work...
-	CRM((RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_spatialAudioStreamForHrtf), NULL),
+	CRM((RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_pSpatialAudioStreamForHrtf), NULL),
 		"Spatial audio stream not available");
 
 
 	// Create the event that will be used to signal the client for more data
-	m_hSpatialBufferCompletionEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	CN(m_hSpatialBufferCompletionEvent);
+	m_hSpatialBufferEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	CN(m_hSpatialBufferEvent);
 
 
 	UINT32 maxDynamicObjectCount;
@@ -654,7 +702,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	streamParams.MinDynamicObjectCount = 0;
 	streamParams.MaxDynamicObjectCount = (maxDynamicObjectCount < 4) ? maxDynamicObjectCount : 4;
 	streamParams.Category = AudioCategory_GameEffects;
-	streamParams.EventHandle = m_hSpatialBufferCompletionEvent;
+	streamParams.EventHandle = m_hSpatialBufferEvent;
 	streamParams.NotifyObject = NULL;
 
 	SpatialAudioHrtfDistanceDecay decayModel;
@@ -694,7 +742,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	pv.blob.cbSize = sizeof(streamParams);
 	pv.blob.pBlobData = (BYTE*)&streamParams;
 
-	CRM((RESULT)m_pAudioSpatialClient->ActivateSpatialAudioStream(&pv, __uuidof(m_spatialAudioStreamForHrtf), (void**)&m_spatialAudioStreamForHrtf),
+	CRM((RESULT)m_pAudioSpatialClient->ActivateSpatialAudioStream(&pv, __uuidof(m_pSpatialAudioStreamForHrtf), (void**)&m_pSpatialAudioStreamForHrtf),
 			"Failed to activate spatial audio stream");
 
 

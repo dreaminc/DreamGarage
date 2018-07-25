@@ -922,6 +922,12 @@
     <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp">
       <Filter>Sound\XAudio2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SpatialSoundObject.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp">
+      <Filter>Sound\WASAPI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2025,6 +2031,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h">
       <Filter>Sound\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SpatialSoundObject.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h">
+      <Filter>Sound\WASAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
