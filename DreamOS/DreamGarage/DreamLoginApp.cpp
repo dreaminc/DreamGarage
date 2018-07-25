@@ -31,12 +31,31 @@ RESULT DreamLoginApp::HandleDreamFormSuccess() {
 Error:
 	return r;
 }
-RESULT DreamLoginApp::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) {
-	return R_PASS;
+
+RESULT DreamLoginApp::HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
+
+	RESULT r = R_PASS;
+
+	m_strRefreshToken = strRefreshToken;
+	m_strAccessToken = strAccessToken;
+
+	CR(SetCredential(CREDENTIAL_REFRESH_TOKEN, strRefreshToken));
+
+Error:
+	return r;
 }
 
 RESULT DreamLoginApp::HandleDreamFormSetEnvironmentId(int environmentId) {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	m_strLastEnvironmentId = std::to_string(environmentId);
+
+	//TODO: once everything else works, shouldn't need to save this anymore
+	// (along with access token)
+	//CR(SetCredential(CREDENTIAL_LAST_ENVIRONMENT, m_strLastEnvironmentId));
+
+//Error:
+	return r;
 }
 
 CredentialManager::type DreamLoginApp::GetCredentialManagerType(CredentialType type) {
@@ -106,6 +125,15 @@ Error:
 	return r;
 }
 
+RESULT DreamLoginApp::ClearCredential(CredentialType type) {
+	RESULT r = R_PASS;
+
+	CR(GetDOS()->RemoveCredential(GetCredentialManagerString(type), GetCredentialManagerType(type)));
+
+Error:
+	return r;
+}
+
 bool DreamLoginApp::IsFirstLaunch() {
 
 	RESULT r = R_PASS;
@@ -123,7 +151,7 @@ bool DreamLoginApp::HasStoredCredentials(std::string& strRefreshToken, std::stri
 	RESULT r = R_PASS;
 
 	CR(GetCredential(CREDENTIAL_REFRESH_TOKEN, strRefreshToken));
-	CR(GetCredential(CREDENTIAL_ACCESS_TOKEN, strAccessToken));
+	//CR(GetCredential(CREDENTIAL_ACCESS_TOKEN, strAccessToken));
 
 	return true;
 Error:
@@ -143,6 +171,44 @@ RESULT DreamLoginApp::SetLaunchDate() {
 	std::string strCurrentTime = std::to_string(std::chrono::duration_cast<std::chrono::seconds>(currentTime.time_since_epoch()).count());
 
 	CR(SetCredential(CREDENTIAL_LAST_LOGIN, strCurrentTime));
+
+Error:
+	return r;
+}
+
+std::string& DreamLoginApp::GetAccessToken() {
+	return m_strAccessToken;
+}
+
+RESULT DreamLoginApp::SetAccessToken(std::string strAccessToken) {
+	RESULT r = R_PASS;
+
+	// update with new access token
+	m_strAccessToken = strAccessToken;
+
+//Error:
+	return r;
+}
+
+RESULT DreamLoginApp::SaveTokens() {
+	RESULT r = R_PASS;
+
+	// probably don't need to save access token, because the app should always try to get a new one
+	// with the saved refresh token
+	CR(SetCredential(CREDENTIAL_REFRESH_TOKEN, m_strRefreshToken));
+
+Error:
+	return r;
+}
+
+RESULT DreamLoginApp::ClearTokens() {
+	RESULT r = R_PASS;
+
+	m_strRefreshToken = "";
+	m_strAccessToken = "";
+
+	CR(ClearCredential(CREDENTIAL_REFRESH_TOKEN));
+//	CR(ClearCredential(CREDENTIAL_ACCESS_TOKEN));
 
 Error:
 	return r;

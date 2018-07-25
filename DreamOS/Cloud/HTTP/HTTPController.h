@@ -76,6 +76,10 @@ public:
 		return { "Content-Type: application/json", "Accept: application/json; version=1.0" };
 	}
 
+	static const std::string AuthorizationHeader(std::string& strAccessToken) {
+		return "Authorization: Bearer " + strAccessToken;
+	}
+
 public:
 	HTTPControllerProxy* GetHTTPControllerProxy();
 

@@ -697,11 +697,22 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		std::string strRefreshToken;
 		std::string	strAccessToken;
 
+		//TODO: removed from settings(?)
+		std::wstring wstrHardwareId;
+		std::string strHMDType;
+
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
+			RESULT r = R_PASS;
+
 			if (strMessage == "DreamSettingsApp.OnSuccess") {
 				fFirst = false;
 				std::string strFormType;
-				if (fFirstLogin) {
+				// this specific case is only when: not first login, has credentials, has no settings, has no team
+				if (!fFirstLogin && fHasCreds) {
+					strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+					pUserController->GetFormURL(strFormType);
+				}
+				else if (fFirstLogin) {
 					strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
 					pUserController->GetFormURL(strFormType);
 					pLoginApp->Show();
@@ -714,14 +725,35 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			}
 			else if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
-				pLoginApp->SetLaunchDate();
+				CR(pLoginApp->SetLaunchDate());
+				CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
+
+				/*
+				CR(pUserController->RequestSetSettings(wstrHardwareId,
+					strHMDType,
+					pUserApp->GetHeight(),
+					pUserApp->GetDepth(),
+					pUserApp->GetScale()));
+					//*/
+//				CR(pLoginApp->SaveTokens());
 			}
 
-			return R_PASS;
+		Error:
+			return r;
 		}
 
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
-			return R_PASS;
+			RESULT r = R_PASS;
+
+			CR(pUserApp->UpdateHeight(height));
+			CR(pUserApp->UpdateDepth(depth));
+			CR(pUserApp->UpdateScale(scale));
+
+			// get team 
+			pUserController->GetTeam(pLoginApp->GetAccessToken());
+			
+		Error:
+			return r;
 		}
 		virtual RESULT OnSetSettings() override {
 			return R_PASS;
@@ -745,10 +777,46 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				CR(pSettingsApp->UpdateWithNewForm(strURL));
 				CR(pSettingsApp->Show());
 			}
-			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP) {
+			// the behavior of sign in, sign up, and teams create should be executed the same
+			// way with regards to the functions that they use
+			// TODO: potentially, the teams form will do other stuff later
+			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_CREATE) {
 				pLoginApp->GetComposite()->SetVisible(true, false);
 				CR(pLoginApp->UpdateWithNewForm(strURL));
 				CR(pLoginApp->Show());
+			}
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			if (!fSuccess) {
+				pLoginApp->ClearTokens();
+			}
+			else {
+			//	pLoginApp->Set
+			//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
+				CR(pLoginApp->SetAccessToken(strAccessToken));
+				CR(pUserController->GetSettings(strAccessToken));
+			}
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) {
+			RESULT r = R_PASS;
+
+			if (!fSuccess) {
+				// need to create a team, since the user has no teams
+				std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+				CR(pUserController->GetFormURL(strFormType));
+			}
+			else {
+				CR(pLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 			}
 
 		Error:
@@ -770,6 +838,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 		m_pDreamOS->AddQuad(1.0f, 1.0f);
+
+		pTestContext->wstrHardwareId = m_pDreamOS->GetHardwareID();
+		pTestContext->strHMDType = m_pDreamOS->GetHMDTypeString();
 
 		m_pDreamOS->RegisterDOSObserver(pTestContext);
 		m_pDreamOS->InitializeCloudController();
@@ -793,7 +864,6 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->pLoginApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
 			pTestContext->pSettingsApp = m_pDreamOS->LaunchDreamApp<DreamSettingsApp>(this, false);
 
-			pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 
 
 			//pTestContext->pFormApp->GetComposite()->SetVisible(true, false);
@@ -813,6 +883,11 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			pTestContext->fFirstLogin = pTestContext->pLoginApp->IsFirstLaunch();
 			if (!pTestContext->fFirstLogin) {
 				pTestContext->fHasCreds = pTestContext->pLoginApp->HasStoredCredentials(pTestContext->strRefreshToken, pTestContext->strAccessToken);
+				if (pTestContext->fHasCreds) {
+					//TODO: remove when encoding bug is fixed
+					pTestContext->strRefreshToken.pop_back();
+					pTestContext->pUserController->GetAccessToken(pTestContext->strRefreshToken);
+				}
 			}
 
 
@@ -833,6 +908,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 
 				if (!pForm->m_pFormView->GetViewQuad()->IsVisible() && pTestContext->fFirst) {
+					pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, -0.2f, -0.5f));
 					pForm->Show();
 				}
 			}
@@ -1166,6 +1242,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
 			return R_NOT_IMPLEMENTED;
 		}
 

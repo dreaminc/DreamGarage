@@ -100,6 +100,8 @@ public:
 		virtual RESULT OnLogout() = 0;
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) = 0;
 	};
 
 	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
@@ -205,6 +207,9 @@ public:
 	virtual RESULT OnLogout() override;
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override;
+
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

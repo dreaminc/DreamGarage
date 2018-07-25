@@ -840,6 +840,14 @@ float DreamUserApp::GetAnimationDuration() {
 	return m_userSettings->m_animationDuration;
 }
 
+float DreamUserApp::GetHeight() {
+	return m_userSettings->m_height;
+}
+
+float DreamUserApp::GetDepth() {
+	return m_userSettings->m_depth;
+}
+
 float DreamUserApp::GetScale() {
 	return m_userSettings->m_scale;
 }
@@ -861,6 +869,9 @@ RESULT DreamUserApp::UpdateHeight(float heightDiff) {
 
 	point ptComposite = GetComposite()->GetPosition();
 	ptComposite += point(0.0f, heightDiff, 0.0f);
+
+	m_userSettings->m_height += heightDiff;
+
 	GetComposite()->SetPosition(ptComposite);
 
 	return R_PASS;
@@ -875,6 +886,8 @@ RESULT DreamUserApp::UpdateDepth(float depthDiff) {
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 	vector vDiff = depthDiff * vAppLookXZ;
+
+	m_userSettings->m_depth += depthDiff;
 
 	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
 
