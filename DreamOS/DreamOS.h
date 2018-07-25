@@ -194,6 +194,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// DreamPeer Observer
 	virtual RESULT OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) override;
 

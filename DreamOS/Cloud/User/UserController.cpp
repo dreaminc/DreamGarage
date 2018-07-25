@@ -77,13 +77,13 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		} break;
 		
 		//TODO: get and set settings need to be confirmed with doug
-		case UserMethod::GET_SETTINGS: {
+		case UserMethod::SETTINGS: {
 			strURI = strAPIURL + "/users/settings";
 		} break;
 
-		case UserMethod::SET_SETTINGS: {
-			strURI = strAPIURL + "/users/settings";
-		} break;
+		case UserMethod::TEAMS: {
+			strURI = strAPIURL + "/teams/";
+		}
 	}
 
 	return strURI;
@@ -456,13 +456,11 @@ RESULT UserController::GetSettings(std::string& strAccessToken) {
 
 	HTTPResponse httpResponse;
 
-	std::string strURI = GetMethodURI(UserMethod::GET_SETTINGS);
+	std::string strURI = GetMethodURI(UserMethod::SETTINGS);
 
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
-
-	std::string strAuthHeader = "Authorization: Bearer " + strAccessToken;
-	headers.emplace_back(strAuthHeader);
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
 
 	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetApiSettings, this, std::placeholders::_1)));
 
@@ -470,7 +468,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
+void UserController::OnGetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -499,26 +497,87 @@ RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
 	CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
 
 Error:
-	return r;
+	return;
 }
 
-RESULT UserController::SetSettings(std::string& strAccessToken) {
+RESULT UserController::SetSettings(std::string& strAccessToken, float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
 
-	std::string strURI = GetMethodURI(UserMethod::SET_SETTINGS);
+	std::string strURI = GetMethodURI(UserMethod::SETTINGS);
 
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
 
+	nlohmann::json jsonSettings = nlohmann::json::object();
+	jsonSettings["user_settings"] = nlohmann::json::object();
+	jsonSettings["user_settings"]["ui_offset_y"] = height;
+	jsonSettings["user_settings"]["ui_offset_z"] = depth;
+	jsonSettings["user_settings"]["ui_scale"] = scale;
+
+	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnAccessToken, this, std::placeholders::_1)));
+
+Error:
 	return r;
 }
 
-RESULT UserController::OnSetApiSettings(std::string&& strResponse) {
+void UserController::OnSetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	CR(m_pUserControllerObserver->OnSetSettings());
+
+Error:
+	return;
+}
+
+RESULT UserController::GetTeam(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::TEAMS);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetTeam, this, std::placeholders::_1)));
+
+Error:
 	return r;
+}
+
+void UserController::OnGetTeam(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200 || statusCode == 404);
+
+	if (statusCode == 404) {
+		m_pUserControllerObserver->OnGetTeam(false, -1);
+	}
+	else {
+		nlohmann::json jsonTeam = jsonData["/team"_json_pointer];
+		//Currently, only the default environment is needed here	
+		int environmentId = jsonTeam["/default_environment"_json_pointer].get<int>();
+		m_pUserControllerObserver->OnGetTeam(true, environmentId);
+	}
+	
+Error:
+	return;
 }
 
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {

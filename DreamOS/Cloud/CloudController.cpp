@@ -521,6 +521,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnGetTeam(bool fSuccess, int environmentId) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnGetTeam(fSuccess, environmentId));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 

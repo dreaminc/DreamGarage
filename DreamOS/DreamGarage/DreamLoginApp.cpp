@@ -50,9 +50,11 @@ RESULT DreamLoginApp::HandleDreamFormSetEnvironmentId(int environmentId) {
 
 	m_strLastEnvironmentId = std::to_string(environmentId);
 
-	CR(SetCredential(CREDENTIAL_LAST_ENVIRONMENT, m_strLastEnvironmentId));
+	//TODO: once everything else works, shouldn't need to save this anymore
+	// (along with access token)
+	//CR(SetCredential(CREDENTIAL_LAST_ENVIRONMENT, m_strLastEnvironmentId));
 
-Error:
+//Error:
 	return r;
 }
 
@@ -172,6 +174,10 @@ RESULT DreamLoginApp::SetLaunchDate() {
 
 Error:
 	return r;
+}
+
+std::string& DreamLoginApp::GetAccessToken() {
+	return m_strAccessToken;
 }
 
 RESULT DreamLoginApp::SetAccessToken(std::string strAccessToken) {

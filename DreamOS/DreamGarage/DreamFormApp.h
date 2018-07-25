@@ -13,6 +13,7 @@ enum class FormType {
 	SIGN_IN,
 	SIGN_UP,
 	SETTINGS,
+	TEAMS_CREATE,
 	DEFAULT,
 	INVALID
 };

@@ -707,7 +707,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			if (strMessage == "DreamSettingsApp.OnSuccess") {
 				fFirst = false;
 				std::string strFormType;
-				if (fFirstLogin) {
+				// this specific case is only when: not first login, has credentials, has no settings, has no team
+				if (!fFirstLogin && fHasCreds) {
+					strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+					pUserController->GetFormURL(strFormType);
+				}
+				else if (fFirstLogin) {
 					strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
 					pUserController->GetFormURL(strFormType);
 					pLoginApp->Show();
@@ -721,6 +726,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			else if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
 				CR(pLoginApp->SetLaunchDate());
+				CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
 
 				/*
 				CR(pUserController->RequestSetSettings(wstrHardwareId,
@@ -737,12 +743,17 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		}
 
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			RESULT r = R_PASS;
 
-			pUserApp->UpdateHeight(height);
-			pUserApp->UpdateDepth(depth);
-			pUserApp->UpdateScale(scale);
+			CR(pUserApp->UpdateHeight(height));
+			CR(pUserApp->UpdateDepth(depth));
+			CR(pUserApp->UpdateScale(scale));
 
-			return R_PASS;
+			// get team 
+			pUserController->GetTeam(pLoginApp->GetAccessToken());
+			
+		Error:
+			return r;
 		}
 		virtual RESULT OnSetSettings() override {
 			return R_PASS;
@@ -766,7 +777,10 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				CR(pSettingsApp->UpdateWithNewForm(strURL));
 				CR(pSettingsApp->Show());
 			}
-			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP) {
+			// the behavior of sign in, sign up, and teams create should be executed the same
+			// way with regards to the functions that they use
+			// TODO: potentially, the teams form will do other stuff later
+			else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_CREATE) {
 				pLoginApp->GetComposite()->SetVisible(true, false);
 				CR(pLoginApp->UpdateWithNewForm(strURL));
 				CR(pLoginApp->Show());
@@ -787,6 +801,22 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
 				CR(pLoginApp->SetAccessToken(strAccessToken));
 				CR(pUserController->GetSettings(strAccessToken));
+			}
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) {
+			RESULT r = R_PASS;
+
+			if (!fSuccess) {
+				// need to create a team, since the user has no teams
+				std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_CREATE);
+				CR(pUserController->GetFormURL(strFormType));
+			}
+			else {
+				CR(pLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 			}
 
 		Error:
@@ -1216,6 +1246,10 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
 			return R_NOT_IMPLEMENTED;
 		}
 

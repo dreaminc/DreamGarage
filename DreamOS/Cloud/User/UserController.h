@@ -42,8 +42,8 @@ public:
 		// new
 		GET_FORM,
 		GET_ACCESS_TOKEN,
-		GET_SETTINGS,
-		SET_SETTINGS,
+		SETTINGS,
+		TEAMS,
 		INVALID
 	};
 
@@ -111,10 +111,13 @@ public:
 	void OnAccessToken(std::string&& strResponse);
 
 	RESULT GetSettings(std::string& strAccessToken);
-	RESULT OnGetApiSettings(std::string&& strResponse);
+	void OnGetApiSettings(std::string&& strResponse);
 
-	RESULT SetSettings(std::string& strAccessToken);
-	RESULT OnSetApiSettings(std::string&& strResponse);
+	RESULT SetSettings(std::string& strAccessToken, float height, float depth, float scale);
+	void OnSetApiSettings(std::string&& strResponse);
+
+	RESULT GetTeam(std::string& strAccessToken);
+	void OnGetTeam(std::string&& strResponse);
 
 // basic http error handling
 private:
@@ -132,6 +135,7 @@ public:
 		// api methods
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);
