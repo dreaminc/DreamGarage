@@ -45,6 +45,7 @@ public:
 	bool HasStoredCredentials(std::string& strRefreshToken, std::string& strAccessToken);
 
 	RESULT SetLaunchDate(); // always set to now
+	RESULT SetAccessToken(std::string strAccessToken);
 	RESULT SaveTokens();
 	RESULT ClearTokens();
 

@@ -722,11 +722,13 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				// TODO:
 				CR(pLoginApp->SetLaunchDate());
 
+				/*
 				CR(pUserController->RequestSetSettings(wstrHardwareId,
 					strHMDType,
 					pUserApp->GetHeight(),
 					pUserApp->GetDepth(),
 					pUserApp->GetScale()));
+					//*/
 //				CR(pLoginApp->SaveTokens());
 			}
 
@@ -735,6 +737,11 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		}
 
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+
+			pUserApp->UpdateHeight(height);
+			pUserApp->UpdateDepth(depth);
+			pUserApp->UpdateScale(scale);
+
 			return R_PASS;
 		}
 		virtual RESULT OnSetSettings() override {
@@ -776,10 +783,14 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				pLoginApp->ClearTokens();
 			}
 			else {
-			//	pLoginApp->
+			//	pLoginApp->Set
+			//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
+				CR(pLoginApp->SetAccessToken(strAccessToken));
+				CR(pUserController->GetSettings(strAccessToken));
 			}
 
-			return R_PASS;
+		Error:
+			return r;
 		}
 
 	} *pTestContext = new TestContext();

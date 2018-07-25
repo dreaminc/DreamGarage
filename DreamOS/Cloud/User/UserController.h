@@ -110,9 +110,15 @@ public:
 	RESULT GetAccessToken(std::string& strRefreshToken);
 	void OnAccessToken(std::string&& strResponse);
 
+	RESULT GetSettings(std::string& strAccessToken);
+	RESULT OnGetApiSettings(std::string&& strResponse);
+
+	RESULT SetSettings(std::string& strAccessToken);
+	RESULT OnSetApiSettings(std::string&& strResponse);
+
 // basic http error handling
 private:
-	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse);
+	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode);
 
 public:
 	class UserControllerObserver {

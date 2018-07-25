@@ -174,6 +174,16 @@ Error:
 	return r;
 }
 
+RESULT DreamLoginApp::SetAccessToken(std::string strAccessToken) {
+	RESULT r = R_PASS;
+
+	// update with new access token
+	m_strAccessToken = strAccessToken;
+
+//Error:
+	return r;
+}
+
 RESULT DreamLoginApp::SaveTokens() {
 	RESULT r = R_PASS;
 

@@ -78,11 +78,11 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		
 		//TODO: get and set settings need to be confirmed with doug
 		case UserMethod::GET_SETTINGS: {
-			strURI = strAPIURL + "/users/get_settings";
+			strURI = strAPIURL + "/users/settings";
 		} break;
 
 		case UserMethod::SET_SETTINGS: {
-			strURI = strAPIURL + "/users/set_settings";
+			strURI = strAPIURL + "/users/settings";
 		} break;
 	}
 
@@ -378,10 +378,11 @@ void UserController::OnFormURL(std::string&& strResponse) {
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
 	nlohmann::json jsonData;
 	nlohmann::json jsonForm;
-
+	int statusCode;
 
 	//TODO: these function are void instead of RESULT
-	CR(GetResponseData(jsonData, jsonResponse));
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
 
 	CBM(!jsonData["/form"_json_pointer].is_null(), "form object is malformed");
 
@@ -425,18 +426,23 @@ void UserController::OnAccessToken(std::string&& strResponse) {
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
 	nlohmann::json jsonData;
+	nlohmann::json jsonAccessTokenObject;
 	std::string strAccessToken;
+	int statusCode;
 
-	CR(GetResponseData(jsonData, jsonResponse));
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
 
 	// if the json data is null we know that we got an expected error in GetResponseData
 	// right now, that is only a 401 bad access
-	if (jsonData.is_null()) {
+	if (statusCode == 401) {
 		CR(m_pUserControllerObserver->OnAccessToken(false, strAccessToken));
 	}
-	else {
-		CBM(!jsonData["/access_token"_json_pointer].is_null(), "access token is malformed");
-		strAccessToken = jsonData["/access_token"_json_pointer].get<std::string>();
+	else if (statusCode == 200) {
+		CBM(!jsonData["/access_token"_json_pointer].is_null(), "access token object is malformed");
+		jsonAccessTokenObject = jsonData["/access_token"_json_pointer];
+		CBM(!jsonAccessTokenObject["/token"_json_pointer].is_null(), "access token is malformed");
+			
+		strAccessToken = jsonAccessTokenObject["/token"_json_pointer].get<std::string>();
 
 		CR(m_pUserControllerObserver->OnAccessToken(true, strAccessToken))
 	}
@@ -445,13 +451,82 @@ Error:
 	return;
 }
 
-RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse) {
+RESULT UserController::GetSettings(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::GET_SETTINGS);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	std::string strAuthHeader = "Authorization: Bearer " + strAccessToken;
+	headers.emplace_back(strAuthHeader);
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetApiSettings, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	float height;
+	float depth;
+	float scale;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+
+	if (statusCode == 404) {
+		//TODO: it isn't right to have this code here
+		std::string strSettingsFormKey = "FormKey.UserSettings";
+		GetFormURL(strSettingsFormKey);
+	}
+	//TODO: combine with the json rpc response
+	else if (statusCode == 200) {
+		nlohmann::json jsonSettings = jsonData["/user_settings"_json_pointer];
+		height = jsonSettings["ui_offset_y"].get<float>();
+		depth = jsonSettings["ui_offset_z"].get<float>();
+		scale = jsonSettings["ui_scale"].get<float>();
+	}
+
+	CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
+
+Error:
+	return r;
+}
+
+RESULT UserController::SetSettings(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::SET_SETTINGS);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	return r;
+}
+
+RESULT UserController::OnSetApiSettings(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	return r;
+}
+
+RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {
 	RESULT r = R_PASS;
 
 	//{"errors":[],"meta":{"status_code":200},"data":{
 	//"form":{"key":"FormKey.UsersSettings","title":"Settings","url":"https://www.develop.dreamos.com/forms/users/settings"}}}
 	nlohmann::json jsonMeta;
-	int statusCode = -1;
 	
 	CBM(!jsonResponse.is_null(), "HTTP json response is null");
 
@@ -465,20 +540,11 @@ RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json 
 
 	//TODO: more advanced handling of different codes
 	//TODO: extract message out of errors list
-	CBM(statusCode == 200 || statusCode == 401, "website returned unhandled status code: %d", statusCode);
+	//CBM(statusCode == 200 || statusCode == 401, "website returned unhandled status code: %d", statusCode);
 	
-	if (statusCode == 200) {
-		CBM(!jsonResponse["/data"_json_pointer].is_null(), "HTTP json data is malformed");
+	jsonData = jsonResponse["/data"_json_pointer];
 
-		jsonData = jsonResponse["/data"_json_pointer];
-
-		//	jsonResponse["/errors"_json_pointer][0];
-
-	}
-	else if (statusCode == 401) {
-		
-		jsonData = jsonResponse["/data"_json_pointer];
-	}
+	//	jsonResponse["/errors"_json_pointer][0];
 
 Error:
 	return r;
@@ -640,8 +706,8 @@ RESULT UserController::RequestGetSettings(std::wstring wstrHardwareID, std::stri
 
 	jsonPayload["user_settings"] = nlohmann::json::object();
 	jsonPayload["user_settings"]["user"] = (int)(m_user.GetUserID());
-	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
-	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+//	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
+//	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);
@@ -664,8 +730,8 @@ RESULT UserController::RequestSetSettings(std::wstring wstrHardwareID, std::stri
 
 	jsonPayload["user_settings"] = nlohmann::json::object();
 	jsonPayload["user_settings"]["user"] = (int)(m_user.GetUserID());
-	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
-	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
+//	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
+//	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
 	jsonPayload["user_settings"]["ui_offset_y"] = yOffset;
 	jsonPayload["user_settings"]["ui_offset_z"] = zOffset;
 	jsonPayload["user_settings"]["ui_scale"] = scale;
