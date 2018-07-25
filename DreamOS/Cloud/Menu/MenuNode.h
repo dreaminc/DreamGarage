@@ -53,10 +53,12 @@ public:
 	const std::string& GetTitle();
 	const std::string& GetIconURL();
 	const std::string& GetThumbnailURL();
+	const std::shared_ptr<std::vector<uint8_t>>& GetTextureBufferVector();
 
 	const MenuNode::type& GetNodeType();
 
 	RESULT SetName(std::string strName);
+	RESULT SetTextureBufferVector(std::shared_ptr<std::vector<uint8_t>> &pBufferVector);
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
@@ -68,6 +70,8 @@ private:
 	std::string m_strMIMEType;
 	std::string m_strIconURL;
 	std::string m_strThumbnailURL;
+
+	std::shared_ptr<std::vector<uint8_t>> m_pTextureBufferVector = nullptr;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

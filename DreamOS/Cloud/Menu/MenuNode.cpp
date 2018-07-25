@@ -171,7 +171,16 @@ const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
 }
 
+const std::shared_ptr<std::vector<uint8_t>>& MenuNode::GetTextureBufferVector() {
+	return m_pTextureBufferVector;
+}
+
 RESULT MenuNode::SetName(std::string strName) {
 	m_strTitle = strName;
+	return R_PASS;
+}
+
+RESULT MenuNode::SetTextureBufferVector(std::shared_ptr<std::vector<uint8_t>> &pBufferVector) {
+	m_pTextureBufferVector = pBufferVector;
 	return R_PASS;
 }
