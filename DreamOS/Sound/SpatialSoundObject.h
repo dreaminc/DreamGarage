@@ -13,7 +13,7 @@ class camera;
 class SpatialSoundObject : public VirtualObj {
 
 public:
-	SpatialSoundObject(point ptOrigin);
+	SpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection);
 
 	//~SpatialSoundObject();
 
@@ -26,8 +26,14 @@ public:
 	// TODO: This needs to be generalized in the arch since it is camera dependent (IMPORTANT)
 	virtual RESULT SetSpatialSoundObjectOrientation(vector vEmitterDirection, vector vListenerDirection) = 0;
 
+	virtual RESULT Update() = 0;
+
 private:
 	camera *m_pListenerCamera = nullptr;
+
+protected:
+	vector m_vEmitterDirection;
+	vector m_vListenerDirection;
 };
 
 #endif // ! SPATIAL_SOUND_OBJECT_H_

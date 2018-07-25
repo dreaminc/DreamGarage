@@ -15,7 +15,9 @@
 
 class WASAPISpatialSoundObject : public SpatialSoundObject {
 public:
-	WASAPISpatialSoundObject(point ptOrigin, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* spatialAudioStreamForHrtf);
+	WASAPISpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, 
+		ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* spatialAudioStreamForHrtf);
+
 	~WASAPISpatialSoundObject();
 
 
@@ -31,6 +33,8 @@ public:
 
 	// TODO: This needs to be generalized in the arch since it is camera dependent (IMPORTANT)
 	virtual RESULT SetSpatialSoundObjectOrientation(vector vEmitterDirection, vector vListenerDirection) override;
+
+	virtual RESULT Update() override;
 
 private:
 	ISpatialAudioClient * m_pAudioSpatialClient = nullptr;

@@ -30,7 +30,7 @@ public:
 	virtual RESULT AudioSpatialProcess() override;
 
 	// TODO: 
-	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition) override;
+	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) override;
 
 private:
 

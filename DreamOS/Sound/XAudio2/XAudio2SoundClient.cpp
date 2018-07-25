@@ -41,6 +41,6 @@ RESULT XAudio2SoundClient::Initialize() {
 }
 
 // TODO:
-std::shared_ptr<SpatialSoundObject> XAudio2SoundClient::MakeSpatialAudioObject(point ptPosition) {
+std::shared_ptr<SpatialSoundObject> XAudio2SoundClient::MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
 	return nullptr;
 }

@@ -4,8 +4,8 @@
 #include <WindowsNumerics.h>
 
 
-WASAPISpatialSoundObject::WASAPISpatialSoundObject(point ptOrigin, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
-	SpatialSoundObject(ptOrigin),
+WASAPISpatialSoundObject::WASAPISpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
+	SpatialSoundObject(ptOrigin, vEmitterDirection, vListenerDirection),
 	m_pAudioSpatialClient(pAudioSpatialClient),
 	m_pSpatialAudioStreamForHrtf(pSpatialAudioStreamForHrtf)
 {
@@ -92,12 +92,8 @@ RESULT WASAPISpatialSoundObject::SetSpatialObjectPosition(point ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(SetPosition(ptPosition));
-	
-	{
-		auto ptPosition = GetPosition(true);
 
-		CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
-	}
+	CR(Update());
 
 Error:
 	return r;
@@ -177,3 +173,15 @@ Error:
 	return r;
 }
 
+RESULT WASAPISpatialSoundObject::Update() {
+	RESULT r = R_PASS;
+
+	point ptPosition = GetPosition(true);
+	CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
+	
+	// TODO: Get from virtual object and camera etc
+	CR(SetSpatialSoundObjectOrientation(m_vEmitterDirection, m_vListenerDirection));
+
+Error:
+	return r;
+}
