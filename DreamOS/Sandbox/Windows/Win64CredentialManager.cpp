@@ -1,5 +1,5 @@
 #include "Win64CredentialManager.h"
-
+#include "Core/Utilities.h"
 #include <wincred.h>
 
 Win64CredentialManager::Win64CredentialManager()
@@ -11,11 +11,11 @@ Win64CredentialManager::Win64CredentialManager()
 RESULT Win64CredentialManager::GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
-	PCREDENTIALW pcred;
+	PCREDENTIALW pcred = { 0 };
 	CBM(CredReadW(wstrKey.c_str(), credType, 0, &pcred), "Error getting credential: 0x%x", GetLastError());
 	// Not found with TargetName, no such logon session, invalid flags - must be 0
 
-	strOut = (char*)pcred->CredentialBlob;
+	strOut.assign((char*)pcred->CredentialBlob, pcred->CredentialBlobSize);
 		
 Error:
 	CredFree(pcred); // must free memory allocated by CredRead()
@@ -25,7 +25,7 @@ Error:
 RESULT Win64CredentialManager::SetKeyValue(std::wstring wstrKey, std::string strField, CredentialManager::type credType, bool fOverwrite) {
 	RESULT r = R_PASS;
 
-	PCREDENTIALW pcred;
+	PCREDENTIALW pcred = { 0 };
 	bool fAlreadyExists = CredReadW(wstrKey.c_str(), credType, 0, &pcred);
 	
 	if (fOverwrite || !fAlreadyExists) {	// only write cred if it doesn't already exist, or we want to overwrite it

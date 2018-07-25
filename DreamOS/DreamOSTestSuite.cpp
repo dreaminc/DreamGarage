@@ -1814,20 +1814,22 @@ RESULT DreamOSTestSuite::AddTestCredentialStorage() {
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 		std::wstring wstrKey = L"key";
-		std::string strField = "field";
+		//std::string strField = "field";
+		std::string strField = "v7BgzYwu2WhE0EuD2YAaLVIzCLhaJgFVNLEaD2I6NPptJOOVAS4VOuz7VCYaMbQi";
 		std::string strOut;
 		{
 			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
+			DEBUG_LINEOUT("old cred or error not found: %s", strOut.c_str());
 
 			m_pDreamOS->SaveCredential(wstrKey, strField, CredentialManager::type::CREDENTIAL_GENERIC, true);
 
 			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
-			DEBUG_LINEOUT("cred: %s", strOut.c_str());
+			DEBUG_LINEOUT("saved cred: %s", strOut.c_str());
 
-			m_pDreamOS->SaveCredential(wstrKey, "field2", CredentialManager::type::CREDENTIAL_GENERIC, false);
+			m_pDreamOS->SaveCredential(wstrKey, "THIS ISNT SUPPOSED TO OVERWRITE", CredentialManager::type::CREDENTIAL_GENERIC, false);
 
 			m_pDreamOS->GetCredential(wstrKey, strOut, CredentialManager::type::CREDENTIAL_GENERIC);
-			DEBUG_LINEOUT("cred: %s", strOut.c_str());
+			DEBUG_LINEOUT("checking for overwrite: %s", strOut.c_str());
 
 			m_pDreamOS->RemoveCredential(wstrKey, CredentialManager::type::CREDENTIAL_GENERIC);
 		}
