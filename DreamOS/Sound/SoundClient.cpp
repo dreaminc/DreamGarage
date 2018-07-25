@@ -243,14 +243,14 @@ Error:
 }
 
 // Spatial Sound Objects
-std::shared_ptr<SpatialSoundObject> SoundClient::AddSpatialSoundObject(point ptPosition) {
+std::shared_ptr<SpatialSoundObject> SoundClient::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<SpatialSoundObject>	pSpatialSoundObject = nullptr;
 
 	CBM((m_spatialSoundObjects.size() < m_maxSpatialSoundObjects), "Cannot add another spatial audio object");
 
-	pSpatialSoundObject = MakeSpatialAudioObject(ptPosition);
+	pSpatialSoundObject = MakeSpatialAudioObject(ptPosition, vEmitterDirection, vListenerDirection);
 	CNM(pSpatialSoundObject, "Failed to create spatial sound object");
 
 	// Add to our storage

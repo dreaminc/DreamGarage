@@ -60,9 +60,9 @@ protected:
 
 	RESULT HandleAudioDataCaptured(int numFrames);
 
-	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition) = 0;
+	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) = 0;
 
-	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition);
+	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
 	bool FindSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject);
 	RESULT ClearSpatialSoundObjects();
 

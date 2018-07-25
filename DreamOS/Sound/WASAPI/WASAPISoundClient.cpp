@@ -360,7 +360,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<SpatialSoundObject> WASAPISoundClient::MakeSpatialAudioObject(point ptPosition) {
+std::shared_ptr<SpatialSoundObject> WASAPISoundClient::MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
@@ -369,7 +369,7 @@ std::shared_ptr<SpatialSoundObject> WASAPISoundClient::MakeSpatialAudioObject(po
 	CNM(m_pSpatialAudioStreamForHrtf, "Audio Spatial HRTF not initialized");
 
 	pSpatialSoundObject =
-		std::make_shared<WASAPISpatialSoundObject>(ptPosition, m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
+		std::make_shared<WASAPISpatialSoundObject>(ptPosition, vEmitterDirection, vListenerDirection, m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
 	CNM(pSpatialSoundObject, "Failed to allocate wasapi spatial sound object");
 
 	CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
@@ -399,7 +399,7 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 	{
 		// Temp shit
 		auto pSpatialSoundObject =
-			std::make_shared<WASAPISpatialSoundObject>(point(0.0f, 0.0f, 1.0f), m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
+			std::make_shared<WASAPISpatialSoundObject>(point(0.0f, 0.0f, 1.0f), vector(0.0f, 0.0f, 1.0f), vector(0.0f, 0.0f, -1.0f), m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
 		CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
 
 		while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
@@ -437,8 +437,10 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 
 			pSpatialSoundObject->SetPosition(ptPosition);
 
-			CR(pSpatialSoundObject->SetSpatialObjectPosition(pSpatialSoundObject->GetPosition(true)));
-			CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vEmitterDirection, vector(0.0f, 0.0f, 1.0f)));
+			//CR(pSpatialSoundObject->SetSpatialObjectPosition(pSpatialSoundObject->GetPosition(true)));
+			//CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vEmitterDirection, vector(0.0f, 0.0f, 1.0f)));
+
+			CR(pSpatialSoundObject->Update());
 
 			// Let the audio-engine know that the object data are available for processing now
 			CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
