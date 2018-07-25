@@ -41,10 +41,6 @@ RESULT WASAPISpatialSoundObject::Initialize() {
 
 	CNM(m_pSpatialAudioObjectHRTF, "Failed to allocate spatial hrtf audio object");
 
-	// Need to set up the audio object position
-	// TODO: This is super hacky looking code - note that SetPosition is overridden and GetPosition is from VObj
-	CRM(SetSpatialObjectPosition(GetPosition(true)), "Failed to set spatial object position");
-
 Error:
 	return r;
 }

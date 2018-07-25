@@ -27,7 +27,7 @@ public:
 	RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f);
 
 	// Will need to take over other functions
-	RESULT VirtualObj* SetSpatialObjectPosition(point ptPosition);
+	RESULT SetSpatialObjectPosition(point ptPosition);
 
 	// TODO: This needs to be generalized in the arch since it is camera depdent (IMPORTANT)
 	RESULT SetSpatialSoundObjectOrientation(vector vEmitterDirection, vector vListenerDirection);

@@ -372,7 +372,6 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 
 	CRM((RESULT)m_pSpatialAudioStreamForHrtf->Start(), "Failed to start spatial audio HRTF stream");
 
-	
 	{
 		// Temp shit
 		auto pSpatialSoundObject =
@@ -402,7 +401,10 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 			// implied 48K sampling, 440 hz freq
 			pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);
 
-			pSpatialSoundObject->SetSpatialSoundObjectOrientation(vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, 1.0f));
+			// Need to set up the audio object position
+			// TODO: This is super hacky looking code - note that SetPosition is overridden and GetPosition is from VObj
+			CR(pSpatialSoundObject->SetSpatialObjectPosition(pSpatialSoundObject->GetPosition(true)));
+			CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, 1.0f)));
 
 			// Let the audio-engine know that the object data are available for processing now
 			CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
