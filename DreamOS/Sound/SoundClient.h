@@ -10,7 +10,7 @@
 
 #include "SoundBuffer.h"
 
-
+class SoundBuffer;
 class SoundFile;
 class SpatialSoundObject;
 class point;
@@ -62,13 +62,14 @@ protected:
 
 	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) = 0;
 
+public:
 	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
 	bool FindSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject);
 	RESULT ClearSpatialSoundObjects();
 
 	int GetMaxSpatialAudioObjets() { return m_maxSpatialSoundObjects; };
 
-private:
+protected:
 	std::vector<std::shared_ptr<SpatialSoundObject>> m_spatialSoundObjects;
 
 public:
@@ -102,6 +103,7 @@ protected:
 
 protected:
 	uint32_t m_maxSpatialSoundObjects = DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS;
+	bool m_fHRTFEnabled = false;
 };
 
 #endif SOUND_CLIENT_H_

@@ -41,6 +41,9 @@ RESULT WASAPISpatialSoundObject::Initialize() {
 
 	CNM(m_pSpatialAudioObjectHRTF, "Failed to allocate spatial hrtf audio object");
 
+	CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT), 
+		"Failed to initialize sound buffer for spatial audio object");
+
 Error:
 	return r;
 }
@@ -70,7 +73,7 @@ RESULT WASAPISpatialSoundObject::WriteTestSignalToAudioObjectBuffer(unsigned int
 
 		float val = sin(theta);
 
-		val *= 0.25f;
+		//val *= 0.25f;
 
 		for (unsigned int j = 0; j < numChannels; j++) {
 			pDataBuffer[i + j] = val;
@@ -83,17 +86,6 @@ RESULT WASAPISpatialSoundObject::WriteTestSignalToAudioObjectBuffer(unsigned int
 			theta = theta - (2.0f * M_PI);
 		}
 	}
-
-Error:
-	return r;
-}
-
-RESULT WASAPISpatialSoundObject::SetSpatialObjectPosition(point ptPosition) {
-	RESULT r = R_PASS;
-
-	CN(SetPosition(ptPosition));
-
-	CR(Update());
 
 Error:
 	return r;
@@ -146,14 +138,14 @@ DirectX::XMMATRIX CalculateEmitterConeOrientationMatrix(Windows::Foundation::Num
 }
 
 // TODO: Decompose using our matrix libs
-RESULT WASAPISpatialSoundObject::SetSpatialSoundObjectOrientation(vector vEmitterDirection, vector vListenerDirection) {
+RESULT WASAPISpatialSoundObject::UpdateSpatialSoundObjectOrientation() {
 	RESULT r = R_PASS;
 
 	Windows::Foundation::Numerics::float3 emitterDirection = 
-		Windows::Foundation::Numerics::float3(vEmitterDirection.x(), vEmitterDirection.y(), vEmitterDirection.z());
+		Windows::Foundation::Numerics::float3(m_vEmitterDirection.x(), m_vEmitterDirection.y(), m_vEmitterDirection.z());
 
 	Windows::Foundation::Numerics::float3 listenerDirection = 
-		Windows::Foundation::Numerics::float3(vListenerDirection.x(), vListenerDirection.y(), vListenerDirection.z());
+		Windows::Foundation::Numerics::float3(m_vListenerDirection.x(), m_vListenerDirection.y(), m_vListenerDirection.z());
 
 	DirectX::XMFLOAT4X4 rotationMatrix;
 
@@ -180,7 +172,7 @@ RESULT WASAPISpatialSoundObject::Update() {
 	CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
 	
 	// TODO: Get from virtual object and camera etc
-	CR(SetSpatialSoundObjectOrientation(m_vEmitterDirection, m_vListenerDirection));
+	CR(UpdateSpatialSoundObjectOrientation());
 
 Error:
 	return r;

@@ -8,6 +8,7 @@
 
 #include "SoundClientFactory.h"
 #include "SoundFile.h"
+#include "SpatialSoundObject.h"
 
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -107,9 +108,12 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
+	float radius = 10.0f;
 
 	struct TestContext : public SoundClient::observer {
 		SoundClient *pSoundClient = nullptr;
+		sphere *pSphere = nullptr;
+		std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
 
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
@@ -127,7 +131,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 	} *pTestContext = new TestContext();
 
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		CN(m_pDreamOS);
@@ -138,25 +142,39 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 
-		sphere *pSphere;
-		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			point ptPosition = point(0.0f, 0.0f, -radius);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 
-		//// Open a sound file
-		//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
-		//CN(pNewSoundFile);
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(ptPosition);
 
-		// Create the sound client
-		pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-		CN(pTestContext->pSoundClient);
+			//// Open a sound file
+			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			CN(pNewSoundFile);
 
-		CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
-		
-		CR(pTestContext->pSoundClient->StartSpatial());
+			// Create the sound client
+			pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+			CN(pTestContext->pSoundClient);
 
-		//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
+			CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
+
+			CR(pTestContext->pSoundClient->StartSpatial());
+
+			//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
+
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
+
+			pTestContext->pSpatialSoundObject = pTestContext->pSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			CN(pTestContext->pSpatialSoundObject);
+
+			CR(pTestContext->pSpatialSoundObject->LoopSoundFile(pNewSoundFile));
+		}
 
 	Error:
 		return R_PASS;
@@ -173,13 +191,28 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 	};
 
 	// Update Code
-	auto fnUpdate = [&](void *pContext) {
+	auto fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		// Do stuff
+		{
+			static float theta = 0.0f;
+			point ptPosition(0.0f, 0.0f, -radius);
+			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, theta) * ptPosition;
+
+			//vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vEmitterDireciton = point(0.0f, 0.0f, 1.0f);
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+			
+			pTestContext->pSphere->SetPosition(ptPosition);
+
+			pTestContext->pSpatialSoundObject->SetPosition(ptPosition);
+			pTestContext->pSpatialSoundObject->SetEmitterListenerDirection(vEmitterDireciton, vListenerDireciton);
+
+			theta += 0.0005f;
+		}
 
 	Error:
 		return r;
