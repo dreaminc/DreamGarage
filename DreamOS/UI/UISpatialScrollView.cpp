@@ -402,6 +402,11 @@ Error:
 	return r;
 }
 
+RESULT UISpatialScrollView::AddScrollViewNode(MenuNode* pMenuNode) {
+	m_pScrollViewNodes.push_back(pMenuNode);
+	return R_PASS;
+}
+
 RESULT UISpatialScrollView::HideAllButtons(UIButton* pPushButton) {
 	RESULT r = R_PASS;
 

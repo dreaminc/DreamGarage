@@ -84,7 +84,7 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
-	RESULT MakeNextButtons();
+	RESULT MakeMenuItems();
 
 	RESULT PopPath();
 	RESULT RequestMenu();
@@ -137,9 +137,9 @@ private:
 
 	std::vector<std::shared_ptr<UIButton>> m_pButtons;
 
-	int m_menuNode_n = 0;
+	int m_numMenuItems = 8;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
-	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
+	std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;	
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 

@@ -13,6 +13,8 @@
 
 #include "json.hpp"
 
+class texture;
+
 class MenuNode : public dirty {
 public:
 	enum class type {
@@ -53,12 +55,12 @@ public:
 	const std::string& GetTitle();
 	const std::string& GetIconURL();
 	const std::string& GetThumbnailURL();
-	const std::shared_ptr<std::vector<uint8_t>>& GetTextureBufferVector();
+	texture* GetThumbnailTexture();
 
 	const MenuNode::type& GetNodeType();
 
 	RESULT SetName(std::string strName);
-	RESULT SetTextureBufferVector(std::shared_ptr<std::vector<uint8_t>> &pBufferVector);
+	RESULT SetThumbnailTexture(texture* pTexture);
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
@@ -71,7 +73,7 @@ private:
 	std::string m_strIconURL;
 	std::string m_strThumbnailURL;
 
-	std::shared_ptr<std::vector<uint8_t>> m_pTextureBufferVector = nullptr;
+	texture* m_pThumbnailTexture = nullptr;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

@@ -6,6 +6,8 @@
 #include "Sense/SenseController.h"
 #include "UI/UIScrollView.h"
 
+#include "Cloud/Menu/MenuNode.h"	// replace this with a ScrollViewNode
+
 #include <queue>
 
 class UIButton;
@@ -73,6 +75,8 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
+	RESULT AddScrollViewNode(MenuNode* pMenuNode);
+
 public:
 	ScrollState GetState();
 	std::shared_ptr<quad> GetTitleQuad();
@@ -84,7 +88,7 @@ public:
 	float GetClippingRate();
 
 public:
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;	
 
 private:
 	// button positioning
@@ -137,6 +141,7 @@ private:
 	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
+	std::vector<MenuNode*> m_pScrollViewNodes;
 //	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
