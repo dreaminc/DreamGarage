@@ -61,6 +61,8 @@ public:
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
 
+	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
+
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 	virtual RESULT LoadDataToInterlacedTargetBuffer(int16_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -155,6 +157,7 @@ public:
 		return false;
 	}
 
+	// TODO: Is it really bytes?
 	virtual size_t NumPendingBytes() override {
 		size_t numPendingBytes = -1;
 		bool fFirst = true;
@@ -177,6 +180,17 @@ public:
 		}
 
 		return numPendingBytes;
+	}
+
+	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) override {
+		RESULT r = R_PASS;
+
+		for (int i = 0; i < m_channels; i++) {
+			CR(m_ppCircularBuffers[i]->SetBufferToValues(startPosition, numPendingFrames));
+		}
+
+	Error:
+		return r;
 	}
 
 	// This is sub-typed below

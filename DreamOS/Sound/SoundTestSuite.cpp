@@ -108,7 +108,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
-	float radius = 10.0f;
+	float radius = 2.0f;
 
 	struct TestContext : public SoundClient::observer {
 		SoundClient *pSoundClient = nullptr;
@@ -155,7 +155,8 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			pTestContext->pSphere->SetPosition(ptPosition);
 
 			//// Open a sound file
-			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"TR808/CP.WAV", SoundFile::type::WAVE);
 			CN(pNewSoundFile);
 
 			// Create the sound client
@@ -174,6 +175,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			CN(pTestContext->pSpatialSoundObject);
 
 			CR(pTestContext->pSpatialSoundObject->LoopSoundFile(pNewSoundFile));
+			//CR(pTestContext->pSpatialSoundObject->PlaySoundFile(pNewSoundFile));
 
 
 
@@ -204,7 +206,9 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 		{
 			static float theta = 0.0f;
-			point ptPosition(0.0f, 0.0f, -radius);
+			static float localRadius = radius;
+
+			point ptPosition(0.0f, 0.0f, -localRadius);
 			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, theta) * ptPosition;
 
 			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
@@ -217,7 +221,8 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			pTestContext->pSpatialSoundObject->SetPosition(ptPosition);
 			pTestContext->pSpatialSoundObject->SetEmitterListenerDirection(vEmitterDireciton, vListenerDireciton);
 
-			theta += 0.0005f;
+			theta += 0.00025f;
+			localRadius += 0.0001f;
 		}
 
 	Error:
