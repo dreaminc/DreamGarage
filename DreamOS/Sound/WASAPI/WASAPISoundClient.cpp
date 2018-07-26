@@ -417,10 +417,10 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 
 		for (auto &pSpatialSoundObject : m_spatialSoundObjects) {
 			
-			pSpatialSoundObject->Update();
+			CR(pSpatialSoundObject->Update(frameCount, 1));
 
-			// Implied 48K sampling, 440 hz freq
-			pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);	
+			//// Implied 48K sampling, 440 hz freq
+			//pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);	
 
 		}
 			
