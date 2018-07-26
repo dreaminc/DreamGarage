@@ -415,38 +415,38 @@ int32_t WebRTCAudioDeviceModule::NeedMorePlayData(const size_t nSamples,
 	return res;
 }
 
-void WebRTCAudioDeviceModule::PushCaptureData(int voe_channel,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) 
-{
-	//int32_t res = 0;
-
-	DEBUG_LINEOUT("PushCaptureData: %d", (int)(number_of_frames));
-
-	// Capture PCM data of locally captured audio.
-	//if (m_pAudioDeviceCapturer) {
-	//	m_pAudioDeviceCapturer->PushCaptureData(voe_channel, 
-	//											audio_data, 
-	//											bits_per_sample, 
-	//											sample_rate,
-	//											number_of_channels, 
-	//											number_of_frames);
-	//}
-
-	RTC_NOTREACHED();
-
-	//if (m_pAudioTransport) {
-	//	m_pAudioTransport->PushCaptureData(voe_channel,
-	//											 audio_data,
-	//											 bits_per_sample, 
-	//											 sample_rate, 
-	//											 number_of_channels, 
-	//											 number_of_frames);
-	//}
-}
+//void WebRTCAudioDeviceModule::PushCaptureData(int voe_channel,
+//	const void* audio_data,
+//	int bits_per_sample,
+//	int sample_rate,
+//	size_t number_of_channels,
+//	size_t number_of_frames) 
+//{
+//	//int32_t res = 0;
+//
+//	DEBUG_LINEOUT("PushCaptureData: %d", (int)(number_of_frames));
+//
+//	// Capture PCM data of locally captured audio.
+//	//if (m_pAudioDeviceCapturer) {
+//	//	m_pAudioDeviceCapturer->PushCaptureData(voe_channel, 
+//	//											audio_data, 
+//	//											bits_per_sample, 
+//	//											sample_rate,
+//	//											number_of_channels, 
+//	//											number_of_frames);
+//	//}
+//
+//	RTC_NOTREACHED();
+//
+//	//if (m_pAudioTransport) {
+//	//	m_pAudioTransport->PushCaptureData(voe_channel,
+//	//											 audio_data,
+//	//											 bits_per_sample, 
+//	//											 sample_rate, 
+//	//											 number_of_channels, 
+//	//											 number_of_frames);
+//	//}
+//}
 
 void WebRTCAudioDeviceModule::PullRenderData(int bits_per_sample,
 	int sample_rate,
@@ -575,13 +575,13 @@ bool WebRTCAudioDeviceModule::Recording() const  {
 	return m_pAudioDeviceModuleImp->Recording();
 }
 
-int32_t WebRTCAudioDeviceModule::SetAGC(bool enable)  {
-	return m_pAudioDeviceModuleImp->SetAGC(enable);
-}
-
-bool WebRTCAudioDeviceModule::AGC() const  {
-	return m_pAudioDeviceModuleImp->AGC();
-}
+//int32_t WebRTCAudioDeviceModule::SetAGC(bool enable)  {
+//	return m_pAudioDeviceModuleImp->SetAGC(enable);
+//}
+//
+//bool WebRTCAudioDeviceModule::AGC() const  {
+//	return m_pAudioDeviceModuleImp->AGC();
+//}
 
 /*
 int32_t WebRTCAudioDeviceModule::SetWaveOutVolume(uint16_t volume_left, uint16_t volume_right)  {

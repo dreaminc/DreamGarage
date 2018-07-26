@@ -23,7 +23,7 @@
 #include "build/build_config.h"
 
 namespace gin {
-class V8BackgroundTaskRunner;
+class V8Platform;
 }
 
 namespace content {
@@ -36,6 +36,7 @@ namespace base {
 
 class HistogramBase;
 class Location;
+class SchedulerWorkerObserver;
 
 // Interface for a task scheduler and static methods to manage the instance used
 // by the post_task.h API.
@@ -84,8 +85,16 @@ class BASE_EXPORT TaskScheduler {
   virtual ~TaskScheduler() = default;
 
   // Allows the task scheduler to create threads and run tasks following the
-  // |init_params| specification. CHECKs on failure.
-  virtual void Start(const InitParams& init_params) = 0;
+  // |init_params| specification.
+  //
+  // If specified, |scheduler_worker_observer| will be notified when a worker
+  // enters and exits its main function. It must not be destroyed before
+  // JoinForTesting() has returned (must never be destroyed in production).
+  //
+  // CHECKs on failure.
+  virtual void Start(
+      const InitParams& init_params,
+      SchedulerWorkerObserver* scheduler_worker_observer = nullptr) = 0;
 
   // Posts |task| with a |delay| and specific |traits|. |delay| can be zero.
   // For one off tasks that don't require a TaskRunner.
@@ -148,6 +157,13 @@ class BASE_EXPORT TaskScheduler {
   // other threads during the call. Returns immediately when shutdown completes.
   virtual void FlushForTesting() = 0;
 
+  // Returns and calls |flush_callback| when there are no incomplete undelayed
+  // tasks. |flush_callback| may be called back on any thread and should not
+  // perform a lot of work. May be used when additional work on the current
+  // thread needs to be performed during a flush. Only one
+  // FlushAsyncForTesting() may be pending at any given time.
+  virtual void FlushAsyncForTesting(OnceClosure flush_callback) = 0;
+
   // Joins all threads. Tasks that are already running are allowed to complete
   // their execution. This can only be called once. Using this task scheduler
   // instance to create task runners or post tasks is not permitted during or
@@ -172,9 +188,9 @@ class BASE_EXPORT TaskScheduler {
 
 #if !defined(OS_NACL)
   // Creates and starts a task scheduler using default params. |name| is used to
-  // label threads and histograms. It should identify the component that calls
-  // this. Start() is called by this method; it is invalid to call it again
-  // afterwards. CHECKs on failure. For tests, prefer
+  // label histograms, it must not be empty. It should identify the component
+  // that calls this. Start() is called by this method; it is invalid to call it
+  // again afterwards. CHECKs on failure. For tests, prefer
   // base::test::ScopedTaskEnvironment (ensures isolation).
   static void CreateAndStartWithDefaultParams(StringPiece name);
 
@@ -183,12 +199,12 @@ class BASE_EXPORT TaskScheduler {
   void StartWithDefaultParams();
 #endif  // !defined(OS_NACL)
 
-  // Creates a ready to start task scheduler. |name| is used to label threads
-  // and histograms. It should identify the component that creates the
-  // TaskScheduler. The task scheduler doesn't create threads until Start() is
-  // called. Tasks can be posted at any time but will not run until after
-  // Start() is called. For tests, prefer base::test::ScopedTaskEnvironment
-  // (ensures isolation).
+  // Creates a ready to start task scheduler. |name| is used to label
+  // histograms, it must not be empty. It should identify the component that
+  // creates the TaskScheduler. The task scheduler doesn't create threads until
+  // Start() is called. Tasks can be posted at any time but will not run until
+  // after Start() is called. For tests, prefer
+  // base::test::ScopedTaskEnvironment (ensures isolation).
   static void Create(StringPiece name);
 
   // Registers |task_scheduler| to handle tasks posted through the post_task.h
@@ -210,7 +226,7 @@ class BASE_EXPORT TaskScheduler {
   static TaskScheduler* GetInstance();
 
  private:
-  friend class gin::V8BackgroundTaskRunner;
+  friend class gin::V8Platform;
   friend class content::BrowserMainLoopTest_CreateThreadsInSingleProcess_Test;
 
   // Returns the maximum number of non-single-threaded non-blocked tasks posted
