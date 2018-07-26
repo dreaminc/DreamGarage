@@ -396,61 +396,40 @@ RESULT WASAPISoundClient::AudioSpatialProcess() {
 
 	CRM((RESULT)m_pSpatialAudioStreamForHrtf->Start(), "Failed to start spatial audio HRTF stream");
 
-	{
-		// Temp shit
-		auto pSpatialSoundObject =
-			std::make_shared<WASAPISpatialSoundObject>(point(0.0f, 0.0f, 1.0f), vector(0.0f, 0.0f, 1.0f), vector(0.0f, 0.0f, -1.0f), m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
-		CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
+	do {
 
-		while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+		// Wait for next buffer event to be signaled.
+		DWORD retval = WaitForSingleObject(m_hSpatialBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
 
-			// Wait for next buffer event to be signaled.
-			DWORD retval = WaitForSingleObject(m_hSpatialBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
-
-			// Event handle timed out after the default time out
-			if (retval != WAIT_OBJECT_0) {
-				//m_pAudioSpatialClient->Stop();
-				CRM((RESULT)(ERROR_TIMEOUT), "Spatial audio thread is hung and exited");
-			}
-
-			UINT32 availableDynamicObjectCount;
-			UINT32 frameCount;
-
-			// Begin the process of sending object data and metadata
-			// Get the number of active objects that can be used to send object-data
-			// Get the frame count that each buffer will be filled with 
-			CRM((RESULT)m_pSpatialAudioStreamForHrtf->BeginUpdatingAudioObjects(&availableDynamicObjectCount, &frameCount),
-				"Failed to begin updating audio objects");
-
-			// implied 48K sampling, 440 hz freq
-			pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);
-
-			// Need to set up the audio object position
-			// TODO: This is super hacky looking code - note that SetPosition is overridden and GetPosition is from VObj
-			static float rotationTheta = 0.0f;
-			
-			point ptPosition = point(0.0f, 0.0f, 4.0f);
-			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, rotationTheta) * ptPosition;
-			vector vEmitterDirection = point(0.0f, 0.0f, 0.0f) - ptPosition;
-			vEmitterDirection.Normalize();
-			rotationTheta += 0.01f;
-
-			pSpatialSoundObject->SetPosition(ptPosition);
-
-			//CR(pSpatialSoundObject->SetSpatialObjectPosition(pSpatialSoundObject->GetPosition(true)));
-			//CR(pSpatialSoundObject->SetSpatialSoundObjectOrientation(vEmitterDirection, vector(0.0f, 0.0f, 1.0f)));
-
-			CR(pSpatialSoundObject->Update());
-
-			// Let the audio-engine know that the object data are available for processing now
-			CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
+		// Event handle timed out after the default time out
+		if (retval != WAIT_OBJECT_0) {
+			CRM((RESULT)(ERROR_TIMEOUT), "Spatial audio thread is hung and exited");
 		}
-	}
 
-	//CRM((RESULT)m_pAudioSpatialClient->Stop(), "Failed to stop audio spatial client");
+		UINT32 availableDynamicObjectCount;
+		UINT32 frameCount;
+
+		// Begin the process of sending object data and metadata
+		// Get the number of active objects that can be used to send object-data
+		// Get the frame count that each buffer will be filled with 
+		CRM((RESULT)m_pSpatialAudioStreamForHrtf->BeginUpdatingAudioObjects(&availableDynamicObjectCount, &frameCount),
+			"Failed to begin updating audio objects");
+
+		for (auto &pSpatialSoundObject : m_spatialSoundObjects) {
+			
+			pSpatialSoundObject->Update();
+
+			// Implied 48K sampling, 440 hz freq
+			pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);	
+
+		}
+			
+		// Let the audio-engine know that the object data are available for processing now
+		CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
+
+	} while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT);
 
 Error:
-
 	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Finish");
 
 	if (m_hSpatialBufferEvent != nullptr) {
@@ -707,6 +686,7 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	
 
 	// Move this to member etc
+	// Spatial audio is more restrictive (mono)
 	WAVEFORMATEX format;
 	format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 	format.wBitsPerSample = 32;
@@ -718,15 +698,19 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 
 	CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&format)), "Audio format not supported");
 	
-	// This doesn't actually work...
-	CRM((RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_pSpatialAudioStreamForHrtf), NULL),
-		"Spatial audio stream not available");
+	// This will fail if windows sonic or whatever isn't set up
+	// Use HRTF if available
 
+	if ((r = (RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_pSpatialAudioStreamForHrtf), NULL)) < 0) {
+		m_pSpatialAudioStreamForHrtf = nullptr;
+		m_fHRTFEnabled = false;
+		DEBUG_LINEOUT("Spatial audio stream not available");
+		CBM((false), "WASAPI Spatial not supported");
+	}
 
 	// Create the event that will be used to signal the client for more data
 	m_hSpatialBufferEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	CN(m_hSpatialBufferEvent);
-
 
 	UINT32 maxDynamicObjectCount;
 	CRM((RESULT)m_pAudioSpatialClient->GetMaxDynamicObjectCount(&maxDynamicObjectCount), "Failed to get max dynamic object count");
@@ -734,13 +718,12 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	m_maxSpatialSoundObjects = maxDynamicObjectCount;
 
 	// TODO: Move all of this into user etc 
-
 	SpatialAudioHrtfActivationParams streamParams;
 	streamParams.ObjectFormat = &format;
 	streamParams.StaticObjectTypeMask = AudioObjectType_None;
 	streamParams.MinDynamicObjectCount = 0;
 	streamParams.MaxDynamicObjectCount = maxDynamicObjectCount;
-	streamParams.Category = AudioCategory_GameEffects;
+	streamParams.Category = AudioCategory_Communications;
 	streamParams.EventHandle = m_hSpatialBufferEvent;
 	streamParams.NotifyObject = NULL;
 
@@ -754,7 +737,8 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	streamParams.DistanceDecay = &decayModel;
 
 	SpatialAudioHrtfDirectivity directivity;
-	directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cone;
+	//directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cone;
+	directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cardioid;
 	//directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_OmniDirectional;
 	directivity.Scaling = 1.0f;
 
@@ -763,19 +747,25 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 	cone.InnerAngle = 0.1f;
 	cone.OuterAngle = 0.2f;
 
+	SpatialAudioHrtfDirectivityCardioid cardioid; 
+	cardioid.directivity = directivity;
+	cardioid.Order = 2;
+	
 	SpatialAudioHrtfDirectivityUnion directivityUnion;
-	directivityUnion.Cone = cone;
+	//directivityUnion.Omni = directivity;
+	//directivityUnion.Cone = cone;
+	directivityUnion.Cardiod = cardioid;
 	streamParams.Directivity = &directivityUnion;
 
-	//SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Large;
+	//SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Small;
 	SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Outdoors;
 	streamParams.Environment = &environment;
 
 	// identity matrix
-	SpatialAudioHrtfOrientation orientation = { 1.0f, 0.0f, 0.0f, 
-												0.0f, 1.0f, 0.0f, 
-												0.0f, 0.0f, 1.0f }; 
-	streamParams.Orientation = &orientation;
+	SpatialAudioHrtfOrientation hrtfOrientation = { 1.0f, 0.0f, 0.0f, 
+													0.0f, 1.0f, 0.0f, 
+													0.0f, 0.0f, 1.0f }; 
+	streamParams.Orientation = &hrtfOrientation;
 
 	PROPVARIANT pv;
 	PropVariantInit(&pv);
@@ -785,7 +775,6 @@ RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
 
 	CRM((RESULT)m_pAudioSpatialClient->ActivateSpatialAudioStream(&pv, __uuidof(m_pSpatialAudioStreamForHrtf), (void**)&m_pSpatialAudioStreamForHrtf),
 			"Failed to activate spatial audio stream");
-
 
 Error:
 	return r;
