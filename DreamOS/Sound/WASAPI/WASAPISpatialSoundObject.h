@@ -27,10 +27,11 @@ public:
 	RESULT GetBuffer(BYTE **ppBuffer, UINT32 *pBufferLength);
 
 	RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f);
+	RESULT LoadDataFromBuffer(unsigned int numFrames, unsigned int numChannels = 1);
 
 	RESULT UpdateSpatialSoundObjectOrientation();
 
-	virtual RESULT Update() override;
+	virtual RESULT Update(unsigned int numFrames, unsigned int numChannels) override;
 
 private:
 	ISpatialAudioClient *m_pAudioSpatialClient = nullptr;

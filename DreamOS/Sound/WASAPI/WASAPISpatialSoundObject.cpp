@@ -57,6 +57,44 @@ Error:
 	return r;
 }
 
+RESULT WASAPISpatialSoundObject::Update(unsigned int numFrames, unsigned int numChannels) {
+	RESULT r = R_PASS;
+
+	point ptPosition = GetPosition(true);
+	CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
+
+	// TODO: Get from virtual object and camera etc
+	CR(UpdateSpatialSoundObjectOrientation());
+
+	// Copy data into buffer
+	CR(LoadDataFromBuffer(numFrames, numChannels));
+
+Error:
+	return r;
+}
+
+RESULT WASAPISpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsigned int numChannels) {
+	RESULT r = R_PASS;
+
+	BYTE *pBuffer = nullptr;
+	UINT32 pBuffer_n = 0;
+
+	CN(m_pSoundBuffer);
+
+	CR(GetBuffer(&pBuffer, &pBuffer_n));
+
+	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
+	
+	CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
+
+	// TODO: Lets just see what happens
+
+Error:
+	return r;
+}
+
+
+
 RESULT WASAPISpatialSoundObject::WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate, unsigned int numChannels, float frequency) {
 	RESULT r = R_PASS;
 
@@ -160,19 +198,6 @@ RESULT WASAPISpatialSoundObject::UpdateSpatialSoundObjectOrientation() {
 	};
 
 	CR((RESULT)m_pSpatialAudioObjectHRTF->SetOrientation(&spatialAudioHRTFOrientationMatrix));
-
-Error:
-	return r;
-}
-
-RESULT WASAPISpatialSoundObject::Update() {
-	RESULT r = R_PASS;
-
-	point ptPosition = GetPosition(true);
-	CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
-	
-	// TODO: Get from virtual object and camera etc
-	CR(UpdateSpatialSoundObjectOrientation());
 
 Error:
 	return r;

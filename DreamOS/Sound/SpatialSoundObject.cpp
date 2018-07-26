@@ -22,13 +22,16 @@ RESULT SpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
 	float *pFloatAudioBuffer = nullptr;
 
 	CN(pSoundFile);
-	CBM((pSoundFile->NumChannels() == m_pSoundBuffer->NumChannels()),
-		"Don't currently support playing files that don't match render buffer channel count");
+
+	//CBM((pSoundFile->NumChannels() == m_pSoundBuffer->NumChannels()),
+	//	"Don't currently support playing files that don't match render buffer channel count");
 
 	m_pSoundBuffer->LockBuffer();
 	{
 		if (m_pSoundBuffer->IsFull() == false) {
-			CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer));
+			
+			CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer, 1));
+
 			CR(m_pSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
 		}
 	}

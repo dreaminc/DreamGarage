@@ -27,7 +27,7 @@ public:
 
 	RESULT SetEmitterListenerDirection(vector vEmitterDirection, vector vListenerDirection);
 
-	virtual RESULT Update() = 0;
+	virtual RESULT Update(unsigned int numFrames, unsigned int numChannels) = 0;
 
 	// TODO: Move this to internal buffer
 	// Function needs to copy over stuff 

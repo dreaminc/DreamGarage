@@ -56,6 +56,7 @@ public:
 	virtual void* GetDataBuffer() override;
 
 	virtual RESULT GetAudioBuffer(float* &pAudioData_n) override;
+	virtual RESULT GetAudioBuffer(float* &pAudioData_n, int numChannels) override;
 
 private:
 	RIFFChunk m_riffChunk;

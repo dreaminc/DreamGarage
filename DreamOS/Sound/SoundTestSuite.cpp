@@ -164,7 +164,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 			CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
 
-			CR(pTestContext->pSoundClient->StartSpatial());
+			
 
 			//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
 
@@ -174,6 +174,11 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			CN(pTestContext->pSpatialSoundObject);
 
 			CR(pTestContext->pSpatialSoundObject->LoopSoundFile(pNewSoundFile));
+
+
+
+			CR(pTestContext->pSoundClient->StartSpatial());
+
 		}
 
 	Error:
@@ -202,8 +207,9 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			point ptPosition(0.0f, 0.0f, -radius);
 			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, theta) * ptPosition;
 
-			//vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
-			vector vEmitterDireciton = point(0.0f, 0.0f, 1.0f);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			//vector vEmitterDireciton = point(0.0f, 0.0f, 1.0f);
+
 			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 			
 			pTestContext->pSphere->SetPosition(ptPosition);
