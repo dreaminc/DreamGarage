@@ -27,6 +27,7 @@ public:
 	virtual int NumChannels() = 0;
 	virtual int SamplingRate() = 0;
 	virtual int BitsPerSample() = 0;
+	virtual int BytesPerSample() = 0;
 	virtual int GetNumFrames() = 0;
 	virtual int GetNumSamples() = 0;
 

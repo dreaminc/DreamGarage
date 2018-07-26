@@ -9,6 +9,7 @@
 #include "Sound/SoundClient.h"
 
 #include <Windows.h>
+#include <XAudio2.h>
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
@@ -32,12 +33,24 @@ public:
 	// TODO: 
 	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) override;
 
+	// XAudio doesn't need buffers apparently 
+	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
+
+private:
+	//RESULT InitializeRenderAudioClient();
+	//RESULT InitializeCaptureAudioClient();
+	//RESULT InitializeSpatialAudioClient();
+
 private:
 
 	//RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
 
 private:
-	// TODO:
+	std::shared_ptr<IXAudio2> m_pXAudio2 = nullptr;
+
+	std::shared_ptr<IXAudio2MasteringVoice> m_pXAudio2MasterVoice = nullptr;
+
+	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoice = nullptr;
 };
 
 #endif XAUDIO2_SOUND_CLIENT_H_

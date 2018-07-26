@@ -89,7 +89,7 @@ public:
 
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
-	RESULT PlaySoundFile(SoundFile *pSoundFile);
+	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
 
 private:
 	std::thread	m_audioRenderProcessingThread;

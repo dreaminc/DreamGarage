@@ -50,6 +50,7 @@ public:
 	virtual int NumChannels() override;
 	virtual int SamplingRate() override;
 	virtual int BitsPerSample() override;
+	virtual int BytesPerSample() override;
 	virtual int GetNumFrames() override;
 	virtual int GetNumSamples() override;
 

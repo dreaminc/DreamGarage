@@ -27,6 +27,10 @@ int SoundFileWave::BitsPerSample() {
 	return m_formatChunk.bitsPerSample;
 }
 
+int SoundFileWave::BytesPerSample() {
+	return (m_formatChunk.bitsPerSample >> 3);
+}
+
 void* SoundFileWave::GetDataBuffer() {
 	return m_dataChunk.pChunkData;
 }
