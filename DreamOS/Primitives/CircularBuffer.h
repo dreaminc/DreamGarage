@@ -73,6 +73,17 @@ public:
 		return R_PASS;
 	}
 
+	// This function will not reset the buffer, but allow to 
+	// manipulate the buffer (such as would be used to loop audio)
+	// This will use the existing data in the buffer
+	RESULT SetBufferToValues(size_t startPosition, size_t numPendingFrames) {
+		m_circularBuffer_e = startPosition + numPendingFrames;
+		m_circularBuffer_c = startPosition;
+		m_numPendingBytes = numPendingFrames;
+
+		return R_PASS;
+	}
+
 	inline RESULT IncrementBuffer(int count) {
 		RESULT r = R_PASS;
 

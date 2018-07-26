@@ -85,9 +85,28 @@ RESULT WASAPISpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsi
 
 	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
 	
-	CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
+	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingBytes();
+	size_t numFramesRead = 0;
 
-	// TODO: Lets just see what happens
+	while (numFramesRead < numFrames) {
+
+		if (m_fLoop) {
+			if (numFramesInBuffer <= numFrames) {
+				CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)numFramesInBuffer));
+				m_pSoundBuffer->ResetBuffer(m_startLoop, m_endLoop);
+
+				numFramesRead += numFramesInBuffer;
+			}
+			else {
+				CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
+				numFramesRead += numFrames;
+			}
+		}
+		else {
+			CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
+			numFramesRead += numFrames;
+		}
+	}
 
 Error:
 	return r;
