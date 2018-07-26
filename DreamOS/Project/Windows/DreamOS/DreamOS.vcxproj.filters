@@ -164,6 +164,12 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{09646d0f-8390-4196-9ad1-d33514e93b78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound\WASAPI">
+      <UniqueIdentifier>{958ee80b-50a2-4584-bf58-d29525f855b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sound\XAudio2">
+      <UniqueIdentifier>{72210ad1-c585-4056-9ecc-88d0fd79c9df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
@@ -769,9 +775,6 @@
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -918,6 +921,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64CredentialManager.cpp">
       <Filter>Sandbox\Windows</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISoundClient.cpp">
+      <Filter>Sound\WASAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp">
+      <Filter>Sound\XAudio2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\SpatialSoundObject.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp">
+      <Filter>Sound\WASAPI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1915,9 +1933,6 @@
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sound\AudioPacket.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -2031,6 +2046,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64CredentialManager.h">
       <Filter>Sandbox\Windows</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISoundClient.h">
+      <Filter>Sound\WASAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h">
+      <Filter>Sound\XAudio2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SpatialSoundObject.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h">
+      <Filter>Sound\WASAPI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

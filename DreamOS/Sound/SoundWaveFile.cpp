@@ -125,3 +125,48 @@ RESULT SoundFileWave::GetAudioBuffer(float* &pAudioData_n) {
 Error:
 	return r;
 }
+
+RESULT SoundFileWave::GetAudioBuffer(float* &pAudioData_n, int numChannels) {
+	RESULT r = R_PASS;
+	
+	int numSamples = 0;
+
+	CBM((pAudioData_n == nullptr), "Non-null pointer provided");
+	CBM((BitsPerSample() == 16), "Don't currently support conversion from %d bits", BitsPerSample());
+
+	numSamples = GetNumSamples();
+	
+	int numFrames = GetNumFrames();
+
+	int numWaveChannels = m_formatChunk.numChannels;
+
+	pAudioData_n = new float[numFrames * numChannels];
+	CN(pAudioData_n);
+
+	switch (BitsPerSample()) {
+
+	case 16: {
+		int16_t *pAudioData = (int16_t*)m_dataChunk.pChunkData;
+		CN(pAudioData);
+
+		unsigned int bufferCounter = 0;
+
+		for (int i = 0; i < numSamples; i += numWaveChannels) {
+			for (int j = 0; j < numChannels; j++) {
+				pAudioData_n[bufferCounter] = (float)pAudioData[i + j] / ((float)std::numeric_limits<uint16_t>::max() - 1);
+				bufferCounter++;
+			}
+		}
+
+		int a = 5;
+
+	} break;
+
+	default: {
+		CBM((0), "Don't currently support conversion from %d bits", BitsPerSample());
+	} break;
+	}
+
+Error:
+	return r;
+}

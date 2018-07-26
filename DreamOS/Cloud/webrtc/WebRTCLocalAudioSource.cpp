@@ -65,8 +65,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 	//	pendingAudioPacket.GetNumFrames()
 	//);
 
-	int samples_per_sec = 44100
-		;
+	int samples_per_sec = 44100;
 	//int nSamples = pendingAudioPacket.GetNumFrames();
 	int nSamples = pendingAudioPacket.GetNumFrames();
 	
@@ -77,8 +76,9 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 	static double theta = 0.0f;
 	double freq = 440.0f;
 
-	if (m_strAudioTrackLabel == "chrome_audio_label")
-		freq *= 2.0f;
+	if (m_strAudioTrackLabel == "chrome_audio_label") {
+		freq *= 4.0f;
+	}
 
 	int16_t *pDataBuffer = nullptr;  
 	
@@ -91,6 +91,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 
 			for (int j = 0; j < channels; j++) {
 				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
+				//pDataBuffer[i + j] = (int16_t)(5);
 			}
 
 			// increment theta

@@ -15,6 +15,7 @@ class SoundFile {
 public:
 	enum class type {
 		WAVE,
+		MP3,
 		INVALID
 	};
 
@@ -33,7 +34,9 @@ public:
 	// so going old school
 	virtual void* GetDataBuffer() = 0;
 
+	// TODO: Merge the two?
 	virtual RESULT GetAudioBuffer(float* &pAudioData_n) = 0;
+	virtual RESULT GetAudioBuffer(float* &pAudioData_n, int numChannels) = 0;
 
 protected:
 	SoundFile::type m_soundFileType;

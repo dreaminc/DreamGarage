@@ -16,7 +16,8 @@
 	#include "./Sandbox/Linux/LinuxApp.h"
 #endif
 
-#include "WASAPISoundClient.h"
+#include "WASAPI/WASAPISoundClient.h"
+#include "XAudio2/XAudio2SoundClient.h"
 
 SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type) {
 	RESULT r = R_PASS;
@@ -31,6 +32,15 @@ SoundClient* SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE type) {
 			pSoundClient = nullptr;
 			DEBUG_LINEOUT("Sound Client type %d not supported on this platform!", type);
 	#endif
+		} break;
+
+		case SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2: {
+#if defined(_WIN32)
+			pSoundClient = new XAudio2SoundClient();
+#else
+			pSoundClient = nullptr;
+			DEBUG_LINEOUT("Sound Client type %d not supported on this platform!", type);
+#endif
 		} break;
 	}
 

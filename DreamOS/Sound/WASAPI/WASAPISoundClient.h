@@ -4,16 +4,21 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Sound/WASAPISoundClient.h
+// DreamOS/Sound/WASAPI/WASAPISoundClient.h
 
-#include "SoundClient.h"
+#include "Sound/SoundClient.h"
 
 #include <Windows.h>
 #include <AudioClient.h>
+#include <SpatialAudioClient.h>
+#include <SpatialAudioHrtf.h>
+
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
 #include <avrt.h>
 #include <functiondiscoverykeys.h>
+
+#include <wrl/client.h>
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
@@ -29,20 +34,31 @@ public:
 
 	virtual RESULT AudioRenderProcess() override;
 	virtual RESULT AudioCaptureProcess() override;
+	virtual RESULT AudioSpatialProcess() override;
 
 private:
 	RESULT InitializeRenderAudioClient();
 	RESULT InitializeCaptureAudioClient();
+	RESULT InitializeSpatialAudioClient();
 
 	RESULT EnumerateWASAPIDevices();
 	RESULT EnumerateWASAPISessions();
 	std::wstring GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex);
+	std::wstring GetDeviceName(IMMDevice *pDevice);
 
 	RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
+
+	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) override;
 
 private:
 	IMMDeviceEnumerator *m_pDeviceEnumerator = nullptr;
 	IAudioSessionManager2* m_pSessionManager = nullptr;
+
+	// Spatial 
+	IMMDevice *m_pAudioEndpointSpatialDevice = nullptr;
+	ISpatialAudioClient *m_pAudioSpatialClient = nullptr;
+	ISpatialAudioObjectRenderStreamForHrtf* m_pSpatialAudioStreamForHrtf = nullptr;
+	HANDLE m_hSpatialBufferEvent = nullptr;
 
 	// Render
 	IMMDevice *m_pAudioEndpointRenderDevice = nullptr;
