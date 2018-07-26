@@ -119,8 +119,11 @@ public:
 	RESULT GetTeam(std::string& strAccessToken);
 	void OnGetTeam(std::string&& strResponse);
 
-	RESULT LoadUserProfile(std::string& strAccessToken);
+	RESULT RequestUserProfile(std::string& strAccessToken);
 	void OnUserProfile(std::string&& strResponse);
+
+	RESULT RequestTwilioNTSInformation(std::string& strAccessToken);
+	void OnTwilioNTSInformation(std::string&& strResponse);
 
 // basic http error handling
 private:

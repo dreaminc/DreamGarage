@@ -1068,6 +1068,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		// could also be once the environment id is set
 
 		// TODO: populate user
+		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 	}
 
 Error:
@@ -1142,10 +1143,12 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		CR(m_pDreamLoginApp->ClearTokens());
 	}
 	else {
-	//	pLoginApp->Set
-	//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
+		//TODO: should be temporary
+		m_strAccessToken = strAccessToken;
+
+
 		CR(m_pDreamLoginApp->SetAccessToken(strAccessToken));
-	//	CR(pUserController->GetSettings(strAccessToken));
+		CR(m_pUserController->GetSettings(strAccessToken));
 	}
 
 Error:
@@ -1176,6 +1179,8 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
 	}
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
+		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 	}
 
 Error:

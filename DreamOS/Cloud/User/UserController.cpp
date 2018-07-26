@@ -580,7 +580,7 @@ Error:
 	return;
 }
 
-RESULT UserController::LoadUserProfile(std::string& strAccessToken) {
+RESULT UserController::RequestUserProfile(std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -591,12 +591,84 @@ RESULT UserController::LoadUserProfile(std::string& strAccessToken) {
 	auto headers = HTTPController::ContentAcceptJson();
 	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
 
-	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetTeam, this, std::placeholders::_1)));
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnUserProfile, this, std::placeholders::_1)));
 
 Error:
 	return r;
 }
-void OnUserProfile(std::string&& strResponse);
+
+void UserController::OnUserProfile(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	m_user = User(
+		jsonData["/id"_json_pointer].get<long>(),
+		-1,
+		jsonData["/email"_json_pointer].get<std::string>(),
+		jsonData["/public_name"_json_pointer].get<std::string>(),
+		jsonData["/first_name"_json_pointer].get<std::string>(),
+		jsonData["/last_name"_json_pointer].get<std::string>(),
+		version(1.0f)	// version
+	);
+
+Error:
+	return;
+}
+
+RESULT UserController::RequestTwilioNTSInformation(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnTwilioNTSInformation, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	m_twilioNTSInformation = TwilioNTSInformation(
+		jsonData["/date_created"_json_pointer].get<std::string>(),
+		jsonData["/date_updated"_json_pointer].get<std::string>(),
+		jsonData["/ttl"_json_pointer].get<int>(),
+		jsonData["/username"_json_pointer].get<std::string>(),
+		jsonData["/password"_json_pointer].get<std::string>()
+	);
+
+	// Ice Server URIs
+	for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
+		std::string strSDPCandidate = jsonICEServer["url"].get<std::string>();
+		m_twilioNTSInformation.AddICEServerURI(strSDPCandidate);
+	}
+
+	DEBUG_LINEOUT("Twilio NTS Information Loaded");
+	m_twilioNTSInformation.Print();
+
+
+Error:
+	return;
+}
 
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {
 	RESULT r = R_PASS;
