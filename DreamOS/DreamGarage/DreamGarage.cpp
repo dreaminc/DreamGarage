@@ -358,6 +358,7 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 
@@ -378,9 +379,32 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 	CN(m_pDreamSettings);
 
+	m_pDreamLoginApp = LaunchDreamApp<DreamLoginApp>(this, false);
+	CN(m_pDreamLoginApp);
+
 	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
 	CN(m_pDreamSettings);
 
+	//TODO: could be somewhere else(?)
+	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
+	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
+
+	// UserController is initialized during CloudController::Initialize,
+	// which is in SandboxApp::Initialize while fInitCloud is true
+	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(m_pUserController);
+	
+	// initial step of login flow:
+	// if there has already been a successful login, try to authenticate
+	if (!m_fFirstLogin && m_fHasCredentials) {
+		m_pUserController->GetAccessToken(m_strRefreshToken);
+	}
+	// otherwise, start by showing the settings form
+	else {
+		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+		CR(m_pUserController->GetFormURL(strFormType));
+	}
+	
 Error:
 	return r;
 }
@@ -1014,25 +1038,36 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		std::string strFormType;
 		// this specific case is only when: not first login, has credentials, has no settings, has no team
 		if (!fFirstLogin && fHasCreds) {
-			//strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-			//pUserController->GetFormURL(strFormType);
+			strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+			m_pUserController->GetFormURL(strFormType);
 			m_pDreamLoginApp->Show();
 		}
+		// after the user has defined their settings, show sign up/sign in 
+		// based on whether this is the first launch or not
 		else if (fFirstLogin) {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
-			//pUserController->GetFormURL(strFormType);
+			m_pUserController->GetFormURL(strFormType);
 			m_pDreamLoginApp->Show();
 		}
 		else {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
-			//pUserController->GetFormURL(strFormType);
+			m_pUserController->GetFormURL(strFormType);
 			m_pDreamLoginApp->Show();
 		}
 	}
+	// once login has succeeded, save the settings from earlier and the launch date
+	// environment id should have been set through DreamLoginApp responding to javascript
 	else if (strMessage == "DreamLoginApp.OnSuccess") {
-		// TODO:
 		CR(m_pDreamLoginApp->SetLaunchDate());
-//		CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
+		CR(m_pUserController->SetSettings(m_strAccessToken, 
+			m_pDreamUserApp->GetHeight(), 
+			m_pDreamUserApp->GetDepth(), 
+			m_pDreamUserApp->GetScale()));
+
+		// TODO: potentially where the lobby environment changes to the team environment
+		// could also be once the environment id is set
+
+		// TODO: populate user
 	}
 
 Error:
@@ -1048,7 +1083,7 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 
 	//TODO: needs different route.  environment socket path does not need to get team
 
-	//pUserController->GetTeam(pLoginApp->GetAccessToken());
+	m_pUserController->GetTeam(m_pDreamLoginApp->GetAccessToken());
 
 
 Error:
@@ -1094,6 +1129,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
 		CR(m_pDreamLoginApp->Show());
 	}
+	//TODO: general form?
 
 Error:
 	return r;

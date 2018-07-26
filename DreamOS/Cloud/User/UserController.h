@@ -119,6 +119,9 @@ public:
 	RESULT GetTeam(std::string& strAccessToken);
 	void OnGetTeam(std::string&& strResponse);
 
+	RESULT LoadUserProfile(std::string& strAccessToken);
+	void OnUserProfile(std::string&& strResponse);
+
 // basic http error handling
 private:
 	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode);

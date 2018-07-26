@@ -580,6 +580,24 @@ Error:
 	return;
 }
 
+RESULT UserController::LoadUserProfile(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::LOAD_PROFILE);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnGetTeam, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+void OnUserProfile(std::string&& strResponse);
+
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {
 	RESULT r = R_PASS;
 

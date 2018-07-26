@@ -149,6 +149,13 @@ private:
 
 	long m_pendingAssetReceiveUserID = -1;
 
+	// TODO: should these be here
+	bool m_fFirstLogin = true;
+	bool m_fHasCredentials = false;
+	std::string m_strRefreshToken;
+	std::string m_strAccessToken;
+	UserController* m_pUserController;
+
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode;
