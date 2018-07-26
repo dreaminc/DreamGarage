@@ -25,11 +25,11 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestPlaySound());
+
 	CR(AddTestSpatialSound());
 	
 	CR(AddTestCaptureSound());
-
-	// Add: Play a simple sound
 
 	// Add: Play a looping sound
 
@@ -447,7 +447,122 @@ Error:
 }
 
 RESULT SoundTestSuite::AddTestPlaySound() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+	float radius = 2.0f;
+
+	struct TestContext : public SoundClient::observer {
+		SoundClient *pSoundClient = nullptr;
+		sphere *pSphere = nullptr;
+
+		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+			RESULT r = R_PASS;
+
+			//// Simply pushes the capture buffer to the render buffer
+			//if (pSoundClient != nullptr) {
+			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("standard"));
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+
+			point ptPosition = point(0.0f, 0.0f, -radius);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(ptPosition);
+
+			//// Open a sound file
+			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"TR808/CP.WAV", SoundFile::type::WAVE);
+			CN(pNewSoundFile);
+
+			// Create the sound client
+			pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
+			CN(pTestContext->pSoundClient);
+
+			CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
+
+			CR(pTestContext->pSoundClient->StartRender());
+
+			CR(pTestContext->pSoundClient->PlaySoundFile(pNewSoundFile));
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			// empty
+		}
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Audio Play Sound");
+	pUITest->SetTestDescription("Basic test of playing a sound");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
 
 RESULT SoundTestSuite::AddTestPlaySoundHRTF() {
