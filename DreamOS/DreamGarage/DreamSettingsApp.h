@@ -52,6 +52,8 @@ private:
 	bool m_fRespondToController = false;
 	bool m_fLeftTriggerDown = false;
 	bool m_fRightTriggerDown = false;
+
+	bool m_fPendShowFormView = false;
 };
 
 #endif // ! DREAM_SETTINGS_APP_H_

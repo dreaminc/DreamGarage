@@ -336,11 +336,12 @@ RESULT DreamGarage::LoadScene() {
 			fShowModels = false;
 		}
 	}
-
+	//*
 	if (fShowModels) {
 		m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
 		CN(m_pDreamEnvironmentApp);
 	}
+	//*/
 
 #endif
 
@@ -371,7 +372,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
-	m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
+	if (m_pDreamEnvironmentApp != nullptr) {
+		m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
+	}
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 	CN(m_pDreamShareView);
@@ -386,6 +389,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamSettings);
 
 	//TODO: could be somewhere else(?)
+	CR(RegisterDOSObserver(this));
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
 	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
 
@@ -1057,7 +1061,9 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	}
 	// once login has succeeded, save the settings from earlier and the launch date
 	// environment id should have been set through DreamLoginApp responding to javascript
-	else if (strMessage == "DreamLoginApp.OnSuccess") {
+	else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
+	//else if (strMessage == "DreamLoginApp.OnSuccess") {
+		m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
 		CR(m_pDreamLoginApp->SetLaunchDate());
 		CR(m_pUserController->SetSettings(m_strAccessToken, 
 			m_pDreamUserApp->GetHeight(), 
@@ -1121,6 +1127,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 		CR(m_pDreamSettings->Show());
+		//m_pDreamUserApp->ResetAppComposite();
 	}
 	// the behavior of sign in, sign up, and teams create should be executed the same
 	// way with regards to the functions that they use

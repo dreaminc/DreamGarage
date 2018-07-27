@@ -154,7 +154,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 	strURI += std::to_string(m_environment.GetEnvironmentID()); 
 	strURI += "/";
 
-	DEBUG_LINEOUT("Connceting to environment socket URL: %s", strURI.c_str());
+	DEBUG_LINEOUT("Connecting to environment socket URL: %s", strURI.c_str());
 
 	// TODO: Not hard coded!
 	if (m_pEnvironmentWebsocket == nullptr) {

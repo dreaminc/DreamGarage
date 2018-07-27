@@ -58,6 +58,14 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		m_pUserApp->UpdateScale(m_pUserApp->GetScale() - m_scaleTick);
 	}
 
+	if (m_fPendShowFormView) {
+		if (m_pUserApp != nullptr) {
+			m_pUserApp->ResetAppComposite();
+		}
+		GetComposite()->SetVisible(true, false);
+		CR(Show());
+	}
+
 Error:
 	return r;
 }
@@ -128,8 +136,14 @@ Error:
 RESULT DreamSettingsApp::Show() {
 	RESULT r = R_PASS;
 
-	CR(DreamFormApp::Show());
-	m_fRespondToController = true;
+	if (m_pFormView == nullptr) {
+		m_fPendShowFormView = true;
+	}
+	else {
+		CR(DreamFormApp::Show());
+		m_fRespondToController = true;
+		m_fPendShowFormView = false;
+	}
 
 Error:
 	return r;

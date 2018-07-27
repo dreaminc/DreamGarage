@@ -53,7 +53,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
-		m_pFormView->Hide();
+		//m_pFormView->Hide();
+		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
@@ -79,6 +80,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
 		CR(m_pDreamBrowserForm->SetURI(m_strURL));
 	}
+
 
 Error:
 	return r;
@@ -373,8 +375,7 @@ Error:
 RESULT DreamFormApp::Show() {
 	RESULT r = R_PASS;
 
-	CNR(m_pFormView, R_SKIPPED);
-
+	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
 

@@ -39,7 +39,11 @@ RESULT DreamLoginApp::HandleDreamFormSetCredentials(std::string& strRefreshToken
 	m_strRefreshToken = strRefreshToken;
 	m_strAccessToken = strAccessToken;
 
+	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(pUserController);
 	CR(SetCredential(CREDENTIAL_REFRESH_TOKEN, strRefreshToken));
+
+	CR(pUserController->SetAccessToken(strAccessToken));
 
 Error:
 	return r;
@@ -50,11 +54,17 @@ RESULT DreamLoginApp::HandleDreamFormSetEnvironmentId(int environmentId) {
 
 	m_strLastEnvironmentId = std::to_string(environmentId);
 
+	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(pUserController);
+	pUserController->SetUserDefaultEnvironmentID(environmentId);
+	pUserController->UpdateLoginState();
+
+
 	//TODO: once everything else works, shouldn't need to save this anymore
 	// (along with access token)
 	//CR(SetCredential(CREDENTIAL_LAST_ENVIRONMENT, m_strLastEnvironmentId));
 
-//Error:
+Error:
 	return r;
 }
 

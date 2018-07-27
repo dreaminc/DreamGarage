@@ -17,8 +17,8 @@ CEFBrowserManager::CEFBrowserManager() {
 CEFBrowserManager::~CEFBrowserManager() {
 	RESULT r = R_PASS;
 
-	//CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
-	CR(r);
+	CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	//CR(r);
 
 Error:
 	return;
