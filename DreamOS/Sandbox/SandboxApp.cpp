@@ -462,7 +462,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	//CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
 	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
 
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
