@@ -12,8 +12,7 @@
 #include <vector>
 
 #include "json.hpp"
-
-class texture;
+#include "Primitives/texture.h"
 
 class MenuNode : public dirty {
 public:

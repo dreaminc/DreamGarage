@@ -76,6 +76,7 @@ public:
 	RESULT Hide();
 
 	RESULT AddScrollViewNode(MenuNode* pMenuNode);
+	RESULT ClearScrollViewNodes();
 
 public:
 	ScrollState GetState();

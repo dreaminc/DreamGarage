@@ -76,6 +76,7 @@ public:
 	bool Contains(VirtualObj* pObj);
 
 	std::string& GetName();
+	RESULT SetName(std::string strName);
 
 
 private:

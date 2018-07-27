@@ -132,7 +132,7 @@ RESULT UISpatialScrollView::Update() {
 
 
 	int index = m_yRotation / yRotationPerElement;
-	int arrayMaxIndex = (int)(pChildren.size()) - 1;
+	int arrayMaxIndex = (int)(m_pScrollViewNodes.size()) - 1;
 
 	int minIndex = index - 1;
 	if (minIndex < 0) {
@@ -144,11 +144,21 @@ RESULT UISpatialScrollView::Update() {
 		maxIndex = arrayMaxIndex;
 	}
 
-	for (int i = minIndex; i <= maxIndex; i++) {
+	for (int i = minIndex % (int)pChildren.size(); i <= maxIndex % (int)pChildren.size(); i++) {
 		auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
 		if (!pObj->IsVisible()) {
 			pObj->SetVisible(true);
-			pObj->RegisterToInteractionEngine(m_pDreamOS);
+			//pObj->RegisterToInteractionEngine(m_pDreamOS);
+		}
+	}
+
+	if (m_pScrollViewNodes.size() > minIndex) {
+		for (int i = minIndex; i <= maxIndex; i++) {
+			auto pObj = dynamic_cast<UIMenuItem*>(pChildren[i % 8].get());
+			if (pObj != nullptr) {
+				pObj->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[i]->GetThumbnailTexture());
+				pObj->SetName(m_pScrollViewNodes[i]->GetTitle());
+			}
 		}
 	}
 
@@ -403,7 +413,18 @@ Error:
 }
 
 RESULT UISpatialScrollView::AddScrollViewNode(MenuNode* pMenuNode) {
+	RESULT r = R_PASS;
+	
+	CN(pMenuNode);
+
 	m_pScrollViewNodes.push_back(pMenuNode);
+	
+Error:
+	return r;
+}
+
+RESULT UISpatialScrollView::ClearScrollViewNodes() {
+	m_pScrollViewNodes.clear();
 	return R_PASS;
 }
 

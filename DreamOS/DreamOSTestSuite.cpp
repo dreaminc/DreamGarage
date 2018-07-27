@@ -17,6 +17,7 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
+#include "DreamGarage\DreamFormApp.h"
 #include "DreamControlView\DreamControlView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
@@ -50,6 +51,10 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestEnvironmentSwitching());
+	
+	CR(AddTestDreamOS());
+
+	CR(AddTestDreamUIBar());
 
 	CR(AddTestCredentialStorage());
 
@@ -71,8 +76,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamShareView());
 
-	CR(AddTestDreamOS());
-
 	CR(AddTestUserApp());
 
 	CR(AddTestCaptureApp());
@@ -80,8 +83,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamApps());
 
 	CR(AddTestUIKeyboard());
-
-	CR(AddTestDreamUIBar());
 
 	CR(AddTestCaptureApp());
 
@@ -1207,7 +1208,8 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
+
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
 
@@ -1216,7 +1218,12 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		/*
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
 			auto pCommandLineManager = CommandLineManager::instance();
@@ -1234,13 +1241,19 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 			}
 		}
-		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
-		CN(pDreamControlView);
+		*/
+		//pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
+		//CN(pDreamControlView);
 
 		// UIKeyboard App
+		m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
+
 		CR(m_pDreamOS->InitializeKeyboard());
 		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CN(pTestContext->pUser);
+
+		pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+		CN(pUserControlArea);
 
 		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
 		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
