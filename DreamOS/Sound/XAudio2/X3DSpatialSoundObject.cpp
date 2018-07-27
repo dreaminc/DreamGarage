@@ -146,6 +146,37 @@ RESULT X3DSpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	m_fLoop = false;
+
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundBuffer);
+
+	pFloatAudioBuffer = (float*)malloc(sizeof(float) * numFrames);
+	CN(pFloatAudioBuffer);
+
+	CR(pSoundBuffer->LoadDataToInterlacedTargetBuffer(pFloatAudioBuffer, numFrames));
+
+	{
+		XAUDIO2_BUFFER xaudio2AudioBuffer{};
+
+		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * numFrames);
+		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+		xaudio2AudioBuffer.pContext = reinterpret_cast<void*>(pFloatAudioBuffer);
+
+		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
+	}
+
+Error:
+	// The buffer will be deleted in the buffer-end handler
+
+	return r;
+}
+
+// More control is available using the callbacks if needed in the future
 RESULT X3DSpatialSoundObject::LoopSoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 
@@ -167,6 +198,8 @@ RESULT X3DSpatialSoundObject::LoopSoundFile(SoundFile *pSoundFile) {
 	}
 
 Error:
+	// The buffer will be deleted in the buffer-end handler
+
 	return r;
 }
 
@@ -190,6 +223,8 @@ RESULT X3DSpatialSoundObject::PlaySoundFile(SoundFile *pSoundFile) {
 	}
 
 Error:
+	// The buffer will be deleted in the buffer-end handler
+
 	return r;
 }
 
