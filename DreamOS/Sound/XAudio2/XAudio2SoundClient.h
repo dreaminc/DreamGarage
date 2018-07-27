@@ -10,6 +10,7 @@
 
 #include <Windows.h>
 #include <XAudio2.h>
+#include <x3daudio.h>
 
 #define REFTIMES_PER_MILLISEC  10000
 #define REFTIMES_PER_SEC (REFTIMES_PER_MILLISEC * 100)   
@@ -51,6 +52,10 @@ private:
 	std::shared_ptr<IXAudio2MasteringVoice> m_pXAudio2MasterVoice = nullptr;
 
 	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoice = nullptr;
+
+	// Spatial
+	std::shared_ptr<X3DAUDIO_HANDLE> m_pX3DInstance = nullptr;
+	std::shared_ptr<X3DAUDIO_LISTENER> m_pX3DListener = nullptr;
 };
 
 #endif XAUDIO2_SOUND_CLIENT_H_
