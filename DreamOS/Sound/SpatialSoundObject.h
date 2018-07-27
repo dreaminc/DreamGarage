@@ -34,7 +34,7 @@ public:
 	virtual RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f) { return R_NOT_IMPLEMENTED; }
 
 	RESULT LoadSoundFile(SoundFile *pSoundFile);
-	RESULT PlaySoundFile(SoundFile *pSoundFile);
+	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
 	RESULT LoopSoundFile(SoundFile *pSoundFile);
 
 private:
