@@ -22,7 +22,7 @@ public:
 		INVALID
 	};
 
-	static const char * TypeString(SoundBuffer::type bufferType);
+	static const char *TypeString(SoundBuffer::type bufferType);
 
 protected:
 	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
@@ -338,7 +338,7 @@ public:
 	virtual RESULT MixIntoInterlacedTargetBuffer(CBType *pDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CB((NumPendingBytes() >= numFrameCount));
+		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
 		
 		{
 			size_t bufferCounter = 0;
@@ -361,7 +361,7 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CB((NumPendingBytes() >= numFrameCount));
+		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
 
 		{
 			size_t bufferCounter = 0;

@@ -17,6 +17,31 @@ RESULT SpatialSoundObject::SetEmitterListenerDirection(vector vEmitterDirection,
 	return R_PASS;
 }
 
+RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundBuffer);
+
+	//CBM((pSoundFile->NumChannels() == m_pSoundBuffer->NumChannels()),
+	//	"Don't currently support playing files that don't match render buffer channel count");
+
+	m_pSoundBuffer->LockBuffer();
+	{
+		if (m_pSoundBuffer->IsFull() == false) {
+			m_pSoundBuffer->PushMonoAudioBuffer(numFrames, pSoundBuffer);
+		}
+		else {
+			DEBUG_LINEOUT("Render buffer is full");
+		}
+	}
+	m_pSoundBuffer->UnlockBuffer();
+
+Error:
+	return r;
+}
+
 RESULT SpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 	float *pFloatAudioBuffer = nullptr;

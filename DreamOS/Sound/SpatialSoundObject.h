@@ -37,6 +37,8 @@ public:
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
 	virtual RESULT LoopSoundFile(SoundFile *pSoundFile);
 
+	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer);
+
 private:
 	camera *m_pListenerCamera = nullptr;
 

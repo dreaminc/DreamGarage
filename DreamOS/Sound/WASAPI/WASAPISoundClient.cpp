@@ -837,7 +837,7 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 
 	// Audio Capture Client Device
 	CRM((RESULT)m_pAudioEndpointCaptureDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioCaptureClient), "Failed to activate audio capture client");
-	CN(m_pAudioRenderClient);
+	CN(m_pAudioCaptureClient);
 
 	// Capture Format 
 	CR((RESULT)m_pAudioCaptureClient->GetMixFormat(&m_pCaptureWaveFormatX));
@@ -870,75 +870,20 @@ RESULT WASAPISoundClient::Initialize() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
 
-	//UINT32 bufferFrameCount;
-	//UINT32 numFramesAvailable;
-	//UINT32 packetLength = 0;
-
-	//BYTE *pData = nullptr;
-
-	//DWORD captureFlags;
-
 	DEBUG_LINEOUT("Initializing WASAPI Sound Client");
 
 	// Enumerate end points 
 	// TODO: Member function - allow for better selection
 	CR(EnumerateWASAPIDevices());
 
-	
-	//CR(EnumerateWASAPISessions(pSessionManager));
-
 	//// Initialize the render audio client
-	//CR(InitializeRenderAudioClient());
-	//
-	//// Initialize the capture audio client
-	//CR(InitializeCaptureAudioClient());
+	CRM(InitializeRenderAudioClient(), "Failed to initialize wasapi render");
+	
+	// Initialize the capture audio client
+	CRM(InitializeCaptureAudioClient(), "Failed to initialize wasapi capture");
 
 	// Spatial Audio Client
-	CR(InitializeSpatialAudioClient());
-
-	// Test: Try to play something
-
-	/*
-	// This is for recording stuff
-	CRM((RESULT)pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get service");
-	
-	// Notify the audio sink which format to use.
-	//CR(pAudioSink->SetFormat(pwfx));
-
-	// Calculate the actual duration of the allocated buffer.
-	hnsActualDuration = (double)REFTIMES_PER_SEC * bufferFrameCount / pwfx->nSamplesPerSec;
-
-	// Start recording.
-	CR((RESULT)pAudioClient->Start());  
-
-	// Each loop fills about half of the shared buffer.
-	while (fDone == false) {
-
-		// Sleep for half the buffer duration.
-		Sleep(hnsActualDuration / REFTIMES_PER_MILLISEC / 2);
-
-		CR((RESULT)pCaptureClient->GetNextPacketSize(&packetLength));
-
-		while (packetLength > 0) {
-			// Get the available data in the shared buffer.
-			CR((RESULT)pCaptureClient->GetBuffer(&pData, &numFramesAvailable, &captureFlags, nullptr, nullptr));
-
-			if (captureFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
-				pData = nullptr;  // Tell CopyData to write silence.
-			}
-
-			// Copy the available capture data to the audio sink.
-			//CR(pMySink->CopyData(pData, numFramesAvailable, &bDone));
-
-			CR((RESULT)pCaptureClient->ReleaseBuffer(numFramesAvailable));
-
-			CR((RESULT)pCaptureClient->GetNextPacketSize(&packetLength));
-		}
-	}
-
-	// Stop recording.
-	CR((RESULT)pAudioClient->Stop());
-	*/
+	//CRM(InitializeSpatialAudioClient() " Failed to initialize wasapi spatial");
 
 Error:
 	return r;

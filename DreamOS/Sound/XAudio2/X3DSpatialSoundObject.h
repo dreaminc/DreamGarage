@@ -34,6 +34,8 @@ public:
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
 	virtual RESULT LoopSoundFile(SoundFile *pSoundFile) override;
 
+	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) override;
+
 	//RESULT GetBuffer(BYTE **ppBuffer, UINT32 *pBufferLength);
 	//
 	//RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f);
