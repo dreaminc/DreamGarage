@@ -3,6 +3,8 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 
+#include "Sound/SoundFile.h"
+
 X3DSpatialSoundObject::X3DSpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, std::shared_ptr<IXAudio2> pXAudio2, std::shared_ptr<IXAudio2MasteringVoice> pXAudio2MasterVoice) :
 	SpatialSoundObject(ptOrigin, vEmitterDirection, vListenerDirection),
 	m_pXAudio2(pXAudio2),
@@ -20,6 +22,11 @@ RESULT X3DSpatialSoundObject::Kill() {
 
 	if (m_pXAudio2SourceVoice != nullptr) {
 		m_pXAudio2SourceVoice = nullptr;
+	}
+
+	if (m_hBufferEndEvent != nullptr) {
+		CloseHandle(m_hBufferEndEvent);
+		m_hBufferEndEvent = nullptr;
 	}
 
 //Error:
@@ -49,7 +56,9 @@ RESULT X3DSpatialSoundObject::Initialize() {
 
 	// Create a source voice to accept audio data in the specified format.
 	IXAudio2SourceVoice* pXAudio2SourceVoice = nullptr;
-	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to initialize object voice");
+	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat, 0, XAUDIO2_DEFAULT_FREQ_RATIO, this, NULL, NULL),
+		"Failed to initialize object voice");
+
 	CN(pXAudio2SourceVoice);
 	m_pXAudio2SourceVoice = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
 
@@ -121,7 +130,51 @@ RESULT X3DSpatialSoundObject::Initialize() {
 		}
 	}
 
+	m_hBufferEndEvent = CreateEvent(nullptr, false, false, nullptr);
+	CNM(m_hBufferEndEvent, "Failed to create buffer end event for object");
+
+	// Our local buffer
+	CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT),
+		"Failed to initialize sound buffer for spatial audio object");
+
+
+	
+
 Error:
+	return r;
+}
+
+RESULT X3DSpatialSoundObject::PlaySoundFile(SoundFile *pSoundFile) {
+	RESULT r = R_PASS;
+
+	m_fLoop = false;
+
+	//CR(LoadSoundFile(pSoundFile));
+
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundFile);
+	CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer, 1));
+
+	{
+		XAUDIO2_BUFFER xaudio2AudioBuffer{};
+
+		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * pSoundFile->GetNumFrames());
+		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+		xaudio2AudioBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
+
+		CR(m_pSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
+	}
+
+	CRM((RESULT)m_pXAudio2SourceVoice->Start(0), "Failed to start spatial object voice");
+
+Error:
+	//if (pFloatAudioBuffer != nullptr) {
+	//	delete[] pFloatAudioBuffer;
+	//	pFloatAudioBuffer = nullptr;
+	//}
+
 	return r;
 }
 
@@ -134,24 +187,11 @@ RESULT X3DSpatialSoundObject::Update(unsigned int numFrames, unsigned int numCha
 	//// TODO: Get from virtual object and camera etc
 	//CR(UpdateSpatialSoundObjectOrientation());
 	//
-	//// Copy data into buffer
+
+	// Copy data into buffer
 	//CR(LoadDataFromBuffer(numFrames, numChannels));
 
-	// TODO:
-
-	CR(r);
-
-Error:
-	return r;
-}
-
-/*
-RESULT X3DSpatialSoundObject::GetBuffer(BYTE **ppBuffer, UINT32 *pBufferLength) {
-	RESULT r = R_PASS;
-
-	CRM((RESULT)m_pSpatialAudioObjectHRTF->GetBuffer(ppBuffer, pBufferLength), "Failed to get buffer");
-
-Error:
+//Error:
 	return r;
 }
 
@@ -161,11 +201,11 @@ RESULT X3DSpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsigne
 	BYTE *pBuffer = nullptr;
 	UINT32 pBuffer_n = 0;
 
+	// TODO:
+
 	CN(m_pSoundBuffer);
 
-	CR(GetBuffer(&pBuffer, &pBuffer_n));
-
-	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
+	float *pDataBuffer = nullptr;
 	
 	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingBytes();
 	size_t numFramesRead = 0;
@@ -173,6 +213,16 @@ RESULT X3DSpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsigne
 	while (numFramesRead < numFrames) {
 
 		if (m_fLoop) {
+
+			XAUDIO2_BUFFER xAudio2Buffer{};
+			
+			xAudio2Buffer.AudioBytes = static_cast<UINT32>(sizeof(float) * numFramesInBuffer);
+			//xAudio2Buffer.pAudioData = m_pSoundBuffer->m_;
+			xAudio2Buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+
+			CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xAudio2Buffer), "Failed to submit buffer to source");
+
+
 			if (numFramesInBuffer <= numFrames) {
 				CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)numFramesInBuffer));
 				m_pSoundBuffer->ResetBuffer(m_startLoop, m_endLoop);
@@ -194,6 +244,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT X3DSpatialSoundObject::WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate, unsigned int numChannels, float frequency) {
 	RESULT r = R_PASS;
 
