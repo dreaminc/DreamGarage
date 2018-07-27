@@ -81,14 +81,14 @@ RESULT X3DSpatialSoundObject::Initialize() {
 		CR((RESULT)CreateHrtfApo(&hrtfAPOInit, &m_pXAPO));
 		CN(m_pXAPO);
 
-		if (m_pHRTFfParams != nullptr) {
-			m_pHRTFfParams.Reset();
+		if (m_pHRTFParams != nullptr) {
+			m_pHRTFParams.Reset();
 		}
 		
-		m_pXAPO.As(&m_pHRTFfParams);
+		m_pXAPO.As(&m_pHRTFParams);
 		HrtfEnvironment hrtfEnvironment = HrtfEnvironment::Outdoors;
 
-		m_pHRTFfParams->SetEnvironment(hrtfEnvironment);
+		m_pHRTFParams->SetEnvironment(hrtfEnvironment);
 
 		// Create a submix voice that will host the xAPO - this submix voice will be destroyed when XAudio2 instance is destroyed.
 
@@ -133,23 +133,28 @@ RESULT X3DSpatialSoundObject::Initialize() {
 	m_hBufferEndEvent = CreateEvent(nullptr, false, false, nullptr);
 	CNM(m_hBufferEndEvent, "Failed to create buffer end event for object");
 
-	// Our local buffer
-	CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT),
-		"Failed to initialize sound buffer for spatial audio object");
+	// XAudio manages the buffers for us, so we don't need to do this apparently 
+	//CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT),
+	//	"Failed to initialize sound buffer for spatial audio object");
 
+	// Quickly set the params of the object since they should be 
+	// valid here
+	Update(0, 0);
 
-	
+	CRM((RESULT)m_pXAudio2SourceVoice->Start(0), "Failed to start spatial object voice");
 
 Error:
 	return r;
 }
 
-RESULT X3DSpatialSoundObject::PlaySoundFile(SoundFile *pSoundFile) {
+RESULT X3DSpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT X3DSpatialSoundObject::LoopSoundFile(SoundFile *pSoundFile) {
 	RESULT r = R_PASS;
 
-	m_fLoop = false;
-
-	//CR(LoadSoundFile(pSoundFile));
+	m_fLoop = true;
 
 	float *pFloatAudioBuffer = nullptr;
 
@@ -162,26 +167,41 @@ RESULT X3DSpatialSoundObject::PlaySoundFile(SoundFile *pSoundFile) {
 		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * pSoundFile->GetNumFrames());
 		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
 		xaudio2AudioBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+		xaudio2AudioBuffer.pContext = reinterpret_cast<void*>(pFloatAudioBuffer);
 		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
-
-		CR(m_pSoundBuffer->PushData(pFloatAudioBuffer, pSoundFile->GetNumFrames()));
 	}
 
-	CRM((RESULT)m_pXAudio2SourceVoice->Start(0), "Failed to start spatial object voice");
+Error:
+	return r;
+}
+
+RESULT X3DSpatialSoundObject::PlaySoundFile(SoundFile *pSoundFile) {
+	RESULT r = R_PASS;
+
+	m_fLoop = false;
+
+	float *pFloatAudioBuffer = nullptr;
+	
+	CN(pSoundFile);
+	CR(pSoundFile->GetAudioBuffer(pFloatAudioBuffer, 1));
+	
+	{
+		XAUDIO2_BUFFER xaudio2AudioBuffer{};
+	
+		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * pSoundFile->GetNumFrames());
+		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+		xaudio2AudioBuffer.pContext = reinterpret_cast<void*>(pFloatAudioBuffer);
+		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
+	}
 
 Error:
-	//if (pFloatAudioBuffer != nullptr) {
-	//	delete[] pFloatAudioBuffer;
-	//	pFloatAudioBuffer = nullptr;
-	//}
-
 	return r;
 }
 
 RESULT X3DSpatialSoundObject::Update(unsigned int numFrames, unsigned int numChannels) {
 	RESULT r = R_PASS;
 
-	//point ptPosition = GetPosition(true);
+	point ptPosition = GetPosition(true);
 	//CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
 	//
 	//// TODO: Get from virtual object and camera etc
@@ -191,165 +211,50 @@ RESULT X3DSpatialSoundObject::Update(unsigned int numFrames, unsigned int numCha
 	// Copy data into buffer
 	//CR(LoadDataFromBuffer(numFrames, numChannels));
 
-//Error:
-	return r;
-}
+	CN(m_pHRTFParams);
 
-RESULT X3DSpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsigned int numChannels) {
-	RESULT r = R_PASS;
+	auto hrtfPosition = HrtfPosition{ ptPosition.x(), ptPosition.y(), ptPosition.z() };
+	CR((RESULT)m_pHRTFParams->SetSourcePosition(&hrtfPosition));
 
-	BYTE *pBuffer = nullptr;
-	UINT32 pBuffer_n = 0;
+	//auto sourceOrientation = OrientationFromAngles(pitch, yaw, roll);
+	//hr = _hrtfParams->SetSourceOrientation(&sourceOrientation);
 
-	// TODO:
-
-	CN(m_pSoundBuffer);
-
-	float *pDataBuffer = nullptr;
-	
-	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingBytes();
-	size_t numFramesRead = 0;
-
-	while (numFramesRead < numFrames) {
-
-		if (m_fLoop) {
-
-			XAUDIO2_BUFFER xAudio2Buffer{};
-			
-			xAudio2Buffer.AudioBytes = static_cast<UINT32>(sizeof(float) * numFramesInBuffer);
-			//xAudio2Buffer.pAudioData = m_pSoundBuffer->m_;
-			xAudio2Buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
-
-			CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xAudio2Buffer), "Failed to submit buffer to source");
-
-
-			if (numFramesInBuffer <= numFrames) {
-				CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, (int)numFramesInBuffer));
-				m_pSoundBuffer->ResetBuffer(m_startLoop, m_endLoop);
-
-				numFramesRead += numFramesInBuffer;
-			}
-			else {
-				CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
-				numFramesRead += numFrames;
-			}
-		}
-		else {
-			CR(m_pSoundBuffer->LoadDataToInterlacedTargetBuffer(pDataBuffer, numFrames));
-			numFramesRead += numFrames;
-		}
-	}
 
 Error:
 	return r;
 }
 
-/*
-RESULT X3DSpatialSoundObject::WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate, unsigned int numChannels, float frequency) {
-	RESULT r = R_PASS;
+void X3DSpatialSoundObject::OnStreamEnd() {
+	//int a = 5;
+}
 
-	static double theta = 0.0f;
+void X3DSpatialSoundObject::OnVoiceProcessingPassEnd() {
+	//int a = 5;
+}
 
-	BYTE *pBuffer = nullptr;
-	UINT32 pBuffer_n = 0;
+void X3DSpatialSoundObject::OnVoiceProcessingPassStart(UINT32 samplesRequired) {
+	//int a = 5;
+}
 
-	CR(GetBuffer(&pBuffer, &pBuffer_n));
+void X3DSpatialSoundObject::OnBufferEnd(void *pBufferContext) {
+	if (pBufferContext != nullptr) {
+		float *pFloatAudioBuffer = reinterpret_cast<float*>(pBufferContext);
 
-	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
-
-	for (unsigned int i = 0; i < (numFrames * numChannels); i += numChannels) {
-
-		float val = sin(theta);
-
-		//val *= 0.25f;
-
-		for (unsigned int j = 0; j < numChannels; j++) {
-			pDataBuffer[i + j] = val;
-		}
-
-		// Increment theta
-		theta += ((2.0f * M_PI) / (float)(samplingRate)) * frequency;
-
-		if (theta >= 2.0f * M_PI) {
-			theta = theta - (2.0f * M_PI);
+		if (pFloatAudioBuffer != nullptr) {
+			delete[] pFloatAudioBuffer;
+			pFloatAudioBuffer = nullptr;
 		}
 	}
-
-Error:
-	return r;
 }
 
-// TODO: Decompose using our matrix libs
-DirectX::XMMATRIX CalculateEmitterConeOrientationMatrix(Windows::Foundation::Numerics::float3 listenerOrientationFront, Windows::Foundation::Numerics::float3 emitterDirection) {
-
-	DirectX::XMVECTOR vListenerDirection = DirectX::XMLoadFloat3(&listenerOrientationFront);
-	DirectX::XMVECTOR vEmitterDirection = DirectX::XMLoadFloat3(&emitterDirection);
-	DirectX::XMVECTOR vCross = DirectX::XMVector3Cross(vListenerDirection, vEmitterDirection);
-	DirectX::XMVECTOR vDot = DirectX::XMVector3Dot(vListenerDirection, vEmitterDirection);
-	DirectX::XMVECTOR vAngle = DirectX::XMVectorACos(vDot);
-
-	float angle = DirectX::XMVectorGetX(vAngle);
-
-	// The angle must be non-zero
-	if (fabsf(angle) > FLT_EPSILON) {
-
-		// And less than PI
-		if (fabsf(angle) < DirectX::XM_PI) {
-			return DirectX::XMMatrixRotationAxis(vCross, angle);
-		}
-		else {
-			// If equal to PI, find any other non-collinear vector to generate the perpendicular vector to rotate about
-
-			DirectX::XMFLOAT3 vector = { 1.0f, 1.0f, 1.0f };
-
-			if (listenerOrientationFront.x != 0.0f) {
-				vector.x = -listenerOrientationFront.x;
-			}
-			else if (listenerOrientationFront.y != 0.0f) {
-				vector.y = -listenerOrientationFront.y;
-			}
-			else {
-				vector.z = -listenerOrientationFront.z;
-			}
-
-			DirectX::XMVECTOR vVector = DirectX::XMLoadFloat3(&vector);
-
-			vVector = DirectX::XMVector3Normalize(vVector);
-			vCross = DirectX::XMVector3Cross(vVector, vEmitterDirection);
-
-			return DirectX::XMMatrixRotationAxis(vCross, angle);
-		}
-	}
-
-	// If the angle is zero, use an identity matrix
-	return DirectX::XMMatrixIdentity();
+void X3DSpatialSoundObject::OnBufferStart(void *pBufferContext) {
+	//int a = 5;
 }
 
-// TODO: Decompose using our matrix libs
-RESULT X3DSpatialSoundObject::UpdateSpatialSoundObjectOrientation() {
-	RESULT r = R_PASS;
-
-	Windows::Foundation::Numerics::float3 emitterDirection = 
-		Windows::Foundation::Numerics::float3(m_vEmitterDirection.x(), m_vEmitterDirection.y(), m_vEmitterDirection.z());
-
-	Windows::Foundation::Numerics::float3 listenerDirection = 
-		Windows::Foundation::Numerics::float3(m_vListenerDirection.x(), m_vListenerDirection.y(), m_vListenerDirection.z());
-
-	DirectX::XMFLOAT4X4 rotationMatrix;
-
-	DirectX::XMMATRIX rotation = CalculateEmitterConeOrientationMatrix(emitterDirection, listenerDirection);
-
-	XMStoreFloat4x4(&rotationMatrix, rotation);
-
-	SpatialAudioHrtfOrientation spatialAudioHRTFOrientationMatrix = {
-		rotationMatrix._11, rotationMatrix._12, rotationMatrix._13,
-		rotationMatrix._21, rotationMatrix._22, rotationMatrix._23,
-		rotationMatrix._31, rotationMatrix._32, rotationMatrix._33
-	};
-
-	CR((RESULT)m_pSpatialAudioObjectHRTF->SetOrientation(&spatialAudioHRTFOrientationMatrix));
-
-Error:
-	return r;
+void X3DSpatialSoundObject::OnLoopEnd(void *pBufferContext) {
+	//int a = 5;
 }
-*/
+
+void X3DSpatialSoundObject::OnVoiceError(void *pBufferContext, HRESULT hrError) {
+	//int a = 5;
+}

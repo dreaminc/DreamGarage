@@ -155,8 +155,8 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			pTestContext->pSphere->SetPosition(ptPosition);
 
 			//// Open a sound file
-			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
-			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"TR808/CP.WAV", SoundFile::type::WAVE);
+			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"TR808/CP.WAV", SoundFile::type::WAVE);
 			CN(pNewSoundFile);
 
 			// Create the sound client
@@ -220,6 +220,8 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 			theta += 0.00025f;
 			localRadius += 0.0001f;
+
+			pTestContext->pSpatialSoundObject->Update(0, 0);
 		}
 
 	Error:

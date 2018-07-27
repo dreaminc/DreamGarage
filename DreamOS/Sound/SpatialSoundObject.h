@@ -33,9 +33,9 @@ public:
 	// Function needs to copy over stuff 
 	virtual RESULT WriteTestSignalToAudioObjectBuffer(unsigned int numFrames, unsigned int samplingRate = 48000, unsigned int numChannels = 1, float frequency = 440.0f) { return R_NOT_IMPLEMENTED; }
 
-	RESULT LoadSoundFile(SoundFile *pSoundFile);
+	virtual RESULT LoadSoundFile(SoundFile *pSoundFile);
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
-	RESULT LoopSoundFile(SoundFile *pSoundFile);
+	virtual RESULT LoopSoundFile(SoundFile *pSoundFile);
 
 private:
 	camera *m_pListenerCamera = nullptr;

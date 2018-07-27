@@ -28,9 +28,11 @@ public:
 	virtual RESULT Kill() override;
 	virtual RESULT Update(unsigned int numFrames, unsigned int numChannels) override;
 
-	RESULT LoadDataFromBuffer(unsigned int numFrames, unsigned int numChannels);
+	//RESULT LoadDataFromBuffer(unsigned int numFrames, unsigned int numChannels);
 
+	virtual RESULT LoadSoundFile(SoundFile *pSoundFile) override;
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
+	virtual RESULT LoopSoundFile(SoundFile *pSoundFile) override;
 
 	//RESULT GetBuffer(BYTE **ppBuffer, UINT32 *pBufferLength);
 	//
@@ -42,25 +44,20 @@ public:
 	// public IXAudio2VoiceCallback
 
 	//Called when the voice has just finished playing a contiguous audio stream.
-	void OnStreamEnd() override { 
-		int a = 5;
-		SetEvent(m_hBufferEndEvent); 
-	}
-
-	//Unused methods are stubs
-	void OnVoiceProcessingPassEnd() override {}
-	void OnVoiceProcessingPassStart(UINT32 samplesRequired) override { }
-	void OnBufferEnd(void *pBufferContext) override  {}
-	void OnBufferStart(void *pBufferContext) override {}
-	void OnLoopEnd(void *pBufferContext) override {}
-	void OnVoiceError(void * pBufferContext, HRESULT hrError) override {}
+	void OnStreamEnd() override;
+	void OnVoiceProcessingPassEnd() override;
+	void OnVoiceProcessingPassStart(UINT32 samplesRequired) override;
+	void OnBufferEnd(void *pBufferContext) override;
+	void OnBufferStart(void *pBufferContext) override;
+	void OnLoopEnd(void *pBufferContext) override;
+	void OnVoiceError(void * pBufferContext, HRESULT hrError) override;
 
 private:
 	std::shared_ptr<IXAudio2> m_pXAudio2 = nullptr;
 	std::shared_ptr<IXAudio2MasteringVoice> m_pXAudio2MasterVoice = nullptr;
 
 	Microsoft::WRL::ComPtr<IXAPO> m_pXAPO;
-	Microsoft::WRL::ComPtr<IXAPOHrtfParameters> m_pHRTFfParams;
+	Microsoft::WRL::ComPtr<IXAPOHrtfParameters> m_pHRTFParams;
 
 	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoice = nullptr;
 	std::shared_ptr<IXAudio2SubmixVoice> m_pXAudio2SubmixVoice = nullptr;
