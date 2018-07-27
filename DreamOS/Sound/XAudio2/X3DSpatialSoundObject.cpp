@@ -91,7 +91,6 @@ RESULT X3DSpatialSoundObject::Initialize() {
 		m_pHRTFParams->SetEnvironment(hrtfEnvironment);
 
 		// Create a submix voice that will host the xAPO - this submix voice will be destroyed when XAudio2 instance is destroyed.
-
 		{
 			IXAudio2SubmixVoice* pXAudio2SubmixVoice = nullptr;
 
@@ -136,10 +135,6 @@ RESULT X3DSpatialSoundObject::Initialize() {
 	// XAudio manages the buffers for us, so we don't need to do this apparently 
 	//CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT),
 	//	"Failed to initialize sound buffer for spatial audio object");
-
-	// Quickly set the params of the object since they should be 
-	// valid here
-	Update(0, 0);
 
 	CRM((RESULT)m_pXAudio2SourceVoice->Start(0), "Failed to start spatial object voice");
 
@@ -202,23 +197,14 @@ RESULT X3DSpatialSoundObject::Update(unsigned int numFrames, unsigned int numCha
 	RESULT r = R_PASS;
 
 	point ptPosition = GetPosition(true);
-	//CR((RESULT)m_pSpatialAudioObjectHRTF->SetPosition(ptPosition.x(), ptPosition.y(), ptPosition.z()));
-	//
-	//// TODO: Get from virtual object and camera etc
-	//CR(UpdateSpatialSoundObjectOrientation());
-	//
-
-	// Copy data into buffer
-	//CR(LoadDataFromBuffer(numFrames, numChannels));
 
 	CN(m_pHRTFParams);
 
-	auto hrtfPosition = HrtfPosition{ ptPosition.x(), ptPosition.y(), ptPosition.z() };
+	auto hrtfPosition = HrtfPosition{ ptPosition.x(), ptPosition.y(), -ptPosition.z() };
 	CR((RESULT)m_pHRTFParams->SetSourcePosition(&hrtfPosition));
 
 	//auto sourceOrientation = OrientationFromAngles(pitch, yaw, roll);
 	//hr = _hrtfParams->SetSourceOrientation(&sourceOrientation);
-
 
 Error:
 	return r;
@@ -232,11 +218,15 @@ void X3DSpatialSoundObject::OnVoiceProcessingPassEnd() {
 	//int a = 5;
 }
 
-void X3DSpatialSoundObject::OnVoiceProcessingPassStart(UINT32 samplesRequired) {
-	//int a = 5;
+void X3DSpatialSoundObject::OnVoiceProcessingPassStart(UINT32 bytesRequired) {
+	Update(bytesRequired, 1);
 }
 
 void X3DSpatialSoundObject::OnBufferEnd(void *pBufferContext) {
+
+	// We create these static buffers when we submit a packet of audio
+	// so here we de-allocate them
+
 	if (pBufferContext != nullptr) {
 		float *pFloatAudioBuffer = reinterpret_cast<float*>(pBufferContext);
 
