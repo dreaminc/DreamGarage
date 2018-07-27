@@ -46,7 +46,7 @@ public:
 	//Called when the voice has just finished playing a contiguous audio stream.
 	void OnStreamEnd() override;
 	void OnVoiceProcessingPassEnd() override;
-	void OnVoiceProcessingPassStart(UINT32 samplesRequired) override;
+	void OnVoiceProcessingPassStart(UINT32 bytesRequired) override;
 	void OnBufferEnd(void *pBufferContext) override;
 	void OnBufferStart(void *pBufferContext) override;
 	void OnLoopEnd(void *pBufferContext) override;
