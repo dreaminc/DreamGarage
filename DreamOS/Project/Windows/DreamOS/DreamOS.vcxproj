@@ -920,6 +920,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sound\SpatialSoundObject.cpp" />
     <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp" />
+    <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp" />
     <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
@@ -1288,6 +1289,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sound\SpatialSoundObject.h" />
     <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISoundClient.h" />
     <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h" />
+    <ClInclude Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.h" />
     <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />

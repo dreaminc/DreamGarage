@@ -25,9 +25,9 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
-	CR(AddTestPlaySound());
-
 	CR(AddTestSpatialSound());
+
+	CR(AddTestPlaySound());
 	
 	CR(AddTestCaptureSound());
 
@@ -160,12 +160,11 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			CN(pNewSoundFile);
 
 			// Create the sound client
-			pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+			//pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+			pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
 			CN(pTestContext->pSoundClient);
 
 			CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
-
-			
 
 			//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
 
@@ -176,8 +175,6 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 			CR(pTestContext->pSpatialSoundObject->LoopSoundFile(pNewSoundFile));
 			//CR(pTestContext->pSpatialSoundObject->PlaySoundFile(pNewSoundFile));
-
-
 
 			CR(pTestContext->pSoundClient->StartSpatial());
 

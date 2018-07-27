@@ -940,6 +940,9 @@
     <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp">
       <Filter>Sound\WASAPI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp">
+      <Filter>Sound\XAudio2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2067,6 +2070,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h">
       <Filter>Sound\WASAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.h">
+      <Filter>Sound\XAudio2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
