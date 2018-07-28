@@ -71,7 +71,9 @@ Error:
 
 RESULT TimeManager::PrintFPS() {
 	//DEBUG_LINEOUT_RETURN("Runtime FPS: %f numframes:%zd", m_runTimeFPS, m_numFrames);
+	
 	DEBUG_LINEOUT_RETURN("Runtime FPS: %04f min:%04f max:%04f", m_runTimeFPS, m_minFPS, m_maxFPS);
+	
 	return R_PASS;
 }
 
