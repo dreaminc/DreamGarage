@@ -87,12 +87,7 @@ private:
 
 	float m_deltaTime; 
 
-#ifdef _USE_TEST_APP
-	bool m_fPassThru = false;
-#else
 	bool m_fPassThru = true;
-#endif
-
 };
 
 #endif // ! OGLPROGRAM_STANDARD_H_

@@ -94,7 +94,7 @@ RESULT UISpatialScrollView::Update() {
 	//m_yRotation = m_yRotation + (m_velocity*(float)(tDiff));
 	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
-		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
+		float maxRotation = (m_pScrollViewNodes.size() - m_maxElements) * yRotationPerElement;
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
 			m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)), maxRotation));
@@ -130,32 +130,54 @@ RESULT UISpatialScrollView::Update() {
 
 	}
 
+	CBR(!m_pScrollViewNodes.empty(), R_SKIPPED);
 
-	int index = m_yRotation / yRotationPerElement;
+	int firstButtonIndex = m_yRotation / yRotationPerElement;
 	int arrayMaxIndex = (int)(m_pScrollViewNodes.size()) - 1;
 
-	int minIndex = index - 1;
-	if (minIndex < 0) {
-		minIndex = 0;
+	int minNodeIndex = firstButtonIndex - 1;
+	if (minNodeIndex < 0) {
+		minNodeIndex = 0;
 	}
 
-	int maxIndex = index + m_maxElements + 1;
-	if (maxIndex > arrayMaxIndex) {
-		maxIndex = arrayMaxIndex;
+	int maxNodeIndex = firstButtonIndex + m_maxElements;
+	if (maxNodeIndex > arrayMaxIndex) {
+		maxNodeIndex = arrayMaxIndex;
 	}
 
-	for (int i = minIndex % (int)pChildren.size(); i <= maxIndex % (int)pChildren.size(); i++) {
-		auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
-		if (!pObj->IsVisible()) {
-			pObj->SetVisible(true);
-			//pObj->RegisterToInteractionEngine(m_pDreamOS);
+	int minButtonIndex = minNodeIndex % (int)pChildren.size();
+	int maxButtonIndex = maxNodeIndex % (int)pChildren.size();
+
+	if (minButtonIndex < maxButtonIndex) {
+		for (int i = minButtonIndex; i <= maxButtonIndex; i++) {
+			auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
+			if (!pObj->IsVisible()) {
+				pObj->SetVisible(true);
+				pObj->RegisterToInteractionEngine(m_pDreamOS);
+			}
+		}
+	}
+	else {
+		for (int i = minButtonIndex; i <= pChildren.size(); i++) {
+			auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
+			if (!pObj->IsVisible()) {
+				pObj->SetVisible(true);
+				pObj->RegisterToInteractionEngine(m_pDreamOS);
+			}
+		}
+		for (int i = 0; i <= maxButtonIndex; i++) {
+			auto pObj = dynamic_cast<UIButton*>(pChildren[i].get());
+			if (!pObj->IsVisible()) {
+				pObj->SetVisible(true);
+				pObj->RegisterToInteractionEngine(m_pDreamOS);
+			}
 		}
 	}
 
-	if (m_pScrollViewNodes.size() > minIndex) {
-		for (int i = minIndex; i <= maxIndex; i++) {
+	if (m_pScrollViewNodes.size() > 0) {
+		for (int i = minNodeIndex; i <= maxNodeIndex; i++) {
 			auto pObj = dynamic_cast<UIMenuItem*>(pChildren[i % 8].get());
-			if (pObj != nullptr) {
+			if (pObj != nullptr && pObj->GetName() == "") {
 				pObj->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[i]->GetThumbnailTexture());
 				pObj->SetName(m_pScrollViewNodes[i]->GetTitle());
 			}
@@ -163,15 +185,40 @@ RESULT UISpatialScrollView::Update() {
 	}
 
 	// Hide items that are far enough from the view
-	if (minIndex - 1 >= 0) {
-		auto pObj = dynamic_cast<DimObj*>(pChildren[minIndex - 1].get());
+	if (minButtonIndex - 1 > 0) {
+		auto pObj = dynamic_cast<UIMenuItem*>(pChildren[minButtonIndex - 1].get());
 		pObj->SetVisible(false);
+		pObj->SetName("");
 	}
-	if (maxIndex + 1 <= arrayMaxIndex) {
-		auto pObj = dynamic_cast<DimObj*>(pChildren[maxIndex + 1].get());
+	else {
+		auto pObj = dynamic_cast<UIMenuItem*>(pChildren[maxButtonIndex].get());
 		pObj->SetVisible(false);
+		pObj->SetName("");
 	}
 
+	if (maxButtonIndex + 1 < pChildren.size()) {
+		auto pObj = dynamic_cast<UIMenuItem*>(pChildren[maxButtonIndex + 1].get());
+		pObj->SetVisible(false);
+		pObj->SetName("");
+	}
+	else {
+		auto pObj = dynamic_cast<UIMenuItem*>(pChildren[0].get());
+		pObj->SetVisible(false);
+		pObj->SetName("");
+	}
+
+	// Rotate buttons as we scroll
+	if (minNodeIndex > 1 && m_velocity > 0) {
+		UIButton* pObj = dynamic_cast<UIButton*>(pChildren[minButtonIndex - 1].get());
+		PositionMenuButton(maxNodeIndex + 2, pObj);
+	}
+
+	/*
+	if (maxButtonIndex == pChildren.size() - 1) {
+		UIButton* pObj = dynamic_cast<UIButton*>(pChildren[maxButtonIndex + 3].get());
+		PositionMenuButton(minNodeIndex - 1, pObj);
+	}
+	*/
 
 	m_frameMs = msNow;
 
@@ -256,10 +303,10 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 	m_pDreamOS->AddObjectToUIGraph(m_pTitleView.get());
 
 
-	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
+	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton.get());
 	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
 
-	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
+	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton.get());
 	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
 
 	return r;
@@ -299,10 +346,10 @@ RESULT UISpatialScrollView::UpdateWithWidth(float totalWidth) {
 	m_pTitleView->SetScale(objectScale);
 //	m_pTitleQuad->SetScale(objectScale);
 
-	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
+	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton.get());
 	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
 
-	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
+	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton.get());
 	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
 
 Error:
@@ -310,7 +357,7 @@ Error:
 }
 
 // mostly borrowed from UIBar right now, current default values make sense with ray selection
-RESULT UISpatialScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> pButton) {
+RESULT UISpatialScrollView::PositionMenuButton(float index, UIButton* pButton) {
 	RESULT r = R_PASS;
 
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -index;
@@ -398,7 +445,7 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 		m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
 
-		PositionMenuButton(i, pButton);
+		PositionMenuButton(i, pButton.get());
 		m_pMenuButtonsContainer->AddObject(pButton);
 
 		if (i > m_maxElements-1) {
@@ -485,7 +532,7 @@ RESULT UISpatialScrollView::Snap() {
 		int startIndex = std::round(m_yRotation / yRotationPerElement);
 		float endYRotation = (float)(startIndex) * yRotationPerElement;
 		m_yRotation = endYRotation;
-	
+		/*
 		int index = 0;
 		for (auto& pChild : m_pMenuButtonsContainer->GetChildren()) {
 			if (index < startIndex || index >= startIndex + m_maxElements) {
@@ -496,7 +543,7 @@ RESULT UISpatialScrollView::Snap() {
 			}
 			index++;
 		}
-		
+		*/
 		return R_PASS;
 	};
 

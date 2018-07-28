@@ -58,7 +58,7 @@ public:
 	RESULT Update();
 	RESULT UpdateWithWidth(float totalWidth);
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
-	RESULT PositionMenuButton(float index, std::shared_ptr<UIButton> pButton);
+	RESULT PositionMenuButton(float index, UIButton* pButton);
 
 	RESULT SetScrollVisible(bool fVisible);
 	bool IsCapturable(UIButton* pButton);
@@ -143,6 +143,7 @@ private:
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<MenuNode*> m_pScrollViewNodes;
+	std::deque<UIButton*> m_pButtonDeque;
 //	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
