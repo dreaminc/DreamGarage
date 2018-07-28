@@ -49,7 +49,7 @@ RESULT X3DSpatialSoundObject::Initialize() {
 	sourceFormat.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 	sourceFormat.wBitsPerSample = 32;
 	sourceFormat.nChannels = 1;
-	sourceFormat.nSamplesPerSec = 48000;
+	sourceFormat.nSamplesPerSec = 44100;
 	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
@@ -159,6 +159,15 @@ RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pS
 	CN(pFloatAudioBuffer);
 
 	CR(pSoundBuffer->LoadDataToInterlacedTargetBuffer(pFloatAudioBuffer, numFrames));
+
+	// DEBUG:
+
+	// TODO: Might need to add a mechanism to flush the queued buffers if we're too delayed
+	// likely should do this where we are detecting delay from the network or source
+
+	//XAUDIO2_VOICE_STATE voiceState;
+	//m_pXAudio2SourceVoice->GetState(&voiceState);
+	//DEBUG_LINEOUT("samples: %d queued buffs: %d", (int)voiceState.SamplesPlayed, (int)voiceState.BuffersQueued);
 
 	{
 		XAUDIO2_BUFFER xaudio2AudioBuffer{};

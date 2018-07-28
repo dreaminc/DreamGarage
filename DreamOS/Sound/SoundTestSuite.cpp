@@ -371,8 +371,8 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 				pTestContext->pXAudioSpatialSoundObject->SetEmitterListenerDirection(vEmitterDireciton, vListenerDireciton);
 			}
 
-			//theta += 0.00025f;
-			//localRadius += 0.0001f;
+			theta += 0.00025f;
+			localRadius += 0.0001f;
 		}
 
 	Error:
