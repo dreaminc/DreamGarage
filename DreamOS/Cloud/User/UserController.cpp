@@ -514,7 +514,7 @@ void UserController::OnGetApiSettings(std::string&& strResponse) {
 
 	if (statusCode == 404) {
 		//TODO: it isn't right to have this code here
-		std::string strSettingsFormKey = "FormKey.UserSettings";
+		std::string strSettingsFormKey = "FormKey.UsersSettings";
 		GetFormURL(strSettingsFormKey);
 	}
 	//TODO: combine with the json rpc response
@@ -548,7 +548,7 @@ RESULT UserController::SetSettings(std::string& strAccessToken, float height, fl
 	jsonSettings["user_settings"]["ui_offset_z"] = depth;
 	jsonSettings["user_settings"]["ui_scale"] = scale;
 
-	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnAccessToken, this, std::placeholders::_1)));
+	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
 
 Error:
 	return r;

@@ -54,6 +54,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
 		//m_pFormView->Hide();
+		m_pFormView->GetComposite()->SetVisible(false);
 		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration

@@ -740,13 +740,14 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 
 	else {
 		std::shared_ptr<DreamBrowser> pBrowser = nullptr;
-		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
 		pBrowser = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
+
 		m_pActiveSource = pBrowser;
 
 		pBrowser->SetScope(strScope);
 		pBrowser->SetPath(m_strURL);
+
+		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
 		if (strTitle != "website") {
 			UpdateControlBarText(strTitle);
