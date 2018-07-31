@@ -635,8 +635,9 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 	nlohmann::json jsonData;
 	int statusCode;
 
-	CR(GetResponseData(jsonData, jsonResponse, statusCode));
-	CB(statusCode == 200);
+	//CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	GetResponseData(jsonData, jsonResponse, statusCode);
+	//CB(statusCode == 200);
 
 	m_user = User(
 		jsonData["/id"_json_pointer].get<long>(),
@@ -649,7 +650,7 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 	);
 
 	m_loginState.fHasUserProfile = true;
-	UpdateLoginState();
+	CR(UpdateLoginState());
 
 Error:
 	return;

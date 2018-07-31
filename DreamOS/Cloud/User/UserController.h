@@ -167,11 +167,11 @@ private:
 	bool m_fLoggedIn = false;
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
-	User m_user;
+	User m_user = User();
 	long m_defaultEnvironmentId = -1; // used in the case m_user is not initialized
 	std::string m_strAccessToken;
 
-	TwilioNTSInformation m_twilioNTSInformation;
+	TwilioNTSInformation m_twilioNTSInformation = TwilioNTSInformation();
 
 	UserControllerObserver *m_pUserControllerObserver;
 };
