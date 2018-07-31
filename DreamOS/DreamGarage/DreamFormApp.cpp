@@ -268,6 +268,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
+		/*
 	case INTERACTION_EVENT_MENU: {
 		if (m_pUserApp->GetKeyboard()->IsVisible()) {
 			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
@@ -278,6 +279,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		}
 		
 	} break;
+	//*/
 	case INTERACTION_EVENT_KEY_DOWN: {
 
 		char chkey = (char)(pEvent->m_value);

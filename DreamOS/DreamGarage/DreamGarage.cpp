@@ -1065,6 +1065,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	//else if (strMessage == "DreamLoginApp.OnSuccess") {
 		m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
 		CR(m_pDreamLoginApp->SetLaunchDate());
+		
 		CR(m_pUserController->SetSettings(m_strAccessToken, 
 			m_pDreamUserApp->GetHeight(), 
 			m_pDreamUserApp->GetDepth(), 
@@ -1075,6 +1076,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 
 		// TODO: populate user
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 	}
 
 Error:

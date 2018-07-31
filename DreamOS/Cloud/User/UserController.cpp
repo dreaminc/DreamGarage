@@ -750,7 +750,6 @@ RESULT UserController::UpdateLoginState() {
 		CN(pEnvironmentController);
 		CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
 		SetIsLoggedIn(true);
-		//pEnvironmentController->
 	}
 
 Error:
