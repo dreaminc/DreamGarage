@@ -744,16 +744,24 @@ RESULT UserController::UpdateLoginState() {
 		m_loginState.fHasEnvironmentId &&
 		m_loginState.fHasTwilioInformation) {
 
-		m_user.SetDefaultEnvironmentID(m_defaultEnvironmentId);
-		m_user.SetToken(m_strAccessToken);
+		if (!m_loginState.fPendingConnect) {
+			m_loginState.fPendingConnect = true;
 
-		auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-		CN(pEnvironmentController);
-		CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
-		SetIsLoggedIn(true);
+			m_user.SetDefaultEnvironmentID(m_defaultEnvironmentId);
+			m_user.SetToken(m_strAccessToken);
+
+			if (!IsLoggedIn()) {
+
+				auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CN(pEnvironmentController);
+				CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
+				SetIsLoggedIn(true);
+			}
+		}
 	}
 
 Error:
+	m_loginState.fPendingConnect = false;
 	return r;
 }
 

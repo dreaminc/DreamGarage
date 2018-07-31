@@ -27,6 +27,7 @@ struct LoginState {
 	unsigned fHasEnvironmentId : 1;
 	unsigned fHasUserProfile : 1;
 	unsigned fHasTwilioInformation : 1;
+	unsigned fPendingConnect : 1;
 };
 
 class UserControllerProxy : public ControllerProxy {

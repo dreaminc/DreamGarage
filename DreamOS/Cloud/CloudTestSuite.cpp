@@ -103,6 +103,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		m_pCloudController = pCloudController;
 
 		CR(SetupPipeline());
+		
 
 		// user controller is set up during initialize
 		{
