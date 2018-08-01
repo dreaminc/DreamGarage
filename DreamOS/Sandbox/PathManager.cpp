@@ -76,7 +76,7 @@ Error:
 }
 
 // Set up path manager
-RESULT PathManager::InitializePaths() {
+RESULT PathManager::InitializePaths(DreamOS *pDOSHandle) {
 	DEBUG_LINEOUT("PathManager Initialize Paths");
 	return R_VIRTUAL;
 }

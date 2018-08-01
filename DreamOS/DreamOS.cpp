@@ -43,7 +43,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	srand(static_cast <unsigned> (time(0)));
 
 	// Create the Sandbox
-	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
+	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM, this);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");

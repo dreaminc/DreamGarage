@@ -46,6 +46,22 @@ public:
 	RESULT SendHandPosition();
 	RESULT SendMouthSize();
 
+	virtual bool UseInstallPath() override {
+#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+		return true;
+#else
+		return false;
+#endif
+	}
+
+	virtual std::wstring GetDreamFolderPath() {
+#ifdef PRODUCTION_BUILD
+		return std::wstring(L"\\Dream\\");
+#else DEV_PRODUCTION_BUILD
+		return std::wstring(L"\\DreamDev\\");
+#endif
+	}
+
 	// TODO: this is just a debug test temp
 	//RESULT SendSwitchHeadMessage();
 

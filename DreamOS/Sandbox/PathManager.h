@@ -51,6 +51,11 @@ typedef enum {
 // the letter v as in "v123\" vs "123\" for example
 #define PATH_VERSION_PATH_WITH_V true
 
+#define DREAM_FOLDER_PATH L"\\Dream\\"
+#define DREAM_DEV_FOLDER_PATH L"\\DreamDev\\"
+
+class DreamOS;
+
 class PathManager : public valid {
 	friend class PathManagerFactory;
 
@@ -87,7 +92,7 @@ protected:
 
 	RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
 	
-	virtual RESULT InitializePaths();
+	virtual RESULT InitializePaths(DreamOS *pDOSHandle);
 	PATH_VALUE_TYPE GetPathValueType(wchar_t *pszValue);
 
 public:
@@ -149,6 +154,10 @@ public:
 private:
 	UID m_uid;
 	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
+
+protected:
+	bool m_fUseInstallPath = false;
+	std::wstring m_wstrDreamFolder;
 	
 	// TODO: Replace with Singleton pattern / manager
 	// Singleton Usage
