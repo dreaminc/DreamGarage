@@ -1112,7 +1112,7 @@ RESULT DimObj::OnManipulation() {
 		CR(m_pBoundingVolume->SetDirty());
 
 		// Update parent
-		if (m_pParent != nullptr) {
+		if (m_pParent != nullptr && m_pParent->GetBoundingVolume() != nullptr) {
 			//CR(m_pParent->OnManipulation());
 			CR(m_pParent->UpdateBoundingVolume());
 		}
