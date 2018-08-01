@@ -30,8 +30,8 @@
 
 #pragma warning(pop)
 
-//typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
-typedef websocketpp::client<websocketpp::config::asio_tls_client> WebsocketClient;
+typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+//typedef websocketpp::client<websocketpp::config::asio_tls_client> WebsocketClient;
 typedef websocketpp::lib::shared_ptr<websocketpp::lib::asio::ssl::context> context_ptr;
 
 using websocketpp::lib::placeholders::_1;

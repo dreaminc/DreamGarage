@@ -20,6 +20,16 @@
 
 class UserControllerObserver;
 
+struct LoginState {
+	unsigned fFirstLaunch : 1;
+	unsigned fHasCredentials : 1;
+	unsigned fHasAccessToken : 1;
+	unsigned fHasEnvironmentId : 1;
+	unsigned fHasUserProfile : 1;
+	unsigned fHasTwilioInformation : 1;
+	unsigned fPendingConnect : 1;
+};
+
 class UserControllerProxy : public ControllerProxy {
 public:
 	virtual std::string GetUserToken() = 0;
@@ -96,6 +106,8 @@ public:
 	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
 	long GetUserDefaultEnvironmentID();
+	RESULT SetUserDefaultEnvironmentID(long environmentId);
+	RESULT SetAccessToken(std::string strAccessToken);
 	User GetUser();
 	TwilioNTSInformation GetTwilioNTSInformation();
 
@@ -119,9 +131,21 @@ public:
 	RESULT GetTeam(std::string& strAccessToken);
 	void OnGetTeam(std::string&& strResponse);
 
+	RESULT RequestUserProfile(std::string& strAccessToken);
+	void OnUserProfile(std::string&& strResponse);
+
+	RESULT RequestTwilioNTSInformation(std::string& strAccessToken);
+	void OnTwilioNTSInformation(std::string&& strResponse);
+
 // basic http error handling
 private:
 	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode);
+
+public:
+	RESULT UpdateLoginState();
+
+private:
+	LoginState m_loginState = { 0 };
 
 public:
 	class UserControllerObserver {
@@ -144,8 +168,11 @@ private:
 	bool m_fLoggedIn = false;
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
-	User m_user;
-	TwilioNTSInformation m_twilioNTSInformation;
+	User m_user = User();
+	long m_defaultEnvironmentId = -1; // used in the case m_user is not initialized
+	std::string m_strAccessToken;
+
+	TwilioNTSInformation m_twilioNTSInformation = TwilioNTSInformation();
 
 	UserControllerObserver *m_pUserControllerObserver;
 };

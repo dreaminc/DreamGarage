@@ -45,7 +45,7 @@ Websocket::~Websocket() {
 }
 
 RESULT Websocket::SetToken(const std::string& strToken) {
-	m_strToken = "Token " + strToken;
+	m_strToken = "Bearer " + strToken;
 	return R_PASS;
 }
 
@@ -172,14 +172,19 @@ RESULT Websocket::ProcessingThread() {
 			m_websocketClient.init_asio();
 
 			m_websocketClient.set_message_handler(std::bind(m_fnOnWebsocketMessageCallback, &m_websocketClient, ::_1, ::_2));
+
+//			m_websocketClient
 			
 			/*
 			m_websocketClient.set_socket_init_handler([](websocketpp::connection_hdl, asio::ssl::stream<asio::ip::tcp::socket> &ssl_stream)
 			{
 				SSL_set_tlsext_host_name(ssl_stream.native_handle(), "ws.develop.dreamos.com");
 			});
-			*/
+			//*/
 
+			// TODO: NEED TO REENABLE FOR PRODUCTION
+			// TODO: ALSO SWITCH TYPEDEF BACK TO asio_client
+			/*
 			m_websocketClient.set_tls_init_handler([] (websocketpp::connection_hdl) ->context_ptr {
 				context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
 
@@ -189,25 +194,22 @@ RESULT Websocket::ProcessingThread() {
 						asio::ssl::context::no_sslv3 |
 						asio::ssl::context::single_dh_use);
 
-					/*
 					// client verification for a server trust is not yet supported.
 
-					ctx->set_verify_mode(asio::ssl::verify_peer);
-					ctx->set_verify_callback(bind(&verify_certificate, hostname, ::_1, ::_2));
+					//ctx->set_verify_mode(asio::ssl::verify_peer);
+					//ctx->set_verify_callback(bind(&verify_certificate, hostname, ::_1, ::_2));
 					
-					ctx->load_verify_file("ca-cert.pem");
-					*/
+					//ctx->load_verify_file("ca-cert.pem");
 				}
-				//*
 				catch (std::exception& e) {
 					(void)e;
 					DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
 					DEBUG_LINEOUT("%s", e.what());
 					//ACBM(0, "%s", e.what());
 				}
-				//*/
 				return ctx;
 			});
+			//*/
 
 			// Handlers
 			m_websocketClient.set_open_handler(std::bind(m_fnOnWebsocketConnectionOpenCallback, ::_1));
