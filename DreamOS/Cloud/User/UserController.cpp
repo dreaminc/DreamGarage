@@ -47,9 +47,12 @@ Error:
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	//std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-	//std::string strWWWURL = pCommandLineManager->GetParameterValue("www.ip");
+
+#ifdef USE_LOCALHOST
 	std::string strAPIURL = "http://localhost:8001";
+#else
+	std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+#endif
 
 
 	switch (userMethod) {

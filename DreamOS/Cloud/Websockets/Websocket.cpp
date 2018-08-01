@@ -182,9 +182,7 @@ RESULT Websocket::ProcessingThread() {
 			});
 			//*/
 
-			// TODO: NEED TO REENABLE FOR PRODUCTION
-			// TODO: ALSO SWITCH TYPEDEF BACK TO asio_client
-			/*
+#ifndef USE_LOCALHOST
 			m_websocketClient.set_tls_init_handler([] (websocketpp::connection_hdl) ->context_ptr {
 				context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
 
@@ -209,7 +207,7 @@ RESULT Websocket::ProcessingThread() {
 				}
 				return ctx;
 			});
-			//*/
+#endif
 
 			// Handlers
 			m_websocketClient.set_open_handler(std::bind(m_fnOnWebsocketConnectionOpenCallback, ::_1));
