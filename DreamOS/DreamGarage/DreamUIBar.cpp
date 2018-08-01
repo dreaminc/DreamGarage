@@ -500,8 +500,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
 
-	// Copy into temp vector
-	//std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
+	// Copy into temp vector 
+	//std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
 	//m_downloadQueue.clear();
 
 	// Makes sense for UIBar to always have a user run with it for now
@@ -533,6 +533,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		}
 	}
 
+	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 	CR(m_pScrollView->Update());
 
 	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies pretty heavily on dirty only being set if we move to a new menu level
@@ -544,12 +545,13 @@ RESULT DreamUIBar::Update(void *pContext) {
 		//int elements = (m_downloadQueue.size() > (int)m_pScrollView->GetMenuItemsView()->GetChildren().size() ? 8 : ;
 
 		//for (int i = m_menuNode_n; i < elements + m_menuNode_n; i++) {
-		for (int i = 0; i < m_downloadQueue.size(); i++) {
+		for (int i = 0; i <= m_downloadQueue.size(); i++) {
 			auto pQueueObj = m_downloadQueue.back();
 			auto pMenuNode = pQueueObj.first;
 			auto pBufferVector = pQueueObj.second;
 
 			texture *pTexture = nullptr;
+			std::string strKey = pMenuNode->GetPath() + pMenuNode->GetScope();
 
 			CN(pBufferVector);
 			uint8_t* pBuffer = &(pBufferVector->operator[](0));
@@ -563,15 +565,22 @@ RESULT DreamUIBar::Update(void *pContext) {
 			if (pMenuNode->GetTitle() == "root_menu_title") {
 				//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 				m_pPendingIconTexture = pTexture;
-				//TODO: May want to move downloading outside of DreamUIBar
-				//TODO: the only time the title view is used is to show the chrome icon and "Website" title
+				// TODO: May want to move downloading outside of DreamUIBar
+				// TODO: the only time the title view is used is to show the chrome icon and "Website" title
 				if (m_pKeyboardHandle != nullptr) {
 					m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
 				}
 			}
-			
-			else {
-				m_pScrollView->AddScrollViewNode(pMenuNode);
+			else if (strKey == m_readyQueue.front().first) {
+				while(!m_readyQueue.empty()) {
+					if (m_readyQueue.front().second->GetThumbnailTexture() == nullptr) {
+						break;
+					}
+					else {
+						m_pScrollView->AddScrollViewNode(m_readyQueue.front().second);
+						m_readyQueue.pop();
+					}
+				}
 			}
 			
 			if (pBufferVector != nullptr) {
@@ -580,6 +589,16 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			m_downloadQueue.pop_back();
 		}
+
+	}
+
+	else if (m_downloadQueue.empty() && !m_readyQueue.empty()) {
+		//DEBUG_LINEOUT("%d items pending!", (int)m_readyQueue.size());
+		if (m_readyQueue.front().second->GetThumbnailTexture() == nullptr) {
+			m_readyQueue.front().second->SetThumbnailTexture(m_pDefaultThumbnail.get());
+		}
+		m_pScrollView->AddScrollViewNode(m_readyQueue.front().second);
+		m_readyQueue.pop();
 	}
 
 Error:
@@ -594,6 +613,7 @@ RESULT DreamUIBar::MakeMenuItems() {
 	if (m_pMenuNode) {
 
 		int elements = ((int)m_pMenuNode->NumSubMenuNodes() > 8 ? 8 : (int)m_pMenuNode->NumSubMenuNodes());
+		std::vector<std::shared_ptr<UIButton>> pButtons;
 
 		for (int i = 0; i < elements; i++) {	
 			auto pUIMenuItem = m_pView->MakeUIMenuItem(m_pScrollView->GetWidth(), m_pScrollView->GetWidth() * ASPECT_RATIO);
@@ -619,10 +639,10 @@ RESULT DreamUIBar::MakeMenuItems() {
 			//CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
-			m_pButtons.emplace_back(pUIMenuItem);
+			pButtons.emplace_back(pUIMenuItem);
 		}
 
-		CR(m_pScrollView->UpdateMenuButtons(m_pButtons));
+		CR(m_pScrollView->UpdateMenuButtons(pButtons));
 		
 
 		{
@@ -774,8 +794,8 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 
 	if (pMenuNode->NumSubMenuNodes() > 0) {
 
+		m_readyQueue = {};
 		m_downloadQueue.clear();
-		m_pButtons.clear();
 
 		m_pMenuNode = pMenuNode;
 		if (m_pathStack.empty()) {
@@ -786,6 +806,11 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		auto strHeaders = GetStringHeaders();
 
 		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
+			
+			if (pMenuNode->GetTitle() != "root_menu_title") {
+				std::string strKey = pSubMenuNode->GetPath() + pSubMenuNode->GetScope();
+				m_readyQueue.push(std::pair<std::string, std::shared_ptr<MenuNode>>(strKey, pSubMenuNode));
+			}
 
 			auto strURI = pSubMenuNode->GetThumbnailURL();
 			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {

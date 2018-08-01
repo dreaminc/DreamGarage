@@ -58,7 +58,7 @@ public:
 	RESULT Update();
 	RESULT UpdateWithWidth(float totalWidth);
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
-	RESULT PositionMenuButton(float index, UIButton* pButton);
+	RESULT PositionMenuButton(float index, std::shared_ptr<UIButton> pButton);
 
 	RESULT SetScrollVisible(bool fVisible);
 	bool IsCapturable(UIButton* pButton);
@@ -75,7 +75,9 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
-	RESULT AddScrollViewNode(MenuNode* pMenuNode);
+	RESULT OnRotationDelta(int delta);
+
+	RESULT AddScrollViewNode(std::shared_ptr<MenuNode> pMenuNode);
 	RESULT ClearScrollViewNodes();
 
 public:
@@ -93,6 +95,7 @@ public:
 
 private:
 	// button positioning
+	int m_itemIndex = 0;
 	float m_menuCenterOffset = MENU_CENTER_OFFSET;
 
 	float m_itemAngleX = ITEM_ANGLE_X;
@@ -123,7 +126,7 @@ private:
 	float m_maxElements = MAX_ELEMENTS;
 	float m_yRotation;
 	float m_yRotationPerElement;
-	//float m_velocity;
+	//float m_velocity;		// inherited from UIScrollView
 	float m_fadeDuration = FADE_DURATION;
 	float m_pushDepth = PUSH_DEPTH;
 	float m_initialWidth = 0.0f;
@@ -142,8 +145,8 @@ private:
 	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
-	std::vector<MenuNode*> m_pScrollViewNodes;
-	std::deque<UIButton*> m_pButtonDeque;
+	std::vector<std::shared_ptr<MenuNode>> m_pScrollViewNodes;
+	std::deque<std::shared_ptr<UIButton>> m_pButtonDeque;
 //	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
