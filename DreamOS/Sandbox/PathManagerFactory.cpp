@@ -12,15 +12,17 @@
     #include "Sandbox/Linux/LinuxPathManager.h"
 #endif
 
-PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type) {
+PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type, DreamOS *pDOSHandle) {
     RESULT r = R_PASS;
     PathManager *pPathManager = NULL;
+
+	CN(pDOSHandle);
 
 	switch (type) {
 		case PATH_MANAGER_WIN32: {
             #if defined(_WIN32)
                 pPathManager = new Win64PathManager();
-                CRM(pPathManager->InitializePaths(), "Failed to initialize paths!");
+                CRM(pPathManager->InitializePaths(pDOSHandle), "Failed to initialize paths!");
             #else
                 pPathManager = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
@@ -30,7 +32,7 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type) {
         case PATH_MANAGER_OSX: {
             #if defined(__APPLE__)
                 pPathManager = new OSXPathManager();
-                CRM(pPathManager->InitializePaths(), "Failed to initialize paths!");
+                CRM(pPathManager->InitializePaths(pDOSHandle), "Failed to initialize paths!");
             #else
                 pPathManager = NULL;
                 DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);

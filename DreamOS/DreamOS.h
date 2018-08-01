@@ -116,6 +116,10 @@ public:
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
 
+	// These are used to set paths for path manager
+	virtual bool UseInstallPath() { return false; }
+	virtual std::wstring GetDreamFolderPath() { return std::wstring(L""); }
+
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT DidFinishLoading() { return R_NOT_IMPLEMENTED; }

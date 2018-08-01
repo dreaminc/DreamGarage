@@ -289,11 +289,14 @@ HWND Windows64App::GetWindowHandle() {
 	return m_hwndWindow;
 }
 
-RESULT Windows64App::InitializePathManager() {
+RESULT Windows64App::InitializePathManager(DreamOS *pDOSHandle) {
 	RESULT r = R_PASS;
 
 	// Initialize Path Manager
-	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+	m_pDreamOSHandle = pDOSHandle;
+	CNM(m_pDreamOSHandle, "DOS Handle not initialized");
+
+	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32, m_pDreamOSHandle);
 
 	CNM(m_pPathManager, "Failed to allocated path manager");
 	CVM(m_pPathManager, "Failed to initialize path manager");

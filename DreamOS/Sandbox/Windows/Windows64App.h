@@ -58,7 +58,7 @@ public:	// Sandbox Interface
 	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) override;
 
 public:
-	RESULT InitializePathManager();	
+	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
 	//RESULT InitializeHAL();
