@@ -87,7 +87,8 @@ Error:
 RESULT Win64PathManager::GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_TYPE pathValueType) {
 	RESULT r = R_PASS;
 
-	switch (pathValueType) {
+	if (m_fUseInstallPath) {
+		switch (pathValueType) {
 		case (DREAM_PATH_ROAMING): {
 			REFKNOWNFOLDERID rfid = FOLDERID_RoamingAppData;
 			DWORD dwFlags = 0;
@@ -107,19 +108,21 @@ RESULT Win64PathManager::GetDreamPath(std::wstring &wstrAppDataPath, DREAM_PATH_
 			CRM((RESULT)SHGetKnownFolderPath(rfid, dwFlags, hToken, ppszPath), "Could not find appdata folder");
 			wstrAppDataPath = *ppszPath;
 		} break;
-	}
-
-	if (m_fUseInstallPath) {
-		wstrAppDataPath = wstrAppDataPath + m_wstrDreamFolder;
-
-		// Check if Dream folder exists 
-		if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
-			// Create the directory
-			wchar_t* pwszDirectory = const_cast<wchar_t*>(wstrAppDataPath.c_str());
-			PathManager::instance()->CreateDirectory(pwszDirectory);
 		}
+
+		wstrAppDataPath = wstrAppDataPath + m_wstrDreamFolder;	
 	}
-	// TODO: handle the else (although this was not handled previously)
+	else {	// non-prod builds
+		GetDreamPath(wstrAppDataPath);
+		wstrAppDataPath = wstrAppDataPath + L"\\";	// logger and cefcache expect \\ ending
+	}
+
+	// Check if Dream folder exists 
+	if (PathManager::instance()->DoesPathExist(wstrAppDataPath) != R_DIRECTORY_FOUND) {
+		// Create the directory
+		wchar_t* pwszDirectory = const_cast<wchar_t*>(wstrAppDataPath.c_str());
+		PathManager::instance()->CreateDirectory(pwszDirectory);
+	}
 
 Error:
 	return r;
