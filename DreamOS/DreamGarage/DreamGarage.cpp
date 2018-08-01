@@ -184,7 +184,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-		//TODO: Matrix node
+		// TODO: Matrix node
 		//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
 		// Connect output as pass-thru to internal blend program
@@ -388,7 +388,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
 	CN(m_pDreamSettings);
 
-	//TODO: could be somewhere else(?)
+	// TODO: could be somewhere else(?)
 	CR(RegisterDOSObserver(this));
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
 	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
@@ -634,7 +634,7 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	//TODO: use the DreamUserControlArea
+	// TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
 		m_pDreamUserControlArea->ResetAppComposite();
 
@@ -659,7 +659,7 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 
 		rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 
-		//TODO: fuck this
+		// TODO: fuck this
 		//if (m_pDreamBrowser != nullptr) {
 		//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
 	//	}
@@ -1034,7 +1034,7 @@ Error:
 
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
-	//TODO: populate these
+	// TODO: populate these
 	bool fFirstLogin = true;
 	bool fHasCreds = false;
 
@@ -1090,7 +1090,7 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	CR(m_pDreamUserApp->UpdateDepth(depth));
 	CR(m_pDreamUserApp->UpdateScale(scale));
 
-	//TODO: needs different route.  environment socket path does not need to get team
+	// TODO: needs different route.  environment socket path does not need to get team
 
 	m_pUserController->GetTeam(m_pDreamLoginApp->GetAccessToken());
 
@@ -1106,10 +1106,10 @@ RESULT DreamGarage::OnSetSettings() {
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 
-	//TODO: other pieces of login flow
+	// TODO: other pieces of login flow
 	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-	//TODO: uncomment when everything else works
+	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
 //Error:
@@ -1139,7 +1139,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
 		CR(m_pDreamLoginApp->Show());
 	}
-	//TODO: general form?
+	// TODO: general form?
 
 Error:
 	return r;
@@ -1152,7 +1152,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		CR(m_pDreamLoginApp->ClearTokens());
 	}
 	else {
-		//TODO: should be temporary
+		// TODO: should be temporary
 		m_strAccessToken = strAccessToken;
 
 
@@ -1236,7 +1236,7 @@ Error:
 RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
-	//TODO: enum to string dictionary
+	// TODO: enum to string dictionary
 	if (strKey == "FormKey.UsersSettings") {
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 

@@ -360,7 +360,7 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 			headermap = it->second;
 		}
 	}
-	//TODO: check for api url
+	// TODO: check for api url
 	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	//pUserController->GetAccessToken()
 

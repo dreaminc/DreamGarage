@@ -182,8 +182,8 @@ RESULT Websocket::ProcessingThread() {
 			});
 			//*/
 
-			//TODO: NEED TO REENABLE FOR PRODUCTION
-			//TODO: ALSO SWITCH TYPEDEF BACK TO asio_client
+			// TODO: NEED TO REENABLE FOR PRODUCTION
+			// TODO: ALSO SWITCH TYPEDEF BACK TO asio_client
 			/*
 			m_websocketClient.set_tls_init_handler([] (websocketpp::connection_hdl) ->context_ptr {
 				context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);

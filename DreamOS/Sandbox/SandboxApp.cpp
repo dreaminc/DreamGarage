@@ -268,7 +268,7 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	//TODO: broken for now
+	// TODO: broken for now
 //	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 //	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
 
