@@ -51,6 +51,7 @@ class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
+class DreamLoginApp;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -470,6 +471,7 @@ protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 	std::shared_ptr<DreamShareView> m_pDreamShareView;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
+	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;
 
 private:

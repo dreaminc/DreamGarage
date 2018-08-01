@@ -243,7 +243,7 @@ private:
 
 	std::thread	m_cloudThread;
 	bool m_fRunning;
-	bool m_fLoginOnStart = true;
+	bool m_fLoginOnStart = false;
 
 	RESULT CloudThreadProcess();
 	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);

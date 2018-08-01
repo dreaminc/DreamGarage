@@ -53,7 +53,9 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
-		m_pFormView->Hide();
+		//m_pFormView->Hide();
+		m_pFormView->GetComposite()->SetVisible(false);
+		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
@@ -79,6 +81,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
 		CR(m_pDreamBrowserForm->SetURI(m_strURL));
 	}
+
 
 Error:
 	return r;
@@ -106,8 +109,8 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::SETTINGS) {
 		strType = "FormKey.UsersSettings";
 	}
-	else if (type == FormType::TEAMS_CREATE) {
-		strType = "FormKey.TeamsCreate";
+	else if (type == FormType::TEAMS_MISSING) {
+		strType = "FormKey.TeamsMissing";
 	}
 
 	return strType;
@@ -126,8 +129,8 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	else if (strType == "FormKey.UsersSettings") {
 		type = FormType::SETTINGS;
 	}
-	else if (strType == "FormKey.TeamsCreate") {
-		type = FormType::TEAMS_CREATE;
+	else if (strType == "FormKey.TeamsMissing") {
+		type = FormType::TEAMS_MISSING;
 	}
 
 	return type;
@@ -265,6 +268,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
+		/*
 	case INTERACTION_EVENT_MENU: {
 		if (m_pUserApp->GetKeyboard()->IsVisible()) {
 			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
@@ -275,6 +279,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		}
 		
 	} break;
+	//*/
 	case INTERACTION_EVENT_KEY_DOWN: {
 
 		char chkey = (char)(pEvent->m_value);
@@ -373,8 +378,7 @@ Error:
 RESULT DreamFormApp::Show() {
 	RESULT r = R_PASS;
 
-	CNR(m_pFormView, R_SKIPPED);
-
+	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
 

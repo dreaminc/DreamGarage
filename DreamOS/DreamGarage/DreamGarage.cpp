@@ -20,6 +20,7 @@ light *g_pLight = nullptr;
 #include "DreamShareView/DreamShareView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
+#include "DreamGarage/DreamLoginApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -183,7 +184,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-		//TODO: Matrix node
+		// TODO: Matrix node
 		//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
 
 		// Connect output as pass-thru to internal blend program
@@ -335,11 +336,12 @@ RESULT DreamGarage::LoadScene() {
 			fShowModels = false;
 		}
 	}
-
+	//*
 	if (fShowModels) {
 		m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
 		CN(m_pDreamEnvironmentApp);
 	}
+	//*/
 
 #endif
 
@@ -357,6 +359,7 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 
@@ -369,7 +372,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
-	m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
+	if (m_pDreamEnvironmentApp != nullptr) {
+		m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
+	}
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
 	CN(m_pDreamShareView);
@@ -377,9 +382,33 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);
 	CN(m_pDreamSettings);
 
+	m_pDreamLoginApp = LaunchDreamApp<DreamLoginApp>(this, false);
+	CN(m_pDreamLoginApp);
+
 	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
 	CN(m_pDreamSettings);
 
+	// TODO: could be somewhere else(?)
+	CR(RegisterDOSObserver(this));
+	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
+	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
+
+	// UserController is initialized during CloudController::Initialize,
+	// which is in SandboxApp::Initialize while fInitCloud is true
+	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	CN(m_pUserController);
+	
+	// initial step of login flow:
+	// if there has already been a successful login, try to authenticate
+	if (!m_fFirstLogin && m_fHasCredentials) {
+		m_pUserController->GetAccessToken(m_strRefreshToken);
+	}
+	// otherwise, start by showing the settings form
+	else {
+		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+		CR(m_pUserController->GetFormURL(strFormType));
+	}
+	
 Error:
 	return r;
 }
@@ -605,7 +634,7 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	//TODO: use the DreamUserControlArea
+	// TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
 		m_pDreamUserControlArea->ResetAppComposite();
 
@@ -630,7 +659,7 @@ RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &r
 
 		rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
 
-		//TODO: fuck this
+		// TODO: fuck this
 		//if (m_pDreamBrowser != nullptr) {
 		//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
 	//	}
@@ -1003,13 +1032,71 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+	// TODO: populate these
+	bool fFirstLogin = true;
+	bool fHasCreds = false;
+
+	if (strMessage == "DreamSettingsApp.OnSuccess") {
+		std::string strFormType;
+		// this specific case is only when: not first login, has credentials, has no settings, has no team
+		if (!fFirstLogin && fHasCreds) {
+			strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+			m_pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+		// after the user has defined their settings, show sign up/sign in 
+		// based on whether this is the first launch or not
+		else if (fFirstLogin) {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+			m_pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+		else {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+			m_pUserController->GetFormURL(strFormType);
+			m_pDreamLoginApp->Show();
+		}
+	}
+	// once login has succeeded, save the settings from earlier and the launch date
+	// environment id should have been set through DreamLoginApp responding to javascript
+	else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
+	//else if (strMessage == "DreamLoginApp.OnSuccess") {
+		m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
+		CR(m_pDreamLoginApp->SetLaunchDate());
+		
+		CR(m_pUserController->SetSettings(m_strAccessToken, 
+			m_pDreamUserApp->GetHeight(), 
+			m_pDreamUserApp->GetDepth(), 
+			m_pDreamUserApp->GetScale()));
+
+		// TODO: potentially where the lobby environment changes to the team environment
+		// could also be once the environment id is set
+
+		// TODO: populate user
+		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
+	RESULT r = R_PASS;
 
-	m_pDreamUserApp->UpdateHeight(height);
-	m_pDreamUserApp->UpdateDepth(depth);
-	m_pDreamUserApp->UpdateScale(scale);
+	CR(m_pDreamUserApp->UpdateHeight(height));
+	CR(m_pDreamUserApp->UpdateDepth(depth));
+	CR(m_pDreamUserApp->UpdateScale(scale));
 
-	return R_PASS;
+	// TODO: needs different route.  environment socket path does not need to get team
+
+	m_pUserController->GetTeam(m_pDreamLoginApp->GetAccessToken());
+
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnSetSettings() {
@@ -1019,10 +1106,10 @@ RESULT DreamGarage::OnSetSettings() {
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 
-	//TODO: other pieces of login flow
+	// TODO: other pieces of login flow
 	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-	//TODO: uncomment when everything else works
+	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
 //Error:
@@ -1031,6 +1118,50 @@ RESULT DreamGarage::OnLogin() {
 
 RESULT DreamGarage::OnLogout() {
 	return R_PASS;
+}
+
+RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
+	RESULT r = R_PASS;
+
+	FormType type = DreamFormApp::TypeFromString(strKey);
+
+	if (type == FormType::SETTINGS) {
+	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
+		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
+		CR(m_pDreamSettings->Show());
+		//m_pDreamUserApp->ResetAppComposite();
+	}
+	// the behavior of sign in, sign up, and teams create should be executed the same
+	// way with regards to the functions that they use
+	// TODO: potentially, the teams form will do other stuff later
+	else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
+	//	m_pDreamLoginApp->GetComposite()->SetVisible(true, false);
+		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
+		CR(m_pDreamLoginApp->Show());
+	}
+	// TODO: general form?
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	if (!fSuccess) {
+		CR(m_pDreamLoginApp->ClearTokens());
+	}
+	else {
+		// TODO: should be temporary
+		m_strAccessToken = strAccessToken;
+
+
+		CR(m_pDreamLoginApp->SetAccessToken(strAccessToken));
+		CR(m_pUserController->GetSettings(strAccessToken));
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnShareAsset() {
@@ -1042,6 +1173,24 @@ RESULT DreamGarage::OnShareAsset() {
 	CR(m_pDreamShareView->ShowCastingTexture());
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
+	RESULT r = R_PASS;
+
+	if (!fSuccess) {
+		// need to create a team, since the user has no teams
+		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+		//CR(pUserController->GetFormURL(strFormType));
+	}
+	else {
+		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
+		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+	}
 
 Error:
 	return r;
@@ -1087,7 +1236,7 @@ Error:
 RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
-	//TODO: enum to string dictionary
+	// TODO: enum to string dictionary
 	if (strKey == "FormKey.UsersSettings") {
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 
