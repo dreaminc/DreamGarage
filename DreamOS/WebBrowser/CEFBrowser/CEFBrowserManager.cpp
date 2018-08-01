@@ -65,7 +65,7 @@ RESULT CEFBrowserManager::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
-	CN(pCEFBrowserController);
+	CNM(pCEFBrowserController, "pCEFBrowserController is null");
 
 	CR(pCEFBrowserController->OnAfterCreated());
 
@@ -187,6 +187,11 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 }
 
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
+	CBM(m_webBrowserControllers.size() > 0, "No web browser controllers have been created.");
+	CNM(pCEFBrowser, "CEF Browser is nullptr");
+
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
 
@@ -197,6 +202,7 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 		}
 	}
 
+Error:
 	return nullptr;
 }
 

@@ -383,6 +383,8 @@ RESULT UserController::GetFormURL(std::string& strFormKey) {
 
 	std::string strURI = GetMethodURI(UserMethod::GET_FORM) + strFormKey;
 
+	DOSLOG(INFO, "Requesting form: %s", strURI);
+
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
 
