@@ -591,7 +591,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		}
 
 	}
-
+	/*
 	else if (m_downloadQueue.empty() && !m_readyQueue.empty()) {
 		//DEBUG_LINEOUT("%d items pending!", (int)m_readyQueue.size());
 		if (m_readyQueue.front().second->GetThumbnailTexture() == nullptr) {
@@ -600,6 +600,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		m_pScrollView->AddScrollViewNode(m_readyQueue.front().second);
 		m_readyQueue.pop();
 	}
+	*/
 
 Error:
 	return r;

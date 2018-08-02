@@ -181,7 +181,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	}
 
 	if (delta > 0) {	// scrolling right
-		if (minItemIndex > 0) {
+		if (minItemIndex > 0 && maxItemIndex <= arrayMaxIndex) {
 			for (int i = 0; i < delta; i++) {	// New items
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.front();
@@ -189,7 +189,14 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				CN(pMenuItem);
 				if (pMenuItem != nullptr && maxItemIndex + i <= arrayMaxIndex) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[maxItemIndex + i]->GetThumbnailTexture());
-					pMenuItem->SetName(m_pScrollViewNodes[maxItemIndex + i]->GetTitle());
+					//pMenuItem->SetName(m_pScrollViewNodes[maxItemIndex + i]->GetTitle());
+					std::string strPosition = std::to_string(maxItemIndex + i);
+					pMenuItem->SetName(strPosition);
+
+					PositionMenuButton(maxItemIndex + i, pButton);
+
+					m_pButtonDeque.pop_front();
+					m_pButtonDeque.push_back(pButton);
 				}
 
 				/*
@@ -197,10 +204,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					pButton->SetVisible(false);
 				}
 				*/
-				PositionMenuButton(maxItemIndex + i, pButton);
-
-				m_pButtonDeque.pop_front();
-				m_pButtonDeque.push_back(pButton);
+				
 			}
 			/*
 			std::shared_ptr<UIButton> pButton = m_pButtonDeque.front();
@@ -215,7 +219,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	}
 
 	else if (delta < 0) {	// scrolling left
-		if (maxItemIndex <= arrayMaxIndex) {
+		if (maxItemIndex < arrayMaxIndex && minItemIndex >= 0) {
 			for (int i = 0; i > delta; i--) {	// New items
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.back();
@@ -224,16 +228,20 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				if (pMenuItem != nullptr && minItemIndex + i >= 0) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[minItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[minItemIndex + i]->GetTitle());
+					std::string strPosition = std::to_string(minItemIndex + i);
+					pMenuItem->SetName(strPosition);
+
+					PositionMenuButton(minItemIndex + i, pButton);
+
+					m_pButtonDeque.pop_back();
+					m_pButtonDeque.push_front(pButton);
 				}
 				/*
 				if (pButton->IsVisible()) {
 					pButton->SetVisible(false);
 				}
 				*/
-				PositionMenuButton(minItemIndex + i, pButton);
-
-				m_pButtonDeque.pop_back();
-				m_pButtonDeque.push_front(pButton);
+				
 			}
 			/*
 			std::shared_ptr<UIButton> pButton = m_pButtonDeque.back();
@@ -258,7 +266,6 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				pMenuItem->SetName(m_pScrollViewNodes[minItemIndex + i]->GetTitle());
 			}
 
-			pMenuItem->SetVisible(true);
 			pButton->SetVisible(true);
 
 			PositionMenuButton(minItemIndex + i, pButton);
@@ -466,10 +473,10 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 
 		CN(pButton);
 
-		if (i < m_maxElements) {
-			CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-			pButton->SetVisible(true);
-		}
+		//if (i < m_maxElements) {
+		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		pButton->SetVisible(true);
+		//}
 
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
