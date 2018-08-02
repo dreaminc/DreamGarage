@@ -8,6 +8,7 @@
 #include "include\cef_sandbox_win.h"
 
 #include "RESULT/EHM.h"
+#include "DreamLogger/DreamLogger.h"
 
 #include "DreamCEFApp.h"
 
@@ -22,6 +23,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//CefEnableHighDPISupport();
 
 	CefMainArgs cefMainArgs(hInstance);
+
+	// Initialize Logging
+	DreamLogger::InitializeLoggerNoPathmanager("DCEF");
+	DOSLOG(DreamLogger::Level::INFO, "Initialized DCEF logger");
 
 	// Optional implementation of the CefApp interface.
 	CefRefPtr<DreamCEFApp> pDreamCEFApp(new DreamCEFApp());
