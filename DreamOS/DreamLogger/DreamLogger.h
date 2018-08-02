@@ -83,7 +83,7 @@ public:
 	// Note: constructor must be public for this to work
 	//static DreamLogger *instance();
 
-	static DreamLogger *initializeSingletonInstance() {
+	static DreamLogger *instanceNoPathMgr(std::string strLogName = "DOS") {
 		RESULT r = R_PASS;
 
 		if (s_pInstance != nullptr) {
@@ -97,7 +97,7 @@ public:
 			goto Error;
 		}
 
-		r = s_pInstance->InitializeLogger();
+		r = s_pInstance->InitializeLoggerNoPathmanager(strLogName);
 		if (r != R_PASS) {
 			goto Error;
 		}

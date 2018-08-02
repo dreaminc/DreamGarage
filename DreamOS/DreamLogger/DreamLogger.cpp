@@ -29,6 +29,14 @@ DreamLogger* DreamLogger::s_pInstance = nullptr;
 		return std::string(szPathResult, GetModuleFileNameA(nullptr, szPathResult, MAX_PATH));
 	}
 
+	std::string GetFolderPathOfExecutible() {
+		std::string strExecPath = GetPathOfExecutible();
+		char pBuffer[MAX_PATH];
+		GetModuleFileNameA(NULL, pBuffer, MAX_PATH);
+		auto slashPosition = strExecPath.find_last_of("\\/");
+		return strExecPath.substr(0, slashPosition);
+	}
+
 	std::string GetCommandLineString() {
 		return std::string(GetCommandLineA());
 	}
@@ -95,7 +103,7 @@ RESULT DreamLogger::InitializeLoggerNoPathmanager(std::string strLogName) {
 	char szTime[32];
 	std::strftime(szTime, 32, "%Y-%m-%d_%H-%M-%S", localTimeNow);
 
-	m_strDreamLogPath = GetPathOfExecutible() + "log-" + szTime + ".log";
+	m_strDreamLogPath = GetFolderPathOfExecutible() + "\\" + "log-" + szTime + ".log";
 
 	// Set up async mode and flush to 1 second
 	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
