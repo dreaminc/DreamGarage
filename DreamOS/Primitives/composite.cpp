@@ -76,7 +76,7 @@ RESULT composite::UpdateBoundingVolume() {
 	point ptMinTemp = point();
 	point ptMaxTemp = point();
 
-	CN(m_pBoundingVolume);
+	CNR(m_pBoundingVolume, R_SKIPPED);
 
 	if (HasChildren()) {
 		for (auto &childObj : GetChildren()) {

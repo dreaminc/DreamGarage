@@ -53,10 +53,13 @@ RESULT CEFExtension::Initialize() {
 
 		std::copy(wstrCurrentExeFolder.begin(), wstrCurrentExeFolder.end(), pszDreamPath);
 		std::string strPath(pszDreamPath);
+		DOSLOG(INFO, "CEFExtension path created");
 #else		
 		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 		std::string strPath(pszDreamPath);
 		strPath += "\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js";
+
+		DOSLOG(INFO, "CEFExtension path created");
 #endif
 		std::ifstream ifstreamExtensionFile(strPath);
 		std::stringstream bufferExtensionCode;

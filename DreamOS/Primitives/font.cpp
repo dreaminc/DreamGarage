@@ -187,7 +187,7 @@ T font::GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName
 	RESULT r = R_PASS;
 	T value;
 
-	CR(GetValue(value, wstrLine, wstrValueName, delimiter));
+	CBR(GetValue(value, wstrLine, wstrValueName, delimiter) == R_PASS, R_SKIPPED);
 
 	return value;
 
@@ -201,9 +201,7 @@ RESULT font::GetValue(T& value, const std::wstring& wstrLine, const std::wstring
 
 	auto pos = wstrLine.find(wstrValueName);
 
-	CB((pos < wstrLine.size()));
-
-	{
+	if (pos < wstrLine.size()) {
 		pos += wstrValueName.size();
 		std::wstring valueString = wstrLine.substr(pos, wstrLine.find(delimiter, pos) - pos);
 		std::wistringstream iss(valueString);
