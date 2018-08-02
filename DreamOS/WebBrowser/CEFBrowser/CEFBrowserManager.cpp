@@ -296,7 +296,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	// Provide CEF with command-line arguments.
 	int exitCode = CefExecuteProcess(cefMainArgs, nullptr, nullptr);
-	DEBUG_LINEOUT("CefExecuteProcess returned %d", exitCode);
+	DOSLOG(INFO, "CefExecuteProcess returned %d", exitCode);
 
 	// Specify CEF global settings here.
 	CefSettings cefSettings;
@@ -330,7 +330,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp, nullptr), "CefInitialize error");
 
-	DEBUG_LINEOUT("CefInitialize completed successfully");
+	DOSLOG(INFO, "CefInitialize completed successfully");
 	m_state = state::INITIALIZED;
 	m_condBrowserInit.notify_one();
 
@@ -339,7 +339,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefRunMessageLoop();
 	//*/
 
-	DEBUG_LINEOUT("CEF thread complete...");
+	DOSLOG(INFO, "CEF thread complete...");
 
 	// Success:
 	return r;
