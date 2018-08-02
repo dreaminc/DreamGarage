@@ -242,6 +242,8 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 	strType = pMessageArguments->GetString(0);
 	strMethod = pMessageArguments->GetString(1);
 
+	DOSLOG(INFO, "HandleDreamExtensionCall: %s.%s", strType, strMethod);
+
 	//TODO: implement the other ones
 	if (strType == "Form") {
 		if (strMethod == "success") {
