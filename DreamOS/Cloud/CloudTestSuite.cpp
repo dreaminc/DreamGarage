@@ -29,10 +29,14 @@ RESULT CloudTestSuite::AddTests() {
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
 	CR(AddTestMultiConnectTest());
-	//CR(AddTestDownloadFile());	// requires logged in
 
-	//CR(AddTestConnectLogin());
-	//CR(AddTestMenuAPI());
+	// Requires login
+
+	CR(AddTestDownloadFile());	
+
+	CR(AddTestConnectLogin());
+	
+	CR(AddTestMenuAPI());
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -52,18 +56,37 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	struct TestContext : public CloudController::UserObserver {
 		UserController *pUserController = nullptr;
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override { return R_NOT_IMPLEMENTED; };
-		virtual RESULT OnSetSettings() override { return R_NOT_IMPLEMENTED; };
-		virtual RESULT OnLogin() override { return R_NOT_IMPLEMENTED; };
-		virtual RESULT OnLogout() override { return R_NOT_IMPLEMENTED; };
-		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override { return R_NOT_IMPLEMENTED; };
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnSetSettings() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnLogin() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnLogout() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override { 
 			RESULT r = R_PASS;
-			CB(fSuccess);
-			CR(pUserController->RequestUserProfile(strAccessToken)); 
-			CR(pUserController->RequestTwilioNTSInformation(strAccessToken));
-			CR(pUserController->GetTeam(strAccessToken));
-			//CR(pUserController->Request)
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+			
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile"); 
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			
 		Error:
 			return r;
 		};
@@ -71,10 +94,12 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override { 
 			RESULT r = R_PASS;
 
+			DEBUG_LINEOUT("OnGetToken");
+
 			CB(fSuccess); 
 			
-			CR(pUserController->SetUserDefaultEnvironmentID(environmentId));
-			CR(pUserController->UpdateLoginState());
+			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
 
 		Error:
 			return r;
@@ -87,35 +112,47 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		RESULT r = R_PASS;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-		m_pDreamOS->InitializeCloudController();
-		m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext);
-
-		// Cloud Controller
-		CloudController *pCloudController = m_pDreamOS->GetCloudController();
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-		CN(pCloudController);
-		CN(pCommandLineManager);
-
-		// For later
-		m_pCloudController = pCloudController;
-
-		CR(SetupPipeline());
+		CN(pTestContext);
 		
-
-		// user controller is set up during initialize
 		{
+
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+			CRM(m_pDreamOS->InitializeCloudController(), "Failed to initialize DreamOS cloud controller");
+			CRM(m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext), "Failed to register user observer");
+
+			// Cloud Controller
+			CloudController *pCloudController = m_pDreamOS->GetCloudController();
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+
+			CN(pCloudController);
+			CN(pCommandLineManager);
+
+			// For later
+			m_pCloudController = pCloudController;
+
+			CR(SetupPipeline());
+
+			// user controller is set up during initialize
+		
+			// Objects 
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+			auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			CN(pSphere);
+
+
 			pTestContext->pUserController = dynamic_cast<UserController*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
 			
-			m_pCloudController->RegisterUserObserver(pTestContext);
-			std::string id = pCommandLineManager->GetParameterValue("testval");
-			int envID = atoi(id.c_str());
+			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
+			int testUserNumber = atoi(strTestValue.c_str());
 
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
-			pTestContext->pUserController->GetAccessToken(m_tokens[envID]);
+			pTestContext->pUserController->GetAccessToken(m_tokens[testUserNumber]);
+
 			m_pUserController = pTestContext->pUserController;
 
 		}
