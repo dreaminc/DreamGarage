@@ -406,7 +406,9 @@ RESULT HALTestSuite::AddTestSkybox() {
 		RESULT r = R_PASS;
 
 		CR(SetupSkyboxPipeline("standard"));
+
 		CR(Initialize());
+
 		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
 
 	Error:

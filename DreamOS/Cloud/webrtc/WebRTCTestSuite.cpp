@@ -18,6 +18,7 @@
 
 #include "DreamLogger/DreamLogger.h"
 #include "Sound/SoundClientFactory.h"
+#include "Sound/SpatialSoundObject.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -425,10 +426,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		// TODO: Why does shit explode with no objects in scene
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
-
-		// Command Line Manager
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-		CN(pCommandLineManager);
 
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
