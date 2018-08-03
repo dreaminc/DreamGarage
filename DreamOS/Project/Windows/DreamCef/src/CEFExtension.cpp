@@ -40,21 +40,18 @@ RESULT CEFExtension::Initialize() {
 		//	"  };"
 		//	"})();";
 
+#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+		char pszDreamPath[MAX_PATH];
+		size_t pszDreamPath_n = 0;
+
+		GetModuleFileNameA(nullptr, pszDreamPath, MAX_PATH);
+		std::string strCurrentExePath(pszDreamPath);
+		std::string strCurrentExeFolder = strCurrentExePath.substr(0, strCurrentExePath.rfind('\\'));
+
+		std::string strPath = strCurrentExeFolder + "\\DreamCEFExtension.js";
+#else		
 		char *pszDreamPath = NULL;
 		size_t pszDreamPath_n = 0;
-#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
-		HMODULE hModule = GetModuleHandleW(NULL);
-		WCHAR wszCurrentExePath[MAX_PATH];
-		std::wstring wstrCurrentExeFolder;
-
-		CB(GetModuleFileName(hModule, wszCurrentExePath, MAX_PATH) != 0);
-		wstrCurrentExeFolder = std::wstring(wszCurrentExePath);
-		wstrCurrentExeFolder = wstrCurrentExeFolder.substr(0, wstrCurrentExeFolder.rfind('\\'));
-
-		std::copy(wstrCurrentExeFolder.begin(), wstrCurrentExeFolder.end(), pszDreamPath);
-		std::string strPath(pszDreamPath);
-		DOSLOG(INFO, "CEFExtension path created");
-#else		
 		errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 		std::string strPath(pszDreamPath);
 		strPath += "\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js";
