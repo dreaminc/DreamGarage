@@ -273,14 +273,21 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
-		/*
+		//*
 	case INTERACTION_EVENT_MENU: {
-		if (m_pUserApp->GetKeyboard()->IsVisible()) {
-			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
-			CR(m_pFormView->HandleKeyboardDown());
-		}
-		else {
-			CR(Hide());
+	//	m_pUserC
+		auto pCloudController = GetDOS()->GetCloudController();
+		if (pCloudController != nullptr && 
+			pCloudController->IsUserLoggedIn() && 
+			pCloudController->IsEnvironmentConnected()) {
+
+			if (m_pUserApp->GetKeyboard()->IsVisible()) {
+				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+				CR(m_pFormView->HandleKeyboardDown());
+			}
+			else {
+				CR(Hide());
+			}
 		}
 		
 	} break;

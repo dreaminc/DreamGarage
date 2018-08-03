@@ -345,7 +345,7 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 	{
 		HTTPResponse httpResponse;
 
-		std::string strAuthorizationToken = "Authorization: Token " + GetUserToken();
+		std::string strAuthorizationToken = "Authorization: Bearer " + GetUserToken();
 
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
