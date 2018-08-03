@@ -126,7 +126,8 @@ Error:
 RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
-	CR(DreamFormApp::HandleDreamFormSuccess());
+	//CR(DreamFormApp::HandleDreamFormSuccess());
+	CR(Hide());
 	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 
 Error:
