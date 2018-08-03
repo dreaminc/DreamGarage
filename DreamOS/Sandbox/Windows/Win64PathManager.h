@@ -13,6 +13,8 @@
 #include <string.h>
 #include <tchar.h>
 
+class DreamOS;
+
 class Win64PathManager : public PathManager {
 public:
 	Win64PathManager();
@@ -23,7 +25,7 @@ public:
 
 protected:
 	virtual RESULT Dealloc() override;
-	virtual RESULT InitializePaths() override;
+	virtual RESULT InitializePaths(DreamOS *pDOSHandle) override;
 	virtual RESULT OpenDreamPathsFile() override;
 	virtual RESULT UpdateCurrentPath() override;
 	virtual RESULT SetCurrentPath(wchar_t *pszPath) override;

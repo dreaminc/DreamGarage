@@ -10,6 +10,8 @@
 // Dream OS Path Manager Factory for the construction of path managers within a given
 // sandbox or native implementation
 
+class DreamOS;
+
 typedef enum {
 	PATH_MANAGER_WIN32,
 	PATH_MANAGER_OSX,
@@ -18,7 +20,7 @@ typedef enum {
 
 class PathManagerFactory : public Factory {
 public:
-	static PathManager* MakePathManager(PATH_MANAGER_TYPE type);
+	static PathManager* MakePathManager(PATH_MANAGER_TYPE type, DreamOS *pDOSHandle);
 };
 
 #endif // ! PATH_MANAGER_FACTORY_H_

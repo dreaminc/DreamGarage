@@ -24,9 +24,17 @@ DreamLogger* DreamLogger::s_pInstance = nullptr;
 	//extern unsigned long GetModuleFileNameA(void*, char*, unsigned long);
 
 	// TODO: Replace these with the proper path manager stuff
-	std::string GetPathOfExecutible () {
+	std::string GetPathOfExecutible() {
 		char szPathResult[MAX_PATH];
 		return std::string(szPathResult, GetModuleFileNameA(nullptr, szPathResult, MAX_PATH));
+	}
+
+	std::string GetFolderPathOfExecutible() {
+		std::string strExecPath = GetPathOfExecutible();
+		char pBuffer[MAX_PATH];
+		GetModuleFileNameA(NULL, pBuffer, MAX_PATH);
+		auto slashPosition = strExecPath.find_last_of("\\/");
+		return strExecPath.substr(0, slashPosition);
 	}
 
 	std::string GetCommandLineString() {
@@ -84,7 +92,34 @@ RESULT DreamLogger::Flush() {
 	return R_PASS;
 }
 
-RESULT DreamLogger::InitializeLogger() {
+RESULT DreamLogger::InitializeLoggerNoPathmanager(std::string strLogName) {
+	RESULT r = R_PASS;
+
+	// TODO: Delete old logs
+
+	std::time_t timeNow = std::time(nullptr);
+	std::tm *localTimeNow = std::localtime(&timeNow);
+
+	char szTime[32];
+	std::strftime(szTime, 32, "%Y-%m-%d_%H-%M-%S", localTimeNow);
+
+	m_strDreamLogPath = GetFolderPathOfExecutible() + "\\" + "log-" + szTime + ".log";
+
+	// Set up async mode and flush to 1 second
+	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
+
+	m_pDreamLogger = spdlog::basic_logger_mt(strLogName, m_strDreamLogPath);
+	CN(m_pDreamLogger);
+
+	Log(DreamLogger::Level::INFO, "Process Launched: %s", GetPathOfExecutible());
+	Log(DreamLogger::Level::INFO, "PID: %d", GetProcessID());
+	//Log(DreamLogger::Level::INFO, "Process Arguments: %s", GetCommandLineString());
+
+Error:
+	return R_PASS;
+}
+
+RESULT DreamLogger::InitializeLogger(std::string strLogName) {
 	RESULT r = R_PASS;
 
 	// TODO: Delete old logs
@@ -116,7 +151,7 @@ RESULT DreamLogger::InitializeLogger() {
 	// Set up async mode and flush to 1 second
 	spdlog::set_async_mode(LOG_QUEUE_SIZE, spdlog::async_overflow_policy::block_retry, nullptr, std::chrono::seconds(1));
 
-	m_pDreamLogger = spdlog::basic_logger_mt("DOS", m_strDreamLogPath);
+	m_pDreamLogger = spdlog::basic_logger_mt(strLogName, m_strDreamLogPath);
 	CN(m_pDreamLogger);
 
 	Log(DreamLogger::Level::INFO, "Process Launched: %s", GetPathOfExecutible());

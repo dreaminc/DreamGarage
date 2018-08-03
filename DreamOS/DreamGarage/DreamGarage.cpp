@@ -1124,7 +1124,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	RESULT r = R_PASS;
 
 	FormType type = DreamFormApp::TypeFromString(strKey);
-
+	DOSLOG(INFO, "OnFormURL: %s, %s, %s", strKey, strTitle, strURL);
 	if (type == FormType::SETTINGS) {
 	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));

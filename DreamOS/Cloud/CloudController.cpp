@@ -809,7 +809,7 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
-	CB(m_fRunning);
+	CBR(m_fRunning, R_SKIPPED);
 
 	CN(m_pUserController);
 	{

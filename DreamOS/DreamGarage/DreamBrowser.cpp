@@ -687,6 +687,10 @@ Error:
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
+	if (m_pBrowserTexture == nullptr) {
+		DOSLOG(INFO, "browser texture not initialized");
+	}
+
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
 	// Update texture dimensions if needed

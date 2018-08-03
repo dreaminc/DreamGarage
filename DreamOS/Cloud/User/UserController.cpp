@@ -47,9 +47,12 @@ Error:
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	//std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-	//std::string strWWWURL = pCommandLineManager->GetParameterValue("www.ip");
+
+#ifdef USE_LOCALHOST
 	std::string strAPIURL = "http://localhost:8001";
+#else
+	std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+#endif
 
 
 	switch (userMethod) {
@@ -379,6 +382,8 @@ RESULT UserController::GetFormURL(std::string& strFormKey) {
 	HTTPResponse httpResponse;
 
 	std::string strURI = GetMethodURI(UserMethod::GET_FORM) + strFormKey;
+
+	DOSLOG(INFO, "Requesting form: %s", strURI);
 
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();

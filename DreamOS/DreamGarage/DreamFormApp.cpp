@@ -72,6 +72,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 	// there's fancier code around this in DreamUserControlArea, 
 	// but we assume that there is only one piece of content here
 	if (m_fInitBrowser) {
+		DOSLOG(INFO, "Creating browser app for form: %s", m_strURL);
 		m_fInitBrowser = false;
 
 		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
@@ -79,7 +80,10 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->RegisterObserver(this));
 
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+
 		CR(m_pDreamBrowserForm->SetURI(m_strURL));
+
+		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 	}
 
 
@@ -142,6 +146,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	if (m_pDreamBrowserForm == nullptr) {
 		m_strURL = strURL;
 		m_fInitBrowser = true;
+		DOSLOG(INFO, "Create browser for form: %s", strURL);
 	}
 	else {
 		m_pDreamBrowserForm->SetURI(m_strURL);

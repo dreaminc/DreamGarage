@@ -129,7 +129,7 @@ public:
 	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) = 0;
 
 public:
-	virtual RESULT InitializePathManager() = 0;
+	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) = 0;
 	virtual RESULT InitializeCredentialManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;

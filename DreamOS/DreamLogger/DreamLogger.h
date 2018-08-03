@@ -65,7 +65,8 @@ private:
 	~DreamLogger();
 
 public:
-	RESULT InitializeLogger();
+	RESULT InitializeLoggerNoPathmanager(std::string strLogName = "DOS");
+	RESULT InitializeLogger(std::string strLogName = "DOS");
 	RESULT Flush();
 
 private:
@@ -81,6 +82,37 @@ private:
 public:
 	// Note: constructor must be public for this to work
 	//static DreamLogger *instance();
+
+	static DreamLogger *instanceNoPathMgr(std::string strLogName = "DOS") {
+		RESULT r = R_PASS;
+
+		if (s_pInstance != nullptr) {
+			r = R_FAIL;
+			goto Error;
+		}
+
+		s_pInstance = new DreamLogger();
+		if (s_pInstance == nullptr) {
+			r = R_FAIL;
+			goto Error;
+		}
+
+		r = s_pInstance->InitializeLoggerNoPathmanager(strLogName);
+		if (r != R_PASS) {
+			goto Error;
+		}
+
+		// Success:
+		return s_pInstance;
+
+	Error:
+		if (s_pInstance != nullptr) {
+			delete s_pInstance;
+			s_pInstance = nullptr;
+		}
+
+		return nullptr;
+	}
 
 	static DreamLogger *instance() {
 		RESULT r = R_PASS;
