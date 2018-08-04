@@ -151,8 +151,8 @@ RESULT UISpatialScrollView::Update() {
 		m_pDreamOS->UnregisterInteractionObject(pButton);
 		m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
 
-		//m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
-		m_pDreamOS->RemoveObjectFromUIGraph(pButton);
+		m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
+		//m_pDreamOS->RemoveObjectFromUIGraph(pButton);
 
 		if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(pButton)) {
 			m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pButton);
@@ -172,7 +172,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	int arrayMaxIndex = (int)(m_pScrollViewNodes.size()) - 1;
 	
 	int minItemIndex = m_itemIndex - 2;
-	int maxItemIndex = m_itemIndex + m_maxElements + 2;
+	int maxItemIndex = m_itemIndex + m_maxElements + 1;
 
 	/*
 	if (minItemIndex < 0) {
@@ -183,8 +183,8 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	}
 	*/
 	if (delta > 0) {	// scrolling right
-		if (minItemIndex >= 0 && maxItemIndex <= arrayMaxIndex) {
-			for (int i = 0; i < delta; i++) {	// New items
+		if (minItemIndex >= 0 && maxItemIndex < arrayMaxIndex) {
+			for (int i = 1; i <= delta; i++) {	// New items
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.front();
 				UIMenuItem* pMenuItem = dynamic_cast<UIMenuItem*>(pButton.get());
@@ -221,7 +221,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	}
 
 	else if (delta < 0) {	// scrolling left
-		if ((maxItemIndex <= arrayMaxIndex + 1) && minItemIndex > 0) {
+		if ((maxItemIndex <= arrayMaxIndex) && minItemIndex > 0) {
 			for (int i = -1; i >= delta; i--) {	// New items
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.back();
@@ -485,8 +485,8 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
-		//m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
-		m_pDreamOS->AddObjectToUIGraph(pButton.get());
+		m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
+		//m_pDreamOS->AddObjectToUIGraph(pButton.get());
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
