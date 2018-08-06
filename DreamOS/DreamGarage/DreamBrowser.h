@@ -252,6 +252,7 @@ private:
 
 private:
 	// when the user goes to a URL that starts with these strings, we send their auth token as well
+	// TODO: build native URL parser for future flexibility
 	std::vector<std::string> m_authenticatedURLs = {
 		"http://localhost:8001",
 		"http://localhost:8002",
