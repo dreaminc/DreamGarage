@@ -192,7 +192,7 @@ RESULT UITestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnviro
 
 		auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		CN(pUserControllerProxy);
-		std::string strTokenValue = "Token " + pUserControllerProxy->GetUserToken();
+		std::string strTokenValue = "Bearer " + pUserControllerProxy->GetUserToken();
 		std::wstring wstrTokenValue = util::StringToWideString(strTokenValue);
 
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
@@ -935,7 +935,7 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		webRequest.SetURL(L"http://placehold.it/350x150/A00AAA/000000");
 
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-		CR(webRequest.AddRequestHeader(L"Authorization", L"Token "));
+		CR(webRequest.AddRequestHeader(L"Authorization", L"Bearer "));
 
 		// NOTE: this is kind of working, data is clearly being sent but there's
 		// no real support for form/file etc yet

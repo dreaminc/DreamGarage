@@ -96,10 +96,6 @@ RESULT DreamFormApp::Update(void *pContext) {
 		WebRequest webRequest;
 		webRequest.SetURL(util::StringToWideString(m_strURL));
 		webRequest.SetRequestMethod(WebRequest::Method::GET);
-		//webRequest.SetRequestHeaders(headerMap)
-		//CefRefPtr<CefRequest> cefRequest;
-		//cefRequest->SetURL((CefString)(m_strURL));
-		//cefRequest->SetMethod((CefString)("GET"));
 
 		std::multimap<std::wstring, std::wstring> requestHeaders;
 		for (std::multimap<std::string, std::string>::iterator itr = headerMap.begin(); itr != headerMap.end(); ++itr) {
@@ -110,11 +106,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(util::StringToWideString(strKey), util::StringToWideString(strValue)));
 		}
 		webRequest.SetRequestHeaders(requestHeaders);
-		//cefRequest->SetHeaderMap(requestHeaders);
 
 		m_pDreamBrowserForm->LoadRequest(webRequest);
-
-		//CR(m_pDreamBrowserForm->SetURI(m_strURL));
 	}
 
 
@@ -181,8 +174,6 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	}
 	else {
 		m_fUpdateFormURL = true;
-		//m_pDreamBrowserForm->SetURI(m_strURL);
-		//m_pDreamBrowserForm->LoadRequest()
 	}
 
 	return r;
@@ -306,9 +297,8 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
-		//*
+
 	case INTERACTION_EVENT_MENU: {
-	//	m_pUserC
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr && 
 			pCloudController->IsUserLoggedIn() && 
@@ -324,7 +314,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		}
 		
 	} break;
-	//*/
+
 	case INTERACTION_EVENT_KEY_DOWN: {
 
 		char chkey = (char)(pEvent->m_value);
@@ -426,6 +416,7 @@ RESULT DreamFormApp::Show() {
 	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
+	m_fFormVisible = true;
 
 Error:
 	return r;
@@ -438,6 +429,7 @@ RESULT DreamFormApp::Hide() {
 	CNR(m_pDreamBrowserForm, R_SKIPPED);
 
 	CR(m_pFormView->Hide());
+	m_fFormVisible = false;
 	CR(m_pFormView->HandleKeyboardDown());
 	CR(m_pUserApp->SetEventApp(nullptr));
 	CR(m_pUserApp->SetHasOpenApp(false));

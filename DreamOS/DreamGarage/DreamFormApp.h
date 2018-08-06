@@ -89,6 +89,8 @@ protected:
 	bool m_fInitBrowser = false;
 	bool m_fUpdateFormURL = false;
 
+	bool m_fFormVisible = false;
+
 };
 
 #endif // ! DREAM_FORM_APP_H_

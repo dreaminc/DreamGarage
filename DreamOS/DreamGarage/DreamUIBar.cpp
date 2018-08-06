@@ -785,7 +785,7 @@ Error:
 
 std::vector<std::string> DreamUIBar::GetStringHeaders() {
 
-	std::string strAuthorizationToken = "Authorization: Token " + m_pUserControllerProxy->GetUserToken();
+	std::string strAuthorizationToken = "Authorization: Bearer " + m_pUserControllerProxy->GetUserToken();
 
 	auto strHeaders = HTTPController::ContentHttp();
 	strHeaders.push_back(strAuthorizationToken);

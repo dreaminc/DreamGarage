@@ -821,7 +821,7 @@ RESULT UserController::LoadTwilioNTSInformation() {
 
 	{
 		HTTPResponse httpResponse;
-		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		std::string strAuthorizationToken = "Authorization: Bearer " + m_strToken;
 		std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
 		HTTPController *pHTTPController = HTTPController::instance();
 
