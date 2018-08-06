@@ -19,6 +19,8 @@
 #include "WebBrowser/DOMNode.h"
 #include "Sound/AudioPacket.h"
 
+#include "Core/Utilities.h"
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -360,10 +362,23 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 			headermap = it->second;
 		}
 	}
-	// TODO: check for api url
-	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	//pUserController->GetAccessToken()
 
+	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	if (pUserController->IsLoggedIn()) {
+		// make a copy of strURL
+		std::string strLowercaseURL = strURL;
+		util::tolowerstring(strLowercaseURL);
+
+		for (std::string& strAuthURL : m_authenticatedURLs) {
+			if (strLowercaseURL.find(strAuthURL) == 0) {
+				std::string strAccessToken = pUserController->GetSavedAccessToken();
+				std::string strFirst = "Authorization";
+				std::string strSecond = "Bearer " + strAccessToken;
+				headermap.insert(std::pair<std::string, std::string>(strFirst, strSecond));
+			}
+		}
+	}
+	
 
 	return r;
 }

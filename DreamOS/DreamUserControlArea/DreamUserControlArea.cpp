@@ -761,7 +761,7 @@ Error:
 RESULT DreamUserControlArea::CreateBrowserSource() {
 	RESULT r = R_PASS;
 
-	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 	if (m_strURL == "") {
 		CR(m_pDreamUIBar->ShowRootMenu(false));
@@ -777,7 +777,7 @@ Error:
 RESULT DreamUserControlArea::SetActiveBrowserURI() {
 	RESULT r = R_PASS;
 
-	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);

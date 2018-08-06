@@ -345,7 +345,7 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 	{
 		HTTPResponse httpResponse;
 
-		std::string strAuthorizationToken = "Authorization: Token " + GetUserToken();
+		std::string strAuthorizationToken = "Authorization: Bearer " + GetUserToken();
 
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
@@ -770,6 +770,10 @@ Error:
 	return r;
 }
 
+std::string UserController::GetSavedAccessToken() {
+	return m_strAccessToken;
+}
+
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
 }
@@ -817,7 +821,7 @@ RESULT UserController::LoadTwilioNTSInformation() {
 
 	{
 		HTTPResponse httpResponse;
-		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		std::string strAuthorizationToken = "Authorization: Bearer " + m_strToken;
 		std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
 		HTTPController *pHTTPController = HTTPController::instance();
 

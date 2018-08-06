@@ -143,6 +143,7 @@ private:
 
 public:
 	RESULT UpdateLoginState();
+	std::string GetSavedAccessToken();
 
 private:
 	LoginState m_loginState = { 0 };

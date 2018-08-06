@@ -48,8 +48,6 @@ private:
 
 	float m_scaleTick = SCALE_TICK;
 
-	//TODO: should be temporary
-	bool m_fRespondToController = false;
 	bool m_fLeftTriggerDown = false;
 	bool m_fRightTriggerDown = false;
 
