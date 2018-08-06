@@ -390,6 +390,10 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
+		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pFormView->HandleKeyboardDown());
+		}
 		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
 	} break;
 
