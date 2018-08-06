@@ -87,6 +87,7 @@ protected:
 protected:
 	std::string m_strURL;
 	bool m_fInitBrowser = false;
+	bool m_fUpdateFormURL = false;
 
 };
 

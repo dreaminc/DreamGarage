@@ -430,6 +430,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 		}
 	}*/
 	
+	//*
 	CheckForHeaders(checkForRequestHeaders, browser, strURL);
 	if (!checkForRequestHeaders.empty()) {
 		for (std::multimap<std::string, std::string>::iterator itr = checkForRequestHeaders.begin(); itr != checkForRequestHeaders.end(); ++itr) {
@@ -449,7 +450,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	
-	/*
+	//*
 	// This is a gut check to see that the right headers are in the right place
 	// TODO: comment out if not in testing
 	CefRequest::HeaderMap cefHeaders;
@@ -458,11 +459,11 @@ bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<Cef
 	request->GetHeaderMap(cefReqHeaders);
 
 	CefResponse::HeaderMap::iterator headeritem;
-	DEBUG_LINEOUT("OnResourceResponse::Response headers size = %i", (int)cefHeaders.size());
+	DOSLOG(INFO, "OnResourceResponse::Response headers size = %i", (int)cefHeaders.size());
 
 	int i = 0;
 	for (headeritem = cefHeaders.begin(); headeritem != cefHeaders.end(); headeritem++) {
-		DEBUG_LINEOUT("[%i]: ['%s','%s']", i++, headeritem->first.ToString().c_str(), headeritem->second.ToString().c_str());
+		DOSLOG(INFO, "[%i]: ['%s','%s']", i++, headeritem->first.ToString().c_str(), headeritem->second.ToString().c_str());
 	}
 	//*/
 

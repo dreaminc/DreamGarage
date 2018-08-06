@@ -770,6 +770,10 @@ Error:
 	return r;
 }
 
+std::string UserController::GetSavedAccessToken() {
+	return m_strAccessToken;
+}
+
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
 }

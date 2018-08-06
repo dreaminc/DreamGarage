@@ -3,6 +3,8 @@
 
 #include "WebBrowser/DOMNode.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "Cloud/WebRequest.h"
+#include "Core/Utilities.h"
 
 #include "UI/UISurface.h"
 
@@ -85,6 +87,35 @@ RESULT DreamFormApp::Update(void *pContext) {
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 	}
+	if (m_fUpdateFormURL) {
+		m_fUpdateFormURL = false;
+
+		std::multimap<std::string, std::string> headerMap;
+		m_pDreamBrowserForm->CheckForHeaders(headerMap, m_strURL);
+
+		WebRequest webRequest;
+		webRequest.SetURL(util::StringToWideString(m_strURL));
+		webRequest.SetRequestMethod(WebRequest::Method::GET);
+		//webRequest.SetRequestHeaders(headerMap)
+		//CefRefPtr<CefRequest> cefRequest;
+		//cefRequest->SetURL((CefString)(m_strURL));
+		//cefRequest->SetMethod((CefString)("GET"));
+
+		std::multimap<std::wstring, std::wstring> requestHeaders;
+		for (std::multimap<std::string, std::string>::iterator itr = headerMap.begin(); itr != headerMap.end(); ++itr) {
+
+			std::string strKey = itr->first;
+			std::string strValue = itr->second;
+
+			requestHeaders.insert(std::pair<std::wstring, std::wstring>(util::StringToWideString(strKey), util::StringToWideString(strValue)));
+		}
+		webRequest.SetRequestHeaders(requestHeaders);
+		//cefRequest->SetHeaderMap(requestHeaders);
+
+		m_pDreamBrowserForm->LoadRequest(webRequest);
+
+		//CR(m_pDreamBrowserForm->SetURI(m_strURL));
+	}
 
 
 Error:
@@ -143,13 +174,15 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	RESULT r = R_PASS;
 
+	m_strURL = strURL;
 	if (m_pDreamBrowserForm == nullptr) {
-		m_strURL = strURL;
 		m_fInitBrowser = true;
-		DOSLOG(INFO, "Create browser for form: %s", strURL);
+		DOSLOG(INFO, "Create browser for form: %s", m_strURL);
 	}
 	else {
-		m_pDreamBrowserForm->SetURI(m_strURL);
+		m_fUpdateFormURL = true;
+		//m_pDreamBrowserForm->SetURI(m_strURL);
+		//m_pDreamBrowserForm->LoadRequest()
 	}
 
 	return r;

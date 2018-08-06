@@ -250,6 +250,16 @@ private:
 
 	long m_assetID = -1;
 
+private:
+	// when the user goes to a URL that starts with these strings, we send their auth token as well
+	std::vector<std::string> m_authenticatedURLs = {
+		"http://localhost:8001",
+		"http://localhost:8002",
+		"https://api.develop.dreamos.com",
+		"https://www.develop.dreamos.com",
+		"https://api.dreamos.com",
+		"https://dreamos.com"
+	};
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
