@@ -20,6 +20,8 @@
 #include "Sound/SoundClientFactory.h"
 #include "Sound/SpatialSoundObject.h"
 
+#include "Cloud/CloudTestSuite.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -311,8 +313,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public SoundClient::observer, public CloudController::PeerConnectionObserver {
+	struct TestContext : public SoundClient::observer, public CloudController::PeerConnectionObserver, public CloudController::UserObserver {
 		CloudController *pCloudController = nullptr;
+		UserController *pUserController = nullptr;
 
 		SoundClient *pWASAPICaptureClient = nullptr;
 		SoundClient *pXAudio2AudioClient = nullptr;
@@ -402,6 +405,66 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
+		// CloudController::UserObserver
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			DEBUG_LINEOUT("OnGetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSetSettings() override {
+			DEBUG_LINEOUT("OnSetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogin() override {
+			DEBUG_LINEOUT("OnLogin");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogout() override {
+			DEBUG_LINEOUT("OnLogout");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			DEBUG_LINEOUT("OnFormURL");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile");
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+
+		Error:
+			return r;
+		};
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnGetToken");
+
+			CB(fSuccess);
+
+			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
+
+		Error:
+			return r;
+		};
+
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
@@ -414,7 +477,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupSkyboxPipeline("standard"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -434,12 +497,14 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		// Cloud Controller
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
+
 		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
 		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
+
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+		CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pTestContext->pCloudController->Initialize(), "Failed to initialize cloud controller");
 
 		// WASAPI Capture Sound Client
 		pTestContext->pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
@@ -455,19 +520,16 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		// Log in 
 		{
-			long environmentID = 170;
+			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
 
-			std::string strUsername = "test";
-			strUsername += pCommandLineManager->GetParameterValue("testval");
-			strUsername += "@dreamos.com";
+			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
+			int testUserNumber = atoi(strTestValue.c_str());
 
-			if (pCommandLineManager->GetParameterValue("testval") != "1") {
-				strURL = "https://www.youtube.com/watch?v=5vZ4lCKv1ik";
-			}
-
-			std::string strPassword = "nightmare";
-
-			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
+			// m_tokens stores the refresh token of users test0-9,
+			// so use -t 0 to login as test0@dreamos.com
+			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
+			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 		/*
