@@ -1,4 +1,4 @@
-// screenquad.vert
+// screenquad.frag
 // shadertype=glsl
 
 // This is a minimal shader that simply displays a texture to screen quad

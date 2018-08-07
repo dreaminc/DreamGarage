@@ -1364,6 +1364,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\core440.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard.frag">

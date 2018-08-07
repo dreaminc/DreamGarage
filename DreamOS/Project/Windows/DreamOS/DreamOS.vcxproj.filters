@@ -2247,6 +2247,10 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
+      <Filter>HAL</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
