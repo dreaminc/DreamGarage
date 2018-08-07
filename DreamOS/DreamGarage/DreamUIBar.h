@@ -138,7 +138,6 @@ private:
 	int m_numMenuItems = 8;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 	std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;	
-	std::queue<std::pair<std::string, std::shared_ptr<MenuNode>>> m_readyQueue;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 
@@ -161,6 +160,7 @@ private:
 	float m_actuationDepth = ACTUATION_DEPTH;
 
 	bool m_fWaitingForMenuResponse = false;
+	bool m_fClearMenuData = false;
 
 	MenuState m_menuState = MenuState::NONE;
 

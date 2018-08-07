@@ -78,6 +78,7 @@ public:
 	RESULT OnRotationDelta(int delta);
 
 	RESULT AddScrollViewNode(std::shared_ptr<MenuNode> pMenuNode);
+	RESULT UpdateScrollViewNode(MenuNode* pMenuNode);
 	RESULT ClearScrollViewNodes();
 
 public:

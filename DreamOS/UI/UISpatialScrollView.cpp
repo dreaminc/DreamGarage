@@ -185,6 +185,9 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	if (delta > 0) {	// scrolling right
 		if (minItemIndex >= 0 && maxItemIndex < arrayMaxIndex) {
 			for (int i = 1; i <= delta; i++) {	// New items
+				// unassociate button from old data
+				m_pScrollViewNodes[minItemIndex]->SetAssociatedButton(nullptr);
+
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.front();
 				UIMenuItem* pMenuItem = dynamic_cast<UIMenuItem*>(pButton.get());
@@ -192,6 +195,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				if (pMenuItem != nullptr && maxItemIndex + i <= arrayMaxIndex) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[maxItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[maxItemIndex + i]->GetTitle());
+					m_pScrollViewNodes[maxItemIndex + i]->SetAssociatedButton(pButton);
 					//std::string strPosition = std::to_string(maxItemIndex + i);
 					//pMenuItem->SetName(strPosition);
 
@@ -200,20 +204,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					m_pButtonDeque.pop_front();
 					m_pButtonDeque.push_back(pButton);
 				}
-
-				/*
-				if (pButton->IsVisible()) {
-					pButton->SetVisible(false);
-				}
-				*/
-				
 			}
-			/*
-			std::shared_ptr<UIButton> pButton = m_pButtonDeque.front();
-			if (pButton->IsVisible()) {
-				pButton->SetVisible(false);
-			}
-			*/
 		}
 
 		maxItemIndex += delta;
@@ -223,6 +214,9 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	else if (delta < 0) {	// scrolling left
 		if ((maxItemIndex <= arrayMaxIndex) && minItemIndex > 0) {
 			for (int i = -1; i >= delta; i--) {	// New items
+				// unassociate button from old data
+				m_pScrollViewNodes[maxItemIndex]->SetAssociatedButton(nullptr);
+												
 				// MenuItem portion - populating with new data
 				std::shared_ptr<UIButton> pButton = m_pButtonDeque.back();
 				UIMenuItem* pMenuItem = dynamic_cast<UIMenuItem*>(pButton.get());
@@ -230,6 +224,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				if (pMenuItem != nullptr && minItemIndex + i >= 0) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[minItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[minItemIndex + i]->GetTitle());
+					m_pScrollViewNodes[minItemIndex + i]->SetAssociatedButton(pButton);
 					//std::string strPosition = std::to_string(minItemIndex + i);
 					//pMenuItem->SetName(strPosition);
 
@@ -238,24 +233,11 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					m_pButtonDeque.pop_back();
 					m_pButtonDeque.push_front(pButton);
 				}
-				/*
-				if (pButton->IsVisible()) {
-					pButton->SetVisible(false);
-				}
-				*/
-				
 			}
-			/*
-			std::shared_ptr<UIButton> pButton = m_pButtonDeque.back();
-			if (pButton->IsVisible()) {
-				pButton->SetVisible(false);
-			}
-			*/
 		}
 
 		maxItemIndex += delta;
-		minItemIndex += delta;
-		
+		minItemIndex += delta;	
 	}
 
 	else if (m_pScrollViewNodes.size() <= m_pButtonDeque.size()) {	// delta == 0 which means we're just populating new data
@@ -272,7 +254,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 			}
 
 			pButton->SetVisible(true);
-
+			m_pScrollViewNodes[i]->SetAssociatedButton(pButton);
 			PositionMenuButton(m_itemIndex + i, pButton);
 		}
 
@@ -518,8 +500,33 @@ Error:
 	return r;
 }
 
+RESULT UISpatialScrollView::UpdateScrollViewNode(MenuNode* pMenuNode) {
+	RESULT r = R_PASS;
+
+	CN(pMenuNode);
+
+	if (pMenuNode->GetAssociatedButton() != nullptr) {
+		std::shared_ptr<UIButton> pButton = pMenuNode->GetAssociatedButton();
+		UIMenuItem* pMenuItem = dynamic_cast<UIMenuItem*>(pButton.get());
+		CN(pMenuItem);
+
+		if (pMenuItem != nullptr) {
+			pMenuItem->GetSurface()->SetDiffuseTexture(pMenuNode->GetThumbnailTexture());
+			pMenuItem->SetName(pMenuNode->GetTitle());	// Because we can
+			DEBUG_LINEOUT("updated button");
+		}
+
+		pButton->SetVisible(false);
+		pButton->SetVisible(true);
+	}
+
+Error:
+	return r;
+}
+
 RESULT UISpatialScrollView::ClearScrollViewNodes() {
 	m_pScrollViewNodes.clear();
+	m_itemIndex = 0;
 	return R_PASS;
 }
 

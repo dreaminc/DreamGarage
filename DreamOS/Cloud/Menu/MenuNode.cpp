@@ -31,6 +31,10 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 		}
 	}
 
+	if (jsonMenuNode["/next_page_token"_json_pointer].is_string()) {
+		m_strNextPageToken = jsonMenuNode["/next_page_token"_json_pointer].get<std::string>();
+	}
+
 	if (jsonMenuNode["/icon_url"_json_pointer].is_string())
 		m_strIconURL = jsonMenuNode["/icon_url"_json_pointer].get<std::string>();
 
@@ -159,6 +163,10 @@ const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
 }
 
+const std::string& MenuNode::GetNextPageToken() {
+	return m_strNextPageToken;
+}
+
 const std::string& MenuNode::GetIconURL() {
 	return m_strIconURL;
 }
@@ -175,6 +183,10 @@ texture* MenuNode::GetThumbnailTexture() {
 	return m_pThumbnailTexture;
 }
 
+std::shared_ptr<UIButton> MenuNode::GetAssociatedButton() {
+	return m_pUIButton;
+}
+
 RESULT MenuNode::SetName(std::string strName) {
 	m_strTitle = strName;
 	return R_PASS;
@@ -185,5 +197,10 @@ RESULT MenuNode::SetThumbnailTexture(texture* pTexture) {
 	m_pThumbnailTexture = pTexture;
 	m_pThumbnailTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
+	return R_PASS;
+}
+
+RESULT MenuNode::SetAssociatedButton(std::shared_ptr<UIButton> pButton) {
+	m_pUIButton = pButton;
 	return R_PASS;
 }

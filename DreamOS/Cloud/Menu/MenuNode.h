@@ -13,6 +13,7 @@
 
 #include "json.hpp"
 #include "Primitives/texture.h"
+#include "UI/UIButton.h"
 
 class MenuNode : public dirty {
 public:
@@ -52,14 +53,18 @@ public:
 	const std::string& GetScope();
 	const std::string& GetMIMEType();
 	const std::string& GetTitle();
+	const std::string& GetNextPageToken();
 	const std::string& GetIconURL();
 	const std::string& GetThumbnailURL();
 	texture* GetThumbnailTexture();
+
+	std::shared_ptr<UIButton> GetAssociatedButton();
 
 	const MenuNode::type& GetNodeType();
 
 	RESULT SetName(std::string strName);
 	RESULT SetThumbnailTexture(texture* pTexture);
+	RESULT SetAssociatedButton(std::shared_ptr<UIButton> pButton);
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
@@ -71,8 +76,10 @@ private:
 	std::string m_strMIMEType;
 	std::string m_strIconURL;
 	std::string m_strThumbnailURL;
+	std::string m_strNextPageToken;
 
 	texture* m_pThumbnailTexture = nullptr;
+	std::shared_ptr<UIButton> m_pUIButton = nullptr;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

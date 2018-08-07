@@ -532,13 +532,37 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
 		}
 	}
-
-	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
-	CR(m_pScrollView->Update());
-
-	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies pretty heavily on dirty only being set if we move to a new menu level
-		CR(MakeMenuItems());
+	
+	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies on dirty only being set if we move to a new menu level
+		m_downloadQueue.clear();
 		m_pScrollView->ClearScrollViewNodes();
+
+		CR(MakeMenuItems());
+
+		if (m_pMenuNode->NumSubMenuNodes() > 0) {
+
+			auto strHeaders = GetStringHeaders();
+
+			for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
+
+				if (pSubMenuNode->GetThumbnailTexture() == nullptr) {	// This should always be true :/
+					pSubMenuNode->SetThumbnailTexture(m_pDefaultThumbnail.get());
+				}
+				m_pScrollView->AddScrollViewNode(pSubMenuNode);
+
+				auto strURI = pSubMenuNode->GetThumbnailURL();
+				if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
+								   //MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
+					CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pSubMenuNode.get()));
+				}
+			}
+
+			auto strURI = m_pMenuNode->GetIconURL();
+			if (strURI != "") {
+				m_pMenuNode->SetName("root_menu_title");
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
+			}
+		}
 	}
 	
 	if (!m_downloadQueue.empty()) {
@@ -550,8 +574,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 			auto pMenuNode = pQueueObj.first;
 			auto pBufferVector = pQueueObj.second;
 
-			texture *pTexture = nullptr;
-			std::string strKey = pMenuNode->GetPath() + pMenuNode->GetScope();
+			texture *pTexture = nullptr;	
 
 			CN(pBufferVector);
 			uint8_t* pBuffer = &(pBufferVector->operator[](0));
@@ -570,17 +593,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 				if (m_pKeyboardHandle != nullptr) {
 					m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
 				}
+				DEBUG_LINEOUT("updated title");
 			}
-			else if (strKey == m_readyQueue.front().first) {
-				while(!m_readyQueue.empty()) {
-					if (m_readyQueue.front().second->GetThumbnailTexture() == nullptr) {
-						break;
-					}
-					else {
-						m_pScrollView->AddScrollViewNode(m_readyQueue.front().second);
-						m_readyQueue.pop();
-					}
-				}
+			else {
+				m_pScrollView->UpdateScrollViewNode(pMenuNode);
 			}
 			
 			if (pBufferVector != nullptr) {
@@ -589,18 +605,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			m_downloadQueue.pop_back();
 		}
-
 	}
-	//*
-	else if (m_downloadQueue.empty() && !m_readyQueue.empty()) {
-		//DEBUG_LINEOUT("%d items pending!", (int)m_readyQueue.size());
-		if (m_readyQueue.front().second->GetThumbnailTexture() == nullptr) {
-			m_readyQueue.front().second->SetThumbnailTexture(m_pDefaultThumbnail.get());
-		}
-		m_pScrollView->AddScrollViewNode(m_readyQueue.front().second);
-		m_readyQueue.pop();
-	}
-	//*/
+	
+	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+	CR(m_pScrollView->Update());
 
 Error:
 	return r;
@@ -793,39 +801,19 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		m_fWaitingForMenuResponse = false;
 	}
 
-	if (pMenuNode->NumSubMenuNodes() > 0) {
-
-		m_readyQueue = {};
-		m_downloadQueue.clear();
-
+	if (m_pMenuNode == pMenuNode) {		// Catch next page
+		// I think this is fine since we're just adding on?
+		for (auto& pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
+			pSubMenuNode->SetThumbnailTexture(m_pDefaultThumbnail.get());
+			m_pScrollView->AddScrollViewNode(pSubMenuNode);
+		}
+	}
+	else {	// opening new layer of the menu
 		m_pMenuNode = pMenuNode;
 		if (m_pathStack.empty()) {
 			m_pathStack.push(m_pMenuNode);
 		}
 		m_pMenuNode->SetDirty();
-
-		auto strHeaders = GetStringHeaders();
-
-		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-			
-			if (pMenuNode->GetTitle() != "root_menu_title") {
-				std::string strKey = pSubMenuNode->GetPath() + pSubMenuNode->GetScope();
-				m_readyQueue.push(std::pair<std::string, std::shared_ptr<MenuNode>>(strKey, pSubMenuNode));
-			}
-
-			auto strURI = pSubMenuNode->GetThumbnailURL();
-			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-				//MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pSubMenuNode.get()));
-			}
-		}
-
-		auto strURI = m_pMenuNode->GetIconURL();
-		if (strURI != "") {
-			MenuNode* pTempMenuNode = new MenuNode();
-			pTempMenuNode->SetName("root_menu_title");
-			CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
-		}
 	}
 
 Error:
