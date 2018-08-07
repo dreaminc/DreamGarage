@@ -144,7 +144,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 
 	// Chrome Audio Source
-	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 
 	// Chrome Video
 	//CR(AddVideoStream());
@@ -477,8 +477,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	// TODO: do we add to a map like out going? Or check existing ?
 
 	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->id().c_str());
-
-	int a = 5;
 
 	// Add to remote streams
 	// TODO: This is done with local_stream/remote_stream now
