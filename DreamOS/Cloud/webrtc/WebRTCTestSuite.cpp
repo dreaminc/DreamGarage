@@ -517,7 +517,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CN(pTestContext->pWASAPICaptureClient);
 
 		CR(pTestContext->pWASAPICaptureClient->RegisterObserver(pTestContext));
-		CR(pTestContext->pWASAPICaptureClient->StartCapture());
+		//CR(pTestContext->pWASAPICaptureClient->StartCapture());
 
 		// XAudio2 Render / Spatial Sound Client
 		pTestContext->pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
