@@ -14,7 +14,7 @@ class OGLQuad;
 
 class OGLProgramScreenQuad : public OGLProgram {
 public:
-	OGLProgramScreenQuad(OpenGLImp *pParentImp);
+	OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName = "oglscreenquad");
 
 	RESULT OGLInitialize();
 

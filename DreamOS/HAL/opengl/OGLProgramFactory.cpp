@@ -19,6 +19,7 @@
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramStandard.h"
 #include "OGLProgramScreenQuad.h"
+#include "OGLProgramScreenFade.h"
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
 #include "OGLProgramBlurQuad.h"
@@ -47,6 +48,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "standard", OGLPROGRAM_STANDARD },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
+	{ "screenfade", OGLPROGRAM_SCREEN_FADE },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
 	{ "blur", OGLPROGRAM_BLUR_QUAD },
@@ -207,6 +209,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 
 		case OGLPROGRAM_SCREEN_QUAD: {
 			pOGLProgram = new OGLProgramScreenQuad(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"screenquad.vert", L"screenquad.frag", versionOGL), 
+				"Failed to initialize OGL screen quad texture Program");
+		} break;
+
+		case OGLPROGRAM_SCREEN_FADE: {
+			pOGLProgram = new OGLProgramScreenFade(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"screenquad.vert", L"screenquad.frag", versionOGL), 
 				"Failed to initialize OGL screen quad texture Program");

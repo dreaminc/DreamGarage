@@ -943,7 +943,14 @@ RESULT HALTestSuite::AddTestFadeShader() {
 
 			auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
-			CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
+			// Screen Quad Shader (opt - we could replace this if we need to)
+			ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenfade");
+			CN(pRenderScreenQuad);
+			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+			// Connect Program to Display
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+			//CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
 
 			quad *pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f);
 			point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
