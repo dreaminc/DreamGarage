@@ -4,8 +4,6 @@
 // This is a minimal shader that simply renders
 // a texture to scren
 
-#version 440 core
-
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 3) in vec2 inV_vec2UVCoord;

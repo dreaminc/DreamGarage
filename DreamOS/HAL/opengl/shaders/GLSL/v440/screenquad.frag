@@ -3,8 +3,6 @@
 
 // This is a minimal shader that simply displays a texture to screen quad
 
-#version 440 core
-
 in Data {
 	vec4 color;
 	vec2 uvCoord;

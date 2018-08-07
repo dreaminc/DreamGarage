@@ -3,8 +3,6 @@
 
 // This is a minimal shader that simply displays a texture to screen quad
 
-#version 440 core
-
 in Data {
 	vec4 color;
 	vec2 uvCoord;
@@ -13,6 +11,9 @@ in Data {
 uniform sampler2D u_textureColor;
 uniform sampler2DMS u_textureColorMS;
 uniform int u_textureColorMS_n;
+
+uniform vec4 u_vec4FadeColor;
+uniform float u_fadeProgress;
 
 uniform	bool u_fTextureMS;
 bool g_fTextureMS = true;
@@ -38,5 +39,5 @@ void main(void) {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	}
 	
-	out_vec4Color = color;
+	out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
 }

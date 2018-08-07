@@ -17,6 +17,7 @@ public:
 	OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName = "oglscreenquad");
 
 	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;

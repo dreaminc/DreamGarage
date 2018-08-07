@@ -210,14 +210,14 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_SCREEN_QUAD: {
 			pOGLProgram = new OGLProgramScreenQuad(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"screenquad.vert", L"screenquad.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL screen quad texture Program");
 		} break;
 
 		case OGLPROGRAM_SCREEN_FADE: {
 			pOGLProgram = new OGLProgramScreenFade(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"screenfade.vert", L"screenfade.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL screen quad texture Program");
 		} break;
 
