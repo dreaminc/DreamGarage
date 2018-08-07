@@ -15,6 +15,7 @@
 #include "HAL/opengl/OGLProgramRefraction.h"
 #include "HAL/opengl/OGLProgramWater.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
+#include "HAL/opengl/OGLProgramScreenFade.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -840,6 +841,8 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	int nRepeats = 1;
 
 	struct TestContext {
+		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
+		bool fFirst = true;
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -948,6 +951,8 @@ RESULT HALTestSuite::AddTestFadeShader() {
 			CN(pRenderScreenQuad);
 			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
+			pTestContext->pScreenFadeProgram = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenQuad);
+
 			// Connect Program to Display
 			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 			//CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
@@ -993,15 +998,10 @@ RESULT HALTestSuite::AddTestFadeShader() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		//pTestContext->pSphere->translateY(-0.001f);
-		//pTestContext->pVolume->translateY(0.001f);
-
-		//pTestContext->pReflectionQuad->translateY(-0.0001f);
-		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
-		//pTestContext->pWaterQuad->RotateXByDeg(0.002f);
-
-		//m_pDreamOS->GetCamera()->translateZ(0.0001f);
-		//m_pDreamOS->GetCamera()->translateY(0.0001f);
+		if (pTestContext->fFirst) {
+			pTestContext->fFirst = false;
+			pTestContext->pScreenFadeProgram->FadeOut();
+		}
 
 	Error:
 		return r;

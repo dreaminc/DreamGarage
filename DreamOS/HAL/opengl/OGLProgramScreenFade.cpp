@@ -56,8 +56,39 @@ Error:
 RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-
 	// TODO: update duration related to progress
+	switch (m_fadeState) {
+
+	case (FADE_OUT): {
+
+		auto tNow = std::chrono::high_resolution_clock::now();
+		double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - m_startTime).count();
+		double sDiff = msDiff / 1000.0f;
+		m_fadeProgress = sDiff / m_fadeDurationSeconds;
+
+		if (m_fadeProgress > 1) {
+			m_fadeProgress = 1.0f;
+			m_fadeState = NONE;
+		}
+
+	} break;
+
+	case (FADE_IN): {
+
+		auto tNow = std::chrono::high_resolution_clock::now();
+		double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - m_startTime).count();
+		double sDiff = msDiff / 1000.0f;
+		m_fadeProgress = 1.0f - (sDiff / m_fadeDurationSeconds);
+
+		if (m_fadeProgress < 0) {
+			m_fadeProgress = 0.0f;
+			m_fadeState = NONE;
+			// execute function after setting to NONE
+		}
+
+	} break;
+
+	}
 
 	CR(OGLProgramScreenQuad::ProcessNode(frameID));
 	m_pUniformFadeColor->SetUniform(m_vFadeColor);
@@ -68,9 +99,36 @@ Error:
 }
 
 RESULT OGLProgramScreenFade::FadeIn() {
-	return R_PASS;
+	RESULT r = R_PASS;
+	CBR(m_fadeState == NONE, R_SKIPPED);
+
+	m_startTime = std::chrono::high_resolution_clock::now();
+	m_fadeState = FADE_IN;
+	m_fadeProgress = 1.0f;
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramScreenFade::FadeOut() {
-	return R_PASS;
+	RESULT r = R_PASS;
+	CBR(m_fadeState == NONE, R_SKIPPED);
+
+	m_startTime = std::chrono::high_resolution_clock::now();
+	m_fadeState = FADE_OUT;
+	m_fadeProgress = 0.0f;
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramScreenFade::FadeOutIn(std::function<RESULT(void*)> fnOut) {
+	RESULT r = R_PASS;
+	CBR(m_fadeState == NONE, R_SKIPPED);
+
+	m_startTime = std::chrono::high_resolution_clock::now();
+	m_fadeState = FADE_OUT;
+
+Error:
+	return r;
 }

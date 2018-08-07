@@ -4,7 +4,15 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgramScreenQuad.h"
 
+#include <chrono>
+
 #define FADE_DURATION_SECONDS 0.5f
+
+typedef enum FadeState {
+	FADE_IN,
+	FADE_OUT,
+	NONE
+} FADE_STATE;
 
 class OGLQuad;
 
@@ -20,6 +28,7 @@ public:
 public:
 	RESULT FadeIn();
 	RESULT FadeOut();
+	RESULT FadeOutIn(std::function<RESULT(void*)> fnOut = nullptr);
 
 	// fade control uniforms
 private:
@@ -28,9 +37,12 @@ private:
 
 	// local fade logic variables
 private:
-	color m_vFadeColor = color(COLOR_WHITE);
+	color m_vFadeColor = color(COLOR_BLACK);
 	float m_fadeDurationSeconds = FADE_DURATION_SECONDS;
 	float m_fadeProgress = 0.0f;
+
+	FadeState m_fadeState = FadeState::NONE;
+	std::chrono::high_resolution_clock::time_point m_startTime;
 };
 
 #endif // ! OGLPROGRAM_SCREEN_FADE_H_

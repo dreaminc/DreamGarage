@@ -26,6 +26,7 @@ void main(void) {
 	// Look up texture by coord
 	vec4 color = vec4(0.0f);
 
+	//TODO: this could be removed, but this shader takes the same uniforms as screenquad so don't want to cause problems
 	if(u_fTextureMS == true) {
 		vec4 colorAccumulator = vec4(0.0f);
 		for(int i = 0; i < u_textureColorMS_n; i++) {
@@ -39,8 +40,6 @@ void main(void) {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	}
 	
-	//out_vec4Color = (1.0f - u_fadeProgress) * u_vec4FadeColor + u_fadeProgress * color;
+	//TODO: sigmoidal transition and shared code for animation functions
 	out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
-	//out_vec4Color = 0.01f* color + u_vec4FadeColor;
-	//out_vec4Color = color;
 }
