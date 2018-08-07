@@ -444,7 +444,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			CBM(fSuccess, "Request of access token failed");
 
 			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile");
+			
 			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+
 			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
 
 		Error:
@@ -458,7 +460,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 			CB(fSuccess);
 
-			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+			//CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+
+			// Using environment 170 for testing
+			CRM(pUserController->SetUserDefaultEnvironmentID(170), "Failed to set default environment id");
+
 			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
 
 		Error:

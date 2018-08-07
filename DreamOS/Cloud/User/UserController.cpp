@@ -178,8 +178,11 @@ RESULT UserController::SetUserDefaultEnvironmentID(long environmentID) {
 
 	// user may not be initialized
 //	return m_user.SetDefaultEnvironmentID(environmentID);
+	
 	m_loginState.fHasEnvironmentId = true;
+	
 	m_defaultEnvironmentId = environmentID;
+
 	CR(UpdateLoginState());
 
 Error:
