@@ -56,11 +56,12 @@ Error:
 RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	m_pUniformFadeColor->SetUniform(m_vFadeColor);
 
 	// TODO: update duration related to progress
 
 	CR(OGLProgramScreenQuad::ProcessNode(frameID));
+	m_pUniformFadeColor->SetUniform(m_vFadeColor);
+	m_pUniformFadeProgress->SetUniform(m_fadeProgress);
 
 Error:
 	return r;

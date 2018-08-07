@@ -39,5 +39,8 @@ void main(void) {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	}
 	
+	//out_vec4Color = (1.0f - u_fadeProgress) * u_vec4FadeColor + u_fadeProgress * color;
 	out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
+	//out_vec4Color = 0.01f* color + u_vec4FadeColor;
+	//out_vec4Color = color;
 }
