@@ -843,6 +843,10 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	struct TestContext {
 		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
 		bool fFirst = true;
+
+		std::chrono::high_resolution_clock::time_point m_startTime;
+		int m_iteration = -1;
+		double m_iterationDuration = 2.0f;
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -854,12 +858,18 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
 		// Set up the pipeline
 		HALImp *pHAL = GetHALImp();
 
 		Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
 		SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
 		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CN(pTestContext);
+
+		pTestContext->m_startTime = std::chrono::high_resolution_clock::now();
 
 		//CR(pHAL->MakeCurrentContext());
 
@@ -997,11 +1007,27 @@ RESULT HALTestSuite::AddTestFadeShader() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+		{
+			auto msCurrentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - pTestContext->m_startTime).count();
+			int iteration = (int)(msCurrentTime / (1000.0f * pTestContext->m_iterationDuration));
+			if (iteration != pTestContext->m_iteration) {
+				pTestContext->m_iteration = iteration;
 
+				if (pTestContext->m_iteration % 2 == 0) {
+					pTestContext->pScreenFadeProgram->FadeOut();
+				}
+				else {
+					pTestContext->pScreenFadeProgram->FadeIn();
+				}
+			}
+		}
+
+		/*
 		if (pTestContext->fFirst) {
 			pTestContext->fFirst = false;
 			pTestContext->pScreenFadeProgram->FadeOut();
 		}
+		//*/
 
 	Error:
 		return r;
