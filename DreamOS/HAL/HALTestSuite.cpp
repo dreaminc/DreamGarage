@@ -843,6 +843,7 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	struct TestContext {
 		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
 		bool fFirst = true;
+		model *pEnvironmentModel = nullptr;
 
 		std::chrono::high_resolution_clock::time_point m_startTime;
 		int m_iteration = -1;
