@@ -312,6 +312,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
+	float radius = 2.0f;
 
 	struct TestContext : public SoundClient::observer, public CloudController::PeerConnectionObserver, public CloudController::UserObserver {
 		CloudController *pCloudController = nullptr;
@@ -320,8 +321,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		SoundClient *pWASAPICaptureClient = nullptr;
 		SoundClient *pXAudio2AudioClient = nullptr;
 
+		int testUserNum = 0;
+
 		sphere *pSphere = nullptr;
-		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject = nullptr;
+		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject1 = nullptr;
+		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject2 = nullptr;
 
 		// SoundClient::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -341,12 +345,45 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 				//CR(pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket));
 			}
 
+			// temp
+			pCaptureBuffer->IncrementBuffer(numFrames);
+
 			//// Simply pushes the capture buffer to the render buffer
-			if (pXAudioSpatialSoundObject != nullptr) {
-				CR(pXAudioSpatialSoundObject->PushMonoAudioBuffer(numFrames, pCaptureBuffer));
+			//if (pXAudioSpatialSoundObject != nullptr) {
+			//	CR(pXAudioSpatialSoundObject->PushMonoAudioBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			// Measure time diff
+			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+			auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+			lastUpdateTime = timeNow;
+
+			static bool fOnOff = 0;
+
+			if (pCloudController != nullptr && testUserNum == 1) {
+
+				// Send a dummy audio packet (generating audio right now)
+				int nChannels = 1;
+				int samplingFrequency = 44100;
+				numFrames = samplingFrequency / 100;
+
+				//int numFrames = (nChannels * samplingFrequency) * 0.01f;
+				AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, samplingFrequency, nullptr);
+				//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+
+				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+				pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+
+				fOnOff = !fOnOff;
+
 			}
 
-		Error:
+			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
+			auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - timeNow).count();
+
+
+		//Error:
 			return r;
 		}
 
@@ -382,9 +419,53 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		}
 
 		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			RESULT r = R_PASS;
+			
 			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
-			return R_NOT_HANDLED;
+			if (strAudioTrackLabel == kUserAudioLabel) {
+
+				if (pXAudioSpatialSoundObject1 != nullptr) {
+
+					static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+					auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+					lastUpdateTime = timeNow;
+
+					//int16_t *pInt16Soundbuffer = (int16_t*)(pAudioDataBuffer);
+
+					// Do I need to copy the buffer over (getting over written maybe)
+					int16_t *pInt16Soundbuffer = new int16_t[frames];
+					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+
+					if (pInt16Soundbuffer != nullptr) {
+						CR(pXAudioSpatialSoundObject1->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
+					}
+				}
+			}
+			else if (strAudioTrackLabel == kChromeAudioLabel) {
+				
+				if (pXAudioSpatialSoundObject1 != nullptr) {
+
+					static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+					auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+					lastUpdateTime = timeNow;
+
+					//int16_t *pInt16Soundbuffer = (int16_t*)(pAudioDataBuffer);
+
+					// Do I need to copy the buffer over (getting over written maybe)
+					int16_t *pInt16Soundbuffer = new int16_t[frames];
+					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+
+					if (pInt16Soundbuffer != nullptr) {
+						CR(pXAudioSpatialSoundObject2->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
+					}
+				}
+			}
+
+		Error:
+			return r;
 		}
 
 		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
@@ -463,7 +544,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			//CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
 
 			// Using environment 170 for testing
-			CRM(pUserController->SetUserDefaultEnvironmentID(170), "Failed to set default environment id");
+			CRM(pUserController->SetUserDefaultEnvironmentID(168), "Failed to set default environment id");
 
 			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
 
@@ -474,7 +555,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
@@ -510,6 +591,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
 		CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
 
+		// TODO: All of the login stuff should be pushed into CloudController and consolidated
+		CRM(pTestContext->pCloudController->Start(false), "Failed to start cloud controller");
+
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 
 		// WASAPI Capture Sound Client
@@ -517,11 +601,28 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CN(pTestContext->pWASAPICaptureClient);
 
 		CR(pTestContext->pWASAPICaptureClient->RegisterObserver(pTestContext));
-		//CR(pTestContext->pWASAPICaptureClient->StartCapture());
+		CR(pTestContext->pWASAPICaptureClient->StartCapture());
 
 		// XAudio2 Render / Spatial Sound Client
 		pTestContext->pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
 		CN(pTestContext->pXAudio2AudioClient);
+		{
+
+			point ptPosition = point(-2.0f, 0.0f, -radius);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			pTestContext->pXAudioSpatialSoundObject1 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			CN(pTestContext->pXAudioSpatialSoundObject1);
+
+			ptPosition = point(2.0f, 0.0f, -radius);
+			vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			pTestContext->pXAudioSpatialSoundObject2 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			CN(pTestContext->pXAudioSpatialSoundObject2);
+		}
+
 		CR(pTestContext->pXAudio2AudioClient->StartSpatial());
 
 		// Log in 
@@ -531,6 +632,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
 			int testUserNumber = atoi(strTestValue.c_str());
+
+			pTestContext->testUserNum = testUserNumber;
 
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
@@ -573,11 +676,47 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
+	auto fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		CloudController *pCloudController = pTestContext->pCloudController;
+		CN(pCloudController);
+
+		// Every 20 ms
+
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		/*
+		{
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+			
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 0) {
+
+				lastUpdateTime = timeNow;
+
+				if (pCloudController != nullptr && pTestContext->testUserNum == 1) {
+					// TODO: Retrieve audio packet from capture buffer (might need copy
+					// or convert to correct packet format
+					//pCaptureBuffer->IncrementBuffer(numFrames);
+					//AudioPacket pendingAudioPacket = pCaptureBuffer->GetAudioPacket(numFrames);
+
+					// Send a dummy audio packet (generating audio right now)
+					int nChannels = 1;
+					int samplingFrequency = 44100;
+					int numFrames = (nChannels * samplingFrequency) * 0.01f;
+					AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
+					//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+
+					// DO BOTH
+					pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+					pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+				}
+			}
+		}
+		//*/
 
 	Error:
 		return r;

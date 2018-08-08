@@ -35,6 +35,8 @@ public:
 	virtual RESULT LoopSoundFile(SoundFile *pSoundFile) override;
 
 	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) override;
+	virtual RESULT PushMonoAudioBuffer(int numFrames, const int16_t *pSoundBuffer) override;
+	virtual RESULT PushMonoAudioBuffer(int numFrames, const float *pSoundBuffer) override;
 
 	//RESULT GetBuffer(BYTE **ppBuffer, UINT32 *pBufferLength);
 	//

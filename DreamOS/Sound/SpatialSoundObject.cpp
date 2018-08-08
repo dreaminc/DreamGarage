@@ -17,6 +17,46 @@ RESULT SpatialSoundObject::SetEmitterListenerDirection(vector vEmitterDirection,
 	return R_PASS;
 }
 
+RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, const float *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	CN(pSoundBuffer);
+
+	m_pSoundBuffer->LockBuffer();
+	{
+		if (m_pSoundBuffer->IsFull() == false) {
+			m_pSoundBuffer->PushData((float*)(pSoundBuffer), numFrames);
+		}
+		else {
+			DEBUG_LINEOUT("Render buffer is full");
+		}
+	}
+	m_pSoundBuffer->UnlockBuffer();
+
+Error:
+	return r;
+}
+
+RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	CN(pSoundBuffer);
+
+	m_pSoundBuffer->LockBuffer();
+	{
+		if (m_pSoundBuffer->IsFull() == false) {
+			m_pSoundBuffer->PushData((int16_t*)(pSoundBuffer), numFrames);
+		}
+		else {
+			DEBUG_LINEOUT("Render buffer is full");
+		}
+	}
+	m_pSoundBuffer->UnlockBuffer();
+
+Error:
+	return r;
+}
+
 RESULT SpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) {
 	RESULT r = R_PASS;
 

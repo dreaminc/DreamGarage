@@ -125,8 +125,15 @@ public:
 	int GetRecordAudioParameters(AudioParameters* params) const override;
 #endif  // WEBRTC_IOS
 
+private:
+	// Audio Process
+	RESULT WebRTCADMProcess();
+	std::thread	m_webrtcADMThread;
+	bool m_fRunning = false;
+
 protected:
 	webrtc::AudioTransport* m_pAudioTransport = nullptr;
+	
 
 	bool m_fValid = false;
 	bool m_fInitialized = false;
