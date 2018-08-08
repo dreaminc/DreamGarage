@@ -8,8 +8,8 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglscreenquad")
+OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName) :
+	OGLProgram(pParentImp, strName)
 {
 	// empty
 }
@@ -57,6 +57,39 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	//CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	//CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	//*/
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramScreenQuad::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"screenquad.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"screenquad.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
 
 Error:
 	return r;
