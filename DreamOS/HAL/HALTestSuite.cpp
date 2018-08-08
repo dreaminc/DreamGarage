@@ -955,17 +955,17 @@ RESULT HALTestSuite::AddTestFadeShader() {
 			// Connect output as pass-thru to internal blend program
 			CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-			auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+			EnvironmentProgram* pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
 			// Screen Quad Shader (opt - we could replace this if we need to)
-			ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenfade");
-			CN(pRenderScreenQuad);
-			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+			ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
+			CN(pRenderScreenFade);
+			CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
-			pTestContext->pScreenFadeProgram = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenQuad);
+			pTestContext->pScreenFadeProgram = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
 
 			// Connect Program to Display
-			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
 			//CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
 
 			quad *pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f);

@@ -41,7 +41,6 @@ void main(void) {
 	}
 	
 	//out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
-	//TODO: sigmoidal transition code could be shared with uistage.frag
-	float sigmoidProgress = (tanh(6.0f*(u_fadeProgress - 0.5f)) + 1.0f)/2.0f;
+	float sigmoidProgress = sigmoid(6.0f, u_fadeProgress);
 	out_vec4Color = (1.0f - sigmoidProgress) * color + sigmoidProgress * u_vec4FadeColor;
 }

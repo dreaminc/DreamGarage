@@ -2251,6 +2251,9 @@
       <Filter>HAL</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\mathCommon.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

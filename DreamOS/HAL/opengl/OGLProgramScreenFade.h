@@ -37,7 +37,7 @@ private:
 
 	// local fade logic variables
 private:
-	color m_vFadeColor = color(COLOR_BLACK);
+	color m_cFadeColor = color(COLOR_BLACK);
 	float m_fadeDurationSeconds = FADE_DURATION_SECONDS;
 	float m_fadeProgress = 0.0f;
 

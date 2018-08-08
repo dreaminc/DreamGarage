@@ -29,6 +29,7 @@ RESULT OGLProgramScreenFade::OGLInitialize(version versionOGL) {
 
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"mathCommon.shader"), "Failed to add math global shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"screenfade.vert"), "Failed to create vertex shader");
@@ -91,7 +92,7 @@ RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 	}
 
 	CR(OGLProgramScreenQuad::ProcessNode(frameID));
-	m_pUniformFadeColor->SetUniform(m_vFadeColor);
+	m_pUniformFadeColor->SetUniform(m_cFadeColor);
 	m_pUniformFadeProgress->SetUniform(m_fadeProgress);
 
 Error:
