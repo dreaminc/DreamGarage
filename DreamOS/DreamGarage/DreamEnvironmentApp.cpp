@@ -3,6 +3,7 @@
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
+#include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
 
 #include "Sandbox/CommandLineManager.h"
@@ -63,8 +64,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 		//CN(pModel);
 
 		//TODO: may need a way to load multiple files for the environment in a more general way
-		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
-		CN(pModel);
+		m_pEnvironment = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
+		CN(m_pEnvironment);
 
 		//auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
 		//CN(pRiver);
@@ -141,4 +142,43 @@ DreamEnvironmentApp* DreamEnvironmentApp::SelfConstruct(DreamOS *pDreamOS, void 
 RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
 	m_skyboxPrograms = pPrograms;
 	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram) {
+	m_pFadeProgram = pFadeProgram;
+	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
+	RESULT r = R_PASS;
+
+	auto fnOnFadeOut = [&](void *pContext) {
+		m_pEnvironment->SetVisible(false);
+		m_pFadeProgram->FadeIn();
+		return R_PASS;
+	};
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+
+	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
+	RESULT r = R_PASS;
+
+	auto fnOnFadeOut = [&](void *pContext) {
+		m_pEnvironment->SetVisible(true);
+		m_pFadeProgram->FadeIn();
+		return R_PASS;
+	};
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+
+	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
 }

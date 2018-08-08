@@ -43,6 +43,9 @@ private:
 
 	FadeState m_fadeState = FadeState::NONE;
 	std::chrono::high_resolution_clock::time_point m_startTime;
+
+	std::function<RESULT(void*)> m_fnOnFadeIn = nullptr;
+	std::function<RESULT(void*)> m_fnOnFadeOut = nullptr;
 };
 
 #endif // ! OGLPROGRAM_SCREEN_FADE_H_

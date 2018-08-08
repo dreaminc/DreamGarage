@@ -1973,6 +1973,8 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 		pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
 		CN(pTestContext->pEnvironmentApp);
 
+		pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
+
 	Error:
 		return r;
 	};
@@ -1990,10 +1992,14 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 				pTestContext->m_iteration = iteration;
 
 				if (pTestContext->m_iteration % 2 == 0) {
-					pTestContext->pScreenFadeProgram->FadeOut();
+					//pTestContext->pScreenFadeProgram->FadeOut();
+
+					pTestContext->pEnvironmentApp->HideEnvironment(nullptr);
 				}
 				else {
-					pTestContext->pScreenFadeProgram->FadeIn();
+					//pTestContext->pScreenFadeProgram->FadeIn();
+
+					pTestContext->pEnvironmentApp->ShowEnvironment(nullptr);
 				}
 			}
 		}
