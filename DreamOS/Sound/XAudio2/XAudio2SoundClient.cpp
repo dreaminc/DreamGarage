@@ -118,7 +118,7 @@ std::shared_ptr<SpatialSoundObject> XAudio2SoundClient::MakeSpatialAudioObject(p
 	CNM(m_pX3DInstance, "X3D Instance not initialized");
 
 	pSpatialSoundObject =
-		std::make_shared<X3DSpatialSoundObject>(ptPosition, vEmitterDirection, vListenerDirection, m_pXAudio2, m_pXAudio2MasterVoice);
+		std::make_shared<X3DSpatialSoundObject>(GetSpaitalSamplingRate(), ptPosition, vEmitterDirection, vListenerDirection, m_pXAudio2, m_pXAudio2MasterVoice);
 	CNM(pSpatialSoundObject, "Failed to allocate X3D spatial sound object");
 
 	CRM(pSpatialSoundObject->Initialize(), "Failed to initialize X3D HRTF spatial object");

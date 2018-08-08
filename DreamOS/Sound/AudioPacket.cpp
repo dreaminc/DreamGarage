@@ -2,6 +2,16 @@
 
 #include <cstdlib>
 
+AudioPacket::AudioPacket() :
+	m_frames(0),
+	m_channels(0),
+	m_bitsPerSample(0),
+	m_pDataBuffer(nullptr),
+	m_pDataBuffer_n(0)
+{
+	// empty
+}
+
 AudioPacket::AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer) :
 	m_frames(frames),
 	m_channels(channels),
