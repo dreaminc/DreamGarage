@@ -34,9 +34,7 @@
 #include "Core/Utilities.h"
 
 #include "WebRTCCustomVideoCapturer.h"
-#include "WebRTCLocalAudioSource.h"
 #include "WebRTCLocalAudioTrack.h"
-#include "WebRTCAudioTrackSink.h"
 
 #include "Primitives/texture.h"
 
@@ -144,7 +142,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 
 	// Chrome Audio Source
-	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 
 	// Chrome Video
 	//CR(AddVideoStream());
@@ -303,6 +301,12 @@ RESULT WebRTCPeerConnection::AddLocalAudioSource(const std::string &strAudioTrac
 
 		//fakeAudioOptions.playout_sample_rate = rtc::Optional<uint32_t>(44100);
 		//fakeAudioOptions.recording_sample_rate = rtc::Optional<uint32_t>(44100);
+		
+		fakeAudioOptions.echo_cancellation = rtc::Optional<bool>(false);
+		fakeAudioOptions.auto_gain_control = rtc::Optional<bool>(false);
+		fakeAudioOptions.noise_suppression = rtc::Optional<bool>(false);
+		fakeAudioOptions.highpass_filter = rtc::Optional<bool>(false);
+		fakeAudioOptions.typing_detection = rtc::Optional<bool>(false);
 
 		//auto pWebRTCLocalAudioSource = new rtc::RefCountedObject<WebRTCLocalAudioSource>();
 		//auto pWebRTCLocalAudioSource = WebRTCLocalAudioSource::Create(strAudioTrackLabel, audioSourceConstraints);
@@ -505,9 +509,13 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 			if (pUserAudioTrackSource != nullptr) {
 				std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
-				m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+				
+				pWebRTCAudioTrackSink->RegisterObserver(this);
 
+				m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
+				
 				pUserAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+				
 			}
 		}
 
@@ -551,9 +559,11 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 		if (pChromeAudioTrackSource != nullptr) {
 
 			std::shared_ptr<WebRTCAudioTrackSink> pWebRTCAudioTrackSink = std::make_shared<WebRTCAudioTrackSink>(strTrackName);
+			pWebRTCAudioTrackSink->RegisterObserver(this);
 			m_webRTCAudioTrackSinks[strTrackName] = pWebRTCAudioTrackSink;
 
 			pChromeAudioTrackSource->AddSink(pWebRTCAudioTrackSink.get());
+			
 		}
 	}
 	
@@ -675,17 +685,14 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	}
 }
 
-//void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
-//	
-//	// TODO: Register local source as sink or something
-//	std::string strAudioTrackLabel = "tempTrack";
-//
-//	DEBUG_LINEOUT("OnAudioData: %s %d samples", strAudioTrackLabel.c_str(), (int)frames);
-//	
-//	if (m_pParentObserver != nullptr) {
-//		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
-//	}
-//}
+void WebRTCPeerConnection::OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {	
+	//DEBUG_LINEOUT("OnAudioData: %s %d samples", strAudioTrackLabel.c_str(), (int)frames);
+	
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnAudioData(strAudioTrackLabel, m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
+	}
+
+}
 
 // TODO: Update WebRTC version and move to webrtc::video_frame since 
 // I'm not sure what the hell cricket is all about

@@ -24,6 +24,79 @@ WebRTCAudioDeviceModule::~WebRTCAudioDeviceModule() {
 	m_pAudioTransport = nullptr;
 }
 
+#include <avrt.h>
+
+RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("ProcessingThread start");
+
+	m_fRunning = true;
+	int samplingRate = 48000;
+	int numSamples = samplingRate / 100;
+	int numChannels = 1;
+	int bitsPerSample = 16;
+
+	int16_t *pAudioBuffer = new int16_t[numSamples];
+
+	DWORD taskIndex = 0;
+	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+	CNM(hAudioRenderProcessTask, "Failed to set up audio process task");
+
+	while (m_fRunning) {
+
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+
+		if (m_pAudioTransport != nullptr && diffVal > 9) {
+
+			lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+
+			int64_t msElapsedTime = 0;
+			int64_t msNTPTime = 0;
+
+			//int numSamples = (int)(44100.0f * ((float)diffVal/1000.0f));
+
+			//memset(pAudioBuffer, 0, sizeof(int16_t) * numSamples);
+
+			//int32_t retVal = m_pAudioTransport->NeedMorePlayData(
+			//	441,
+			//	sizeof(uint16_t),
+			//	1,
+			//	44100,
+			//	pAudioBuffer,
+			//	nSamplesOut,  
+			//	&msElapsedTime,
+			//	&msNTPTime);
+
+			m_pAudioTransport->PullRenderData(
+				bitsPerSample,
+				samplingRate,
+				numChannels,
+				numSamples,
+				pAudioBuffer,
+				&msElapsedTime,
+				&msNTPTime
+			);
+
+			if (diffVal > 10) {
+				m_msOutputDelay = diffVal - 10;
+			}
+
+		}
+
+		std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
+		auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	}
+
+	DEBUG_LINEOUT("CloudThreadProcess End");
+
+Error:
+	return r;
+}
+
 RESULT WebRTCAudioDeviceModule::Initialize() {
 	RESULT r = R_PASS;
 
@@ -34,6 +107,9 @@ RESULT WebRTCAudioDeviceModule::Initialize() {
 	m_pendingAudioCircularBuffer.InitializePendingBuffer();
 
 	m_fInitialized = true;
+
+	// Kick off thread
+	m_webrtcADMThread = std::thread(&WebRTCAudioDeviceModule::WebRTCADMProcess, this);
 
 //Error:
 	return r;
@@ -267,26 +343,6 @@ int32_t WebRTCAudioDeviceModule::PlayoutDelay(uint16_t* delay_ms) const  {
 	//base::AutoLock auto_lock(lock_);
 
 	*delay_ms = static_cast<uint16_t>(m_msOutputDelay);
-
-	// HACKKK:
-
-	size_t nSamplesOut = 0;
-	int64_t msElapsedTime = 0;
-	int64_t msNTPTime = 0;
-	int numSamples = 441;
-
-	int16_t *pAudioBuffer = new int16_t[numSamples];
-	memset(pAudioBuffer, 0, sizeof(int16_t) * numSamples);
-
-	int32_t retVal = m_pAudioTransport->NeedMorePlayData(
-		441,
-		sizeof(uint16_t),
-		1,
-		44100,
-		pAudioBuffer,
-		nSamplesOut,  
-		&msElapsedTime,
-		&msNTPTime);
 
 	return 0;
 }

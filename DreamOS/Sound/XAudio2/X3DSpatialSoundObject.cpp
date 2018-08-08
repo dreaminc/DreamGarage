@@ -50,6 +50,7 @@ RESULT X3DSpatialSoundObject::Initialize() {
 	sourceFormat.wBitsPerSample = 32;
 	sourceFormat.nChannels = 1;
 	sourceFormat.nSamplesPerSec = 44100;
+	//sourceFormat.nSamplesPerSec = 48000;
 	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;
@@ -144,6 +145,78 @@ Error:
 
 RESULT X3DSpatialSoundObject::LoadSoundFile(SoundFile *pSoundFile) {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	m_fLoop = false;
+
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundBuffer);
+
+	pFloatAudioBuffer = (float*)malloc(sizeof(float) * numFrames);
+	CN(pFloatAudioBuffer);
+	
+	// Convert to float
+	for (int i = 0; i < numFrames; i++) {
+		pFloatAudioBuffer[i] = ((float)pSoundBuffer[i]) / std::numeric_limits<int16_t>::max();
+	}
+
+	// TODO: Might need to add a mechanism to flush the queued buffers if we're too delayed
+	// likely should do this where we are detecting delay from the network or source
+
+	{
+		XAUDIO2_BUFFER xaudio2AudioBuffer{};
+
+		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * numFrames);
+		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+		xaudio2AudioBuffer.pContext = reinterpret_cast<void*>(pFloatAudioBuffer);
+
+		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
+	}
+
+Error:
+	// The buffer will be deleted in the buffer-end handler
+
+	return r;
+}
+
+RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, const float *pSoundBuffer) {
+	RESULT r = R_PASS;
+
+	m_fLoop = false;
+
+	float *pFloatAudioBuffer = nullptr;
+
+	CN(pSoundBuffer);
+
+	size_t floatBufferSize = sizeof(float) * numFrames;
+
+	pFloatAudioBuffer = (float*)malloc(floatBufferSize);
+	CN(pFloatAudioBuffer);
+
+	// Copy over
+	memcpy(pFloatAudioBuffer, pSoundBuffer, floatBufferSize);
+
+	// TODO: Might need to add a mechanism to flush the queued buffers if we're too delayed
+	// likely should do this where we are detecting delay from the network or source
+
+	{
+		XAUDIO2_BUFFER xaudio2AudioBuffer{};
+
+		xaudio2AudioBuffer.AudioBytes = static_cast<UINT32>(sizeof(float) * numFrames);
+		xaudio2AudioBuffer.pAudioData = reinterpret_cast<BYTE*>(pFloatAudioBuffer);
+		xaudio2AudioBuffer.pContext = reinterpret_cast<void*>(pFloatAudioBuffer);
+
+		CRM((RESULT)m_pXAudio2SourceVoice->SubmitSourceBuffer(&xaudio2AudioBuffer), "Failed to submit source buffer");
+	}
+
+Error:
+	// The buffer will be deleted in the buffer-end handler
+
+	return r;
 }
 
 RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pSoundBuffer) {

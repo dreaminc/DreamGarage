@@ -25,10 +25,12 @@
 
 #include "pc/localaudiosource.h"
 
+#include "WebRTCLocalAudioSource.h"
+#include "WebRTCAudioTrackSink.h"
+
 class WebRTConductor;
-class WebRTCLocalAudioSource;
-class WebRTCLocalAudioTrack;
-class WebRTCAudioTrackSink;
+//class WebRTCLocalAudioSource;
+//class WebRTCAudioTrackSink;
 class User;
 class TwilioNTSInformation;
 class AudioPacket;
@@ -42,9 +44,9 @@ class WebRTCPeerConnection :
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	//public webrtc::AudioTrackSinkInterface,
 	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
-	public WebRTCPeerConnectionProxy
+	public WebRTCPeerConnectionProxy,
+	public WebRTCAudioTrackSink::observer
 {
 public:
 	
@@ -118,7 +120,6 @@ protected:
 
 	virtual void OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
 
-
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
@@ -138,6 +139,9 @@ protected:
 
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
 	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+
+	// WebRTCAudioTrackSink::observer
+	virtual void OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);

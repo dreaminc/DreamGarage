@@ -12,6 +12,8 @@
 class AudioPacket {
 public:
 	AudioPacket(int frames, int channels, int bitsPerSample, uint8_t* pDataBuffer);
+	AudioPacket(int frames, int channels, int bitsPerSample, int samplingRate, uint8_t* pDataBuffer);
+	
 	~AudioPacket();
 
 	uint8_t *GetDataBuffer() const {
