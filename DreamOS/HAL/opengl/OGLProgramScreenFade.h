@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-#define FADE_DURATION_SECONDS 0.5f
+#define FADE_DURATION_SECONDS 0.2f
 
 typedef enum FadeState {
 	FADE_IN,
@@ -37,6 +37,7 @@ private:
 
 	// local fade logic variables
 private:
+//	color m_cFadeColor = color(0.25f, 0.25f, 0.25f, 1.0f);
 	color m_cFadeColor = color(COLOR_BLACK);
 	float m_fadeDurationSeconds = FADE_DURATION_SECONDS;
 	float m_fadeProgress = 0.0f;

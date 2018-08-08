@@ -1962,18 +1962,24 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 				CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
 			}
 
+			/*
 			vector vLightDirection = vector(1.0f, -1.0f, 0.0f);
 			float lightIntensity = 1.0f;
 			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightDirection);
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.70f * lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f * vLightDirection));
+			//*/
+			std::vector<SkyboxScatterProgram*> skyboxProgramNodes;
+			skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
+			skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
+
+			pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
+			CN(pTestContext->pEnvironmentApp);
+
+			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
+			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
 		}
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
-
-		pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
-		CN(pTestContext->pEnvironmentApp);
-
-		pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 
 	Error:
 		return r;

@@ -41,6 +41,6 @@ void main(void) {
 	}
 	
 	//out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
-	float sigmoidProgress = sigmoid(6.0f, u_fadeProgress);
+	float sigmoidProgress = sigmoid(3.0f, u_fadeProgress);
 	out_vec4Color = (1.0f - sigmoidProgress) * color + sigmoidProgress * u_vec4FadeColor;
 }
