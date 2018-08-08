@@ -107,7 +107,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 		}
 		webRequest.SetRequestHeaders(requestHeaders);
 
-		m_pDreamBrowserForm->LoadRequest(webRequest);
+//		m_pDreamBrowserForm->LoadRequest(webRequest);
+		m_pDreamBrowserForm->SetURI(m_strURL);
 	}
 
 
@@ -437,6 +438,11 @@ RESULT DreamFormApp::Hide() {
 	CR(m_pFormView->HandleKeyboardDown());
 	CR(m_pUserApp->SetEventApp(nullptr));
 	CR(m_pUserApp->SetHasOpenApp(false));
+
+//	m_pDreamBrowserForm->Shutdown();
+	m_pDreamBrowserForm->CloseSource();
+	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
+	m_pDreamBrowserForm = nullptr;
 
 Error:
 	return r;

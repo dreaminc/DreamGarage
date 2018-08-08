@@ -892,6 +892,7 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	else {	
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
+		//TODO: should set pBrowser to nullptr?
 	}
 
 	return r;
