@@ -99,7 +99,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramScreenFade::FadeIn() {
+RESULT OGLProgramScreenFade::FadeIn(std::function<RESULT(void*)> fnIn) {
 	RESULT r = R_PASS;
 	CBR(m_fadeState == NONE, R_SKIPPED);
 
@@ -111,7 +111,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramScreenFade::FadeOut() {
+RESULT OGLProgramScreenFade::FadeOut(std::function<RESULT(void*)> fnOut) {
 	RESULT r = R_PASS;
 	CBR(m_fadeState == NONE, R_SKIPPED);
 
@@ -123,7 +123,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramScreenFade::FadeOutIn(std::function<RESULT(void*)> fnOut) {
+RESULT OGLProgramScreenFade::FadeOutIn(std::function<RESULT(void*)> fnOut, std::function<RESULT(void*)> fnIn) {
 	RESULT r = R_PASS;
 	CBR(m_fadeState == NONE, R_SKIPPED);
 

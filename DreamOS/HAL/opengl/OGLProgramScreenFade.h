@@ -26,9 +26,9 @@ public:
 	
 	// fade control functions
 public:
-	RESULT FadeIn();
-	RESULT FadeOut();
-	RESULT FadeOutIn(std::function<RESULT(void*)> fnOut = nullptr);
+	RESULT FadeIn(std::function<RESULT(void*)> fnIn = nullptr);
+	RESULT FadeOut(std::function<RESULT(void*)> fnOut = nullptr);
+	RESULT FadeOutIn(std::function<RESULT(void*)> fnOut = nullptr, std::function<RESULT(void*)> fnIn = nullptr);
 
 	// fade control uniforms
 private:
