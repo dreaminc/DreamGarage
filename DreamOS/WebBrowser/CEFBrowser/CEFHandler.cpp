@@ -392,6 +392,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 	
 	CefString cefstrRequestURL = request->GetURL();
 	CefRequest::HeaderMap requestHeaders;
+	request->GetHeaderMap(requestHeaders);
 	std::multimap<std::string, std::string> checkForRequestHeaders;
 	std::string strURL = cefstrRequestURL;
 	
@@ -444,6 +445,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 		}
 		request->SetHeaderMap(requestHeaders);
 	}
+	//*/
 
 	return RV_CONTINUE;
 }
