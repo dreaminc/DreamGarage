@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "SoundBuffer.h"
+#include "SoundCommon.h"
 
 class SoundBuffer;
 class SoundFile;
@@ -50,13 +51,17 @@ protected:
 	virtual RESULT AudioCaptureProcess() = 0;
 	virtual RESULT AudioSpatialProcess() = 0;
 
+	int GetRenderSamplingRate() { return m_renderSamplingRate; }
+	int GetCaptureSamplingRate() { return m_captureSamplingRate; }
+	int GetSpaitalSamplingRate() { return m_spatialSamplingRate; }
+
 	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
 	SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
 	SoundClient::state m_spatialState = SoundClient::state::UNINITIALIZED;
 
-	RESULT InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType);
-	RESULT InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType);
-	RESULT InitializeSpatialSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	RESULT InitializeCaptureSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT InitializeSpatialSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 
 	RESULT HandleAudioDataCaptured(int numFrames);
 
@@ -100,6 +105,10 @@ protected:
 	SoundBuffer *m_pCaptureSoundBuffer = nullptr;
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
 	SoundBuffer *m_pSpatialSoundBuffer = nullptr;
+
+	int m_renderSamplingRate = DEFAULT_SAMPLING_RATE;
+	int m_captureSamplingRate = DEFAULT_SAMPLING_RATE;
+	int m_spatialSamplingRate = DEFAULT_SAMPLING_RATE;
 
 protected:
 	uint32_t m_maxSpatialSoundObjects = DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS;

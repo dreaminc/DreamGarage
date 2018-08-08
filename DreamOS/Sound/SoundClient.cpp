@@ -13,12 +13,12 @@ SoundClient::~SoundClient() {
 }
 
 
-RESULT SoundClient::InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SoundClient::InitializeCaptureSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pCaptureSoundBuffer == nullptr));
 
-	m_pCaptureSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pCaptureSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pCaptureSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Capture Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
@@ -27,12 +27,12 @@ Error:
 	return r;
 }
 
-RESULT SoundClient::InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SoundClient::InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pRenderSoundBuffer == nullptr));
 
-	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pRenderSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Render Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
@@ -42,12 +42,12 @@ Error:
 }
 
 // TODO: This might not be needed 
-RESULT SoundClient::InitializeSpatialSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SoundClient::InitializeSpatialSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pSpatialSoundBuffer == nullptr));
 
-	m_pSpatialSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pSpatialSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pSpatialSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Spatial Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));

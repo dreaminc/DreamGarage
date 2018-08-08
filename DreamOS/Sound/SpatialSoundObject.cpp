@@ -2,8 +2,9 @@
 
 #include "SoundFile.h"
 
-SpatialSoundObject::SpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection) :
+SpatialSoundObject::SpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection) :
 	VirtualObj(ptOrigin),
+	m_samplingRate(samplingRate),
 	m_vEmitterDirection(vEmitterDirection),
 	m_vListenerDirection(vListenerDirection)
 {
@@ -136,12 +137,12 @@ Error:
 	return r;
 }
 
-RESULT SpatialSoundObject::InitializeSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SpatialSoundObject::InitializeSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pSoundBuffer == nullptr));
 
-	m_pSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Spatial Object Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));

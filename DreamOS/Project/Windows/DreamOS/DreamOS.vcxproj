@@ -1282,6 +1282,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sound\SoundBuffer.h" />
     <ClInclude Include="..\..\..\Sound\SoundClient.h" />
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h" />
+    <ClInclude Include="..\..\..\Sound\SoundCommon.h" />
     <ClInclude Include="..\..\..\Sound\SoundFile.h" />
     <ClInclude Include="..\..\..\Sound\SoundFileWave.h" />
     <ClInclude Include="..\..\..\Sound\SpatialSoundObject.h" />

@@ -15,7 +15,7 @@
 
 class WASAPISpatialSoundObject : public SpatialSoundObject {
 public:
-	WASAPISpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, 
+	WASAPISpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, 
 		ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* spatialAudioStreamForHrtf);
 
 	~WASAPISpatialSoundObject();

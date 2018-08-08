@@ -330,28 +330,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		// SoundClient::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
+			
+			int nChannels = 1;
+			int samplingFrequency = 44100;
+			numFrames = samplingFrequency / 100;
 
-			// TODO: Broadcast this audio
-			if (pCloudController != nullptr) {
-				// TODO: Retrieve audio packet from capture buffer (might need copy
-				// or convert to correct packet format
-				//pCaptureBuffer->IncrementBuffer(numFrames);
-				////AudioPacket pendingAudioPacket = pCaptureBuffer->GetAudioPacket(numFrames);
-				//
-				//// Send a dummy audio packet (generating audio right now)
-				//AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, nullptr);
-				
-
-				//CR(pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket));
-			}
-
-			// temp
-			pCaptureBuffer->IncrementBuffer(numFrames);
-
-			//// Simply pushes the capture buffer to the render buffer
-			//if (pXAudioSpatialSoundObject != nullptr) {
-			//	CR(pXAudioSpatialSoundObject->PushMonoAudioBuffer(numFrames, pCaptureBuffer));
-			//}
+			AudioPacket pendingAudioPacket;
+			pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);
 
 			// Measure time diff
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
@@ -359,24 +344,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 			lastUpdateTime = timeNow;
 
-			static bool fOnOff = 0;
-
-			if (pCloudController != nullptr && testUserNum == 1) {
-
-				// Send a dummy audio packet (generating audio right now)
-				int nChannels = 1;
-				int samplingFrequency = 44100;
-				numFrames = samplingFrequency / 100;
-
-				//int numFrames = (nChannels * samplingFrequency) * 0.01f;
-				AudioPacket pendingAudioPacket = AudioPacket(numFrames, 1, 16, samplingFrequency, nullptr);
-				//pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+			if (pCloudController != nullptr && testUserNum == 2) {
 
 				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
-				pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
-
-				fOnOff = !fOnOff;
-
+				
+				//pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
 			}
 
 			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
@@ -426,14 +398,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			if (strAudioTrackLabel == kUserAudioLabel) {
 
 				if (pXAudioSpatialSoundObject1 != nullptr) {
-
-					static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-					auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
-					lastUpdateTime = timeNow;
-
-					//int16_t *pInt16Soundbuffer = (int16_t*)(pAudioDataBuffer);
-
 					// Do I need to copy the buffer over (getting over written maybe)
 					int16_t *pInt16Soundbuffer = new int16_t[frames];
 					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
@@ -446,14 +410,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			else if (strAudioTrackLabel == kChromeAudioLabel) {
 				
 				if (pXAudioSpatialSoundObject1 != nullptr) {
-
-					static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-					auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
-					lastUpdateTime = timeNow;
-
-					//int16_t *pInt16Soundbuffer = (int16_t*)(pAudioDataBuffer);
-
 					// Do I need to copy the buffer over (getting over written maybe)
 					int16_t *pInt16Soundbuffer = new int16_t[frames];
 					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);

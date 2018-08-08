@@ -2068,6 +2068,9 @@
     <ClInclude Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.h">
       <Filter>Sound\XAudio2</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sound\SoundCommon.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

@@ -20,7 +20,7 @@ class SoundFile;
 
 class X3DSpatialSoundObject : public SpatialSoundObject, public IXAudio2VoiceCallback {
 public:
-	X3DSpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, std::shared_ptr<IXAudio2> pXAudio2, std::shared_ptr<IXAudio2MasteringVoice> pXAudio2MasterVoice);
+	X3DSpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, std::shared_ptr<IXAudio2> pXAudio2, std::shared_ptr<IXAudio2MasteringVoice> pXAudio2MasterVoice);
 	~X3DSpatialSoundObject();
 
 

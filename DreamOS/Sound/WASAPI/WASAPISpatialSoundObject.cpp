@@ -4,8 +4,8 @@
 #include <WindowsNumerics.h>
 
 
-WASAPISpatialSoundObject::WASAPISpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
-	SpatialSoundObject(ptOrigin, vEmitterDirection, vListenerDirection),
+WASAPISpatialSoundObject::WASAPISpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
+	SpatialSoundObject(samplingRate, ptOrigin, vEmitterDirection, vListenerDirection),
 	m_pAudioSpatialClient(pAudioSpatialClient),
 	m_pSpatialAudioStreamForHrtf(pSpatialAudioStreamForHrtf)
 {
@@ -41,7 +41,7 @@ RESULT WASAPISpatialSoundObject::Initialize() {
 
 	CNM(m_pSpatialAudioObjectHRTF, "Failed to allocate spatial hrtf audio object");
 
-	CRM(InitializeSoundBuffer(1, SoundBuffer::type::FLOATING_POINT_32_BIT), 
+	CRM(InitializeSoundBuffer(1, m_samplingRate, sound::type::FLOATING_POINT_32_BIT),
 		"Failed to initialize sound buffer for spatial audio object");
 
 Error:

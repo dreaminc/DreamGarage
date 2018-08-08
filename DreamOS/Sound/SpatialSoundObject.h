@@ -16,14 +16,14 @@ class SoundFile;
 class SpatialSoundObject : public VirtualObj {
 
 public:
-	SpatialSoundObject(point ptOrigin, vector vEmitterDirection, vector vListenerDirection);
+	SpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection);
 
 	//~SpatialSoundObject();
 
 	virtual RESULT Initialize() = 0;
 	virtual RESULT Kill() = 0;
 
-	RESULT InitializeSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	RESULT InitializeSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 
 	RESULT SetEmitterListenerDirection(vector vEmitterDirection, vector vListenerDirection);
 
@@ -52,6 +52,8 @@ protected:
 	bool m_fLoop = false;
 	uint64_t m_startLoop = 0;
 	uint64_t m_endLoop = 0;
+	
+	int m_samplingRate = DEFAULT_SAMPLING_RATE;
 };
 
 #endif // ! SPATIAL_SOUND_OBJECT_H_

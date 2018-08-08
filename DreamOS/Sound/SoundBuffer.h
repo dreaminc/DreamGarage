@@ -10,35 +10,34 @@
 
 #include <mutex>
 
+#include "SoundCommon.h"
 #include "Primitives/CircularBuffer.h"
+
+class AudioPacket;
 
 class SoundBuffer {
 public:
-	enum class type {
-		UNSIGNED_8_BIT,
-		SIGNED_16_BIT,
-		FLOATING_POINT_32_BIT,
-		FLOATING_POINT_64_BIT,
-		INVALID
-	};
-
-	static const char *TypeString(SoundBuffer::type bufferType);
+	static const char *TypeString(sound::type bufferType);
 
 protected:
-	SoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	SoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 	~SoundBuffer();
 
 public:
-	virtual SoundBuffer::type GetType() const = 0;
+	virtual sound::type GetType() const = 0;
 	virtual RESULT Initialize() = 0;
 
-	static SoundBuffer* Make(int numChannels, SoundBuffer::type bufferType);
+	static SoundBuffer* Make(int numChannels, int samplingRate, sound::type bufferType);
 
 	virtual bool IsFull() = 0;
 	virtual size_t NumPendingBytes() = 0;
 
 	int NumChannels() {
 		return m_channels;
+	}
+
+	int GetSamplingRate() {
+		return m_samplingRate;
 	}
 
 	// This will block
@@ -60,8 +59,17 @@ public:
 	virtual RESULT PushMonoAudioBuffer(int numFrames, SoundBuffer *pSourceBuffer) = 0;
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
+	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket);
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
+
+	virtual int GetBytesPerFrame() { return 0; }
+	virtual int GetBitsPerFrame() { return 0; }
+	virtual int GetBytesPerSample() { return 0; }
+	virtual int GetBitsPerSample() { return 0; }
+
+public:
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) { return R_INVALID_PARAM; }
 
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -96,7 +104,9 @@ public:
 
 protected:
 	int m_channels;
-	SoundBuffer::type m_bufferType = type::INVALID;
+	int m_samplingRate = DEFAULT_SAMPLING_RATE;
+
+	sound::type m_bufferType = sound::type::INVALID;
 	//std::mutex m_bufferLock;
 	std::recursive_mutex m_bufferLock;
 };
@@ -105,8 +115,8 @@ protected:
 template <class CBType>
 class SoundBufferTyped : public SoundBuffer {
 public:
-	SoundBufferTyped(int numChannels) :
-		SoundBuffer(numChannels, GetType())
+	SoundBufferTyped(int numChannels, int samplingRate) :
+		SoundBuffer(numChannels, samplingRate, GetType())
 	{
 		// empty
 	}
@@ -132,7 +142,7 @@ public:
 
 		// Currently only support two channels
 		CB((m_channels >= 1 && m_channels <= 2));
-		CB((m_bufferType != SoundBuffer::type::INVALID));
+		CB((m_bufferType != sound::type::INVALID));
 
 		m_ppCircularBuffers = new CircularBuffer<CBType>*[m_channels];
 		CN(m_ppCircularBuffers);
@@ -194,8 +204,8 @@ public:
 	}
 
 	// This is sub-typed below
-	virtual SoundBuffer::type GetType() const override {
-		return SoundBuffer::type::INVALID;
+	virtual sound::type GetType() const override {
+		return sound::type::INVALID;
 	}
 
 	inline virtual RESULT ReadNextValue(int channel, CBType &value) { 
@@ -358,6 +368,49 @@ public:
 		return r;
 	}
 
+	virtual int GetBytesPerFrame() override { 
+		return (m_channels * sizeof(CBType));
+	}
+
+	virtual int GetBytesPerSample() override {
+		return sizeof(CBType);
+	}
+
+	virtual int GetBitsPerFrame() override {
+		return (m_channels * (sizeof(CBType) << 3));
+	}
+
+	virtual int GetBitsPerSample() override {
+		return (sizeof(CBType) << 3);
+	}
+
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) override {
+		RESULT r = R_SKIPPED;
+
+		CBType *pTargetDataBuffer = nullptr;
+		size_t bufferLength = 0;
+
+		CB((n_pDataBuffer == nullptr));
+
+		bufferLength = numFrames * m_channels;
+		pTargetDataBuffer = new CBType[bufferLength];
+		CN(pTargetDataBuffer);
+
+		CR(LoadDataToInterlacedTargetBuffer(pTargetDataBuffer, numFrames));
+		n_pDataBuffer = (void*)(pTargetDataBuffer);
+		m_pDataBuffer_n = bufferLength * sizeof(CBType);
+
+		return r;
+
+	Error:
+		if (pTargetDataBuffer != nullptr) {
+			delete[] pTargetDataBuffer;
+			pTargetDataBuffer = nullptr;
+		}
+
+		return r;
+	}
+
 	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
@@ -387,33 +440,33 @@ private:
 
 // Unsigned 8 bit int
 template<>
-SoundBuffer::type SoundBufferTyped<uint8_t>::GetType() const { ;
-	return SoundBuffer::type::UNSIGNED_8_BIT; 
+sound::type SoundBufferTyped<uint8_t>::GetType() const { ;
+	return sound::type::UNSIGNED_8_BIT; 
 }
 
 // Signed 16 bit int
 template<>
-SoundBuffer::type SoundBufferTyped<int16_t>::GetType() const { 
-	return SoundBuffer::type::UNSIGNED_8_BIT; 
+sound::type SoundBufferTyped<int16_t>::GetType() const { 
+	return sound::type::UNSIGNED_8_BIT; 
 }
 
 // 32 bit floating point
 template<>
-SoundBuffer::type SoundBufferTyped<float>::GetType() const { 
-	return SoundBuffer::type::FLOATING_POINT_32_BIT; 
+sound::type SoundBufferTyped<float>::GetType() const { 
+	return sound::type::FLOATING_POINT_32_BIT; 
 }
 
 // 64 bit floating point
 template<>
-SoundBuffer::type SoundBufferTyped<double>::GetType() const { 
-	return SoundBuffer::type::FLOATING_POINT_64_BIT; 
+sound::type SoundBufferTyped<double>::GetType() const { 
+	return sound::type::FLOATING_POINT_64_BIT; 
 }
 
 template <class CBType>
-SoundBuffer *MakeSoundBuffer(int numChannels) {
+SoundBuffer *MakeSoundBuffer(int numChannels, int samplingRate) {
 	RESULT r = R_PASS;
 
-	SoundBufferTyped<CBType> *pSoundBufferReturn = new SoundBufferTyped<CBType>(numChannels);
+	SoundBufferTyped<CBType> *pSoundBufferReturn = new SoundBufferTyped<CBType>(numChannels, samplingRate);
 	CN(pSoundBufferReturn);
 
 	CR(pSoundBufferReturn->Initialize());
