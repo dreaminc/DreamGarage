@@ -26,9 +26,9 @@ public:
 	
 	// fade control functions
 public:
-	RESULT FadeIn();
-	RESULT FadeOut();
-	RESULT FadeOutIn(std::function<RESULT(void*)> fnOut = nullptr);
+	RESULT FadeIn(std::function<RESULT(void*)> fnFadeInCallback = nullptr);
+	RESULT FadeOut(std::function<RESULT(void*)> fnFadeOutCallback = nullptr);
+	RESULT FadeOutIn(std::function<RESULT(void*)> fnFadeOutCallback = nullptr, std::function<RESULT(void*)> fnFadeInCallback = nullptr);
 
 	// fade control uniforms
 private:
@@ -43,6 +43,9 @@ private:
 
 	FadeState m_fadeState = FadeState::NONE;
 	std::chrono::high_resolution_clock::time_point m_startTime;
+
+	std::function<RESULT(void*)> m_fnOnFadeInCallback = nullptr;
+	std::function<RESULT(void*)> m_fnOnFadeOutCallback = nullptr;
 };
 
 #endif // ! OGLPROGRAM_SCREEN_FADE_H_

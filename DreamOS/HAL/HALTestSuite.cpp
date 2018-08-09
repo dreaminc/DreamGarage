@@ -843,11 +843,13 @@ RESULT HALTestSuite::AddTestFadeShader() {
 	struct TestContext {
 		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
 		bool fFirst = true;
-		model *pEnvironmentModel = nullptr;
+		model *m_pModel = nullptr;
 
 		std::chrono::high_resolution_clock::time_point m_startTime;
 		int m_iteration = -1;
 		double m_iterationDuration = 2.0f;
+
+		
 	};
 	TestContext *pTestContext = new TestContext();
 
@@ -861,6 +863,10 @@ RESULT HALTestSuite::AddTestFadeShader() {
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 
+		point sceneOffset = point(90, -5, -25);
+		float sceneScale = 0.1f;
+		vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
 		// Set up the pipeline
 		HALImp *pHAL = GetHALImp();
 
@@ -871,6 +877,7 @@ RESULT HALTestSuite::AddTestFadeShader() {
 		CN(pTestContext);
 
 		pTestContext->m_startTime = std::chrono::high_resolution_clock::now();
+		pTestContext->m_pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
 
 		//CR(pHAL->MakeCurrentContext());
 

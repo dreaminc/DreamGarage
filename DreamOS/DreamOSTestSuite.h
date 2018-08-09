@@ -35,6 +35,7 @@ public:
 	RESULT AddTestUserApp();
 	RESULT AddTestPeerApps();
 	RESULT AddTestGamepadCamera();
+	RESULT AddTestEnvironmentSwitching();
 
 	// Meta UI
 	RESULT AddTestMeta();
