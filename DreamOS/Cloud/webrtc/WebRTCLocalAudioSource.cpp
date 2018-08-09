@@ -57,26 +57,18 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 
 	CN(m_pLocalAudioTrackSink);
 
-	//if (m_strAudioTrackLabel != "chrome_audio_label") {
+	m_pLocalAudioTrackSink->OnData(
+		pendingAudioPacket.GetDataBuffer(),
+		pendingAudioPacket.GetBitsPerSample(),
+		pendingAudioPacket.GetSamplingRate(),
+		pendingAudioPacket.GetNumChannels(),
+		pendingAudioPacket.GetNumFrames()
+	);
 
-	//m_pLocalAudioSourceSink->OnData(
-	//	pendingAudioPacket.GetDataBuffer(),
-	//	pendingAudioPacket.GetBitsPerSample(),
-	//	pendingAudioPacket.GetSamplingRate(),
-	//	pendingAudioPacket.GetNumChannels(),
-	//	pendingAudioPacket.GetNumFrames()
-	//);
-
+	/* DEBUG
 	int samples_per_sec = pendingAudioPacket.GetSamplingRate();
 	int nSamples = pendingAudioPacket.GetNumFrames();
 	int channels = pendingAudioPacket.GetNumChannels();
-	
-	//int nSamples = samples_per_sec * 0.01f; // 10 ms audio
-
-
-	//if (m_strAudioTrackLabel == "chrome_audio_label") {
-	//	freq *= 4.0f;
-	//}
 
 	static int16_t *pStaticDataBufferSine = nullptr;  
 	static int16_t *pStaticDataBufferSine2 = nullptr;
@@ -142,6 +134,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 			nSamples
 		);
 	}
+	*/
 
 Error:
 	return r;

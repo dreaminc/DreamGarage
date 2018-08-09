@@ -319,6 +319,8 @@ public:
 		return r;
 	}
 
+	
+
 	// Pushes de-interlaced data to a specific channel
 	virtual RESULT PushDataToChannel(int channel, CBType *pDataBuffer, size_t pDataBuffer_n) override {
 		RESULT r = R_PASS;
@@ -447,7 +449,7 @@ sound::type SoundBufferTyped<uint8_t>::GetType() const { ;
 // Signed 16 bit int
 template<>
 sound::type SoundBufferTyped<int16_t>::GetType() const { 
-	return sound::type::UNSIGNED_8_BIT; 
+	return sound::type::SIGNED_16_BIT; 
 }
 
 // 32 bit floating point
