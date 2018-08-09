@@ -24,6 +24,7 @@ class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
 class SkyboxScatterProgram;
+class OGLProgramScreenFade;
 
 #define MAX_PEERS 8
 
@@ -174,8 +175,9 @@ private:
 
 	// UI
 	//ViewMatrix *m_pClippingView;
-	UIStageProgram *m_pUIProgramNode;
+	UIStageProgram *m_pUIProgramNode = nullptr;
 	std::vector<SkyboxScatterProgram*> m_skyboxProgramNodes;
+	OGLProgramScreenFade *m_pScreenFadeProgramNode = nullptr;
 
 	std::shared_ptr<DreamEnvironmentApp> m_pDreamEnvironmentApp = nullptr;
 	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;

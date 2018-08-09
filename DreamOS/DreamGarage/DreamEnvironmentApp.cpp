@@ -114,7 +114,6 @@ Error:
 }
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
-	// only for testing
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	return R_PASS;
 }

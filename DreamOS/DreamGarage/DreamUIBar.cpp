@@ -443,6 +443,15 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CR(m_pKeyboardHandle->Show());
 					CR(m_pKeyboardHandle->ShowTitleView());
 				}
+				else if (strScope == "SystemScope.SignOut") {
+					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+					// TODO: this is incomplete, need to disconnect from environment socket
+					// just for testing environment fadeout
+					pUserController->SetIsLoggedIn(false);
+					//pUserController->Logout();
+
+				}
 				else if (strScope == "FormScope.Form") {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
