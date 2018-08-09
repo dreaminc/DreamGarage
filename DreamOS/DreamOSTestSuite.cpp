@@ -42,15 +42,15 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
 	CR(AddTestCredentialStorage());
 
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
 
-//	CR(AddTestMeta());
-
-	CR(AddTestDreamBrowser());
+	CR(AddTestMeta());
 	
 	CR(AddTestDreamDesktop());
 
