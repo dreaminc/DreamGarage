@@ -115,7 +115,7 @@ Error:
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
 	// only for testing
-	m_pCurrentEnvironment = m_environmentModels[type];
+	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	return R_PASS;
 }
 
@@ -133,7 +133,7 @@ RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto fnOnFadeOut = [&](void *pContext) {
-		m_pCurrentEnvironment->SetVisible(false);
+		m_pCurrentEnvironmentModel->SetVisible(false);
 		m_pFadeProgram->FadeIn();
 		return R_PASS;
 	};
@@ -150,7 +150,7 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto fnOnFadeOut = [&](void *pContext) {
-		m_pCurrentEnvironment->SetVisible(true);
+		m_pCurrentEnvironmentModel->SetVisible(true);
 		m_pFadeProgram->FadeIn();
 		return R_PASS;
 	};
@@ -171,9 +171,9 @@ RESULT DreamEnvironmentApp::SwitchToEnvironment(EnvironmentType type) {
 
 	auto fnOnFadeOut = [&](void *pContext) {
 
-		m_pCurrentEnvironment->SetVisible(false);
-		m_pCurrentEnvironment = m_environmentModels[m_currentType];
-		m_pCurrentEnvironment->SetVisible(true);
+		m_pCurrentEnvironmentModel->SetVisible(false);
+		m_pCurrentEnvironmentModel = m_environmentModels[m_currentType];
+		m_pCurrentEnvironmentModel->SetVisible(true);
 
 		m_pFadeProgram->FadeIn();
 
