@@ -1974,6 +1974,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 
 			pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
 			CN(pTestContext->pEnvironmentApp);
+			pTestContext->pEnvironmentApp->SetCurrentEnvironment(CAVE);
 
 			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
