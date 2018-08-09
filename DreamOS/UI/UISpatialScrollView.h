@@ -161,7 +161,6 @@ private:
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<std::shared_ptr<MenuNode>> m_pScrollViewNodes;
 	std::deque<std::shared_ptr<UIButton>> m_pButtonDeque;
-//	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
 

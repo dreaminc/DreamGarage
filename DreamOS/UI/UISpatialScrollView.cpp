@@ -37,7 +37,6 @@ RESULT UISpatialScrollView::Initialize() {
 //	m_pDreamOS->AddObjectToUIGraph(this);
 //	m_pDreamOS->AddObjectToUIClippingGraph(this);
 
-
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
 	//m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
@@ -152,7 +151,6 @@ RESULT UISpatialScrollView::Update() {
 		m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
 
 		m_pDreamOS->RemoveObjectFromUIClippingGraph(pButton);
-		//m_pDreamOS->RemoveObjectFromUIGraph(pButton);
 
 		if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(pButton)) {
 			m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(pButton);
@@ -174,14 +172,6 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 	int minItemIndex = m_itemIndex - 2;
 	int maxItemIndex = m_itemIndex + m_maxElements + 1;
 
-	/*
-	if (minItemIndex < 0) {
-		minItemIndex = 0;
-	}
-	if (maxItemIndex > arrayMaxIndex) {
-		maxItemIndex = arrayMaxIndex;
-	}
-	*/
 	if (delta > 0) {	// scrolling right
 		if (minItemIndex >= 0 && maxItemIndex < arrayMaxIndex) {
 			for (int i = 1; i <= delta; i++) {	// New items
@@ -196,9 +186,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[maxItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[maxItemIndex + i]->GetTitle());
 					m_pScrollViewNodes[maxItemIndex + i]->SetAssociatedButton(pButton);
-					//std::string strPosition = std::to_string(maxItemIndex + i);
-					//pMenuItem->SetName(strPosition);
-
+					
 					PositionMenuButton(maxItemIndex + i, pButton);
 
 					m_pButtonDeque.pop_front();
@@ -229,8 +217,6 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[minItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[minItemIndex + i]->GetTitle());
 					m_pScrollViewNodes[minItemIndex + i]->SetAssociatedButton(pButton);
-					//std::string strPosition = std::to_string(minItemIndex + i);
-					//pMenuItem->SetName(strPosition);
 
 					PositionMenuButton(minItemIndex + i, pButton);
 
@@ -356,7 +342,6 @@ RESULT UISpatialScrollView::UpdateWithWidth(float totalWidth) {
 	theta += m_clippingRate;
 	m_clippingThreshold = cos(theta / 2.0f);
 
-
 	// calculate angle between each element
 	float itemAngleYRad = theta / m_maxElements;
 
@@ -427,7 +412,6 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 				//TODO: this works for now, but it may be necessary to have some of the individual
 				// RemoveObject functions properly cascade the call for future situations
 
-
 				m_pDreamOS->UnregisterInteractionObject(pButton);
 				m_pDreamOS->RemoveObjectFromInteractionGraph(pButton);
 
@@ -472,17 +456,12 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
 		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
 		m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
-		//m_pDreamOS->AddObjectToUIGraph(pButton.get());
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
 		m_pButtonDeque.push_back(pButton);
 		m_itemIndex = -1;	// Is this a hack? In theory it should just be reset to 0, but this let's me also use it as a "first time" flag.
-		/*
-		if (i > m_maxElements-1) {
-			pButton->SetVisible(false);
-		}
-		*/
+
 		i++;
 	}
 
@@ -521,9 +500,6 @@ RESULT UISpatialScrollView::UpdateScrollViewNode(MenuNode* pMenuNode) {
 			pMenuItem->SetName(pMenuNode->GetTitle());	// Because we can
 			DEBUG_LINEOUT("updated button");
 		}
-
-		pButton->SetVisible(false);
-		pButton->SetVisible(true);
 	}
 
 Error:

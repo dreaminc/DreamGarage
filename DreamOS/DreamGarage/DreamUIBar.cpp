@@ -535,7 +535,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 	
 	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies on dirty only being set if we move to a new menu level
 		m_downloadQueue.clear();
-		std::queue<std::shared_ptr<MenuNode>>().swap(m_requestQueue);	// the Googles said this was clean.
+		m_requestQueue = std::queue<std::shared_ptr<MenuNode>>();
 		m_pScrollView->ClearScrollViewNodes();
 		m_loadedMenuItems = 0;
 
@@ -569,7 +569,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 	if (!m_requestQueue.empty() && m_fRequestTexture) {
 		if (m_pMenuNode->NumSubMenuNodes() > 0) {
 			auto strHeaders = GetStringHeaders();
-			int elements = (m_requestQueue.size() > 1 ? 1 : (int)m_requestQueue.size());
+			int elements = (m_requestQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_requestQueue.size());
 
 			for (int i = 0; i < elements; i++) {
 				auto strURI = m_requestQueue.front()->GetThumbnailURL();
@@ -584,7 +584,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 	}
 	
 	if (!m_downloadQueue.empty()) {
-		int elements = (m_downloadQueue.size() > 5 ? 5 : (int)m_downloadQueue.size());
+		int elements = (m_downloadQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_downloadQueue.size());
 
 		for (int i = m_loadedMenuItems; i < elements + m_loadedMenuItems; i++) {
 		//for (int i = 0; i <= m_downloadQueue.size(); i++) {
