@@ -71,9 +71,9 @@ RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 			m_fadeProgress = 1.0f;
 			m_fadeState = NONE;
 
-			if (m_fnOnFadeOut != nullptr) {
-				m_fnOnFadeOut(nullptr);
-				m_fnOnFadeOut = nullptr;
+			if (m_fnOnFadeOutCallback != nullptr) {
+				m_fnOnFadeOutCallback(nullptr);
+				m_fnOnFadeOutCallback = nullptr;
 			}
 		}
 
@@ -90,9 +90,9 @@ RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 			m_fadeProgress = 0.0f;
 			m_fadeState = NONE;
 			// execute function after setting to NONE
-			if (m_fnOnFadeIn != nullptr) {
-				m_fnOnFadeIn(nullptr);
-				m_fnOnFadeIn = nullptr;
+			if (m_fnOnFadeInCallback != nullptr) {
+				m_fnOnFadeInCallback(nullptr);
+				m_fnOnFadeInCallback = nullptr;
 			}
 		}
 
@@ -116,7 +116,7 @@ RESULT OGLProgramScreenFade::FadeIn(std::function<RESULT(void*)> fnIn) {
 	m_fadeState = FADE_IN;
 	m_fadeProgress = 1.0f;
 
-	m_fnOnFadeIn = fnIn;
+	m_fnOnFadeInCallback = fnIn;
 
 Error:
 	return r;
@@ -130,7 +130,7 @@ RESULT OGLProgramScreenFade::FadeOut(std::function<RESULT(void*)> fnOut) {
 	m_fadeState = FADE_OUT;
 	m_fadeProgress = 0.0f;
 
-	m_fnOnFadeOut = fnOut;
+	m_fnOnFadeOutCallback = fnOut;
 
 Error:
 	return r;
