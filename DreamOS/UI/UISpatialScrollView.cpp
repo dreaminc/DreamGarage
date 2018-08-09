@@ -205,6 +205,10 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 					m_pButtonDeque.push_back(pButton);
 				}
 			}
+			// If we scroll far enough to the right, request the next page of items
+			if (m_itemIndex > m_pScrollViewNodes.size() - m_nextPagePremptBuffer) {
+				m_pObserver->GetNextPageItems();
+			}
 		}
 
 		maxItemIndex += delta;
@@ -504,6 +508,8 @@ RESULT UISpatialScrollView::UpdateScrollViewNode(MenuNode* pMenuNode) {
 	RESULT r = R_PASS;
 
 	CN(pMenuNode);
+	CBR(!pMenuNode->IsDirty(), R_SKIPPED);
+	CBR(pMenuNode->GetScope() != "", R_SKIPPED)
 
 	if (pMenuNode->GetAssociatedButton() != nullptr) {
 		std::shared_ptr<UIButton> pButton = pMenuNode->GetAssociatedButton();
@@ -528,6 +534,34 @@ RESULT UISpatialScrollView::ClearScrollViewNodes() {
 	m_pScrollViewNodes.clear();
 	m_itemIndex = 0;
 	return R_PASS;
+}
+
+std::vector<std::shared_ptr<MenuNode>> UISpatialScrollView::GetScrollViewNodes() {
+	return m_pScrollViewNodes;
+}
+
+RESULT UISpatialScrollView::RegisterObserver(UISpatialScrollViewObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pObserver), "Observer cannot be nullptr");
+	CBM((m_pObserver == nullptr), "Can't overwrite scrollview observer");
+
+	m_pObserver = pObserver;
+
+Error:
+	return r;
+}
+
+RESULT UISpatialScrollView::UnregisterObserver(UISpatialScrollViewObserver *pObserver) {
+	RESULT r = R_PASS;
+
+	CN(pObserver);
+	CBM((m_pObserver == pObserver), "Browser Observer is not set to this object");
+
+	m_pObserver = nullptr;
+
+Error:
+	return r;
 }
 
 RESULT UISpatialScrollView::HideAllButtons(UIButton* pPushButton) {
@@ -755,18 +789,14 @@ bool UISpatialScrollView::IsCapturable(UIButton *pButton) {
 	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
 	int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
 	int lowIndex = std::ceil(m_yRotation / yRotationPerElement);
-
-	auto pChildren = m_pMenuButtonsContainer->GetChildren();
-	for (int i = 0; i < pChildren.size(); i++) {
-		auto pChildButton = dynamic_cast<UIButton*>(pChildren[i].get());
-		if (pChildButton == pButton) {
-			if (i >= lowIndex && i < highIndex) {
-				return true;
-			}
-			return false;
+	
+	for (int i = lowIndex; i < highIndex; i++) {
+		if (m_pScrollViewNodes[i]->GetAssociatedButton().get() == pButton) {
+			return true;
 		}
 	}
-	return true;
+
+	return false;
 }
 
 std::shared_ptr<quad> UISpatialScrollView::GetTitleQuad() {

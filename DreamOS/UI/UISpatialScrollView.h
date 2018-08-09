@@ -45,6 +45,11 @@ enum class ScrollState {
 	SCROLLING
 };
 
+class UISpatialScrollViewObserver {
+public:
+	virtual RESULT GetNextPageItems() = 0;
+};
+
 class UISpatialScrollView : public UIView, public UIScrollView//,
 					//public Subscriber<SenseControllerEvent>					
 {
@@ -80,6 +85,13 @@ public:
 	RESULT AddScrollViewNode(std::shared_ptr<MenuNode> pMenuNode);
 	RESULT UpdateScrollViewNode(MenuNode* pMenuNode);
 	RESULT ClearScrollViewNodes();
+	std::vector<std::shared_ptr<MenuNode>> GetScrollViewNodes();
+
+	RESULT RegisterObserver(UISpatialScrollViewObserver *pObserver);
+	RESULT UnregisterObserver(UISpatialScrollViewObserver *pObserver);
+
+private:
+	UISpatialScrollViewObserver* m_pObserver = nullptr;
 
 public:
 	ScrollState GetState();
@@ -125,6 +137,7 @@ private:
 	float m_scrollScale = SCROLL_SCALE;
 	float m_scrollBias = SCROLL_ARROW_BIAS;
 	float m_maxElements = MAX_ELEMENTS;
+	int m_nextPagePremptBuffer = 15;	// this just happens to be enough that it feels seamless - fairly dependent on max scroll speed.
 	float m_yRotation;
 	float m_yRotationPerElement;
 	//float m_velocity;		// inherited from UIScrollView

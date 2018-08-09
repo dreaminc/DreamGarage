@@ -395,7 +395,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
 	// should check if website
-	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
+	for (auto &pSubMenuNode : m_pScrollView->GetScrollViewNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			const std::string& strScope = pSubMenuNode->GetScope();
 			const std::string& strPath = pSubMenuNode->GetPath();
@@ -535,41 +535,59 @@ RESULT DreamUIBar::Update(void *pContext) {
 	
 	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies on dirty only being set if we move to a new menu level
 		m_downloadQueue.clear();
+		std::queue<std::shared_ptr<MenuNode>>().swap(m_requestQueue);	// the Googles said this was clean.
 		m_pScrollView->ClearScrollViewNodes();
+		m_loadedMenuItems = 0;
+
+		// request title icon
+		auto strHeaders = GetStringHeaders();
+
+		auto strURI = m_pMenuNode->GetIconURL();
+		if (strURI != "") {
+			m_pMenuNode->SetName("root_menu_title");
+			CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
+		}
 
 		CR(MakeMenuItems());
+	}
+	CNR(m_pMenuNode, R_SKIPPED);
 
+	if (m_fAddNewMenuItems) {
+		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
+
+			if (pSubMenuNode->GetThumbnailTexture() == nullptr) {	// This should always be true :/
+				pSubMenuNode->SetThumbnailTexture(m_pDefaultThumbnail.get());
+			}
+			m_pScrollView->AddScrollViewNode(pSubMenuNode);
+			m_requestQueue.push(pSubMenuNode);
+		}
+		m_fAddNewMenuItems = false;
+		m_fRequestTexture = true;
+		ClearMenuWaitingFlag();
+	}
+
+	if (!m_requestQueue.empty() && m_fRequestTexture) {
 		if (m_pMenuNode->NumSubMenuNodes() > 0) {
-
 			auto strHeaders = GetStringHeaders();
+			int elements = (m_requestQueue.size() > 1 ? 1 : (int)m_requestQueue.size());
 
-			for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-
-				if (pSubMenuNode->GetThumbnailTexture() == nullptr) {	// This should always be true :/
-					pSubMenuNode->SetThumbnailTexture(m_pDefaultThumbnail.get());
-				}
-				m_pScrollView->AddScrollViewNode(pSubMenuNode);
-
-				auto strURI = pSubMenuNode->GetThumbnailURL();
+			for (int i = 0; i < elements; i++) {
+				auto strURI = m_requestQueue.front()->GetThumbnailURL();
 				if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
 								   //MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
-					CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pSubMenuNode.get()));
+					CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
 				}
-			}
-
-			auto strURI = m_pMenuNode->GetIconURL();
-			if (strURI != "") {
-				m_pMenuNode->SetName("root_menu_title");
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
+				m_requestQueue.pop();
 			}
 		}
+		m_fRequestTexture = false;
 	}
 	
 	if (!m_downloadQueue.empty()) {
-		//int elements = (m_downloadQueue.size() > (int)m_pScrollView->GetMenuItemsView()->GetChildren().size() ? 8 : ;
+		int elements = (m_downloadQueue.size() > 5 ? 5 : (int)m_downloadQueue.size());
 
-		//for (int i = m_menuNode_n; i < elements + m_menuNode_n; i++) {
-		for (int i = 0; i <= m_downloadQueue.size(); i++) {
+		for (int i = m_loadedMenuItems; i < elements + m_loadedMenuItems; i++) {
+		//for (int i = 0; i <= m_downloadQueue.size(); i++) {
 			auto pQueueObj = m_downloadQueue.back();
 			auto pMenuNode = pQueueObj.first;
 			auto pBufferVector = pQueueObj.second;
@@ -605,6 +623,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			m_downloadQueue.pop_back();
 		}
+		m_loadedMenuItems += elements;
+		m_fRequestTexture = true;
 	}
 	
 	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
@@ -673,6 +693,19 @@ Error:
 	return r;
 }
 
+RESULT DreamUIBar::GetNextPageItems() {
+	RESULT r = R_PASS;
+
+	if (!m_fWaitingForMenuResponse) {
+		if (m_pMenuNode->GetNextPageToken() != "") {
+			m_fWaitingForMenuResponse = true;
+			CR(m_pMenuControllerProxy->RequestSubMenu(m_pMenuNode->GetScope(), m_pMenuNode->GetPath(), m_pMenuNode->GetTitle(), m_pMenuNode->GetNextPageToken()));
+		}
+	}
+
+Error:
+	return r;
+}
 
 RESULT DreamUIBar::SelectMenuItem(UIButton *pPushButton, std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
@@ -704,6 +737,7 @@ RESULT DreamUIBar::HideApp() {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
+	m_pMenuNode = nullptr;
 	m_menuState = MenuState::ANIMATING;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -797,16 +831,10 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
-	if (m_fWaitingForMenuResponse) {
-		m_fWaitingForMenuResponse = false;
-	}
 
-	if (m_pMenuNode == pMenuNode) {		// Catch next page
-		// I think this is fine since we're just adding on?
-		for (auto& pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
-			pSubMenuNode->SetThumbnailTexture(m_pDefaultThumbnail.get());
-			m_pScrollView->AddScrollViewNode(pSubMenuNode);
-		}
+	if (m_pMenuNode && m_pMenuNode->GetPath() == pMenuNode->GetPath() && m_pMenuNode->GetScope() == pMenuNode->GetScope()) {		// Catch next page
+		// stubby stub stub
+		m_pMenuNode = pMenuNode;
 	}
 	else {	// opening new layer of the menu
 		m_pMenuNode = pMenuNode;
@@ -815,6 +843,7 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		}
 		m_pMenuNode->SetDirty();
 	}
+	m_fAddNewMenuItems = true;
 
 Error:
 	return r;
@@ -854,6 +883,7 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	totalWidth = m_pParentApp->GetTotalWidth();
 
 	m_pScrollView->InitializeWithWidth(totalWidth);
+	m_pScrollView->RegisterObserver(this);
 
 	if (m_pUIStageProgram != nullptr) {
 		m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
