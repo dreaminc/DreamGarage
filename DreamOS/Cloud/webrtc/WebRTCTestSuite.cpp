@@ -354,7 +354,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
 			auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - timeNow).count();
 
-
 		//Error:
 			return r;
 		}

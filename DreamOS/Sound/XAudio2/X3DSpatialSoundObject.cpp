@@ -49,9 +49,9 @@ RESULT X3DSpatialSoundObject::Initialize() {
 	sourceFormat.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 	sourceFormat.wBitsPerSample = 32;
 	sourceFormat.nChannels = 1;
-	sourceFormat.nSamplesPerSec = m_samplingRate;
+	//sourceFormat.nSamplesPerSec = m_samplingRate;
 	//sourceFormat.nSamplesPerSec = 44100;
-	//sourceFormat.nSamplesPerSec = 48000;
+	sourceFormat.nSamplesPerSec = 48000;
 	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
 	sourceFormat.cbSize = 0;

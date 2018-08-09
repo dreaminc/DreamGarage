@@ -301,20 +301,27 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				hr = pCaptureClient->GetBuffer(&pAudioCaptureBufferData, &numFramesAvailable, &audioDeviceFlags, nullptr, nullptr);
 				CR((RESULT)hr);
 
-				// Convert to float data buffer
-				float *pDataBuffer = (float*)(pAudioCaptureBufferData);
+				// Set to float data buffer
+				float *pFloatDataBuffer = (float*)(pAudioCaptureBufferData);
 
 				// Check for silence
 				if (audioDeviceFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
 					pAudioCaptureBufferData = nullptr;  
 				}
 
-				//CR(HandleAudioDataCaptured(dataType, numFramesAvailable, channels, pDataBuffer, pDataBuffer_n)
+				int16_t *pSigned16IntBuffer = nullptr;
+				pSigned16IntBuffer = new int16_t[numFramesAvailable];
+				CN(pSigned16IntBuffer);
+
+				// Convert to signed int data buffer
+				for (unsigned int i = 0; i < numFramesAvailable; i++) {
+					pSigned16IntBuffer[i] = pFloatDataBuffer[i] * std::numeric_limits<int16_t>::max();
+				}
 
 				m_pCaptureSoundBuffer->LockBuffer();
 				{
 					if (m_pCaptureSoundBuffer->IsFull() == false) {
-						CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
+						CR(m_pCaptureSoundBuffer->PushData(pSigned16IntBuffer, numFramesAvailable));
 
 						// This will trigger the observer 
 						CR(HandleAudioDataCaptured(numFramesAvailable));
@@ -324,6 +331,12 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 					}
 				}
 				m_pCaptureSoundBuffer->UnlockBuffer();
+
+				// De-alloc the temp thing
+				if (pSigned16IntBuffer != nullptr) {
+					delete[] pSigned16IntBuffer;
+					pSigned16IntBuffer = nullptr;
+				}
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);
@@ -843,9 +856,12 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 	CR((RESULT)m_pAudioCaptureClient->GetMixFormat(&m_pCaptureWaveFormatX));
 	CN(m_pCaptureWaveFormatX);
 
-	sound::type bufferType = GetFormatSoundBufferType(m_pCaptureWaveFormatX);
+	sound::type captureBufferType = GetFormatSoundBufferType(m_pCaptureWaveFormatX);
 	int numChannels = m_pCaptureWaveFormatX->nChannels;
 	int samplingRate = m_pCaptureWaveFormatX->nSamplesPerSec;
+
+	// We want to use 16 bit signed integer for the sound buffer
+	sound::type bufferType = sound::type::SIGNED_16_BIT;
 
 	// Print out format
 	CR(PrintWaveFormat(m_pCaptureWaveFormatX, "capture"));
