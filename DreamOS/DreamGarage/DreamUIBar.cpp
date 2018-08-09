@@ -59,7 +59,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	//TODO: could move this logic up to DreamUserObserver, and then only 
@@ -241,7 +241,7 @@ RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	//CBR(m_pathStack.empty(), R_SKIPPED);
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 
-	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
+	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 	m_pPendingIconTexture = m_pShareIcon.get();
 	if (fResetComposite) {
@@ -343,7 +343,7 @@ Error:
 RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
-	if (pMenuNode->GetTitle() == "Share") {
+	if (pMenuNode->GetTitle() == "Menu") {
 	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		m_pPendingIconTexture = m_pShareIcon.get();
 	}
@@ -567,64 +567,11 @@ RESULT DreamUIBar::Update(void *pContext) {
 	}
 
 	if (!m_requestQueue.empty() && m_fRequestTexture) {
-		if (m_pMenuNode->NumSubMenuNodes() > 0) {
-			auto strHeaders = GetStringHeaders();
-			int elements = (m_requestQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_requestQueue.size());
-
-			for (int i = 0; i < elements; i++) {
-				auto strURI = m_requestQueue.front()->GetThumbnailURL();
-				if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-								   //MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
-					CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
-				}
-				m_requestQueue.pop();
-			}
-		}
-		m_fRequestTexture = false;
+		CR(RequestMenuItemTexture());
 	}
 	
 	if (!m_downloadQueue.empty()) {
-		int elements = (m_downloadQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_downloadQueue.size());
-
-		for (int i = m_loadedMenuItems; i < elements + m_loadedMenuItems; i++) {
-		//for (int i = 0; i <= m_downloadQueue.size(); i++) {
-			auto pQueueObj = m_downloadQueue.back();
-			auto pMenuNode = pQueueObj.first;
-			auto pBufferVector = pQueueObj.second;
-
-			texture *pTexture = nullptr;	
-
-			CN(pBufferVector);
-			uint8_t* pBuffer = &(pBufferVector->operator[](0));
-			size_t pBuffer_n = pBufferVector->size();
-
-			pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			CN(pTexture);
-			
-			pMenuNode->SetThumbnailTexture(pTexture);
-			
-			if (pMenuNode->GetTitle() == "root_menu_title") {
-				//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-				m_pPendingIconTexture = pTexture;
-				// TODO: May want to move downloading outside of DreamUIBar
-				// TODO: the only time the title view is used is to show the chrome icon and "Website" title
-				if (m_pKeyboardHandle != nullptr) {
-					m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
-				}
-				DEBUG_LINEOUT("updated title");
-			}
-			else {
-				m_pScrollView->UpdateScrollViewNode(pMenuNode);
-			}
-			
-			if (pBufferVector != nullptr) {
-				pBufferVector = nullptr;
-			}
-
-			m_downloadQueue.pop_back();
-		}
-		m_loadedMenuItems += elements;
-		m_fRequestTexture = true;
+		CR(ProcessDownloadMenuItemTexture());
 	}
 	
 	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
@@ -688,6 +635,77 @@ RESULT DreamUIBar::MakeMenuItems() {
 			CR(ShowApp());
 		}	
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::RequestMenuItemTexture() {
+	RESULT r = R_PASS;
+
+	if (m_pMenuNode->NumSubMenuNodes() > 0) {
+		auto strHeaders = GetStringHeaders();
+		int elements = (m_requestQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_requestQueue.size());
+
+		for (int i = 0; i < elements; i++) {
+			auto strURI = m_requestQueue.front()->GetThumbnailURL();
+			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
+							   //MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
+			}
+			m_requestQueue.pop();
+		}
+	}
+	m_fRequestTexture = false;
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
+	RESULT r = R_PASS;
+
+	int elements = (m_downloadQueue.size() > m_concurrentRequestLimit ? m_concurrentRequestLimit : (int)m_downloadQueue.size());
+
+	for (int i = m_loadedMenuItems; i < elements + m_loadedMenuItems; i++) {
+		//for (int i = 0; i <= m_downloadQueue.size(); i++) {
+		auto pQueueObj = m_downloadQueue.back();
+		auto pMenuNode = pQueueObj.first;
+		auto pBufferVector = pQueueObj.second;
+
+		texture *pTexture = nullptr;
+
+		CN(pBufferVector);
+		uint8_t* pBuffer = &(pBufferVector->operator[](0));
+		size_t pBuffer_n = pBufferVector->size();
+
+		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		CN(pTexture);
+
+		pMenuNode->SetThumbnailTexture(pTexture);
+
+		if (pMenuNode->GetTitle() == "root_menu_title") {
+			//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
+			m_pPendingIconTexture = pTexture;
+			// TODO: May want to move downloading outside of DreamUIBar
+			// TODO: the only time the title view is used is to show the chrome icon and "Website" title
+			if (m_pKeyboardHandle != nullptr) {
+				m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
+			}
+			DEBUG_LINEOUT("updated title");
+		}
+		else {
+			m_pScrollView->UpdateScrollViewNode(pMenuNode);
+		}
+
+		if (pBufferVector != nullptr) {
+			pBufferVector = nullptr;
+		}
+
+		m_downloadQueue.pop_back();
+	}
+	m_loadedMenuItems += elements;
+	m_fRequestTexture = true;
 
 Error:
 	return r;

@@ -89,6 +89,8 @@ public:
 	RESULT HandleTouchEnd(void* pContext);
 
 	RESULT MakeMenuItems();
+	RESULT RequestMenuItemTexture();
+	RESULT ProcessDownloadMenuItemTexture();
 
 	RESULT PopPath();
 	RESULT RequestMenu();
