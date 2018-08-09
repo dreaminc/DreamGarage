@@ -52,6 +52,10 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestEnvironmentSeating());
 
+	CR(AddTestDreamBrowser());
+
+	CR(AddTestCredentialStorage());
+
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestEnvironmentSwitching());
@@ -64,9 +68,7 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamLogger());
 
-//	CR(AddTestMeta());
-
-	CR(AddTestDreamBrowser());
+	CR(AddTestMeta());
 	
 	CR(AddTestDreamDesktop());
 
