@@ -802,8 +802,14 @@ RESULT UserController::SetIsLoggedIn(bool fLoggedIn) {
 		CR(m_pUserControllerObserver->OnLogin());
 	}
 	else {
-		//TODO: currently SetIsLoggedIn is never called with false
+		// TODO: currently SetIsLoggedIn is never called with false
 		CR(m_pUserControllerObserver->OnLogout());
+
+		// Reset 
+		m_loginState.fHasAccessToken = false;
+		m_loginState.fHasUserProfile = false;
+		m_loginState.fHasEnvironmentId = false;
+		m_loginState.fHasTwilioInformation = false;
 	}
 
 Error:

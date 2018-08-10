@@ -180,6 +180,7 @@ RESULT EnvironmentController::DisconnectFromEnvironmentSocket() {
 
 	CNR(m_pEnvironmentWebsocket, R_SKIPPED);
 	CR(m_pEnvironmentWebsocket->Stop());
+	m_pEnvironmentWebsocket = nullptr;
 
 Error:
 	return r;
