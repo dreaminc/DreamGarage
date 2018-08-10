@@ -13,13 +13,13 @@
 #include "Primitives/Subscriber.h"
 
 #include "DreamUserApp.h"
+#include "UI/UISpatialScrollView.h"
 
 #include <functional>
 #include <stack>
 #include <queue>
 
 class DreamUserControlArea;
-class UISpatialScrollView;
 class UIMallet;
 class UIView;
 
@@ -49,6 +49,7 @@ enum class MenuState {
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					public DreamUserObserver,
 					public MenuController::observer, 
+					public UISpatialScrollViewObserver,
 					public Subscriber<UIEvent>
 {
 
@@ -71,6 +72,9 @@ public:
 
 	virtual DreamAppHandle* GetAppHandle() override;
 
+	// ScrollViewObserver
+	virtual RESULT GetNextPageItems() override;
+
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 
@@ -83,6 +87,10 @@ public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
+
+	RESULT MakeMenuItems();
+	RESULT RequestMenuItemTexture();
+	RESULT ProcessDownloadMenuItemTexture();
 
 	RESULT PopPath();
 	RESULT RequestMenu();
@@ -133,8 +141,13 @@ private:
 	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
 	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
+	int m_concurrentRequestLimit = 1;
+	int m_loadedMenuItems = 0;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
-	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
+	std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
+	
+	std::queue<std::shared_ptr<MenuNode>> m_requestQueue;
+	bool m_fRequestTexture = false;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 
@@ -157,6 +170,7 @@ private:
 	float m_actuationDepth = ACTUATION_DEPTH;
 
 	bool m_fWaitingForMenuResponse = false;
+	bool m_fAddNewMenuItems = false;
 
 	MenuState m_menuState = MenuState::NONE;
 

@@ -17,6 +17,7 @@
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
+#include "DreamGarage\DreamFormApp.h"
 #include "DreamControlView\DreamControlView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
@@ -50,6 +51,10 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestEnvironmentSwitching());
+	
+	CR(AddTestDreamOS());
+
+	CR(AddTestDreamUIBar());
 
 	CR(AddTestCredentialStorage());
 
@@ -71,8 +76,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamShareView());
 
-	CR(AddTestDreamOS());
-
 	CR(AddTestUserApp());
 
 	CR(AddTestCaptureApp());
@@ -80,8 +83,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamApps());
 
 	CR(AddTestUIKeyboard());
-
-	CR(AddTestDreamUIBar());
 
 	CR(AddTestCaptureApp());
 
@@ -1201,13 +1202,13 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 	struct TestContext {
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
 
@@ -1216,47 +1217,47 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		// Cloud Controller
 		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
+			CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+			MenuControllerProxy *pMenuControllerProxy = nullptr;
+			CN(pContext);
+			CN(pCloudController);
+			CN(pCommandLineManager);
+
 			DEBUG_LINEOUT("Initializing Cloud Controller");
-			quad *pQuad = nullptr;
 			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+			// Log in 
 			{
 				std::string strUsername = pCommandLineManager->GetParameterValue("username");
 				std::string strPassword = pCommandLineManager->GetParameterValue("password");
 				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-				long environmentID = 168;
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-				CRM(pCloudController->Start(false), "Failed to Start Cloud Controller");
-
 			}
+
+			//CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&UITestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+			//CR(pCloudController->RegisterEnvironmentObserver(this));
 		}
-		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
-		CN(pDreamControlView);
+		//pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
+		//CN(pDreamControlView);
 
 		// UIKeyboard App
-		CR(m_pDreamOS->InitializeKeyboard());
+		//m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
+
 		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CN(pTestContext->pUser);
 
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+		pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+		CN(pTestContext->pUserControlArea);
 
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
-
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(9.0f);
-		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-
-		pDreamBrowser->SetVisible(false);
-
-		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-		CN(pDreamUIBar);
-		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+		pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUser);
 
 	Error:
 		return r;
@@ -1270,6 +1271,10 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pUserControlArea->Update();
 
 		return r;
 	};

@@ -153,6 +153,10 @@ DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	// Empty - initialization by factory
 }
 
+DreamUserApp::~DreamUserApp() {
+	Shutdown();
+}
+
 DreamUserApp* DreamUserApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUserApp *pDreamApp = new DreamUserApp(pDreamOS, pContext);
 	return pDreamApp;

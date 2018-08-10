@@ -6,6 +6,8 @@
 #include "Sense/SenseController.h"
 #include "UI/UIScrollView.h"
 
+#include "Cloud/Menu/MenuNode.h"	// replace this with a ScrollViewNode
+
 #include <queue>
 
 class UIButton;
@@ -43,6 +45,11 @@ enum class ScrollState {
 	SCROLLING
 };
 
+class UISpatialScrollViewObserver {
+public:
+	virtual RESULT GetNextPageItems() = 0;
+};
+
 class UISpatialScrollView : public UIView, public UIScrollView//,
 					//public Subscriber<SenseControllerEvent>					
 {
@@ -73,6 +80,19 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
+	RESULT OnRotationDelta(int delta);
+
+	RESULT AddScrollViewNode(std::shared_ptr<MenuNode> pMenuNode);
+	RESULT UpdateScrollViewNode(MenuNode* pMenuNode);
+	RESULT ClearScrollViewNodes();
+	std::vector<std::shared_ptr<MenuNode>> GetScrollViewNodes();
+
+	RESULT RegisterObserver(UISpatialScrollViewObserver *pObserver);
+	RESULT UnregisterObserver(UISpatialScrollViewObserver *pObserver);
+
+private:
+	UISpatialScrollViewObserver* m_pObserver = nullptr;
+
 public:
 	ScrollState GetState();
 	std::shared_ptr<quad> GetTitleQuad();
@@ -84,10 +104,11 @@ public:
 	float GetClippingRate();
 
 public:
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;	
 
 private:
 	// button positioning
+	int m_itemIndex = 0;
 	float m_menuCenterOffset = MENU_CENTER_OFFSET;
 
 	float m_itemAngleX = ITEM_ANGLE_X;
@@ -116,9 +137,10 @@ private:
 	float m_scrollScale = SCROLL_SCALE;
 	float m_scrollBias = SCROLL_ARROW_BIAS;
 	float m_maxElements = MAX_ELEMENTS;
+	int m_nextPagePremptBuffer = 15;	// this just happens to be enough that it feels seamless - fairly dependent on max scroll speed.
 	float m_yRotation;
 	float m_yRotationPerElement;
-	//float m_velocity;
+	//float m_velocity;		// inherited from UIScrollView
 	float m_fadeDuration = FADE_DURATION;
 	float m_pushDepth = PUSH_DEPTH;
 	float m_initialWidth = 0.0f;
@@ -137,7 +159,8 @@ private:
 	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
-//	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
+	std::vector<std::shared_ptr<MenuNode>> m_pScrollViewNodes;
+	std::deque<std::shared_ptr<UIButton>> m_pButtonDeque;
 
 	bool m_fScrollButtonVisible = false;
 

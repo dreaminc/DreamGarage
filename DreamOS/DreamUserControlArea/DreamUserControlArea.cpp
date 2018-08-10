@@ -1131,7 +1131,7 @@ WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact)
 
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
-	
+
 	ptRelative.x = posX * m_pActiveSource->GetWidth();
 	ptRelative.y = posY * m_pActiveSource->GetHeight();
 
