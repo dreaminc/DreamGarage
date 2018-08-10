@@ -466,13 +466,6 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 		MenuNode* pObj = reinterpret_cast<MenuNode*>(pContext);
 		
 		m_downloadQueue.push_back(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
-
-		/*
-		if (pObj != nullptr) {
-			delete pObj;
-			pObj = nullptr;
-		}
-		//*/
 	}
 
 //Error:
@@ -499,10 +492,6 @@ Error:
 RESULT DreamUIBar::Update(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
-
-	// Copy into temp vector 
-	//std::vector<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
-	//m_downloadQueue.clear();
 
 	// Makes sense for UIBar to always have a user run with it for now
 	if(m_pUserHandle == nullptr) {
@@ -574,7 +563,6 @@ RESULT DreamUIBar::Update(void *pContext) {
 		CR(ProcessDownloadMenuItemTexture());
 	}
 	
-	//CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
 	CR(m_pScrollView->Update());
 
 Error:
@@ -606,12 +594,10 @@ RESULT DreamUIBar::MakeMenuItems() {
 			pUIMenuItem->Update(iconFormat, labelFormat);
 
 			//CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_ENDED,
-			//*
 			CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 			CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
-				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));
-			//*/
+				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1, std::placeholders::_2)));	
 			//CR(pUIMenuItem->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
@@ -649,8 +635,7 @@ RESULT DreamUIBar::RequestMenuItemTexture() {
 
 		for (int i = 0; i < elements; i++) {
 			auto strURI = m_requestQueue.front()->GetThumbnailURL();
-			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-							   //MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
+			if (strURI != "") {
 				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_requestQueue.front().get()));
 			}
 			m_requestQueue.pop();
