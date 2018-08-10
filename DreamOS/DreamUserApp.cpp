@@ -243,6 +243,7 @@ RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(m_pWebBrowserManager->Shutdown());
+	m_pWebBrowserManager = nullptr;
 
 Error:
 	return r;
@@ -864,7 +865,37 @@ RESULT DreamUserApp::SetScale(float widthScale) {
 }
 
 std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserManager == nullptr) {
+		m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(m_pWebBrowserManager);
+		CR(m_pWebBrowserManager->Initialize());
+	}
+
+Error:
 	return m_pWebBrowserManager;
+}
+
+RESULT DreamUserApp::ResetBrowserManager() {
+	RESULT r = R_PASS;
+
+	std::string strDeleteCEFCache;
+	std::wstring wstrAppDataPath;
+	const char *deleteCEFCacheCommand;
+
+	m_pWebBrowserManager->Shutdown();
+	m_pWebBrowserManager = nullptr;
+
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
+	//strDeleteCEFCache = "rmdir /s /q " + util::WideStringToString(wstrAppDataPath) + "CEFCache\\";
+	strDeleteCEFCache = "del /f /s /q " + util::WideStringToString(wstrAppDataPath) + "CEFCache\\";
+	deleteCEFCacheCommand = strDeleteCEFCache.c_str();
+	system(deleteCEFCacheCommand);
+
+	
+//Error:
+	return r;
 }
 
 RESULT DreamUserApp::UpdateHeight(float heightDiff) {

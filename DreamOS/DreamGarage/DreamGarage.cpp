@@ -21,6 +21,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
+#include "DreamUserApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -1128,10 +1129,18 @@ Error:
 RESULT DreamGarage::OnLogout() {
 	RESULT r = R_PASS;
 
+
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+
+	// reset settings before signing back in
+	std::string strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+
+	CR(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN));
+	CR(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN));
+
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
+	m_pDreamUserApp->ResetBrowserManager();
 
 Error:
 	return r;
