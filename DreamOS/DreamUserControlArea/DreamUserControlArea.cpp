@@ -1095,8 +1095,13 @@ Error:
 RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
-	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
-	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
+	WebBrowserPoint wptContact;
+	point ptContact;
+
+	CNR(m_pActiveSource, R_SKIPPED);
+
+	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
+	ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
 	CBR(pUIEvent->m_pObj == m_pControlView->GetViewQuad().get(), R_SKIPPED);

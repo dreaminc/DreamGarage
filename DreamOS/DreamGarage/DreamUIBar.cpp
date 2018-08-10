@@ -332,7 +332,6 @@ RESULT DreamUIBar::RequestMenu() {
 
 	CR(RequestIconFile(pNode));
 
-	m_pathStack.pop();
 	m_fWaitingForMenuResponse = true;
 	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 
@@ -454,7 +453,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 					CR(pEnvironmentControllerProxy->RequestForm(strPath));
 				}
-				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 				ClearMenuWaitingFlag();
 			}
 //*/
