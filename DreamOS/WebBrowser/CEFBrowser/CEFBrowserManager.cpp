@@ -373,6 +373,24 @@ Error:
 	return nullptr;
 }
 
+RESULT CEFBrowserManager::DeleteCookies() {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefCookieManager> pCefCookieManager = CefCookieManager::GetGlobalManager(nullptr);
+
+	CefString pCefCookieURL;
+	CefString pCefCookieName;
+	CefRefPtr<CefDeleteCookiesCallback> pCefDeleteCookiesCallback = nullptr;
+
+	CNM(pCefCookieManager, "Cef Cookie Manager was null");
+
+	// Empty URL, name, and null callback should result in deleting all cookies;
+	CBM(pCefCookieManager->DeleteCookies(pCefCookieURL,pCefCookieName,nullptr), "Delete cookies failed");
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserManager::Shutdown() {
 	RESULT r = R_PASS;
 

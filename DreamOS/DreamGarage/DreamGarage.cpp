@@ -22,6 +22,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
 #include "DreamUserApp.h"
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -1140,7 +1141,9 @@ RESULT DreamGarage::OnLogout() {
 
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
-	m_pDreamUserApp->ResetBrowserManager();
+
+	m_pDreamUserApp->GetBrowserManager()->DeleteCookies();
+	//m_pDreamUserApp->ResetBrowserManager();
 
 Error:
 	return r;
