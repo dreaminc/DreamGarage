@@ -1128,6 +1128,9 @@ Error:
 RESULT DreamGarage::OnLogout() {
 	RESULT r = R_PASS;
 
+	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
 Error:

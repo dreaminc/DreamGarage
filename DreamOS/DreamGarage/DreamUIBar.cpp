@@ -448,8 +448,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 					// TODO: this is incomplete, need to disconnect from environment socket
 					// just for testing environment fadeout
-					pUserController->SetIsLoggedIn(false);
-					//pUserController->Logout();
+					//pUserController->SetIsLoggedIn(false);
+					CR(pUserController->Logout());
 
 				}
 				else if (strScope == "FormScope.Form") {

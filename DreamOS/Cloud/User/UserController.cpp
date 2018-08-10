@@ -168,6 +168,21 @@ Error:
 	return r;
 }
 
+RESULT UserController::Logout() {
+	RESULT r = R_PASS;
+	
+	CBRM(IsLoggedIn(), R_SKIPPED, "User not logged in");
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist");
+	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "EnvironmentSocketNotConnected");
+	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+	CR(SetIsLoggedIn(false));
+
+Error:
+	return r;
+}
+
 long UserController::GetUserDefaultEnvironmentID() {
 	return m_defaultEnvironmentId;
 //	return m_user.GetDefaultEnvironmentID();
