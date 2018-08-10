@@ -441,6 +441,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
 					CN(m_pKeyboardHandle);
 					CR(m_pKeyboardHandle->Show());
+					CR(m_pKeyboardHandle->ShowTitleView());
 				}
 				else if (strScope == "FormScope.Form") {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));

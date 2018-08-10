@@ -5,9 +5,27 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+#include "HAL/opengl/OGLProgram.h"
+
 #include "Cloud/Environment/EnvironmentAsset.h"
 
 #include "DreamGarage/DreamContentView.h"
+
+std::map<int, std::string> k_refreshTokens = {
+	{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
+	{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },
+	{ 2, "GckLS9Q691PO6RmdmwRp368JjWaETNOMEoASqQF0TCnImHzpmOv2Rch1RDrgr2V7" },
+	{ 3, "HYlowX58aRPRB85IT0M2wB20RC8rd0zpOxfIIvEgMF9XVzzFbL8UzY3yyCovdEIQ" },
+	{ 4, "sROmFa73UM38v7snrTaDy3JF1vCJGdJhBBLvBcCLaWxjoEYVfAqcgMAZPVHzaZrR" },
+	{ 5, "gc2EPtlKmKtkmiZC6cRfUtMIHwiWW9Tf55wbFBcq45Wg8DBRDWV3iZiLsqBedfqF" },
+	{ 6, "F5EwwHxmgf4pqLXZjP6zWH4NBn42UtLQUmrlU4vl62BGeprnug0Hn1WeMm3snHQa" },
+	{ 7, "cuX1beJjJE58DdU4cYOrsIoNFil534fOWscH9bzmhmcFkV1qn3M8zPkdW7J3UEH1" },
+	{ 8, "B3Wwz6Lbwfj2emo7caKBQXtKoMYXR9P70eOvkFzFIfh9NRlal6PLFqIagTFXiDHy" },
+	{ 9, "HPfaNfjFrAhlbqS9DuZD5dCrAzI215ETDTRzFMVXrtoYrI2A9XBS3VEKOjGlDSVE" }
+};
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -23,11 +41,15 @@ RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
-	//CR(AddTestMultiConnectTest());
-	//CR(AddTestDownloadFile());	// requires logged in
+	CR(AddTestMultiConnectTest());
+
+	// Requires login
+
+	CR(AddTestDownloadFile());	
 
 	CR(AddTestConnectLogin());
-	//CR(AddTestMenuAPI());
+	
+	CR(AddTestMenuAPI());
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -43,25 +65,116 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 
 	double sTestTime = 200.0f;
 
+	// non-asynchronous methods could be set up for tests that login immediately like this
+	struct TestContext : public CloudController::UserObserver {
+		UserController *pUserController = nullptr;
+
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnSetSettings() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnLogin() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnLogout() override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override { 
+			return R_NOT_IMPLEMENTED; 
+		}
+		
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override { 
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+			
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile"); 
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			
+		Error:
+			return r;
+		};
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override { 
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnGetToken");
+
+			CB(fSuccess); 
+			
+			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
+
+		Error:
+			return r;
+		};
+
+	} *pTestContext = new TestContext();
+
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		// Cloud Controller
-		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-		CN(pCloudController);
-		CN(pCommandLineManager);
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		
+		{
 
-		// For later
-		m_pCloudController = pCloudController;
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			CRM(m_pDreamOS->InitializeCloudController(), "Failed to initialize DreamOS cloud controller");
+			CRM(m_pDreamOS->GetCloudController()->RegisterUserObserver(pTestContext), "Failed to register user observer");
+
+			// Cloud Controller
+			CloudController *pCloudController = m_pDreamOS->GetCloudController();
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+
+			CN(pCloudController);
+			CN(pCommandLineManager);
+
+			// For later
+			m_pCloudController = pCloudController;
+
+			CR(SetupPipeline());
+
+			// user controller is set up during initialize
+		
+			// Objects 
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+			auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			CN(pSphere);
+
+
+			pTestContext->pUserController = dynamic_cast<UserController*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
+			
+			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
+			int testUserNumber = atoi(strTestValue.c_str());
+
+			// m_tokens stores the refresh token of users test0-9,
+			// so use -t 0 to login as test0@dreamos.com
+			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
+			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+
+			m_pUserController = pTestContext->pUserController;
+
+		}
 
 		// Log in 
 		{
 			// TODO: This way to start the cloud controller thread is not great
+			/*
 			std::string strUsername = "jason_test";
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
@@ -70,6 +183,8 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
 
 			CRM(pCloudController->Start(), "Failed to start cloud controller");
+			//*/
+			
 		}
 
 	Error:
@@ -92,7 +207,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	auto pNewTest = AddTest(fnInitialize, fnTest, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Test Connect and Login");
@@ -189,6 +304,8 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 		CN(pCloudController);
 		CN(pCommandLineManager);
 
+		CR(SetupPipeline());
+
 		// For later
 		m_pCloudController = pCloudController;
 
@@ -245,6 +362,43 @@ RESULT CloudTestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 	}
 
 //Error:
+	return r;
+}
+
+RESULT CloudTestSuite::SetupPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	ProgramNode* pRenderProgramNode;
+	pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Screen Quad Shader (opt - we could replace this if we need to)
+	ProgramNode *pRenderScreenQuad;
+	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Connect Program to Display
+
+	// Connected in parallel (order matters)
+	// NOTE: Right now this won't work with mixing for example
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
 	return r;
 }
 

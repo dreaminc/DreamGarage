@@ -53,7 +53,9 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
 
-		m_pFormView->Hide();
+		//m_pFormView->Hide();
+		m_pFormView->GetComposite()->SetVisible(false);
+		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
@@ -70,6 +72,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 	// there's fancier code around this in DreamUserControlArea, 
 	// but we assume that there is only one piece of content here
 	if (m_fInitBrowser) {
+		DOSLOG(INFO, "Creating browser app for form: %s", m_strURL);
 		m_fInitBrowser = false;
 
 		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
@@ -77,8 +80,12 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->RegisterObserver(this));
 
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+
 		CR(m_pDreamBrowserForm->SetURI(m_strURL));
+
+		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 	}
+
 
 Error:
 	return r;
@@ -106,8 +113,8 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::SETTINGS) {
 		strType = "FormKey.UsersSettings";
 	}
-	else if (type == FormType::TEAMS_CREATE) {
-		strType = "FormKey.TeamsCreate";
+	else if (type == FormType::TEAMS_MISSING) {
+		strType = "FormKey.TeamsMissing";
 	}
 
 	return strType;
@@ -126,8 +133,8 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	else if (strType == "FormKey.UsersSettings") {
 		type = FormType::SETTINGS;
 	}
-	else if (strType == "FormKey.TeamsCreate") {
-		type = FormType::TEAMS_CREATE;
+	else if (strType == "FormKey.TeamsMissing") {
+		type = FormType::TEAMS_MISSING;
 	}
 
 	return type;
@@ -139,6 +146,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	if (m_pDreamBrowserForm == nullptr) {
 		m_strURL = strURL;
 		m_fInitBrowser = true;
+		DOSLOG(INFO, "Create browser for form: %s", strURL);
 	}
 	else {
 		m_pDreamBrowserForm->SetURI(m_strURL);
@@ -265,6 +273,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
+		/*
 	case INTERACTION_EVENT_MENU: {
 		if (m_pUserApp->GetKeyboard()->IsVisible()) {
 			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
@@ -275,6 +284,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		}
 		
 	} break;
+	//*/
 	case INTERACTION_EVENT_KEY_DOWN: {
 
 		char chkey = (char)(pEvent->m_value);
@@ -373,8 +383,7 @@ Error:
 RESULT DreamFormApp::Show() {
 	RESULT r = R_PASS;
 
-	CNR(m_pFormView, R_SKIPPED);
-
+	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
 

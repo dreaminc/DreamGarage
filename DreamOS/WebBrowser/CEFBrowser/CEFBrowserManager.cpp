@@ -17,8 +17,8 @@ CEFBrowserManager::CEFBrowserManager() {
 CEFBrowserManager::~CEFBrowserManager() {
 	RESULT r = R_PASS;
 
-	//CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
-	CR(r);
+	CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	//CR(r);
 
 Error:
 	return;
@@ -65,7 +65,7 @@ RESULT CEFBrowserManager::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
-	CN(pCEFBrowserController);
+	CNM(pCEFBrowserController, "pCEFBrowserController is null");
 
 	CR(pCEFBrowserController->OnAfterCreated());
 
@@ -187,6 +187,11 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 }
 
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
+	CBM(m_webBrowserControllers.size() > 0, "No web browser controllers have been created.");
+	CNM(pCEFBrowser, "CEF Browser is nullptr");
+
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
 
@@ -197,6 +202,7 @@ std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController
 		}
 	}
 
+Error:
 	return nullptr;
 }
 
@@ -235,6 +241,8 @@ RESULT CEFBrowserManager::HandleDreamExtensionCall(CefRefPtr<CefBrowser> pCefBro
 
 	strType = pMessageArguments->GetString(0);
 	strMethod = pMessageArguments->GetString(1);
+
+	DOSLOG(INFO, "HandleDreamExtensionCall: %s.%s", strType, strMethod);
 
 	//TODO: implement the other ones
 	if (strType == "Form") {
@@ -288,7 +296,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	// Provide CEF with command-line arguments.
 	int exitCode = CefExecuteProcess(cefMainArgs, nullptr, nullptr);
-	DEBUG_LINEOUT("CefExecuteProcess returned %d", exitCode);
+	DOSLOG(INFO, "CefExecuteProcess returned %d", exitCode);
 
 	// Specify CEF global settings here.
 	CefSettings cefSettings;
@@ -322,7 +330,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp, nullptr), "CefInitialize error");
 
-	DEBUG_LINEOUT("CefInitialize completed successfully");
+	DOSLOG(INFO, "CefInitialize completed successfully");
 	m_state = state::INITIALIZED;
 	m_condBrowserInit.notify_one();
 
@@ -331,7 +339,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefRunMessageLoop();
 	//*/
 
-	DEBUG_LINEOUT("CEF thread complete...");
+	DOSLOG(INFO, "CEF thread complete...");
 
 	// Success:
 	return r;

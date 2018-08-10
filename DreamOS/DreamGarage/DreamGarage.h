@@ -29,7 +29,8 @@ class SkyboxScatterProgram;
 
 class DreamGarage : public DreamOS,
 				    public Subscriber<SenseKeyboardEvent>,
-					public Subscriber<SenseTypingEvent>
+					public Subscriber<SenseTypingEvent>,
+					public DOSObserver
 {
 public:
 
@@ -44,6 +45,22 @@ public:
 	RESULT SendHeadPosition();
 	RESULT SendHandPosition();
 	RESULT SendMouthSize();
+
+	virtual bool UseInstallPath() override {
+#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+		return true;
+#else
+		return false;
+#endif
+	}
+
+	virtual std::wstring GetDreamFolderPath() {
+#ifdef PRODUCTION_BUILD
+		return std::wstring(L"\\Dream\\");
+#else DEV_PRODUCTION_BUILD
+		return std::wstring(L"\\DreamDev\\");
+#endif
+	}
 
 	// TODO: this is just a debug test temp
 	//RESULT SendSwitchHeadMessage();
@@ -96,6 +113,14 @@ public:
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
 
+	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
+	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId);
+
+
+	// DOS Observer
+	virtual RESULT HandleDOSMessage(std::string& strMessage) override;
+
 	// DreamGarage Messages
 	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
@@ -139,6 +164,13 @@ private:
 	bool m_fShouldUpdateAppComposites = false;
 
 	long m_pendingAssetReceiveUserID = -1;
+
+	// TODO: should these be here
+	bool m_fFirstLogin = true;
+	bool m_fHasCredentials = false;
+	std::string m_strRefreshToken;
+	std::string m_strAccessToken;
+	UserController* m_pUserController;
 
 	// UI
 	//ViewMatrix *m_pClippingView;

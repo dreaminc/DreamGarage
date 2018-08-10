@@ -225,6 +225,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
 
+	CR(ResetAppComposite());
+
 Error:
 	return r;
 }

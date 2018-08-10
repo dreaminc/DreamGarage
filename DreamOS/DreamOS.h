@@ -51,6 +51,7 @@ class UIKeyboardLayout;
 class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
+class DreamLoginApp;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -114,6 +115,10 @@ public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
+
+	// These are used to set paths for path manager
+	virtual bool UseInstallPath() { return false; }
+	virtual std::wstring GetDreamFolderPath() { return std::wstring(L""); }
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
@@ -470,6 +475,7 @@ protected:
 	std::shared_ptr<DreamUserApp> m_pDreamUser;
 	std::shared_ptr<DreamShareView> m_pDreamShareView;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
+	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;
 
 private:

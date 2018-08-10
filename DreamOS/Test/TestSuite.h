@@ -60,6 +60,7 @@ public:
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;
 	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
+
 };
 
 #endif // ! TEST_SUITE_H_

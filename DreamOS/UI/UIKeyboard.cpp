@@ -851,8 +851,9 @@ Error:
 
 RESULT UIKeyboard::ShowKeyboardTitleView() {
 	RESULT r = R_PASS;
-	CR(m_pTitleIcon->SetVisible(true));
-	CR(m_pTitleText->SetVisible(true));
+	CR(m_pHeaderContainer->SetVisible(true));
+	//CR(m_pTitleIcon->SetVisible(true));
+	//CR(m_pTitleText->SetVisible(true));
 Error:
 	return r;
 }

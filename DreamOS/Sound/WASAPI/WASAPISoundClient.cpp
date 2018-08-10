@@ -2,6 +2,8 @@
 
 #include <string>
 
+// TODO: This should get moved up to SoundClient
+#include "WASAPISpatialSoundObject.h"
 
 // File specific utilities
 template <class T> RESULT SafeRelease(T **ppT) {
@@ -26,6 +28,8 @@ WASAPISoundClient::~WASAPISoundClient() {
 	SafeRelease<IMMDeviceEnumerator>(&m_pDeviceEnumerator);
 	SafeRelease<IMMDevice>(&m_pAudioEndpointRenderDevice);
 	SafeRelease<IAudioClient>(&m_pAudioRenderClient);
+	
+	// TODO: Release spatial shits
 }
 
 RESULT WASAPISoundClient::EnumerateWASAPISessions() {
@@ -84,27 +88,39 @@ Error:
 	return r;
 }
 
-std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
+std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 	RESULT r = R_PASS;
 
-	IMMDevice *pDevice;
 	LPWSTR deviceId;
 	std::wstring wstrResult = L"";
-
-	CR((RESULT)pDeviceCollection->Item(DeviceIndex, &pDevice));
-	CN(pDevice);
 
 	CR((RESULT)pDevice->GetId(&deviceId));
 
 	IPropertyStore *pPropertyStore;
 	CR((RESULT)pDevice->OpenPropertyStore(STGM_READ, &pPropertyStore));
-	
-	SafeRelease(&pDevice);
 
 	PROPVARIANT propVariantFriendlyName;
 	PropVariantInit(&propVariantFriendlyName);
-	
+
 	CR((RESULT)pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propVariantFriendlyName));
+
+	//DWORD numProps;
+	//pPropertyStore->GetCount(&numProps);
+	//
+	//for (int i = 0; i < (int)numProps; i++) {
+	//	PROPERTYKEY propKeyTemp;
+	//
+	//	CR((RESULT)pPropertyStore->GetAt((DWORD)(i), &propKeyTemp));
+	//
+	//	PROPVARIANT propVariantTemp;
+	//	PropVariantInit(&propVariantTemp);
+	//
+	//	CR((RESULT)pPropertyStore->GetValue(propKeyTemp, &propVariantTemp));
+	//
+	//	if(propVariantTemp.vt == 31 && propVariantTemp.pwszVal != nullptr) {
+	//		DEBUG_LINEOUT("%d: %S", i, propVariantTemp.pwszVal);
+	//	}
+	//}
 
 	SafeRelease(&pPropertyStore);
 
@@ -114,6 +130,26 @@ std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollec
 	CoTaskMemFree(deviceId);
 
 Error:
+	return wstrResult;
+}
+
+std::wstring WASAPISoundClient::GetDeviceName(IMMDeviceCollection *pDeviceCollection, UINT DeviceIndex) {
+	RESULT r = R_PASS;
+
+	IMMDevice *pDevice = nullptr;
+	std::wstring wstrResult = L"";
+
+	CR((RESULT)pDeviceCollection->Item(DeviceIndex, &pDevice));
+	CN(pDevice);
+
+	wstrResult = GetDeviceName(pDevice);
+
+Error:
+	if (pDevice != nullptr) {
+		SafeRelease(&pDevice);
+		pDevice = nullptr;
+	}
+
 	return wstrResult;
 }
 
@@ -214,7 +250,6 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 	UINT32 packetLength = 0;
 	UINT32 numFramesAvailable;
 
-
 	DEBUG_LINEOUT("WASAPISoundClient::AudioCaptureProcess Start");
 
 	CNM(m_pAudioCaptureClient, "Audio Capture Client not initialized");
@@ -266,20 +301,27 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				hr = pCaptureClient->GetBuffer(&pAudioCaptureBufferData, &numFramesAvailable, &audioDeviceFlags, nullptr, nullptr);
 				CR((RESULT)hr);
 
-				// Convert to float data buffer
-				float *pDataBuffer = (float*)(pAudioCaptureBufferData);
+				// Set to float data buffer
+				float *pFloatDataBuffer = (float*)(pAudioCaptureBufferData);
 
 				// Check for silence
 				if (audioDeviceFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
 					pAudioCaptureBufferData = nullptr;  
 				}
 
-				//CR(HandleAudioDataCaptured(dataType, numFramesAvailable, channels, pDataBuffer, pDataBuffer_n)
+				int16_t *pSigned16IntBuffer = nullptr;
+				pSigned16IntBuffer = new int16_t[numFramesAvailable];
+				CN(pSigned16IntBuffer);
+
+				// Convert to signed int data buffer
+				for (unsigned int i = 0; i < numFramesAvailable; i++) {
+					pSigned16IntBuffer[i] = pFloatDataBuffer[i] * std::numeric_limits<int16_t>::max();
+				}
 
 				m_pCaptureSoundBuffer->LockBuffer();
 				{
 					if (m_pCaptureSoundBuffer->IsFull() == false) {
-						CR(m_pCaptureSoundBuffer->PushData(pDataBuffer, numFramesAvailable));
+						CR(m_pCaptureSoundBuffer->PushData(pSigned16IntBuffer, numFramesAvailable));
 
 						// This will trigger the observer 
 						CR(HandleAudioDataCaptured(numFramesAvailable));
@@ -289,6 +331,12 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 					}
 				}
 				m_pCaptureSoundBuffer->UnlockBuffer();
+
+				// De-alloc the temp thing
+				if (pSigned16IntBuffer != nullptr) {
+					delete[] pSigned16IntBuffer;
+					pSigned16IntBuffer = nullptr;
+				}
 
 				hr = pCaptureClient->ReleaseBuffer(numFramesAvailable);
 				CR((RESULT)hr);
@@ -320,6 +368,86 @@ Error:
 
 	if (pCaptureClient != nullptr) {
 		SafeRelease<IAudioCaptureClient>(&pCaptureClient);
+	}
+
+	return r;
+}
+
+std::shared_ptr<SpatialSoundObject> WASAPISoundClient::MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
+
+	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
+	CNM(m_pSpatialAudioStreamForHrtf, "Audio Spatial HRTF not initialized");
+
+	pSpatialSoundObject =
+		std::make_shared<WASAPISpatialSoundObject>(GetSpaitalSamplingRate(), ptPosition, vEmitterDirection, vListenerDirection, m_pAudioSpatialClient, m_pSpatialAudioStreamForHrtf);
+	CNM(pSpatialSoundObject, "Failed to allocate wasapi spatial sound object");
+
+	CRM(pSpatialSoundObject->Initialize(), "Failed to initialize WASAPI HRTF spatial object");
+
+	return pSpatialSoundObject;
+
+Error:
+	if (pSpatialSoundObject != nullptr) {
+		pSpatialSoundObject = nullptr;
+	}
+
+	return nullptr;
+}
+
+RESULT WASAPISoundClient::AudioSpatialProcess() {
+	RESULT r = R_PASS;
+
+	DWORD audioDeviceFlags = 0;
+
+	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Start");
+
+	CNM(m_pAudioSpatialClient, "Audio Spatial Client not initialized");
+	CNM(m_pSpatialAudioStreamForHrtf, "Audio Spatial HRTF not initialized");
+
+	CRM((RESULT)m_pSpatialAudioStreamForHrtf->Start(), "Failed to start spatial audio HRTF stream");
+
+	do {
+
+		// Wait for next buffer event to be signaled.
+		DWORD retval = WaitForSingleObject(m_hSpatialBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);
+
+		// Event handle timed out after the default time out
+		if (retval != WAIT_OBJECT_0) {
+			CRM((RESULT)(ERROR_TIMEOUT), "Spatial audio thread is hung and exited");
+		}
+
+		UINT32 availableDynamicObjectCount;
+		UINT32 frameCount;
+
+		// Begin the process of sending object data and metadata
+		// Get the number of active objects that can be used to send object-data
+		// Get the frame count that each buffer will be filled with 
+		CRM((RESULT)m_pSpatialAudioStreamForHrtf->BeginUpdatingAudioObjects(&availableDynamicObjectCount, &frameCount),
+			"Failed to begin updating audio objects");
+
+		for (auto &pSpatialSoundObject : m_spatialSoundObjects) {
+			
+			CR(pSpatialSoundObject->Update(frameCount, 1));
+
+			//// Implied 48K sampling, 440 hz freq
+			//pSpatialSoundObject->WriteTestSignalToAudioObjectBuffer(frameCount);	
+
+		}
+			
+		// Let the audio-engine know that the object data are available for processing now
+		CRM((RESULT)m_pSpatialAudioStreamForHrtf->EndUpdatingAudioObjects(), "Failed to EndUpdatingAudioObjects");
+
+	} while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT);
+
+Error:
+	DEBUG_LINEOUT("WASAPISoundClient::AudioSpatialProcess Finish");
+
+	if (m_hSpatialBufferEvent != nullptr) {
+		CloseHandle(m_hSpatialBufferEvent);
+		m_hSpatialBufferEvent = nullptr;
 	}
 
 	return r;
@@ -497,7 +625,7 @@ const char *GetSubFormatString(GUID waveFormatSubFormat) {
 	return "UNDEFINED SUBFORMAT";
 }
 
-SoundBuffer::type GetFormatSoundBufferType(WAVEFORMATEX *pWaveFormatX) {
+sound::type GetFormatSoundBufferType(WAVEFORMATEX *pWaveFormatX) {
 	RESULT r = R_PASS;
 
 	if (pWaveFormatX->wFormatTag == WAVE_FORMAT_EXTENSIBLE) {
@@ -508,20 +636,20 @@ SoundBuffer::type GetFormatSoundBufferType(WAVEFORMATEX *pWaveFormatX) {
 		
 		if (waveFormatSubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT) {
 			if (pWaveFormatX->wBitsPerSample == 32)
-				return SoundBuffer::type::FLOATING_POINT_32_BIT;
+				return sound::type::FLOATING_POINT_32_BIT;
 			else if(pWaveFormatX->wBitsPerSample == 64)
-				return SoundBuffer::type::FLOATING_POINT_64_BIT;
+				return sound::type::FLOATING_POINT_64_BIT;
 		}
 		else if (waveFormatSubFormat == KSDATAFORMAT_SUBTYPE_PCM) {
 			if (pWaveFormatX->wBitsPerSample == 8)
-				return SoundBuffer::type::UNSIGNED_8_BIT;
+				return sound::type::UNSIGNED_8_BIT;
 			else if (pWaveFormatX->wBitsPerSample == 16)
-				return SoundBuffer::type::SIGNED_16_BIT;
+				return sound::type::SIGNED_16_BIT;
 		}
 	}
 
 Error:
-	return SoundBuffer::type::INVALID;
+	return sound::type::INVALID;
 }
 
 RESULT WASAPISoundClient::PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo) {
@@ -552,6 +680,119 @@ Error:
 	return r;
 }
 
+RESULT WASAPISoundClient::InitializeSpatialAudioClient() {
+	RESULT r = R_PASS;
+
+	// Default Render Endpoint
+	CRM((RESULT)m_pDeviceEnumerator->GetDefaultAudioEndpoint(eRender, eConsole, &m_pAudioEndpointSpatialDevice),
+		"Failed to get default audio spatial endpoint");
+	CN(m_pAudioEndpointSpatialDevice);
+	
+	{
+		std::wstring wstrDeviceName = GetDeviceName(m_pAudioEndpointSpatialDevice);
+		DEBUG_LINEOUT("Spatial Device: %S", wstrDeviceName.c_str());
+	}
+	
+	CRM((RESULT)m_pAudioEndpointSpatialDevice->Activate(__uuidof(ISpatialAudioClient), CLSCTX_ALL, nullptr, (void**)&m_pAudioSpatialClient),
+		"Failed to activate spatial audio client");
+	CN(m_pAudioSpatialClient);
+	
+
+	// Move this to member etc
+	// Spatial audio is more restrictive (mono)
+	WAVEFORMATEX format;
+	format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
+	format.wBitsPerSample = 32;
+	format.nChannels = 1;
+	format.nSamplesPerSec = 48000;
+	format.nBlockAlign = (format.wBitsPerSample >> 3) * format.nChannels;
+	format.nAvgBytesPerSec = format.nBlockAlign * format.nSamplesPerSec;
+	format.cbSize = 0;
+
+	CRM((RESULT)(m_pAudioSpatialClient->IsAudioObjectFormatSupported(&format)), "Audio format not supported");
+	
+	// This will fail if windows sonic or whatever isn't set up
+	// Use HRTF if available
+
+	if ((r = (RESULT)m_pAudioSpatialClient->IsSpatialAudioStreamAvailable(__uuidof(m_pSpatialAudioStreamForHrtf), NULL)) < 0) {
+		m_pSpatialAudioStreamForHrtf = nullptr;
+		m_fHRTFEnabled = false;
+		DEBUG_LINEOUT("Spatial audio stream not available");
+		CBM((false), "WASAPI Spatial not supported");
+	}
+
+	// Create the event that will be used to signal the client for more data
+	m_hSpatialBufferEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	CN(m_hSpatialBufferEvent);
+
+	UINT32 maxDynamicObjectCount;
+	CRM((RESULT)m_pAudioSpatialClient->GetMaxDynamicObjectCount(&maxDynamicObjectCount), "Failed to get max dynamic object count");
+	CBM((maxDynamicObjectCount > 0), "Spatial audio doesn't support any dynamic objects");
+	m_maxSpatialSoundObjects = maxDynamicObjectCount;
+
+	// TODO: Move all of this into user etc 
+	SpatialAudioHrtfActivationParams streamParams;
+	streamParams.ObjectFormat = &format;
+	streamParams.StaticObjectTypeMask = AudioObjectType_None;
+	streamParams.MinDynamicObjectCount = 0;
+	streamParams.MaxDynamicObjectCount = maxDynamicObjectCount;
+	streamParams.Category = AudioCategory_Communications;
+	streamParams.EventHandle = m_hSpatialBufferEvent;
+	streamParams.NotifyObject = NULL;
+
+	SpatialAudioHrtfDistanceDecay decayModel;
+	decayModel.CutoffDistance = 100.0f;
+	decayModel.MaxGain = 3.98f;
+	decayModel.MinGain = float(1.58439f * pow(10.0f, -5.0f));
+	decayModel.Type = SpatialAudioHrtfDistanceDecayType::SpatialAudioHrtfDistanceDecay_NaturalDecay;
+	decayModel.UnityGainDistance = 1.0f;
+
+	streamParams.DistanceDecay = &decayModel;
+
+	SpatialAudioHrtfDirectivity directivity;
+	//directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cone;
+	directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_Cardioid;
+	//directivity.Type = SpatialAudioHrtfDirectivityType::SpatialAudioHrtfDirectivity_OmniDirectional;
+	directivity.Scaling = 1.0f;
+
+	SpatialAudioHrtfDirectivityCone cone;
+	cone.directivity = directivity;
+	cone.InnerAngle = 0.1f;
+	cone.OuterAngle = 0.2f;
+
+	SpatialAudioHrtfDirectivityCardioid cardioid; 
+	cardioid.directivity = directivity;
+	cardioid.Order = 2;
+	
+	SpatialAudioHrtfDirectivityUnion directivityUnion;
+	//directivityUnion.Omni = directivity;
+	//directivityUnion.Cone = cone;
+	directivityUnion.Cardiod = cardioid;
+	streamParams.Directivity = &directivityUnion;
+
+	//SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Small;
+	SpatialAudioHrtfEnvironmentType environment = SpatialAudioHrtfEnvironmentType::SpatialAudioHrtfEnvironment_Outdoors;
+	streamParams.Environment = &environment;
+
+	// identity matrix
+	SpatialAudioHrtfOrientation hrtfOrientation = { 1.0f, 0.0f, 0.0f, 
+													0.0f, 1.0f, 0.0f, 
+													0.0f, 0.0f, 1.0f }; 
+	streamParams.Orientation = &hrtfOrientation;
+
+	PROPVARIANT pv;
+	PropVariantInit(&pv);
+	pv.vt = VT_BLOB;
+	pv.blob.cbSize = sizeof(streamParams);
+	pv.blob.pBlobData = (BYTE*)&streamParams;
+
+	CRM((RESULT)m_pAudioSpatialClient->ActivateSpatialAudioStream(&pv, __uuidof(m_pSpatialAudioStreamForHrtf), (void**)&m_pSpatialAudioStreamForHrtf),
+			"Failed to activate spatial audio stream");
+
+Error:
+	return r;
+}
+
 RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	RESULT r = R_PASS;
 
@@ -571,7 +812,7 @@ RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	CR((RESULT)m_pAudioRenderClient->GetMixFormat(&m_pRenderWaveFormatX));
 	CN(m_pRenderWaveFormatX);
 
-	SoundBuffer::type bufferType = GetFormatSoundBufferType(m_pRenderWaveFormatX);
+	sound::type bufferType = GetFormatSoundBufferType(m_pRenderWaveFormatX);
 	int numChannels = m_pRenderWaveFormatX->nChannels;
 
 	// Print out format
@@ -592,7 +833,7 @@ RESULT WASAPISoundClient::InitializeRenderAudioClient() {
 	"Failed to init render client");
 
 	// Set up the render Sound buffer
-	CR(InitializeRenderSoundBuffer(numChannels, bufferType));
+	CR(InitializeRenderSoundBuffer(numChannels, m_pRenderWaveFormatX->nSamplesPerSec, bufferType));
 
 Error:
 	return r;
@@ -609,14 +850,18 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 
 	// Audio Capture Client Device
 	CRM((RESULT)m_pAudioEndpointCaptureDevice->Activate(__uuidof(IAudioClient), CLSCTX_ALL, NULL, (void**)&m_pAudioCaptureClient), "Failed to activate audio capture client");
-	CN(m_pAudioRenderClient);
+	CN(m_pAudioCaptureClient);
 
 	// Capture Format 
 	CR((RESULT)m_pAudioCaptureClient->GetMixFormat(&m_pCaptureWaveFormatX));
 	CN(m_pCaptureWaveFormatX);
 
-	SoundBuffer::type bufferType = GetFormatSoundBufferType(m_pCaptureWaveFormatX);
+	sound::type captureBufferType = GetFormatSoundBufferType(m_pCaptureWaveFormatX);
 	int numChannels = m_pCaptureWaveFormatX->nChannels;
+	int samplingRate = m_pCaptureWaveFormatX->nSamplesPerSec;
+
+	// We want to use 16 bit signed integer for the sound buffer
+	sound::type bufferType = sound::type::SIGNED_16_BIT;
 
 	// Print out format
 	CR(PrintWaveFormat(m_pCaptureWaveFormatX, "capture"));
@@ -632,7 +877,7 @@ RESULT WASAPISoundClient::InitializeCaptureAudioClient() {
 		"Failed to init capture client");
 
 	// Set up the capture Sound buffer
-	CR(InitializeCaptureSoundBuffer(numChannels, bufferType));
+	CR(InitializeCaptureSoundBuffer(numChannels, samplingRate, bufferType));
 
 Error:
 	return r;
@@ -642,75 +887,20 @@ RESULT WASAPISoundClient::Initialize() {
 	RESULT r = R_PASS;
 	HRESULT hr = S_OK;
 
-	//UINT32 bufferFrameCount;
-	//UINT32 numFramesAvailable;
-	//UINT32 packetLength = 0;
-
-	//BYTE *pData = nullptr;
-
-	//DWORD captureFlags;
-
 	DEBUG_LINEOUT("Initializing WASAPI Sound Client");
 
 	// Enumerate end points 
 	// TODO: Member function - allow for better selection
 	CR(EnumerateWASAPIDevices());
 
-	
-	//CR(EnumerateWASAPISessions(pSessionManager));
-
-	// Initialize the render audio client
-	CR(InitializeRenderAudioClient());
+	//// Initialize the render audio client
+	CRM(InitializeRenderAudioClient(), "Failed to initialize wasapi render");
 	
 	// Initialize the capture audio client
-	CR(InitializeCaptureAudioClient());
+	CRM(InitializeCaptureAudioClient(), "Failed to initialize wasapi capture");
 
-
-	// Test: Try to play something
-
-
-
-	/*
-	// This is for recording stuff
-	CRM((RESULT)pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void**)&pCaptureClient), "Failed to get service");
-	
-	// Notify the audio sink which format to use.
-	//CR(pAudioSink->SetFormat(pwfx));
-
-	// Calculate the actual duration of the allocated buffer.
-	hnsActualDuration = (double)REFTIMES_PER_SEC * bufferFrameCount / pwfx->nSamplesPerSec;
-
-	// Start recording.
-	CR((RESULT)pAudioClient->Start());  
-
-	// Each loop fills about half of the shared buffer.
-	while (fDone == false) {
-
-		// Sleep for half the buffer duration.
-		Sleep(hnsActualDuration / REFTIMES_PER_MILLISEC / 2);
-
-		CR((RESULT)pCaptureClient->GetNextPacketSize(&packetLength));
-
-		while (packetLength > 0) {
-			// Get the available data in the shared buffer.
-			CR((RESULT)pCaptureClient->GetBuffer(&pData, &numFramesAvailable, &captureFlags, nullptr, nullptr));
-
-			if (captureFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
-				pData = nullptr;  // Tell CopyData to write silence.
-			}
-
-			// Copy the available capture data to the audio sink.
-			//CR(pMySink->CopyData(pData, numFramesAvailable, &bDone));
-
-			CR((RESULT)pCaptureClient->ReleaseBuffer(numFramesAvailable));
-
-			CR((RESULT)pCaptureClient->GetNextPacketSize(&packetLength));
-		}
-	}
-
-	// Stop recording.
-	CR((RESULT)pAudioClient->Stop());
-	*/
+	// Spatial Audio Client
+	//CRM(InitializeSpatialAudioClient() " Failed to initialize wasapi spatial");
 
 Error:
 	return r;

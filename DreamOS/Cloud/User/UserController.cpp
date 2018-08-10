@@ -47,8 +47,13 @@ Error:
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
+
+#ifdef USE_LOCALHOST
+	std::string strAPIURL = "http://localhost:8001";
+#else
 	std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
-	std::string strWWWURL = pCommandLineManager->GetParameterValue("www.ip");
+#endif
+
 
 	switch (userMethod) {
 		case UserMethod::LOGIN: {
@@ -164,7 +169,35 @@ Error:
 }
 
 long UserController::GetUserDefaultEnvironmentID() {
-	return m_user.GetDefaultEnvironmentID();
+	return m_defaultEnvironmentId;
+//	return m_user.GetDefaultEnvironmentID();
+}
+
+RESULT UserController::SetUserDefaultEnvironmentID(long environmentID) {
+	RESULT r = R_PASS;
+
+	// user may not be initialized
+//	return m_user.SetDefaultEnvironmentID(environmentID);
+	
+	m_loginState.fHasEnvironmentId = true;
+	
+	m_defaultEnvironmentId = environmentID;
+
+	CR(UpdateLoginState());
+
+Error:
+	return r;
+}
+
+RESULT UserController::SetAccessToken(std::string strAccessToken) {
+	RESULT r = R_PASS;
+
+	m_loginState.fHasAccessToken = true;
+	m_strAccessToken = strAccessToken;
+	CR(UpdateLoginState());
+
+Error:
+	return r;
 }
 
 User UserController::GetUser() {
@@ -284,7 +317,7 @@ RESULT UserController::LoadProfile() {
 		m_user = User(
 			jsonResponse["/data/id"_json_pointer].get<long>(),
 			//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
-			-1,
+			m_defaultEnvironmentId,
 			jsonResponse["/data/email"_json_pointer].get<std::string>(),
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
@@ -352,6 +385,8 @@ RESULT UserController::GetFormURL(std::string& strFormKey) {
 	HTTPResponse httpResponse;
 
 	std::string strURI = GetMethodURI(UserMethod::GET_FORM) + strFormKey;
+
+	DOSLOG(INFO, "Requesting form: %s", strURI);
 
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
@@ -444,7 +479,11 @@ void UserController::OnAccessToken(std::string&& strResponse) {
 			
 		strAccessToken = jsonAccessTokenObject["/token"_json_pointer].get<std::string>();
 
-		CR(m_pUserControllerObserver->OnAccessToken(true, strAccessToken))
+		CR(m_pUserControllerObserver->OnAccessToken(true, strAccessToken));
+
+		m_strAccessToken = strAccessToken;
+		m_loginState.fHasAccessToken = true;
+		UpdateLoginState();
 	}
 
 Error:
@@ -483,7 +522,7 @@ void UserController::OnGetApiSettings(std::string&& strResponse) {
 
 	if (statusCode == 404) {
 		//TODO: it isn't right to have this code here
-		std::string strSettingsFormKey = "FormKey.UserSettings";
+		std::string strSettingsFormKey = "FormKey.UsersSettings";
 		GetFormURL(strSettingsFormKey);
 	}
 	//TODO: combine with the json rpc response
@@ -517,7 +556,7 @@ RESULT UserController::SetSettings(std::string& strAccessToken, float height, fl
 	jsonSettings["user_settings"]["ui_offset_z"] = depth;
 	jsonSettings["user_settings"]["ui_scale"] = scale;
 
-	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnAccessToken, this, std::placeholders::_1)));
+	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -580,6 +619,102 @@ Error:
 	return;
 }
 
+RESULT UserController::RequestUserProfile(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::LOAD_PROFILE);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnUserProfile, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+void UserController::OnUserProfile(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	//CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	GetResponseData(jsonData, jsonResponse, statusCode);
+	//CB(statusCode == 200);
+
+	m_user = User(
+		jsonData["/id"_json_pointer].get<long>(),
+		m_defaultEnvironmentId,
+		jsonData["/email"_json_pointer].get<std::string>(),
+		jsonData["/public_name"_json_pointer].get<std::string>(),
+		jsonData["/first_name"_json_pointer].get<std::string>(),
+		jsonData["/last_name"_json_pointer].get<std::string>(),
+		version(1.0f)	// version
+	);
+
+	m_loginState.fHasUserProfile = true;
+	CR(UpdateLoginState());
+
+Error:
+	return;
+}
+
+RESULT UserController::RequestTwilioNTSInformation(std::string& strAccessToken) {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+
+	std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+	headers.emplace_back(HTTPController::AuthorizationHeader(strAccessToken));
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnTwilioNTSInformation, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	int statusCode;
+
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	m_twilioNTSInformation = TwilioNTSInformation(
+		jsonData["/date_created"_json_pointer].get<std::string>(),
+		jsonData["/date_updated"_json_pointer].get<std::string>(),
+		jsonData["/ttl"_json_pointer].get<int>(),
+		jsonData["/username"_json_pointer].get<std::string>(),
+		jsonData["/password"_json_pointer].get<std::string>()
+	);
+
+	// Ice Server URIs
+	for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
+		std::string strSDPCandidate = jsonICEServer["url"].get<std::string>();
+		m_twilioNTSInformation.AddICEServerURI(strSDPCandidate);
+	}
+
+	DEBUG_LINEOUT("Twilio NTS Information Loaded");
+	m_twilioNTSInformation.Print();
+
+	m_loginState.fHasTwilioInformation = true;
+	UpdateLoginState();
+
+Error:
+	return;
+}
+
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {
 	RESULT r = R_PASS;
 
@@ -606,6 +741,35 @@ RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json 
 	//	jsonResponse["/errors"_json_pointer][0];
 
 Error:
+	return r;
+}
+
+RESULT UserController::UpdateLoginState() {
+	RESULT r = R_PASS;
+
+	if (m_loginState.fHasAccessToken &&
+		m_loginState.fHasUserProfile &&
+		m_loginState.fHasEnvironmentId &&
+		m_loginState.fHasTwilioInformation) {
+
+		if (!m_loginState.fPendingConnect) {
+			m_loginState.fPendingConnect = true;
+
+			m_user.SetDefaultEnvironmentID(m_defaultEnvironmentId);
+			m_user.SetToken(m_strAccessToken);
+
+			if (!IsLoggedIn()) {
+
+				auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CN(pEnvironmentController);
+				CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
+				SetIsLoggedIn(true);
+			}
+		}
+	}
+
+Error:
+	m_loginState.fPendingConnect = false;
 	return r;
 }
 

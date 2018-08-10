@@ -20,6 +20,9 @@ class EnvironmentAsset;
 
 class DreamContentView;
 
+// Test Users login (refresh) tokens for users test<key>@dreamos.com
+extern std::map<int, std::string> k_refreshTokens;
+
 class CloudTestSuite : public TestSuite, 
 					   public MenuController::observer,
 					   public CloudController::EnvironmentObserver
@@ -37,6 +40,9 @@ public:
 	RESULT AddTestConnectLogin();
 	RESULT AddTestMenuAPI();
 	RESULT AddTestMultiConnectTest();
+
+	//TODO: remove when tests don't need pipelines
+	RESULT SetupPipeline();
 
 	// Functionality
 	RESULT LaunchDreamView();
@@ -75,9 +81,15 @@ private:
 	CloudController *GetCloudController();
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
 	CloudController *m_pCloudController = nullptr;
+	UserController *m_pUserController = nullptr;
 	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
+
+public:
+	static std::string GetTestUserRefreshToken(int testUserID) {
+		return k_refreshTokens[testUserID];
+	}
 };
 
 #endif // ! MENU_CONTROLLER_TEST_SUITE_H_

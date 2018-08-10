@@ -50,12 +50,14 @@ public:
 	virtual int NumChannels() override;
 	virtual int SamplingRate() override;
 	virtual int BitsPerSample() override;
+	virtual int BytesPerSample() override;
 	virtual int GetNumFrames() override;
 	virtual int GetNumSamples() override;
 
 	virtual void* GetDataBuffer() override;
 
 	virtual RESULT GetAudioBuffer(float* &pAudioData_n) override;
+	virtual RESULT GetAudioBuffer(float* &pAudioData_n, int numChannels) override;
 
 private:
 	RIFFChunk m_riffChunk;

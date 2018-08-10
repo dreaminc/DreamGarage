@@ -27,6 +27,9 @@ std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int wi
 
 	m_webBrowserControllers.push_back(pWebBrowserController);
 
+	DOSLOG(INFO, "Added new browser controller");
+
+
 // Success:
 	return pWebBrowserController;
 

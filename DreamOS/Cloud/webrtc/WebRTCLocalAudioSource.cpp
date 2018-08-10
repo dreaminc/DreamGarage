@@ -57,57 +57,84 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 
 	CN(m_pLocalAudioTrackSink);
 
-	//m_pLocalAudioSourceSink->OnData(
-	//	pendingAudioPacket.GetDataBuffer(),
-	//	pendingAudioPacket.GetBitsPerSample(),
-	//	pendingAudioPacket.GetSamplingRate(),
-	//	pendingAudioPacket.GetNumChannels(),
-	//	pendingAudioPacket.GetNumFrames()
-	//);
+	m_pLocalAudioTrackSink->OnData(
+		pendingAudioPacket.GetDataBuffer(),
+		pendingAudioPacket.GetBitsPerSample(),
+		pendingAudioPacket.GetSamplingRate(),
+		pendingAudioPacket.GetNumChannels(),
+		pendingAudioPacket.GetNumFrames()
+	);
 
-	int samples_per_sec = 44100
-		;
-	//int nSamples = pendingAudioPacket.GetNumFrames();
+	/* DEBUG
+	int samples_per_sec = pendingAudioPacket.GetSamplingRate();
 	int nSamples = pendingAudioPacket.GetNumFrames();
-	
-	//int nSamples = samples_per_sec * 0.01f; // 10 ms audio
+	int channels = pendingAudioPacket.GetNumChannels();
 
-	int channels = 1;
-	
-	static double theta = 0.0f;
-	double freq = 440.0f;
+	static int16_t *pStaticDataBufferSine = nullptr;  
+	static int16_t *pStaticDataBufferSine2 = nullptr;
+	static int16_t *pStaticDataBufferEmpty = nullptr;
 
-	if (m_strAudioTrackLabel == "chrome_audio_label")
-		freq *= 2.0f;
+	if (pStaticDataBufferSine == nullptr) {
 
-	int16_t *pDataBuffer = nullptr;  
-	
-	if (pDataBuffer == nullptr) {
-		pDataBuffer = new int16_t[nSamples * channels];
+		pStaticDataBufferSine = new int16_t[nSamples * channels];
+		pStaticDataBufferSine2 = new int16_t[nSamples * channels];
+
+		double theta = 0.0f;
+		//double theta2 = 0.0f;
 
 		for (int i = 0; i < nSamples * channels; i++) {
-			float val = sin(theta);
-			//val *= 0.25f;
+			// sine
+			//float val = sin(theta);
+			//float val2 = sin(theta * 1.5f);
+
+			// saw
+			float val = (fmod(theta / (2.0f * M_PI), 1.0f) * 2.0f) - 1.0f;
+			float val2 = (fmod((theta * 2.0f) / (2.0f * M_PI), 1.0f) * 2.0f) - 1.0f;
+
+			//float val2 = 0.0f;
+
+			val *= 0.5f;
+			val2 *= 0.5f;
 
 			for (int j = 0; j < channels; j++) {
-				pDataBuffer[i + j] = (int16_t)(val * 10000.0f);
+				pStaticDataBufferSine[i + j] = (int16_t)(val * 10000.0f);
+				pStaticDataBufferSine2[i + j] = (int16_t)(val2 * 10000.0f);
 			}
 
 			// increment theta
-			theta += ((2.0f * M_PI) / (float)samples_per_sec) * freq;
-			if (theta >= 2.0f * M_PI) {
-				theta = theta - (2.0f * M_PI);
-			}
+			theta += ((2.0f * M_PI) / nSamples) * 6.0f;
+
+			//if (theta >= (2.0f * M_PI)) {
+			//	theta = theta - (2.0f * M_PI);
+			//}
 		}
 	}
 
-	m_pLocalAudioTrackSink->OnData(
-		pDataBuffer,
-		16,
-		samples_per_sec,
-		channels,
-		nSamples
-	);
+	if (pStaticDataBufferEmpty == nullptr) {
+		pStaticDataBufferEmpty = new int16_t[nSamples * channels];
+		memset(pStaticDataBufferEmpty, 0, sizeof(int16_t) * nSamples * channels);
+	}
+
+	if (m_strAudioTrackLabel == "user_audio_label") {
+		m_pLocalAudioTrackSink->OnData(
+			pStaticDataBufferSine,
+			16,
+			samples_per_sec,
+			channels,
+			nSamples
+		);
+	}
+	else {
+		m_pLocalAudioTrackSink->OnData(
+			//pStaticDataBufferEmpty,
+			pStaticDataBufferSine2,
+			16,
+			samples_per_sec,
+			channels,
+			nSamples
+		);
+	}
+	*/
 
 Error:
 	return r;

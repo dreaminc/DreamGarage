@@ -1,6 +1,8 @@
 #include "SoundClient.h"
 
 #include "SoundFile.h"
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
 
 SoundClient::SoundClient() {
 	// empty
@@ -11,12 +13,12 @@ SoundClient::~SoundClient() {
 }
 
 
-RESULT SoundClient::InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SoundClient::InitializeCaptureSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pCaptureSoundBuffer == nullptr));
 
-	m_pCaptureSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pCaptureSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pCaptureSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Capture Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
@@ -25,12 +27,12 @@ Error:
 	return r;
 }
 
-RESULT SoundClient::InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType) {
+RESULT SoundClient::InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
 	RESULT r = R_PASS;
 
 	CB((m_pRenderSoundBuffer == nullptr));
 
-	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, bufferType);
+	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
 	CN(m_pRenderSoundBuffer);
 
 	DEBUG_LINEOUT("Initialized Render Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
@@ -39,6 +41,20 @@ Error:
 	return r;
 }
 
+// TODO: This might not be needed 
+RESULT SoundClient::InitializeSpatialSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pSpatialSoundBuffer == nullptr));
+
+	m_pSpatialSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
+	CN(m_pSpatialSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Spatial Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
 
 bool SoundClient::IsRunning() {
 	return (m_renderState == state::RUNNING);
@@ -85,6 +101,29 @@ RESULT SoundClient::StopRender() {
 	// Join thread
 	if (m_audioRenderProcessingThread.joinable()) {
 		m_audioRenderProcessingThread.join();
+	}
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StartSpatial() {
+	DEBUG_LINEOUT("SoundClient::StartSpatial");
+
+	// This will kick off the audio spatial process defined in the sound client implementation
+	m_spatialState = state::RUNNING;
+	m_audioSpatialProcessingThread = std::thread(&SoundClient::AudioSpatialProcess, this);
+
+	return R_PASS;
+}
+
+RESULT SoundClient::StopSpatial() {
+	DEBUG_LINEOUT("SoundClient::StopSpatial");
+
+	m_spatialState = state::STOPPED;
+
+	// Join thread
+	if (m_audioSpatialProcessingThread.joinable()) {
+		m_audioSpatialProcessingThread.join();
 	}
 
 	return R_PASS;
@@ -201,4 +240,45 @@ Error:
 		pFloatAudioBuffer = nullptr;
 	}
 	return r;
+}
+
+// Spatial Sound Objects
+std::shared_ptr<SpatialSoundObject> SoundClient::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<SpatialSoundObject>	pSpatialSoundObject = nullptr;
+
+	CBM((m_spatialSoundObjects.size() < m_maxSpatialSoundObjects), "Cannot add another spatial audio object");
+
+	pSpatialSoundObject = MakeSpatialAudioObject(ptPosition, vEmitterDirection, vListenerDirection);
+	CNM(pSpatialSoundObject, "Failed to create spatial sound object");
+
+	// Add to our storage
+
+	m_spatialSoundObjects.push_back(pSpatialSoundObject);
+
+	return pSpatialSoundObject;
+
+Error:
+	if (pSpatialSoundObject != nullptr) {
+		pSpatialSoundObject = nullptr;
+	}
+
+	return nullptr;
+}
+
+bool SoundClient::FindSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject) {
+	auto it = std::find(m_spatialSoundObjects.begin(), m_spatialSoundObjects.end(), pSpatialSoundObject);
+	
+	if (it == m_spatialSoundObjects.end()) 
+		return false;
+	else 
+		return true;
+}
+
+RESULT SoundClient::ClearSpatialSoundObjects() {
+	
+	m_spatialSoundObjects.clear();
+
+	return R_PASS;
 }

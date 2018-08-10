@@ -29,9 +29,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-//	CR(AddTestSkybox());
+	CR(AddTestWaterShader());
 
-//	CR(AddTestWaterShader());
+	CR(AddTestSkybox());
 
 	CR(AddTestStandardShader());
 
@@ -403,7 +403,9 @@ RESULT HALTestSuite::AddTestSkybox() {
 		RESULT r = R_PASS;
 
 		CR(SetupSkyboxPipeline("standard"));
+
 		CR(Initialize());
+
 		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
 
 	Error:

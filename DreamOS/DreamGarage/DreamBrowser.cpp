@@ -360,6 +360,10 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 			headermap = it->second;
 		}
 	}
+	// TODO: check for api url
+	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	//pUserController->GetAccessToken()
+
 
 	return r;
 }
@@ -682,6 +686,10 @@ Error:
 // TODO: Turn off CEF when we're not using it
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
+
+	if (m_pBrowserTexture == nullptr) {
+		DOSLOG(INFO, "browser texture not initialized");
+	}
 
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
