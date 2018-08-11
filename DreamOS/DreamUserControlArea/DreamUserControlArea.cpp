@@ -898,6 +898,18 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	return r;
 }
 
+RESULT DreamUserControlArea::ShutdownAllSources() {
+	RESULT r = R_PASS;
+
+	m_pDreamTabView->ShutdownAllSources();
+
+//	m_pActiveSource->CloseSource();
+//	m_pActiveSource = nullptr;
+	CloseActiveAsset();
+
+	return r;
+}
+
 RESULT DreamUserControlArea::CloseActiveAsset() {
 	RESULT r = R_PASS;
 

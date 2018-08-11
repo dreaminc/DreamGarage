@@ -1142,6 +1142,8 @@ RESULT DreamGarage::OnLogout() {
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
+	CR(m_pDreamUserControlArea->ShutdownAllSources());
+
 	m_pDreamUserApp->GetBrowserManager()->DeleteCookies();
 	//m_pDreamUserApp->ResetBrowserManager();
 

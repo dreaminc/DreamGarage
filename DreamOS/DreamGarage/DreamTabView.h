@@ -64,6 +64,9 @@ public:
 
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
+	// Called on logout, closes all tabs
+	RESULT ShutdownAllSources();
+
 //	std::vector<std::shared_ptr<UIButton>> GetTabButtons();
 
 private:
@@ -119,6 +122,8 @@ private:
 
 	std::queue<std::pair<UIButton*, void *>> m_pendingSelectTabQueue;
 	bool m_fAllowObjectRemoval = false;
+
+	bool m_fDeleteAllTabs = false;
 };
 
 #endif // ! DREAM_TAB_VIEW_H_
