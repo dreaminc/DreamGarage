@@ -313,8 +313,8 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 			CN(pTestContext->pWASAPISoundClient);
 			CR(pTestContext->pWASAPISoundClient->RegisterObserver(pTestContext));
 
-			CR(pTestContext->pWASAPISoundClient->StartRender());
-			CR(pTestContext->pWASAPISoundClient->StartCapture());
+			//CR(pTestContext->pWASAPISoundClient->StartRender());
+			
 
 			///*
 			pTestContext->pXAudioSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
@@ -324,6 +324,8 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 			CN(pTestContext->pXAudioSpatialSoundObject);
 
 			CR(pTestContext->pXAudioSoundClient->StartSpatial());
+
+			CR(pTestContext->pWASAPISoundClient->StartCapture());
 			//*/
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);

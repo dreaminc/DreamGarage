@@ -416,18 +416,18 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		if (NumPendingBytes() >= numFrameCount) {
+			{
+				size_t bufferCounter = 0;
+				CBType tempVal = 0;
 
-		{
-			size_t bufferCounter = 0;
-			CBType tempVal = 0;
+				for (int j = 0; j < numFrameCount; j++) {
+					for (int i = 0; i < m_channels; i++) {
+						CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
 
-			for (int j = 0; j < numFrameCount; j++) {
-				for (int i = 0; i < m_channels; i++) {
-					CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
-
-					pTargetDataBuffer[bufferCounter] = tempVal;
-					bufferCounter++;
+						pTargetDataBuffer[bufferCounter] = tempVal;
+						bufferCounter++;
+					}
 				}
 			}
 		}
