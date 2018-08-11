@@ -232,6 +232,8 @@ Error:
 RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	RESULT r = R_PASS;
 
+	MenuNode* pRootMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "");
+
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
 	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
@@ -240,6 +242,8 @@ RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 
 	//CBR(m_pathStack.empty(), R_SKIPPED);
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+	m_pMenuNode = nullptr;
+	m_pathStack.push(std::make_shared<MenuNode>(pRootMenuNode));
 
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
@@ -247,6 +251,28 @@ RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	if (fResetComposite) {
 		CR(ResetAppComposite());
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ShowOpenMenu() {
+	RESULT r = R_PASS;
+
+	MenuNode* pRootMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "");
+	MenuNode* pOpenMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "");
+
+	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
+	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
+
+	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
+
+	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+	m_pathStack.push(std::make_shared<MenuNode>(pRootMenuNode));
+	m_pathStack.push(std::make_shared<MenuNode>(pOpenMenuNode));
+
+	m_pMenuControllerProxy->RequestSubMenu("MenuProviderScope.OpenMenuProvider", "", "Open");
 
 Error:
 	return r;
@@ -264,16 +290,20 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				CR(m_pUserHandle->SendReleaseKeyboard());
 				m_pKeyboardHandle = nullptr;
 
-				CR(RequestMenu());
+				RequestMenu();
 				//break;
 			}
 
 			else if (!m_pathStack.empty()) {
 				CR(PopPath());
+				if (m_pathStack.empty()) {	// if stack is empty after pop, hide the app
+					CR(HideApp());
+					m_pMenuNode = nullptr;
+				}
+			}
 
-				// if the stack is empty after popping from the path, hide the app
-				CBR(m_pathStack.empty(), R_SKIPPED);
-				CR(HideApp());
+			else {
+				ShowRootMenu(false);
 			}
 
 		} break;
@@ -287,6 +317,7 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 			CR(m_pUserHandle->SendClearFocusStack());
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+			m_pMenuNode = nullptr;
 				
 		} break;
 
@@ -297,7 +328,10 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 			} 
 			m_pUserHandle->SendPreserveSharingState(true);
+			
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+			m_pMenuNode = nullptr;
+
 			if (m_pParentApp != nullptr) {
 				CR(m_pParentApp->CreateBrowserSource());
 			}
@@ -328,7 +362,8 @@ RESULT DreamUIBar::RequestMenu() {
 	std::shared_ptr<MenuNode> pNode;
 	CBR(!m_pathStack.empty(), R_SKIPPED);
 
-	pNode = m_pathStack.top();
+	pNode = m_pathStack.top();	
+	m_pMenuNode = nullptr;
 
 	CR(RequestIconFile(pNode));
 
@@ -401,6 +436,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
 			CR(RequestIconFile(pSubMenuNode));
+			m_pathStack.push(pSubMenuNode);
 
 			m_fWaitingForMenuResponse = true;
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
@@ -408,8 +444,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
-				auto pTempMenuNode = std::shared_ptr<MenuNode>(new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType(), pSubMenuNode->GetIconURL(), pSubMenuNode->GetThumbnailURL()));
-				m_pathStack.push(pTempMenuNode);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
 
@@ -420,10 +454,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
-				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
-
 			}
-//*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
@@ -435,6 +466,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					if (m_pParentApp != nullptr) {
 						CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
 					}
+					//m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+					//m_pMenuNode = nullptr;
 				}
 				else if (strTitle == "Website") {
 					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
@@ -453,9 +486,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 					CR(pEnvironmentControllerProxy->RequestForm(strPath));
 				}
+				m_pathStack.pop();	// Don't save ACTION nodes to stack	
 				ClearMenuWaitingFlag();
 			}
-//*/
 		}
 	}
 
@@ -844,10 +877,7 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		m_pMenuNode = pMenuNode;
 	}
 	else {	// opening new layer of the menu
-		m_pMenuNode = pMenuNode;
-		if (m_pathStack.empty()) {
-			m_pathStack.push(m_pMenuNode);
-		}
+		m_pMenuNode = pMenuNode;	
 		m_pMenuNode->SetDirty();
 	}
 	m_fAddNewMenuItems = true;

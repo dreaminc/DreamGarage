@@ -298,7 +298,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
-		CR(m_pDreamUIBar->ShowRootMenu(false));
+		CR(m_pDreamUIBar->ShowOpenMenu());
 		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 		CR(Hide());
 	} break;
@@ -764,7 +764,7 @@ RESULT DreamUserControlArea::CreateBrowserSource() {
 	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 	if (m_strURL == "") {
-		CR(m_pDreamUIBar->ShowRootMenu(false));
+		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK));
 		m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 	}
 	else {
@@ -1001,25 +1001,26 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		if (m_fKeyboardUp) {
 			HideWebsiteTyping();
 		}
-		else if (m_pDreamUIBar->IsEmpty()) {
+		
+		else if (!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) {	// Pulling up Menu from nothing
 			CR(m_pDreamUIBar->ShowRootMenu());
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			m_pDreamUserApp->SetHasOpenApp(true);
 
-			ResetAppComposite();
-
-			if (m_fHasOpenApp) {
-//			if (m_pDreamUserApp->m_fHasOpenApp) {
-				Hide();
-			}
-			else {
-				m_pDreamUserApp->SetHasOpenApp(true);
-			}
+			ResetAppComposite();	
 		}
-		else {
+		
+		else if (m_fHasOpenApp && m_pControlView->IsVisible()) {	// Pressing Menu while we have content open
+			Hide();
+			m_pDreamUIBar->ShowRootMenu();
+			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			ResetAppComposite();
+		}
+
+		else {	// Pressing back while in Menu
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
-			if (m_pDreamUIBar->IsEmpty()) {
+			if (m_pDreamUIBar->IsEmpty()) {	// Case where pressing back on Top level menu
 				if (m_fHasOpenApp) {
-			//	if (m_pDreamUserApp->m_fHasOpenApp) {
 					Show();
 				}
 				else {

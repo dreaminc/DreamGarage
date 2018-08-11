@@ -66,7 +66,7 @@ RESULT MultiContentTestSuite::Initialize() {
 	CN(m_pDreamOS);
 
 	m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	CN(m_pTestTextureUser1);
 	CN(m_pTestTextureUser2);

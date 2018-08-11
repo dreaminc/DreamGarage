@@ -292,7 +292,7 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 
 	float titleWidth = m_titleWidth * totalWidth;
 	m_pTitleQuad = m_pTitleView->AddQuad(titleWidth, titleWidth * m_titleAspectRatio);
-	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(titleWidth / 2.0f, totalWidth * m_titleHeight, 0.0f));
 	m_pTitleQuad->SetVisible(false);

@@ -44,6 +44,15 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	InitializeMimeToString();
 }
 
+MenuNode::MenuNode(MenuNode* pMenuNode) :
+	m_nodeType(pMenuNode->GetNodeType()),
+	m_strPath(pMenuNode->GetPath()),
+	m_strScope(pMenuNode->GetScope()),
+	m_strTitle(pMenuNode->GetTitle())
+{
+	// stub
+}
+
 MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType) :
 	m_nodeType(nodeType),
 	m_strPath(strPath),

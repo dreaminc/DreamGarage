@@ -28,7 +28,7 @@ DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 }
 
 DreamBrowser::~DreamBrowser(){
-	/*
+	///*
 	RESULT r = R_PASS;
 
 	CR(Shutdown());
@@ -41,9 +41,9 @@ Error:
 RESULT DreamBrowser::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	/*
+	///*
 	if (m_pWebBrowserManager != nullptr) {
-		CR(m_pWebBrowserManager->Shutdown());
+		m_pWebBrowserManager->Shutdown();
 		//m_pWebBrowserManager = nullptr;
 	}
 	//*/
