@@ -446,9 +446,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				else if (strScope == "SystemScope.SignOut") {
 					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-					// TODO: this is incomplete, need to disconnect from environment socket
-					// just for testing environment fadeout
-					//pUserController->SetIsLoggedIn(false);
 					CR(pUserController->Logout());
 
 				}

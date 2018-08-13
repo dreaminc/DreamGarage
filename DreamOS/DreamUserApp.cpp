@@ -877,27 +877,6 @@ Error:
 	return m_pWebBrowserManager;
 }
 
-RESULT DreamUserApp::ResetBrowserManager() {
-	RESULT r = R_PASS;
-
-	std::string strDeleteCEFCache;
-	std::wstring wstrAppDataPath;
-	const char *deleteCEFCacheCommand;
-
-	m_pWebBrowserManager->Shutdown();
-	m_pWebBrowserManager = nullptr;
-
-	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
-	//strDeleteCEFCache = "rmdir /s /q " + util::WideStringToString(wstrAppDataPath) + "CEFCache\\";
-	strDeleteCEFCache = "del /f /s /q " + util::WideStringToString(wstrAppDataPath) + "CEFCache\\";
-	deleteCEFCacheCommand = strDeleteCEFCache.c_str();
-	system(deleteCEFCacheCommand);
-
-	
-//Error:
-	return r;
-}
-
 RESULT DreamUserApp::UpdateHeight(float heightDiff) {
 
 	point ptComposite = GetComposite()->GetPosition();

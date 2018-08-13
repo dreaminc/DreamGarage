@@ -1147,7 +1147,6 @@ RESULT DreamGarage::OnLogout() {
 	CR(m_pDreamUserControlArea->ShutdownAllSources());
 
 	m_pDreamUserApp->GetBrowserManager()->DeleteCookies();
-	//m_pDreamUserApp->ResetBrowserManager();
 
 Error:
 	return r;
@@ -1277,7 +1276,6 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
 		CR(m_pDreamSettings->Show());
 	}
-	//else if (strKey == "FormKey.")
 	else {
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
 		CR(m_pDreamGeneralForm->Show());

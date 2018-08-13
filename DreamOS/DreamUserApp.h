@@ -199,7 +199,6 @@ public:
 	RESULT SetScale(float widthScale);
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
-	RESULT ResetBrowserManager();
 
 	RESULT UpdateHeight(float heightDiff);
 	RESULT UpdateDepth(float depthDiff);
