@@ -65,6 +65,8 @@ public:
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
 	// Called on logout, closes all tabs
+	RESULT FlagShutdownAllSources();
+	// Execute shutdown of sources during Update
 	RESULT ShutdownAllSources();
 
 //	std::vector<std::shared_ptr<UIButton>> GetTabButtons();

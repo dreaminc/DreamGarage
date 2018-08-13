@@ -72,26 +72,7 @@ RESULT DreamTabView::Update(void *pContext) {
 	}
 
 	if (m_fDeleteAllTabs) {
-
-		m_fDeleteAllTabs = false;
-
-		for (auto pSource : m_sources) {
-			pSource->CloseSource();
-			pSource = nullptr;
-		}
-		m_sources.clear();
-
-		for (auto pButton : m_tabButtons) {
-			GetDOS()->UnregisterInteractionObject(pButton.get());
-			GetDOS()->RemoveObjectFromInteractionGraph(pButton.get());
-			GetDOS()->RemoveObjectFromUIGraph(pButton.get());
-			m_pScrollView->RemoveChild(pButton);
-			pButton = nullptr;
-		}
-		m_tabButtons.clear();
-
-
-		m_appToTabMap.clear();
+		CRM(ShutdownAllSources(), "Shutdown of content failed");
 	}
 
 Error:
@@ -323,10 +304,36 @@ RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pC
 	return R_PASS;
 }
 
-RESULT DreamTabView::ShutdownAllSources() {
+RESULT DreamTabView::FlagShutdownAllSources() {
 	RESULT r = R_PASS;
 
 	m_fDeleteAllTabs = true;
+	return r;
+}
+
+RESULT DreamTabView::ShutdownAllSources() {
+	RESULT r = R_PASS;
+
+	m_fDeleteAllTabs = false;
+
+	for (auto pSource : m_sources) {
+		pSource->CloseSource();
+		pSource = nullptr;
+	}
+	m_sources.clear();
+
+	for (auto pButton : m_tabButtons) {
+		GetDOS()->UnregisterInteractionObject(pButton.get());
+		GetDOS()->RemoveObjectFromInteractionGraph(pButton.get());
+		GetDOS()->RemoveObjectFromUIGraph(pButton.get());
+		CRM(m_pScrollView->RemoveChild(pButton), "failed to remove content from tab view");
+		pButton = nullptr;
+	}
+	m_tabButtons.clear();
+
+	m_appToTabMap.clear();
+
+Error:
 	return r;
 }
 

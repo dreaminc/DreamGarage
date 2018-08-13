@@ -1132,21 +1132,22 @@ Error:
 RESULT DreamGarage::OnLogout() {
 	RESULT r = R_PASS;
 
-
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
 	// reset settings before signing back in
 	std::string strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 
-	CR(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN));
-	CR(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN));
+	CNM(pUserController, "User controller was nullptr");
+
+	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
+	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
 
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
-	CR(m_pDreamUserControlArea->ShutdownAllSources());
+	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
-	m_pDreamUserApp->GetBrowserManager()->DeleteCookies();
+	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
 
 Error:
 	return r;

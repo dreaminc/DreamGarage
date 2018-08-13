@@ -903,7 +903,7 @@ Error:
 RESULT DreamUserControlArea::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
-	m_pDreamTabView->ShutdownAllSources();
+	m_pDreamTabView->FlagShutdownAllSources();
 	CloseActiveAsset();
 
 	return r;
