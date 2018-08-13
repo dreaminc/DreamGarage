@@ -65,10 +65,10 @@ RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 		auto tNow = std::chrono::high_resolution_clock::now();
 		double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - m_startTime).count();
 		double sDiff = msDiff / 1000.0f;
-		m_fadeProgress = sDiff / m_fadeDurationSeconds;
+		m_fadeProgress = 1.0 - (sDiff / m_fadeDurationSeconds);
 
-		if (m_fadeProgress > 1) {
-			m_fadeProgress = 1.0f;
+		if (m_fadeProgress < 0) {
+			m_fadeProgress = 0.0f;
 			m_fadeState = NONE;
 
 			if (m_fnOnFadeOutCallback != nullptr) {
@@ -84,10 +84,10 @@ RESULT OGLProgramScreenFade::ProcessNode(long frameID) {
 		auto tNow = std::chrono::high_resolution_clock::now();
 		double msDiff = std::chrono::duration_cast<std::chrono::milliseconds>(tNow - m_startTime).count();
 		double sDiff = msDiff / 1000.0f;
-		m_fadeProgress = 1.0f - (sDiff / m_fadeDurationSeconds);
+		m_fadeProgress = (sDiff / m_fadeDurationSeconds);
 
-		if (m_fadeProgress < 0) {
-			m_fadeProgress = 0.0f;
+		if (m_fadeProgress > 1) {
+			m_fadeProgress = 1.0f;
 			m_fadeState = NONE;
 			// execute function after setting to NONE
 			if (m_fnOnFadeInCallback != nullptr) {
@@ -114,7 +114,7 @@ RESULT OGLProgramScreenFade::FadeIn(std::function<RESULT(void*)> fnIn) {
 
 	m_startTime = std::chrono::high_resolution_clock::now();
 	m_fadeState = FADE_IN;
-	m_fadeProgress = 1.0f;
+	m_fadeProgress = 0.0f;
 
 	m_fnOnFadeInCallback = fnIn;
 
@@ -128,7 +128,7 @@ RESULT OGLProgramScreenFade::FadeOut(std::function<RESULT(void*)> fnOut) {
 
 	m_startTime = std::chrono::high_resolution_clock::now();
 	m_fadeState = FADE_OUT;
-	m_fadeProgress = 0.0f;
+	m_fadeProgress = 1.0f;
 
 	m_fnOnFadeOutCallback = fnOut;
 
@@ -145,4 +145,8 @@ RESULT OGLProgramScreenFade::FadeOutIn(std::function<RESULT(void*)> fnOut, std::
 
 Error:
 	return r;
+}
+
+float OGLProgramScreenFade::GetFadeProgress() {
+	return m_fadeProgress;
 }

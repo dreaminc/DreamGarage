@@ -103,6 +103,7 @@ public:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
+	RESULT Logout();
 	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
 	long GetUserDefaultEnvironmentID();

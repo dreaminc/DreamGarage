@@ -154,7 +154,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 	strURI += std::to_string(m_environment.GetEnvironmentID()); 
 	strURI += "/";
 
-	DEBUG_LINEOUT("Connecting to environment socket URL: %s", strURI.c_str());
+	DOSLOG(INFO, "Connecting to environment socket URL: %s", strURI.c_str());
 
 	// TODO: Not hard coded!
 	if (m_pEnvironmentWebsocket == nullptr) {
@@ -170,6 +170,17 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 	m_fConnected = true;
 
 	DOSLOG(INFO, "[EnvironmentController] user connected to socket:user=%v", user);
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::DisconnectFromEnvironmentSocket() {
+	RESULT r = R_PASS;
+
+	CNR(m_pEnvironmentWebsocket, R_SKIPPED);
+	CR(m_pEnvironmentWebsocket->Stop());
+	m_pEnvironmentWebsocket = nullptr;
 
 Error:
 	return r;

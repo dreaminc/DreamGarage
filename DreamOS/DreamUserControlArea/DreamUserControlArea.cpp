@@ -883,6 +883,7 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveSource, R_SKIPPED);
 	m_pActiveSource->CloseSource();
 	
 	if (m_pDreamDesktop == m_pActiveSource) {
@@ -894,6 +895,16 @@ RESULT DreamUserControlArea::ShutdownSource() {
 		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
 		//TODO: should set pBrowser to nullptr?
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::ShutdownAllSources() {
+	RESULT r = R_PASS;
+
+	m_pDreamTabView->FlagShutdownAllSources();
+	CloseActiveAsset();
 
 	return r;
 }

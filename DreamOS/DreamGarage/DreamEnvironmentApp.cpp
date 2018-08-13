@@ -114,7 +114,6 @@ Error:
 }
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
-	// only for testing
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
 	return R_PASS;
 }
@@ -155,9 +154,28 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 		return R_PASS;
 	};
 
+	float fadeProgress = 0.0f;
 	CNR(m_pFadeProgram, R_SKIPPED);
 
-	m_pFadeProgram->FadeOut(fnOnFadeOut);
+	fadeProgress = m_pFadeProgram->GetFadeProgress();
+	
+	if (fadeProgress == 1.0f) {
+		m_pFadeProgram->FadeOut(fnOnFadeOut);
+	}
+	else if (fadeProgress == 0.0f) {
+		m_pCurrentEnvironmentModel->SetVisible(true);
+		m_pFadeProgram->FadeIn();
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::FadeIn() {
+	RESULT r = R_PASS;
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+	m_pFadeProgram->FadeIn();
 
 Error:
 	return r;
