@@ -290,7 +290,8 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				CR(m_pUserHandle->SendReleaseKeyboard());
 				m_pKeyboardHandle = nullptr;
 
-				RequestMenu();
+				//RequestMenu();
+				PopPath();
 				//break;
 			}
 
@@ -314,7 +315,6 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			CR(m_pUserHandle->SendClearFocusStack());
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			m_pMenuNode = nullptr;
@@ -365,7 +365,7 @@ RESULT DreamUIBar::RequestMenu() {
 	pNode = m_pathStack.top();	
 	m_pMenuNode = nullptr;
 
-	CR(RequestIconFile(pNode));
+	//CR(RequestIconFile(pNode));
 
 	m_fWaitingForMenuResponse = true;
 	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
@@ -485,8 +485,10 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 					CR(pEnvironmentControllerProxy->RequestForm(strPath));
+					m_pUserHandle->SendSetPreviousApp(this);
 				}
-				m_pathStack.pop();	// Don't save ACTION nodes to stack	
+				m_pMenuNode = pSubMenuNode;
+				//m_pathStack.pop();	// Don't save ACTION nodes to stack	
 				ClearMenuWaitingFlag();
 			}
 		}
@@ -873,7 +875,6 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
 
 	if (m_pMenuNode && m_pMenuNode->GetPath() == pMenuNode->GetPath() && m_pMenuNode->GetScope() == pMenuNode->GetScope()) {		// Catch next page
-		// stubby stub stub
 		m_pMenuNode = pMenuNode;
 	}
 	else {	// opening new layer of the menu

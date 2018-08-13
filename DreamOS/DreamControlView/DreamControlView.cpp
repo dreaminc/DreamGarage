@@ -162,9 +162,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			bool fStreaming = false;
 
 			CR(Hide());
-			CN(m_pDreamUserApp);
-			CR(m_pDreamUserApp->ClearFocusStack());
-
+			m_pDreamUserApp->SetHasOpenApp(false);
 		}
 
 
@@ -379,8 +377,7 @@ RESULT DreamControlView::Dismiss() {
 	}
 
 	CR(Hide());
-	CN(m_pDreamUserApp);
-	CR(m_pDreamUserApp->ClearFocusStack());
+	CN(m_pDreamUserApp);	
 
 Error:
 	return r;
