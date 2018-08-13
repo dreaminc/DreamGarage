@@ -48,9 +48,9 @@ public:
 public:
 	RESULT HideEnvironment(void *pContext);
 	RESULT ShowEnvironment(void *pContext);
+	RESULT FadeIn();
 
 	RESULT SwitchToEnvironment(EnvironmentType type);
-
 
 private:
 	point m_ptSceneOffset;

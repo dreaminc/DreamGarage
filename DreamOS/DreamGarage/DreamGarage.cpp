@@ -412,6 +412,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	else {
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
+
+		CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 	}
 	
 Error:

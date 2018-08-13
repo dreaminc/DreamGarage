@@ -30,6 +30,8 @@ public:
 	RESULT FadeOut(std::function<RESULT(void*)> fnFadeOutCallback = nullptr);
 	RESULT FadeOutIn(std::function<RESULT(void*)> fnFadeOutCallback = nullptr, std::function<RESULT(void*)> fnFadeInCallback = nullptr);
 
+	float GetFadeProgress(); // 1 is faded out, 0 is faded in
+
 	// fade control uniforms
 private:
 	OGLUniformVector *m_pUniformFadeColor = nullptr;

@@ -40,7 +40,15 @@ void main(void) {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	}
 	
-	//out_vec4Color = (1.0f - u_fadeProgress) * color + u_fadeProgress * u_vec4FadeColor;
-	float sigmoidProgress = sigmoid(3.0f, u_fadeProgress);
-	out_vec4Color = (1.0f - sigmoidProgress) * color + sigmoidProgress * u_vec4FadeColor;
+	// sigmoid(3.0f, 1.0f) = 0.9526f, so we need to scale it for a pure black during the fade
+	// may make sense to not expose the rate in this way anymore
+	float scale = 1.0f / 0.9526f;
+	float sigmoidProgress = sigmoid(3.0f, u_fadeProgress) * scale;
+	if (sigmoidProgress < 0.05f) {
+		out_vec4Color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else {
+		//out_vec4Color = (1.0f - sigmoidProgress) * color + sigmoidProgress * u_vec4FadeColor;
+		out_vec4Color = (sigmoidProgress) * color + (1.0f - sigmoidProgress) * u_vec4FadeColor;
+	}
 }
