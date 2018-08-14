@@ -27,12 +27,6 @@ Error:
 RESULT CEFBrowserManager::Initialize() {
 	RESULT r = R_PASS;
 
-	/*
-	m_ServiceThread = std::thread(&CEFBrowserManager::CEFManagerThread, this);
-	std::unique_lock<std::mutex> lockCEFBrowserInitialization(m_mutex);
-	m_condBrowserInit.wait(lockCEFBrowserInitialization);
-	*/
-
 	CR(CEFManagerThread());
 
 	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");
@@ -283,6 +277,9 @@ Error:
 
 }
 
+#include <chrono>
+#include <thread>
+
 RESULT CEFBrowserManager::CEFManagerThread() {
 	RESULT r = R_PASS;
 
@@ -306,13 +303,16 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
-	
+
+#ifndef _DEBUG
+	// CEF will create the Directory(s) if necessary
 	std::wstring wstrAppDataPath;
 	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
 	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
+	
 	CefString(&cefSettings.cache_path) = wstrAppDataPath;
-	// CEF will create the Directory(s) if necessary
-
+#endif
+	
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
 	
@@ -330,9 +330,10 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp, nullptr), "CefInitialize error");
 
+	//std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
 	DOSLOG(INFO, "CefInitialize completed successfully");
 	m_state = state::INITIALIZED;
-	m_condBrowserInit.notify_one();
 
 	/*
 	DEBUG_LINEOUT("CEF Run message loop");
@@ -356,14 +357,20 @@ std::shared_ptr<WebBrowserController> CEFBrowserManager::MakeNewBrowser(int widt
 	std::shared_ptr<WebBrowserController> pWebBrowserController = nullptr;
 	DEBUG_LINEOUT("CEFApp: MakeNewBrowser");
 
-	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
-	CN(pCEFApp);
+	CBM((m_state == state::INITIALIZED), "MakeNewBrowser fail - CEFApp not yet initialized");
 
-	pWebBrowserController = pCEFApp->CreateBrowser(width, height, strURL);
-	CN(pWebBrowserController);
+	{
+		CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
+		CN(pCEFApp);
 
-// Success:
-	return pWebBrowserController;
+		pWebBrowserController = pCEFApp->CreateBrowser(width, height, strURL);
+		CN(pWebBrowserController);
+
+		// Success:
+		return pWebBrowserController;
+	}
+
+	return nullptr;
 
 Error:
 	if (pWebBrowserController != nullptr) {

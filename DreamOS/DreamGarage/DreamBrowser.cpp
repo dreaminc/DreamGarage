@@ -288,7 +288,9 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
+		
 		CR(m_pWebBrowserController->IsInputFocused());
+
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -320,7 +322,10 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	UIKeyboardHandle *pKeyboardHandle = nullptr;
 
-	CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
+	}
+
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		if (m_pWebBrowserController != nullptr) {
 			CR(m_pWebBrowserController->CanTabNext());
@@ -363,18 +368,21 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 		}
 	}
 
-	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	if (pUserController->IsLoggedIn()) {
-		// make a copy of strURL
-		std::string strLowercaseURL = strURL;
-		util::tolowerstring(strLowercaseURL);
+	if (GetDOS()->GetCloudController() != nullptr) {
+		auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-		for (std::string& strAuthURL : m_authenticatedURLs) {
-			if (strLowercaseURL.find(strAuthURL) == 0) {
-				std::string strAccessToken = pUserController->GetSavedAccessToken();
-				std::string strFirst = "Authorization";
-				std::string strSecond = "Bearer " + strAccessToken;
-				headermap.insert(std::pair<std::string, std::string>(strFirst, strSecond));
+		if (pUserController != nullptr && pUserController->IsLoggedIn()) {
+			// make a copy of strURL
+			std::string strLowercaseURL = strURL;
+			util::tolowerstring(strLowercaseURL);
+
+			for (std::string& strAuthURL : m_authenticatedURLs) {
+				if (strLowercaseURL.find(strAuthURL) == 0) {
+					std::string strAccessToken = pUserController->GetSavedAccessToken();
+					std::string strFirst = "Authorization";
+					std::string strSecond = "Bearer " + strAccessToken;
+					headermap.insert(std::pair<std::string, std::string>(strFirst, strSecond));
+				}
 			}
 		}
 	}
@@ -716,10 +724,12 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-	// when the browser gets a paint event, it checks if its texture is currently shared
+	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
+
 	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 Error:

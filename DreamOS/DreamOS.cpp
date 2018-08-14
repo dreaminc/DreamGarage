@@ -1194,10 +1194,9 @@ bool DreamOS::IsSharing() {
 }
 
 std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
-	RESULT r = R_PASS;
-	CN(m_pDreamShareView);
-	return m_pDreamShareView->GetCastingTexture();
-Error:
+	if(m_pDreamShareView != nullptr) 
+		return m_pDreamShareView->GetCastingTexture();
+	
 	return nullptr;
 }
 
@@ -1205,21 +1204,26 @@ RESULT DreamOS::SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture)
 	if (m_pDreamShareView != nullptr) {
 		m_pDreamShareView->SetCastingTexture(pSharedTexture);
 	}
+
 	return R_PASS;
 }
 
 RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
+
 	CN(m_pDreamShareView);
 	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
+
 Error:
 	return r;
 }
 
 RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
+
 	CN(m_pDreamShareView);
 	CR(m_pDreamShareView->BroadcastAudioPacket(pendingAudioPacket));
+
 Error:
 	return r;
 }

@@ -25,12 +25,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	CefMainArgs cefMainArgs(hInstance);
 
 	// Initialize Logging
-	auto pLoggerInstance = DreamLogger::instanceNoPathMgr("DCEF");
-	pLoggerInstance->Log(DreamLogger::Level::INFO, "Initialized DCEF logger");
+	
+	//auto pLoggerInstance = DreamLogger::instanceNoPathMgr("DCEF");
+	//pLoggerInstance->Log(DreamLogger::Level::INFO, "Initialized DCEF logger");
 
 	// Optional implementation of the CefApp interface.
 	CefRefPtr<DreamCEFApp> pDreamCEFApp(new DreamCEFApp());
-	return CefExecuteProcess(cefMainArgs, pDreamCEFApp.get(), nullptr);
+	int retVal = CefExecuteProcess(cefMainArgs, pDreamCEFApp.get(), nullptr);
 
-	//return CefExecuteProcess(cefMainArgs, nullptr, nullptr);
+	//pLoggerInstance->Log(DreamLogger::Level::INFO, "DCEF closing: %d", retVal);
+
+	return retVal;
 }
