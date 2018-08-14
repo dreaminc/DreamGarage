@@ -36,6 +36,7 @@ public:
 	RESULT AddTestPeerApps();
 	RESULT AddTestGamepadCamera();
 	RESULT AddTestEnvironmentSwitching();
+	RESULT AddTestEnvironmentSeating();
 
 	// Meta UI
 	RESULT AddTestMeta();

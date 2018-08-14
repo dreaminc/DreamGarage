@@ -745,6 +745,10 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
+
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+
 		CB(seatPosition < m_seatLookup.size());
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
@@ -1123,19 +1127,21 @@ RESULT DreamGarage::OnSetSettings() {
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 
-	// TODO: other pieces of login flow
-	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-
 	// TODO: choose environment based on api information
 	// TODO: with seating pass, the cave will look better
+
+	// the fade in now happens in OnNewSocketConnection
+	// TODO: would definitely prefer UserController to respond to OnNewSocketConection so that 
+	// it is a part of UpdateLoginState and the environment can fade in here
+
 	//m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE);
-	CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
-	CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+	//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+	//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
 	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
-Error:
+//Error:
 	return r;
 }
 
@@ -1158,6 +1164,8 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+
+	m_fSeated = false;
 
 Error:
 	return r;

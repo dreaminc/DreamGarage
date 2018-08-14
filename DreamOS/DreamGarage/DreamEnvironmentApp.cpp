@@ -80,9 +80,9 @@ RESULT DreamEnvironmentApp::PositionEnvironment(EnvironmentType type, std::share
 	}
 	else {
 		//pModel->RotateXByDeg(-90.0f);
-		//pModel->RotateYByDeg(90.0f);
+		pModel->RotateYByDeg(90.0f);
 		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
-		m_sceneScale = 0.025f;
+		m_sceneScale = 0.01f;
 	}
 	//*/
 
