@@ -232,8 +232,6 @@ Error:
 RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	RESULT r = R_PASS;
 
-	MenuNode* pRootMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "");
-
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
 	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
@@ -243,7 +241,7 @@ RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
 	//CBR(m_pathStack.empty(), R_SKIPPED);
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 	m_pMenuNode = nullptr;
-	m_pathStack.push(std::make_shared<MenuNode>(pRootMenuNode));
+	m_pathStack.push(std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "")));
 
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
 	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pMenuIcon.get());
@@ -259,9 +257,6 @@ Error:
 RESULT DreamUIBar::ShowOpenMenu() {
 	RESULT r = R_PASS;
 
-	MenuNode* pRootMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "");
-	MenuNode* pOpenMenuNode = new MenuNode(MenuNode::type::FOLDER, "", "MenuProviderScope.OpenMenuProvider", "Open", "", "https://static.develop.dreamos.com/menu/icon/open.ae3a6772bdc9.png", "");
-
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
 	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
@@ -269,8 +264,8 @@ RESULT DreamUIBar::ShowOpenMenu() {
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
-	m_pathStack.push(std::make_shared<MenuNode>(pRootMenuNode));
-	m_pathStack.push(std::make_shared<MenuNode>(pOpenMenuNode));
+	m_pathStack.push(std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", "")));
+	m_pathStack.push(std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "MenuProviderScope.OpenMenuProvider", "Open", "", "https://static.develop.dreamos.com/menu/icon/open.ae3a6772bdc9.png", "")));
 
 	RequestIconFile(m_pathStack.top());
 	m_pMenuControllerProxy->RequestSubMenu("MenuProviderScope.OpenMenuProvider", "", "Open");
