@@ -1,6 +1,7 @@
 #include "SpatialSoundObject.h"
 
 #include "SoundFile.h"
+#include "SoundBuffer.h"
 
 SpatialSoundObject::SpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection) :
 	VirtualObj(ptOrigin),

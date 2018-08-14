@@ -16,8 +16,9 @@
 #include "modules/audio_device/include/audio_device.h"
 //#include "webrtc/rtc_base/scoped_ref_ptr.h"
 
-#include "Sound/AudioPacket.h"
-#include "Sound/SoundBuffer.h"
+//#include "Sound/AudioPacket.h"
+//#include "Sound/SoundBuffer.h"
+#include "Primitives/CircularBuffer.h"
 
 // A wrapper over AudioDeviceModule that registers itself as AudioTransport
 // callback and redirects the PCM data to AudioDeviceDataObserver callback.

@@ -227,12 +227,17 @@ RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, SoundBuffer *pS
 
 	float *pFloatAudioBuffer = nullptr;
 
-	CN(pSoundBuffer);
+	CNM(pSoundBuffer, "Soundbuffer invalid");
 
-	pFloatAudioBuffer = (float*)malloc(sizeof(float) * numFrames);
-	CN(pFloatAudioBuffer);
+	//pFloatAudioBuffer = (float*)malloc(sizeof(float) * numFrames);
+	pFloatAudioBuffer = new float[numFrames];
+	CNM(pFloatAudioBuffer, "Failed to allocate float buffer");
 
-	CR(pSoundBuffer->LoadDataToInterlacedTargetBuffer(pFloatAudioBuffer, numFrames));
+	// This is safe since we control the type of buffer that goes into 
+	// the spatial sound object - the soundbuffer we get from capture 
+	// could be any type
+
+	CRM(pSoundBuffer->LoadDataToInterlacedTargetBufferTargetType(pFloatAudioBuffer, numFrames), "Failed to load data into buffer");
 
 	// DEBUG:
 

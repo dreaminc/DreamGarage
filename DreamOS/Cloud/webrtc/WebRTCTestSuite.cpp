@@ -21,6 +21,7 @@
 #include "Sound/SpatialSoundObject.h"
 
 #include "Cloud/CloudTestSuite.h"
+#include "Sound/AudioPacket.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)

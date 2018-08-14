@@ -301,6 +301,9 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				hr = pCaptureClient->GetBuffer(&pAudioCaptureBufferData, &numFramesAvailable, &audioDeviceFlags, nullptr, nullptr);
 				CR((RESULT)hr);
 
+				// TODO: We might want to handle different kind of 
+				// format types here - or convert elsewhere 
+
 				// Set to float data buffer
 				float *pFloatDataBuffer = (float*)(pAudioCaptureBufferData);
 
