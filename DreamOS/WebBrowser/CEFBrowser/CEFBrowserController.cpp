@@ -663,6 +663,7 @@ RESULT CEFBrowserController::TabPrevious() {
 
 RESULT CEFBrowserController::CanTabNext() {
 	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+
 	pFrame->ExecuteJavaScript("Dream.Browser.canTabNext();", pFrame->GetURL(), 0);
 
 	return R_PASS;

@@ -651,7 +651,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		RESULT r = R_PASS;
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
-		std::string strURL = "https://twitch.tv";
+		//std::string strURL = "https://twitch.tv";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -664,33 +665,33 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		CR(SetupDreamAppPipeline());
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// Create the 2D Mouse App
-		pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
-		CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
-
+		//pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		//CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
 
 		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		CN(pTestContext->m_pWebBrowserManager);
 		CR(pTestContext->m_pWebBrowserManager->Initialize());
-
-		// Create the Shared View App
-		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
-
-		pTestContext->m_pDreamBrowser->SetURI(strURL);
-
+			
+		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
 		CN(pTestContext->m_pBrowserQuad);
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+	
+		// Create the Shared View App
+		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+		
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+		
+		pTestContext->m_pDreamBrowser->SetURI(strURL);
 
 	Error:
 		return R_PASS;
