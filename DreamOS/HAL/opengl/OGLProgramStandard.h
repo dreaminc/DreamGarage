@@ -88,7 +88,6 @@ private:
 	float m_deltaTime; 
 
 	bool m_fPassThru = false;
-
 };
 
 #endif // ! OGLPROGRAM_STANDARD_H_

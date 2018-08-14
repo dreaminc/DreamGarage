@@ -86,7 +86,6 @@ void DreamCEFApp::OnWebKitInitialized() {
 	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
 	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
 
-
 Error:
 	return;
 }

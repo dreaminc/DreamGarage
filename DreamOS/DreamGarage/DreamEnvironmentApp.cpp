@@ -3,6 +3,7 @@
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
+#include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
 
 #include "Sandbox/CommandLineManager.h"
@@ -19,8 +20,6 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	auto pDreamOS = GetDOS();
 
-	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
-	m_sceneScale = 1.0f;
 	m_lightIntensity = 1.0f;
 	m_directionalIntensity = 2.0f;
 
@@ -34,83 +33,13 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	strEnvironmentPath = pCommandLineManager->GetParameterValue("environment.path");
 #endif
 
-	//TODO: environments probably won't all have the same lighting
-	if (strEnvironmentPath == "default") {
-		
-		// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
-		m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * m_vSunDirection));
-		m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), m_vSunDirection);
+	// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
+	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * m_vSunDirection));
+	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), m_vSunDirection);
 
-		//pDirectionalLight->EnableShadows();
+	//pDirectionalLight->EnableShadows();
 
-		//pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	}
-	else {
-		m_lightIntensity = 15.0f;
-	}
-
-	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(-5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	//pDreamOS->AddLight(LIGHT_POINT, m_lightIntensity, point(5.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-
-	if (strEnvironmentPath == "default") {
-		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
-		m_sceneScale = 0.1f;
-
-		//auto pModel = GetComposite()->AddModel(L"\\Cave\\cave_no_water_ib.fbx");
-		//CN(pModel);
-
-		//TODO: may need a way to load multiple files for the environment in a more general way
-		auto pModel = GetComposite()->AddModel(L"\\FloatingIsland\\env.obj");
-		CN(pModel);
-
-		//auto pRiver = GetComposite()->AddModel(L"\\FloatingIsland\\river.obj");
-		//CN(pRiver);
-
-		auto pClouds = GetComposite()->AddModel(L"\\FloatingIsland\\clouds.obj");
-		CN(pClouds);
-		pClouds->SetMaterialAmbient(0.8f, true);
-		pClouds->translateZ(-50.0f);
-
-		//pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
-		if (pOGLObj != nullptr) {
-			pOGLObj->SetOGLProgramPreCallback(
-				[](OGLProgram* pOGLProgram, void *pContext) {
-				// Do some stuff pre-render
-				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
-				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetRiverAnimation(true);
-				}
-				return R_PASS;
-			}
-			);
-
-			pOGLObj->SetOGLProgramPostCallback(
-				[](OGLProgram* pOGLProgram, void *pContext) {
-				// Do some stuff post
-
-				OGLProgramStandard *pOGLEnvironmentProgram = dynamic_cast<OGLProgramStandard*>(pOGLProgram);
-				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetRiverAnimation(false);
-				}
-				return R_PASS;
-			}
-			);
-		}
-	}
-	else {
-		auto pModel = GetComposite()->AddModel(util::StringToWideString(strEnvironmentPath));
-		pModel->RotateXByDeg(-90.0f);
-		pModel->RotateYByDeg(90.0f);
-		//TODO: in theory this should be 1.0f if the models we get are in meters
-		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
-	}
-	//*/
-
-	GetComposite()->SetPosition(m_ptSceneOffset);
-	GetComposite()->SetScale(m_sceneScale);
+	CR(LoadAllEnvironments());
 
 Error:
 	return r;
@@ -138,7 +67,141 @@ DreamEnvironmentApp* DreamEnvironmentApp::SelfConstruct(DreamOS *pDreamOS, void 
 	return pDreamApp;
 }
 
+RESULT DreamEnvironmentApp::PositionEnvironment(EnvironmentType type, std::shared_ptr<model> pModel) {
+	RESULT r = R_PASS;
+
+	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
+	m_sceneScale = 0.1f;
+
+	if (type == ISLAND) {
+		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
+		m_sceneScale = 0.1f;
+
+	}
+	else {
+		//pModel->RotateXByDeg(-90.0f);
+		//pModel->RotateYByDeg(90.0f);
+		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
+		m_sceneScale = 0.025f;
+	}
+	//*/
+
+	//GetComposite()->SetPosition(m_ptSceneOffset);
+	//GetComposite()->SetScale(m_sceneScale);
+	pModel->SetPosition(m_ptSceneOffset);
+	pModel->SetScale(m_sceneScale);
+
+	return r;
+
+}
+
+RESULT DreamEnvironmentApp::LoadAllEnvironments() {
+	RESULT r = R_PASS;
+
+	for (auto& filenamePair : m_environmentFilenames) {
+
+		//TODO: with unique environment shader, change this to MakeModel
+		std::shared_ptr<model> pModel = GetComposite()->AddModel(filenamePair.second);
+		CN(pModel);
+
+		m_environmentModels[filenamePair.first] = pModel;
+		pModel->SetVisible(false);
+		PositionEnvironment(filenamePair.first, pModel);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
+	m_pCurrentEnvironmentModel = m_environmentModels[type];
+	return R_PASS;
+}
+
 RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
 	m_skyboxPrograms = pPrograms;
 	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram) {
+	m_pFadeProgram = pFadeProgram;
+	return R_PASS;
+}
+
+RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
+	RESULT r = R_PASS;
+
+	auto fnOnFadeOut = [&](void *pContext) {
+		m_pCurrentEnvironmentModel->SetVisible(false);
+		m_pFadeProgram->FadeIn();
+		return R_PASS;
+	};
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+
+	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
+	RESULT r = R_PASS;
+
+	auto fnOnFadeOut = [&](void *pContext) {
+		m_pCurrentEnvironmentModel->SetVisible(true);
+		m_pFadeProgram->FadeIn();
+		return R_PASS;
+	};
+
+	float fadeProgress = 0.0f;
+	CNR(m_pFadeProgram, R_SKIPPED);
+
+	fadeProgress = m_pFadeProgram->GetFadeProgress();
+	
+	if (fadeProgress == 1.0f) {
+		m_pFadeProgram->FadeOut(fnOnFadeOut);
+	}
+	else if (fadeProgress == 0.0f) {
+		m_pCurrentEnvironmentModel->SetVisible(true);
+		m_pFadeProgram->FadeIn();
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::FadeIn() {
+	RESULT r = R_PASS;
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+	m_pFadeProgram->FadeIn();
+
+Error:
+	return r;
+}
+
+
+RESULT DreamEnvironmentApp::SwitchToEnvironment(EnvironmentType type) {
+	RESULT r = R_PASS;
+
+	m_currentType = type;
+
+	auto fnOnFadeOut = [&](void *pContext) {
+
+		m_pCurrentEnvironmentModel->SetVisible(false);
+		m_pCurrentEnvironmentModel = m_environmentModels[m_currentType];
+		m_pCurrentEnvironmentModel->SetVisible(true);
+
+		m_pFadeProgram->FadeIn();
+
+		return R_PASS;
+	};
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+
+	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
 }

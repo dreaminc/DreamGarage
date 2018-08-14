@@ -83,7 +83,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	//TODO: unregister/register instead of this flag?
-	CBR(m_fRespondToController, R_SKIPPED);
+	CBR(m_fFormVisible, R_SKIPPED);
 	CNR(m_pUserApp, R_SKIPPED);
 
 	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
@@ -142,7 +142,6 @@ RESULT DreamSettingsApp::Show() {
 	}
 	else {
 		CR(DreamFormApp::Show());
-		m_fRespondToController = true;
 		m_fPendShowFormView = false;
 	}
 
@@ -154,7 +153,6 @@ RESULT DreamSettingsApp::Hide() {
 	RESULT r = R_PASS;
 
 	CR(DreamFormApp::Hide());
-	m_fRespondToController = false;
 
 Error:
 	return r;

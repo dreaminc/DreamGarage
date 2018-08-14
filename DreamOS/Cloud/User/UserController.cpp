@@ -168,6 +168,21 @@ Error:
 	return r;
 }
 
+RESULT UserController::Logout() {
+	RESULT r = R_PASS;
+	
+	CBRM(IsLoggedIn(), R_SKIPPED, "User not logged in");
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist.");
+	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
+	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+	CR(SetIsLoggedIn(false));
+
+Error:
+	return r;
+}
+
 long UserController::GetUserDefaultEnvironmentID() {
 	return m_defaultEnvironmentId;
 //	return m_user.GetDefaultEnvironmentID();
@@ -348,7 +363,7 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 	{
 		HTTPResponse httpResponse;
 
-		std::string strAuthorizationToken = "Authorization: Token " + GetUserToken();
+		std::string strAuthorizationToken = "Authorization: Bearer " + GetSavedAccessToken();
 
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
@@ -773,6 +788,10 @@ Error:
 	return r;
 }
 
+std::string UserController::GetSavedAccessToken() {
+	return m_strAccessToken;
+}
+
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
 }
@@ -786,8 +805,13 @@ RESULT UserController::SetIsLoggedIn(bool fLoggedIn) {
 		CR(m_pUserControllerObserver->OnLogin());
 	}
 	else {
-		//TODO: currently SetIsLoggedIn is never called with false
 		CR(m_pUserControllerObserver->OnLogout());
+
+		// Reset 
+		m_loginState.fHasAccessToken = false;
+		m_loginState.fHasUserProfile = false;
+		m_loginState.fHasEnvironmentId = false;
+		m_loginState.fHasTwilioInformation = false;
 	}
 
 Error:
@@ -820,7 +844,7 @@ RESULT UserController::LoadTwilioNTSInformation() {
 
 	{
 		HTTPResponse httpResponse;
-		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		std::string strAuthorizationToken = "Authorization: Bearer " + m_strToken;
 		std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
 		HTTPController *pHTTPController = HTTPController::instance();
 

@@ -29,10 +29,11 @@ typedef enum {
 	OGLPROGRAM_CUSTOM,
 	OGLPROGRAM_SHADOW_DEPTH,
 	OGLPROGRAM_REFERENCE,
+	OGLPROGRAM_SCREEN_QUAD,
 	
 	// Production shaders - using features from previous shaders 
 	OGLPROGRAM_STANDARD, // used for models in the environment such as head and hands
-	OGLPROGRAM_SCREEN_QUAD,
+	OGLPROGRAM_SCREEN_FADE,
 	OGLPROGRAM_DEPTH_PEEL,
 	OGLPROGRAM_BLEND_QUAD,
 	OGLPROGRAM_BLUR_QUAD,
