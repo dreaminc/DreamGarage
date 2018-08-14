@@ -195,6 +195,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 			}
 			// If we scroll far enough to the right, request the next page of items
 			if (m_itemIndex > m_pScrollViewNodes.size() - m_nextPagePremptBuffer) {
+				CN(m_pObserver);
 				m_pObserver->GetNextPageItems();
 			}
 		}

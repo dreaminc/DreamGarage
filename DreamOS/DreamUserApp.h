@@ -75,7 +75,6 @@ public:
 	RESULT RequestAppBasisPosition(point& ptOrigin);
 	RESULT RequestAppBasisOrientation(quaternion& qOrigin);
 
-	RESULT SendClearFocusStack();
 	RESULT SendSetPreviousApp(DreamUserObserver* pObserver);
 
 	RESULT SendKBEnterEvent();

@@ -48,7 +48,9 @@ MenuNode::MenuNode(MenuNode* pMenuNode) :
 	m_nodeType(pMenuNode->GetNodeType()),
 	m_strPath(pMenuNode->GetPath()),
 	m_strScope(pMenuNode->GetScope()),
-	m_strTitle(pMenuNode->GetTitle())
+	m_strTitle(pMenuNode->GetTitle()),
+	m_strIconURL(pMenuNode->GetIconURL()),
+	m_strThumbnailURL(pMenuNode->GetThumbnailURL())
 {
 	// stub
 }

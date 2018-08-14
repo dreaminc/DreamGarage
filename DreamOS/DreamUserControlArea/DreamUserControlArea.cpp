@@ -1017,7 +1017,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			ResetAppComposite();
 		}
 
-		else {	// Pressing back while in Menu
+		else {	// Pressing back when Menu has a level saved
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
 			if (m_pDreamUIBar->IsEmpty()) {	// Case where pressing back on Top level menu
 				if (m_fHasOpenApp) {

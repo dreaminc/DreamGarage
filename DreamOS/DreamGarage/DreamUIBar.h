@@ -154,11 +154,12 @@ private:
 
 	std::shared_ptr<texture> m_pDefaultThumbnail = nullptr;
 	std::shared_ptr<texture> m_pDefaultIcon = nullptr;
-	std::shared_ptr<texture> m_pShareIcon = nullptr;
+	std::shared_ptr<texture> m_pMenuIcon = nullptr;
 	std::shared_ptr<texture> m_pMenuItemBg = nullptr;
 	texture* m_pOverlayLeft = nullptr;
 	texture* m_pOverlayRight = nullptr;
 	texture* m_pPendingIconTexture = nullptr;
+	std::shared_ptr<std::vector<uint8_t>> m_pPendingIconTextureBuffer;
 
 	std::shared_ptr<font> m_pFont;
 
