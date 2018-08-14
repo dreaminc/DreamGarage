@@ -189,6 +189,136 @@ public:
 		return r;
 	}
 
+	/*
+public:
+	// Cross conversion
+
+	// Unsigned byte
+
+	template<>
+	template<>
+	RESULT CircularBuffer<uint8_t>::ReadNextValueTargetType<float>(float &retVal) {
+		RESULT r = R_PASS;
+
+		uint8_t nextValue = 0;
+		CR(ReadNextValue(nextValue));
+
+		// Apply range
+		retVal = (float)((float)nextValue / (float)std::numeric_limits<int8_t>::max());
+
+		// Re-bias the value
+		retVal = (retVal * 2.0f) - 1.0f;
+
+	Error:
+		return r;
+	}
+
+	template<>
+	template<>
+	RESULT CircularBuffer<uint8_t>::ReadNextValueTargetType<double>(double &retVal) {
+		RESULT r = R_PASS;
+
+		uint8_t nextValue = 0;
+		CR(ReadNextValue(nextValue));
+
+		// Apply range
+		retVal = (double)((double)nextValue / (double)std::numeric_limits<int8_t>::max());
+
+		// Re-bias the value
+		retVal = (retVal * 2.0f) - 1.0f;
+
+	Error:
+		return r;
+	}
+
+	// Signed short
+
+	template<>
+	template<>
+	RESULT CircularBuffer<int16_t>::ReadNextValueTargetType<float>(float &retVal) {
+		RESULT r = R_PASS;
+
+		int16_t nextValue = 0;
+		CR(ReadNextValue(nextValue));
+		retVal = (float)((float)nextValue / (float)std::numeric_limits<int16_t>::max());
+
+	Error:
+		return r;
+	}
+
+	template<>
+	template<>
+	RESULT CircularBuffer<int16_t>::ReadNextValueTargetType<double>(double &retVal) {
+		RESULT r = R_PASS;
+
+		int16_t nextValue = 0;
+		CR(ReadNextValue(nextValue));
+		retVal = (double)((double)nextValue / (double)std::numeric_limits<int16_t>::max());
+
+	Error:
+		return r;
+	}
+
+	// Float
+
+	template<>
+	template<>
+	RESULT CircularBuffer<float>::ReadNextValueTargetType<uint8_t>(uint8_t &retVal) {
+		RESULT r = R_PASS;
+
+		float nextValue = 0;
+		CR(ReadNextValue(nextValue));
+
+		// Set to range of [0.0f, 1.0f] and multiple by the range
+		retVal = (uint8_t)(((nextValue + 1.0f) / 2.0f) * std::numeric_limits<uint8_t>::max());
+
+	Error:
+		return r;
+	}
+
+	template<>
+	template<>
+	RESULT CircularBuffer<float>::ReadNextValueTargetType<int16_t>(int16_t &retVal) {
+		RESULT r = R_PASS;
+
+		float nextValue = 0;
+		CR(ReadNextValue(nextValue));
+		retVal = (int16_t)(nextValue * std::numeric_limits<int16_t>::max());
+
+	Error:
+		return r;
+	}
+
+	// Double
+
+	template<>
+	template<>
+	RESULT CircularBuffer<double>::ReadNextValueTargetType<uint8_t>(uint8_t &retVal) {
+		RESULT r = R_PASS;
+
+		double nextValue = 0;
+		CR(ReadNextValue(nextValue));
+
+		// Set to range of [0.0f, 1.0f] and multiple by the range
+		retVal = (uint8_t)(((nextValue + 1.0f) / 2.0f) * std::numeric_limits<uint8_t>::max());
+
+	Error:
+		return r;
+	}
+
+	template<>
+	template<>
+	RESULT CircularBuffer<double>::ReadNextValueTargetType<int16_t>(int16_t &retVal) {
+		RESULT r = R_PASS;
+
+		double nextValue = 0;
+		CR(ReadNextValue(nextValue));
+		retVal = (int16_t)(nextValue * std::numeric_limits<int16_t>::max());
+
+	Error:
+		return r;
+	}*/
+
 private:
 	CBType m_circularBuffer[MAX_PENDING_BUFFER_LENGTH];
 
@@ -197,5 +327,8 @@ private:
 	size_t m_circularBuffer_c = 0;
 	size_t m_numPendingBytes = 0;
 };
+
+
+
 
 #endif // CIRCULAR_BUFFER_H_

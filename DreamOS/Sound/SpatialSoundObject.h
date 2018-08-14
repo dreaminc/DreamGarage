@@ -8,10 +8,11 @@
 
 #include "Primitives/VirtualObj.h"
 
-#include "SoundBuffer.h"
+#include "Sound/SoundCommon.h"
 
 class camera;
 class SoundFile;
+class SoundBuffer;
 
 class SpatialSoundObject : public VirtualObj {
 

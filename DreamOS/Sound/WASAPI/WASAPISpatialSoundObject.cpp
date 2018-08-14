@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <WindowsNumerics.h>
 
+#include "Sound/SoundBuffer.h"
 
 WASAPISpatialSoundObject::WASAPISpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
 	SpatialSoundObject(samplingRate, ptOrigin, vEmitterDirection, vListenerDirection),
