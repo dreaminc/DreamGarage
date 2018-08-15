@@ -4,6 +4,8 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 
+#include "AudioPacket.h"
+
 SoundClient::SoundClient() {
 	// empty
 }
@@ -240,6 +242,10 @@ Error:
 		pFloatAudioBuffer = nullptr;
 	}
 	return r;
+}
+
+RESULT SoundClient::PlayAudioPacket(AudioPacket pendingAudioPacket) {
+	return R_NOT_HANDLED;
 }
 
 // Spatial Sound Objects

@@ -13,6 +13,7 @@
 
 class SoundBuffer;
 class SoundFile;
+class AudioPacket;
 class SpatialSoundObject;
 class point;
 class vector;
@@ -95,6 +96,8 @@ public:
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
+
+	virtual RESULT PlayAudioPacket(AudioPacket pendingAudioPacket);
 
 private:
 	std::thread	m_audioRenderProcessingThread;
