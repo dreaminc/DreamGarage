@@ -149,6 +149,7 @@ public:
 	RESULT AddEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
+	RESULT OnDreamFormSuccess();
 	RESULT ShutdownSource();
 	RESULT ShutdownAllSources();
 

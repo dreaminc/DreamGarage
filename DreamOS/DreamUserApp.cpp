@@ -385,7 +385,7 @@ RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
 	if (!fHasOpenApp && m_pPreviousApp != nullptr) {
 		m_fHasOpenApp = true;
 		m_pEventApp = m_pPreviousApp;
-		//HandleUserObserverEvent(UserObserverEventType::BACK);
+		HandleUserObserverEvent(UserObserverEventType::BACK);
 		m_pPreviousApp = nullptr;
 	}
 	else {

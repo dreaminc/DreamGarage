@@ -23,6 +23,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamLoginApp.h"
 #include "DreamUserApp.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "DreamGarage/DreamGamepadCameraApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -392,6 +393,10 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
 	CN(m_pDreamSettings);
+
+	if (GetSandboxConfiguration().fUseGamepad) {
+		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+	}
 
 	// TODO: could be somewhere else(?)
 	CR(RegisterDOSObserver(this));
@@ -1041,21 +1046,18 @@ Error:
 
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
-	// TODO: populate these
-	bool fFirstLogin = true;
-	bool fHasCreds = false;
 
 	if (strMessage == "DreamSettingsApp.OnSuccess") {
 		std::string strFormType;
 		// this specific case is only when: not first login, has credentials, has no settings, has no team
-		if (!fFirstLogin && fHasCreds) {
+		if (!m_fFirstLogin && m_fHasCredentials) {
 			strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
 			m_pUserController->GetFormURL(strFormType);
 			m_pDreamLoginApp->Show();
 		}
 		// after the user has defined their settings, show sign up/sign in 
 		// based on whether this is the first launch or not
-		else if (fFirstLogin) {
+		else if (m_fFirstLogin) {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
 			m_pUserController->GetFormURL(strFormType);
 			m_pDreamLoginApp->Show();
@@ -1077,6 +1079,9 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 			m_pDreamUserApp->GetHeight(), 
 			m_pDreamUserApp->GetDepth(), 
 			m_pDreamUserApp->GetScale()));
+
+		// Resuming Dream functions if form was accessed out of Menu
+		m_pDreamUserControlArea->OnDreamFormSuccess();
 
 		// TODO: potentially where the lobby environment changes to the team environment
 		// could also be once the environment id is set

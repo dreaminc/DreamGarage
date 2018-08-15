@@ -986,6 +986,20 @@ RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
 	return R_PASS;
 }
 
+RESULT DreamUserControlArea::OnDreamFormSuccess() {
+	RESULT r = R_PASS;
+
+	if (!m_pDreamUIBar->IsEmpty()) {
+		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS));
+	}
+	else if (m_fHasOpenApp) {
+		CR(Show());
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
 
@@ -1001,8 +1015,8 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		if (m_fKeyboardUp) {
 			HideWebsiteTyping();
 		}
-		
-		else if (!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) {	// Pulling up Menu from nothing
+
+		else if ((!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) || (!m_pDreamUserApp->m_fHasOpenApp && !m_fHasOpenApp)) {	// Pulling up Menu from nothing
 			CR(m_pDreamUIBar->ShowRootMenu());
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
@@ -1024,8 +1038,8 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 					Show();
 				}
 				else {
-					m_pDreamUserApp->SetHasOpenApp(false);
 					m_pDreamUserApp->SetEventApp(nullptr);
+					m_pDreamUserApp->SetHasOpenApp(false);
 				}
 			}
 		}
