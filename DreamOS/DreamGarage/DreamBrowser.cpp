@@ -727,8 +727,9 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 
-	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	// TODO: Either put this back in or move it to a different layer
+	//CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	//CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
@@ -740,7 +741,9 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+	// TODO: Either put this back in or move it to a different layer
+	//if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+	if (m_pObserver != nullptr) {
 		CR(m_pObserver->HandleAudioPacket(pendingAudioPacket, this));
 	}
 

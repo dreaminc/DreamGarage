@@ -3,6 +3,7 @@
 #include <string>
 
 #include "Sound/SoundFile.h"
+#include "Sound/AudioPacket.h"
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
@@ -172,3 +173,13 @@ Error:
 	return r;
 }
 
+RESULT XAudio2SoundClient::PlayAudioPacket(AudioPacket pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	// TODO: 
+
+	CR(r);
+
+Error:
+	return r;
+}

@@ -36,6 +36,7 @@ public:
 
 	// XAudio doesn't need buffers apparently 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
+	virtual RESULT PlayAudioPacket(AudioPacket pendingAudioPacket) override;
 
 private:
 	//RESULT InitializeRenderAudioClient();

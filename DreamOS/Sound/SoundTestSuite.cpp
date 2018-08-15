@@ -10,6 +10,11 @@
 #include "SoundFile.h"
 #include "SpatialSoundObject.h"
 
+// Browser
+#include "DreamGarage\DreamBrowser.h"
+#include "WebBrowser\WebBrowserController.h"
+#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
+
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -24,6 +29,8 @@ RESULT SoundTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	// Add the tests
+
+	CR(AddTestBrowserSoundRouting());
 
 	CR(AddTestCaptureSound());
 
@@ -241,6 +248,222 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 
 	pUITest->SetTestName("Audio Play Spatial Sound");
 	pUITest->SetTestDescription("Basic test of playing a spatial sound");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+	float radius = 2.0f;
+
+	struct TestContext : 
+		public SoundClient::observer,
+		public DreamBrowserObserver
+	{
+		SoundClient *pWASAPISoundClient = nullptr;
+		SoundClient *pXAudioSoundClient = nullptr;
+		
+		sphere *pSphere = nullptr;
+		quad *m_pBrowserQuad = nullptr;
+		
+		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject = nullptr;
+
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+
+		// SoundClient::observer
+		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+			RESULT r = R_PASS;
+
+			//// Simply pushes the capture buffer to the render buffer
+			//if (pSoundClient != nullptr) {
+			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+
+		// DreamBrowserObserver
+		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
+			RESULT r = R_PASS;
+
+			CR(r);
+
+			//if (pXAudio2AudioClient != nullptr) {
+			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			//if (pCloudController != nullptr && testUserNum == 2) {
+			//	pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+			//}
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline("standard"));
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		
+		CN(pTestContext);
+		
+		{
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, -1.0f));
+
+			std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+
+			point ptPosition = point(0.0f, 0.0f, -radius);
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(ptPosition);
+
+			// Browser
+
+			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->m_pWebBrowserManager);
+			CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+			// This presents a timing issue if it works 
+			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+			CN(pTestContext->m_pBrowserQuad);
+			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+			pTestContext->m_pBrowserQuad->SetPosition(ptPosition);
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+
+			pTestContext->m_pDreamBrowser->SetURI(strURL);
+
+			// Create the capture client
+			pTestContext->pWASAPISoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
+			CN(pTestContext->pWASAPISoundClient);
+			CR(pTestContext->pWASAPISoundClient->RegisterObserver(pTestContext));
+
+			///*
+			pTestContext->pXAudioSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
+			CN(pTestContext->pXAudioSoundClient);
+
+			pTestContext->pXAudioSpatialSoundObject = pTestContext->pXAudioSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			CN(pTestContext->pXAudioSpatialSoundObject);
+
+			//CR(pTestContext->pXAudioSoundClient->StartSpatial());
+			//CR(pTestContext->pWASAPISoundClient->StartCapture());
+
+			CR(pTestContext->pXAudioSoundClient->StartRender());
+
+			//*/
+
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowser != nullptr) {
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+		}
+
+		{
+			static float theta = 0.0f;
+			static float localRadius = radius;
+
+			point ptPosition(0.0f, 0.0f, -localRadius);
+			ptPosition = RotationMatrix(RotationMatrix::Y_AXIS, theta) * ptPosition;
+
+			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
+			//vector vEmitterDireciton = point(0.0f, 0.0f, 1.0f);
+
+			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
+
+			if (pTestContext->pSphere != nullptr) {
+				pTestContext->pSphere->SetPosition(ptPosition);
+			}
+
+			if (pTestContext->pXAudioSpatialSoundObject != nullptr) {
+				pTestContext->pXAudioSpatialSoundObject->SetPosition(ptPosition);
+				pTestContext->pXAudioSpatialSoundObject->SetEmitterListenerDirection(vEmitterDireciton, vListenerDireciton);
+			}
+
+			theta += 0.00025f;
+			localRadius += 0.0001f;
+		}
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Audio Play Sound WASAPI");
+	pUITest->SetTestDescription("Basic test of playing a sound utilizing WASAPI");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

@@ -334,13 +334,19 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
 		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 
-		quad *m_pBrowserQuad = nullptr;
-
 		int testUserNum = 0;
 
 		sphere *pSphere = nullptr;
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject1 = nullptr;
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject2 = nullptr;
+
+		quad *m_pBrowserQuad = nullptr;
+		
+		//sphere *pSphereLeftChrome = nullptr;
+		//sphere *pSphereRightChrome = nullptr;
+		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectLeftChrome = nullptr;
+		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectRightChrome = nullptr;
+		
 
 		// SoundClient::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -377,8 +383,15 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
 			RESULT r = R_PASS;
 
-			// TODO: 
 			CR(r);
+
+			//if (pXAudio2AudioClient != nullptr) {
+			//	CR(pXAudio2AudioClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
+			//}
+
+			//if (pCloudController != nullptr && testUserNum == 2) {
+			//	pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+			//}
 
 		Error:
 			return r;
@@ -557,6 +570,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
 		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
 		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		std::string strTestValue;
 
 		CR(SetupSkyboxPipeline("standard"));
 
@@ -571,33 +585,38 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		// TODO: Why does shit explode with no objects in scene
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 
-		// Browser
-		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
-		CN(pTestContext->m_pWebBrowserManager);
-		CR(pTestContext->m_pWebBrowserManager->Initialize());
-
-		// This presents a timing issue if it works 
-		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
-		CN(pTestContext->m_pBrowserQuad);
-		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
-		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
-
-		// Create the Shared View App
-		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-		CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
-
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
-
-		pTestContext->m_pDreamBrowser->SetURI(strURL);
-
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
+
+		strTestValue = pCommandLineManager->GetParameterValue("testval");
+		int testUserNumber = atoi(strTestValue.c_str());
+
+		// Browser
+		if (testUserNumber == 2) {
+			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->m_pWebBrowserManager);
+			CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+			// This presents a timing issue if it works 
+			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+			CN(pTestContext->m_pBrowserQuad);
+			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+
+			// Set up the view
+			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+
+			pTestContext->m_pDreamBrowser->SetURI(strURL);
+		}
 
 		// Cloud Controller
 
@@ -642,21 +661,20 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		}
 
 		CR(pTestContext->pXAudio2AudioClient->StartSpatial());
+		CR(pTestContext->pXAudio2AudioClient->StartRender());
 
 		// Log in 
 		{
 			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
 
-			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
-			int testUserNumber = atoi(strTestValue.c_str());
-
 			pTestContext->testUserNum = testUserNumber;
 
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			
+			//CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 		/*
@@ -703,7 +721,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CloudController *pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
-		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowser != nullptr) {
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+		}
 
 		// Every 20 ms
 

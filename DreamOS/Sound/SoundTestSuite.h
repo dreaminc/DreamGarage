@@ -31,6 +31,8 @@ public:
 	// Capture Sound
 	RESULT AddTestCaptureSound();
 
+	RESULT AddTestBrowserSoundRouting();
+
 	// Play Sound
 	RESULT AddTestPlaySound();
 	RESULT AddTestSpatialSound();
