@@ -6,6 +6,8 @@
 #include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
 
+#include "Primitives/user.h"
+
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
 
@@ -79,10 +81,7 @@ RESULT DreamEnvironmentApp::PositionEnvironment(EnvironmentType type, std::share
 
 	}
 	else {
-		//pModel->RotateXByDeg(-90.0f);
-		//pModel->RotateYByDeg(90.0f);
-		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
-		m_sceneScale = 0.01f;
+		m_sceneScale = m_environmentSceneScale;
 	}
 	//*/
 
@@ -201,6 +200,36 @@ RESULT DreamEnvironmentApp::SwitchToEnvironment(EnvironmentType type) {
 	CNR(m_pFadeProgram, R_SKIPPED);
 
 	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::SeatUser(user *pUser, int seatIndex) {
+	RESULT r = R_PASS;
+
+	CBM(seatIndex < 6, "seat index is greater than maximum allowed users");
+	CBM(seatIndex >= 0, "seat index is invalid");
+	CN(pUser);
+
+	// position
+	switch (seatIndex) {
+	case 0: pUser->SetPosition(point(-m_tableLength / 2.0f, m_tableHeight, -(m_tableWidth - 1.5f) / 2.0f)); break;
+	case 1: pUser->SetPosition(point(-m_tableLength / 2.0f, m_tableHeight, (m_tableWidth - 1.5f) / 2.0f)); break;
+	case 2: pUser->SetPosition(point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f)); break;
+	case 3: pUser->SetPosition(point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f)); break;
+	case 4: pUser->SetPosition(point(0.0f,					m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f)); break;
+	case 5: pUser->SetPosition(point(0.0f,					m_tableHeight, (m_tableWidth + 0.5f) / 2.0f)); break;
+	}
+
+	switch (seatIndex) {
+	case 0: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_frontAngle, 0.0f)); break;
+	case 1: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_frontAngle, 0.0f)); break;
+	case 2: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f)); break;
+	case 3: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f)); break;
+	case 4: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_backAngle, 0.0f)); break;
+	case 5: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_backAngle, 0.0f)); break;
+	}
 
 Error:
 	return r;
