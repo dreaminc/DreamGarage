@@ -2213,26 +2213,36 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
 		}
 
-		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 0.5f, 0.0f));
+		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
 
 		for (int i = 0; i < 6; i++) {
 			pTestContext->m_users.emplace_back(m_pDreamOS->AddUser());
 			pTestContext->m_users[i]->SetVisible(true);
-			pTestContext->m_users[i]->SetPosition(point(0.0f, 5.0f, -1.0f));
 		}
 
 		{
 			// figure out seating for cave environment
 			float tableWidth = 3.0f;
-			float tableLength = 4.0f;
+			float tableLength = 5.0f;
 			float tableHeight = 1.0f;
 
-			pTestContext->m_users[0]->SetPosition(point(-tableWidth / 2.0f, tableHeight, -tableLength / 2.0f));
-			pTestContext->m_users[1]->SetPosition(point(-tableWidth / 2.0f, tableHeight, tableLength / 2.0f));
-			pTestContext->m_users[2]->SetPosition(point(tableWidth / 2.0f, tableHeight, -tableLength / 2.0f));
-			pTestContext->m_users[3]->SetPosition(point(tableWidth / 2.0f, tableHeight, tableLength / 2.0f));
-			pTestContext->m_users[4]->SetPosition(point(-tableWidth / 2.0f, tableHeight, 0.0f));
-			pTestContext->m_users[5]->SetPosition(point(tableWidth / 2.0f, tableHeight, 0.0f));
+			pTestContext->m_users[0]->SetPosition(point(-tableLength / 2.0f, tableHeight, -(tableWidth-1.5) / 2.0f));
+			pTestContext->m_users[1]->SetPosition(point(-tableLength / 2.0f, tableHeight, (tableWidth-1.5) / 2.0f));
+			pTestContext->m_users[2]->SetPosition(point(-tableLength / 4.0f, tableHeight, -(tableWidth) / 2.0f));
+			pTestContext->m_users[3]->SetPosition(point(-tableLength / 4.0f, tableHeight, (tableWidth) / 2.0f));
+			pTestContext->m_users[4]->SetPosition(point(0.0f, tableHeight, -(tableWidth+0.5f)/2.0f));
+			pTestContext->m_users[5]->SetPosition(point(0.0f, tableHeight, (tableWidth+0.5f)/2.0f));
+
+			float angleFront = 45.0f;
+			float angleMiddle = 75.0f;
+			float angleBack = 90.0f;
+
+			pTestContext->m_users[0]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (angleFront+180) * M_PI / 180.0f, 0.0f));
+			pTestContext->m_users[1]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, -angleFront * M_PI / 180.0f, 0.0f));
+			pTestContext->m_users[2]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 195.0f * (float)M_PI / 180.0f, 0.0f));
+			pTestContext->m_users[3]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, -15.0f * (float)M_PI / 180.0f, 0.0f));
+			pTestContext->m_users[4]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (angleBack+90) * M_PI / 180.0f, 0.0f));
+			pTestContext->m_users[5]->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (angleBack-90) * M_PI / 180.0f, 0.0f));
 		}
 		//pTestContext->m_users[0]->SetPosition()
 
