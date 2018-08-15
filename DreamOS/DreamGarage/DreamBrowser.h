@@ -64,6 +64,7 @@ public:
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 };
+
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
 	public DreamContentSource,

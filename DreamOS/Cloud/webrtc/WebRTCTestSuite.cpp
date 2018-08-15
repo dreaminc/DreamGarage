@@ -23,6 +23,10 @@
 #include "Cloud/CloudTestSuite.h"
 #include "Sound/AudioPacket.h"
 
+#include "DreamGarage\DreamBrowser.h"
+#include "WebBrowser\WebBrowserController.h"
+#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
+
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -315,12 +319,22 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	int nRepeats = 1;
 	float radius = 2.0f;
 
-	struct TestContext : public SoundClient::observer, public CloudController::PeerConnectionObserver, public CloudController::UserObserver {
+	struct TestContext : 
+		public SoundClient::observer, 
+		public CloudController::PeerConnectionObserver, 
+		public CloudController::UserObserver,
+		public DreamBrowserObserver
+	{
 		CloudController *pCloudController = nullptr;
 		UserController *pUserController = nullptr;
 
 		SoundClient *pWASAPICaptureClient = nullptr;
 		SoundClient *pXAudio2AudioClient = nullptr;
+
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+
+		quad *m_pBrowserQuad = nullptr;
 
 		int testUserNum = 0;
 
@@ -358,6 +372,29 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//Error:
 			return r;
 		}
+
+		// DreamBrowserObserver
+		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
+			RESULT r = R_PASS;
+
+			// TODO: 
+			CR(r);
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
 
 		// CloudController::PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
@@ -518,7 +555,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
-		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
+		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 
 		CR(SetupSkyboxPipeline("standard"));
 
@@ -528,10 +566,34 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CN(m_pDreamOS);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// TODO: Why does shit explode with no objects in scene
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+
+		// Browser
+		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(pTestContext->m_pWebBrowserManager);
+		CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+		// This presents a timing issue if it works 
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+
+		// Create the Shared View App
+		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+		CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+
+		pTestContext->m_pDreamBrowser->SetURI(strURL);
 
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
@@ -640,6 +702,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		CloudController *pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
+
+		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
 
 		// Every 20 ms
 
