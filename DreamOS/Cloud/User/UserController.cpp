@@ -382,6 +382,8 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 
 		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
 			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
+			// TODO: with avatar implementation
+			//m_avatarID = jsonResponse["/data/avatar_model_id"_json_pointer].get<int>();
 		}
 		
 		DEBUG_LINEOUT("User Profile Loaded");
@@ -623,7 +625,8 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 	else {
 		nlohmann::json jsonTeam = jsonData["/team"_json_pointer];
 		//Currently, only the default environment is needed here	
-		int environmentId = jsonTeam["/default_environment"_json_pointer].get<int>();
+		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
+		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 		m_pUserControllerObserver->OnGetTeam(true, environmentId);
 	}
 	
@@ -668,6 +671,9 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 		jsonData["/last_name"_json_pointer].get<std::string>(),
 		version(1.0f)	// version
 	);
+
+	// TODO: for avatar implementation
+	//jsonData["/avatar_model_id"_json_pointer].get<int>();
 
 	m_loginState.fHasUserProfile = true;
 	CR(UpdateLoginState());

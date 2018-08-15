@@ -17,7 +17,7 @@
 #define RIGHT_HANDED
 //#define LEFT_HANDED
 
-//#define USE_LOCALHOST
+#define USE_LOCALHOST
 
 // Comment out to use production
 //#define _USE_TEST_APP	
