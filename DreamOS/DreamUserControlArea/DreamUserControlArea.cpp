@@ -988,14 +988,15 @@ RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
 
 RESULT DreamUserControlArea::OnDreamFormSuccess() {
 	RESULT r = R_PASS;
-
+	
 	if (!m_pDreamUIBar->IsEmpty()) {
 		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS));
 	}
-	else if (m_fHasOpenApp) {
+	if (m_fHasOpenApp) {
 		CR(Show());
+		m_pDreamUserApp->SetHasOpenApp(true);
 	}
-
+	
 Error:
 	return r;
 }

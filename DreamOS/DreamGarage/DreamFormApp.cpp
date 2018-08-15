@@ -254,6 +254,7 @@ RESULT DreamFormApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);	
+	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 
 Error:

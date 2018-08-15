@@ -121,6 +121,7 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//CR(DreamFormApp::HandleDreamFormSuccess());
+	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 
