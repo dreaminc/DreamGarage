@@ -84,19 +84,21 @@ private:
 
 	// Environment positioning information (non-island) 
 public:
-	RESULT SeatUser(user *pUser, int seatIndex);
+	RESULT SeatUser(point& ptPosition, quaternion& qOrientation, int seatIndex);
 
 private:
 	float m_environmentSceneScale = 0.01f;
 
 	float m_tableWidth = 300.0f * m_environmentSceneScale;
 	float m_tableLength = 500.0f * m_environmentSceneScale;
-	float m_tableHeight = 100.0f * m_environmentSceneScale;
+	float m_tableHeight = 50.0f * m_environmentSceneScale;
 
 	float m_baseTableAngle = 270.0f * (float)M_PI / 180.0f;
-	float m_frontAngle = 45.0f * (float)M_PI / 180.0f;
-	float m_middleAngle = 75.0f * (float)M_PI / 180.0f;
+	float m_frontAngle = 135.0f * (float)M_PI / 180.0f;
+	float m_middleAngle = 105.0f * (float)M_PI / 180.0f;
 	float m_backAngle = 90.0f * (float)M_PI / 180.0f;
+
+	int m_maxSeatingIndex = 6;
 
 };
 

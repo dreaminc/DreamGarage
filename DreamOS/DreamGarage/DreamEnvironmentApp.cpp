@@ -205,30 +205,28 @@ Error:
 	return r;
 }
 
-RESULT DreamEnvironmentApp::SeatUser(user *pUser, int seatIndex) {
+RESULT DreamEnvironmentApp::SeatUser(point& ptPosition, quaternion& qOrientation, int seatIndex) {
 	RESULT r = R_PASS;
 
-	CBM(seatIndex < 6, "seat index is greater than maximum allowed users");
-	CBM(seatIndex >= 0, "seat index is invalid");
-	CN(pUser);
+	CBM(seatIndex < m_maxSeatingIndex && seatIndex >= 0, "Peer index %d not supported by client", seatIndex);
 
 	// position
 	switch (seatIndex) {
-	case 0: pUser->SetPosition(point(-m_tableLength / 2.0f, m_tableHeight, -(m_tableWidth - 1.5f) / 2.0f)); break;
-	case 1: pUser->SetPosition(point(-m_tableLength / 2.0f, m_tableHeight, (m_tableWidth - 1.5f) / 2.0f)); break;
-	case 2: pUser->SetPosition(point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f)); break;
-	case 3: pUser->SetPosition(point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f)); break;
-	case 4: pUser->SetPosition(point(0.0f,					m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f)); break;
-	case 5: pUser->SetPosition(point(0.0f,					m_tableHeight, (m_tableWidth + 0.5f) / 2.0f)); break;
+	case 0: ptPosition = point(-m_tableLength / 2.0f, m_tableHeight, -(m_tableWidth - 1.5f) / 2.0f); break;
+	case 1: ptPosition = point(-m_tableLength / 2.0f, m_tableHeight, (m_tableWidth - 1.5f) / 2.0f); break;
+	case 2: ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f); break;
+	case 3: ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f); break;
+	case 4: ptPosition = point(0.0f,					m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f); break;
+	case 5: ptPosition = point(0.0f,					m_tableHeight, (m_tableWidth + 0.5f) / 2.0f); break;
 	}
 
 	switch (seatIndex) {
-	case 0: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_frontAngle, 0.0f)); break;
-	case 1: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_frontAngle, 0.0f)); break;
-	case 2: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f)); break;
-	case 3: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f)); break;
-	case 4: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_backAngle, 0.0f)); break;
-	case 5: pUser->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_backAngle, 0.0f)); break;
+	case 0: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_frontAngle, 0.0f); break;
+	case 1: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_frontAngle, 0.0f); break;
+	case 2: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f); break;
+	case 3: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f); break;
+	case 4: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_backAngle, 0.0f); break;
+	case 5: qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_backAngle, 0.0f); break;
 	}
 
 Error:

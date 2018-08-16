@@ -2222,7 +2222,12 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 
 		{
 			for (int i = 0; i < 6; i++) {
-				pTestContext->pEnvironmentApp->SeatUser(pTestContext->m_users[i], i);
+			//	pTestContext->pEnvironmentApp->SeatUser(pTestContext->m_users[i], i);
+				point ptPosition;
+				quaternion qOrientation;
+				pTestContext->pEnvironmentApp->SeatUser(ptPosition, qOrientation, i);
+				pTestContext->m_users[i]->SetPosition(ptPosition);
+				pTestContext->m_users[i]->SetOrientation(qOrientation);
 			}
 		}
 		//pTestContext->m_users[0]->SetPosition()

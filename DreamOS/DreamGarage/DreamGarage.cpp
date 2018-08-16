@@ -623,24 +623,6 @@ RESULT DreamGarage::Update(void) {
 	}
 	//*/
 
-	/*
-	// For testing
-	if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - g_lastDebugUpdate).count() > 10) {
-		static int index = 1;
-
-		point ptSeatPosition;
-		float angleRotation;
-
-		GetRoundtablePosition(index++, ptSeatPosition, angleRotation);
-
-		m_usersModelPool[index].second->GetHead()->RotateYByDeg(angleRotation);
-		m_usersModelPool[index].second->SetPosition(ptSeatPosition);
-		m_usersModelPool[index].second->SetVisible(true);
-
-		g_lastDebugUpdate = timeNow;
-	}
-	//*/
-
 	// Periodically check peer app states
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
 		CR(CheckDreamPeerAppStates());
@@ -658,55 +640,22 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle) {
-	RESULT r = R_PASS;
-
-	point ptSeatingCenter = point(0.0f, 1.0f, 1.0f);
-
-	CB((index < m_seatLookup.size()));
-
-	{
-
-		float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
-		diffAngle *= -1.0f;
-
-		rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
-
-		// TODO: fuck this
-		//if (m_pDreamBrowser != nullptr) {
-		//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
-	//	}
-
-		float ptX = -1.0f * m_seatPositioningRadius * std::sin(rotationAngle * M_PI / 180.0f);
-		float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
-
-		ptPosition = point(ptX, 0.0f, ptZ) + ptSeatingCenter;
-
-		// TODO: Remove this (this is a double reverse)
-		//rotationAngle *= -1.0f;
-	}
-
-Error:
-	return r;
-}
-
 RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	RESULT r = R_PASS;
 
 	stereocamera* pCamera = GetCamera();
 
 	point ptSeatPosition;
-	float angleRotation;
+	quaternion qOffset;
 
-	CB((seatingPosition < m_seatLookup.size()));
-	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->SeatUser(ptSeatPosition, qOffset, seatingPosition));
 
 	if (!pCamera->HasHMD()) {
-		pCamera->RotateYByDeg(angleRotation);
+		pCamera->SetOrientation(qOffset);
 		pCamera->SetPosition(ptSeatPosition);
 	}
 	else {
-		quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angleRotation * M_PI / 180.0f, 0.0f);
 		pCamera->SetOffsetOrientation(qOffset);
 		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
 	}
@@ -719,11 +668,12 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	RESULT r = R_PASS;
 
 	point ptSeatPosition;
-	float angleRotation;
+	quaternion qRotation;
 
-	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->SeatUser(ptSeatPosition, qRotation, seatingPosition));
 
-	pDreamPeer->GetUserModel()->GetHead()->RotateYByDeg(angleRotation);
+	pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
 
 Error:
@@ -746,11 +696,12 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 	if (!m_fSeated) {
 
-		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
-		CB(seatPosition < m_seatLookup.size());
 		CR(SetRoundtablePosition(seatPosition));
+		//CR(SetRoundtablePosition())
 		m_fSeated = true;
 		m_fShouldUpdateAppComposites = true;
 	}
@@ -770,17 +721,14 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	// My seating position
 	long localSeatingPosition = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
-	localSeatingPosition -= 1;
 
 	// Remote seating position
 	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
-	remoteSeatingPosition -= 1;
 
 	DOSLOG(INFO, "OnNewDreamPeer local seat position %v", localSeatingPosition);
 	//OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
 	if (!m_fSeated) {
-		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
 		CR(SetRoundtablePosition(localSeatingPosition));
 
 		m_fSeated = true;
