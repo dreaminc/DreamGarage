@@ -40,7 +40,8 @@ RESULT user::Initialize() {
 	m_pHead = AddModel(util::StringToWideString(strHeadPath));
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
-	m_pHead->SetScale(0.018f);
+	m_pHead->SetScale(0.04f);
+	//m_pHead->SetScale(0.018f);
 
 #else
 	//m_pHead = AddComposite();

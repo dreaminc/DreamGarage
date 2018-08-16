@@ -52,6 +52,8 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestEnvironmentSeating());
 
+	CR(AddTestGamepadCamera());
+
 	CR(AddTestEnvironmentSwitching());
 	
 	CR(AddTestDreamOS());
@@ -59,8 +61,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamUIBar());
 
 	CR(AddTestCredentialStorage());
-
-	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
 
@@ -2211,6 +2211,8 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 
 			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
+
+			m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 		}
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
@@ -2226,7 +2228,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 				point ptPosition;
 				quaternion qOrientation;
 				pTestContext->pEnvironmentApp->SeatUser(ptPosition, qOrientation, i);
-				pTestContext->m_users[i]->SetPosition(ptPosition);
+				pTestContext->m_users[i]->SetPosition(ptPosition + point(0.0f, 1.0f, 0.0f));
 				pTestContext->m_users[i]->SetOrientation(qOrientation);
 			}
 		}
