@@ -31,7 +31,7 @@ WebRTCAudioDeviceModule::~WebRTCAudioDeviceModule() {
 RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("ProcessingThread start");
+	DEBUG_LINEOUT("WebRTCADMProcess start");
 
 	m_fRunning = true;
 	int samplingRate = 48000;
@@ -93,9 +93,10 @@ RESULT WebRTCAudioDeviceModule::WebRTCADMProcess() {
 		auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 	}
 
-	DEBUG_LINEOUT("CloudThreadProcess End");
-
 Error:
+
+	DEBUG_LINEOUT("WebRTCADMProcess End");
+
 	return r;
 }
 

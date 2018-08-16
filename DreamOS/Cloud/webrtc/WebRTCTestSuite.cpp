@@ -317,7 +317,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
-	float radius = 2.0f;
+	float radius = 1.0f;
 
 	struct TestContext : 
 		public SoundClient::observer, 
