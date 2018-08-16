@@ -661,12 +661,12 @@ RESULT HALTestSuite::AddTestToonShader() {
 
 		{
 			//auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
-			pTestContext->pModel = m_pDreamOS->AddModel(L"\\head_01_color\\head_01.fbx");
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.fbx");
 			CN(pTestContext->pModel);
 
-			pTestContext->pModel->SetPosition(point(0.0f, -2.0f, -2.0f));
+			pTestContext->pModel->SetPosition(point(0.0f, -2.0f, -1.0f));
 			pTestContext->pModel->SetScale(0.1f);
-			pTestContext->pModel->RotateXByDeg(-90.0f);
+			//pTestContext->pModel->RotateXByDeg(-90.0f);
 		}
 
 	Error:
