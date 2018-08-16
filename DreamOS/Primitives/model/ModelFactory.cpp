@@ -19,6 +19,7 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/Vertex.h"
+#include "Primitives/color.h"
 
 std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
@@ -174,6 +175,31 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 			vert.SetPoint(ptVert);
 		}
 
+		// Color
+		// TODO: Handle color sets (AI_MAX_NUMBER_OF_COLOR_SETS)
+
+		int numColors = pAIMesh->GetNumColorChannels();
+
+		for (int j = 0; j < numColors; j++) {
+			if (pAIMesh->HasVertexColors(j)) {
+				color colorVert;
+				colorVert.r() = pAIMesh->mColors[j][i].r;
+				colorVert.g() = pAIMesh->mColors[j][i].g;
+				colorVert.b() = pAIMesh->mColors[j][i].b;
+				colorVert.a() = pAIMesh->mColors[j][i].a;
+				vert.SetColor(colorVert);
+			}
+		}
+		
+		//if (pAIMesh->mColors != nullptr) {
+		//	color colorVert;
+		//	colorVert.r() = pAIMesh->mColors[i][0].r;
+		//	colorVert.g() = pAIMesh->mColors[i][0].g;
+		//	colorVert.b() = pAIMesh->mColors[i][0].b;
+		//	colorVert.a() = pAIMesh->mColors[i][0].a;
+		//	vert.SetColor(colorVert);
+		//}
+
 		// Normal
 		if (pAIMesh->mNormals != nullptr) {
 			vector vNormal;
@@ -235,7 +261,8 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 	CN(pMesh);
 
 	// Materials 
-	if (pAIMesh->mMaterialIndex != 0) {
+	//if (pAIMesh->mMaterialIndex != 0) {
+	if (pAIScene->mNumMaterials > 0) {
 		aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
 		CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
 	}
@@ -298,9 +325,10 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	const aiScene *pAIScene =
 		assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath),
 			//aiProcess_FlipUVs |
-			//aiProcess_CalcTangentSpace |
+			aiProcess_CalcTangentSpace |
 			aiProcess_GenNormals | 
 			aiProcess_PreTransformVertices |
+			aiProcess_FixInfacingNormals |
 			aiProcess_Triangulate);
 
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
