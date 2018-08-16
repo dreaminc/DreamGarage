@@ -605,7 +605,12 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	}
 	else {
 		pHand->SetOverlayVisible(false);
-		pHand->SetModelState(hand::ModelState::HAND);
+		if (m_fHasOpenApp) {
+			pHand->SetModelState(hand::ModelState::CONTROLLER);
+		}
+		else {
+			pHand->SetModelState(hand::ModelState::HAND);
+		}
 	}
 
 	auto pVolume = pHand->GetPhantomVolume().get();

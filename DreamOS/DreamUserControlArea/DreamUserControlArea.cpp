@@ -298,9 +298,10 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
-		CR(m_pDreamUIBar->ShowOpenMenu());
-		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 		CR(Hide());
+		CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
+		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
+		ResetAppComposite();
 	} break;
 
 	case ControlEventType::CLOSE: {
@@ -758,10 +759,9 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CreateBrowserSource() {
+RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
-	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 	if (m_strURL == "") {
 		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK));
@@ -903,6 +903,7 @@ Error:
 RESULT DreamUserControlArea::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
+	m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS);
 	m_pDreamTabView->FlagShutdownAllSources();
 	CloseActiveAsset();
 
@@ -1018,16 +1019,16 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 
 		else if ((!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) || (!m_pDreamUserApp->m_fHasOpenApp && !m_fHasOpenApp)) {	// Pulling up Menu from nothing
-			CR(m_pDreamUIBar->ShowRootMenu());
+			CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT));
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
 
 			ResetAppComposite();	
 		}
 		
-		else if (m_fHasOpenApp && m_pControlView->IsVisible()) {	// Pressing Menu while we have content open
+		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
 			Hide();
-			m_pDreamUIBar->ShowRootMenu();
+			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			ResetAppComposite();
 		}

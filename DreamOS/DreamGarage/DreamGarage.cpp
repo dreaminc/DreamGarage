@@ -417,8 +417,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	else {
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
-
-		CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+		}
 	}
 	
 Error:

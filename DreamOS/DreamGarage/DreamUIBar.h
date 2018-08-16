@@ -46,6 +46,12 @@ enum class MenuState {
 	ANIMATING
 };
 
+enum class MenuLevel {
+	ROOT,
+	OPEN,
+	INVALID
+};
+
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					public DreamUserObserver,
 					public MenuController::observer, 
@@ -93,10 +99,8 @@ public:
 	RESULT ProcessDownloadMenuItemTexture();
 
 	RESULT PopPath();
-	RESULT RequestMenu();
 	RESULT ResetAppComposite();
-	RESULT ShowRootMenu(bool fResetComposite = true);
-	RESULT ShowOpenMenu();
+	RESULT ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite = true);
 	RESULT HandleEvent(UserObserverEventType type);
 	texture *GetOverlayTexture(HAND_TYPE type);
 
@@ -151,6 +155,9 @@ private:
 	bool m_fRequestTexture = false;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
+	std::shared_ptr<MenuNode> m_pRootMenuNode; 
+	std::shared_ptr<MenuNode> m_pOpenMenuNode; 
+
 
 	std::shared_ptr<texture> m_pDefaultThumbnail = nullptr;
 	std::shared_ptr<texture> m_pDefaultIcon = nullptr;

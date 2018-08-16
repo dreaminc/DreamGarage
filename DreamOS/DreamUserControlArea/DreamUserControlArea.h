@@ -103,7 +103,7 @@ public:
 	RESULT SetScope(std::string strScope);
 	RESULT SetPath(std::string strPath);
 	RESULT RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle);
-	RESULT CreateBrowserSource();
+	RESULT CreateBrowserSource(std::string strScope);
 	RESULT SetActiveBrowserURI();
 	RESULT HideWebsiteTyping();
 

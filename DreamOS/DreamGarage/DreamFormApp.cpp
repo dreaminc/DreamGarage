@@ -422,6 +422,7 @@ RESULT DreamFormApp::Show() {
 	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
+	CR(m_pUserApp->SetHasOpenApp(true));	// For login/logout
 	m_fFormVisible = true;
 
 Error:
