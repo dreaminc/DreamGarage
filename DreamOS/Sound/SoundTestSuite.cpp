@@ -296,15 +296,9 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
 			RESULT r = R_PASS;
 
-			CR(r);
-
-			//if (pXAudio2AudioClient != nullptr) {
-			//	CR(pSoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
-			//}
-
-			//if (pCloudController != nullptr && testUserNum == 2) {
-			//	pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
-			//}
+			if (pXAudioSoundClient != nullptr) {
+				CR(pXAudioSoundClient->PushAudioPacket(pendingAudioPacket));
+			}
 
 		Error:
 			return r;

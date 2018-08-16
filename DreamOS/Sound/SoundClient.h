@@ -97,7 +97,7 @@ public:
 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
 
-	virtual RESULT PlayAudioPacket(AudioPacket pendingAudioPacket);
+	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket);
 
 private:
 	std::thread	m_audioRenderProcessingThread;
