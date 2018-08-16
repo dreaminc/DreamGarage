@@ -494,8 +494,8 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	RESULT r = R_PASS;
 
 	GetComposite()->SetPosition(ptPosition);
-	//GetComposite()->SetOrientation(qOrientation);
-	//GetComposite()->SetScale(scale);
+	GetComposite()->SetOrientation(qOrientation);
+	GetComposite()->SetScale(scale);
 
 	return r;
 }

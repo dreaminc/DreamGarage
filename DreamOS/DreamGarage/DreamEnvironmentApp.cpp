@@ -81,6 +81,7 @@ RESULT DreamEnvironmentApp::PositionEnvironment(EnvironmentType type, std::share
 
 	}
 	else {
+		m_ptSceneOffset = point(0.0f, -1.0f, 0.0f);
 		m_sceneScale = m_environmentSceneScale;
 	}
 	//*/
@@ -114,6 +115,7 @@ Error:
 
 RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
+	m_currentType = type;
 	return R_PASS;
 }
 
@@ -210,16 +212,15 @@ RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternio
 
 	switch (m_currentType) {
 	case ISLAND: {
+		// legacy
 		ptPosition = point(0.0f, 2.0f, -2.0f);
 		qOrientation = quaternion();
 		scale = 1.0f;
 	} break;
 	case CAVE: {
-		//ptPosition = point(m_tableLength/2.0f, 2.0f, -2.0f);
-		//qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
-		ptPosition = point(0.0f, 2.0f, -2.0f);
-		qOrientation = quaternion();
-		scale = 1.0f;
+		ptPosition = point(m_tableLength*0.75f, 1.25f, 0.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+		scale = 0.75f;
 	}
 	}
 

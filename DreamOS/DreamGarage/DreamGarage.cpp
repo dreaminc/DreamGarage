@@ -703,7 +703,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
-		//CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
