@@ -60,6 +60,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pOpenIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	//TODO: could move this logic up to DreamUserObserver, and then only 
@@ -101,7 +102,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
 
 	m_pRootMenuNode = std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", ""));
-	m_pOpenMenuNode = std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "MenuProviderScope.OpenMenuProvider", "Open", "", "https://static.develop.dreamos.com/menu/icon/open.ae3a6772bdc9.png", ""));
+	m_pOpenMenuNode = std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "MenuProviderScope.OpenMenuProvider", "Open", "", "", ""));
 
 Error:
 	return r;
@@ -354,11 +355,14 @@ RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
 	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pMenuIcon.get());
 		m_pPendingIconTexture = m_pMenuIcon.get();
 	}
+	else if (pMenuNode->GetTitle() == "Open") {
+		m_pPendingIconTexture = m_pOpenIcon.get();
+	}
 	else {
 		auto strURI = pMenuNode->GetIconURL();
 		if (strURI != "") {
 			MenuNode* pTempMenuNode = new MenuNode();
-			pTempMenuNode->SetName("root_menu_title");
+			pTempMenuNode->SetName(m_strIconTitle);
 			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 		}
 	}
@@ -472,7 +476,7 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 	if (pContext != nullptr) {
 		MenuNode* pObj = reinterpret_cast<MenuNode*>(pContext);
 		
-		if (pObj->GetTitle() == "root_menu_title") {
+		if (pObj->GetTitle() == m_strIconTitle) {
 			m_pPendingIconTextureBuffer = pBufferVector;
 		}
 		else {

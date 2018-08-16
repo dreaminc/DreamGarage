@@ -158,10 +158,12 @@ private:
 	std::shared_ptr<MenuNode> m_pRootMenuNode; 
 	std::shared_ptr<MenuNode> m_pOpenMenuNode; 
 
+	std::string m_strIconTitle = "icon_title";
 
 	std::shared_ptr<texture> m_pDefaultThumbnail = nullptr;
 	std::shared_ptr<texture> m_pDefaultIcon = nullptr;
 	std::shared_ptr<texture> m_pMenuIcon = nullptr;
+	std::shared_ptr<texture> m_pOpenIcon = nullptr;
 	std::shared_ptr<texture> m_pMenuItemBg = nullptr;
 	texture* m_pOverlayLeft = nullptr;
 	texture* m_pOverlayRight = nullptr;
