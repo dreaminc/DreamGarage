@@ -407,6 +407,8 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 			//pDataBuffer
 		);
 
+		newPendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
+
 		m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer

@@ -244,7 +244,7 @@ Error:
 	return r;
 }
 
-RESULT SoundClient::PlayAudioPacket(AudioPacket pendingAudioPacket) {
+RESULT SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket) {
 	return R_NOT_HANDLED;
 }
 
