@@ -55,14 +55,35 @@ void WebRTCLocalAudioSource::RemoveSink(webrtc::AudioTrackSinkInterface* sink) {
 RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CN(m_pLocalAudioTrackSink);
+	//CN(m_pLocalAudioTrackSink);
+	//
+	//m_pLocalAudioTrackSink->OnData(
+	//	pendingAudioPacket.GetDataBuffer(),
+	//	pendingAudioPacket.GetBitsPerSample(),
+	//	pendingAudioPacket.GetSamplingRate(),
+	//	pendingAudioPacket.GetNumChannels(),
+	//	pendingAudioPacket.GetNumFrames()
+	//);
 
+	CN(m_pLocalAudioTrackSink);
+	
 	m_pLocalAudioTrackSink->OnData(
 		pendingAudioPacket.GetDataBuffer(),
 		pendingAudioPacket.GetBitsPerSample(),
 		pendingAudioPacket.GetSamplingRate(),
 		pendingAudioPacket.GetNumChannels(),
-		pendingAudioPacket.GetNumFrames()
+		pendingAudioPacket.GetSamplingRate() / 100		// 10 ms of frames
+	);
+
+	void *pBufferWithOffset = pendingAudioPacket.GetDataBuffer();
+	pBufferWithOffset = (uint8_t*)(pBufferWithOffset) + ((pendingAudioPacket.GetSamplingRate() / 100) * pendingAudioPacket.GetBytesPerSample() * pendingAudioPacket.GetNumChannels());
+
+	m_pLocalAudioTrackSink->OnData(
+		pBufferWithOffset,
+		pendingAudioPacket.GetBitsPerSample(),
+		pendingAudioPacket.GetSamplingRate(),
+		pendingAudioPacket.GetNumChannels(),
+		pendingAudioPacket.GetSamplingRate() / 100		// 10 ms of frames
 	);
 
 	/* DEBUG

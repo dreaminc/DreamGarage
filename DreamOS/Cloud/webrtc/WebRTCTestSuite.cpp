@@ -366,10 +366,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			lastUpdateTime = timeNow;
 
 			if (pCloudController != nullptr && testUserNum == 2) {
-
-				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
-				
-				//pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);	
 			}
 
 			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
@@ -383,15 +380,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
 			RESULT r = R_PASS;
 
-			CR(r);
-
-			//if (pXAudio2AudioClient != nullptr) {
-			//	CR(pXAudio2AudioClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
-			//}
-
-			//if (pCloudController != nullptr && testUserNum == 2) {
-			//	pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
-			//}
+			if (pCloudController != nullptr && testUserNum == 2) {
+				CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+			}
 
 		Error:
 			return r;
@@ -445,6 +436,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			
 			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
+			// skip for now
+			// return r;
+
 			if (strAudioTrackLabel == kUserAudioLabel) {
 
 				if (pXAudioSpatialSoundObject1 != nullptr) {
@@ -463,7 +457,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 					// Do I need to copy the buffer over (getting over written maybe)
 					int16_t *pInt16Soundbuffer = new int16_t[frames];
 					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
-
+				
 					if (pInt16Soundbuffer != nullptr) {
 						CR(pXAudioSpatialSoundObject2->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
 					}
@@ -673,8 +667,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			
-			//CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 		/*
