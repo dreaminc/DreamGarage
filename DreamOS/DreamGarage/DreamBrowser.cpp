@@ -43,7 +43,7 @@ RESULT DreamBrowser::Shutdown(void *pContext) {
 
 	/*
 	if (m_pWebBrowserManager != nullptr) {
-		CR(m_pWebBrowserManager->Shutdown());
+		m_pWebBrowserManager->Shutdown();
 		//m_pWebBrowserManager = nullptr;
 	}
 	//*/

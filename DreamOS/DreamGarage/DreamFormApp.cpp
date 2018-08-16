@@ -253,7 +253,8 @@ Error:
 RESULT DreamFormApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
-	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
+	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);	
+	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 
 Error:
@@ -421,6 +422,7 @@ RESULT DreamFormApp::Show() {
 	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
+	CR(m_pUserApp->SetHasOpenApp(true));	// For login/logout
 	m_fFormVisible = true;
 
 Error:

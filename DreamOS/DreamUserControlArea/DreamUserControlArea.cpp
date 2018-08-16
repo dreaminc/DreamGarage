@@ -298,9 +298,10 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 	case ControlEventType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
-		CR(m_pDreamUIBar->ShowRootMenu(false));
-		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 		CR(Hide());
+		CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
+		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
+		ResetAppComposite();
 	} break;
 
 	case ControlEventType::CLOSE: {
@@ -758,13 +759,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::CreateBrowserSource() {
+RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
-	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 	if (m_strURL == "") {
-		CR(m_pDreamUIBar->ShowRootMenu(false));
+		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK));
 		m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 	}
 	else {
@@ -903,6 +903,7 @@ Error:
 RESULT DreamUserControlArea::ShutdownAllSources() {
 	RESULT r = R_PASS;
 
+	m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS);
 	m_pDreamTabView->FlagShutdownAllSources();
 	CloseActiveAsset();
 
@@ -986,6 +987,21 @@ RESULT DreamUserControlArea::SetIsAnimating(bool fIsAnimating) {
 	return R_PASS;
 }
 
+RESULT DreamUserControlArea::OnDreamFormSuccess() {
+	RESULT r = R_PASS;
+	
+	if (!m_pDreamUIBar->IsEmpty()) {
+		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::DISMISS));
+	}
+	if (m_fHasOpenApp) {
+		CR(Show());
+		m_pDreamUserApp->SetHasOpenApp(true);
+	}
+	
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 	RESULT r = R_PASS;
 
@@ -1001,30 +1017,31 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		if (m_fKeyboardUp) {
 			HideWebsiteTyping();
 		}
-		else if (m_pDreamUIBar->IsEmpty()) {
-			CR(m_pDreamUIBar->ShowRootMenu());
+
+		else if ((!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) || (!m_pDreamUserApp->m_fHasOpenApp && !m_fHasOpenApp)) {	// Pulling up Menu from nothing
+			CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT));
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			m_pDreamUserApp->SetHasOpenApp(true);
 
-			ResetAppComposite();
-
-			if (m_fHasOpenApp) {
-//			if (m_pDreamUserApp->m_fHasOpenApp) {
-				Hide();
-			}
-			else {
-				m_pDreamUserApp->SetHasOpenApp(true);
-			}
+			ResetAppComposite();	
 		}
-		else {
+		
+		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
+			Hide();
+			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
+			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
+			ResetAppComposite();
+		}
+
+		else {	// Pressing back when Menu has a level saved
 			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
-			if (m_pDreamUIBar->IsEmpty()) {
+			if (m_pDreamUIBar->IsEmpty()) {	// Case where pressing back on Top level menu
 				if (m_fHasOpenApp) {
-			//	if (m_pDreamUserApp->m_fHasOpenApp) {
 					Show();
 				}
 				else {
-					m_pDreamUserApp->SetHasOpenApp(false);
 					m_pDreamUserApp->SetEventApp(nullptr);
+					m_pDreamUserApp->SetHasOpenApp(false);
 				}
 			}
 		}
@@ -1095,8 +1112,13 @@ Error:
 RESULT DreamUserControlArea::Notify(UIEvent *pUIEvent) {
 	RESULT r = R_PASS;
 	
-	WebBrowserPoint wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
-	point ptContact = point(wptContact.x, wptContact.y, 0.0f);
+	WebBrowserPoint wptContact;
+	point ptContact;
+
+	CNR(m_pActiveSource, R_SKIPPED);
+
+	wptContact = GetRelativePointofContact(pUIEvent->m_ptEvent);
+	ptContact = point(wptContact.x, wptContact.y, 0.0f);
 
 	//TODO: temporary, there could be future UISurfaces associated with the DreamTabView and DreamControlBar
 	CBR(pUIEvent->m_pObj == m_pControlView->GetViewQuad().get(), R_SKIPPED);

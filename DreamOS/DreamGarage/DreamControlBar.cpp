@@ -123,6 +123,11 @@ RESULT DreamControlBar::HandleOpenPressed(UIButton* pButtonContext, void* pConte
 	RESULT r = R_PASS;
 	CB(m_pParentApp->CanPressButton(pButtonContext));
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::OPEN));
+	
+	// This call triggers a move to menu, hiding the control bar, so the button needs to be forcefully released
+	CR(GetDOS()->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
+	CR(GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pButtonContext->GetInteractionObject()));
+
 Error:
 	return R_PASS;
 }

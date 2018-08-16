@@ -46,6 +46,12 @@ enum class MenuState {
 	ANIMATING
 };
 
+enum class MenuLevel {
+	ROOT,
+	OPEN,
+	INVALID
+};
+
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					public DreamUserObserver,
 					public MenuController::observer, 
@@ -93,9 +99,8 @@ public:
 	RESULT ProcessDownloadMenuItemTexture();
 
 	RESULT PopPath();
-	RESULT RequestMenu();
 	RESULT ResetAppComposite();
-	RESULT ShowRootMenu(bool fResetComposite = true);
+	RESULT ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite = true);
 	RESULT HandleEvent(UserObserverEventType type);
 	texture *GetOverlayTexture(HAND_TYPE type);
 
@@ -150,14 +155,20 @@ private:
 	bool m_fRequestTexture = false;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
+	std::shared_ptr<MenuNode> m_pRootMenuNode; 
+	std::shared_ptr<MenuNode> m_pOpenMenuNode; 
+
+	std::string m_strIconTitle = "icon_title";
 
 	std::shared_ptr<texture> m_pDefaultThumbnail = nullptr;
 	std::shared_ptr<texture> m_pDefaultIcon = nullptr;
-	std::shared_ptr<texture> m_pShareIcon = nullptr;
+	std::shared_ptr<texture> m_pMenuIcon = nullptr;
+	std::shared_ptr<texture> m_pOpenIcon = nullptr;
 	std::shared_ptr<texture> m_pMenuItemBg = nullptr;
 	texture* m_pOverlayLeft = nullptr;
 	texture* m_pOverlayRight = nullptr;
 	texture* m_pPendingIconTexture = nullptr;
+	std::shared_ptr<std::vector<uint8_t>> m_pPendingIconTextureBuffer;
 
 	std::shared_ptr<font> m_pFont;
 

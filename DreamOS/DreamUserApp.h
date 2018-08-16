@@ -75,9 +75,7 @@ public:
 	RESULT RequestAppBasisPosition(point& ptOrigin);
 	RESULT RequestAppBasisOrientation(quaternion& qOrigin);
 
-	RESULT SendPopFocusStack();
-	RESULT SendPushFocusStack(DreamUserObserver* pObserver);
-	RESULT SendClearFocusStack();
+	RESULT SendSetPreviousApp(DreamUserObserver* pObserver);
 
 	RESULT SendKBEnterEvent();
 	RESULT SendUserObserverEvent(UserObserverEventType type);
@@ -99,9 +97,7 @@ private:
 	virtual RESULT GetAppBasisPosition(point& ptOrigin) = 0;
 	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) = 0;
 
-	virtual RESULT PopFocusStack() = 0;
-	virtual RESULT PushFocusStack(DreamUserObserver* pObserver) = 0;
-	virtual RESULT ClearFocusStack() = 0;
+	virtual RESULT SetPreviousApp(DreamUserObserver* pObserver) = 0;
 
 	virtual RESULT HandleKBEnterEvent() = 0;
 	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) = 0;
@@ -154,10 +150,7 @@ public:
 	virtual RESULT GetAppBasisPosition(point& ptOrigin) override;
 	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) override;
 
-	virtual RESULT PopFocusStack() override;
-	virtual RESULT PushFocusStack(DreamUserObserver* pObserver) override;
-	virtual RESULT ClearFocusStack() override;
-	RESULT OnFocusStackEmpty(DreamUserObserver *pLastApp);
+	virtual RESULT SetPreviousApp(DreamUserObserver* pObserver) override;
 
 	virtual RESULT HandleKBEnterEvent() override;
 	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) override;
@@ -221,6 +214,7 @@ private:
 	bool m_fHasOpenApp = false;
 	// current app that should receive events from the user
 	DreamUserObserver* m_pEventApp = nullptr;
+	DreamUserObserver* m_pPreviousApp = nullptr;
 
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 

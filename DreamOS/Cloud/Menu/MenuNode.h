@@ -36,7 +36,7 @@ public:
 	
 public:
 	MenuNode();
-	MenuNode(nlohmann::json jsonMenuNode);
+	MenuNode(nlohmann::json jsonMenuNode);	
 	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType);
 	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType, std::string strIconURL, std::string strThumbnailURL);
 

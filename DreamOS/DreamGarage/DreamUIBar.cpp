@@ -59,7 +59,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pMenuIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pOpenIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	//TODO: could move this logic up to DreamUserObserver, and then only 
@@ -99,6 +100,9 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
+
+	m_pRootMenuNode = std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "", "Menu", "", "", ""));
+	m_pOpenMenuNode = std::shared_ptr<MenuNode>(new MenuNode(MenuNode::type::FOLDER, "", "MenuProviderScope.OpenMenuProvider", "Open", "", "", ""));
 
 Error:
 	return r;
@@ -191,6 +195,7 @@ RESULT DreamUIBar::PopPath() {
 
 	CR(RequestIconFile(pNode));
 
+	m_fWaitingForMenuResponse = true;
 	CR(m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle()));
 
 Error:
@@ -229,21 +234,34 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowRootMenu(bool fResetComposite) {
+RESULT DreamUIBar::ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite) {
 	RESULT r = R_PASS;
 
+	CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
 	CBR(m_pCloudController != nullptr, R_OBJECT_NOT_FOUND);
 	CBR(m_pUserControllerProxy != nullptr, R_OBJECT_NOT_FOUND);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
-	//CBR(m_pathStack.empty(), R_SKIPPED);
 	m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+	m_pMenuNode = nullptr;
 
-	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-	//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
-	m_pPendingIconTexture = m_pShareIcon.get();
+	switch (menuLevel) {
+	case MenuLevel::ROOT : {
+		m_pathStack.push(m_pRootMenuNode);
+	} break;
+		
+	case MenuLevel::OPEN : {
+		m_pathStack.push(m_pOpenMenuNode);
+	}break;
+	};
+	
+	m_fWaitingForMenuResponse = true;
+	m_pMenuControllerProxy->RequestSubMenu(m_pathStack.top()->GetScope() , m_pathStack.top()->GetPath(), m_pathStack.top()->GetTitle());
+	
+	RequestIconFile(m_pathStack.top());
+
 	if (fResetComposite) {
 		CR(ResetAppComposite());
 	}
@@ -264,16 +282,21 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				CR(m_pUserHandle->SendReleaseKeyboard());
 				m_pKeyboardHandle = nullptr;
 
-				CR(RequestMenu());
-				//break;
+				PopPath();
 			}
 
 			else if (!m_pathStack.empty()) {
-				CR(PopPath());
+				// TODO: Using the MenuWaitingFlag in PopPath() also covers up a bug where backing out of forms sends a double back.  
+				//		 Requires a revision of how apps receive Notify (InteractionObjectEvents)
+				CR(PopPath());	
+				if (m_pathStack.empty()) {	// if stack is empty after pop, hide the app
+					CR(HideApp());
+					m_pMenuNode = nullptr;
+				}
+			}
 
-				// if the stack is empty after popping from the path, hide the app
-				CBR(m_pathStack.empty(), R_SKIPPED);
-				CR(HideApp());
+			else {
+				ShowMenuLevel(MenuLevel::ROOT, false);
 			}
 
 		} break;
@@ -284,9 +307,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pUserHandle->SendReleaseKeyboard();
 				m_pKeyboardHandle = nullptr;
 			} 
-			CR(m_pUserHandle->SendClearFocusStack());
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+			m_pMenuNode = nullptr;
 				
 		} break;
 
@@ -297,10 +320,13 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				m_pKeyboardHandle = nullptr;
 			} 
 			m_pUserHandle->SendPreserveSharingState(true);
-			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+			
 			if (m_pParentApp != nullptr) {
-				CR(m_pParentApp->CreateBrowserSource());
+				CR(m_pParentApp->CreateBrowserSource(m_pMenuNode->GetScope()));
 			}
+
+			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+			m_pMenuNode = nullptr;
 		} break;
 	}
 
@@ -322,36 +348,21 @@ texture *DreamUIBar::GetOverlayTexture(HAND_TYPE type) {
 	return pTexture;
 }
 
-RESULT DreamUIBar::RequestMenu() {
-	RESULT r = R_PASS;
-
-	std::shared_ptr<MenuNode> pNode;
-	CBR(!m_pathStack.empty(), R_SKIPPED);
-
-	pNode = m_pathStack.top();
-
-	CR(RequestIconFile(pNode));
-
-	m_pathStack.pop();
-	m_fWaitingForMenuResponse = true;
-	m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
-
-Error:
-	return r;
-}
-
 RESULT DreamUIBar::RequestIconFile(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	if (pMenuNode->GetTitle() == "Menu") {
-	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
-		m_pPendingIconTexture = m_pShareIcon.get();
+	//	m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pMenuIcon.get());
+		m_pPendingIconTexture = m_pMenuIcon.get();
+	}
+	else if (pMenuNode->GetTitle() == "Open") {
+		m_pPendingIconTexture = m_pOpenIcon.get();
 	}
 	else {
 		auto strURI = pMenuNode->GetIconURL();
 		if (strURI != "") {
 			MenuNode* pTempMenuNode = new MenuNode();
-			pTempMenuNode->SetName("root_menu_title");
+			pTempMenuNode->SetName(m_strIconTitle);
 			CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 		}
 	}
@@ -402,6 +413,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
 			CR(RequestIconFile(pSubMenuNode));
+			m_pathStack.push(pSubMenuNode);
 
 			m_fWaitingForMenuResponse = true;
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
@@ -409,8 +421,6 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
-				auto pTempMenuNode = std::shared_ptr<MenuNode>(new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType(), pSubMenuNode->GetIconURL(), pSubMenuNode->GetThumbnailURL()));
-				m_pathStack.push(pTempMenuNode);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
 
@@ -421,16 +431,11 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
-				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
-
 			}
-//*
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
-
-				//m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 
 				if (strTitle == "Desktop") {
 					if (m_pParentApp != nullptr) {
@@ -453,11 +458,11 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 					CR(pEnvironmentControllerProxy->RequestForm(strPath));
+					m_pUserHandle->SendSetPreviousApp(this);
 				}
-				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+				m_pMenuNode = pSubMenuNode;
 				ClearMenuWaitingFlag();
 			}
-//*/
 		}
 	}
 
@@ -471,7 +476,12 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 	if (pContext != nullptr) {
 		MenuNode* pObj = reinterpret_cast<MenuNode*>(pContext);
 		
-		m_downloadQueue.push_back(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
+		if (pObj->GetTitle() == m_strIconTitle) {
+			m_pPendingIconTextureBuffer = pBufferVector;
+		}
+		else {
+			m_downloadQueue.push_back(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
+		}
 	}
 
 //Error:
@@ -528,25 +538,42 @@ RESULT DreamUIBar::Update(void *pContext) {
 		}
 	}
 	
+	// Got a new MenuNode - moving to a different level in menu from the current one
+	// So clear everything and create buttons
 	if (m_pMenuNode && m_pMenuNode->IsDirty()) {	// this is iffy, it relies on dirty only being set if we move to a new menu level
 		m_downloadQueue.clear();
 		m_requestQueue = std::queue<std::shared_ptr<MenuNode>>();
 		m_pScrollView->ClearScrollViewNodes();
 		m_loadedMenuItems = 0;
 
-		// request title icon
-		auto strHeaders = GetStringHeaders();
-
-		auto strURI = m_pMenuNode->GetIconURL();
-		if (strURI != "") {
-			m_pMenuNode->SetName("root_menu_title");
-			CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
-		}
-
 		CR(MakeMenuItems());
 	}
 	CNR(m_pMenuNode, R_SKIPPED);
 
+	// Processing Title icon
+	if (m_pPendingIconTextureBuffer != nullptr) {
+
+		CN(m_pPendingIconTextureBuffer);
+		uint8_t* pBuffer = &(m_pPendingIconTextureBuffer->operator[](0));
+		size_t pBuffer_n = m_pPendingIconTextureBuffer->size();
+
+		m_pPendingIconTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		CN(m_pPendingIconTexture);
+
+		if (m_pKeyboardHandle != nullptr) {
+			m_pKeyboardHandle->UpdateTitleView(m_pPendingIconTexture, "Website");
+		}
+		else {
+			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
+		}
+
+		DEBUG_LINEOUT("updated title for %s", m_pMenuNode->GetTitle().c_str());
+
+		m_pPendingIconTextureBuffer = nullptr;
+		m_pPendingIconTexture = nullptr;
+	}
+
+	// Created buttons, so build the texture request queue
 	if (m_fAddNewMenuItems) {
 		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 
@@ -561,6 +588,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		ClearMenuWaitingFlag();
 	}
 
+	// Send out texture requests - limited by m_concurrentRequestLimit
 	if (!m_requestQueue.empty() && m_fRequestTexture) {
 		CR(RequestMenuItemTexture());
 	}
@@ -615,15 +643,12 @@ RESULT DreamUIBar::MakeMenuItems() {
 
 		{
 			m_pMenuNode->CleanDirty();
-			if (m_pMenuNode->GetNodeType() != MenuNode::type::ACTION) {
+			m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
 
-				m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
-
-				if (m_pPendingIconTexture != nullptr) {
-					m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
-					m_pPendingIconTexture = nullptr;
-				}
+			if (m_pPendingIconTexture != nullptr) {	// Top level menu has it's icon saved as m_pMenuIcon, so it follows this flow :/
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);
 			}
+
 			CR(ShowApp());
 		}	
 	}
@@ -675,26 +700,15 @@ RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
 
 		pMenuNode->SetThumbnailTexture(pTexture);
 
-		if (pMenuNode->GetTitle() == "root_menu_title") {
-			//m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
-			m_pPendingIconTexture = pTexture;
-			// TODO: May want to move downloading outside of DreamUIBar
-			// TODO: the only time the title view is used is to show the chrome icon and "Website" title
-			if (m_pKeyboardHandle != nullptr) {
-				m_pKeyboardHandle->UpdateTitleView(pTexture, "Website");
-			}
-			DEBUG_LINEOUT("updated title");
-		}
-		else {
-			m_pScrollView->UpdateScrollViewNode(pMenuNode);
-		}
-
+		m_pScrollView->UpdateScrollViewNode(pMenuNode);
+		
 		if (pBufferVector != nullptr) {
 			pBufferVector = nullptr;
 		}
 
 		m_downloadQueue.pop_back();
 	}
+
 	m_loadedMenuItems += elements;
 	m_fRequestTexture = true;
 
@@ -842,14 +856,10 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
 
 	if (m_pMenuNode && m_pMenuNode->GetPath() == pMenuNode->GetPath() && m_pMenuNode->GetScope() == pMenuNode->GetScope()) {		// Catch next page
-		// stubby stub stub
 		m_pMenuNode = pMenuNode;
 	}
 	else {	// opening new layer of the menu
-		m_pMenuNode = pMenuNode;
-		if (m_pathStack.empty()) {
-			m_pathStack.push(m_pMenuNode);
-		}
+		m_pMenuNode = pMenuNode;	
 		m_pMenuNode->SetDirty();
 	}
 	m_fAddNewMenuItems = true;

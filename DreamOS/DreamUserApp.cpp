@@ -50,27 +50,10 @@ Error:
 	return r;
 }
 
-RESULT DreamUserHandle::SendPopFocusStack() {
+RESULT DreamUserHandle::SendSetPreviousApp(DreamUserObserver* pObserver) {
 	RESULT r = R_PASS;
 	CB(GetAppState());
-	CR(PopFocusStack());
-Error:
-	return r;
-}
-
-
-RESULT DreamUserHandle::SendPushFocusStack(DreamUserObserver* pObserver) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PushFocusStack(pObserver));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendClearFocusStack() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ClearFocusStack());
+	CR(SetPreviousApp(pObserver));
 Error:
 	return r;
 }
@@ -399,7 +382,15 @@ RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
 	RESULT r = R_PASS;
 
 	//CBR(fHasOpenApp != m_fHasOpenApp, R_SKIPPED);
-	m_fHasOpenApp = fHasOpenApp;
+	if (!fHasOpenApp && m_pPreviousApp != nullptr) {
+		m_fHasOpenApp = true;
+		m_pEventApp = m_pPreviousApp;
+		HandleUserObserverEvent(UserObserverEventType::BACK);
+		m_pPreviousApp = nullptr;
+	}
+	else {
+		m_fHasOpenApp = fHasOpenApp;
+	}
 
 	if (m_fHasOpenApp) {
 
@@ -564,51 +555,17 @@ RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
 	return R_PASS;
 }
 
-RESULT DreamUserApp::PopFocusStack() {
-	RESULT r = R_PASS;
-
-	return r;
-}
-
-RESULT DreamUserApp::PushFocusStack(DreamUserObserver *pObserver) {
-	RESULT r = R_PASS;
-
-	return r;
-}
-
 RESULT DreamUserApp::StopSharing() {
 	RESULT r = R_PASS;
 
 	return r;
 }
 
-RESULT DreamUserApp::ClearFocusStack() {
+RESULT DreamUserApp::SetPreviousApp(DreamUserObserver* pObserver) {
 	RESULT r = R_PASS;
 
-	CBR(m_pEventApp != nullptr, R_SKIPPED);
-	CR(OnFocusStackEmpty(m_pEventApp));
+	m_pPreviousApp = pObserver;
 
-Error:
-	return r;
-}
-
-RESULT DreamUserApp::OnFocusStackEmpty(DreamUserObserver *pLastApp) {
-	RESULT r = R_PASS;
-
-	ResetAppComposite();
-	if (!m_fStreaming && !m_fIsSharing) {
-		CR(m_pLeftMallet->Hide());
-		CR(m_pRightMallet->Hide());
-
-		UpdateOverlayTextures();
-		//stay with controller models if the user is currently looking at them
-		if (!(m_fCollisionLeft || m_fCollisionRight)) {
-			CR(m_pLeftHand->SetModelState(hand::ModelState::HAND));
-			CR(m_pRightHand->SetModelState(hand::ModelState::HAND));
-		}
-	}
-
-Error:
 	return r;
 }
 
@@ -648,7 +605,12 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	}
 	else {
 		pHand->SetOverlayVisible(false);
-		pHand->SetModelState(hand::ModelState::HAND);
+		if (m_fHasOpenApp) {
+			pHand->SetModelState(hand::ModelState::CONTROLLER);
+		}
+		else {
+			pHand->SetModelState(hand::ModelState::HAND);
+		}
 	}
 
 	auto pVolume = pHand->GetPhantomVolume().get();

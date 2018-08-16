@@ -20,6 +20,7 @@ class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
 class DreamDesktopApp;
+class DreamGamepadCameraApp;
 class DreamEnvironmentApp;
 class UIStageProgram;
 class UpdateMouthMessage;
@@ -187,6 +188,7 @@ private:
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
+	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamePadCameraApp = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

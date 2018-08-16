@@ -23,6 +23,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamLoginApp.h"
 #include "DreamUserApp.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "DreamGarage/DreamGamepadCameraApp.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
@@ -393,6 +394,10 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pDreamGeneralForm = LaunchDreamApp<DreamFormApp>(this, false);
 	CN(m_pDreamSettings);
 
+	if (GetSandboxConfiguration().fUseGamepad) {
+		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+	}
+
 	// TODO: could be somewhere else(?)
 	CR(RegisterDOSObserver(this));
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
@@ -412,8 +417,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	else {
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
-
-		CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+		}
 	}
 	
 Error:
@@ -1041,49 +1047,53 @@ Error:
 
 RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
-	// TODO: populate these
-	bool fFirstLogin = true;
-	bool fHasCreds = false;
 
-	if (strMessage == "DreamSettingsApp.OnSuccess") {
-		std::string strFormType;
-		// this specific case is only when: not first login, has credentials, has no settings, has no team
-		if (!fFirstLogin && fHasCreds) {
-			strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-			m_pUserController->GetFormURL(strFormType);
-			m_pDreamLoginApp->Show();
-		}
-		// after the user has defined their settings, show sign up/sign in 
-		// based on whether this is the first launch or not
-		else if (fFirstLogin) {
-			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
-			m_pUserController->GetFormURL(strFormType);
-			m_pDreamLoginApp->Show();
-		}
-		else {
-			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
-			m_pUserController->GetFormURL(strFormType);
-			m_pDreamLoginApp->Show();
-		}
+	auto pCloudController = GetCloudController();
+	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
+		// Resuming Dream functions if form was accessed out of Menu
+		m_pDreamUserControlArea->OnDreamFormSuccess();
 	}
-	// once login has succeeded, save the settings from earlier and the launch date
-	// environment id should have been set through DreamLoginApp responding to javascript
-	else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
-	//else if (strMessage == "DreamLoginApp.OnSuccess") {
-		m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
-		CR(m_pDreamLoginApp->SetLaunchDate());
-		
-		CR(m_pUserController->SetSettings(m_strAccessToken, 
-			m_pDreamUserApp->GetHeight(), 
-			m_pDreamUserApp->GetDepth(), 
-			m_pDreamUserApp->GetScale()));
+	else {
+		if (strMessage == "DreamSettingsApp.OnSuccess") {
+			std::string strFormType;
+			// this specific case is only when: not first login, has credentials, has no settings, has no team
+			if (!m_fFirstLogin && m_fHasCredentials) {
+				strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
+				m_pUserController->GetFormURL(strFormType);
+				m_pDreamLoginApp->Show();
+			}
+			// after the user has defined their settings, show sign up/sign in 
+			// based on whether this is the first launch or not
+			else if (m_fFirstLogin) {
+				strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+				m_pUserController->GetFormURL(strFormType);
+				m_pDreamLoginApp->Show();
+			}
+			else {
+				strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+				m_pUserController->GetFormURL(strFormType);
+				m_pDreamLoginApp->Show();
+			}
+		}
+		// once login has succeeded, save the settings from earlier and the launch date
+		// environment id should have been set through DreamLoginApp responding to javascript
+		else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
+			//else if (strMessage == "DreamLoginApp.OnSuccess") {
+			m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
+			CR(m_pDreamLoginApp->SetLaunchDate());
 
-		// TODO: potentially where the lobby environment changes to the team environment
-		// could also be once the environment id is set
+			CR(m_pUserController->SetSettings(m_strAccessToken,
+				m_pDreamUserApp->GetHeight(),
+				m_pDreamUserApp->GetDepth(),
+				m_pDreamUserApp->GetScale()));	
 
-		// TODO: populate user
-		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
-		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+			// TODO: potentially where the lobby environment changes to the team environment
+			// could also be once the environment id is set
+
+			// TODO: populate user
+			CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+			CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		}
 	}
 
 Error:

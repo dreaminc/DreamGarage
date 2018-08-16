@@ -31,13 +31,12 @@ Error:
 // DreamApp Interface
 RESULT DreamSettingsApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
-
+	
 	CR(GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this));
 	CR(GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this));
 	CR(GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this));
 	CR(GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this));
-	CR(GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this));
-
+	
 Error:
 	return r;
 }
@@ -86,12 +85,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	CBR(m_fFormVisible, R_SKIPPED);
 	CNR(m_pUserApp, R_SKIPPED);
 
-	if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-		//auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-		//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);
-		//CR(Hide());
-	}
-	else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
+	if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
 		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
 			m_pUserApp->UpdateHeight(diff);
@@ -127,6 +121,7 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//CR(DreamFormApp::HandleDreamFormSuccess());
+	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 
