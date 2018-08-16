@@ -11,6 +11,7 @@
 #include "Cloud/CloudControllerFactory.h"
 
 #include "HAL/opengl/OGLProgram.h"
+#include "HAL\opengl\OGLTexture.h"
 
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/Dream2DMouseApp.h"
@@ -341,12 +342,22 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject2 = nullptr;
 
 		quad *m_pBrowserQuad = nullptr;
+		texture *pQuadTexture = nullptr;
 		
 		//sphere *pSphereLeftChrome = nullptr;
 		//sphere *pSphereRightChrome = nullptr;
 		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectLeftChrome = nullptr;
 		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectRightChrome = nullptr;
 		
+
+		struct PendingVideoBuffer {
+			uint8_t *pPendingBuffer = nullptr;
+			int pxWidth = 0;
+			int pxHeight = 0;
+			bool fPendingBufferReady = false;
+		} m_pendingVideoBuffer;
+
+		uint8_t *pTestVideoFrameBuffer = nullptr;
 
 		// SoundClient::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -481,9 +492,19 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		}
 
 		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
-			//DEVENV_LINEOUT(L"OnVideoFrame");
+			RESULT r = R_PASS;
 
-			return R_NOT_HANDLED;
+			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
+
+			//DEBUG_LINEOUT("on video frame");
+
+			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+			m_pendingVideoBuffer.pxWidth = pxWidth;
+			m_pendingVideoBuffer.pxHeight = pxHeight;
+			m_pendingVideoBuffer.fPendingBufferReady = true;
+
+		Error:
+			return r;
 		}
 
 		// CloudController::UserObserver
@@ -586,17 +607,18 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		strTestValue = pCommandLineManager->GetParameterValue("testval");
 		int testUserNumber = atoi(strTestValue.c_str());
 
+		// quad
+		// This presents a timing issue if it works 
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+
 		// Browser
 		if (testUserNumber == 2) {
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);
 			CR(pTestContext->m_pWebBrowserManager->Initialize());
-
-			// This presents a timing issue if it works 
-			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
-			CN(pTestContext->m_pBrowserQuad);
-			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
-			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 
 			// Create the Shared View App
 			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
@@ -610,6 +632,27 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
 
 			pTestContext->m_pDreamBrowser->SetURI(strURL);
+		}
+		else {
+			// temp
+			int pxWidth = 500;
+			int pxHeight = 500;
+			int channels = 4;
+
+			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+
+			pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
+				texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
+
+			CN(pTestContext->pQuadTexture);
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
 		}
 
 		// Cloud Controller
@@ -714,8 +757,30 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CloudController *pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
-		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowser != nullptr) {
-			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+		if (pTestContext->m_pBrowserQuad != nullptr) {
+
+			if (pTestContext->m_pDreamBrowser != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture().get();
+
+				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pSourceTexture);
+
+				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+
+				pCloudController->BroadcastTextureFrame(pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+			}
+			else if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+				
+				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTexture)->Resize(pTestContext->m_pendingVideoBuffer.pxWidth, pTestContext->m_pendingVideoBuffer.pxHeight);
+
+				// Update the video buffer to texture
+
+				CR(pTestContext->pQuadTexture->Update(
+					(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
+					pTestContext->m_pendingVideoBuffer.pxWidth,
+					pTestContext->m_pendingVideoBuffer.pxHeight,
+					PIXEL_FORMAT::RGBA)
+				);
+			}
 		}
 
 		// Every 20 ms
@@ -752,6 +817,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//*/
 
 	Error:
+		pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+
+		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingVideoBuffer.pPendingBuffer;
+			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
+		}
+
 		return r;
 	};
 
