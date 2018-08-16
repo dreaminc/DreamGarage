@@ -695,9 +695,16 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
+		point ptScreenPosition;
+		quaternion qScreenRotation;
+		float screenScale;
 
 		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
+
+		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		//CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
 		CR(SetRoundtablePosition(seatPosition));

@@ -52,6 +52,7 @@ public:
 	RESULT FadeIn();
 
 	RESULT SwitchToEnvironment(EnvironmentType type);
+	RESULT GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale);
 
 private:
 	point m_ptSceneOffset;

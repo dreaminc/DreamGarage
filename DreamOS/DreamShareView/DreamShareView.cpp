@@ -489,3 +489,13 @@ Error:
 
 	return r;
 }
+
+RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale) {
+	RESULT r = R_PASS;
+
+	GetComposite()->SetPosition(ptPosition);
+	//GetComposite()->SetOrientation(qOrientation);
+	//GetComposite()->SetScale(scale);
+
+	return r;
+}

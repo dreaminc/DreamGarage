@@ -205,6 +205,28 @@ Error:
 	return r;
 }
 
+RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale) {
+	RESULT r = R_PASS;
+
+	switch (m_currentType) {
+	case ISLAND: {
+		ptPosition = point(0.0f, 2.0f, -2.0f);
+		qOrientation = quaternion();
+		scale = 1.0f;
+	} break;
+	case CAVE: {
+		//ptPosition = point(m_tableLength/2.0f, 2.0f, -2.0f);
+		//qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+		ptPosition = point(0.0f, 2.0f, -2.0f);
+		qOrientation = quaternion();
+		scale = 1.0f;
+	}
+	}
+
+//Error:
+	return r;
+}
+
 RESULT DreamEnvironmentApp::SeatUser(point& ptPosition, quaternion& qOrientation, int seatIndex) {
 	RESULT r = R_PASS;
 
