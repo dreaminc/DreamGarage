@@ -116,7 +116,7 @@ public:
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
-	virtual RESULT OnGetTeam(bool fSuccess, int environmentId);
+	virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId);
 
 
 	// DOS Observer

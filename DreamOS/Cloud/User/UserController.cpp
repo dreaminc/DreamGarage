@@ -620,14 +620,14 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 	CB(statusCode == 200 || statusCode == 404);
 
 	if (statusCode == 404) {
-		m_pUserControllerObserver->OnGetTeam(false, -1);
+		m_pUserControllerObserver->OnGetTeam(false, -1, -1);
 	}
 	else {
 		nlohmann::json jsonTeam = jsonData["/team"_json_pointer];
 		//Currently, only the default environment is needed here	
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
-		m_pUserControllerObserver->OnGetTeam(true, environmentId);
+		m_pUserControllerObserver->OnGetTeam(true, environmentId, environmentModelId);
 	}
 	
 Error:

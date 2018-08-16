@@ -161,7 +161,7 @@ public:
 		// api methods
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
-		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) = 0;
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

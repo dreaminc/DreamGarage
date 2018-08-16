@@ -119,6 +119,21 @@ RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
 	return R_PASS;
 }
 
+RESULT DreamEnvironmentApp::SetCurrentEnvironment(int environmentModelId) {
+	RESULT r = R_PASS;
+
+	EnvironmentType type;
+	switch (environmentModelId) {
+		case 1: type = CAVE; break;
+		default: type = ISLAND; break;
+	}
+
+	CR(SetCurrentEnvironment(type));
+
+Error:
+	return R_PASS;
+}
+
 RESULT DreamEnvironmentApp::SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms) {
 	m_skyboxPrograms = pPrograms;
 	return R_PASS;

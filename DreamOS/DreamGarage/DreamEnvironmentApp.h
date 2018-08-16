@@ -41,6 +41,7 @@ public:
 	RESULT PositionEnvironment(EnvironmentType type, std::shared_ptr<model> pModel);
 	RESULT LoadAllEnvironments();
 	RESULT SetCurrentEnvironment(EnvironmentType type);
+	RESULT SetCurrentEnvironment(int environmentModelId);
 
 	RESULT SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms);
 	RESULT SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram);

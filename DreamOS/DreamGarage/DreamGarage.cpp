@@ -700,7 +700,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		float screenScale;
 
 		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
-		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
+		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
@@ -1184,7 +1184,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
+RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
 	if (!fSuccess) {
@@ -1196,6 +1196,8 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environmentModelId));
 	}
 
 Error:
