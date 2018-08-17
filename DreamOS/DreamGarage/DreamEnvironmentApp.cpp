@@ -81,7 +81,7 @@ RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::sha
 
 	}
 	else {
-		m_ptSceneOffset = point(0.0f, -1.0f, 0.0f);
+		m_ptSceneOffset = point(0.0f, -1.21f, 0.0f);
 		m_sceneScale = m_environmentSceneScale;
 	}
 	//*/
