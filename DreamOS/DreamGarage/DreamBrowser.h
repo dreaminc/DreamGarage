@@ -29,6 +29,8 @@
 
 #include "DreamUserControlArea/DreamContentSource.h"
 
+#include "Sound/SoundCommon.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -41,6 +43,7 @@ class DOMNode;
 class DreamUserHandle;
 class DreamUserControlArea;
 class AudioPacket;
+class SoundBuffer;
 
 #include "DreamShareViewMessage.h"
 
@@ -262,6 +265,18 @@ private:
 		"https://api.dreamos.com",
 		"https://dreamos.com"
 	};
+
+	// Sound stuff
+private:
+	RESULT InitializeDreamBrowserSoundSystem();
+	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT AudioProcess();
+
+	sound::state m_soundState = sound::state::UNINITIALIZED;
+	SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	std::thread	m_browserAudioProcessingThread;
+
+	
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

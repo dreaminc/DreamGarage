@@ -60,6 +60,7 @@ public:
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
 	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket);
+	virtual RESULT PushAudioPacket(const AudioPacket &audioPacket);
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
 
