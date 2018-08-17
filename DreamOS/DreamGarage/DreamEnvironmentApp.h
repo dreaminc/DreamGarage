@@ -16,11 +16,14 @@ class SkyboxScatterProgram;
 class OGLProgramScreenFade;
 class user;
 
-typedef enum EnvironmentType {
-	LOBBY,
-	CAVE,
-	ISLAND
-} ENVIRONMENT_TYPE;
+namespace environment {
+	typedef enum type {
+		LOBBY = 0,
+		CAVE = 1,
+		ISLAND = 2,
+		INVALID
+	} ENVIRONMENT_TYPE;
+};
 
 class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	friend class DreamAppManager;
@@ -38,10 +41,9 @@ protected:
 	static DreamEnvironmentApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT PositionEnvironment(EnvironmentType type, std::shared_ptr<model> pModel);
+	RESULT PositionEnvironment(environment::type type, std::shared_ptr<model> pModel);
 	RESULT LoadAllEnvironments();
-	RESULT SetCurrentEnvironment(EnvironmentType type);
-	RESULT SetCurrentEnvironment(int environmentModelId);
+	RESULT SetCurrentEnvironment(environment::type type);
 
 	RESULT SetSkyboxPrograms(std::vector<SkyboxScatterProgram*> pPrograms);
 	RESULT SetScreenFadeProgram(OGLProgramScreenFade* pFadeProgram);
@@ -52,7 +54,7 @@ public:
 	RESULT ShowEnvironment(void *pContext);
 	RESULT FadeIn();
 
-	RESULT SwitchToEnvironment(EnvironmentType type);
+	RESULT SwitchToEnvironment(environment::type type);
 	RESULT GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale);
 
 private:
@@ -72,21 +74,21 @@ private:
 
 private:
 	std::shared_ptr<model> m_pCurrentEnvironmentModel = nullptr;
-	EnvironmentType m_currentType;
+	environment::type m_currentType;
 
 	// environment loading maps
 	//TODO: incorporate new environment
-	std::map<EnvironmentType, std::wstring> m_environmentFilenames = {
-		{ISLAND, L"\\FloatingIsland\\env.obj"},
-		{CAVE, L"\\Cave\\cave_no_water_ib.fbx"}
+	std::map<environment::type, std::wstring> m_environmentFilenames = {
+		{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
+		{environment::CAVE, L"\\Cave\\cave_no_water_ib.fbx"}
 	};
 
 	//populated in LoadAllEnvironments
-	std::map<EnvironmentType, std::shared_ptr<model>> m_environmentModels;
+	std::map<environment::type, std::shared_ptr<model>> m_environmentModels;
 
 	// Environment positioning information (non-island) 
 public:
-	RESULT SeatUser(point& ptPosition, quaternion& qOrientation, int seatIndex);
+	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
 
 private:
 	float m_environmentSceneScale = 0.01f;

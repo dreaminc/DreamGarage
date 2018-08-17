@@ -649,7 +649,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	quaternion qOffset;
 
 	CN(m_pDreamEnvironmentApp);
-	CR(m_pDreamEnvironmentApp->SeatUser(ptSeatPosition, qOffset, seatingPosition));
+	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
 
 	if (!pCamera->HasHMD()) {
 		pCamera->SetOrientation(qOffset);
@@ -671,7 +671,7 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	quaternion qRotation;
 
 	CN(m_pDreamEnvironmentApp);
-	CR(m_pDreamEnvironmentApp->SeatUser(ptSeatPosition, qRotation, seatingPosition));
+	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
 
 	pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
@@ -1197,7 +1197,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 		
-		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environmentModelId));
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 	}
 
 Error:
