@@ -200,9 +200,11 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 	m_pDreamUserApp->m_pAppBasis->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
 	m_pDreamUserApp->GetComposite()->SetPosition(m_pDreamUserApp->m_pAppBasis->GetPosition());
 
+	/*
 	if (m_pDreamUIBar != nullptr) {
 		m_pDreamUIBar->ResetAppComposite();
 	}
+	//*/
 
 	return R_PASS;
 }
@@ -1027,14 +1029,14 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
 
-			ResetAppComposite();	
+//			ResetAppComposite();	
 		}
 		
 		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
 			Hide();
 			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
-			ResetAppComposite();
+//			ResetAppComposite();
 		}
 
 		else {	// Pressing back when Menu has a level saved

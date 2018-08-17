@@ -58,9 +58,11 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 	}
 
 	if (m_fPendShowFormView) {
+		/*
 		if (m_pUserApp != nullptr) {
 			m_pUserApp->ResetAppComposite();
 		}
+		//*/
 		GetComposite()->SetVisible(true, false);
 		CR(Show());
 	}

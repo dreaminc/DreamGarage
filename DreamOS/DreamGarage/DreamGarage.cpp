@@ -679,6 +679,9 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
 	}
 
+	CN(m_pDreamUserApp);
+	//m_pDreamUserApp->
+
 Error:
 	return r;
 }
