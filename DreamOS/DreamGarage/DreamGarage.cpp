@@ -1050,6 +1050,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 			// could also be once the environment id is set
 
 			// TODO: populate user
+			CR(m_pUserController->GetTeam(m_strAccessToken));
 			CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 			CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 		}
@@ -1065,11 +1066,6 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	CR(m_pDreamUserApp->UpdateHeight(height));
 	CR(m_pDreamUserApp->UpdateDepth(depth));
 	CR(m_pDreamUserApp->UpdateScale(scale));
-
-	// TODO: needs different route.  environment socket path does not need to get team
-
-	m_pUserController->GetTeam(m_pDreamLoginApp->GetAccessToken());
-
 
 Error:
 	return r;
@@ -1111,7 +1107,9 @@ RESULT DreamGarage::OnLogout() {
 	CNM(pUserController, "User controller was nullptr");
 
 	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
-	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
+
+	// Don't clear last login on logout
+	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
 
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
@@ -1161,9 +1159,11 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		// TODO: should be temporary
 		m_strAccessToken = strAccessToken;
 
-
-		CR(m_pDreamLoginApp->SetAccessToken(strAccessToken));
-		CR(m_pUserController->GetSettings(strAccessToken));
+		CR(m_pDreamLoginApp->SetAccessToken(m_strAccessToken));
+		CR(m_pUserController->GetSettings(m_strAccessToken));
+		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		CR(m_pUserController->GetTeam(m_strAccessToken));
 	}
 
 Error:
@@ -1194,10 +1194,9 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	}
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
-		
-		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 	}
 
 Error:

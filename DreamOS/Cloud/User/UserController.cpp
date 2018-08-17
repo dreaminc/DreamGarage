@@ -627,6 +627,8 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 		//Currently, only the default environment is needed here	
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
+
+		SetUserDefaultEnvironmentID(environmentId);
 		m_pUserControllerObserver->OnGetTeam(true, environmentId, environmentModelId);
 	}
 	
