@@ -81,7 +81,7 @@ public:
 		return r;
 	}
 
-	sound::type GetSoundType() {
+	sound::type GetSoundType() const {
 		return m_soundType;
 	}
 

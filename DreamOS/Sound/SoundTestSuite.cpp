@@ -297,7 +297,7 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 			RESULT r = R_PASS;
 
 			if (pXAudioSoundClient != nullptr) {
-				CR(pXAudioSoundClient->PushAudioPacket(pendingAudioPacket));
+				CRM(pXAudioSoundClient->PushAudioPacket(pendingAudioPacket), "Failed to push audio packet");
 			}
 
 		Error:

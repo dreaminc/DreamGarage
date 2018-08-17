@@ -27,6 +27,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 #define RFAILED() (r&0x80000000)
 #define RSUCCESS() (!RFAILED())
+#define RCHECK(res) (!(res & 0x80000000))
 
 // Logging
 

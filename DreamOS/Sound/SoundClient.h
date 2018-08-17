@@ -21,13 +21,6 @@ class vector;
 #define DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS 20 
 
 class SoundClient {
-public:
-	enum class state {
-		UNINITIALIZED,
-		STOPPED,
-		RUNNING,
-		INVALID
-	};
 
 public:
 	class observer {
@@ -56,9 +49,9 @@ protected:
 	int GetCaptureSamplingRate() { return m_captureSamplingRate; }
 	int GetSpaitalSamplingRate() { return m_spatialSamplingRate; }
 
-	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
-	SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
-	SoundClient::state m_spatialState = SoundClient::state::UNINITIALIZED;
+	sound::state m_renderState = sound::state::UNINITIALIZED;
+	sound::state m_captureState = sound::state::UNINITIALIZED;
+	sound::state m_spatialState = sound::state::UNINITIALIZED;
 
 	RESULT InitializeCaptureSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);

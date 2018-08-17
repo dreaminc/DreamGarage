@@ -15,6 +15,13 @@ namespace sound {
 		FLOATING_POINT_64_BIT,
 		INVALID
 	};
+
+	enum class state {
+		UNINITIALIZED,
+		STOPPED,
+		RUNNING,
+		INVALID
+	};
 }
 
 #endif // ! SOUND_COMMON_H_
