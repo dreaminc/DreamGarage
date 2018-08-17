@@ -17,7 +17,7 @@ private:
 	inline void WriteNextValue(CBType value) {
 		m_circularBuffer[m_circularBuffer_e] = value;
 		m_circularBuffer_e += 1;
-		m_numPendingBytes++;
+		m_numPendingBufferSamples++;
 
 		if (m_circularBuffer_e >= m_circularBuffer_n) {
 			m_circularBuffer_e = 0;
@@ -35,7 +35,7 @@ public:
 		retVal = m_circularBuffer[m_circularBuffer_c];
 
 		m_circularBuffer_c++;
-		m_numPendingBytes--;
+		m_numPendingBufferSamples--;
 
 		// Circle up
 		if (m_circularBuffer_c >= m_circularBuffer_n) {
@@ -68,7 +68,7 @@ public:
 
 		m_circularBuffer_e = 0;
 		m_circularBuffer_c = 0;
-		m_numPendingBytes = 0;
+		m_numPendingBufferSamples = 0;
 
 		return R_PASS;
 	}
@@ -79,7 +79,7 @@ public:
 	RESULT SetBufferToValues(size_t startPosition, size_t numPendingFrames) {
 		m_circularBuffer_e = startPosition + numPendingFrames;
 		m_circularBuffer_c = startPosition;
-		m_numPendingBytes = numPendingFrames;
+		m_numPendingBufferSamples = numPendingFrames;
 
 		return R_PASS;
 	}
@@ -87,7 +87,7 @@ public:
 	inline RESULT IncrementBuffer(int count) {
 		RESULT r = R_PASS;
 
-		CB((NumPendingBufferBytes() >= count));
+		CB((NumPendingBufferSamples() >= count));
 
 		// Increment current by buffer size
 		m_circularBuffer_c += count;
@@ -97,8 +97,8 @@ public:
 			m_circularBuffer_c -= m_circularBuffer_n;
 		}
 
-		m_numPendingBytes -= count;
-		CBM((m_numPendingBytes >= 0), "ERROR: CIRCULAR BUFFER PENDING BYTES ERROR");
+		m_numPendingBufferSamples -= count;
+		CBM((m_numPendingBufferSamples >= 0), "ERROR: CIRCULAR BUFFER PENDING BYTES ERROR");
 
 	Error:
 		return r;
@@ -129,26 +129,26 @@ public:
 	}
 
 	size_t NumAvailableBufferBytes() {
-		return (m_circularBuffer_n - m_numPendingBytes);
+		return (m_circularBuffer_n - m_numPendingBufferSamples);
 	}
 
 	size_t SizeOfCircularBuffer() {
 		return m_circularBuffer_n;
 	}
 	
-	size_t NumPendingBufferBytes() {
-		return m_numPendingBytes;
+	size_t NumPendingBufferSamples() {
+		return m_numPendingBufferSamples;
 	}
 
 	bool IsPendingBufferEmpty() {
-		if (m_numPendingBytes == 0)
+		if (m_numPendingBufferSamples == 0)
 			return true;
 		else
 			return false;
 	}
 
 	bool IsFull() {
-		if (m_numPendingBytes >= m_circularBuffer_n)
+		if (m_numPendingBufferSamples >= m_circularBuffer_n)
 			return true;
 		else
 			return false;
@@ -157,7 +157,7 @@ public:
 	RESULT ReadFromBuffer(CBType* &pDataBuffer, size_t bytesToRead, size_t &bytesRead) {
 		RESULT r = R_PASS;
 
-		size_t bytesAvailable = NumPendingBufferBytes();
+		size_t bytesAvailable = NumPendingBufferSamples();
 
 		CBR((bytesAvailable > 0), R_BUFFER_EMPTY);
 
@@ -325,7 +325,7 @@ private:
 	size_t m_circularBuffer_n = MAX_PENDING_BUFFER_LENGTH;
 	size_t m_circularBuffer_e = 0;
 	size_t m_circularBuffer_c = 0;
-	size_t m_numPendingBytes = 0;
+	size_t m_numPendingBufferSamples = 0;
 };
 
 

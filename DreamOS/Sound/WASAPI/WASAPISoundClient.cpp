@@ -553,7 +553,7 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			int readBytes = 0;
 			m_pRenderSoundBuffer->LockBuffer(); 
 			{
-				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {
+				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingFrames()) > 0) {
 					//DEBUG_LINEOUT("Rendering %d frames", readBytes);
 
 					float *pDataBuffer = (float*)(pAudioClientBufferData);

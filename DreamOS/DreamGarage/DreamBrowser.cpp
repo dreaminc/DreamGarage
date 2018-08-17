@@ -784,6 +784,7 @@ RESULT DreamBrowser::AudioProcess() {
 
 	DEBUG_LINEOUT("Dream Browser Audio Process Started");
 
+	int64_t pendingBytes = 0;
 	DWORD taskIndex = 0;
 	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
 
@@ -797,20 +798,34 @@ RESULT DreamBrowser::AudioProcess() {
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 
 		if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
+		
+		//if (m_pRenderSoundBuffer != nullptr ) {
 			
-			if (m_pRenderSoundBuffer->NumPendingBytes() > 480) {
+			m_pRenderSoundBuffer->LockBuffer();
 
-				lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+			{
+				pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
 
-				AudioPacket pendingAudioPacket;
+				if (pendingBytes >= 480) {
 
-				m_pRenderSoundBuffer->GetAudioPacket(480, &pendingAudioPacket);
+					//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
-				if (m_pObserver != nullptr) {
-					CBRM(RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)), R_HANDLER_FAILED,
-						"Handle Audio Packet Failed");
+					lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+
+					AudioPacket pendingAudioPacket;
+
+					m_pRenderSoundBuffer->GetAudioPacket(480, &pendingAudioPacket);
+
+					if (m_pObserver != nullptr) {
+						if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+							DOSLOG(INFO, "Handle Audio Packet Failed");
+						}
+					}
 				}
 			}
+
+			m_pRenderSoundBuffer->UnlockBuffer();
+
 		}
 	}
 
@@ -828,7 +843,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	//if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
 
 	if (m_pRenderSoundBuffer != nullptr) {
-		CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket));
+		CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
 	}
 
 	/*

@@ -62,10 +62,21 @@ const char* SoundBuffer::TypeString(sound::type bufferType) {
 	return "invalid";
 }
 
-RESULT SoundBuffer::PushAudioPacket(const AudioPacket &audioPacket) {
+// The aptly named clobber param will clear the current contents of the buffer
+RESULT SoundBuffer::PushAudioPacket(const AudioPacket &audioPacket, bool fClobber) {
 	RESULT r = R_PASS;
 
 	CBM((audioPacket.GetNumChannels() == m_channels), "Channel mismatch");
+
+	if (fClobber) {
+		LockBuffer();
+		
+		{
+			ResetBuffer(0, 0);
+		}
+		
+		UnlockBuffer();
+	}
 
 	switch (audioPacket.GetSoundType()) {
 		case sound::type::UNSIGNED_8_BIT: {

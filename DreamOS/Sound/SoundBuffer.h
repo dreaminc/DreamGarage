@@ -30,7 +30,7 @@ public:
 	static SoundBuffer* Make(int numChannels, int samplingRate, sound::type bufferType);
 
 	virtual bool IsFull() = 0;
-	virtual size_t NumPendingBytes() = 0;
+	virtual int64_t NumPendingFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) = 0;
 
 	int NumChannels() {
 		return m_channels;
@@ -60,7 +60,7 @@ public:
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
 	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket);
-	virtual RESULT PushAudioPacket(const AudioPacket &audioPacket);
+	virtual RESULT PushAudioPacket(const AudioPacket &audioPacket, bool fClobber = false);
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
 
@@ -175,8 +175,8 @@ public:
 	}
 
 	// TODO: Is it really bytes?
-	virtual size_t NumPendingBytes() override {
-		size_t numPendingBytes = -1;
+	virtual int64_t NumPendingFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) override {
+		int64_t numPendingBytes = -1;
 		bool fFirst = true;
 
 		// TODO: Right now a lot of work is going into maintaining 
@@ -186,11 +186,11 @@ public:
 
 		for (int i = 0; i < m_channels; i++) {
 			if (fFirst) {
-				numPendingBytes = m_ppCircularBuffers[i]->NumPendingBufferBytes();
+				numPendingBytes = m_ppCircularBuffers[i]->NumPendingBufferSamples();
 				fFirst = false;
 			}
 			else {
-				if (numPendingBytes != m_ppCircularBuffers[i]->NumPendingBufferBytes()) {
+				if (numPendingBytes != m_ppCircularBuffers[i]->NumPendingBufferSamples()) {
 					return -1;
 				}
 			}
@@ -305,20 +305,20 @@ public:
 		// This will block
 		m_bufferLock.lock();
 
-		// Make sure the buffers have enough space
-		for (int i = 0; i < m_channels; i++) {
-			CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
-			CN(pChannelCircBuf);
+			// Make sure the buffers have enough space
+			for (int i = 0; i < m_channels; i++) {
+				CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
+				CN(pChannelCircBuf);
 
-			CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
-		}
-
-		// This will de-interlace the samples
-		for (int i = 0; i < numFrames; i++) {
-			for (int j = 0; j < m_channels; j++) {
-				m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+				CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
 			}
-		}
+
+			// This will de-interlace the samples
+			for (int i = 0; i < numFrames; i++) {
+				for (int j = 0; j < m_channels; j++) {
+					m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+				}
+			}
 
 		m_bufferLock.unlock();
 
@@ -357,7 +357,7 @@ public:
 	virtual RESULT MixIntoInterlacedTargetBuffer(CBType *pDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 		
 		{
 			size_t bufferCounter = 0;
@@ -425,7 +425,7 @@ public:
 
 		//if (NumPendingBytes() >= numFrameCount) 
 		
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 
 		{	
 			size_t bufferCounter = 0;
@@ -453,7 +453,7 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(uint8_t *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 	
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 	
 		{
 			size_t bufferCounter = 0;
@@ -495,7 +495,7 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(int16_t *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 
 		{
 			size_t bufferCounter = 0;
@@ -538,7 +538,7 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(float *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 
 		{
 			size_t bufferCounter = 0;
@@ -583,7 +583,7 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(double *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 
 		{
 			size_t bufferCounter = 0;
