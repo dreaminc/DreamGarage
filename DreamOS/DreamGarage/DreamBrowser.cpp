@@ -797,16 +797,17 @@ RESULT DreamBrowser::AudioProcess() {
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 
-		if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
-		
 		//if (m_pRenderSoundBuffer != nullptr ) {
+		if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
 			
+			int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+
 			m_pRenderSoundBuffer->LockBuffer();
 
 			{
 				pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
 
-				if (pendingBytes >= 480) {
+				if (pendingBytes >= audioBufferSampleLength10ms) {
 
 					//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
 
@@ -814,7 +815,7 @@ RESULT DreamBrowser::AudioProcess() {
 
 					AudioPacket pendingAudioPacket;
 
-					m_pRenderSoundBuffer->GetAudioPacket(480, &pendingAudioPacket);
+					m_pRenderSoundBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
 
 					if (m_pObserver != nullptr) {
 						if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
