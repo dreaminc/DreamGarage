@@ -1981,7 +1981,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
 
 			pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
 			CN(pTestContext->pEnvironmentApp);
-			pTestContext->pEnvironmentApp->SetCurrentEnvironment(CAVE);
+			pTestContext->pEnvironmentApp->SetCurrentEnvironment(environment::CAVE);
 
 			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
@@ -2207,7 +2207,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 
 			pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
 			CN(pTestContext->pEnvironmentApp);
-			pTestContext->pEnvironmentApp->SetCurrentEnvironment(CAVE);
+			pTestContext->pEnvironmentApp->SetCurrentEnvironment(environment::CAVE);
 
 			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
@@ -2227,7 +2227,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			//	pTestContext->pEnvironmentApp->SeatUser(pTestContext->m_users[i], i);
 				point ptPosition;
 				quaternion qOrientation;
-				pTestContext->pEnvironmentApp->SeatUser(ptPosition, qOrientation, i);
+				pTestContext->pEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptPosition, qOrientation, i);
 				pTestContext->m_users[i]->SetPosition(ptPosition + point(0.0f, 1.0f, 0.0f));
 				pTestContext->m_users[i]->SetOrientation(qOrientation);
 			}
