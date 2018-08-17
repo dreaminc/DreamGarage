@@ -86,7 +86,7 @@ RESULT WASAPISpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsi
 
 	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
 	
-	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingBytes();
+	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingFrames();
 	size_t numFramesRead = 0;
 
 	while (numFramesRead < numFrames) {
