@@ -447,9 +447,6 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			
 			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
 
-			// skip for now
-			// return r;
-
 			if (strAudioTrackLabel == kUserAudioLabel) {
 
 				if (pXAudioSpatialSoundObject1 != nullptr) {
@@ -766,14 +763,16 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
+				// Testing: Memory Leak
 				pCloudController->BroadcastTextureFrame(pSourceTexture, 0, PIXEL_FORMAT::RGBA);
 			}
 			else if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
 				
 				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTexture)->Resize(pTestContext->m_pendingVideoBuffer.pxWidth, pTestContext->m_pendingVideoBuffer.pxHeight);
-
+			
 				// Update the video buffer to texture
-
+			
+				// NOTE: Looks like this bad boy is leaking some mems
 				CR(pTestContext->pQuadTexture->Update(
 					(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
 					pTestContext->m_pendingVideoBuffer.pxWidth,
