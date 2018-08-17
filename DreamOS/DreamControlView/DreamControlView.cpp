@@ -293,6 +293,7 @@ RESULT DreamControlView::ShowView() {
 			m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
 			CN(m_pDreamUserApp);
 		}
+		m_pDreamUserApp->SetEventApp(this);
 
 		UIMallet* pLMallet;
 		pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);

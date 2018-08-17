@@ -933,9 +933,13 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		else {
 			m_pControlView->GetViewQuad()->SetVisible(false);
 			Hide();
+
 			m_fHasOpenApp = false;
-			m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
-			m_pDreamUserApp->SetEventApp(nullptr);
+			if (m_pDreamUserApp->m_pEventApp == m_pControlView.get()) {
+				m_pDreamUserApp->SetHasOpenApp(m_fHasOpenApp);
+				m_pDreamUserApp->SetEventApp(nullptr);
+			}
+
 			SetIsAnimating(false);
 		}
 

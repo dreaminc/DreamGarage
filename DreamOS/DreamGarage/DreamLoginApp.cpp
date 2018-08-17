@@ -54,17 +54,15 @@ RESULT DreamLoginApp::HandleDreamFormSetEnvironmentId(int environmentId) {
 
 	m_strLastEnvironmentId = std::to_string(environmentId);
 
+	// deprecated
+	/*
 	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(pUserController);
 	pUserController->SetUserDefaultEnvironmentID(environmentId);
 	pUserController->UpdateLoginState();
 
-
-	//TODO: once everything else works, shouldn't need to save this anymore
-	// (along with access token)
-	//CR(SetCredential(CREDENTIAL_LAST_ENVIRONMENT, m_strLastEnvironmentId));
-
 Error:
+	//*/
 	return r;
 }
 
