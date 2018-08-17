@@ -521,11 +521,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnGetTeam(bool fSuccess, int environmentId) {
+RESULT CloudController::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnGetTeam(fSuccess, environmentId));
+		CR(m_pUserObserver->OnGetTeam(fSuccess, environmentId, environmentModelId));
 	}
 
 Error:

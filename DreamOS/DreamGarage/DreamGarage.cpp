@@ -623,24 +623,6 @@ RESULT DreamGarage::Update(void) {
 	}
 	//*/
 
-	/*
-	// For testing
-	if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - g_lastDebugUpdate).count() > 10) {
-		static int index = 1;
-
-		point ptSeatPosition;
-		float angleRotation;
-
-		GetRoundtablePosition(index++, ptSeatPosition, angleRotation);
-
-		m_usersModelPool[index].second->GetHead()->RotateYByDeg(angleRotation);
-		m_usersModelPool[index].second->SetPosition(ptSeatPosition);
-		m_usersModelPool[index].second->SetVisible(true);
-
-		g_lastDebugUpdate = timeNow;
-	}
-	//*/
-
 	// Periodically check peer app states
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
 		CR(CheckDreamPeerAppStates());
@@ -658,55 +640,22 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle) {
-	RESULT r = R_PASS;
-
-	point ptSeatingCenter = point(0.0f, 1.0f, 1.0f);
-
-	CB((index < m_seatLookup.size()));
-
-	{
-
-		float diffAngle = (180.0f - (m_keepOutAngle * 2.0f)) / m_seatLookup.size();
-		diffAngle *= -1.0f;
-
-		rotationAngle = m_initialAngle + (diffAngle * m_seatLookup[index]);
-
-		// TODO: fuck this
-		//if (m_pDreamBrowser != nullptr) {
-		//	ptSeatingCenter.y() = (m_pDreamBrowser->GetHeight() / 3.0f);
-	//	}
-
-		float ptX = -1.0f * m_seatPositioningRadius * std::sin(rotationAngle * M_PI / 180.0f);
-		float ptZ = m_seatPositioningRadius * std::cos(rotationAngle * M_PI / 180.0f);
-
-		ptPosition = point(ptX, 0.0f, ptZ) + ptSeatingCenter;
-
-		// TODO: Remove this (this is a double reverse)
-		//rotationAngle *= -1.0f;
-	}
-
-Error:
-	return r;
-}
-
 RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	RESULT r = R_PASS;
 
 	stereocamera* pCamera = GetCamera();
 
 	point ptSeatPosition;
-	float angleRotation;
+	quaternion qOffset;
 
-	CB((seatingPosition < m_seatLookup.size()));
-	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
 
 	if (!pCamera->HasHMD()) {
-		pCamera->RotateYByDeg(angleRotation);
+		pCamera->SetOrientation(qOffset);
 		pCamera->SetPosition(ptSeatPosition);
 	}
 	else {
-		quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angleRotation * M_PI / 180.0f, 0.0f);
 		pCamera->SetOffsetOrientation(qOffset);
 		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
 	}
@@ -719,11 +668,12 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	RESULT r = R_PASS;
 
 	point ptSeatPosition;
-	float angleRotation;
+	quaternion qRotation;
 
-	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
 
-	pDreamPeer->GetUserModel()->GetHead()->RotateYByDeg(angleRotation);
+	pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
 
 Error:
@@ -745,8 +695,20 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
-		CB(seatPosition < m_seatLookup.size());
+		point ptScreenPosition;
+		quaternion qScreenRotation;
+		float screenScale;
+
+		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
+
+		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
+		
+		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+
 		CR(SetRoundtablePosition(seatPosition));
+		//CR(SetRoundtablePosition())
 		m_fSeated = true;
 		m_fShouldUpdateAppComposites = true;
 	}
@@ -766,17 +728,14 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 
 	// My seating position
 	long localSeatingPosition = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
-	localSeatingPosition -= 1;
 
 	// Remote seating position
 	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
-	remoteSeatingPosition -= 1;
 
 	DOSLOG(INFO, "OnNewDreamPeer local seat position %v", localSeatingPosition);
 	//OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
 	if (!m_fSeated) {
-		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
 		CR(SetRoundtablePosition(localSeatingPosition));
 
 		m_fSeated = true;
@@ -1123,19 +1082,21 @@ RESULT DreamGarage::OnSetSettings() {
 RESULT DreamGarage::OnLogin() {
 	RESULT r = R_PASS;
 
-	// TODO: other pieces of login flow
-	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-
 	// TODO: choose environment based on api information
 	// TODO: with seating pass, the cave will look better
+
+	// the fade in now happens in OnNewSocketConnection
+	// TODO: would definitely prefer UserController to respond to OnNewSocketConection so that 
+	// it is a part of UpdateLoginState and the environment can fade in here
+
 	//m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE);
-	CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
-	CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+	//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+	//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
 	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
-Error:
+//Error:
 	return r;
 }
 
@@ -1158,6 +1119,8 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+
+	m_fSeated = false;
 
 Error:
 	return r;
@@ -1221,7 +1184,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
+RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 	RESULT r = R_PASS;
 
 	if (!fSuccess) {
@@ -1233,6 +1196,8 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId) {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		
+		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
 	}
 
 Error:

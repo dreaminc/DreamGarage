@@ -65,6 +65,9 @@ public:
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();
 
+	// Environment
+	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
+
 	struct PendingFrame {
 		bool fPending = false;
 		int pxWidth = 0;

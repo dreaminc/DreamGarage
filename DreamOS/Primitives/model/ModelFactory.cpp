@@ -328,7 +328,7 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 			aiProcess_CalcTangentSpace |
 			aiProcess_GenNormals | 
 			aiProcess_PreTransformVertices |
-			aiProcess_FixInfacingNormals |
+			//aiProcess_FixInfacingNormals |
 			aiProcess_Triangulate);
 
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());

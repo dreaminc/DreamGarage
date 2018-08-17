@@ -6,6 +6,8 @@
 #include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/SkyboxScatterProgram.h"
 
+#include "Primitives/user.h"
+
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
 
@@ -67,22 +69,20 @@ DreamEnvironmentApp* DreamEnvironmentApp::SelfConstruct(DreamOS *pDreamOS, void 
 	return pDreamApp;
 }
 
-RESULT DreamEnvironmentApp::PositionEnvironment(EnvironmentType type, std::shared_ptr<model> pModel) {
+RESULT DreamEnvironmentApp::PositionEnvironment(environment::type type, std::shared_ptr<model> pModel) {
 	RESULT r = R_PASS;
 
 	m_ptSceneOffset = point(0.0f, 0.0f, 0.0f);
 	m_sceneScale = 0.1f;
 
-	if (type == ISLAND) {
+	if (type == environment::ISLAND) {
 		m_ptSceneOffset = point(90.0f, -5.0f, -25.0f);
 		m_sceneScale = 0.1f;
 
 	}
 	else {
-		//pModel->RotateXByDeg(-90.0f);
-		//pModel->RotateYByDeg(90.0f);
-		//m_ptSceneOffset = point(0.0f, -5.0f, 0.0f);
-		m_sceneScale = 0.025f;
+		m_ptSceneOffset = point(0.0f, -1.0f, 0.0f);
+		m_sceneScale = m_environmentSceneScale;
 	}
 	//*/
 
@@ -113,8 +113,9 @@ Error:
 	return r;
 }
 
-RESULT DreamEnvironmentApp::SetCurrentEnvironment(EnvironmentType type) {
+RESULT DreamEnvironmentApp::SetCurrentEnvironment(environment::type type) {
 	m_pCurrentEnvironmentModel = m_environmentModels[type];
+	m_currentType = type;
 	return R_PASS;
 }
 
@@ -182,7 +183,7 @@ Error:
 }
 
 
-RESULT DreamEnvironmentApp::SwitchToEnvironment(EnvironmentType type) {
+RESULT DreamEnvironmentApp::SwitchToEnvironment(environment::type type) {
 	RESULT r = R_PASS;
 
 	m_currentType = type;
@@ -201,6 +202,69 @@ RESULT DreamEnvironmentApp::SwitchToEnvironment(EnvironmentType type) {
 	CNR(m_pFadeProgram, R_SKIPPED);
 
 	m_pFadeProgram->FadeOut(fnOnFadeOut);
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale) {
+	RESULT r = R_PASS;
+
+	switch (m_currentType) {
+	case environment::ISLAND: {
+		// legacy
+		ptPosition = point(0.0f, 2.0f, -2.0f);
+		qOrientation = quaternion();
+		scale = 1.0f;
+	} break;
+	case environment::CAVE: {
+		ptPosition = point(m_tableLength*0.75f, 1.25f, 0.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+		scale = 0.75f;
+	} break;
+	}
+
+//Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex) {
+	RESULT r = R_PASS;
+
+	CBM(seatIndex < m_maxSeatingIndex && seatIndex >= 0, "Peer index %d not supported by client", seatIndex);
+
+	// position
+	switch (seatIndex) {
+	case 0: {
+		ptPosition = point(-m_tableLength / 2.0f, m_tableHeight, -(m_tableWidth - 1.5f) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_frontAngle, 0.0f); break;
+	} break;
+
+	case 1: {
+		ptPosition = point(-m_tableLength / 2.0f, m_tableHeight, (m_tableWidth - 1.5f) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_frontAngle, 0.0f); break;
+	} break;
+
+	case 2: {
+		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, -(m_tableWidth) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_middleAngle, 0.0f); break;
+	} break;
+
+	case 3: {
+		ptPosition = point(-m_tableLength / 4.0f, m_tableHeight, (m_tableWidth) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_middleAngle, 0.0f); break;
+	} break;
+
+	case 4: {
+		ptPosition = point(0.0f, m_tableHeight, -(m_tableWidth + 0.5f) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle - m_backAngle, 0.0f); break;
+	} break;
+
+	case 5: {
+		ptPosition = point(0.0f, m_tableHeight, (m_tableWidth + 0.5f) / 2.0f);
+		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, m_baseTableAngle + m_backAngle, 0.0f); break;
+	} break;
+	}
 
 Error:
 	return r;

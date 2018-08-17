@@ -807,7 +807,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return r;
 		}
 
-		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) {
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) {
 			RESULT r = R_PASS;
 
 			if (!fSuccess) {
@@ -1249,7 +1249,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			return R_NOT_IMPLEMENTED;
 		}
 
-		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
 			return R_NOT_IMPLEMENTED;
 		}
 
