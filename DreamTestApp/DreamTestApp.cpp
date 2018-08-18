@@ -21,6 +21,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
+	sandboxconfig.fInitSound = true;
 	SetSandboxConfiguration(sandboxconfig);
 
 //Error:
