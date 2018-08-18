@@ -363,9 +363,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 			
-			int nChannels = 1;
-			int samplingFrequency = 44100;
-			numFrames = samplingFrequency / 100;
+			int nChannels = pCaptureBuffer->NumChannels();
+			int samplingFrequency = pCaptureBuffer->GetSamplingRate();
+			//numFrames = samplingFrequency / 100;
 
 			AudioPacket pendingAudioPacket;
 			pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);
