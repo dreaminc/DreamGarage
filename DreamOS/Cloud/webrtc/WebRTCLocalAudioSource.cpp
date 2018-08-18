@@ -55,16 +55,17 @@ void WebRTCLocalAudioSource::RemoveSink(webrtc::AudioTrackSinkInterface* sink) {
 RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	//CN(m_pLocalAudioTrackSink);
-	//
-	//m_pLocalAudioTrackSink->OnData(
-	//	pendingAudioPacket.GetDataBuffer(),
-	//	pendingAudioPacket.GetBitsPerSample(),
-	//	pendingAudioPacket.GetSamplingRate(),
-	//	pendingAudioPacket.GetNumChannels(),
-	//	pendingAudioPacket.GetNumFrames()
-	//);
+	CN(m_pLocalAudioTrackSink);
+	
+	m_pLocalAudioTrackSink->OnData(
+		pendingAudioPacket.GetDataBuffer(),
+		pendingAudioPacket.GetBitsPerSample(),
+		pendingAudioPacket.GetSamplingRate(),
+		pendingAudioPacket.GetNumChannels(),
+		pendingAudioPacket.GetNumFrames()
+	);
 
+	/* DEBUG:
 	CN(m_pLocalAudioTrackSink);
 	
 	if (m_strAudioTrackLabel != "user_audio_label") {
@@ -159,8 +160,9 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 				nSamples
 			);
 		}
-		//*/
+		
 	}
+	//*/
 
 Error:
 	return r;
