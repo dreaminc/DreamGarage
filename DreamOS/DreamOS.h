@@ -52,6 +52,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+class DreamSoundSystem;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -456,7 +457,7 @@ public:
 	std::string GetHMDTypeString();
 
 private:
-	SandboxApp *m_pSandbox;
+	SandboxApp *m_pSandbox = nullptr;
 
 public:
 
@@ -468,15 +469,19 @@ public:
 
 // System Applications
 private:
-	std::shared_ptr<UIKeyboard> m_pKeyboard;
+	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
 	// currently used by DreamGarage to dismiss UI when being seated (temporary)
 protected:
-	std::shared_ptr<DreamUserApp> m_pDreamUser;
-	std::shared_ptr<DreamShareView> m_pDreamShareView;
+	std::shared_ptr<DreamUserApp> m_pDreamUser = nullptr;
+	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;
+
+	// Modules
+protected:
+	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
 
 private:
 	version m_versionDreamOS;
