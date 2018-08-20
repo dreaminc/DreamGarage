@@ -473,6 +473,7 @@ private:
 
 	// currently used by DreamGarage to dismiss UI when being seated (temporary)
 protected:
+	// TODO: All of these should go into DreamGarage
 	std::shared_ptr<DreamUserApp> m_pDreamUser = nullptr;
 	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
