@@ -939,9 +939,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp">
       <Filter>Sound\XAudio2</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.h">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamModule.cpp">
+      <Filter>DreamOS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2073,9 +2082,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sound\SoundCommon.h">
       <Filter>Sound</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenFade.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamModule.h">
+      <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
