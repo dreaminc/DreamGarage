@@ -64,6 +64,7 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 		}
 		//*/
 		GetComposite()->SetVisible(true, false);
+		CR(SetInitialSettingsValues());
 		CR(Show());
 	}
 
@@ -78,6 +79,18 @@ RESULT DreamSettingsApp::Shutdown(void *pContext) {
 DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamSettingsApp *pDreamApp = new DreamSettingsApp(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamSettingsApp::SetInitialSettingsValues() {
+	RESULT r = R_PASS;
+
+	// Save initial settings values so that if the form is cancelled, 
+	// the settings can be reset
+	m_initialHeight = m_pUserApp->GetHeight();
+	m_initialDepth = m_pUserApp->GetDepth();
+	m_initialScale = m_pUserApp->GetScale();
+
+	return r;
 }
 
 RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
@@ -119,6 +132,42 @@ Error:
 	return r;
 }
 
+RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	DreamUserObserver *pEventApp = m_pUserApp->m_pEventApp;
+	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
+
+	if (pEvent->m_eventType == INTERACTION_EVENT_MENU) {
+		auto pCloudController = GetDOS()->GetCloudController();
+		if (pCloudController != nullptr &&
+			pCloudController->IsUserLoggedIn() &&
+			pCloudController->IsEnvironmentConnected()) {
+
+			if (m_pUserApp->GetKeyboard()->IsVisible()) {
+				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+				CR(m_pFormView->HandleKeyboardDown());
+			}
+			else {
+
+				// Reset user app to values at the beginning of the form
+				CR(m_pUserApp->UpdateHeight(m_initialHeight));
+				CR(m_pUserApp->UpdateDepth(m_initialDepth));
+				CR(m_pUserApp->UpdateScale(m_initialScale));
+
+				CR(Hide());
+			}
+		}
+
+	}
+	else {
+		CR(DreamFormApp::Notify(pEvent));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
@@ -138,6 +187,7 @@ RESULT DreamSettingsApp::Show() {
 		m_fPendShowFormView = true;
 	}
 	else {
+		CR(SetInitialSettingsValues());
 		CR(DreamFormApp::Show());
 		m_fPendShowFormView = false;
 	}
