@@ -321,7 +321,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 	float radius = 1.0f;
 
 	struct TestContext : 
-		public SoundClient::observer, 
+		public DreamSoundSystem::observer, 
 		public CloudController::PeerConnectionObserver, 
 		public CloudController::UserObserver,
 		public DreamBrowserObserver
@@ -359,7 +359,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		uint8_t *pTestVideoFrameBuffer = nullptr;
 
-		// SoundClient::observer
+		// DreamSoundSystem::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 			
@@ -667,35 +667,25 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 
-		// WASAPI Capture Sound Client
-		pTestContext->pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-		CN(pTestContext->pWASAPICaptureClient);
+		
+		CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
 
-		CR(pTestContext->pWASAPICaptureClient->RegisterObserver(pTestContext));
-		CR(pTestContext->pWASAPICaptureClient->StartCapture());
-
-		// XAudio2 Render / Spatial Sound Client
-		pTestContext->pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
-		CN(pTestContext->pXAudio2AudioClient);
 		{
 
 			point ptPosition = point(-2.0f, 0.0f, -radius);
 			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
 			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 
-			pTestContext->pXAudioSpatialSoundObject1 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pXAudioSpatialSoundObject1 = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pXAudioSpatialSoundObject1);
 
 			ptPosition = point(2.0f, 0.0f, -radius);
 			vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
 			vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 
-			pTestContext->pXAudioSpatialSoundObject2 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pXAudioSpatialSoundObject2 = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pXAudioSpatialSoundObject2);
 		}
-
-		CR(pTestContext->pXAudio2AudioClient->StartSpatial());
-		CR(pTestContext->pXAudio2AudioClient->StartRender());
 
 		// Log in 
 		{
