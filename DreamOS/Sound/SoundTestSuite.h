@@ -23,6 +23,9 @@ public:
 
 public:
 
+	// Sound System Module Test
+	RESULT AddTestSoundSystemModule();
+
 	// Enumerate
 	RESULT AddTestEnumerateDevices();
 
@@ -30,6 +33,8 @@ public:
 
 	// Capture Sound
 	RESULT AddTestCaptureSound();
+
+	RESULT AddTestBrowserSoundRouting();
 
 	// Play Sound
 	RESULT AddTestPlaySound();

@@ -266,7 +266,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;CEF_AUDIO_MIRROR;_ENABLE_LOGGING
+;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDIr)..\DreamDesktopDuplication\include\;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
@@ -710,6 +711,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
@@ -727,6 +729,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamAppHandle.cpp" />
     <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamAppMessage.cpp" />
+    <ClCompile Include="..\..\..\DreamModule.cpp" />
+    <ClCompile Include="..\..\..\DreamModuleManager.cpp" />
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
@@ -911,12 +915,18 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
     <ClCompile Include="..\..\..\Sound\AudioPacket.cpp" />
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.cpp" />
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.h" />
     <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundFile.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundWaveFile.cpp" />
-    <ClCompile Include="..\..\..\Sound\WASAPISoundClient.cpp" />
+    <ClCompile Include="..\..\..\Sound\SpatialSoundObject.cpp" />
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISoundClient.cpp" />
+    <ClCompile Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.cpp" />
+    <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp" />
+    <ClCompile Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
@@ -967,6 +977,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\WebRequestPostData.h" />
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioDeviceModule.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCAudioTrackSink.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCustomVideoCapturer.h" />
@@ -995,6 +1006,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamAppHandle.h" />
     <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamAppMessage.h" />
+    <ClInclude Include="..\..\..\DreamModule.h" />
+    <ClInclude Include="..\..\..\DreamModuleManager.h" />
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
@@ -1278,9 +1291,14 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sound\SoundBuffer.h" />
     <ClInclude Include="..\..\..\Sound\SoundClient.h" />
     <ClInclude Include="..\..\..\Sound\SoundClientFactory.h" />
+    <ClInclude Include="..\..\..\Sound\SoundCommon.h" />
     <ClInclude Include="..\..\..\Sound\SoundFile.h" />
     <ClInclude Include="..\..\..\Sound\SoundFileWave.h" />
-    <ClInclude Include="..\..\..\Sound\WASAPISoundClient.h" />
+    <ClInclude Include="..\..\..\Sound\SpatialSoundObject.h" />
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISoundClient.h" />
+    <ClInclude Include="..\..\..\Sound\WASAPI\WASAPISpatialSoundObject.h" />
+    <ClInclude Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.h" />
+    <ClInclude Include="..\..\..\Sound\XAudio2\XAudio2SoundClient.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />

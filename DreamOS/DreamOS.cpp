@@ -8,6 +8,8 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
+#include "Sound/DreamSoundSystem.h"
+
 #include "DreamAppMessage.h"
 #include "DreamGarage/DreamSettingsApp.h"
 
@@ -137,6 +139,11 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		}
 	}
 	//*/
+
+	// Audio System
+	if (m_pSandbox->m_SandboxConfiguration.fInitSound) {
+		CRM(InitializeDreamSoundSystem(), "Failed to initialize the Dream Sound System");
+	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
 
@@ -688,8 +695,24 @@ std::vector<UID> DreamOS::GetAppUID(std::string strAppName) {
 
 UID DreamOS::GetUniqueAppUID(std::string strAppName) {
 	std::vector<UID> vAppUID = m_pSandbox->m_pDreamAppManager->GetAppUID(strAppName);
+	
 	if (vAppUID.size() == 1) {
 		return vAppUID[0];
+	}
+	else {
+		return UID::MakeInvalidUID();
+	}
+}
+
+std::vector<UID> DreamOS::GetModuleUID(std::string strName) {
+	return m_pSandbox->m_pDreamModuleManager->GetModuleUID(strName);
+}
+
+UID DreamOS::GetUniqueModuleUID(std::string strName) {
+	std::vector<UID> vModuleUID = m_pSandbox->m_pDreamModuleManager->GetModuleUID(strName);
+	
+	if (vModuleUID.size() == 1) {
+		return vModuleUID[0];
 	}
 	else {
 		return UID::MakeInvalidUID();
@@ -728,6 +751,70 @@ RESULT DreamOS::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	CR(m_pSandbox->InitializeCloudController());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::InitializeDreamSoundSystem() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "Initializing Dream Sound System");
+
+	m_pDreamSoundSystem = LaunchDreamModule<DreamSoundSystem>(this);
+	CNM(m_pDreamSoundSystem, "Failed to launch Dream Sound System Module");
+Error:
+	return r;
+}
+
+RESULT DreamOS::RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+	CR(m_pDreamSoundSystem->RegisterObserver(pObserver));
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterSoundSystemObserver() {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+	CR(m_pDreamSoundSystem->UnregisterObserver());
+
+Error:
+	return r;
+}
+
+std::shared_ptr<SpatialSoundObject> DreamOS::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->AddSpatialSoundObject(ptPosition, vEmitterDirection, vListenerDirection);
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<SoundFile> DreamOS::LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->LoadSoundFile(wstrFilename, soundFileType);
+
+Error:
+	return nullptr;
+}
+
+RESULT DreamOS::PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile) {
+	RESULT r = R_PASS;
+
+	CNM(m_pDreamSoundSystem, "Sound system not initialized");
+
+	return m_pDreamSoundSystem->PlaySoundFile(pSoundFile);
 
 Error:
 	return r;
@@ -1194,10 +1281,9 @@ bool DreamOS::IsSharing() {
 }
 
 std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
-	RESULT r = R_PASS;
-	CN(m_pDreamShareView);
-	return m_pDreamShareView->GetCastingTexture();
-Error:
+	if(m_pDreamShareView != nullptr) 
+		return m_pDreamShareView->GetCastingTexture();
+	
 	return nullptr;
 }
 
@@ -1205,21 +1291,26 @@ RESULT DreamOS::SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture)
 	if (m_pDreamShareView != nullptr) {
 		m_pDreamShareView->SetCastingTexture(pSharedTexture);
 	}
+
 	return R_PASS;
 }
 
 RESULT DreamOS::BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
+
 	CN(m_pDreamShareView);
 	m_pDreamShareView->BroadcastVideoFrame(pVideoFrameBuffer, pxWidth, pxHeight);
+
 Error:
 	return r;
 }
 
 RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
+
 	CN(m_pDreamShareView);
 	CR(m_pDreamShareView->BroadcastAudioPacket(pendingAudioPacket));
+
 Error:
 	return r;
 }

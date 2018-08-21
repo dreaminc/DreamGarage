@@ -16,19 +16,16 @@
 #include "call/call.h"
 #include "call/rtp_transport_controller_send.h"
 #include "logging/rtc_event_log/rtc_event_log.h"
+#include "modules/audio_device/include/test_audio_device.h"
 #include "test/encoder_settings.h"
-#include "test/fake_audio_device.h"
 #include "test/fake_decoder.h"
-#include "test/fake_encoder.h"
 #include "test/fake_videorenderer.h"
 #include "test/frame_generator_capturer.h"
+#include "test/function_video_encoder_factory.h"
 #include "test/rtp_rtcp_observer.h"
 #include "test/single_threaded_task_queue.h"
 
 namespace webrtc {
-
-class VoEBase;
-
 namespace test {
 
 class BaseTest;
@@ -38,23 +35,26 @@ class CallTest : public ::testing::Test {
   CallTest();
   virtual ~CallTest();
 
-  static const size_t kNumSsrcs = 3;
+  static constexpr size_t kNumSsrcs = 6;
+  static const int kNumSimulcastStreams = 3;
   static const int kDefaultWidth = 320;
   static const int kDefaultHeight = 180;
   static const int kDefaultFramerate = 30;
   static const int kDefaultTimeoutMs;
   static const int kLongTimeoutMs;
-  static const uint8_t kVideoSendPayloadType;
-  static const uint8_t kSendRtxPayloadType;
-  static const uint8_t kFakeVideoSendPayloadType;
-  static const uint8_t kRedPayloadType;
-  static const uint8_t kRtxRedPayloadType;
-  static const uint8_t kUlpfecPayloadType;
-  static const uint8_t kFlexfecPayloadType;
-  static const uint8_t kAudioSendPayloadType;
-  static const uint8_t kPayloadTypeH264;
-  static const uint8_t kPayloadTypeVP8;
-  static const uint8_t kPayloadTypeVP9;
+  enum classPayloadTypes : uint8_t {
+    kSendRtxPayloadType = 98,
+    kRtxRedPayloadType = 99,
+    kVideoSendPayloadType = 100,
+    kAudioSendPayloadType = 103,
+    kRedPayloadType = 118,
+    kUlpfecPayloadType = 119,
+    kFlexfecPayloadType = 120,
+    kPayloadTypeH264 = 122,
+    kPayloadTypeVP8 = 123,
+    kPayloadTypeVP9 = 124,
+    kFakeVideoSendPayloadType = 125,
+  };
   static const uint32_t kSendRtxSsrcs[kNumSsrcs];
   static const uint32_t kVideoSendSsrcs[kNumSsrcs];
   static const uint32_t kAudioSendSsrc;
@@ -66,9 +66,8 @@ class CallTest : public ::testing::Test {
   static const std::map<uint8_t, MediaType> payload_type_map_;
 
  protected:
-  // RunBaseTest overwrites the audio_state and the voice_engine of the send and
-  // receive Call configs to simplify test code and avoid having old VoiceEngine
-  // APIs in the tests.
+  // RunBaseTest overwrites the audio_state of the send and receive Call configs
+  // to simplify test code.
   void RunBaseTest(BaseTest* test);
 
   void CreateCalls(const Call::Config& sender_config,
@@ -77,11 +76,22 @@ class CallTest : public ::testing::Test {
   void CreateReceiverCall(const Call::Config& config);
   void DestroyCalls();
 
+  void CreateVideoSendConfig(VideoSendStream::Config* video_config,
+                             size_t num_video_streams,
+                             size_t num_used_ssrcs,
+                             Transport* send_transport);
+  void CreateAudioAndFecSendConfigs(size_t num_audio_streams,
+                                    size_t num_flexfec_streams,
+                                    Transport* send_transport);
   void CreateSendConfig(size_t num_video_streams,
                         size_t num_audio_streams,
                         size_t num_flexfec_streams,
                         Transport* send_transport);
 
+  std::vector<VideoReceiveStream::Config> CreateMatchingVideoReceiveConfigs(
+      const VideoSendStream::Config& video_send_config,
+      Transport* rtcp_send_transport);
+  void CreateMatchingAudioAndFecConfigs(Transport* rtcp_send_transport);
   void CreateMatchingReceiveConfigs(Transport* rtcp_send_transport);
 
   void CreateFrameGeneratorCapturerWithDrift(Clock* drift_clock,
@@ -91,8 +101,8 @@ class CallTest : public ::testing::Test {
                                              int height);
   void CreateFrameGeneratorCapturer(int framerate, int width, int height);
   void CreateFakeAudioDevices(
-      std::unique_ptr<FakeAudioDevice::Capturer> capturer,
-      std::unique_ptr<FakeAudioDevice::Renderer> renderer);
+      std::unique_ptr<TestAudioDeviceModule::Capturer> capturer,
+      std::unique_ptr<TestAudioDeviceModule::Renderer> renderer);
 
   void CreateVideoStreams();
   void CreateAudioStreams();
@@ -128,43 +138,23 @@ class CallTest : public ::testing::Test {
   std::vector<FlexfecReceiveStream*> flexfec_receive_streams_;
 
   std::unique_ptr<test::FrameGeneratorCapturer> frame_generator_capturer_;
-  test::FakeEncoder fake_encoder_;
+  test::FunctionVideoEncoderFactory fake_encoder_factory_;
+  int fake_encoder_max_bitrate_ = -1;
   std::vector<std::unique_ptr<VideoDecoder>> allocated_decoders_;
   size_t num_video_streams_;
   size_t num_audio_streams_;
   size_t num_flexfec_streams_;
-  rtc::scoped_refptr<AudioDecoderFactory> decoder_factory_;
-  rtc::scoped_refptr<AudioEncoderFactory> encoder_factory_;
+  rtc::scoped_refptr<AudioDecoderFactory> audio_decoder_factory_;
+  rtc::scoped_refptr<AudioEncoderFactory> audio_encoder_factory_;
   test::FakeVideoRenderer fake_renderer_;
 
   SingleThreadedTaskQueueForTesting task_queue_;
 
  private:
-  // TODO(holmer): Remove once VoiceEngine is fully refactored to the new API.
-  // These methods are used to set up legacy voice engines and channels which is
-  // necessary while voice engine is being refactored to the new stream API.
-  struct VoiceEngineState {
-    VoiceEngineState()
-        : voice_engine(nullptr),
-          base(nullptr),
-          channel_id(-1) {}
-
-    VoiceEngine* voice_engine;
-    VoEBase* base;
-    int channel_id;
-  };
-
-  void CreateVoiceEngines();
-  void DestroyVoiceEngines();
-
-  VoiceEngineState voe_send_;
-  VoiceEngineState voe_recv_;
   rtc::scoped_refptr<AudioProcessing> apm_send_;
   rtc::scoped_refptr<AudioProcessing> apm_recv_;
-
-  // The audio devices must outlive the voice engines.
-  std::unique_ptr<test::FakeAudioDevice> fake_send_audio_device_;
-  std::unique_ptr<test::FakeAudioDevice> fake_recv_audio_device_;
+  rtc::scoped_refptr<TestAudioDeviceModule> fake_send_audio_device_;
+  rtc::scoped_refptr<TestAudioDeviceModule> fake_recv_audio_device_;
 };
 
 class BaseTest : public RtpRtcpObserver {
@@ -180,10 +170,11 @@ class BaseTest : public RtpRtcpObserver {
   virtual size_t GetNumAudioStreams() const;
   virtual size_t GetNumFlexfecStreams() const;
 
-  virtual std::unique_ptr<FakeAudioDevice::Capturer> CreateCapturer();
-  virtual std::unique_ptr<FakeAudioDevice::Renderer> CreateRenderer();
-  virtual void OnFakeAudioDevicesCreated(FakeAudioDevice* send_audio_device,
-                                         FakeAudioDevice* recv_audio_device);
+  virtual std::unique_ptr<TestAudioDeviceModule::Capturer> CreateCapturer();
+  virtual std::unique_ptr<TestAudioDeviceModule::Renderer> CreateRenderer();
+  virtual void OnFakeAudioDevicesCreated(
+      TestAudioDeviceModule* send_audio_device,
+      TestAudioDeviceModule* recv_audio_device);
 
   virtual Call::Config GetSenderCallConfig();
   virtual Call::Config GetReceiverCallConfig();

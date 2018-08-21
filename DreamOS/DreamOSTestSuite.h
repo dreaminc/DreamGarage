@@ -41,6 +41,9 @@ public:
 	// Meta UI
 	RESULT AddTestMeta();
 
+	// Modules
+	RESULT AddTestModuleManager();
+
 	// Apps
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();

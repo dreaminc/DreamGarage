@@ -26,13 +26,13 @@ class VideoDecoderSoftwareFallbackWrapper : public VideoDecoder {
   VideoDecoderSoftwareFallbackWrapper(
       std::unique_ptr<VideoDecoder> sw_fallback_decoder,
       std::unique_ptr<VideoDecoder> hw_decoder);
+  ~VideoDecoderSoftwareFallbackWrapper() override;
 
   int32_t InitDecode(const VideoCodec* codec_settings,
                      int32_t number_of_cores) override;
 
   int32_t Decode(const EncodedImage& input_image,
                  bool missing_frames,
-                 const RTPFragmentationHeader* fragmentation,
                  const CodecSpecificInfo* codec_specific_info,
                  int64_t render_time_ms) override;
 
@@ -46,11 +46,17 @@ class VideoDecoderSoftwareFallbackWrapper : public VideoDecoder {
 
  private:
   bool InitFallbackDecoder();
+  int32_t InitHwDecoder();
+
+  VideoDecoder& active_decoder() const;
 
   // Determines if we are trying to use the HW or SW decoder.
-  bool use_hw_decoder_;
+  enum class DecoderType {
+    kNone,
+    kHardware,
+    kFallback,
+  } decoder_type_;
   std::unique_ptr<VideoDecoder> hw_decoder_;
-  bool hw_decoder_initialized_;
 
   VideoCodec codec_settings_;
   int32_t number_of_cores_;

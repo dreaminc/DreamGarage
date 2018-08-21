@@ -13,6 +13,8 @@
 #include "HAL/opengl/OGLProgramRefraction.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 
+#include "DreamModule.h"
+
 #include "DreamTestingApp.h"
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
@@ -51,6 +53,12 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestEnvironmentSeating());
+	
+	CR(AddTestModuleManager());
+
+	CR(AddTestDreamBrowser());
+
+	CR(AddTestCredentialStorage());
 
 	CR(AddTestGamepadCamera());
 
@@ -64,9 +72,7 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamLogger());
 
-//	CR(AddTestMeta());
-
-	CR(AddTestDreamBrowser());
+	CR(AddTestMeta());
 	
 	CR(AddTestDreamDesktop());
 
@@ -649,7 +655,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		RESULT r = R_PASS;
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
-		std::string strURL = "https://twitch.tv";
+		//std::string strURL = "https://twitch.tv";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -662,33 +669,33 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		CR(SetupDreamAppPipeline());
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// Create the 2D Mouse App
-		pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
-		CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
-
+		//pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		//CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
 
 		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		CN(pTestContext->m_pWebBrowserManager);
 		CR(pTestContext->m_pWebBrowserManager->Initialize());
-
-		// Create the Shared View App
-		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
-
-		pTestContext->m_pDreamBrowser->SetURI(strURL);
-
+			
+		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
 		CN(pTestContext->m_pBrowserQuad);
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+	
+		// Create the Shared View App
+		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+		
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+		
+		pTestContext->m_pDreamBrowser->SetURI(strURL);
 
 	Error:
 		return R_PASS;
@@ -878,6 +885,132 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 	pUITest->SetTestName("Logging Test");
 	pUITest->SetTestDescription("Basic logging test which will spin up a few SPD logs and test out the system");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestModuleManager() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	class DreamTestingModule : public DreamModule<DreamTestingModule> {
+		friend class DreamModuleManager;
+
+	public:
+		DreamTestingModule(DreamOS *pDreamOS, void *pContext = nullptr) :
+			DreamModule<DreamTestingModule>(pDreamOS, pContext)
+		{
+			// empty
+		}
+
+		~DreamTestingModule() {
+			Shutdown();
+		}
+
+		virtual RESULT InitializeModule(void *pContext = nullptr) {
+			RESULT r = R_PASS;
+
+			SetName("DreamSoundSystem");
+			SetModuleDescription("The Dream Sound System Module");
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+		virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		virtual RESULT Update(void *pContext = nullptr) override {
+			RESULT r = R_PASS;
+
+			CR(Print(std::to_string(m_testingValue)));
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT Shutdown(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		RESULT SetTestingValue(int i) {
+			m_testingValue = i;
+			return R_PASS;
+		}
+
+	protected:
+		static DreamTestingModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
+			DreamTestingModule *pDreamModule = new DreamTestingModule(pDreamOS, pContext);
+			return pDreamModule;
+		}
+
+	private:
+		int m_testingValue = -1;
+	};
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamTestingModule> pDreamTestModules[5];
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+
+		// Create the testing modules
+		for (int i = 0; i < 5; i++) {
+			pDreamTestModules[i] = m_pDreamOS->LaunchDreamModule<DreamTestingModule>(this);
+			CNM(pDreamTestModules[i], "Failed to create dream test app");
+			pDreamTestModules[i]->SetTestingValue(i);
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Module Manager Test");
+	pUITest->SetTestDescription("Testing module manager functionality");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 

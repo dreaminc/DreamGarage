@@ -168,6 +168,7 @@ typedef struct MOVStreamContext {
     int *keyframes;
     int time_scale;
     int64_t time_offset;  ///< time offset of the edit list entries
+    int64_t min_corrected_pts;  ///< minimum Composition time shown by the edits excluding empty edits.
     int current_sample;
     int64_t current_index;
     MOVIndexRange* index_ranges;
@@ -317,6 +318,11 @@ void ff_mp4_parse_es_descr(AVIOContext *pb, int *es_id);
 #define MOV_TKHD_FLAG_IN_MOVIE      0x0002
 #define MOV_TKHD_FLAG_IN_PREVIEW    0x0004
 #define MOV_TKHD_FLAG_IN_POSTER     0x0008
+
+#define MOV_SAMPLE_DEPENDENCY_UNKNOWN 0x0
+#define MOV_SAMPLE_DEPENDENCY_YES     0x1
+#define MOV_SAMPLE_DEPENDENCY_NO      0x2
+
 
 #define TAG_IS_AVCI(tag)                    \
     ((tag) == MKTAG('a', 'i', '5', 'p') ||  \

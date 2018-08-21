@@ -229,8 +229,10 @@ RESULT DreamUserApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(m_pWebBrowserManager->Shutdown());
-	m_pWebBrowserManager = nullptr;
+	if (m_pWebBrowserManager != nullptr) {
+		CR(m_pWebBrowserManager->Shutdown());
+		m_pWebBrowserManager = nullptr;
+	}
 
 Error:
 	return r;

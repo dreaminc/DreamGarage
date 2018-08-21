@@ -25,9 +25,12 @@
 
 #include "pc/localaudiosource.h"
 
+#include "WebRTCLocalAudioSource.h"
+#include "WebRTCAudioTrackSink.h"
+
 class WebRTConductor;
-class WebRTCLocalAudioSource;
-class WebRTCLocalAudioTrack;
+//class WebRTCLocalAudioSource;
+//class WebRTCAudioTrackSink;
 class User;
 class TwilioNTSInformation;
 class AudioPacket;
@@ -41,9 +44,9 @@ class WebRTCPeerConnection :
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::AudioTrackSinkInterface,
 	public rtc::VideoSinkInterface<webrtc::VideoFrame>,
-	public WebRTCPeerConnectionProxy
+	public WebRTCPeerConnectionProxy,
+	public WebRTCAudioTrackSink::observer
 {
 public:
 	
@@ -85,9 +88,9 @@ public:
 	// TODO: Generalize this when we add renegotiation 
 	// so that they're not hard coded per WebRTCCommon
 	RESULT AddStreams(bool fAddDataChannel = true);
-	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
-	RESULT AddLocalAudioSource(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface, const std::string &strAudioTrackLabel);
+	RESULT AddVideoStream();
+	RESULT AddAudioStream(const std::string &strAudioTrackLabel);
+	RESULT AddLocalAudioSource(const std::string &strAudioTrackLabel, const std::string &strMediaStreamLabel);
 	RESULT AddDataChannel();
 
 	RESULT SetUserPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
@@ -110,6 +113,13 @@ protected:
 	virtual void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
 	virtual void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+
+	// TODO: Migrate to unified API
+	virtual void OnAddTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver,
+		const std::vector<rtc::scoped_refptr<webrtc::MediaStreamInterface>>&streams) override;
+
+	virtual void OnRemoveTrack(rtc::scoped_refptr<webrtc::RtpReceiverInterface> receiver) override;
+
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
@@ -127,11 +137,11 @@ protected:
 	virtual void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) override;
 	virtual void OnFailure(const std::string& error) override;
 
-	// webrtc::AudioTrackSinkInterface
-	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
-
 	// rtc::VideoSinkInterface<cricket::VideoFrame>
 	virtual void OnFrame(const webrtc::VideoFrame& cricketVideoFrame) override;
+
+	// WebRTCAudioTrackSink::observer
+	virtual void OnAudioTrackSinkData(std::string strAudioTrackLabel, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
@@ -226,15 +236,17 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
+	//std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
+
+	// Sinks
+	std::map<std::string, std::shared_ptr<WebRTCAudioTrackSink>> m_webRTCAudioTrackSinks;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
-
 
 	// local audio sources
 	std::map<std::string, rtc::scoped_refptr<WebRTCLocalAudioSource>> m_pWebRTCLocalAudioSources;

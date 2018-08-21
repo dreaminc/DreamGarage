@@ -81,7 +81,6 @@ private:
 	std::thread m_ServiceThread;
 
 	std::mutex m_mutex;
-	std::condition_variable m_condBrowserInit;
 };
 
 #endif // ! CEF_BROWSER_MANAGER_H_

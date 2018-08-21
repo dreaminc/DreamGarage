@@ -452,9 +452,8 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 
 bool CEFHandler::OnResourceResponse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, CefRefPtr<CefResponse> response) {
 	
-	//*
+	/* TESTING:
 	// This is a gut check to see that the right headers are in the right place
-	// TODO: comment out if not in testing
 	CefRequest::HeaderMap cefHeaders;
 	response->GetHeaderMap(cefHeaders);
 	CefRequest::HeaderMap cefReqHeaders;

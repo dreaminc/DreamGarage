@@ -28,6 +28,10 @@ BEGIN_SIGNALING_PROXY_MAP(PeerConnection)
   PROXY_METHOD0(rtc::scoped_refptr<StreamCollectionInterface>, remote_streams)
   PROXY_METHOD1(bool, AddStream, MediaStreamInterface*)
   PROXY_METHOD1(void, RemoveStream, MediaStreamInterface*)
+  PROXY_METHOD2(RTCErrorOr<rtc::scoped_refptr<RtpSenderInterface>>,
+                AddTrack,
+                rtc::scoped_refptr<MediaStreamTrackInterface>,
+                const std::vector<std::string>&);
   PROXY_METHOD2(rtc::scoped_refptr<RtpSenderInterface>,
                 AddTrack,
                 MediaStreamTrackInterface*,
@@ -66,6 +70,14 @@ BEGIN_SIGNALING_PROXY_MAP(PeerConnection)
                 MediaStreamTrackInterface*,
                 StatsOutputLevel)
   PROXY_METHOD1(void, GetStats, RTCStatsCollectorCallback*)
+  PROXY_METHOD2(void,
+                GetStats,
+                rtc::scoped_refptr<RtpSenderInterface>,
+                rtc::scoped_refptr<RTCStatsCollectorCallback>);
+  PROXY_METHOD2(void,
+                GetStats,
+                rtc::scoped_refptr<RtpReceiverInterface>,
+                rtc::scoped_refptr<RTCStatsCollectorCallback>);
   PROXY_METHOD2(rtc::scoped_refptr<DataChannelInterface>,
                 CreateDataChannel,
                 const std::string&,
@@ -123,7 +135,7 @@ BEGIN_SIGNALING_PROXY_MAP(PeerConnection)
   PROXY_METHOD1(void, SetAudioPlayout, bool)
   PROXY_METHOD1(void, SetAudioRecording, bool)
   PROXY_METHOD1(void, RegisterUMAObserver, UMAObserver*)
-  PROXY_METHOD1(RTCError, SetBitrate, const BitrateParameters&);
+  PROXY_METHOD1(RTCError, SetBitrate, const BitrateSettings&);
   PROXY_METHOD1(void,
                 SetBitrateAllocationStrategy,
                 std::unique_ptr<rtc::BitrateAllocationStrategy>);

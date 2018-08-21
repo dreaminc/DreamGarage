@@ -137,8 +137,6 @@ protected:
 	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-
-public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
 
 	RESULT SetHand(hand* pHand);

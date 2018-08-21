@@ -29,6 +29,10 @@
 
 #include "api/audio_codecs/builtin_audio_decoder_factory.h"
 #include "api/audio_codecs/builtin_audio_encoder_factory.h"
+#include "api/video_codecs/builtin_video_decoder_factory.h"
+#include "api/video_codecs/builtin_video_encoder_factory.h"
+
+#include "modules/audio_processing/include/audio_processing.h"
 
 #include "Sound/AudioPacket.h"
 
@@ -358,10 +362,16 @@ RESULT WebRTCConductor::Initialize() {
 		m_workerThread->Invoke<rtc::scoped_refptr<webrtc::AudioDeviceModule>>(RTC_FROM_HERE,[&]()
 	{
 		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
-		return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
+		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
 		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio, this);
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
+
+		//return CreateWebRTCAudioDevice(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio);
+		//auto pWebRTCAudioDeviceModule = rtc::scoped_refptr<webrtc::AudioDeviceModule>(new WebRTCAudioDeviceModule());
+
+		rtc::scoped_refptr<WebRTCAudioDeviceModule> pWebRTCAudioDeviceModule(new rtc::RefCountedObject<WebRTCAudioDeviceModule>());
+		return pWebRTCAudioDeviceModule;
 	});
 
 	//m_pAudioDeviceModule = webrtc::AudioDeviceModule::Create(15, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
@@ -375,16 +385,22 @@ RESULT WebRTCConductor::Initialize() {
 	m_pWebRTCPeerConnectionFactory =
 		m_signalingThread->Invoke<rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>>(RTC_FROM_HERE, [&]()
 	{
-		return webrtc::CreatePeerConnectionFactory(m_networkThread.get(),	// network thread
+		return webrtc::CreatePeerConnectionFactory(
+			m_networkThread.get(),	// network thread
 			m_workerThread.get(),	// worker thread
 			//rtc::ThreadManager::Instance()->WrapCurrentThread(),	// signaling thread
 			m_signalingThread.get(),
 			m_pAudioDeviceModule.get(),	// TODO: Default ADM
+			
 			//m_pAudioDeviceDummyModule,		// Dummy ADM
-			webrtc::CreateBuiltinAudioEncoderFactory(),	// Audio Encoder Factory
-			webrtc::CreateBuiltinAudioDecoderFactory(),	// Audio Decoder Factory
-			nullptr,	// Video Encoder Factory
-			nullptr		// Video Decoder Factory
+
+			webrtc::CreateBuiltinAudioEncoderFactory(),
+			webrtc::CreateBuiltinAudioDecoderFactory(),
+			webrtc::CreateBuiltinVideoEncoderFactory(),
+			webrtc::CreateBuiltinVideoDecoderFactory(), 
+
+			nullptr, // audio_mixer
+			nullptr // audio_processing
 		);
 	});
 
@@ -686,9 +702,9 @@ Error:
 
 float WebRTCConductor::GetRunTimeMicAverage() {
 	
-	if (m_pWebRTCAudioDeviceModule != nullptr) {
-		return m_pWebRTCAudioDeviceModule->GetRunTimeMicAverage();
-	}
+	//if (m_pWebRTCAudioDeviceModule != nullptr) {
+	//	return m_pWebRTCAudioDeviceModule->GetRunTimeMicAverage();
+	//}
 
 	return 0.0f;
 }
@@ -697,15 +713,14 @@ RESULT WebRTCConductor::SendAudioPacket(const std::string &strAudioTrackLabel, l
 	RESULT r = R_PASS;
 
 	// Not doing per connection with external ADM (mixing into recorded audio)
-	//rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
-	//CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
-	//
-	//CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
+	rtc::scoped_refptr<WebRTCPeerConnection> pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CNM(pWebRTCPeerConnection, "Peer Connection %d not found", peerConnectionID);
+	
+	CR(pWebRTCPeerConnection->SendAudioPacket(strAudioTrackLabel, pendingAudioPacket));
 
 	//WebRTCAudioDeviceModule *pADM = dynamic_cast<WebRTCAudioDeviceModule*>(m_pWebRTCAudioDeviceModule);
-	CN(m_pWebRTCAudioDeviceModule);
-	
-	CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(pendingAudioPacket));
+	//CN(m_pWebRTCAudioDeviceModule);
+	//CR(m_pWebRTCAudioDeviceModule->BroadcastAudioPacket(pendingAudioPacket));
 
 Error:
 	return r;

@@ -315,6 +315,8 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = futureCEFBrowserController.get();
 	CR(pCEFBrowserController->Resize(width, height));
 
+	//m_pCEFAppObserver->OnAfterCreated(pCEFBrowserController->GetCEFBrowser());
+
 	return pCEFBrowserController;
 
 Error:

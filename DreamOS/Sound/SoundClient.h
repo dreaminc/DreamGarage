@@ -9,17 +9,18 @@
 #include <thread>
 
 #include "SoundBuffer.h"
+#include "SoundCommon.h"
 
+class SoundBuffer;
 class SoundFile;
+class AudioPacket;
+class SpatialSoundObject;
+class point;
+class vector;
+
+#define DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS 20 
 
 class SoundClient {
-public:
-	enum class state {
-		UNINITIALIZED,
-		STOPPED,
-		RUNNING,
-		INVALID
-	};
 
 public:
 	class observer {
@@ -42,14 +43,33 @@ public:
 protected:
 	virtual RESULT AudioRenderProcess() = 0;
 	virtual RESULT AudioCaptureProcess() = 0;
+	virtual RESULT AudioSpatialProcess() = 0;
 
-	SoundClient::state m_renderState = SoundClient::state::UNINITIALIZED;
-	SoundClient::state m_captureState = SoundClient::state::UNINITIALIZED;
+	int GetRenderSamplingRate() { return m_renderSamplingRate; }
+	int GetCaptureSamplingRate() { return m_captureSamplingRate; }
+	int GetSpaitalSamplingRate() { return m_spatialSamplingRate; }
 
-	RESULT InitializeCaptureSoundBuffer(int numChannels, SoundBuffer::type bufferType);
-	RESULT InitializeRenderSoundBuffer(int numChannels, SoundBuffer::type bufferType);
+	sound::state m_renderState = sound::state::UNINITIALIZED;
+	sound::state m_captureState = sound::state::UNINITIALIZED;
+	sound::state m_spatialState = sound::state::UNINITIALIZED;
+
+	RESULT InitializeCaptureSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT InitializeSpatialSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
 
 	RESULT HandleAudioDataCaptured(int numFrames);
+
+	virtual std::shared_ptr<SpatialSoundObject> MakeSpatialAudioObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) = 0;
+
+public:
+	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
+	bool FindSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject);
+	RESULT ClearSpatialSoundObjects();
+
+	int GetMaxSpatialAudioObjets() { return m_maxSpatialSoundObjects; };
+
+protected:
+	std::vector<std::shared_ptr<SpatialSoundObject>> m_spatialSoundObjects;
 
 public:
 	bool IsRunning();
@@ -63,18 +83,32 @@ public:
 	RESULT StartRender();
 	RESULT StopRender();
 
+	RESULT StartSpatial();
+	RESULT StopSpatial();
+
 	RESULT PushMonoAudioBufferToRenderBuffer(int numFrames, SoundBuffer *pSourceBuffer);
 
-	RESULT PlaySoundFile(SoundFile *pSoundFile);
+	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
+
+	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket);
 
 private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
+	std::thread	m_audioSpatialProcessingThread;
 
 protected:
 	SoundBuffer *m_pCaptureSoundBuffer = nullptr;
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	SoundBuffer *m_pSpatialSoundBuffer = nullptr;
 
+	int m_renderSamplingRate = DEFAULT_SAMPLING_RATE;
+	int m_captureSamplingRate = DEFAULT_SAMPLING_RATE;
+	int m_spatialSamplingRate = DEFAULT_SAMPLING_RATE;
+
+protected:
+	uint32_t m_maxSpatialSoundObjects = DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS;
+	bool m_fHRTFEnabled = false;
 };
 
 #endif SOUND_CLIENT_H_
