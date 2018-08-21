@@ -117,7 +117,7 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 	int nRepeats = 1;
 	float radius = 2.0f;
 
-	struct TestContext : public SoundClient::observer {
+	struct TestContext : public DreamSoundSystem::observer {
 		
 		sphere *pSphere = nullptr;
 

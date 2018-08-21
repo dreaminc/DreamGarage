@@ -552,7 +552,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return r;
 		};
 
-		virtual RESULT OnGetTeam(bool fSuccess, int environmentId) override {
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
 			RESULT r = R_PASS;
 
 			DEBUG_LINEOUT("OnGetToken");
