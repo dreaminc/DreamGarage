@@ -162,7 +162,12 @@ RESULT WASAPISoundClient::EnumerateWASAPIDevices() {
 	IMMDeviceCollection *pDeviceCollection = nullptr;
 	IMMDevice *pDevice = nullptr;
 
-	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_pDeviceEnumerator),
+	// TODO: Put into WindowsApp ? 
+	CRM((RESULT)CoInitializeEx(NULL, COINIT_MULTITHREADED), "Faield to initialize COM library");
+
+	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr,
+		CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
+		(void**)&m_pDeviceEnumerator),
 		"CoCreateInstance Failed");
 	CN(m_pDeviceEnumerator);
 
