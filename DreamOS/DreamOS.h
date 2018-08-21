@@ -47,6 +47,8 @@
 
 //#include "DreamLogger/DreamLogger.h"
 
+#include "Sound/DreamSoundSystem.h"
+
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
@@ -54,7 +56,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
-class DreamSoundSystem;
+
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -292,6 +294,9 @@ public:
 	template<class derivedModuleType>
 	RESULT ShutdownDreamModule(std::shared_ptr<derivedModuleType> pDreamModule);
 
+	std::vector<UID> GetModuleUID(std::string strName);
+	UID GetUniqueModuleUID(std::string strName);
+
 //protected:
 public:
 	// Keyboard
@@ -440,6 +445,14 @@ protected:
 
 	// Dream App Messaging
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+
+	// Sound 
+	RESULT InitializeDreamSoundSystem();
+	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
+	RESULT UnregisterSoundSystemObserver();
+	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
+	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
+	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
 
 	// IO
 //protected:

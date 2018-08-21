@@ -11,11 +11,30 @@
 #include "DreamModule.h"
 #include "SoundCommon.h"
 
+#include "SoundClient.h"
+
+#include "SoundFile.h"
+
 #include <memory>
 
-class SoundClient;
+class SpatialSoundObject;
+class SoundFile;
+class ObjectStoreNode;
+class HMD;
+//class SoundBuffer;
 
-class DreamSoundSystem : public DreamModule<DreamSoundSystem> {
+class DreamSoundSystem : 
+	public DreamModule<DreamSoundSystem>, 
+	public SoundClient::observer 
+{
+	friend class DreamModuleManager;
+
+public:
+	class observer {
+	public:
+		virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) = 0;
+	};
+
 public:
 	DreamSoundSystem(DreamOS *pDreamOS, void *pContext = nullptr);
 	~DreamSoundSystem();
@@ -25,18 +44,30 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	RESULT RegisterObserver(DreamSoundSystem::observer *pObserver);
+	RESULT UnregisterObserver();
+
+public:
+	// SoundClient::observer
+	virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) override;
+
+public:
+	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
+	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
+	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
+
 protected:
 	static DreamSoundSystem* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	ObjectStoreNode *m_pSpatialSoundObjectGraph = nullptr;
+
+private:
 	std::shared_ptr<SoundClient> m_pWASAPICaptureClient = nullptr;
 	std::shared_ptr<SoundClient> m_pXAudio2AudioClient = nullptr;
-};
 
-// The Self Construct
-DreamSoundSystem* DreamSoundSystem::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamSoundSystem *pDreamModule = new DreamSoundSystem(pDreamOS, pContext);
-	return pDreamModule;
-}
+	HMD *m_pHMD = nullptr;
+	DreamSoundSystem::observer *m_pObserver = nullptr;
+};
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

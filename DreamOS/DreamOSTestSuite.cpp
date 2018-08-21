@@ -54,9 +54,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestModuleManager());
 
-	// TODO:
-	//CR(AddTestSoundSystemModule());
-
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestEnvironmentSwitching());
@@ -1015,10 +1012,6 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 
 Error:
 	return r;
-}
-
-RESULT DreamOSTestSuite::AddTestSoundSystemModule() {
-	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamOSTestSuite::AddTestDreamApps() {

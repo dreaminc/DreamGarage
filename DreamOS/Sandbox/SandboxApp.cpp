@@ -571,6 +571,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
+
 	// Auto Login Handling
 	// This is done in DreamOS now
 	//if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {

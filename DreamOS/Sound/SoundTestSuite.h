@@ -23,6 +23,9 @@ public:
 
 public:
 
+	// Sound System Module Test
+	RESULT AddTestSoundSystemModule();
+
 	// Enumerate
 	RESULT AddTestEnumerateDevices();
 

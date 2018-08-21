@@ -42,7 +42,6 @@ public:
 
 	// Modules
 	RESULT AddTestModuleManager();
-	RESULT AddTestSoundSystemModule();
 
 	// Apps
 	RESULT AddTestUIKeyboard();
