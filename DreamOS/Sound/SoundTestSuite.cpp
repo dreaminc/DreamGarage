@@ -314,6 +314,7 @@ RESULT SoundTestSuite::AddTestSoundSystemModule() {
 
 			// Should work without sound client
 			CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
+
 			CR(m_pDreamOS->PlaySoundFile(pNewSoundFile));
 		}
 
