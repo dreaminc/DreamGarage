@@ -47,23 +47,28 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 	SetModuleDescription("The Dream Sound System Module");
 
 	// WASAPI Capture Client
+	// This can fail - if this is the case then capture will not fire (obviously)
 	auto pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-	CNM(pWASAPICaptureClient, "Failed to create WASAPI Client");
-	m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
-	CN(m_pWASAPICaptureClient);
+	
+	if (pWASAPICaptureClient != nullptr) {
+		m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
+		CN(m_pWASAPICaptureClient);
 
-	CR(m_pWASAPICaptureClient->RegisterObserver(this));
-	CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
+		CR(m_pWASAPICaptureClient->RegisterObserver(this));
+		CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
+	}
 
 	// XAudio2 Spatial and Render Client
+	// This cannot fail - we need a default audio device, if none exists this will blow up
 	auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
 	CNM(pXAudio2AudioClient, "Failed to create XAudio2 Client");
 	m_pXAudio2AudioClient =std::shared_ptr<SoundClient>(pXAudio2AudioClient);
 	CN(m_pXAudio2AudioClient);
 
-	// Set up the spatial sound object store
-	m_pSpatialSoundObjectGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
-	CNM(m_pSpatialSoundObjectGraph, "Failed to allocate Scene Graph");
+	CRM(m_pXAudio2AudioClient->StartSpatial(), "Failed to start spatial for XAudio2");
+	CRM(m_pXAudio2AudioClient->StartRender(), "Failed to start render for XAudio2");
+
+	CR(ClearSpatialSoundObjects());
 
 	m_pHMD = GetDOS()->GetHMD();
 
@@ -106,19 +111,59 @@ Error:
 	return r;
 }
 
-std::shared_ptr<SpatialSoundObject> DreamSoundSystem::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+RESULT DreamSoundSystem::AddSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject) {
 	RESULT r = R_PASS;
 
-	CNM(m_pXAudio2AudioClient, "XAudio2 client not initialized");
-	
-	{
-		std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = m_pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDirection, vListenerDirection);
-		CNM(pSpatialSoundObject, "Failed to create spatial sound object");
+	CN(pSpatialSoundObject);
 
-		return pSpatialSoundObject;
+	// Add to our spatial objects
+	m_pSpatialSoundObjects.push_back(pSpatialSoundObject);
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::RemoveSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject) {
+	RESULT r = R_PASS;
+
+	auto findIterator = std::find(m_pSpatialSoundObjects.begin(), m_pSpatialSoundObjects.end(), pSpatialSoundObject);
+
+	if (findIterator != m_pSpatialSoundObjects.end()) {
+		m_pSpatialSoundObjects.erase(findIterator);
+	}
+	else {
+		r = R_NOT_FOUND;
 	}
 
 Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::ClearSpatialSoundObjects() {
+	// Set up the spatial sound object store
+	m_pSpatialSoundObjects = std::vector<std::shared_ptr<SpatialSoundObject>>();
+
+	return R_PASS;
+}
+
+std::shared_ptr<SpatialSoundObject> DreamSoundSystem::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
+
+	CNM(m_pXAudio2AudioClient, "XAudio2 client not initialized");
+		
+	pSpatialSoundObject = m_pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDirection, vListenerDirection);
+	CNM(pSpatialSoundObject, "Failed to create spatial sound object");
+
+	CR(AddSpatialSoundObject(pSpatialSoundObject));
+
+	return pSpatialSoundObject;
+
+Error:
+	if (pSpatialSoundObject != nullptr) {
+			pSpatialSoundObject = nullptr;
+	}
 	return nullptr;
 }
 

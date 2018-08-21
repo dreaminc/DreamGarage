@@ -19,7 +19,6 @@
 
 class SpatialSoundObject;
 class SoundFile;
-class ObjectStoreNode;
 class HMD;
 //class SoundBuffer;
 
@@ -60,7 +59,11 @@ protected:
 	static DreamSoundSystem* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	ObjectStoreNode *m_pSpatialSoundObjectGraph = nullptr;
+	std::vector<std::shared_ptr<SpatialSoundObject>> m_pSpatialSoundObjects;
+
+	RESULT AddSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject);
+	RESULT RemoveSpatialSoundObject(std::shared_ptr<SpatialSoundObject> pSpatialSoundObject);
+	RESULT ClearSpatialSoundObjects();
 
 private:
 	std::shared_ptr<SoundClient> m_pWASAPICaptureClient = nullptr;
