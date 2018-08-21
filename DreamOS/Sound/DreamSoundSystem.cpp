@@ -1,7 +1,7 @@
 #include "DreamSoundSystem.h"
 
 DreamSoundSystem::DreamSoundSystem(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamSoundSystem>(pDreamOS, pContext)
+	DreamModule<DreamSoundSystem>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
@@ -13,7 +13,7 @@ DreamSoundSystem::~DreamSoundSystem() {
 RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 	RESULT r = R_PASS;
 
-	SetModuleName("DreamSoundSystem");
+	SetName("DreamSoundSystem");
 	SetModuleDescription("The Dream Sound System Module");
 
 	CR(r);
@@ -55,7 +55,7 @@ Error:
 	return r;
 }
 
-RESULT DreamSoundSystem::OnModuleDidFinishInitializing(void *pContext) {
+RESULT DreamSoundSystem::OnDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);

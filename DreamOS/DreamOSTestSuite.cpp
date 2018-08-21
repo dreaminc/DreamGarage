@@ -13,6 +13,8 @@
 #include "HAL/opengl/OGLProgramRefraction.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 
+#include "DreamModule.h"
+
 #include "DreamTestingApp.h"
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
@@ -51,6 +53,11 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestEnvironmentSeating());
+	
+	CR(AddTestModuleManager());
+
+	// TODO:
+	//CR(AddTestSoundSystemModule());
 
 	CR(AddTestDreamBrowser());
 
@@ -886,6 +893,136 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 Error:
 	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestModuleManager() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	class DreamTestingModule : public DreamModule<DreamTestingModule> {
+		friend class DreamModuleManager;
+
+	public:
+		DreamTestingModule(DreamOS *pDreamOS, void *pContext = nullptr) :
+			DreamModule<DreamTestingModule>(pDreamOS, pContext)
+		{
+			// empty
+		}
+
+		~DreamTestingModule() {
+			Shutdown();
+		}
+
+		virtual RESULT InitializeModule(void *pContext = nullptr) {
+			RESULT r = R_PASS;
+
+			SetName("DreamSoundSystem");
+			SetModuleDescription("The Dream Sound System Module");
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+		virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		virtual RESULT Update(void *pContext = nullptr) override {
+			RESULT r = R_PASS;
+
+			CR(Print(std::to_string(m_testingValue)));
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT Shutdown(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		RESULT SetTestingValue(int i) {
+			m_testingValue = i;
+			return R_PASS;
+		}
+
+	protected:
+		static DreamTestingModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
+			DreamTestingModule *pDreamModule = new DreamTestingModule(pDreamOS, pContext);
+			return pDreamModule;
+		}
+
+	private:
+		int m_testingValue = -1;
+	};
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamTestingModule> pDreamTestModules[5];
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+
+		// Create the testing modules
+		for (int i = 0; i < 5; i++) {
+			pDreamTestModules[i] = m_pDreamOS->LaunchDreamModule<DreamTestingModule>(this);
+			CNM(pDreamTestModules[i], "Failed to create dream test app");
+			pDreamTestModules[i]->SetTestingValue(i);
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Module Manager Test");
+	pUITest->SetTestDescription("Testing module manager functionality");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestSoundSystemModule() {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamOSTestSuite::AddTestDreamApps() {

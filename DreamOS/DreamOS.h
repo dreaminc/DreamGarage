@@ -38,6 +38,8 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
+#include "DreamModuleManager.h"
+
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
 #include "DreamAppHandle.h"
@@ -281,6 +283,14 @@ public:
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
 
 	//std::map<DreamAppHandleBase*, std::vector<DreamAppBase*>> m_capturedApps;
+
+	// Dream Modules
+public:
+	template<class derivedModuleType>
+	std::shared_ptr<derivedModuleType> LaunchDreamModule(void *pContext);
+
+	template<class derivedModuleType>
+	RESULT ShutdownDreamModule(std::shared_ptr<derivedModuleType> pDreamModule);
 
 //protected:
 public:

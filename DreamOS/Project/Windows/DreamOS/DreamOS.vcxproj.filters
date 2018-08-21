@@ -955,6 +955,9 @@
     <ClCompile Include="..\..\..\DreamModule.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamModuleManager.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2093,6 +2096,9 @@
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamModule.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamModuleManager.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>

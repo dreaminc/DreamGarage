@@ -40,6 +40,7 @@
 
 	#pragma warning( disable : 4312)
 	#pragma warning( disable : 4244)	// TODO: WebRTC port.h needs this, it's not a good one though
+	#pragma warning( disable:  4102)	// This disables the warning for unused labels (useful for doc and consistency)
 
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
