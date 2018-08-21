@@ -150,6 +150,8 @@ public:
 	RESULT SetUIProgramNode(UIStageProgram *pUIProgramNode);
 
 	RESULT ShutdownSource();
+	RESULT ShutdownAllSources();
+
 	RESULT CloseActiveAsset();
 	RESULT OnReceiveAsset();
 

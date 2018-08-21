@@ -132,3 +132,8 @@ bool UIMenuItem::Contains(VirtualObj *pObj) {
 std::string& UIMenuItem::GetName() {
 	return m_pLabel->GetText();
 }
+
+RESULT UIMenuItem::SetName(std::string strName) {
+	m_pLabel->SetText(strName);
+	return R_PASS;
+}

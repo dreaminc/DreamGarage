@@ -103,6 +103,7 @@ public:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
+	RESULT Logout();
 	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
 	long GetUserDefaultEnvironmentID();
@@ -143,6 +144,7 @@ private:
 
 public:
 	RESULT UpdateLoginState();
+	std::string GetSavedAccessToken();
 
 private:
 	LoginState m_loginState = { 0 };

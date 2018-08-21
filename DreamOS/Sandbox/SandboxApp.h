@@ -56,6 +56,7 @@ class DreamAppMessage;
 class UIKeyboardLayout;
 
 class DreamAppManager;
+class DreamModuleManager;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
@@ -74,6 +75,7 @@ public:
 		unsigned fMouseLook : 1;
 		unsigned fUseGamepad : 1;
 		unsigned fInitCloud : 1;
+		unsigned fInitSound : 1;
 	};
 
 private:
@@ -104,6 +106,7 @@ private:
 	RESULT InitializeInteractionEngine();
 	RESULT InitializeTimeManager();
 	RESULT InitializeDreamAppManager();
+	RESULT InitializeDreamModuleManager();
 	RESULT InitializeCamera();
 
 protected:
@@ -398,40 +401,41 @@ protected:
 	viewport m_viewport;
 
 	// TODO: Move to unique_ptr
-	CommandLineManager *m_pCommandLineManager;
-	PathManager *m_pPathManager;
-	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
+	CommandLineManager *m_pCommandLineManager = nullptr;
+	PathManager *m_pPathManager = nullptr;
+	OpenGLRenderingContext *m_pOpenGLRenderingContext = nullptr;		// TODO: fix it!
 	
 	// TODO: Should these be in their respective "engine" objects?
-	ObjectStore *m_pPhysicsGraph;	
-	ObjectStore *m_pInteractionGraph;
-	ObjectStore *m_pFlatSceneGraph;
+	ObjectStore *m_pPhysicsGraph = nullptr;	
+	ObjectStore *m_pInteractionGraph = nullptr;
+	ObjectStore *m_pFlatSceneGraph = nullptr;
 
 	//ObjectStore *m_pSceneGraph;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
 	ObjectStoreNode *m_pUISceneGraph = nullptr;
 	ObjectStoreNode *m_pUIClippingSceneGraph = nullptr;
 
-	CloudController *m_pCloudController;
-	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
-	std::unique_ptr<InteractionEngine> m_pInteractionEngine;
+	CloudController *m_pCloudController = nullptr;
+	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine = nullptr;
+	std::unique_ptr<InteractionEngine> m_pInteractionEngine = nullptr;
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
-	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
+	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion = nullptr;
 	SenseKeyboard *m_pSenseKeyboard = nullptr;
 	SenseMouse *m_pSenseMouse = nullptr;
 	SenseGamepadController *m_pSenseGamepad = nullptr;
-	HMD *m_pHMD;
+	HMD *m_pHMD = nullptr;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
 	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
+	std::unique_ptr<DreamModuleManager> m_pDreamModuleManager = nullptr;
 	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
-	HALImp *m_pHALImp;
+	HALImp *m_pHALImp = nullptr;
 
 	//std::shared_ptr<stereocamera> m_pCamera = nullptr;
 	CameraNode *m_pCamera = nullptr;

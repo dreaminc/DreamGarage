@@ -940,6 +940,21 @@
     <ClCompile Include="..\..\..\Sound\XAudio2\X3DSpatialSoundObject.cpp">
       <Filter>Sound\XAudio2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.h">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamModule.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamModuleManager.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2071,6 +2086,15 @@
     <ClInclude Include="..\..\..\Sound\SoundCommon.h">
       <Filter>Sound</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenFade.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamModule.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamModuleManager.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2278,6 +2302,13 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
+      <Filter>HAL</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\mathCommon.shader">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

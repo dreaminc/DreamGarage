@@ -30,7 +30,7 @@ public:
 	static SoundBuffer* Make(int numChannels, int samplingRate, sound::type bufferType);
 
 	virtual bool IsFull() = 0;
-	virtual size_t NumPendingBytes() = 0;
+	virtual int64_t NumPendingFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) = 0;
 
 	int NumChannels() {
 		return m_channels;
@@ -60,6 +60,7 @@ public:
 	virtual RESULT IncrementBuffer(int numFrames) = 0;
 	virtual RESULT IncrementBufferChannel(int channel, int numFrames) = 0;
 	virtual RESULT GetAudioPacket(int numFrames, AudioPacket *pAudioPacket);
+	virtual RESULT PushAudioPacket(const AudioPacket &audioPacket, bool fClobber = false);
 
 	virtual RESULT ResetBuffer(size_t startPosition, size_t numPendingFrames) = 0;
 
@@ -69,7 +70,13 @@ public:
 	virtual int GetBitsPerSample() { return 0; }
 
 public:
-	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) { return R_INVALID_PARAM; }
+	virtual RESULT GetInterlacedAudioDataBuffer(int numFrames, void* &n_pDataBuffer, size_t &m_pDataBuffer_n) = 0;
+	
+public:
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(uint8_t *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(int16_t *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(float *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(double *pTargetDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
 
 public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(uint8_t *pDataBuffer, int numFrameCount) { return R_INVALID_PARAM; }
@@ -168,8 +175,8 @@ public:
 	}
 
 	// TODO: Is it really bytes?
-	virtual size_t NumPendingBytes() override {
-		size_t numPendingBytes = -1;
+	virtual int64_t NumPendingFrames(int64_t *optMinFrames = nullptr, int64_t *optMaxFrames = nullptr) override {
+		int64_t numPendingBytes = -1;
 		bool fFirst = true;
 
 		// TODO: Right now a lot of work is going into maintaining 
@@ -179,11 +186,11 @@ public:
 
 		for (int i = 0; i < m_channels; i++) {
 			if (fFirst) {
-				numPendingBytes = m_ppCircularBuffers[i]->NumPendingBufferBytes();
+				numPendingBytes = m_ppCircularBuffers[i]->NumPendingBufferSamples();
 				fFirst = false;
 			}
 			else {
-				if (numPendingBytes != m_ppCircularBuffers[i]->NumPendingBufferBytes()) {
+				if (numPendingBytes != m_ppCircularBuffers[i]->NumPendingBufferSamples()) {
 					return -1;
 				}
 			}
@@ -298,20 +305,20 @@ public:
 		// This will block
 		m_bufferLock.lock();
 
-		// Make sure the buffers have enough space
-		for (int i = 0; i < m_channels; i++) {
-			CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
-			CN(pChannelCircBuf);
+			// Make sure the buffers have enough space
+			for (int i = 0; i < m_channels; i++) {
+				CircularBuffer<CBType> *pChannelCircBuf = m_ppCircularBuffers[i];
+				CN(pChannelCircBuf);
 
-			CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
-		}
-
-		// This will de-interlace the samples
-		for (int i = 0; i < numFrames; i++) {
-			for (int j = 0; j < m_channels; j++) {
-				m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+				CB((pChannelCircBuf->NumAvailableBufferBytes() >= numFrames));
 			}
-		}
+
+			// This will de-interlace the samples
+			for (int i = 0; i < numFrames; i++) {
+				for (int j = 0; j < m_channels; j++) {
+					m_ppCircularBuffers[j]->WriteToBuffer(pDataBuffer[sampleCount++]);
+				}
+			}
 
 		m_bufferLock.unlock();
 
@@ -350,7 +357,7 @@ public:
 	virtual RESULT MixIntoInterlacedTargetBuffer(CBType *pDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 		
 		{
 			size_t bufferCounter = 0;
@@ -416,7 +423,79 @@ public:
 	virtual RESULT LoadDataToInterlacedTargetBuffer(CBType *pTargetDataBuffer, int numFrameCount) override {
 		RESULT r = R_PASS;
 
-		CBR((NumPendingBytes() >= numFrameCount), R_SKIPPED);
+		//if (NumPendingBytes() >= numFrameCount) 
+		
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+
+		{	
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
+
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+
+					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+
+					pTargetDataBuffer[bufferCounter] = tempVal;
+					bufferCounter++;
+
+				}
+			}
+		}
+
+	Error:
+		return r;
+	}
+
+	// TODO: Fix the templates, there's a lot of duplicated code in these functions 
+	// but can't seem to push the templating around to make it work without it
+
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(uint8_t *pTargetDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+	
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+	
+		{
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
+	
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+	
+					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+					
+					switch (m_bufferType) {
+						case sound::type::UNSIGNED_8_BIT: {
+							pTargetDataBuffer[bufferCounter] = tempVal;
+						} break;
+
+						case sound::type::SIGNED_16_BIT: {
+							float floatVal = (float)((float)tempVal / (float)std::numeric_limits<int16_t>::max());
+							pTargetDataBuffer[bufferCounter] = ((floatVal + 1.0f) / 2.0f) * std::numeric_limits<uint8_t>::max();
+						} break;
+
+						case sound::type::FLOATING_POINT_32_BIT: {
+							pTargetDataBuffer[bufferCounter] = ((tempVal + 1.0f) / 2.0f) * std::numeric_limits<uint8_t>::max();
+						} break;
+
+						case sound::type::FLOATING_POINT_64_BIT: {
+							pTargetDataBuffer[bufferCounter] = ((tempVal + 1.0f) / 2.0f) * std::numeric_limits<uint8_t>::max();
+						} break;
+					}
+
+					bufferCounter++;
+				}
+			}
+		}
+	
+	Error:
+		return r;
+	}	
+
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(int16_t *pTargetDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
 
 		{
 			size_t bufferCounter = 0;
@@ -424,10 +503,120 @@ public:
 
 			for (int j = 0; j < numFrameCount; j++) {
 				for (int i = 0; i < m_channels; i++) {
-					CR(m_ppCircularBuffers[i]->ReadNextValue(tempVal));
 
-					pTargetDataBuffer[bufferCounter] = tempVal;
+					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+
+					switch (m_bufferType) {
+						case sound::type::UNSIGNED_8_BIT: {
+							float floatVal = (float)((float)tempVal / (float)std::numeric_limits<uint8_t>::max());
+							pTargetDataBuffer[bufferCounter] = ((floatVal * 2.0f) - 1.0f) * std::numeric_limits<int16_t>::max();
+						} break;
+
+						case sound::type::SIGNED_16_BIT: {
+							pTargetDataBuffer[bufferCounter] = tempVal;
+						} break;
+
+						case sound::type::FLOATING_POINT_32_BIT: {
+							pTargetDataBuffer[bufferCounter] = (int16_t)(tempVal * std::numeric_limits<int16_t>::max());
+						} break;
+
+						case sound::type::FLOATING_POINT_64_BIT: {
+							pTargetDataBuffer[bufferCounter] = (int16_t)(tempVal * std::numeric_limits<int16_t>::max());
+						} break;
+					}
+
 					bufferCounter++;
+
+				}
+			}
+		}
+
+	Error:
+		return r;
+	}
+
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(float *pTargetDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+
+		{
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
+
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+
+					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+
+					switch (m_bufferType) {
+						case sound::type::UNSIGNED_8_BIT: {
+							float floatVal = (float)((float)tempVal / (float)std::numeric_limits<uint8_t>::max());
+							pTargetDataBuffer[bufferCounter] = ((floatVal * 2.0f) - 1.0f);
+						} break;
+
+						case sound::type::SIGNED_16_BIT: {
+							float floatVal = (float)((float)tempVal / (float)std::numeric_limits<int16_t>::max());
+							pTargetDataBuffer[bufferCounter] = floatVal;
+							
+						} break;
+
+						case sound::type::FLOATING_POINT_32_BIT: {
+							pTargetDataBuffer[bufferCounter] = tempVal;
+						} break;
+
+						case sound::type::FLOATING_POINT_64_BIT: {
+							pTargetDataBuffer[bufferCounter] = (float)tempVal;
+						} break;
+					}
+
+					bufferCounter++;
+
+				}
+			}
+		}
+
+	Error:
+		return r;
+	}
+
+	virtual RESULT LoadDataToInterlacedTargetBufferTargetType(double *pTargetDataBuffer, int numFrameCount) override {
+		RESULT r = R_PASS;
+
+		CBR((NumPendingFrames() >= numFrameCount), R_SKIPPED);
+
+		{
+			size_t bufferCounter = 0;
+			CBType tempVal = 0;
+
+			for (int j = 0; j < numFrameCount; j++) {
+				for (int i = 0; i < m_channels; i++) {
+
+					CRM(m_ppCircularBuffers[i]->ReadNextValue(tempVal), "Read next value failed");
+
+					switch (m_bufferType) {
+						case sound::type::UNSIGNED_8_BIT: {
+							double floatVal = (double)((double)tempVal / (double)std::numeric_limits<uint8_t>::max());
+							pTargetDataBuffer[bufferCounter] = ((floatVal * 2.0f) - 1.0f);
+						} break;
+
+						case sound::type::SIGNED_16_BIT: {
+							double floatVal = (double)((double)tempVal / (double)std::numeric_limits<int16_t>::max());
+							pTargetDataBuffer[bufferCounter] = floatVal;
+
+						} break;
+
+						case sound::type::FLOATING_POINT_32_BIT: {
+							pTargetDataBuffer[bufferCounter] = (double)tempVal;
+						} break;
+
+						case sound::type::FLOATING_POINT_64_BIT: {
+							pTargetDataBuffer[bufferCounter] = tempVal;
+						} break;
+					}
+
+					bufferCounter++;
+
 				}
 			}
 		}
@@ -483,7 +672,6 @@ Error:
 
 	return nullptr;
 }
-
 
 
 #endif // SOUND_BUFFER_H_

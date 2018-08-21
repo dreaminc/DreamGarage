@@ -45,6 +45,10 @@ public:
 		return m_samplingRate;
 	}
 
+	size_t GetByteSize() const {
+		return (size_t)((m_bitsPerSample / 8) * m_frames * m_channels);
+	}
+
 	RESULT SetNumFrames(int numFrames) {
 		m_frames = numFrames;
 		return R_PASS;
@@ -77,7 +81,7 @@ public:
 		return r;
 	}
 
-	sound::type GetSoundType() {
+	sound::type GetSoundType() const {
 		return m_soundType;
 	}
 
@@ -86,6 +90,7 @@ public:
 		return R_PASS;
 	}
 
+	RESULT GetDataBufferCopy(uint8_t*&pDataBuffer, size_t &pDataBuffer_n) const;
 	RESULT DeleteBuffer();
 
 private:

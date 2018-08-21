@@ -62,6 +62,44 @@ const char* SoundBuffer::TypeString(sound::type bufferType) {
 	return "invalid";
 }
 
+// The aptly named clobber param will clear the current contents of the buffer
+RESULT SoundBuffer::PushAudioPacket(const AudioPacket &audioPacket, bool fClobber) {
+	RESULT r = R_PASS;
+
+	CBM((audioPacket.GetNumChannels() == m_channels), "Channel mismatch");
+
+	if (fClobber) {
+		LockBuffer();
+		
+		{
+			ResetBuffer(0, 0);
+		}
+		
+		UnlockBuffer();
+	}
+
+	switch (audioPacket.GetSoundType()) {
+		case sound::type::UNSIGNED_8_BIT: {
+			CR(PushData((uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		} break;
+
+		case sound::type::SIGNED_16_BIT: {
+			CR(PushData((int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		} break;
+
+		case sound::type::FLOATING_POINT_32_BIT: {
+			CR(PushData((float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		} break;
+
+		case sound::type::FLOATING_POINT_64_BIT: {
+			CR(PushData((double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+		} break;
+	}
+
+Error:
+	return r;
+}
+
 RESULT SoundBuffer::GetAudioPacket(int numFrames, AudioPacket *pAudioPacket) {
 	RESULT r = R_PASS;
 

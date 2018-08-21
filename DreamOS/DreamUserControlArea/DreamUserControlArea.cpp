@@ -761,7 +761,7 @@ Error:
 RESULT DreamUserControlArea::CreateBrowserSource() {
 	RESULT r = R_PASS;
 
-	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 	if (m_strURL == "") {
 		CR(m_pDreamUIBar->ShowRootMenu(false));
@@ -777,7 +777,7 @@ Error:
 RESULT DreamUserControlArea::SetActiveBrowserURI() {
 	RESULT r = R_PASS;
 
-	std::string strScope = "WebsiteProviderScope.WebsiteProvider";
+	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
 	std::string strTitle = m_strWebsiteTitle;
 
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
@@ -883,6 +883,7 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
 
+	CNR(m_pActiveSource, R_SKIPPED);
 	m_pActiveSource->CloseSource();
 	
 	if (m_pDreamDesktop == m_pActiveSource) {
@@ -892,7 +893,18 @@ RESULT DreamUserControlArea::ShutdownSource() {
 	else {	
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		GetDOS()->ShutdownDreamApp<DreamBrowser>(pBrowser);
+		//TODO: should set pBrowser to nullptr?
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserControlArea::ShutdownAllSources() {
+	RESULT r = R_PASS;
+
+	m_pDreamTabView->FlagShutdownAllSources();
+	CloseActiveAsset();
 
 	return r;
 }
@@ -1130,7 +1142,7 @@ WebBrowserPoint DreamUserControlArea::GetRelativePointofContact(point ptContact)
 
 	posX = (posX + 1.0f) / 2.0f;	// flip it
 	posY = (posY + 1.0f) / 2.0f;  
-	
+
 	ptRelative.x = posX * m_pActiveSource->GetWidth();
 	ptRelative.y = posY * m_pActiveSource->GetHeight();
 

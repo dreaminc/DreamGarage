@@ -7,15 +7,25 @@
 #include "HAL/UIStageProgram.h"
 #include "HAL/EnvironmentProgram.h"
 
+#include "HAL/opengl/OGLProgramScreenFade.h"
+#include "HAL/opengl/OGLProgramWater.h"
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramSkyboxScatter.h"
+
+#include "DreamModule.h"
+
 #include "DreamTestingApp.h"
 #include "DreamUserApp.h"
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
+#include "DreamGarage\DreamFormApp.h"
 #include "DreamControlView\DreamControlView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamGarage\DreamGamepadCameraApp.h"
+#include "DreamGarage\DreamEnvironmentApp.h"
 
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
@@ -42,7 +52,15 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestModuleManager());
+
 	CR(AddTestDreamBrowser());
+
+	CR(AddTestEnvironmentSwitching());
+	
+	CR(AddTestDreamOS());
+
+	CR(AddTestDreamUIBar());
 
 	CR(AddTestCredentialStorage());
 
@@ -62,8 +80,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamShareView());
 
-	CR(AddTestDreamOS());
-
 	CR(AddTestUserApp());
 
 	CR(AddTestCaptureApp());
@@ -71,8 +87,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamApps());
 
 	CR(AddTestUIKeyboard());
-
-	CR(AddTestDreamUIBar());
 
 	CR(AddTestCaptureApp());
 
@@ -637,7 +651,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		RESULT r = R_PASS;
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
-		std::string strURL = "https://twitch.tv";
+		//std::string strURL = "https://twitch.tv";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
 		
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -650,33 +665,33 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		CR(SetupDreamAppPipeline());
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// Create the 2D Mouse App
-		pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
-		CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
-
+		//pTestContext->m_pDream2DMouse = m_pDreamOS->LaunchDreamApp<Dream2DMouseApp>(this);
+		//CNM(pTestContext->m_pDream2DMouse, "Failed to create dream 2D mouse app");
 
 		pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		CN(pTestContext->m_pWebBrowserManager);
 		CR(pTestContext->m_pWebBrowserManager->Initialize());
-
-		// Create the Shared View App
-		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
-		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
-
-		// Set up the view
-		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
-
-		pTestContext->m_pDreamBrowser->SetURI(strURL);
-
+			
+		// This presents a timing issue if it works 
 		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
 		CN(pTestContext->m_pBrowserQuad);
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+	
+		// Create the Shared View App
+		pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+		CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+		
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+		
+		pTestContext->m_pDreamBrowser->SetURI(strURL);
 
 	Error:
 		return R_PASS;
@@ -866,6 +881,132 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 	pUITest->SetTestName("Logging Test");
 	pUITest->SetTestDescription("Basic logging test which will spin up a few SPD logs and test out the system");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestModuleManager() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 3000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	class DreamTestingModule : public DreamModule<DreamTestingModule> {
+		friend class DreamModuleManager;
+
+	public:
+		DreamTestingModule(DreamOS *pDreamOS, void *pContext = nullptr) :
+			DreamModule<DreamTestingModule>(pDreamOS, pContext)
+		{
+			// empty
+		}
+
+		~DreamTestingModule() {
+			Shutdown();
+		}
+
+		virtual RESULT InitializeModule(void *pContext = nullptr) {
+			RESULT r = R_PASS;
+
+			SetName("DreamSoundSystem");
+			SetModuleDescription("The Dream Sound System Module");
+
+			CR(r);
+
+		Error:
+			return r;
+		}
+		virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		virtual RESULT Update(void *pContext = nullptr) override {
+			RESULT r = R_PASS;
+
+			CR(Print(std::to_string(m_testingValue)));
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT Shutdown(void *pContext = nullptr) override {
+			return R_PASS;
+		}
+
+		RESULT SetTestingValue(int i) {
+			m_testingValue = i;
+			return R_PASS;
+		}
+
+	protected:
+		static DreamTestingModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
+			DreamTestingModule *pDreamModule = new DreamTestingModule(pDreamOS, pContext);
+			return pDreamModule;
+		}
+
+	private:
+		int m_testingValue = -1;
+	};
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamTestingModule> pDreamTestModules[5];
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+
+		// Create the testing modules
+		for (int i = 0; i < 5; i++) {
+			pDreamTestModules[i] = m_pDreamOS->LaunchDreamModule<DreamTestingModule>(this);
+			CNM(pDreamTestModules[i], "Failed to create dream test app");
+			pDreamTestModules[i]->SetTestingValue(i);
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Module Manager Test");
+	pUITest->SetTestDescription("Testing module manager functionality");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -1192,13 +1333,13 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 	struct TestContext {
 		std::shared_ptr<DreamUserApp> pUser = nullptr;
+		std::shared_ptr<DreamUserControlArea> pUserControlArea = nullptr;
 	};
 	TestContext *pTestContext = new TestContext();
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<DreamControlView> pDreamControlView = nullptr;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 		std::shared_ptr<DreamUIBar> pDreamUIBar = nullptr;
 
@@ -1207,47 +1348,47 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		CR(SetupPipeline());
+
+		light *pLight;
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		// Cloud Controller
 		{
-			auto pCloudController = m_pDreamOS->GetCloudController();
-			auto pCommandLineManager = CommandLineManager::instance();
+			CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+			MenuControllerProxy *pMenuControllerProxy = nullptr;
+			CN(pContext);
+			CN(pCloudController);
+			CN(pCommandLineManager);
+
 			DEBUG_LINEOUT("Initializing Cloud Controller");
-			quad *pQuad = nullptr;
 			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+			// Log in 
 			{
 				std::string strUsername = pCommandLineManager->GetParameterValue("username");
 				std::string strPassword = pCommandLineManager->GetParameterValue("password");
 				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-				long environmentID = 168;
 
 				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-				CRM(pCloudController->Start(false), "Failed to Start Cloud Controller");
-
 			}
+
+			//CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&UITestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+			//CR(pCloudController->RegisterEnvironmentObserver(this));
 		}
-		pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
-		CN(pDreamControlView);
+		//pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, false);
+		//CN(pDreamControlView);
 
 		// UIKeyboard App
-		CR(m_pDreamOS->InitializeKeyboard());
+		//m_pDreamOS->LaunchDreamApp<DreamFormApp>(this, false);
+
 		pTestContext->pUser = m_pDreamOS->LaunchDreamApp<DreamUserApp>(this);
 		CN(pTestContext->pUser);
 
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT)));
-		CR(pTestContext->pUser->SetHand(m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT)));
+		pTestContext->pUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+		CN(pTestContext->pUserControlArea);
 
-		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
-		CNM(pDreamBrowser, "Failed to create dream browser");
-
-		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
-		pDreamBrowser->SetDiagonalSize(9.0f);
-		pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
-
-		pDreamBrowser->SetVisible(false);
-
-		pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
-		CN(pDreamUIBar);
-		CR(pDreamUIBar->SetUIStageProgram(m_pUIProgramNode));
+		pTestContext->pUserControlArea->SetDreamUserApp(pTestContext->pUser);
 
 	Error:
 		return r;
@@ -1261,6 +1402,10 @@ RESULT DreamOSTestSuite::AddTestDreamOS() {
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		pTestContext->pUserControlArea->Update();
 
 		return r;
 	};
@@ -1796,6 +1941,233 @@ Error:
 	return r;
 }
 
+RESULT DreamOSTestSuite::AddTestEnvironmentSwitching() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 300.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		OGLProgramScreenFade *pScreenFadeProgram = nullptr;
+		std::shared_ptr<DreamEnvironmentApp> pEnvironmentApp = nullptr;
+
+		std::chrono::high_resolution_clock::time_point m_startTime;
+		int m_iteration = -1;
+		double m_iterationDuration = 2.0f;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnInitialize = [=](void *pContext) {
+
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		point sceneOffset = point(90, -5, -25);
+		float sceneScale = 0.1f;
+		vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+
+		Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
+		SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CN(pTestContext);
+
+		pTestContext->m_startTime = std::chrono::high_resolution_clock::now();
+
+		{
+			// Reflection 
+
+			ProgramNode* pReflectionProgramNode;
+			pReflectionProgramNode = nullptr;
+			pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+			CN(pReflectionProgramNode);
+			CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			ProgramNode* pReflectionSkyboxProgram;
+			pReflectionSkyboxProgram = nullptr;
+			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pReflectionSkyboxProgram);
+			CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+
+			// Refraction
+
+			ProgramNode* pRefractionProgramNode;
+			pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
+			CN(pRefractionProgramNode);
+			CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRefractionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// "Water"
+
+			ProgramNode* pWaterProgramNode;
+			pWaterProgramNode = nullptr;
+			pWaterProgramNode = pHAL->MakeProgramNode("water");
+			CN(pWaterProgramNode);
+			CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// TODO: This is not particularly general yet
+			// Uncomment below to turn on water effects
+			CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNode->Output("output_framebuffer")));
+			CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+			// Standard shader
+
+			ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
+			CN(pRenderProgramNode);
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+
+			// Reference Geometry Shader Program
+			ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+			CN(pReferenceGeometryProgram);
+			CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+			// Skybox
+			ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			CN(pSkyboxProgram);
+			CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Connect output as pass-thru to internal blend program
+			CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+			ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+			CN(pUIProgramNode);
+			CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
+			CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+			CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// TODO: Matrix node
+			//CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
+
+			// Connect output as pass-thru to internal blend program
+			CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+			EnvironmentProgram* pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+
+			// Screen Quad Shader (opt - we could replace this if we need to)
+			ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
+			CN(pRenderScreenFade);
+			CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+			pTestContext->pScreenFadeProgram = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
+
+			// Connect Program to Display
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
+			//CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
+
+			quad *pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f);
+			point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
+			pWaterQuad->SetPosition(ptQuadOffset);
+			pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 88.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+			CN(pWaterQuad);
+
+			if (pWaterProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+			}
+
+			if (pReflectionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
+			}
+
+			if (pRefractionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
+			}
+
+			if (pReflectionSkyboxProgram != nullptr) {
+				CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+			}
+
+			/*
+			vector vLightDirection = vector(1.0f, -1.0f, 0.0f);
+			float lightIntensity = 1.0f;
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightDirection);
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.70f * lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f * vLightDirection));
+			//*/
+			std::vector<SkyboxScatterProgram*> skyboxProgramNodes;
+			skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
+			skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
+
+			pTestContext->pEnvironmentApp = m_pDreamOS->LaunchDreamApp<DreamEnvironmentApp>(this);
+			CN(pTestContext->pEnvironmentApp);
+			pTestContext->pEnvironmentApp->SetCurrentEnvironment(CAVE);
+
+			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
+			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
+		}
+
+		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+		{
+			auto msCurrentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - pTestContext->m_startTime).count();
+			int iteration = (int)(msCurrentTime / (1000.0f * pTestContext->m_iterationDuration));
+			if (iteration != pTestContext->m_iteration) {
+				pTestContext->m_iteration = iteration;
+
+				if (pTestContext->m_iteration % 2 == 0) {
+					//pTestContext->pScreenFadeProgram->FadeOut();
+
+					pTestContext->pEnvironmentApp->HideEnvironment(nullptr);
+				}
+				else {
+					//pTestContext->pScreenFadeProgram->FadeIn();
+
+					pTestContext->pEnvironmentApp->ShowEnvironment(nullptr);
+				}
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Environment Fade Shader");
+	pNewTest->SetTestDescription("Environment fade shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT DreamOSTestSuite::AddTestCredentialStorage() {
 	RESULT r = R_PASS;

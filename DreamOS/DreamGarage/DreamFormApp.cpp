@@ -3,6 +3,8 @@
 
 #include "WebBrowser/DOMNode.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "Cloud/WebRequest.h"
+#include "Core/Utilities.h"
 
 #include "UI/UISurface.h"
 
@@ -85,6 +87,29 @@ RESULT DreamFormApp::Update(void *pContext) {
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 	}
+	if (m_fUpdateFormURL) {
+		m_fUpdateFormURL = false;
+
+		std::multimap<std::string, std::string> headerMap;
+		m_pDreamBrowserForm->CheckForHeaders(headerMap, m_strURL);
+
+		WebRequest webRequest;
+		webRequest.SetURL(util::StringToWideString(m_strURL));
+		webRequest.SetRequestMethod(WebRequest::Method::GET);
+
+		std::multimap<std::wstring, std::wstring> requestHeaders;
+		for (std::multimap<std::string, std::string>::iterator itr = headerMap.begin(); itr != headerMap.end(); ++itr) {
+
+			std::string strKey = itr->first;
+			std::string strValue = itr->second;
+
+			requestHeaders.insert(std::pair<std::wstring, std::wstring>(util::StringToWideString(strKey), util::StringToWideString(strValue)));
+		}
+		webRequest.SetRequestHeaders(requestHeaders);
+
+//		m_pDreamBrowserForm->LoadRequest(webRequest);
+		m_pDreamBrowserForm->SetURI(m_strURL);
+	}
 
 
 Error:
@@ -143,13 +168,13 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	RESULT r = R_PASS;
 
+	m_strURL = strURL;
 	if (m_pDreamBrowserForm == nullptr) {
-		m_strURL = strURL;
 		m_fInitBrowser = true;
-		DOSLOG(INFO, "Create browser for form: %s", strURL);
+		DOSLOG(INFO, "Create browser for form: %s", m_strURL);
 	}
 	else {
-		m_pDreamBrowserForm->SetURI(m_strURL);
+		m_fUpdateFormURL = true;
 	}
 
 	return r;
@@ -273,18 +298,24 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
-		/*
+
 	case INTERACTION_EVENT_MENU: {
-		if (m_pUserApp->GetKeyboard()->IsVisible()) {
-			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
-			CR(m_pFormView->HandleKeyboardDown());
-		}
-		else {
-			CR(Hide());
+		auto pCloudController = GetDOS()->GetCloudController();
+		if (pCloudController != nullptr && 
+			pCloudController->IsUserLoggedIn() && 
+			pCloudController->IsEnvironmentConnected()) {
+
+			if (m_pUserApp->GetKeyboard()->IsVisible()) {
+				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+				CR(m_pFormView->HandleKeyboardDown());
+			}
+			else {
+				CR(Hide());
+			}
 		}
 		
 	} break;
-	//*/
+
 	case INTERACTION_EVENT_KEY_DOWN: {
 
 		char chkey = (char)(pEvent->m_value);
@@ -360,6 +391,10 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
+		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
+			CR(m_pFormView->HandleKeyboardDown());
+		}
 		CR(m_pDreamBrowserForm->OnClick(ptContact, true));
 	} break;
 
@@ -386,6 +421,7 @@ RESULT DreamFormApp::Show() {
 	//CNR(m_pFormView, R_SKIPPED);
 	CR(m_pFormView->Show());
 	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
+	m_fFormVisible = true;
 
 Error:
 	return r;
@@ -398,9 +434,15 @@ RESULT DreamFormApp::Hide() {
 	CNR(m_pDreamBrowserForm, R_SKIPPED);
 
 	CR(m_pFormView->Hide());
+	m_fFormVisible = false;
 	CR(m_pFormView->HandleKeyboardDown());
 	CR(m_pUserApp->SetEventApp(nullptr));
 	CR(m_pUserApp->SetHasOpenApp(false));
+
+//	m_pDreamBrowserForm->Shutdown();
+	m_pDreamBrowserForm->CloseSource();
+	GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
+	m_pDreamBrowserForm = nullptr;
 
 Error:
 	return r;

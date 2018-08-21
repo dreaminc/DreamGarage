@@ -157,7 +157,7 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 		//auto strHeaders = HTTPController::ContentAcceptJson();
 		auto strHeaders = HTTPController::ContentHttp();
 		
-		//std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+		//std::string strAuthorizationToken = "Authorization: Bearer " + pUserControllerProxy->GetUserToken();
 		//strHeaders.push_back(strAuthorizationToken);
 
 		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));

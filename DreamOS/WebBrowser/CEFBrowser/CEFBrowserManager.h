@@ -51,6 +51,8 @@ public:
 
 	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) override;
 
+	virtual RESULT DeleteCookies() override;
+
 private:
 	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
 	virtual RESULT OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) override;
@@ -79,7 +81,6 @@ private:
 	std::thread m_ServiceThread;
 
 	std::mutex m_mutex;
-	std::condition_variable m_condBrowserInit;
 };
 
 #endif // ! CEF_BROWSER_MANAGER_H_

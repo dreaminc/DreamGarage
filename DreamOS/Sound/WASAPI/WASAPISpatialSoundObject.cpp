@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <WindowsNumerics.h>
 
+#include "Sound/SoundBuffer.h"
 
 WASAPISpatialSoundObject::WASAPISpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, ISpatialAudioClient *pAudioSpatialClient, ISpatialAudioObjectRenderStreamForHrtf* pSpatialAudioStreamForHrtf) :
 	SpatialSoundObject(samplingRate, ptOrigin, vEmitterDirection, vListenerDirection),
@@ -85,7 +86,7 @@ RESULT WASAPISpatialSoundObject::LoadDataFromBuffer(unsigned int numFrames, unsi
 
 	float *pDataBuffer = reinterpret_cast<float*>(pBuffer);
 	
-	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingBytes();
+	size_t numFramesInBuffer = m_pSoundBuffer->NumPendingFrames();
 	size_t numFramesRead = 0;
 
 	while (numFramesRead < numFrames) {

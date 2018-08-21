@@ -35,9 +35,13 @@ public:
 	RESULT AddTestUserApp();
 	RESULT AddTestPeerApps();
 	RESULT AddTestGamepadCamera();
+	RESULT AddTestEnvironmentSwitching();
 
 	// Meta UI
 	RESULT AddTestMeta();
+
+	// Modules
+	RESULT AddTestModuleManager();
 
 	// Apps
 	RESULT AddTestUIKeyboard();
@@ -56,7 +60,7 @@ public:
 	RESULT AddTestCredentialStorage();
 
 private:
-	RESULT SetupPipeline(std::string strRenderProgramName = "environment");
+	RESULT SetupPipeline(std::string strRenderProgramName = "standard");
 	RESULT SetupDreamAppPipeline();
 
 	// Used for creating a clickable quad in tests

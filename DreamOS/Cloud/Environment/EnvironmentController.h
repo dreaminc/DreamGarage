@@ -125,6 +125,7 @@ public:
 	RESULT Initialize();
 
 	RESULT ConnectToEnvironmentSocket(User user, long environmentID);
+	RESULT DisconnectFromEnvironmentSocket();
 	RESULT CreateEnvironmentUser(User user);	// TODO: This is deprecated
 	RESULT GetEnvironmentPeerList(User user);
 

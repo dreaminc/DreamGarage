@@ -4,6 +4,8 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 
+#include "AudioPacket.h"
+
 SoundClient::SoundClient() {
 	// empty
 }
@@ -57,14 +59,14 @@ Error:
 }
 
 bool SoundClient::IsRunning() {
-	return (m_renderState == state::RUNNING);
+	return (m_renderState == sound::state::RUNNING);
 }
 
 RESULT SoundClient::StartCapture() {
 	DEBUG_LINEOUT("SoundClient::StartCapture");
 
 	// This will kick off the audio capture process defined in the sound client implementation
-	m_captureState = state::RUNNING;
+	m_captureState = sound::state::RUNNING;
 	m_audioCaptureProcessingThread = std::thread(&SoundClient::AudioCaptureProcess, this);
 
 	return R_PASS;
@@ -73,7 +75,7 @@ RESULT SoundClient::StartCapture() {
 RESULT SoundClient::StopCapture() {
 	DEBUG_LINEOUT("SoundClient::StopCapture");
 
-	m_captureState = state::STOPPED;
+	m_captureState = sound::state::STOPPED;
 
 	// Join thread
 	if (m_audioCaptureProcessingThread.joinable()) {
@@ -87,7 +89,7 @@ RESULT SoundClient::StartRender() {
 	DEBUG_LINEOUT("SoundClient::StartRender");
 
 	// This will kick off the audio render process defined in the sound client implementation
-	m_renderState = state::RUNNING;
+	m_renderState = sound::state::RUNNING;
 	m_audioRenderProcessingThread = std::thread(&SoundClient::AudioRenderProcess, this);
 
 	return R_PASS;
@@ -96,7 +98,7 @@ RESULT SoundClient::StartRender() {
 RESULT SoundClient::StopRender() {
 	DEBUG_LINEOUT("SoundClient::StopRender");
 
-	m_renderState = state::STOPPED;
+	m_renderState = sound::state::STOPPED;
 
 	// Join thread
 	if (m_audioRenderProcessingThread.joinable()) {
@@ -110,7 +112,7 @@ RESULT SoundClient::StartSpatial() {
 	DEBUG_LINEOUT("SoundClient::StartSpatial");
 
 	// This will kick off the audio spatial process defined in the sound client implementation
-	m_spatialState = state::RUNNING;
+	m_spatialState = sound::state::RUNNING;
 	m_audioSpatialProcessingThread = std::thread(&SoundClient::AudioSpatialProcess, this);
 
 	return R_PASS;
@@ -119,7 +121,7 @@ RESULT SoundClient::StartSpatial() {
 RESULT SoundClient::StopSpatial() {
 	DEBUG_LINEOUT("SoundClient::StopSpatial");
 
-	m_spatialState = state::STOPPED;
+	m_spatialState = sound::state::STOPPED;
 
 	// Join thread
 	if (m_audioSpatialProcessingThread.joinable()) {
@@ -240,6 +242,10 @@ Error:
 		pFloatAudioBuffer = nullptr;
 	}
 	return r;
+}
+
+RESULT SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket) {
+	return R_NOT_HANDLED;
 }
 
 // Spatial Sound Objects

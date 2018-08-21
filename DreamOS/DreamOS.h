@@ -38,12 +38,16 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
+#include "DreamModuleManager.h"
+
 #include "DreamPeerApp.h"
 #include "DreamUserApp.h"
 #include "DreamAppHandle.h"
 #include "DreamShareView/DreamShareView.h"
 
 //#include "DreamLogger/DreamLogger.h"
+
+#include "Sound/DreamSoundSystem.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -52,6 +56,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -281,6 +286,17 @@ public:
 
 	//std::map<DreamAppHandleBase*, std::vector<DreamAppBase*>> m_capturedApps;
 
+	// Dream Modules
+public:
+	template<class derivedModuleType>
+	std::shared_ptr<derivedModuleType> LaunchDreamModule(void *pContext);
+
+	template<class derivedModuleType>
+	RESULT ShutdownDreamModule(std::shared_ptr<derivedModuleType> pDreamModule);
+
+	std::vector<UID> GetModuleUID(std::string strName);
+	UID GetUniqueModuleUID(std::string strName);
+
 //protected:
 public:
 	// Keyboard
@@ -430,6 +446,14 @@ protected:
 	// Dream App Messaging
 	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
 
+	// Sound 
+	RESULT InitializeDreamSoundSystem();
+	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
+	RESULT UnregisterSoundSystemObserver();
+	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
+	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
+	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
+
 	// IO
 //protected:
 public:
@@ -456,7 +480,7 @@ public:
 	std::string GetHMDTypeString();
 
 private:
-	SandboxApp *m_pSandbox;
+	SandboxApp *m_pSandbox = nullptr;
 
 public:
 
@@ -468,15 +492,20 @@ public:
 
 // System Applications
 private:
-	std::shared_ptr<UIKeyboard> m_pKeyboard;
+	std::shared_ptr<UIKeyboard> m_pKeyboard = nullptr;
 
 	// currently used by DreamGarage to dismiss UI when being seated (temporary)
 protected:
-	std::shared_ptr<DreamUserApp> m_pDreamUser;
-	std::shared_ptr<DreamShareView> m_pDreamShareView;
+	// TODO: All of these should go into DreamGarage
+	std::shared_ptr<DreamUserApp> m_pDreamUser = nullptr;
+	std::shared_ptr<DreamShareView> m_pDreamShareView = nullptr;
 	std::shared_ptr<DreamSettingsApp> m_pDreamSettings = nullptr;
 	std::shared_ptr<DreamLoginApp> m_pDreamLoginApp = nullptr;
 	std::shared_ptr<DreamFormApp> m_pDreamGeneralForm = nullptr;
+
+	// Modules
+protected:
+	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
 
 private:
 	version m_versionDreamOS;

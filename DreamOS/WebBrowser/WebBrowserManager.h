@@ -33,6 +33,8 @@ public:
 	
 	RESULT RemoveBrowser(std::shared_ptr<WebBrowserController> pWebBrowserController);
 
+	virtual RESULT DeleteCookies() = 0;
+
 protected:
 	RESULT ClearAllBrowserControllers();
 

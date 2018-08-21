@@ -162,7 +162,12 @@ RESULT WASAPISoundClient::EnumerateWASAPIDevices() {
 	IMMDeviceCollection *pDeviceCollection = nullptr;
 	IMMDevice *pDevice = nullptr;
 
-	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_pDeviceEnumerator),
+	// TODO: Put into WindowsApp ? 
+	CRM((RESULT)CoInitializeEx(NULL, COINIT_MULTITHREADED), "Faield to initialize COM library");
+
+	CRM((RESULT)CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr,
+		CLSCTX_ALL, __uuidof(IMMDeviceEnumerator),
+		(void**)&m_pDeviceEnumerator),
 		"CoCreateInstance Failed");
 	CN(m_pDeviceEnumerator);
 
@@ -300,6 +305,9 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				// Get the available data in the shared buffer.
 				hr = pCaptureClient->GetBuffer(&pAudioCaptureBufferData, &numFramesAvailable, &audioDeviceFlags, nullptr, nullptr);
 				CR((RESULT)hr);
+
+				// TODO: We might want to handle different kind of 
+				// format types here - or convert elsewhere 
 
 				// Set to float data buffer
 				float *pFloatDataBuffer = (float*)(pAudioCaptureBufferData);
@@ -550,7 +558,7 @@ RESULT WASAPISoundClient::AudioRenderProcess() {
 			int readBytes = 0;
 			m_pRenderSoundBuffer->LockBuffer(); 
 			{
-				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingBytes()) > 0) {
+				if ((readBytes = (int)m_pRenderSoundBuffer->NumPendingFrames()) > 0) {
 					//DEBUG_LINEOUT("Rendering %d frames", readBytes);
 
 					float *pDataBuffer = (float*)(pAudioClientBufferData);

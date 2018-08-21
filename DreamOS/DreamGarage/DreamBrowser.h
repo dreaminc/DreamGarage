@@ -29,6 +29,8 @@
 
 #include "DreamUserControlArea/DreamContentSource.h"
 
+#include "Sound/SoundCommon.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -41,6 +43,7 @@ class DOMNode;
 class DreamUserHandle;
 class DreamUserControlArea;
 class AudioPacket;
+class SoundBuffer;
 
 #include "DreamShareViewMessage.h"
 
@@ -64,6 +67,7 @@ public:
 	virtual RESULT HandleCanTabNext(bool fCanNext) = 0;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) = 0;
 };
+
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
 	public DreamContentSource,
@@ -250,6 +254,29 @@ private:
 
 	long m_assetID = -1;
 
+private:
+	// when the user goes to a URL that starts with these strings, we send their auth token as well
+	// TODO: build native URL parser for future flexibility
+	std::vector<std::string> m_authenticatedURLs = {
+		"http://localhost:8001",
+		"http://localhost:8002",
+		"https://api.develop.dreamos.com",
+		"https://www.develop.dreamos.com",
+		"https://api.dreamos.com",
+		"https://dreamos.com"
+	};
+
+	// Sound stuff
+private:
+	RESULT InitializeDreamBrowserSoundSystem();
+	RESULT InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType);
+	RESULT AudioProcess();
+
+	sound::state m_soundState = sound::state::UNINITIALIZED;
+	SoundBuffer *m_pRenderSoundBuffer = nullptr;
+	std::thread	m_browserAudioProcessingThread;
+
+	
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

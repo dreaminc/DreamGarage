@@ -21,9 +21,12 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
+#include "DreamUserApp.h"
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
+#include "HAL/opengl/OGLProgramScreenFade.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -215,13 +218,14 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
-		//ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		//CN(pRenderScreenQuad);
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
+		CN(pRenderScreenFade);
+		CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
+		m_pScreenFadeProgramNode = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
 		// Connect Program to Display
 		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
 
 		//CR(pHAL->ReleaseCurrentContext());
 
@@ -374,6 +378,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	if (m_pDreamEnvironmentApp != nullptr) {
 		m_pDreamEnvironmentApp->SetSkyboxPrograms(m_skyboxProgramNodes);
+		m_pDreamEnvironmentApp->SetScreenFadeProgram(m_pScreenFadeProgramNode);
 	}
 
 	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
@@ -407,6 +412,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	else {
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
+
+		CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 	}
 	
 Error:
@@ -1109,15 +1116,41 @@ RESULT DreamGarage::OnLogin() {
 	// TODO: other pieces of login flow
 	UserControllerProxy *pUserController = dynamic_cast<UserControllerProxy*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
+	// TODO: choose environment based on api information
+	// TODO: with seating pass, the cave will look better
+	//m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE);
+	CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
+	CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+
 	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
 	
-//Error:
+Error:
 	return r;
 }
 
 RESULT DreamGarage::OnLogout() {
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	// reset settings before signing back in
+	std::string strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+
+	CNM(pUserController, "User controller was nullptr");
+
+	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
+	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
+
+	CR(pUserController->GetFormURL(strFormType));
+	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
+
+	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
+
+	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
@@ -1244,10 +1277,7 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 		//CR(m_pDreamSettings->InitializeSettingsForm("https://www.develop.dreamos.com/forms/account/signup"));
 		CR(m_pDreamSettings->Show());
 	}
-	// FormKey.UsersSignUp
-	// FormKey.UsersSignIn
 	else {
-		// TODO: general form
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
 		CR(m_pDreamGeneralForm->Show());
 	}

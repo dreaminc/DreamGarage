@@ -64,11 +64,13 @@ public:
 	virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override {
 
 		command_line->AppendSwitchWithValue(L"autoplay-policy", L"no-user-gesture-required");
-
+		
 		command_line->AppendSwitchWithValue(L"disable-blink-features", L"RootLayerScrolling");
 
 		command_line->AppendSwitchWithValue(L"disable-features", L"AsyncWheelEvents");
 		command_line->AppendSwitchWithValue(L"disable-features", L"TouchpadAndWheelScrollLatching");
+
+		command_line->AppendSwitch(L"mute-audio");
 
 		return;
 	}

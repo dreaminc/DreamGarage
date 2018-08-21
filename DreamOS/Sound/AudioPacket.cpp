@@ -43,3 +43,18 @@ RESULT AudioPacket::DeleteBuffer() {
 
 	return R_PASS;
 }
+
+RESULT AudioPacket::GetDataBufferCopy(uint8_t* &pDataBuffer, size_t &pDataBuffer_n) const {
+	RESULT r = R_PASS;
+
+	CB((pDataBuffer == nullptr));
+
+	pDataBuffer_n = GetByteSize();
+	pDataBuffer = (uint8_t*)malloc(pDataBuffer_n);
+	CN(pDataBuffer);
+
+	memcpy(pDataBuffer, m_pDataBuffer, pDataBuffer_n);
+
+Error:
+	return r;
+}

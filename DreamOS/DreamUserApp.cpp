@@ -153,6 +153,10 @@ DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	// Empty - initialization by factory
 }
 
+DreamUserApp::~DreamUserApp() {
+	Shutdown();
+}
+
 DreamUserApp* DreamUserApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUserApp *pDreamApp = new DreamUserApp(pDreamOS, pContext);
 	return pDreamApp;
@@ -243,6 +247,7 @@ RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(m_pWebBrowserManager->Shutdown());
+	m_pWebBrowserManager = nullptr;
 
 Error:
 	return r;
@@ -864,6 +869,15 @@ RESULT DreamUserApp::SetScale(float widthScale) {
 }
 
 std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserManager == nullptr) {
+		m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+		CN(m_pWebBrowserManager);
+		CR(m_pWebBrowserManager->Initialize());
+	}
+
+Error:
 	return m_pWebBrowserManager;
 }
 

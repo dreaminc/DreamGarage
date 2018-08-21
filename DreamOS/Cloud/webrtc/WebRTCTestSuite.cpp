@@ -11,6 +11,7 @@
 #include "Cloud/CloudControllerFactory.h"
 
 #include "HAL/opengl/OGLProgram.h"
+#include "HAL\opengl\OGLTexture.h"
 
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/Dream2DMouseApp.h"
@@ -21,6 +22,11 @@
 #include "Sound/SpatialSoundObject.h"
 
 #include "Cloud/CloudTestSuite.h"
+#include "Sound/AudioPacket.h"
+
+#include "DreamGarage\DreamBrowser.h"
+#include "WebBrowser\WebBrowserController.h"
+#include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
 WebRTCTestSuite::WebRTCTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -312,14 +318,22 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
-	float radius = 2.0f;
+	float radius = 1.0f;
 
-	struct TestContext : public SoundClient::observer, public CloudController::PeerConnectionObserver, public CloudController::UserObserver {
+	struct TestContext : 
+		public DreamSoundSystem::observer, 
+		public CloudController::PeerConnectionObserver, 
+		public CloudController::UserObserver,
+		public DreamBrowserObserver
+	{
 		CloudController *pCloudController = nullptr;
 		UserController *pUserController = nullptr;
 
 		SoundClient *pWASAPICaptureClient = nullptr;
 		SoundClient *pXAudio2AudioClient = nullptr;
+
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
 
 		int testUserNum = 0;
 
@@ -327,13 +341,31 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject1 = nullptr;
 		std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObject2 = nullptr;
 
-		// SoundClient::observer
+		quad *m_pBrowserQuad = nullptr;
+		texture *pQuadTexture = nullptr;
+		
+		//sphere *pSphereLeftChrome = nullptr;
+		//sphere *pSphereRightChrome = nullptr;
+		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectLeftChrome = nullptr;
+		//std::shared_ptr<SpatialSoundObject> pXAudioSpatialSoundObjectRightChrome = nullptr;
+		
+
+		struct PendingVideoBuffer {
+			uint8_t *pPendingBuffer = nullptr;
+			int pxWidth = 0;
+			int pxHeight = 0;
+			bool fPendingBufferReady = false;
+		} m_pendingVideoBuffer;
+
+		uint8_t *pTestVideoFrameBuffer = nullptr;
+
+		// DreamSoundSystem::observer
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 			
-			int nChannels = 1;
-			int samplingFrequency = 44100;
-			numFrames = samplingFrequency / 100;
+			int nChannels = pCaptureBuffer->NumChannels();
+			int samplingFrequency = pCaptureBuffer->GetSamplingRate();
+			//numFrames = samplingFrequency / 100;
 
 			AudioPacket pendingAudioPacket;
 			pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);
@@ -345,10 +377,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			lastUpdateTime = timeNow;
 
 			if (pCloudController != nullptr && testUserNum == 2) {
-
-				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
-				
-				//pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket);
+				pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);	
 			}
 
 			std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
@@ -357,6 +386,30 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//Error:
 			return r;
 		}
+
+		// DreamBrowserObserver
+		virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override {
+			RESULT r = R_PASS;
+
+			if (pCloudController != nullptr && testUserNum == 2) {
+				CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+			}
+
+		Error:
+			return r;
+		}
+
+		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormCancel() override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetCredentials(std::string& strRefreshToken, std::string& accessToken) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
 
 		// CloudController::PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
@@ -412,7 +465,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 					// Do I need to copy the buffer over (getting over written maybe)
 					int16_t *pInt16Soundbuffer = new int16_t[frames];
 					memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
-
+				
 					if (pInt16Soundbuffer != nullptr) {
 						CR(pXAudioSpatialSoundObject2->PushMonoAudioBuffer((int)frames, pInt16Soundbuffer));
 					}
@@ -436,9 +489,19 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		}
 
 		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
-			//DEVENV_LINEOUT(L"OnVideoFrame");
+			RESULT r = R_PASS;
 
-			return R_NOT_HANDLED;
+			CBM((m_pendingVideoBuffer.fPendingBufferReady == false), "Buffer already pending");
+
+			//DEBUG_LINEOUT("on video frame");
+
+			m_pendingVideoBuffer.pPendingBuffer = pVideoFrameDataBuffer;
+			m_pendingVideoBuffer.pxWidth = pxWidth;
+			m_pendingVideoBuffer.pxHeight = pxHeight;
+			m_pendingVideoBuffer.fPendingBufferReady = true;
+
+		Error:
+			return r;
 		}
 
 		// CloudController::UserObserver
@@ -517,7 +580,9 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		std::shared_ptr<Dream2DMouseApp> pDream2DMouse = nullptr;
 
 		//std::string strURL = "https://www.w3schools.com/html/html_forms.asp";
-		std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
+		//std::string strURL = "http://urlme.me/troll/dream_test/1.jpg";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		std::string strTestValue;
 
 		CR(SetupSkyboxPipeline("standard"));
 
@@ -527,7 +592,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CN(m_pDreamOS);
 
 		// Objects 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 
 		// TODO: Why does shit explode with no objects in scene
 		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
@@ -535,6 +600,57 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		// Command Line Manager
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
+
+		strTestValue = pCommandLineManager->GetParameterValue("testval");
+		int testUserNumber = atoi(strTestValue.c_str());
+
+		// quad
+		// This presents a timing issue if it works 
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		CN(pTestContext->m_pBrowserQuad);
+		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+
+		// Browser
+		if (testUserNumber == 2) {
+			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->m_pWebBrowserManager);
+			CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+			CRM(pTestContext->m_pDreamBrowser->RegisterObserver(pTestContext), "Failed to register browser observer");
+
+			// Set up the view
+			//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+			//pTestContext->m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+			//pTestContext->m_pDreamBrowser->SetDiagonalSize(10.0f);
+
+			pTestContext->m_pDreamBrowser->SetURI(strURL);
+		}
+		else {
+			// temp
+			int pxWidth = 500;
+			int pxHeight = 500;
+			int channels = 4;
+
+			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
+
+			pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
+				texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+				pxWidth,
+				pxHeight,
+				PIXEL_FORMAT::RGBA,
+				4,
+				&vectorByteBuffer[0],
+				pxWidth * pxHeight * 4
+			);
+
+			CN(pTestContext->pQuadTexture);
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
+		}
 
 		// Cloud Controller
 
@@ -551,42 +667,30 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 
-		// WASAPI Capture Sound Client
-		pTestContext->pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-		CN(pTestContext->pWASAPICaptureClient);
+		
+		CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
 
-		CR(pTestContext->pWASAPICaptureClient->RegisterObserver(pTestContext));
-		CR(pTestContext->pWASAPICaptureClient->StartCapture());
-
-		// XAudio2 Render / Spatial Sound Client
-		pTestContext->pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
-		CN(pTestContext->pXAudio2AudioClient);
 		{
 
 			point ptPosition = point(-2.0f, 0.0f, -radius);
 			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
 			vector vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 
-			pTestContext->pXAudioSpatialSoundObject1 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pXAudioSpatialSoundObject1 = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pXAudioSpatialSoundObject1);
 
 			ptPosition = point(2.0f, 0.0f, -radius);
 			vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
 			vListenerDireciton = vector(0.0f, 0.0f, -1.0f);
 
-			pTestContext->pXAudioSpatialSoundObject2 = pTestContext->pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pXAudioSpatialSoundObject2 = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pXAudioSpatialSoundObject2);
 		}
-
-		CR(pTestContext->pXAudio2AudioClient->StartSpatial());
 
 		// Log in 
 		{
 			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
-
-			std::string strTestValue = pCommandLineManager->GetParameterValue("testval");
-			int testUserNumber = atoi(strTestValue.c_str());
 
 			pTestContext->testUserNum = testUserNumber;
 
@@ -640,6 +744,34 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		CloudController *pCloudController = pTestContext->pCloudController;
 		CN(pCloudController);
 
+		if (pTestContext->m_pBrowserQuad != nullptr) {
+
+			if (pTestContext->m_pDreamBrowser != nullptr) {
+				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture().get();
+
+				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pSourceTexture);
+
+				//GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
+
+				// Testing: Memory Leak
+				pCloudController->BroadcastTextureFrame(pSourceTexture, 0, PIXEL_FORMAT::RGBA);
+			}
+			else if (pTestContext->m_pendingVideoBuffer.fPendingBufferReady && pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+				
+				reinterpret_cast<OGLTexture*>(pTestContext->pQuadTexture)->Resize(pTestContext->m_pendingVideoBuffer.pxWidth, pTestContext->m_pendingVideoBuffer.pxHeight);
+			
+				// Update the video buffer to texture
+			
+				// NOTE: Looks like this bad boy is leaking some mems
+				CR(pTestContext->pQuadTexture->Update(
+					(unsigned char*)(pTestContext->m_pendingVideoBuffer.pPendingBuffer),
+					pTestContext->m_pendingVideoBuffer.pxWidth,
+					pTestContext->m_pendingVideoBuffer.pxHeight,
+					PIXEL_FORMAT::RGBA)
+				);
+			}
+		}
+
 		// Every 20 ms
 
 		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
@@ -674,6 +806,13 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		//*/
 
 	Error:
+		pTestContext->m_pendingVideoBuffer.fPendingBufferReady = false;
+
+		if (pTestContext->m_pendingVideoBuffer.pPendingBuffer != nullptr) {
+			delete pTestContext->m_pendingVideoBuffer.pPendingBuffer;
+			pTestContext->m_pendingVideoBuffer.pPendingBuffer = nullptr;
+		}
+
 		return r;
 	};
 

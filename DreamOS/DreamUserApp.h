@@ -127,6 +127,7 @@ class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, publ
 
 public:
 	DreamUserApp(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamUserApp();
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
@@ -138,8 +139,6 @@ public:
 
 protected:
 	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
-
-public:
 
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;

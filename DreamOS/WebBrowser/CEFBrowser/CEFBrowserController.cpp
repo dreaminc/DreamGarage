@@ -407,6 +407,8 @@ RESULT CEFBrowserController::PushPendingAudioPacket(int frames, int channels, in
 			//pDataBuffer
 		);
 
+		newPendingPacket.SetSoundType(sound::type::SIGNED_16_BIT);
+
 		m_pendingAudioPackets.push(newPendingPacket);
 
 		// This will push directly into the pending buffer
@@ -663,6 +665,7 @@ RESULT CEFBrowserController::TabPrevious() {
 
 RESULT CEFBrowserController::CanTabNext() {
 	auto pFrame = m_pCEFBrowser->GetFocusedFrame();
+
 	pFrame->ExecuteJavaScript("Dream.Browser.canTabNext();", pFrame->GetURL(), 0);
 
 	return R_PASS;

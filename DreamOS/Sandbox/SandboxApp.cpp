@@ -8,8 +8,14 @@
 #include <HMD/OpenVR/OpenVRDevice.h>
 #include <HMD/Oculus/OVR.h>
 
+
+// TODO: Rename to non Dream names?
+#include "DreamModuleManager.h"
+
 #include "DreamAppManager.h"
 #include "DreamAppMessage.h"
+
+// TODO: This shouldn't be needed here
 #include "DreamOS.h"
 
 #include "HAL/Pipeline/SinkNode.h"
@@ -340,6 +346,11 @@ RESULT SandboxApp::Shutdown() {
 		m_pDreamAppManager = nullptr;
 	}
 
+	if (m_pDreamModuleManager != nullptr) {
+		CR(m_pDreamModuleManager->Shutdown());
+		m_pDreamModuleManager = nullptr;
+	}
+
 	if (m_pHMD != nullptr) {
 		CR(m_pHMD->ReleaseHMD());
 		delete m_pHMD;
@@ -374,6 +385,10 @@ RESULT SandboxApp::RunAppLoop() {
 		CR(m_pCloudController->Update());
 #endif
 
+		// Module Manager
+		CR(m_pDreamModuleManager->Update());
+
+		// TODO: MODULE
 		// Time Manager
 		CR(m_pTimeManager->Update());
 
@@ -405,6 +420,7 @@ RESULT SandboxApp::RunAppLoop() {
 		// TODO: Do these need to be wired up this way?
 		// Why not just do an Update with retained graph
 
+		// TODO: MODULE
 		// Update Physics
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
@@ -534,7 +550,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 		CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	}
 
+	CRM(InitializeDreamModuleManager(), "Failed to initialize Dream Module Manager");
+
+	// TODO: Time manager should be converted to a module
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
+
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
@@ -544,10 +564,13 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
 
+	// TODO: Make these into modules
 	// TODO: These have dependencies potentially on previous modules
 	// TODO: Need to create proper module loading / dependency system
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
+
 	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
+
 
 	// Auto Login Handling
 	// This is done in DreamOS now
@@ -610,6 +633,19 @@ RESULT SandboxApp::InitializeTimeManager() {
 
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CVM(m_pTimeManager, "Failed to validate Time Manager");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeDreamModuleManager() {
+	RESULT r = R_PASS;
+
+	// Initialize Time Manager
+	m_pDreamModuleManager = std::make_unique<DreamModuleManager>(GetDreamOSHandle());
+
+	CNM(m_pDreamModuleManager, "Failed to allocate Dream Module Manager");
+	CVM(m_pDreamModuleManager, "Failed to validate Dream Module Manager");
 
 Error:
 	return r;

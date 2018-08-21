@@ -19,6 +19,10 @@
 #include "WebBrowser/DOMNode.h"
 #include "Sound/AudioPacket.h"
 
+#include "Core/Utilities.h"
+
+#include "Sound/SoundBuffer.h"
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -286,7 +290,9 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 
 	if (!fLoading) {
 		m_strCurrentURL = strCurrentURL;
+		
 		CR(m_pWebBrowserController->IsInputFocused());
+
 		CR(PendUpdateObjectTextures());
 	}
 
@@ -318,7 +324,10 @@ RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 
 	UIKeyboardHandle *pKeyboardHandle = nullptr;
 
-	CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
+	if (m_pObserver != nullptr) {
+		CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
+	}
+
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
 		if (m_pWebBrowserController != nullptr) {
 			CR(m_pWebBrowserController->CanTabNext());
@@ -360,10 +369,26 @@ RESULT DreamBrowser::CheckForHeaders(std::multimap<std::string, std::string> &he
 			headermap = it->second;
 		}
 	}
-	// TODO: check for api url
-	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	//pUserController->GetAccessToken()
 
+	if (GetDOS()->GetCloudController() != nullptr) {
+		auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+		if (pUserController != nullptr && pUserController->IsLoggedIn()) {
+			// make a copy of strURL
+			std::string strLowercaseURL = strURL;
+			util::tolowerstring(strLowercaseURL);
+
+			for (std::string& strAuthURL : m_authenticatedURLs) {
+				if (strLowercaseURL.find(strAuthURL) == 0) {
+					std::string strAccessToken = pUserController->GetSavedAccessToken();
+					std::string strFirst = "Authorization";
+					std::string strSecond = "Bearer " + strAccessToken;
+					headermap.insert(std::pair<std::string, std::string>(strFirst, strSecond));
+				}
+			}
+		}
+	}
+	
 
 	return r;
 }
@@ -594,6 +619,9 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 
+	// Set up the audio system (captures audio from browser, pushes it into a buffer)
+	CRM(InitializeDreamBrowserSoundSystem(), "Failed to initialize sound system for browser");
+
 Error:
 	return r;
 }
@@ -701,13 +729,110 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
 
-	// when the browser gets a paint event, it checks if its texture is currently shared
+	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
-	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+
+	// TODO: Either put this back in or move it to a different layer
+	//CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	//CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
+	RESULT r = R_PASS;
+
+	int numChannels = 2;
+	int samplingRate = 48000;
+	sound::type bufferType = sound::type::SIGNED_16_BIT;
+
+	// Set up the render Sound buffer
+	CRM(InitializeRenderSoundBuffer(numChannels, samplingRate, bufferType),
+		"Failed to initialize dream borwser render sound buffer");
+
+	m_soundState = sound::state::RUNNING;
+	m_browserAudioProcessingThread = std::thread(&DreamBrowser::AudioProcess, this);
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::InitializeRenderSoundBuffer(int numChannels, int samplingRate, sound::type bufferType) {
+	RESULT r = R_PASS;
+
+	CB((m_pRenderSoundBuffer == nullptr));
+
+	m_pRenderSoundBuffer = SoundBuffer::Make(numChannels, samplingRate, bufferType);
+	CN(m_pRenderSoundBuffer);
+
+	DEBUG_LINEOUT("Initialized Dream Browser Render Sound Buffer %d channels type: %s", numChannels, SoundBuffer::TypeString(bufferType));
+
+Error:
+	return r;
+}
+
+// TODO: This is not cross platform 
+// TODO: Need to create a thread platform capability and wrap these functions 
+// in there
+#include <avrt.h>
+
+RESULT DreamBrowser::AudioProcess() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Dream Browser Audio Process Started");
+
+	int64_t pendingBytes = 0;
+	DWORD taskIndex = 0;
+	HANDLE hAudioRenderProcessTask = AvSetMmThreadCharacteristics(TEXT("Pro Audio"), &taskIndex);
+
+	CBM((m_soundState == sound::state::RUNNING), "Dream Browser Audio Process not running");
+
+	while (m_soundState == sound::state::RUNNING) {
+		
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+
+		//if (m_pRenderSoundBuffer != nullptr ) {
+		if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
+			
+			int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+
+			m_pRenderSoundBuffer->LockBuffer();
+
+			{
+				pendingBytes = m_pRenderSoundBuffer->NumPendingFrames();
+
+				if (pendingBytes >= audioBufferSampleLength10ms) {
+
+					//DEBUG_LINEOUT("pending %d", (int)pendingBytes)
+
+					lastUpdateTime = timeNow - std::chrono::microseconds(diffVal - 10);
+
+					AudioPacket pendingAudioPacket;
+
+					m_pRenderSoundBuffer->GetAudioPacket(audioBufferSampleLength10ms, &pendingAudioPacket);
+
+					if (m_pObserver != nullptr) {
+						if (RCHECK(m_pObserver->HandleAudioPacket(pendingAudioPacket, this)) == false) {
+							DOSLOG(INFO, "Handle Audio Packet Failed");
+						}
+					}
+				}
+			}
+
+			m_pRenderSoundBuffer->UnlockBuffer();
+
+		}
+	}
+
+Error:
+	DEBUG_LINEOUT("Dream Browser Audio Process Ended");
+
 	return r;
 }
 
@@ -715,8 +840,11 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
-	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
-		CR(m_pObserver->HandleAudioPacket(pendingAudioPacket, this));
+	// TODO: Either put this back in or move it to a different layer
+	//if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+
+	if (m_pRenderSoundBuffer != nullptr) {
+		CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
 	}
 
 	/*

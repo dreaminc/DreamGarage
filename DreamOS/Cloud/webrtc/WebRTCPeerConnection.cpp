@@ -145,7 +145,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 
 	// Chrome Video
-	//CR(AddVideoStream());
+	CR(AddVideoStream());
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
@@ -166,9 +166,9 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// Data Channel
 	// This is not in the media streaming interface
-	//if (fAddDataChannel) {
-	//	CR(AddDataChannel());
-	//}
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;

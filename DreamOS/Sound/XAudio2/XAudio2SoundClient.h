@@ -36,6 +36,7 @@ public:
 
 	// XAudio doesn't need buffers apparently 
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile) override;
+	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket) override;
 
 private:
 	//RESULT InitializeRenderAudioClient();
@@ -51,7 +52,8 @@ private:
 
 	std::shared_ptr<IXAudio2MasteringVoice> m_pXAudio2MasterVoice = nullptr;
 
-	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoice = nullptr;
+	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoiceStereoFloat32 = nullptr;
+	std::shared_ptr<IXAudio2SourceVoice> m_pXAudio2SourceVoiceStereoSignedInt16 = nullptr;
 
 	// Spatial
 	std::shared_ptr<X3DAUDIO_HANDLE> m_pX3DInstance = nullptr;

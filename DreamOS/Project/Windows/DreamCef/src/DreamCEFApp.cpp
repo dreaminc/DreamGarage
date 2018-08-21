@@ -70,6 +70,7 @@ void DreamCEFApp::OnBrowserCreated(CefRefPtr<CefBrowser> browser) {
 	// empty
 }
 
+///*
 void DreamCEFApp::OnWebKitInitialized() {
 	RESULT r = R_PASS;
 
@@ -81,12 +82,12 @@ void DreamCEFApp::OnWebKitInitialized() {
 	CR(m_pCEFV8Handler->Initialize());
 
 	// Register Extension
-
+	
 	m_pCEFDreamExtension = new CEFExtension(L"C:\\dev\\DreamGarage\\DreamOS\\Project\\Windows\\DreamCef\\src\\DreamCEFExtension.js", m_pCEFV8Handler);
 	CNM(m_pCEFDreamExtension, "Failed to allocate cef extension object");
 	CRM(m_pCEFDreamExtension->Initialize(), "Failed to initialize cef extension");
 
-
 Error:
 	return;
 }
+//*/
