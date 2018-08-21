@@ -30,13 +30,13 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestSpatialSound());
+
 	CR(AddTestSoundSystemModule());
 
 	CR(AddTestBrowserSoundRouting());
 
 	CR(AddTestCaptureSound());
-
-	CR(AddTestSpatialSound());
 
 	CR(AddTestPlaySound());
 
@@ -118,8 +118,9 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 	float radius = 2.0f;
 
 	struct TestContext : public SoundClient::observer {
-		SoundClient *pSoundClient = nullptr;
+		
 		sphere *pSphere = nullptr;
+
 		std::shared_ptr<SpatialSoundObject> pSpatialSoundObject = nullptr;
 
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
@@ -162,29 +163,20 @@ RESULT SoundTestSuite::AddTestSpatialSound() {
 			pTestContext->pSphere->SetPosition(ptPosition);
 
 			//// Open a sound file
-			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			//SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01r.wav", SoundFile::type::WAVE);
 			SoundFile *pNewSoundFile = SoundFile::LoadSoundFile(L"TR808/CP.WAV", SoundFile::type::WAVE);
 			CN(pNewSoundFile);
 
-			// Create the sound client
-			//pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-			pTestContext->pSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
-			CN(pTestContext->pSoundClient);
-
-			CR(pTestContext->pSoundClient->RegisterObserver(pTestContext));
+			CR(m_pDreamOS->RegisterSoundSystemObserver(pTestContext));
 
 			//CR(pTestContext->pSoundClient->PlaySound(pNewSoundFile));
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
 			
-			pTestContext->pSpatialSoundObject = pTestContext->pSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pSpatialSoundObject = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pSpatialSoundObject);
 
 			CR(pTestContext->pSpatialSoundObject->LoopSoundFile(pNewSoundFile));
-			//CR(pTestContext->pSpatialSoundObject->PlaySoundFile(pNewSoundFile));
-
-			CR(pTestContext->pSoundClient->StartSpatial());
-
 		}
 
 	Error:
