@@ -40,6 +40,10 @@ public:
 	// Meta UI
 	RESULT AddTestMeta();
 
+	// Modules
+	RESULT AddTestModuleManager();
+	RESULT AddTestSoundSystemModule();
+
 	// Apps
 	RESULT AddTestUIKeyboard();
 	RESULT AddTestDreamUIBar();

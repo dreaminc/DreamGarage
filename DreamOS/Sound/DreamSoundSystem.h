@@ -21,7 +21,7 @@ public:
 	~DreamSoundSystem();
 
 	virtual RESULT InitializeModule(void *pContext = nullptr) override;
-	virtual RESULT OnModuleDidFinishInitializing(void *pContext = nullptr) override;
+	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
@@ -35,8 +35,8 @@ private:
 
 // The Self Construct
 DreamSoundSystem* DreamSoundSystem::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamSoundSystem *pDreamApp = new DreamSoundSystem(pDreamOS, pContext);
-	return pDreamApp;
+	DreamSoundSystem *pDreamModule = new DreamSoundSystem(pDreamOS, pContext);
+	return pDreamModule;
 }
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

@@ -19,7 +19,7 @@ Error:
 	return r;
 }
 
-bool DreamModuleBase::IsModuleShuttingDown() {
+bool DreamModuleBase::IsShuttingDown() {
 	return m_fShutdownFlag;
 }
 
@@ -48,4 +48,10 @@ double DreamModuleBase::GetTimeRun() {
 // In short, this will return 
 double DreamModuleBase::GetEffectivePriorityValue() const {
 	return (m_usTimeRun * m_priority);
+}
+
+RESULT DreamModuleBase::Print(std::string strOptString) {
+	//DEBUG_LINEOUT_RETURN("%s: %s running %fus pri: %d", strOptString.c_str(), (m_strName.length() > 0) ? m_strName.c_str() : "DreamModule", GetTimeRun(), GetPriority());
+	DEBUG_LINEOUT("%s: %s running %fus pri: %d", strOptString.c_str(), (m_strName.length() > 0) ? m_strName.c_str() : "DreamModule", GetTimeRun(), GetPriority());
+	return R_PASS;
 }

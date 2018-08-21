@@ -7,6 +7,11 @@
 // DreamOS/DreamModule.h
 // The base Dream Module object
 
+// Modules are different than apps in a number of ways.  Like apps, Modules have 
+// an update function that will be called by Sandbox in the protected area.  However,
+// unlike apps - Modules also have a ModuleProcess which is a dedicated thread (managed by the module itself) 
+// that will run and execute tasks.
+
 #include "Primitives/valid.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/vector.h"
@@ -21,25 +26,78 @@ class DreamAppHandle;
 class PeerConnection;
 class DreamAppMessage;
 
+class DreamModuleTask {
+public:
+	enum state {
+		PENDING,
+		RUNNING,
+		COMPLETE,
+		FAILED,
+		INVALID
+	};
+
+	DreamModuleTask(std::function<RESULT(void*)> fnTask, void *pContext = nullptr) :
+		m_pContext(pContext),
+		m_fnTask(fnTask)
+	{
+		// empty
+	}
+
+	~DreamModuleTask() {
+		if (m_fnTask != nullptr) {
+			m_fnTask = nullptr;
+		}
+
+		if (m_pContext != nullptr) {
+			m_pContext = nullptr;
+		}
+	}
+
+	RESULT Execute() {
+		RESULT r = R_PASS;
+
+		CN(m_fnTask);
+		CR(m_fnTask(m_pContext));
+
+	Success:
+		m_state = state::COMPLETE;
+		return r;
+
+	Error:
+		m_state = state::FAILED;
+		return r;
+	}
+
+private:
+	std::function<RESULT(void*)> m_fnTask;
+	DreamModuleTask::state m_state = DreamModuleTask::state::INVALID;
+	void *m_pContext = nullptr;
+};
+
 class DreamModuleBase {
 	friend class DreamModuleManager;
 	friend class DreamOS;
+	friend struct DreamModuleBaseCompare;
 
 public:
 	virtual RESULT InitializeModule(void *pContext = nullptr) = 0;
-	virtual RESULT OnModuleDidFinishInitializing(void *pContext = nullptr) = 0;
+	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
 
 	virtual DreamOS *GetDOS() = 0;
 
 protected:
-	virtual void *GetModuleContext() = 0;
-	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
+	virtual void *GetContext() = 0;
+	virtual RESULT Print(std::string strOptString = "");
 
 	RESULT FlagShutdown(std::string strShutdownFlagSignalName = "normal");
-	bool IsModuleShuttingDown();
+	bool IsShuttingDown();
 	std::string GetShutdownFlagSignalName();
+
+	// TODO: Add multi-tasking process to module
+	// TODO: this will be added in the async modle loader etc 
+	//RESULT ModuleProcess(void *pContext = nullptr);
 
 protected:
 	RESULT SetPriority(int priority);
@@ -51,17 +109,17 @@ protected:
 
 protected:
 
-	virtual std::string GetModuleName() {
-		return m_strModuleName;
+	virtual std::string GetName() {
+		return m_strName;
 	}
 
-	RESULT SetModuleName(std::string strAppName) {
-		m_strModuleName = strAppName;
+	RESULT SetName(std::string strAppName) {
+		m_strName = strAppName;
 		return R_PASS;
 	}
 
 	RESULT SetModuleDescription(std::string strAppDescription) {
-		m_strModuleDescription = strAppDescription;
+		m_strDescription = strAppDescription;
 		return R_PASS;
 	}
 
@@ -69,7 +127,7 @@ protected:
 		return m_uid.GetID();
 	}
 
-	UID GetAppUID() {
+	UID GetUID() {
 		return m_uid;
 	}
 
@@ -80,10 +138,20 @@ private:
 	bool m_fShutdownFlag = false;
 	std::string m_strShutdownFlagSignalName;
 
+protected:
+	std::string m_strName;
+	std::string m_strDescription;
+
 private:
-	std::string m_strModuleName;
-	std::string m_strModuleDescription;
 	UID m_uid;
+};
+
+// Using Fixed-priority preemptive scheduling: https://en.wikipedia.org/wiki/Fixed-priority_pre-emptive_scheduling
+struct DreamModuleBaseCompare {
+	bool operator()(const std::shared_ptr<DreamModuleBase> &lhsModule, const std::shared_ptr<DreamModuleBase> &rhsModule) const {
+		// Note: This is actually returning the lowest value (not highest) since priority is inverted
+		return lhsModule->GetEffectivePriorityValue() > rhsModule->GetEffectivePriorityValue();
+	}
 };
 
 template<class derivedModuleType>
@@ -121,13 +189,13 @@ public:
 		return r;
 	}
 
-	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
+	virtual RESULT InitializeModule(void *pContext = nullptr) = 0;
+	virtual RESULT OnDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 
 protected:
 	//TODO: these can be moved into DreamApp.tpp
-	void *GetAppContext() {
+	virtual void *GetContext() override {
 		return m_pContext;
 	}
 
@@ -137,11 +205,6 @@ protected:
 
 	virtual DreamOS *GetDOS() override {
 		return m_pDreamOS;
-	}
-
-	virtual RESULT Print() override {
-		//DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
-		return R_PASS;
 	}
 
 private:

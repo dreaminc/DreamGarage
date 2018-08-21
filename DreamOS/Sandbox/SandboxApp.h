@@ -56,6 +56,7 @@ class DreamAppMessage;
 class UIKeyboardLayout;
 
 class DreamAppManager;
+class DreamModuleManager;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
@@ -105,6 +106,7 @@ private:
 	RESULT InitializeInteractionEngine();
 	RESULT InitializeTimeManager();
 	RESULT InitializeDreamAppManager();
+	RESULT InitializeDreamModuleManager();
 	RESULT InitializeCamera();
 
 protected:
@@ -428,6 +430,7 @@ protected:
 	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
+	std::unique_ptr<DreamModuleManager> m_pDreamModuleManager = nullptr;
 	std::unique_ptr<CredentialManager> m_pCredentialManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
