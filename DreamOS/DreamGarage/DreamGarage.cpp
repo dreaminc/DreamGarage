@@ -435,9 +435,9 @@ RESULT DreamGarage::DidFinishLoading() {
 
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
-		
-		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+		if (m_pDreamEnvironmentApp != nullptr) {	
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+			m_fShouldUpdateAppComposites = true;
 		}
 	}
 	
@@ -650,9 +650,15 @@ RESULT DreamGarage::Update(void) {
 
 	// TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
-		m_pDreamUserControlArea->ResetAppComposite();
+		//m_pDreamUserControlArea->ResetAppComposite();
 
 		m_fShouldUpdateAppComposites = false;
+		
+		auto pHMD = GetHMD();
+		if (pHMD != nullptr) {
+			m_pDreamUserApp->UpdateHeight(pHMD->GetHeadPointOrigin().y());
+			m_pDreamUserApp->UpdateDepth(0.0f);
+		}
 	}
 
 Error:
@@ -670,17 +676,19 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
 
+	CN(m_pDreamUserApp);
+	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset));
+
 	if (!pCamera->HasHMD()) {
 		pCamera->SetOrientation(qOffset);
 		pCamera->SetPosition(ptSeatPosition);
+		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
 		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
+		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
-
-	CN(m_pDreamUserApp);
-	//m_pDreamUserApp->
 
 Error:
 	return r;
@@ -1060,11 +1068,16 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
 			//else if (strMessage == "DreamLoginApp.OnSuccess") {
 			m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
+
+			float height;
+			float depth;
+			CR(m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth));
+
 			CR(m_pDreamLoginApp->SetLaunchDate());
 
 			CR(m_pUserController->SetSettings(m_strAccessToken,
-				m_pDreamUserApp->GetHeight(),
-				m_pDreamUserApp->GetDepth(),
+				height,
+				depth,
 				m_pDreamUserApp->GetScale()));	
 
 			// TODO: potentially where the lobby environment changes to the team environment
@@ -1155,6 +1168,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 		CR(m_pDreamSettings->Show());
 		//m_pDreamUserApp->ResetAppComposite();
+		//m_pDreamUIBar->ResetAppComposite();
 	}
 	// the behavior of sign in, sign up, and teams create should be executed the same
 	// way with regards to the functions that they use

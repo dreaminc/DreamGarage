@@ -215,6 +215,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	CR(m_pWebBrowserManager->Initialize());
 #endif
 
+	// this is the guess at where the UI could be, only call this here
 	CR(ResetAppComposite());
 
 Error:
@@ -670,6 +671,35 @@ Error:
 	return r;
 }
 
+RESULT DreamUserApp::SetAppCompositeOrientation(quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	m_pAppBasis->SetOrientation(qOrientation);
+	GetComposite()->SetOrientation(m_pAppBasis->GetOrientation());
+
+	return R_PASS;
+}
+
+RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
+	RESULT r = R_PASS;
+
+	
+	stereocamera *pCamera = GetDOS()->GetCamera();
+
+	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+	vAppLook.Normalize();
+	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+	vector vDiff = m_userSettings->m_depth * vAppLookXZ;
+
+	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f) + vDiff);
+
+	m_pAppBasis->SetPosition(ptComposite);
+	GetComposite()->SetPosition(ptComposite);
+
+	return R_PASS;
+}
+
 RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
 
 	composite *pComposite = GetComposite();
@@ -878,10 +908,33 @@ RESULT DreamUserApp::UpdateDepth(float depthDiff) {
 
 	return R_PASS;
 }
+
 RESULT DreamUserApp::UpdateScale(float scale) {
 
 	m_userSettings->m_scale = scale;
 	GetComposite()->SetScale(scale);
+
+	return R_PASS;
+}
+
+RESULT DreamUserApp::GetSettingsRelativeHeightAndDepth(float& height, float& depth) {
+	
+	auto pHMD = GetDOS()->GetHMD();
+	if (pHMD != nullptr) {
+
+
+		//pHMD->GetPosition()
+		//point ptHMD = pHMD->GetHeadPointOrigin();
+		point ptCamera = GetDOS()->GetCamera()->GetEyePosition(EYE_MONO) + pHMD->GetHeadPointOrigin();
+		point ptComposite = GetComposite()->GetPosition(true);
+		//vector vDiff = vector(ptHMD.x(), 0.0f, ptHMD.z());
+		vector vDiff = vector(ptCamera.x() - ptComposite.x(), 0.0f, ptCamera.z() - ptComposite.z());
+		
+		depth = vDiff.magnitude();
+
+		height = GetComposite()->GetPosition(true).y() - ptCamera.y();
+		//vector vDiff = depthDiff * vAppLookXZ;
+	}
 
 	return R_PASS;
 }

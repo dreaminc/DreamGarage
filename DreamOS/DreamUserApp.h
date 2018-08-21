@@ -162,6 +162,8 @@ public:
 	virtual RESULT StopSharing() override;
 
 	virtual RESULT ResetAppComposite() override;
+	RESULT SetAppCompositeOrientation(quaternion qOrientation);
+	RESULT SetAppCompositePosition(point ptPosition);
 
 	RESULT SetHasOpenApp(bool fHasOpenApp);
 	RESULT SetEventApp(DreamUserObserver *pEventApp);
@@ -195,6 +197,9 @@ public:
 	RESULT UpdateHeight(float heightDiff);
 	RESULT UpdateDepth(float depthDiff);
 	RESULT UpdateScale(float scale);
+
+	// capture current settings values relative to the head to save
+	RESULT GetSettingsRelativeHeightAndDepth(float& height, float& depth);
 
 private:
 	//user *m_pUserModel = nullptr;
