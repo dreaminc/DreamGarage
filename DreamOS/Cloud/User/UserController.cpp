@@ -631,6 +631,17 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 
+#ifdef _DEBUG
+		// Allow force of environment ID in DEBUG
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		std::string strEnvironmentID = pCommandLineManager->GetParameterValue("environment");
+		if ((strEnvironmentID.compare("default") == 0) == false) {
+			environmentId = stoi(strEnvironmentID);
+		}
+#endif
+
 		SetUserDefaultEnvironmentID(environmentId);
 
 		if (m_pUserControllerObserver != nullptr) {
