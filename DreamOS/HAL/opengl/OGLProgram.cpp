@@ -991,7 +991,8 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
 	// IsVisible will return false for Virtual Objects
-	if (pOGLObj != nullptr) {
+	// TODO: Composite should be smarter than this
+	if (pOGLObj != nullptr && pOGLObj->NumberIndices() > 0) {
 
 		// Update buffers if marked as dirty
 		if (pDimObj->CheckAndCleanDirty()) {

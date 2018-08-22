@@ -55,13 +55,14 @@ RESULT CloudController::CloudThreadProcess() {
 
 	m_fRunning = true;
 
+	// TODO: WAT
 	// Message pump goes here
 #if (defined(_WIN32) || defined(_WIN64))
 	Win32Helper::ThreadBlockingMessageLoop();
 #else
 #pragma message ("not implemented message loop")
 	while (m_fRunning) {
-
+	
 	}
 #endif
 

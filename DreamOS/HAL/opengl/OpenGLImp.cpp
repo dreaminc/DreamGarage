@@ -1277,6 +1277,9 @@ RESULT OpenGLImp::glBindVertexArray(GLuint gluiArray) {
 	CRM(CheckGLError(), "glBindVertexArray failed");
 
 Error:
+	if (RFAILED()) {
+		int a = 5;
+	}
 	return r;
 }
 

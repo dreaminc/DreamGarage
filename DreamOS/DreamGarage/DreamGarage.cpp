@@ -387,13 +387,16 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
 	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
 
+	// TODO: This might need to be reworked
+	CRM(GetCloudController()->Start(false), "Failed to start cloud controller");
+
 	// UserController is initialized during CloudController::Initialize,
 	// which is in SandboxApp::Initialize while fInitCloud is true
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		std::map<int, std::string> testRefreshTokens = {
 			{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
@@ -420,7 +423,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 
 	// Initial step of login flow:
 	// if there has already been a successful login, try to authenticate

@@ -48,6 +48,7 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 
 	// NOTE: User Model is assigned externally
 	GetComposite()->InitializeOBB();
+
 	GetDOS()->AddObjectToInteractionGraph(GetComposite());
 
 	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
@@ -83,8 +84,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 	// If pending user mode - add to composite here
 	if (m_fPendingAssignedUserModel) {
+
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
+
 		m_fPendingAssignedUserModel = false;
 	}
 
@@ -175,6 +178,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	//*/
 
 Error:
+	if (RFAILED()) {
+		int a = 5;
+	}
+
 	return r;
 }
 
@@ -519,7 +526,8 @@ Error:
 RESULT DreamPeerApp::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 
-	CN(m_pUserModel);
+	CNR(m_pUserModel, R_SKIPPED);
+
 	m_pUserModel->UpdateMouth(mouthScale);
 
 Error:
