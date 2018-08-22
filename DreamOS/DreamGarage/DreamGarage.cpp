@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = true;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fMouseLook = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -331,29 +331,12 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-#ifndef _DEBUG
-
-	bool fShowModels = true;
-	auto pHMD = GetHMD();
-
-	if (pHMD != nullptr) {
-		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
-			fShowModels = false;
-		}
-	}
-	//*
-	if (fShowModels) {
-		m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
-		CN(m_pDreamEnvironmentApp);
-	}
-	//*/
-
-#endif
+	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
+	CN(m_pDreamEnvironmentApp);
 
 	CR(SetupUserModelPool());
 
 	AddSkybox();
-
 
 Error:
 	return r;
@@ -400,23 +383,59 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	// TODO: could be somewhere else(?)
 	CR(RegisterDOSObserver(this));
+
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
 	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
+
+	// TODO: This might need to be reworked
+	CRM(GetCloudController()->Start(false), "Failed to start cloud controller");
 
 	// UserController is initialized during CloudController::Initialize,
 	// which is in SandboxApp::Initialize while fInitCloud is true
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
 	
-	// initial step of login flow:
+	// DEBUG:
+#ifdef _DEBUG
+	{
+		std::map<int, std::string> testRefreshTokens = {
+			{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
+			{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },
+			{ 2, "GckLS9Q691PO6RmdmwRp368JjWaETNOMEoASqQF0TCnImHzpmOv2Rch1RDrgr2V7" },
+			{ 3, "HYlowX58aRPRB85IT0M2wB20RC8rd0zpOxfIIvEgMF9XVzzFbL8UzY3yyCovdEIQ" },
+			{ 4, "sROmFa73UM38v7snrTaDy3JF1vCJGdJhBBLvBcCLaWxjoEYVfAqcgMAZPVHzaZrR" },
+			{ 5, "gc2EPtlKmKtkmiZC6cRfUtMIHwiWW9Tf55wbFBcq45Wg8DBRDWV3iZiLsqBedfqF" },
+			{ 6, "F5EwwHxmgf4pqLXZjP6zWH4NBn42UtLQUmrlU4vl62BGeprnug0Hn1WeMm3snHQa" },
+			{ 7, "cuX1beJjJE58DdU4cYOrsIoNFil534fOWscH9bzmhmcFkV1qn3M8zPkdW7J3UEH1" },
+			{ 8, "B3Wwz6Lbwfj2emo7caKBQXtKoMYXR9P70eOvkFzFIfh9NRlal6PLFqIagTFXiDHy" },
+			{ 9, "HPfaNfjFrAhlbqS9DuZD5dCrAzI215ETDTRzFMVXrtoYrI2A9XBS3VEKOjGlDSVE" }
+		};
+
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		std::string strTestUserNumber = pCommandLineManager->GetParameterValue("rtoken");
+		if ((strTestUserNumber.compare("") == 0) == false) {
+			
+			int testUserNumber = stoi(strTestUserNumber);
+
+			std::string strDebugRefreshToken = testRefreshTokens[testUserNumber];
+			return m_pUserController->GetAccessToken(strDebugRefreshToken);
+		}
+	}
+#endif
+
+	// Initial step of login flow:
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
 		m_pUserController->GetAccessToken(m_strRefreshToken);
 	}
-	// otherwise, start by showing the settings form
 	else {
+		// Otherwise, start by showing the settings form
+
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
+		
 		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 		}
@@ -1195,8 +1214,9 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
-		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
-		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		
+		//CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		//CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 	}
 
 Error:

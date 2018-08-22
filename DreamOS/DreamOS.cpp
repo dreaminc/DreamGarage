@@ -242,7 +242,7 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
-
+	
 	CR(pDreamPeer->RegisterDreamPeerObserver(this));
 
 Error:
@@ -285,9 +285,9 @@ RESULT DreamOS::OnDreamPeerStateChange(DreamPeerApp* pDreamPeer) {
 	RESULT r = R_PASS;
 
 	switch (pDreamPeer->GetState()) {
-	case DreamPeerApp::state::ESTABLISHED: {
-		CR(OnNewDreamPeer(pDreamPeer));
-	} break;
+		case DreamPeerApp::state::ESTABLISHED: {
+			CR(OnNewDreamPeer(pDreamPeer));
+		} break;
 	}
 
 Error:
@@ -484,6 +484,7 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 
 	CBM((m_dreamPeerApps.find(peerUserID) == m_dreamPeerApps.end()), "Error: Peer user ID %d already exists", peerUserID);
 
+	//pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	CNM(pDreamPeerApp, "Failed to create dream peer app");
 

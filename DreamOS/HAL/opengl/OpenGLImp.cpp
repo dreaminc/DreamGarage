@@ -1572,6 +1572,7 @@ RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glUniform1i(location, v0);
+
 	CRM(CheckGLError(), "glUniform1i failed");
 
 Error:

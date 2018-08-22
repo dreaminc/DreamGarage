@@ -30,6 +30,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestModel());
+
 	CR(AddTestFadeShader());
 
 	CR(AddTestSkybox());
@@ -63,8 +65,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(TestNestedOBB());
 
 	CR(AddTestText());
-
-	CR(AddTestModel());
 
 	CR(AddTestUserModel());
 
@@ -2128,7 +2128,7 @@ RESULT HALTestSuite::AddTestModel() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("environment"));
+		CR(SetupSkyboxPipeline("minimal"));
 
 		// Objects 
 

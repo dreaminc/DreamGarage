@@ -208,9 +208,12 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_userSettings->m_baseWidth = std::sqrt(((m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio) * (m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize)) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
 	m_userSettings->m_baseHeight = std::sqrt((m_userSettings->m_diagonalSize * m_userSettings->m_diagonalSize) / (1.0f + (m_userSettings->m_aspectRatio * m_userSettings->m_aspectRatio)));
 
+#ifndef _DEBUG
+	// TODO: This should move into DreamBrowser as a singleton
 	m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 	CN(m_pWebBrowserManager);
 	CR(m_pWebBrowserManager->Initialize());
+#endif
 
 	CR(ResetAppComposite());
 

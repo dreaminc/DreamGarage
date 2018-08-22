@@ -501,6 +501,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("head.path", "head.path", "default"));
 	CR(m_pCommandLineManager->RegisterParameter("lefthand.path", "lhand.path", "default"));
 	CR(m_pCommandLineManager->RegisterParameter("righthand.path", "rhand.path", "default"));
+
+	CR(m_pCommandLineManager->RegisterParameter("rtoken", "rt", ""));
 #endif
 
 	// For auto login, use '-l auto'

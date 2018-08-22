@@ -209,7 +209,11 @@ RESULT OGLProgramReflection::SetObjectTextures(OGLObj *pOGLObj) {
 
 	// Material textures
 	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
-	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
+	
+	if (pOGLObj->GetOGLTextureDiffuse() != nullptr) {
+		SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
+	}
+
 	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	// bump texture
