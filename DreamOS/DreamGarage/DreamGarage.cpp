@@ -1211,8 +1211,9 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
-		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
-		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
+		
+		//CR(m_pUserController->RequestUserProfile(m_strAccessToken));
+		//CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 	}
 
 Error:

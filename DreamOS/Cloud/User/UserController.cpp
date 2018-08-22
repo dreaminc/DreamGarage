@@ -632,7 +632,10 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 
 		SetUserDefaultEnvironmentID(environmentId);
-		m_pUserControllerObserver->OnGetTeam(true, environmentId, environmentModelId);
+
+		if (m_pUserControllerObserver != nullptr) {
+			m_pUserControllerObserver->OnGetTeam(true, environmentId, environmentModelId);
+		}
 	}
 	
 Error:
