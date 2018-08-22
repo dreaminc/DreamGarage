@@ -178,10 +178,6 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	//*/
 
 Error:
-	if (RFAILED()) {
-		int a = 5;
-	}
-
 	return r;
 }
 
