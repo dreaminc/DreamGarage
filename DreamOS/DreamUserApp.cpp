@@ -690,7 +690,7 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-	vector vDiff = m_userSettings->m_depth * vAppLookXZ;
+	vector vDiff = 2*m_userSettings->m_depth * vAppLookXZ;
 	//vDiff = vector(vDiff.z(), vDiff.y(), vDiff.x());
 
 	//point ptHeadset = GetDOS()->GetHMD()->GetHeadPointOrigin();
