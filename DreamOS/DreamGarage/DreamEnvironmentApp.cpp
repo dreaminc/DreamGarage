@@ -41,7 +41,22 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	//pDirectionalLight->EnableShadows();
 
-	CR(LoadAllEnvironments());
+	// TODO: this logic needs to go into DreamEnvironmentApp
+	bool fShowModels = true;
+	auto pHMD = pDreamOS->GetHMD();
+
+	if (pHMD != nullptr) {
+		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
+			fShowModels = false;
+		}
+	}
+#ifdef _DEBUG
+	fShowModels = false;
+#endif
+
+	if (fShowModels) {
+		CR(LoadAllEnvironments());
+	}
 
 Error:
 	return r;
@@ -150,8 +165,12 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 	RESULT r = R_PASS;
 
 	auto fnOnFadeOut = [&](void *pContext) {
-		m_pCurrentEnvironmentModel->SetVisible(true);
+		if (m_pCurrentEnvironmentModel != nullptr) {
+			m_pCurrentEnvironmentModel->SetVisible(true);
+		}
+
 		m_pFadeProgram->FadeIn();
+
 		return R_PASS;
 	};
 
@@ -164,7 +183,10 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 		m_pFadeProgram->FadeOut(fnOnFadeOut);
 	}
 	else if (fadeProgress == 0.0f) {
-		m_pCurrentEnvironmentModel->SetVisible(true);
+		if (m_pCurrentEnvironmentModel != nullptr) {
+			m_pCurrentEnvironmentModel->SetVisible(true);
+		}
+
 		m_pFadeProgram->FadeIn();
 	}
 

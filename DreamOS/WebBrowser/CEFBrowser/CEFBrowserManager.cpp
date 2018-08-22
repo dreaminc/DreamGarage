@@ -420,12 +420,14 @@ RESULT CEFBrowserManager::Shutdown() {
 
 	DEBUG_LINEOUT("CEF Exited");
 
-	try {
-		CefShutdown();
-	}
-	catch (...) {
-		DEBUG_LINEOUT("CEF hit exception");
-	}
+	CefShutdown();
+
+	//try {
+	//	CefShutdown();
+	//}
+	//catch (...) {
+	//	DEBUG_LINEOUT("CEF hit exception");
+	//}
 
 //Error:
 	return r;

@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = true;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fMouseLook = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -331,29 +331,12 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-#ifndef _DEBUG
-
-	bool fShowModels = true;
-	auto pHMD = GetHMD();
-
-	if (pHMD != nullptr) {
-		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
-			fShowModels = false;
-		}
-	}
-	//*
-	if (fShowModels) {
-		m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
-		CN(m_pDreamEnvironmentApp);
-	}
-	//*/
-
-#endif
+	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
+	CN(m_pDreamEnvironmentApp);
 
 	CR(SetupUserModelPool());
 
 	AddSkybox();
-
 
 Error:
 	return r;
@@ -400,6 +383,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 	// TODO: could be somewhere else(?)
 	CR(RegisterDOSObserver(this));
+
 	m_fFirstLogin = m_pDreamLoginApp->IsFirstLaunch();
 	m_fHasCredentials = m_pDreamLoginApp->HasStoredCredentials(m_strRefreshToken, m_strAccessToken);
 
@@ -408,15 +392,31 @@ RESULT DreamGarage::DidFinishLoading() {
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
 	
-	// initial step of login flow:
+	// DEBUG:
+#ifdef _DEBUG
+	{
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		std::string strDebugRefreshToken = pCommandLineManager->GetParameterValue("rtoken");
+
+		if ((strDebugRefreshToken.compare("") == 0) == false) {
+			return m_pUserController->GetAccessToken(strDebugRefreshToken);
+		}
+	}
+#endif
+
+	// Initial step of login flow:
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
 		m_pUserController->GetAccessToken(m_strRefreshToken);
 	}
-	// otherwise, start by showing the settings form
 	else {
+		// Otherwise, start by showing the settings form
+
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
+		
 		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 		}
