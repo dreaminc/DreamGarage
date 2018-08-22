@@ -691,9 +691,12 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 	vector vDiff = m_userSettings->m_depth * vAppLookXZ;
+	//vDiff = vector(vDiff.z(), vDiff.y(), vDiff.x());
 
+	//point ptHeadset = GetDOS()->GetHMD()->GetHeadPointOrigin();
+	//point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f));
 	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f) + vDiff);
-
+	//ptComposite += point(ptHeadset.x(), 0.0f, ptHeadset.z());
 	m_pAppBasis->SetPosition(ptComposite);
 	GetComposite()->SetPosition(ptComposite);
 

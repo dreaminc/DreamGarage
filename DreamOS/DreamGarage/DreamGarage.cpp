@@ -648,6 +648,13 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
+	if (m_fShouldUpdateMenuComposite) {
+		if (m_pDreamUIBar != nullptr) {
+			m_pDreamUIBar->ResetAppComposite();
+			m_fShouldUpdateMenuComposite = false;
+		}
+	}
+
 	// TODO: use the DreamUserControlArea
 	if (m_fShouldUpdateAppComposites) {
 		//m_pDreamUserControlArea->ResetAppComposite();
@@ -672,12 +679,13 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 	point ptSeatPosition;
 	quaternion qOffset;
+	quaternion qOffset2 = quaternion::MakeQuaternionWithEuler(0.0f, 90.0f * (float)M_PI / 180.0f, 0.0f);
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
 
 	CN(m_pDreamUserApp);
-	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset));
+	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset*qOffset2));
 
 	if (!pCamera->HasHMD()) {
 		pCamera->SetOrientation(qOffset);
@@ -689,6 +697,9 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
+
+	//CR(m_pDreamUIBar->ResetAppComposite());
+	m_fShouldUpdateMenuComposite = true;
 
 Error:
 	return r;
@@ -725,17 +736,16 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
+		//*
 		point ptScreenPosition;
 		quaternion qScreenRotation;
 		float screenScale;
-
-		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
-		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+		//*/
 
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;

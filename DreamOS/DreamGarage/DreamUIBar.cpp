@@ -209,6 +209,16 @@ RESULT DreamUIBar::ResetAppComposite() {
 	quaternion qOrigin;
 	vector vCameraToMenu;
 	//*
+	if(m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
+		CB(userUIDs.size() == 1);
+		m_userUID = userUIDs[0];
+
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle)
+	}
+
 	if (m_pUserHandle != nullptr) {
 	//	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));

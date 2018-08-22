@@ -106,7 +106,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
-		//GetComposite()->SetPosition(GetComposite()->GetPosition());// +point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
@@ -126,7 +125,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	//m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
 	//m_pDreamUserApp->GetAppBasisOrientation(qOrigin);
 
-	//GetComposite()->SetPosition(ptOrigin);
 	//GetComposite()->SetOrientation(qOrigin);
 
 	//TODO: change this to a UISurface
@@ -196,7 +194,6 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 
 	point ptOrigin = m_pDreamUserApp->m_pAppBasis->GetPosition();
 	//point ptOrigin = m_pDreamUserApp->GetComposite()->GetPosition();//
-	//m_pDreamUserApp->GetComposite()->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
 	m_pDreamUserApp->m_pAppBasis->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
 	m_pDreamUserApp->GetComposite()->SetPosition(m_pDreamUserApp->m_pAppBasis->GetPosition());
 
