@@ -36,8 +36,11 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 #endif
 
 	// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
-	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * m_vSunDirection));
-	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), m_vSunDirection);
+	vector vFakeSunDirection = vector(1.0f, 0.75f, -0.5f);
+	vector vFakeAmbientDirection = vFakeSunDirection;
+
+	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(-1.0f * vFakeSunDirection));
+	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.35f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vFakeAmbientDirection);
 
 	//pDirectionalLight->EnableShadows();
 
