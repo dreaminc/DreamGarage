@@ -80,11 +80,7 @@ private:
 	//TODO: incorporate new environment
 	std::map<environment::type, std::wstring> m_environmentFilenames = {
 		{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		//{environment::CAVE, L"\\Cave\\cave_no_water_ib.fbx"}
-		//{environment::CAVE, L"\\Cave\\cave_binary_test.fbx"}
-		//{environment::CAVE, L"\\Cave\\cave_binary.FBX"}
-		{environment::CAVE, L"\\Cave2\\cave.FBX"}
-		//{environment::CAVE, L"\\Cave2\\cave_test.fbx"}
+		{environment::CAVE, L"\\Cave\\cave.FBX"}
 	};
 
 	//populated in LoadAllEnvironments
