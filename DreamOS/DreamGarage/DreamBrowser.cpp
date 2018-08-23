@@ -43,6 +43,13 @@ Error:
 RESULT DreamBrowser::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	m_soundState = sound::state::STOPPED;
+
+	// Join thread
+	if (m_browserAudioProcessingThread.joinable()) {
+		m_browserAudioProcessingThread.join();
+	}
+
 	/*
 	if (m_pWebBrowserManager != nullptr) {
 		m_pWebBrowserManager->Shutdown();
