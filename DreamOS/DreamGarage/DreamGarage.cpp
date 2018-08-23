@@ -727,7 +727,6 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
 		CR(SetRoundtablePosition(seatPosition));
-		//CR(SetRoundtablePosition())
 		m_fSeated = true;
 		m_fShouldUpdateAppComposites = true;
 	}

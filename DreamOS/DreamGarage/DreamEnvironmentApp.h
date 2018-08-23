@@ -63,7 +63,7 @@ private:
 	float m_lightIntensity;
 	float m_directionalIntensity;
 
-	vector m_vSunDirection = vector(1.0f, 0.75f, -0.5f);
+	vector m_vSunDirection = vector(1.0f, 0.25f, -0.1f);
 	light *m_pDirectionalSunLight = nullptr;
 	light *m_pDirectionalAmbientLight = nullptr;
 
@@ -80,7 +80,7 @@ private:
 	//TODO: incorporate new environment
 	std::map<environment::type, std::wstring> m_environmentFilenames = {
 		{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\Cave\\cave_no_water_ib.fbx"}
+		{environment::CAVE, L"\\Cave\\cave.FBX"}
 	};
 
 	//populated in LoadAllEnvironments
@@ -91,10 +91,10 @@ public:
 	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
 
 private:
-	float m_environmentSceneScale = 0.01f;
+	float m_environmentSceneScale = 0.025f;
 
-	float m_tableWidth = 300.0f * m_environmentSceneScale;
-	float m_tableLength = 500.0f * m_environmentSceneScale;
+	float m_tableWidth = 112.5f * m_environmentSceneScale;
+	float m_tableLength = 187.5f * m_environmentSceneScale;
 	float m_tableHeight = 0.0f * m_environmentSceneScale;
 
 	float m_baseTableAngle = 270.0f * (float)M_PI / 180.0f;
