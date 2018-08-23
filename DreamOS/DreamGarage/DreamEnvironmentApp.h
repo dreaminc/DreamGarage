@@ -84,6 +84,7 @@ private:
 		//{environment::CAVE, L"\\Cave\\cave_binary_test.fbx"}
 		//{environment::CAVE, L"\\Cave\\cave_binary.FBX"}
 		{environment::CAVE, L"\\Cave2\\cave.FBX"}
+		//{environment::CAVE, L"\\Cave2\\cave_test.fbx"}
 	};
 
 	//populated in LoadAllEnvironments
@@ -94,10 +95,10 @@ public:
 	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
 
 private:
-	float m_environmentSceneScale = 0.01f;
+	float m_environmentSceneScale = 0.025f;
 
-	float m_tableWidth = 300.0f * m_environmentSceneScale;
-	float m_tableLength = 500.0f * m_environmentSceneScale;
+	float m_tableWidth = 112.5f * m_environmentSceneScale;
+	float m_tableLength = 187.5f * m_environmentSceneScale;
 	float m_tableHeight = 0.0f * m_environmentSceneScale;
 
 	float m_baseTableAngle = 270.0f * (float)M_PI / 180.0f;
