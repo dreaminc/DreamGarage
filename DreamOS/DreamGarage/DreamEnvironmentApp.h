@@ -63,7 +63,7 @@ private:
 	float m_lightIntensity;
 	float m_directionalIntensity;
 
-	vector m_vSunDirection = vector(1.0f, 0.75f, -0.5f);
+	vector m_vSunDirection = vector(1.0f, 0.25f, -0.1f);
 	light *m_pDirectionalSunLight = nullptr;
 	light *m_pDirectionalAmbientLight = nullptr;
 
