@@ -42,7 +42,9 @@ public:
 	virtual RESULT PushMonoAudioBuffer(int numFrames, const int16_t *pSoundBuffer);
 	virtual RESULT PushMonoAudioBuffer(int numFrames, const float *pSoundBuffer);
 
-private:
+	RESULT SetListenerCamera(camera *pListenerCamera);
+
+protected:
 	camera *m_pListenerCamera = nullptr;
 
 protected:

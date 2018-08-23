@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <locale>
 #include <codecvt>
+#include <string>
 
 std::vector<std::string> util::TokenizeString(std::string str, char cDelim) {
 	std::istringstream strStream(str);
@@ -37,6 +38,18 @@ std::vector<std::string> util::TokenizeString(std::string str, std::string strDe
 
 void util::tolowerstring(std::string& str) {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
+void util::toupperstring(std::string& str) {
+	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+}
+
+void util::tolowerstring(std::wstring& wstr) {
+	std::transform(wstr.begin(), wstr.end(), wstr.begin(), ::tolower);
+}
+
+void util::toupperstring(std::wstring& wstr) {
+	std::transform(wstr.begin(), wstr.end(), wstr.begin(), ::toupper);
 }
 
 std::string util::WideStringToString(const std::wstring& wstrStr) {
@@ -97,4 +110,51 @@ Error:
 	}
 
 	return nullptr;
+}
+
+std::wstring util::CStringToWideString(const char *pszStr) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> charToWideStringConverter;
+
+	std::wstring wstrString = charToWideStringConverter.from_bytes(pszStr);
+
+	return wstrString;
+}
+
+//std::string util::WideCStringToString(const wchar_t *wpszStr) {
+//
+//	std::wstring wstrString = std::wstring(wpszStr);
+//
+//	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>  wcharToStringConverter;
+//
+//	std::string strString = wcharToStringConverter.from_bytes(wstrString);
+//
+//	return strString;
+//}
+
+GUID util::StringToGuid(const std::string& strGUID) {
+	GUID guid;
+
+	sscanf(strGUID.c_str(),
+		"{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
+		&guid.Data1, &guid.Data2, &guid.Data3,
+		&guid.Data4[0], &guid.Data4[1], &guid.Data4[2], &guid.Data4[3],
+		&guid.Data4[4], &guid.Data4[5], &guid.Data4[6], &guid.Data4[7]);
+
+	return guid;
+}
+
+std::string util::GuidToString(GUID guid) {
+	char szGUID[39];
+
+	snprintf(szGUID, sizeof(szGUID),
+		"{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+		guid.Data1, guid.Data2, guid.Data3,
+		guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+		guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+
+	return std::string(szGUID);
+}
+
+std::wstring util::GuidToWideString(GUID guid) {
+	return  StringToWideString(GuidToString(guid));
 }

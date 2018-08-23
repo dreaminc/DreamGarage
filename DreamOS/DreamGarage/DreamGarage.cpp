@@ -74,9 +74,10 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = false;
 	sandboxconfig.fInitCloud = true;
+	sandboxconfig.fInitSound = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fMouseLook = true;
 #endif
 
@@ -874,7 +875,13 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 
 	AudioDataMessage audioDataMessage(senderUserID, recieverUserID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
 
-	CR(HandleAudioDataMessage(pPeerConnection, &audioDataMessage));
+	if (strAudioTrackLabel == kUserAudioLabel) {
+		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
+	}
+	else if (strAudioTrackLabel == kChromeAudioLabel) {
+		// TODO: 
+		//HANDLE that shit
+	}
 
 Error:
 	return r;
@@ -961,7 +968,7 @@ Error:
 }
 
 // This function is currently defunct, but will be removed when the actual audio infrastructure is turned on
-RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
+RESULT DreamGarage::HandleUserAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
 	/*
@@ -973,28 +980,7 @@ RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, Audi
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);
 
-	{
-		//auto msg = pAudioDataMessage->GetAudioMessageBody();
-		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
-		CN(pAudioBuffer);
-
-		size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
-		float averageAccumulator = 0.0f;
-
-		for (int i = 0; i < numSamples; ++i) {
-			//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
-			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
-			float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
-
-			averageAccumulator += std::abs(scaledValue);
-		}
-
-		float mouthScale = averageAccumulator / numSamples;
-		mouthScale *= 10.0f;
-
-		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
-		pDreamPeer->UpdateMouth(mouthScale);
-	}
+	CR(pDreamPeer->HandleUserAudioDataMessage(pAudioDataMessage));
 
 Error:
 	return r;

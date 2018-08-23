@@ -66,6 +66,9 @@ public:
 
 	RESULT ShutdownParentSandbox();
 
+	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) override;
+	virtual RESULT GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) override;
+
 protected:
 	inline const ovrSession &GetOVRSession() { return m_ovrSession; }
 	inline const ovrHmdDesc &GetOVRHMDDescription() { return m_ovrHMDDescription; }

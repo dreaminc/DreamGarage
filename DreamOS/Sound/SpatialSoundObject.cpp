@@ -12,6 +12,17 @@ SpatialSoundObject::SpatialSoundObject(int samplingRate, point ptOrigin, vector 
 	// empty
 }
 
+RESULT SpatialSoundObject::SetListenerCamera(camera *pListenerCamera) {
+	RESULT r = R_PASS;
+
+	CN(pListenerCamera);
+
+	m_pListenerCamera = pListenerCamera;
+
+Error:
+	return r;
+}
+
 RESULT SpatialSoundObject::SetEmitterListenerDirection(vector vEmitterDirection, vector vListenerDirection) {
 	m_vEmitterDirection = vEmitterDirection;
 	m_vListenerDirection = vListenerDirection;

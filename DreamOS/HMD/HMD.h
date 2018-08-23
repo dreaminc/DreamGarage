@@ -143,6 +143,10 @@ public:
 	// string is used instead of HMDDeviceType for server commands like settings
 	virtual std::string GetDeviceTypeString() = 0;
 
+	// Audio
+	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) = 0;
+	virtual RESULT GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) = 0;
+
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 

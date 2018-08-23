@@ -9,6 +9,8 @@
 #include "DreamMessage.h"
 
 #include "Sound/DreamSoundSystem.h"
+#include "Sound/AudioPacket.h"
+#include "DreamGarage/AudioDataMessage.h"
 
 #include "DreamAppMessage.h"
 #include "DreamGarage/DreamSettingsApp.h"
@@ -143,6 +145,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Audio System
 	if (m_pSandbox->m_SandboxConfiguration.fInitSound) {
 		CRM(InitializeDreamSoundSystem(), "Failed to initialize the Dream Sound System");
+		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
 	}
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
@@ -764,6 +767,7 @@ RESULT DreamOS::InitializeDreamSoundSystem() {
 
 	m_pDreamSoundSystem = LaunchDreamModule<DreamSoundSystem>(this);
 	CNM(m_pDreamSoundSystem, "Failed to launch Dream Sound System Module");
+
 Error:
 	return r;
 }
@@ -783,6 +787,33 @@ RESULT DreamOS::UnregisterSoundSystemObserver() {
 
 	CNM(m_pDreamSoundSystem, "Sound system not initialized");
 	CR(m_pDreamSoundSystem->UnregisterObserver());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
+	RESULT r = R_PASS;
+
+	int nChannels = pCaptureBuffer->NumChannels();
+	int samplingFrequency = pCaptureBuffer->GetSamplingRate();
+
+	AudioPacket pendingAudioPacket;
+	pCaptureBuffer->GetAudioPacket(numFrames, &pendingAudioPacket);
+
+	// Measure time diff
+	//static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+	//std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+	//auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+	//lastUpdateTime = timeNow;
+	
+	// Broadcast out captured audio
+	if (GetCloudController() != nullptr) {
+		GetCloudController()->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
+	}
+
+	//std::chrono::system_clock::time_point timeNow2 = std::chrono::system_clock::now();
+	//auto diffVal2 = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow2 - timeNow).count();
 
 Error:
 	return r;

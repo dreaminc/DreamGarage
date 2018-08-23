@@ -5,6 +5,8 @@
 
 #include "Sound/SoundFile.h"
 
+#include "Primitives/camera.h"
+
 X3DSpatialSoundObject::X3DSpatialSoundObject(int samplingRate, point ptOrigin, vector vEmitterDirection, vector vListenerDirection, std::shared_ptr<IXAudio2> pXAudio2, std::shared_ptr<IXAudio2MasteringVoice> pXAudio2MasterVoice) :
 	SpatialSoundObject(samplingRate, ptOrigin, vEmitterDirection, vListenerDirection),
 	m_pXAudio2(pXAudio2),
@@ -321,9 +323,16 @@ RESULT X3DSpatialSoundObject::Update(unsigned int numFrames, unsigned int numCha
 
 	point ptPosition = GetPosition(true);
 
+	// Now apply camera transforms
+	auto matCameraView = m_pListenerCamera->GetViewMatrix();
+
+	point ptViewPoint = (point)(matCameraView * ptPosition);
+	//ptViewPoint.Print("ptView");
+
 	CN(m_pHRTFParams);
 
-	auto hrtfPosition = HrtfPosition{ ptPosition.x(), ptPosition.y(), -ptPosition.z() };
+	//auto hrtfPosition = HrtfPosition{ ptPosition.x(), ptPosition.y(), -ptPosition.z() };
+	auto hrtfPosition = HrtfPosition{ ptViewPoint.x(), ptViewPoint.y(), -ptViewPoint.z() };
 	CR((RESULT)m_pHRTFParams->SetSourcePosition(&hrtfPosition));
 
 	//auto sourceOrientation = OrientationFromAngles(pitch, yaw, roll);

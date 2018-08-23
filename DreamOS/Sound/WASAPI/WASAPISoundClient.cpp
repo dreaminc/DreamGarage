@@ -5,6 +5,8 @@
 // TODO: This should get moved up to SoundClient
 #include "WASAPISpatialSoundObject.h"
 
+#include "Core/Utilities.h"
+
 // File specific utilities
 template <class T> RESULT SafeRelease(T **ppT) {
 	RESULT r = R_PASS;
@@ -18,7 +20,9 @@ Error:
 	return r;
 }
 
-WASAPISoundClient::WASAPISoundClient() {
+WASAPISoundClient::WASAPISoundClient(std::wstring *pwstrOptAudioOutputGUID) :
+	SoundClient(pwstrOptAudioOutputGUID)
+{
 	// empty
 }
 
@@ -88,6 +92,69 @@ Error:
 	return r;
 }
 
+std::wstring WASAPISoundClient::GetDeviceIDFromDeviceID(std::wstring wstrDeviceOutID) {
+	RESULT r = R_PASS;
+
+	LPWSTR pwszDeviceID;
+	std::wstring wstrResult = L"default";
+	
+	UINT deviceCount = 0;
+	int cbSessionCount = 0;
+	bool fFound = false;
+
+	IMMDeviceCollection *pDeviceCollection = nullptr;
+	IMMDevice *pDevice = nullptr;
+
+	CR((RESULT)m_pDeviceEnumerator->EnumAudioEndpoints(eAll, DEVICE_STATE_ACTIVE, &pDeviceCollection));
+	CR((RESULT)pDeviceCollection->GetCount(&deviceCount));
+
+	for (UINT i = 0; i < deviceCount; i++) {
+
+		CR((RESULT)pDeviceCollection->Item(i, &pDevice));
+		CN(pDevice);
+
+		CR((RESULT)pDevice->GetId(&pwszDeviceID));
+		std::wstring wstrDeviceID = std::wstring(pwszDeviceID);
+
+		if(wstrDeviceID == wstrDeviceOutID) {
+
+			IPropertyStore *pPropertyStore = nullptr;
+			CR((RESULT)pDevice->OpenPropertyStore(STGM_READ, &pPropertyStore));
+
+			DWORD numProps;
+			pPropertyStore->GetCount(&numProps);
+
+			for (int j = 0; j < (int)numProps; j++) {
+
+				// TODO: the 45 is also flimsy
+				PROPERTYKEY propKeyTemp;
+				CR((RESULT)pPropertyStore->GetAt((DWORD)(j), &propKeyTemp));
+
+				PROPVARIANT propVariant;
+				PropVariantInit(&propVariant);
+
+				CR((RESULT)pPropertyStore->GetValue(propKeyTemp, &propVariant));
+
+				if(propVariant.vt == 31) {
+					CNM(propVariant.pwszVal, "Device GUID info is nullptr");
+					std::wstring wstrTemp = std::wstring(propVariant.pwszVal);
+
+					if (wstrTemp.find(L"MMDEVAPI") != std::string::npos) {
+						SafeRelease(&pPropertyStore);
+						PropVariantClear(&propVariant);
+						CoTaskMemFree(pwszDeviceID);
+
+						return wstrTemp;
+					}
+				}
+			}
+		}
+	}
+
+Error:
+	return wstrResult;
+}
+
 std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 	RESULT r = R_PASS;
 
@@ -104,23 +171,30 @@ std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 
 	CR((RESULT)pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propVariantFriendlyName));
 
-	//DWORD numProps;
-	//pPropertyStore->GetCount(&numProps);
-	//
-	//for (int i = 0; i < (int)numProps; i++) {
-	//	PROPERTYKEY propKeyTemp;
-	//
-	//	CR((RESULT)pPropertyStore->GetAt((DWORD)(i), &propKeyTemp));
-	//
-	//	PROPVARIANT propVariantTemp;
-	//	PropVariantInit(&propVariantTemp);
-	//
-	//	CR((RESULT)pPropertyStore->GetValue(propKeyTemp, &propVariantTemp));
-	//
-	//	if(propVariantTemp.vt == 31 && propVariantTemp.pwszVal != nullptr) {
-	//		DEBUG_LINEOUT("%d: %S", i, propVariantTemp.pwszVal);
-	//	}
-	//}
+	///* Moar infoz
+	DWORD numProps;
+	pPropertyStore->GetCount(&numProps);
+	
+	for (int i = 0; i < (int)numProps; i++) {
+		PROPERTYKEY propKeyTemp;
+	
+		CR((RESULT)pPropertyStore->GetAt((DWORD)(i), &propKeyTemp));
+	
+		PROPVARIANT propVariantTemp;
+		PropVariantInit(&propVariantTemp);
+	
+		CR((RESULT)pPropertyStore->GetValue(propKeyTemp, &propVariantTemp));
+	
+		if(propVariantTemp.vt == 31 && propVariantTemp.pwszVal != nullptr) {
+			//if (propKeyTemp == PKEY_AudioEndpoint_GUID) {
+			//if (i == 55) {
+			//	int a = 5;
+			//}
+
+			DEBUG_LINEOUT("%d: %S", i, propVariantTemp.pwszVal);
+		}
+	}
+	//*/
 
 	SafeRelease(&pPropertyStore);
 

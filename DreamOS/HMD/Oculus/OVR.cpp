@@ -19,6 +19,9 @@
 
 #include "OVRPlatform.h"
 
+#include "OVR_CAPI_Audio.h"
+#include "core/Utilities.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
@@ -423,6 +426,34 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	cState.ptTouchpad = point(inputState.Thumbstick[cState.type].x, inputState.Thumbstick[cState.type].y, 0.0f);
 		
 	m_pSenseController->SetControllerState(cState);
+
+Error:
+	return r;
+}
+
+RESULT OVRHMD::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
+	RESULT r = R_PASS;
+
+	WCHAR wszDeviceOutStrBuffer[OVR_AUDIO_MAX_DEVICE_STR_SIZE];
+	CRM((RESULT)ovr_GetAudioDeviceOutGuidStr(wszDeviceOutStrBuffer), "Failed to retrieve OVR audio device out GUID");
+	wstrAudioDeviceOutGUID = std::wstring(wszDeviceOutStrBuffer);
+
+	//GUID deviceOutGuid;
+	//CRM((RESULT)ovr_GetAudioDeviceOutGuid(&deviceOutGuid), "Failed to retrieve OVR audio device out GUID");
+	//wstrAudioDeviceOutGUID = util::GuidToWideString(deviceOutGuid);
+	
+Error:
+	return r;
+}
+
+RESULT OVRHMD::GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) {
+	RESULT r = R_PASS;
+
+	//WCHAR wszDeviceInStrBuffer[OVR_AUDIO_MAX_DEVICE_STR_SIZE];
+	//CRM((RESULT)ovr_GetAudioDeviceInGuidStr(wszDeviceInStrBuffer), "Failed to retrieve OVR audio device out GUID");
+	//wstrAudioDeviceInGUID = std::wstring(wszDeviceInStrBuffer);
+
+	// TODO:
 
 Error:
 	return r;

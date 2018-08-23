@@ -6,8 +6,15 @@
 
 #include "AudioPacket.h"
 
-SoundClient::SoundClient() {
-	// empty
+SoundClient::SoundClient(std::wstring *pwstrOptAudioOutputGUID) {
+	if (pwstrOptAudioOutputGUID != nullptr) {
+		m_wstrAudioOutputDeviceGUID.assign(*pwstrOptAudioOutputGUID);
+	}
+	else {
+		m_wstrAudioOutputDeviceGUID = L"default";
+	}
+
+	//m_wstrAudioInputDeviceGUID = L"default";
 }
 
 SoundClient::~SoundClient() {

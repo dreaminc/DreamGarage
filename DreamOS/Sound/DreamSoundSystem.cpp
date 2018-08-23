@@ -46,6 +46,46 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 	SetName("DreamSoundSystem");
 	SetModuleDescription("The Dream Sound System Module");
 
+	std::wstring wstrDeviceOutID;
+	//std::wstring wstrDeviceInGUID;
+
+	std::wstring wstrHMDDeviceOutGUID;
+	//std::wstring wstrHMDDeviceInGUID;
+
+	m_pHMD = GetDOS()->GetHMD();
+
+	if (m_pHMD != nullptr) {
+
+		auto deviceType = m_pHMD->GetDeviceType();
+
+		switch (deviceType) {
+
+			case HMDDeviceType::OCULUS: {
+				
+
+				CRM(m_pHMD->GetAudioDeviceOutID(wstrDeviceOutID), "Failed to get HMD device out");
+				//CRM(m_pHMD->GetAudioDeviceInGUID(wstrDeviceInGUID), "Failed to get HMD device in");
+
+				DEBUG_LINEOUT("out: %S", wstrDeviceOutID.c_str());
+				//DEBUG_LINEOUT("in: %S", wstrDeviceInGUID.c_str());
+
+				// Apply 
+
+			} break;
+
+			case HMDDeviceType::VIVE: {
+				// TODO:
+				
+				
+			} break;
+
+			case HMDDeviceType::META: {
+				// TODO:
+			} break;
+
+		}
+	}
+
 	// WASAPI Capture Client
 	// This can fail - if this is the case then capture will not fire (obviously)
 	auto pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
@@ -58,9 +98,12 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
 	}
 
+	// Use the WASAPI enumerator to get the full thing
+	wstrHMDDeviceOutGUID = pWASAPICaptureClient->GetDeviceIDFromDeviceID(wstrDeviceOutID);
+
 	// XAudio2 Spatial and Render Client
 	// This cannot fail - we need a default audio device, if none exists this will blow up
-	auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
+	auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2, &wstrHMDDeviceOutGUID);
 	CNM(pXAudio2AudioClient, "Failed to create XAudio2 Client");
 	m_pXAudio2AudioClient =std::shared_ptr<SoundClient>(pXAudio2AudioClient);
 	CN(m_pXAudio2AudioClient);
@@ -70,27 +113,17 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 
 	CR(ClearSpatialSoundObjects());
 
-	m_pHMD = GetDOS()->GetHMD();
+	/*
+	{
+		// This is BULL
+		m_pTestSpatialSoundObject = AddSpatialSoundObject(point(0.0f, 0.0f, 2.0f), vector(), vector());
+		CN(m_pTestSpatialSoundObject);
 
-	/* TODO: This is where we can detect the audio routings to pass to the sound system
-	if (pHMD != nullptr) {
-		auto deviceType = pHMD->GetDeviceType();
+		m_pSoundFile = LoadSoundFile(L"OceanWavesMikeKoenig980635527_48K.wav", SoundFile::type::WAVE);
+		CN(m_pSoundFile);
 
-		switch (deviceType) {
-		
-			case HMDDeviceType::OCULUS: {
-				// TODO: 
-			} break;
-			
-			case HMDDeviceType::VIVE: {
-				// TODO: 
-			} break;
-			
-			case HMDDeviceType::META: {
-				// TODO: 
-			} break;
-		
-		}
+		//m_pTestSpatialSoundObject->LoopSoundFile(m_pSoundFile.get());
+		m_pTestSpatialSoundObject->PlaySoundFile(m_pSoundFile.get());
 	}
 	*/
 
@@ -155,6 +188,9 @@ std::shared_ptr<SpatialSoundObject> DreamSoundSystem::AddSpatialSoundObject(poin
 		
 	pSpatialSoundObject = m_pXAudio2AudioClient->AddSpatialSoundObject(ptPosition, vEmitterDirection, vListenerDirection);
 	CNM(pSpatialSoundObject, "Failed to create spatial sound object");
+
+	// Set camera for object
+	CRM(pSpatialSoundObject->SetListenerCamera(GetDOS()->GetCamera()), "Failed to set spatial object camera");
 
 	CR(AddSpatialSoundObject(pSpatialSoundObject));
 

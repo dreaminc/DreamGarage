@@ -10,6 +10,8 @@
 
 #include "OpenVRController.h"
 
+#include "Core/Utilities.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
@@ -352,6 +354,44 @@ std::string OpenVRDevice::GetDeviceTypeString() {
 	}
 
 	return strDeviceType;
+}
+
+RESULT OpenVRDevice::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
+	RESULT r = R_PASS;
+
+	vr::EVRSettingsError evrErr;
+	char szDeviceOutStrBuffer[128];
+
+	CN(m_pIVRHMD);
+
+	vr::COpenVRContext &ctx = vr::OpenVRInternal_ModuleContext();
+	auto pIVRSettings = ctx.VRSettings();
+	CN(pIVRSettings);
+
+	pIVRSettings->GetString(vr::k_pch_SteamVR_Section, vr::k_pch_audio_OnPlaybackDevice_String, szDeviceOutStrBuffer, 128, &evrErr);
+	CBM((evrErr == vr::EVRSettingsError::VRSettingsError_None), "Get SteamVR playback device string failed");
+
+	wstrAudioDeviceOutGUID = util::CStringToWideCString(szDeviceOutStrBuffer);
+
+Error:
+	return r;
+}
+
+RESULT OpenVRDevice::GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) {
+	RESULT r = R_PASS;
+
+	//vr::EVRSettingsError evrErr;
+	//char szDeviceInStrBuffer[128];
+
+	CN(m_pIVRHMD);
+
+	//vr::IVRSettings.GetString(k_pch_SteamVR_Section, k_pch_audio_OnRecordDevice_String, szDeviceInStrBuffer, 128, &evrErr);
+	//CBM((evrErr == VRSettingsError_None), "Get SteamVR playback device string failed");
+	//
+	//wstrAudioDeviceInGUID = std::wstring(szDeviceInStrBuffer);
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {

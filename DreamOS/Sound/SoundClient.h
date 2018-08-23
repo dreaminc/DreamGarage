@@ -35,7 +35,7 @@ private:
 	SoundClient::observer *m_pSoundClientObserver = nullptr;
 
 public:
-	SoundClient();
+	SoundClient(std::wstring *pwstrOptAudioOutputGUID = nullptr);
 	~SoundClient();
 
 	virtual RESULT Initialize() = 0;
@@ -92,6 +92,8 @@ public:
 
 	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket);
 
+	virtual std::wstring GetDeviceIDFromDeviceID(std::wstring wstrDeviceOutGUID) { return L"default"; }
+
 private:
 	std::thread	m_audioRenderProcessingThread;
 	std::thread	m_audioCaptureProcessingThread;
@@ -105,6 +107,9 @@ protected:
 	int m_renderSamplingRate = DEFAULT_SAMPLING_RATE;
 	int m_captureSamplingRate = DEFAULT_SAMPLING_RATE;
 	int m_spatialSamplingRate = DEFAULT_SAMPLING_RATE;
+
+	std::wstring m_wstrAudioOutputDeviceGUID;
+	//std::wstring m_wstrAudioInputDeviceGUID;
 
 protected:
 	uint32_t m_maxSpatialSoundObjects = DEFAULT_MAX_SPATIAL_AUDIO_OBJECTS;

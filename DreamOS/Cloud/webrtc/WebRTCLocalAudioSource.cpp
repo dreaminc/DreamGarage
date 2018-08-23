@@ -57,6 +57,7 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 
 	CN(m_pLocalAudioTrackSink);
 	
+	///*
 	m_pLocalAudioTrackSink->OnData(
 		pendingAudioPacket.GetDataBuffer(),
 		pendingAudioPacket.GetBitsPerSample(),
@@ -64,12 +65,13 @@ RESULT WebRTCLocalAudioSource::SendAudioPacket(const AudioPacket &pendingAudioPa
 		pendingAudioPacket.GetNumChannels(),
 		pendingAudioPacket.GetNumFrames()
 	);
+	//*/
 
 	/* DEBUG:
 	CN(m_pLocalAudioTrackSink);
 	
 	if (m_strAudioTrackLabel != "user_audio_label") {
-
+	
 		m_pLocalAudioTrackSink->OnData(
 			pendingAudioPacket.GetDataBuffer(),
 			pendingAudioPacket.GetBitsPerSample(),
