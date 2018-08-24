@@ -16,6 +16,10 @@
     <LocalDebuggerCommandArguments>-rt 2 -env 170</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'">
+    <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
     <LocalDebuggerCommandArguments>-u test1@dreamos.com -p nightmare -env 170</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

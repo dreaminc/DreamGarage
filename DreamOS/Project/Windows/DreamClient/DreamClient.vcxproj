@@ -13,6 +13,14 @@
       <Configuration>DevProduction</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="OculusProduction|Win32">
+      <Configuration>OculusProduction</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="OculusProduction|x64">
+      <Configuration>OculusProduction</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Production|Win32">
       <Configuration>Production</Configuration>
       <Platform>Win32</Platform>
@@ -90,6 +98,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -130,6 +145,13 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
@@ -178,6 +200,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
@@ -206,6 +232,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
@@ -220,6 +250,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
@@ -278,6 +311,56 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assi
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Include;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\assimp\3.3.1\include\;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\include\;$(ProjectDir)..\..\..\External\webrtc\include\webrtc\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Include\;$(ProjectDir)..\..\..\External\spdlog\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\Freeimage\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;$(ProjectDir)..\DreamDesktopDuplication\include\</AdditionalIncludeDirectories>
+      <ConformanceMode>true</ConformanceMode>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;CEF_AUDIO_MIRROR;PRODUCTION_BUILD;OCULUS_PRODUCTION_BUILD;_ENABLE_LOGGING
+;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;Xinput.lib;XAudio2.lib;HrtfApo.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_encoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g711\audio_decoder_g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g722\audio_decoder_g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\ilbc\audio_decoder_ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_float.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\L16\audio_decoder_L16.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\opus\audio_decoder_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\media\rtc_audio_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\modules\audio_processing\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;$(SolutionDir)$(Platform)\OculusProduction\DreamOS.lib;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\LibOVRPlatform64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
+ /D
+
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+
+
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
+
+xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
+
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
+
+$(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.oculus.nuspec" -properties version=$(DREAMVERSION)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -332,7 +415,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\Fre
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;$(SolutionDir)$(Platform)\Release\DreamOS.lib;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\LibOVRPlatform64_1.lib;Xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;Xinput.lib;XAudio2.lib;HrtfApo.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_encoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g711\audio_decoder_g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g722\audio_decoder_g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\ilbc\audio_decoder_ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_float.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\L16\audio_decoder_L16.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\opus\audio_decoder_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\media\rtc_audio_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\modules\audio_processing\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;$(SolutionDir)$(Platform)\Release\DreamOS.lib;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\LibOVRPlatform64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -357,10 +440,7 @@ xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
 
-copy  "$(TargetDir)\DreamLaunch.exe" "$(TargetDir)\DreamLauncher.exe"
-
-$(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.production.nuspec" -properties version=$(DREAMVERSION)
-$(SolutionDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Dream.$(DREAMVERSION).nupkg -r ProdReleases</Command>
+$(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.production.nuspec" -properties version=$(DREAMVERSION)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">
@@ -386,7 +466,7 @@ $(SolutionDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Dre
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;$(SolutionDir)$(Platform)\Release\DreamOS.lib;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\LibOVRPlatform64_1.lib;Xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;d3d11.lib;wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;Xinput.lib;XAudio2.lib;HrtfApo.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\builtin_audio_encoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g711\audio_decoder_g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\g722\audio_decoder_g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\ilbc\audio_decoder_ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\isac\audio_decoder_isac_float.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\L16\audio_decoder_L16.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\api\audio_codecs\opus\audio_decoder_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\media\rtc_audio_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\modules\audio_processing\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_reader.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_writer.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\jsoncpp\json_value.obj;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\pc\peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\rtc_base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\OCULUS\v1.12.0\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef.dll.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;$(ProjectDir)..\..\..\External\Freetype\freetype-2.8\objs\vc2010\x64\freetype28MT.lib;$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.lib;$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImagePlus.lib;$(SolutionDir)$(Platform)\Release\DreamOS.lib;$(ProjectDir)..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\LibOVRPlatform64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -411,8 +491,7 @@ xcopy /y "$(ProjectDir)..\DreamCef\src\DreamCEFExtension.js" "$(TargetDir)" /D
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assimp-vc140-mt.dll" "$(TargetDir)" 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
 
-$(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.development.nuspec" -properties version=$(DREAMVERSION)
-$(SolutionDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify DreamDev.$(DREAMVERSION).nupkg -r DevReleases</Command>
+$(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.development.nuspec" -properties version=$(DREAMVERSION)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -545,6 +624,20 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OculusProduction|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -635,6 +728,9 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
   </ItemGroup>
   <ItemGroup>
     <None Include="..\DreamOS\DreamClient.development.nuspec" />
+    <None Include="..\DreamOS\DreamClient.oculus.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="..\DreamOS\DreamClient.production.nuspec" />
     <None Include="..\DreamOS\packages.config" />
     <None Include="PropertySheet.props" />

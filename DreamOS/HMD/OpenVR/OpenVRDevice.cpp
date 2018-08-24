@@ -1,3 +1,4 @@
+#ifndef OCULUS_PRODUCTION_BUILD
 #include "OpenVRDevice.h"
 
 #include "Sandbox/SandboxApp.h"
@@ -751,3 +752,4 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 
 	return viewMat;
 }
+#endif

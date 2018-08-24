@@ -8,8 +8,8 @@ using System.Windows;
 using Microsoft.Win32;
 using System.Diagnostics;
 
-using Squirrel;
-using NuGet;
+//using Squirrel;
+//using NuGet;
 
 namespace DreamLaunch {
 
@@ -102,7 +102,7 @@ namespace DreamLaunch {
             try {
                 if (m_mainWindow != null)
                     m_mainWindow.SetStatusText("Checking for Update");
-
+                /*
                 UpdateInfo updateInfo = await m_squirrelUpdateManager.CheckForUpdate();
                 
                 if((updateInfo.CurrentlyInstalledVersion == null) ||    // This could be if (updateInfo.ReleasesToApply.Any())  ?
@@ -177,7 +177,7 @@ namespace DreamLaunch {
 #else
             m_strReleasesURI = "https://dream-client-build-develop.s3-accelerate.amazonaws.com";
 #endif
-
+            /*
             if (m_squirrelUpdateManager == null) {
                 try {
                     if (m_mainWindow != null)
@@ -202,13 +202,13 @@ namespace DreamLaunch {
               onAppUninstall: HandleOnAppUninstall,
               onFirstRun: HandleOnFirstRun,
               onAppObsoleted: HandleOnAppObsoleted);
-
+             */
             return 0;
         }
 
         public string GetSquirrelRootAppDirectory() {
-            if (m_squirrelUpdateManager != null)
-                return m_squirrelUpdateManager.RootAppDirectory;
+            //if (m_squirrelUpdateManager != null)
+            //    return m_squirrelUpdateManager.RootAppDirectory;
 
             return null;
         }
@@ -221,7 +221,7 @@ namespace DreamLaunch {
         }
 
         private MainWindow m_mainWindow = null;
-        private UpdateManager m_squirrelUpdateManager = null;
+        //private UpdateManager m_squirrelUpdateManager = null;
         private string m_strReleasesURI = null;
         private string m_strVersion = null;
         private bool m_fFirstRun = false;

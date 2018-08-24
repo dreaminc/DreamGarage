@@ -1,3 +1,5 @@
+#ifndef OCULUS_PRODUCTION_BUILD
+
 #include "OpenVRHMDSinkNode.h"
 #include "OpenVRDevice.h"
 
@@ -159,3 +161,4 @@ RESULT OpenVRHMDSinkNode::SubmitFrame() {
 //Error:
 	return r;
 }
+#endif

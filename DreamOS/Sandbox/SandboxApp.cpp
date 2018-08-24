@@ -5,7 +5,10 @@
 
 #include "Primitives/ray.h"
 
-#include <HMD/OpenVR/OpenVRDevice.h>
+#ifndef OCULUS_PRODUCTION_BUILD
+	#include <HMD/OpenVR/OpenVRDevice.h>
+#endif
+
 #include <HMD/Oculus/OVR.h>
 
 

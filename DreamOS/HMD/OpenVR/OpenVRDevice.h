@@ -9,7 +9,7 @@
 // Personally not a fan of this architecture, as it plugs into the SteamVR eco-system only, so it's not possible
 // to use the headset stand alone - but it allows maxiumum flexibility in using Dream across Oculus/Steam regardless
 // of the headset being used
-
+#ifndef OCULUS_PRODUCTION_BUILD
 #include <openvr.h>
 
 // TODO: Should this go into Sense?
@@ -121,5 +121,5 @@ public:
 private:
 	OpenVRHMDSinkNode *m_pOpenVRHMDSinkNode = nullptr;
 };
-
+#endif
 #endif // ! OPENVR_DEVICE_H_

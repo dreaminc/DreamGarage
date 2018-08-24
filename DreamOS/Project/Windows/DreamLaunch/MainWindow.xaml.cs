@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Squirrel;
+//using Squirrel;
 
 namespace DreamLaunch {
 
