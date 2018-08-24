@@ -37,6 +37,9 @@ RESULT UISpatialScrollView::Initialize() {
 //	m_pDreamOS->AddObjectToUIGraph(this);
 //	m_pDreamOS->AddObjectToUIClippingGraph(this);
 
+	// TODO: derived from DreamUserControlArea
+	//SetPosition(point(0.0f, 0.0f, 0.1f));
+
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
 	//m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());

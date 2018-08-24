@@ -648,6 +648,7 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
+	/*
 	if (m_fShouldUpdateMenuComposite) {
 		if (m_pDreamUIBar != nullptr) {
 			m_pDreamUIBar->ResetAppComposite();
@@ -655,8 +656,8 @@ RESULT DreamGarage::Update(void) {
 		}
 	}
 
+	//*
 	// TODO: use the DreamUserControlArea
-	/*
 	if (m_fShouldUpdateAppComposites) {
 		//m_pDreamUserControlArea->ResetAppComposite();
 
@@ -751,6 +752,10 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
+		
+		if (m_pDreamUserControlArea != nullptr) {
+			m_pDreamUserControlArea->ResetAppComposite();
+		}
 		m_fShouldUpdateAppComposites = true;
 	}
 

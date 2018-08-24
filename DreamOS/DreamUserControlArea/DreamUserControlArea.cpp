@@ -82,7 +82,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
-		//m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
 
 		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
@@ -198,12 +197,6 @@ RESULT DreamUserControlArea::SetViewHeight(float height) {
 	m_pDreamUserApp->m_pAppBasis->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
 	m_pDreamUserApp->GetComposite()->SetPosition(m_pDreamUserApp->m_pAppBasis->GetPosition());
 
-	/*
-	if (m_pDreamUIBar != nullptr) {
-		m_pDreamUIBar->ResetAppComposite();
-	}
-	//*/
-
 	return R_PASS;
 }
 
@@ -301,7 +294,6 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CR(Hide());
 		CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
 		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
-		ResetAppComposite();
 	} break;
 
 	case ControlEventType::CLOSE: {
@@ -825,7 +817,6 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 	pRenderContext->SetOrientation(qOrigin);
 	//*/
 
-//	CR(m_pDreamUserApp->ResetAppComposite());
 	CR(m_pDreamUIBar->ResetAppComposite());
 
 
@@ -1027,14 +1018,12 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
 
-			ResetAppComposite();	
 		}
 		
 		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
 			Hide();
 			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
-			ResetAppComposite();
 		}
 
 		else {	// Pressing back when Menu has a level saved

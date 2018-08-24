@@ -91,7 +91,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
-	m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
+	//m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
+	m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUISpatialScrollView();
@@ -229,7 +230,7 @@ RESULT DreamUIBar::ResetAppComposite() {
 		//qOrigin = m_pParentApp->GetComposite()->GetOrientation(true);
 	}
 	
-	GetComposite()->SetPosition(ptOrigin + point(0.0f, -0.2f, 0.0f));
+	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);
@@ -943,6 +944,10 @@ bool DreamUIBar::IsEmpty() {
 		fEmpty = true;
 	}
 	return fEmpty;
+}
+
+RESULT DreamUIBar::ShouldUpdateMenuShader() {
+	m_fShouldResetShader = true;
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {
