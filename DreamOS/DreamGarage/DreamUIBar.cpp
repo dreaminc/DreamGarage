@@ -220,16 +220,16 @@ RESULT DreamUIBar::ResetAppComposite() {
 	}
 
 	if (m_pUserHandle != nullptr) {
-	//	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
 	}
 	//*/
 	if (m_pParentApp != nullptr) {
-		ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
+		//ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
 		//qOrigin = m_pParentApp->GetComposite()->GetOrientation(true);
 	}
 	
-	GetComposite()->SetPosition(ptOrigin);
+	GetComposite()->SetPosition(ptOrigin + point(0.0f, -0.2f, 0.0f));
 	GetComposite()->SetOrientation(qOrigin);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);

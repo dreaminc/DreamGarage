@@ -82,6 +82,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		// DreamUserApp can call Update Composite in certain situations and automatically update the other apps
 		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+		//m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
 
 		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);

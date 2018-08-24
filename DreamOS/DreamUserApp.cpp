@@ -935,7 +935,7 @@ RESULT DreamUserApp::GetSettingsRelativeHeightAndDepth(float& height, float& dep
 		
 		depth = vDiff.magnitude();
 
-		height = GetComposite()->GetPosition(true).y() - ptCamera.y();
+		height = GetComposite()->GetPosition(true).y();
 		//vector vDiff = depthDiff * vAppLookXZ;
 	}
 

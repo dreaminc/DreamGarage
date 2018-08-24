@@ -656,6 +656,7 @@ RESULT DreamGarage::Update(void) {
 	}
 
 	// TODO: use the DreamUserControlArea
+	/*
 	if (m_fShouldUpdateAppComposites) {
 		//m_pDreamUserControlArea->ResetAppComposite();
 
@@ -667,6 +668,7 @@ RESULT DreamGarage::Update(void) {
 			m_pDreamUserApp->UpdateDepth(0.0f);
 		}
 	}
+	//*/
 
 Error:
 	return r;
