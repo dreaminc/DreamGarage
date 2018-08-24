@@ -699,8 +699,8 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
 		//pCamera->SetHMDAdjustedPosition(ptSeatPosition);
-		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
+		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
 	}
 
 	//CR(m_pDreamUIBar->ResetAppComposite());

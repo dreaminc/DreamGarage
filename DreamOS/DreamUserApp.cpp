@@ -686,8 +686,8 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	stereocamera *pCamera = GetDOS()->GetCamera();
 
 	vector vDiff = GetDepthVector();
-	//point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f));
-	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f) + vDiff);
+	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f));
+	//point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f) + vDiff);
 
 	m_pAppBasis->SetPosition(ptComposite);
 	GetComposite()->SetPosition(ptComposite);
