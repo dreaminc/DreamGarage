@@ -336,7 +336,8 @@ RESULT DreamGarage::LoadScene() {
 	SetHALConfiguration(halconf);
 	//*/
 
-	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this);
+	// Environment App is rendered directly by the environment program node
+	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this, false);
 	CN(m_pDreamEnvironmentApp);
 
 	CNM(m_pDreamEnvironmentApp, "Dream Environment App not set");
