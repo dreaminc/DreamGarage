@@ -436,8 +436,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
-		
-		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+		if (m_pDreamEnvironmentApp != nullptr) {	
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 		}
 	}
@@ -649,13 +648,6 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	// TODO: use the DreamUserControlArea
-	if (m_fShouldUpdateAppComposites) {
-		m_pDreamUserControlArea->ResetAppComposite();
-
-		m_fShouldUpdateAppComposites = false;
-	}
-
 Error:
 	return r;
 }
@@ -667,17 +659,24 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 	point ptSeatPosition;
 	quaternion qOffset;
+	quaternion qUIOffset;
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
+	qUIOffset = m_pDreamEnvironmentApp->GetUIOffsetOrientation(seatingPosition);
+
+	CN(m_pDreamUserApp);
+	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset*qUIOffset));
 
 	if (!pCamera->HasHMD()) {
 		pCamera->SetOrientation(qOffset);
 		pCamera->SetPosition(ptSeatPosition);
+		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
-		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
+		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
+		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
 	}
 
 Error:
@@ -715,21 +714,23 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 	RESULT r = R_PASS;
 
 	if (!m_fSeated) {
+		//*
 		point ptScreenPosition;
 		quaternion qScreenRotation;
 		float screenScale;
-
-		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
-		//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE));
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
+		//*/
 
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
-		m_fShouldUpdateAppComposites = true;
+		
+		if (m_pDreamUserControlArea != nullptr) {
+			m_pDreamUserControlArea->ResetAppComposite();
+		}
 	}
 
 Error:
@@ -758,7 +759,6 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		CR(SetRoundtablePosition(localSeatingPosition));
 
 		m_fSeated = true;
-		m_fShouldUpdateAppComposites = true;
 	}
 	//*/
 
@@ -1015,6 +1015,13 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
 		m_pDreamUserControlArea->OnDreamFormSuccess();
+		if (strMessage == "DreamSettingsApp.OnSuccess") {
+			float height; 
+			float depth;
+
+			m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth);
+			m_pUserController->SetSettings(m_strAccessToken, height, depth, m_pDreamUserApp->GetScale());
+		}
 	}
 	else {
 		if (strMessage == "DreamSettingsApp.OnSuccess") {
@@ -1043,12 +1050,20 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 		else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
 			//else if (strMessage == "DreamLoginApp.OnSuccess") {
 			m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
+
+			float height;
+			float depth;
+			CR(m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth));
+
 			CR(m_pDreamLoginApp->SetLaunchDate());
 
 			CR(m_pUserController->SetSettings(m_strAccessToken,
-				m_pDreamUserApp->GetHeight(),
-				m_pDreamUserApp->GetDepth(),
+				height,
+				depth,
 				m_pDreamUserApp->GetScale()));	
+
+			m_pDreamUserApp->SetHeight(height);
+			m_pDreamUserApp->SetDepth(depth);
 
 			// TODO: potentially where the lobby environment changes to the team environment
 			// could also be once the environment id is set
@@ -1068,7 +1083,7 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamUserApp->UpdateHeight(height));
-	CR(m_pDreamUserApp->UpdateDepth(depth));
+	CR(m_pDreamUserApp->SetDepth(depth));
 	CR(m_pDreamUserApp->UpdateScale(scale));
 
 Error:
@@ -1137,7 +1152,6 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 		CR(m_pDreamSettings->Show());
-		//m_pDreamUserApp->ResetAppComposite();
 	}
 	// the behavior of sign in, sign up, and teams create should be executed the same
 	// way with regards to the functions that they use

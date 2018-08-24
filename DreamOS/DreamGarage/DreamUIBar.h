@@ -131,6 +131,8 @@ public:
 	RESULT UpdateWidth(float totalWidth);
 	bool IsEmpty();
 
+	RESULT ShouldUpdateMenuShader();
+
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -182,6 +184,7 @@ private:
 
 	bool m_fWaitingForMenuResponse = false;
 	bool m_fAddNewMenuItems = false;
+	bool m_fShouldResetShader = false;
 
 	MenuState m_menuState = MenuState::NONE;
 

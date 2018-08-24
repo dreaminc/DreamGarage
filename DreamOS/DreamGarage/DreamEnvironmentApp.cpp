@@ -295,3 +295,32 @@ RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& p
 Error:
 	return r;
 }
+
+quaternion DreamEnvironmentApp::GetUIOffsetOrientation(int seatIndex) {
+	RESULT r = R_PASS;
+
+	float angle;
+	float offsetAngle = 90.0f * (float)M_PI / 180.0f;
+	switch (seatIndex) {
+	case 0: {
+		angle = 2.0f * (m_frontAngle - offsetAngle);
+	} break;
+	case 1: {
+		angle = -2.0f * (m_frontAngle - offsetAngle);
+	} break;
+	case 2: {
+		angle = 2.0f * (m_middleAngle - offsetAngle);
+	} break;
+	case 3: {
+		angle = -2.0f * (m_middleAngle - offsetAngle);
+	} break;
+	case 4: {
+		angle = 2.0f * (m_backAngle - offsetAngle);
+	} break;
+	case 5: {
+		angle = -2.0f * (m_backAngle - offsetAngle);
+	} break;
+	}
+
+	return quaternion::MakeQuaternionWithEuler(0.0f, angle, 0.0f);
+}

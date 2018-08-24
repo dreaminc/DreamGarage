@@ -106,7 +106,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
-		//GetComposite()->SetPosition(GetComposite()->GetPosition());// +point(currentCenter - totalCenter, 0.0f, 0.0f));
 		
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
@@ -126,7 +125,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	//m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
 	//m_pDreamUserApp->GetAppBasisOrientation(qOrigin);
 
-	//GetComposite()->SetPosition(ptOrigin);
 	//GetComposite()->SetOrientation(qOrigin);
 
 	//TODO: change this to a UISurface
@@ -195,14 +193,9 @@ float DreamUserControlArea::GetBaseWidth() {
 RESULT DreamUserControlArea::SetViewHeight(float height) {
 
 	point ptOrigin = m_pDreamUserApp->m_pAppBasis->GetPosition();
-	//point ptOrigin = m_pDreamUserApp->GetComposite()->GetPosition();
-	//m_pDreamUserApp->GetComposite()->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
+	//point ptOrigin = m_pDreamUserApp->GetComposite()->GetPosition();//
 	m_pDreamUserApp->m_pAppBasis->SetPosition(point(ptOrigin.x(), height, ptOrigin.z()));
 	m_pDreamUserApp->GetComposite()->SetPosition(m_pDreamUserApp->m_pAppBasis->GetPosition());
-
-	if (m_pDreamUIBar != nullptr) {
-		m_pDreamUIBar->ResetAppComposite();
-	}
 
 	return R_PASS;
 }
@@ -301,7 +294,6 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CR(Hide());
 		CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
 		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
-		ResetAppComposite();
 	} break;
 
 	case ControlEventType::CLOSE: {
@@ -825,7 +817,6 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 	pRenderContext->SetOrientation(qOrigin);
 	//*/
 
-	CR(m_pDreamUserApp->ResetAppComposite());
 	CR(m_pDreamUIBar->ResetAppComposite());
 
 
@@ -1027,14 +1018,12 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
 
-			ResetAppComposite();	
 		}
 		
 		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
 			Hide();
 			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
-			ResetAppComposite();
 		}
 
 		else {	// Pressing back when Menu has a level saved
