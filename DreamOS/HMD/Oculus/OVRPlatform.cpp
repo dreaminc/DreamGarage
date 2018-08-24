@@ -18,7 +18,7 @@ RESULT OVRPlatform::InitializePlatform() {
 	// Exit if failed.  Initialization failed which means either the oculus service isn’t on the machine or they’ve hacked their DLL
 	CBM(ovr_PlatformInitializeWindows(m_pszappID) == ovrPlatformInitialize_Success, "Failed to initialize Oculus Platform, check if service is running");
 	
-#ifdef PRODUCTION_BUILD
+#ifdef OCULUS_PRODUCTION_BUILD
 	// Fails/succeeds asynchronously - will send a message to handle in Update()
 	ovr_Entitlement_GetIsViewerEntitled();
 #endif

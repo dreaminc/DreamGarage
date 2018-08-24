@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DreamOculus</id>
+    <version>$version$</version>
+    <title>DreamOculus</title>
+    <authors>Dream Garage, Incorporated</authors>
+    <owners>Dream Garage, Incorporated</owners>
+    <description>DreamOculus</description>
+    <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>-->
+    <projectUrl>https://www.dreamos.com</projectUrl>
+    <iconUrl>https://github.com/dreaminc/Dream/releases/download/Releases/Dream.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+
+    <!--<dependencies></dependencies>-->
+
+    <releaseNotes>
+      Version $version$
+
+      This is a test of the deplopyment system
+    </releaseNotes>
+    
+    <copyright>Copyright 2017</copyright>
+    <tags>native, dreamos</tags>
+  </metadata>
+  <files>
+    <file src="x64\OculusProduction\*.exe" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.lib" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.dll" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.bin" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.dat" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.pak" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.js" target="\DreamOS\src\" />
+
+    <file src=".\..\..\..\dreampaths.txt" target="\DreamOS\src\dreampaths.txt" />
+    <file src=".\..\..\..\HAL\**" target="\DreamOS\src\HAL\" />
+    <file src=".\..\..\..\Models\**" target="\DreamOS\src\Models\" />
+    <file src=".\..\..\..\Resources\**" target="\DreamOS\src\Resources\" />
+    <file src=".\..\..\..\Texture\**" target="\DreamOS\src\Texture\" />
+
+    <file src=".\..\..\..\distribution\*" target="\DreamOS\src\" />
+
+    <file src="x64\OculusProduction\locales\**" target="\DreamOS\src\locales\" />
+
+    <file src="DreamOS.targets" target="\DreamOS\build\DreamOS.targets" />
+  </files>
+</package>

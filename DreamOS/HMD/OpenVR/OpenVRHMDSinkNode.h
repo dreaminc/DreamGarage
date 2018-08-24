@@ -10,6 +10,8 @@
 #include "HMD/HMD.h"
 #include "HMD/HMDSinkNode.h"
 
+#ifndef OCULUS_PRODUCTION_BUILD
+
 // Include the Oculus SDK
 #include <openvr.h>
 
@@ -48,6 +50,6 @@ private:
 	bool m_fVblank;
 	bool m_fGlFinishHack;
 };
-
+#endif
 
 #endif	// ! OPENVR_HMD_SINK_NODE_H_

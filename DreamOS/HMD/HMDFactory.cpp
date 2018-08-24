@@ -1,7 +1,10 @@
 #include "HMDFactory.h"
 
 #include "HMD\Oculus\OVR.h"
-#include "HMD\OpenVR\OpenVRDevice.h"
+
+#ifndef OCULUS_PRODUCTION_BUILD
+	#include "HMD\OpenVR\OpenVRDevice.h"
+#endif
 
 // TODO: Sandbox might be enough, don't need to pass HAL as well
 HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth, int wndHeight) {
@@ -16,9 +19,11 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 		} break;
 
 		case HMD_OPENVR: {
+#ifndef OCULUS_PRODUCTION_BUILD
 			pHMD = new OpenVRDevice(pParentSandbox);
 			CN(pHMD);
 			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight), "Failed to initialize HMD!");
+#endif
 		} break;
 
 		case HMD_ANY_AVAILABLE: {
@@ -37,6 +42,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 				}
 			}
 
+#ifndef OCULUS_PRODUCTION_BUILD
 			// OPENVR Second
 			CB((pHMD == nullptr));
 			pHMD = new OpenVRDevice(pParentSandbox);
@@ -51,7 +57,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 					pHMD = nullptr;
 				}
 			}
-			
+#endif
 			CBM((false), "Failed to find an available HMD");
 
 		} break;

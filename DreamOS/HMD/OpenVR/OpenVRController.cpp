@@ -1,3 +1,4 @@
+#ifndef OCULUS_PRODUCTION_BUILD
 #include "OpenVRController.h"
 #include "Core/Utilities.h"
 
@@ -55,4 +56,4 @@ RESULT OpenVRController::SubmitHapticBuffer(ControllerType controllerType, Hapti
 	return SubmitHapticImpulse(controllerType, SenseController::HapticCurveType::INVALID, 1.0f, msDuration);
 }
 
-
+#endif
