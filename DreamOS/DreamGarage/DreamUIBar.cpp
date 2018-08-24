@@ -91,7 +91,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
-	m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
+	//m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
+	m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUISpatialScrollView();
@@ -209,13 +210,23 @@ RESULT DreamUIBar::ResetAppComposite() {
 	quaternion qOrigin;
 	vector vCameraToMenu;
 	//*
+	if(m_pUserHandle == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
+		CB(userUIDs.size() == 1);
+		m_userUID = userUIDs[0];
+
+		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
+		CN(m_pUserHandle)
+	}
+
 	if (m_pUserHandle != nullptr) {
-	//	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
+		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
 		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
 	}
 	//*/
 	if (m_pParentApp != nullptr) {
-		ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
+		//ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
 		//qOrigin = m_pParentApp->GetComposite()->GetOrientation(true);
 	}
 	
@@ -223,12 +234,19 @@ RESULT DreamUIBar::ResetAppComposite() {
 	GetComposite()->SetOrientation(qOrigin);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);
-	vCameraToMenu = GetComposite()->GetPosition(true) - GetDOS()->GetCameraPosition();
-	vCameraToMenu.y() = 0.0f;
-	vCameraToMenu.Normalize();
+
+	{
+		// Set shader orientation based on seating direction		
+		RotationMatrix matLook = RotationMatrix(qOrigin);
+		vector vAppLook;
+		vector vAppLookXZ;
+		vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+		vAppLook.Normalize();
+		vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+		m_pUIStageProgram->SetOriginDirection(vAppLookXZ);
+	}
 
 	m_pUIStageProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
-	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
 
 Error:
 	return r;
@@ -261,10 +279,6 @@ RESULT DreamUIBar::ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite) {
 	m_pMenuControllerProxy->RequestSubMenu(m_pathStack.top()->GetScope() , m_pathStack.top()->GetPath(), m_pathStack.top()->GetTitle());
 	
 	RequestIconFile(m_pathStack.top());
-
-	if (fResetComposite) {
-		CR(ResetAppComposite());
-	}
 
 Error:
 	return r;
@@ -931,6 +945,10 @@ bool DreamUIBar::IsEmpty() {
 		fEmpty = true;
 	}
 	return fEmpty;
+}
+
+RESULT DreamUIBar::ShouldUpdateMenuShader() {
+	m_fShouldResetShader = true;
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {

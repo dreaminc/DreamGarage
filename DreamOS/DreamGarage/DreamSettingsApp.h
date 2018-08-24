@@ -39,8 +39,14 @@ public:
 public:
 	std::string GetSuccessString();
 
+private:
+	RESULT SetInitialSettingsValues();
+
 public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	
+	// handles settings cancellation
+	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
 private:
 
@@ -52,6 +58,13 @@ private:
 	bool m_fRightTriggerDown = false;
 
 	bool m_fPendShowFormView = false;
+
+	// initial settings - when the user is logged in and presses back to cancel,
+	// the settings should not be saved
+private:
+	float m_initialHeight;
+	float m_initialDepth;
+	float m_initialScale;
 };
 
 #endif // ! DREAM_SETTINGS_APP_H_
