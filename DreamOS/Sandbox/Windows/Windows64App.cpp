@@ -44,7 +44,11 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 			title = title.substr(title.find_last_of(L"/\\") + 1);
 	}
 
-	title = L"Dream " + title;
+	size_t position = 0;
+	std::wstring delimiter = L".";
+	if (position = title.find(delimiter) != std::wstring::npos) {
+		m_wstrVersion = title.substr(position, title.size());
+	}
 
 	m_hInstance = GetModuleHandle(0);
 

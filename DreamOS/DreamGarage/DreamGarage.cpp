@@ -443,8 +443,14 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 
 	// Initial step of login flow:
+	if (m_pSandbox->GetDreamVersion().compare(L"0.4.20") != 0) {
+		if (m_pDreamEnvironmentApp != nullptr) {
+			CR(m_pDreamEnvironmentApp->);
+		}
+	}
+
 	// if there has already been a successful login, try to authenticate
-	if (!m_fFirstLogin && m_fHasCredentials) {
+	else if (!m_fFirstLogin && m_fHasCredentials) {
 		m_pUserController->GetAccessToken(m_strRefreshToken);
 	}
 	else {
