@@ -437,7 +437,6 @@ RESULT DreamGarage::DidFinishLoading() {
 		CR(m_pUserController->GetFormURL(strFormType));
 		if (m_pDreamEnvironmentApp != nullptr) {	
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
-			m_fShouldUpdateAppComposites = true;
 		}
 	}
 	
@@ -648,29 +647,6 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	/*
-	if (m_fShouldUpdateMenuComposite) {
-		if (m_pDreamUIBar != nullptr) {
-			m_pDreamUIBar->ResetAppComposite();
-			m_fShouldUpdateMenuComposite = false;
-		}
-	}
-
-	//*
-	// TODO: use the DreamUserControlArea
-	if (m_fShouldUpdateAppComposites) {
-		//m_pDreamUserControlArea->ResetAppComposite();
-
-		m_fShouldUpdateAppComposites = false;
-		
-		auto pHMD = GetHMD();
-		if (pHMD != nullptr) {
-			m_pDreamUserApp->UpdateHeight(pHMD->GetHeadPointOrigin().y());
-			m_pDreamUserApp->UpdateDepth(0.0f);
-		}
-	}
-	//*/
-
 Error:
 	return r;
 }
@@ -682,14 +658,14 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 	point ptSeatPosition;
 	quaternion qOffset;
-	quaternion qOffset2;// = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
+	quaternion qUIOffset;
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
-	qOffset2 = quaternion::MakeQuaternionWithEuler(0.0f, m_pDreamEnvironmentApp->GetUIOffsetOrientation(seatingPosition) * (float)M_PI / 180.0f, 0.0f);
+	qUIOffset = m_pDreamEnvironmentApp->GetUIOffsetOrientation(seatingPosition);
 
 	CN(m_pDreamUserApp);
-	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset*qOffset2));
+	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset*qUIOffset));
 
 	if (!pCamera->HasHMD()) {
 		pCamera->SetOrientation(qOffset);
@@ -698,13 +674,9 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
-		//pCamera->SetHMDAdjustedPosition(ptSeatPosition);
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
 	}
-
-	//CR(m_pDreamUIBar->ResetAppComposite());
-	m_fShouldUpdateMenuComposite = true;
 
 Error:
 	return r;
@@ -758,7 +730,6 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		if (m_pDreamUserControlArea != nullptr) {
 			m_pDreamUserControlArea->ResetAppComposite();
 		}
-		m_fShouldUpdateAppComposites = true;
 	}
 
 Error:
@@ -787,7 +758,6 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeerApp *pDreamPeer) {
 		CR(SetRoundtablePosition(localSeatingPosition));
 
 		m_fSeated = true;
-		m_fShouldUpdateAppComposites = true;
 	}
 	//*/
 
@@ -1196,8 +1166,6 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	//	m_pDreamSettings->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamSettings->UpdateWithNewForm(strURL));
 		CR(m_pDreamSettings->Show());
-		//m_pDreamUserApp->ResetAppComposite();
-		//m_pDreamUIBar->ResetAppComposite();
 	}
 	// the behavior of sign in, sign up, and teams create should be executed the same
 	// way with regards to the functions that they use

@@ -158,8 +158,6 @@ private:
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
 
-	bool m_fShouldUpdateAppComposites = false;
-	bool m_fShouldUpdateMenuComposite = false;
 
 	long m_pendingAssetReceiveUserID = -1;
 

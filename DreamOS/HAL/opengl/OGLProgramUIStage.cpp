@@ -112,7 +112,6 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 		m_pOGLFramebuffer->Bind();	
 	}
 
-	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 
 	SetLights(pLights);

@@ -938,17 +938,13 @@ RESULT DreamUserApp::GetSettingsRelativeHeightAndDepth(float& height, float& dep
 	if (pHMD != nullptr) {
 
 
-		//pHMD->GetPosition()
-		//point ptHMD = pHMD->GetHeadPointOrigin();
 		point ptCamera = GetDOS()->GetCamera()->GetEyePosition(EYE_MONO) + pHMD->GetHeadPointOrigin();
 		point ptComposite = GetComposite()->GetPosition(true);
-		//vector vDiff = vector(ptHMD.x(), 0.0f, ptHMD.z());
 		vector vDiff = vector(ptCamera.x() - ptComposite.x(), 0.0f, ptCamera.z() - ptComposite.z());
 		
 		depth = vDiff.magnitude();
 
 		height = GetComposite()->GetPosition(true).y();
-		//vector vDiff = depthDiff * vAppLookXZ;
 	}
 
 	return R_PASS;

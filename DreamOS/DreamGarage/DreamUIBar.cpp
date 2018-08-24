@@ -280,12 +280,6 @@ RESULT DreamUIBar::ShowMenuLevel(MenuLevel menuLevel, bool fResetComposite) {
 	
 	RequestIconFile(m_pathStack.top());
 
-	/*
-	if (fResetComposite) {
-		CR(ResetAppComposite());
-	}
-	//*/
-
 Error:
 	return r;
 }
