@@ -11,6 +11,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
 
+#include "Scene/ObjectStoreNode.h"
+
 DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamEnvironmentApp>(pDreamOS, pContext)
 {
@@ -26,6 +28,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	m_directionalIntensity = 2.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
+	HMD *pHMD = nullptr;
+	bool fShowModels = true;
 
 	//TODO: way to change environment after initialization
 	std::string strEnvironmentPath = "default";
@@ -44,22 +48,27 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	//pDirectionalLight->EnableShadows();
 
-	// TODO: this logic needs to go into DreamEnvironmentApp
-	bool fShowModels = true;
-	auto pHMD = pDreamOS->GetHMD();
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+	CB(m_pSceneGraph->incRefCount());
+	
+	pHMD = pDreamOS->GetHMD();
 
 	if (pHMD != nullptr) {
 		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
 			fShowModels = false;
 		}
 	}
-#ifdef _DEBUG
-	fShowModels = false;
-#endif
+//#ifdef _DEBUG
+//	fShowModels = false;
+//#endif
 
 	if (fShowModels) {
 		CR(LoadAllEnvironments());
 	}
+
+	// TODO: Add a way to connect a program composite directly to node (composite node?)
+	CR(m_pSceneGraph->PushObject(GetComposite()));
 
 Error:
 	return r;

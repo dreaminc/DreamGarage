@@ -38,7 +38,7 @@ layout (location = 0) out vec4 out_vec4Color;
 uniform vec4 u_vec4ClippingPlane;
 
 void main(void) {  
-		// Clip fragments on our side of the plane
+	// Clip fragments on our side of the plane
 	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ClippingPlane.xyz)) + u_vec4ClippingPlane.w;
     if (fragmentClipPosition < 0.0) {
 		discard;

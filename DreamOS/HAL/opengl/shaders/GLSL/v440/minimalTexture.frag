@@ -4,38 +4,22 @@
 // This is a minimal texture shader that simply displays
 // a vertex color and position (no lighting)
 
-#version 440 core
-
 in Data {
 	vec4 color;
 	vec2 uvCoord;
+	vec4 vertWorldSpace;
+	float vertDepth;
 } DataIn;
 
 uniform bool	u_hasTextureColor;
 uniform sampler2D u_textureColor;
 
-struct Material {
-	float m_shine;
-	float m_bumpiness;
-	float m_ambient;
-	float reserved3;
-	vec4 m_colorAmbient;
-	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular;
-	float m_tilingU;
-	float m_tilingV;
-	float reserved1;
-	float reserved2;
-};
-
-layout(std140) uniform ub_material {
-    Material material;
-};
-
 layout (location = 0) out vec4 out_vec4Color;
 
 //vec4 g_ambient = vec4(0.05f);
 vec4 g_ambient = vec4(0.0f);
+
+uniform mat4 u_mat4View;
 
 void main(void) {  
 	vec4 textureColor = vec4(1.0f);
@@ -46,7 +30,15 @@ void main(void) {
 		textureColor = DataIn.color;
 	}
 
-	out_vec4Color = material.m_colorDiffuse * textureColor + g_ambient;
-	//out_vec4Color = material.m_colorDiffuse;
-	//out_vec4Color = DataIn.color * textureColor + g_ambient;
+	// Might want to pop this up to client
+	FogConfiguration fogConfig = {
+		50.0f,
+		300.0f,
+		0.05f,
+		vec3(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f)
+	};
+	
+	vec4 shaderColor = material.m_colorDiffuse * textureColor + g_ambient;
+
+	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth, fogConfig);
 }

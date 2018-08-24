@@ -15,6 +15,7 @@ class SkyboxScatterProgram;
 //TODO: move to proxy?
 class OGLProgramScreenFade;
 class user;
+class ObjectStoreNode;
 
 namespace environment {
 	typedef enum type {
@@ -56,6 +57,10 @@ public:
 
 	RESULT SwitchToEnvironment(environment::type type);
 	RESULT GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale);
+
+	ObjectStoreNode *GetSceneGraphNode() {
+		return m_pSceneGraph;
+	}
 
 private:
 	point m_ptSceneOffset;
@@ -104,6 +109,8 @@ private:
 
 	int m_maxSeatingIndex = 6;
 
+private:
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 };
 
 #endif // ! DREAM_ENVIRONMENT_H_

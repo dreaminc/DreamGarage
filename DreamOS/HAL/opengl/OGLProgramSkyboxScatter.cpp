@@ -154,6 +154,7 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
+	// TODO: Replace with a static volume here
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
 
