@@ -15,7 +15,7 @@ typedef enum {
 
 class SoundClientFactory {
 public:
-	static SoundClient* MakeSoundClient(SOUND_CLIENT_TYPE type);
+	static SoundClient* MakeSoundClient(SOUND_CLIENT_TYPE type, std::wstring *pwstrOptAudioOutputGUID = nullptr);
 };
 
 #endif // ! SOUND_CLIENT_FACTORY_H_

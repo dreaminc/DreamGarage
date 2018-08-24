@@ -22,7 +22,7 @@ class vector;
 class XAudio2SoundClient : public SoundClient {
 
 public:
-	XAudio2SoundClient();
+	XAudio2SoundClient(std::wstring *pwstrOptAudioOutputGUID = nullptr);
 	~XAudio2SoundClient();
 
 	virtual RESULT Initialize() override;
@@ -44,7 +44,6 @@ private:
 	//RESULT InitializeSpatialAudioClient();
 
 private:
-
 	//RESULT PrintWaveFormat(WAVEFORMATEX *pWaveFormatX, std::string strInfo = "default");
 
 private:

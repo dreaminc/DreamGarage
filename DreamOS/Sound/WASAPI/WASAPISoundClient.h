@@ -27,7 +27,7 @@
 class WASAPISoundClient : public SoundClient {
 
 public:
-	WASAPISoundClient();
+	WASAPISoundClient(std::wstring *pwstrOptAudioOutputGUID = nullptr);
 	~WASAPISoundClient();
 
 	virtual RESULT Initialize() override;
@@ -35,6 +35,8 @@ public:
 	virtual RESULT AudioRenderProcess() override;
 	virtual RESULT AudioCaptureProcess() override;
 	virtual RESULT AudioSpatialProcess() override;
+
+	virtual std::wstring GetDeviceIDFromDeviceID(std::wstring wstrDeviceOutGUID) override;
 
 private:
 	RESULT InitializeRenderAudioClient();

@@ -71,6 +71,10 @@ private:
 
 	HMD *m_pHMD = nullptr;
 	DreamSoundSystem::observer *m_pObserver = nullptr;
+
+private:	
+	std::shared_ptr<SpatialSoundObject> m_pTestSpatialSoundObject = nullptr;
+	std::shared_ptr<SoundFile> m_pSoundFile = nullptr;
 };
 
 #endif // ! DREAM_SOUND_SYSTEM_H_

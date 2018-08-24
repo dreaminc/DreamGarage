@@ -10,7 +10,9 @@
 
 #include "X3DSpatialSoundObject.h"
 
-XAudio2SoundClient::XAudio2SoundClient() {
+XAudio2SoundClient::XAudio2SoundClient(std::wstring *pwstrOptAudioOutputGUID) : 
+	SoundClient(pwstrOptAudioOutputGUID)
+{
 	// empty
 }
 
@@ -51,6 +53,7 @@ Error:
 	return r;
 }
 
+
 // TODO:
 RESULT XAudio2SoundClient::Initialize() {
 	RESULT r = R_PASS;
@@ -69,7 +72,15 @@ RESULT XAudio2SoundClient::Initialize() {
 
 	// Set up master voice
 	IXAudio2MasteringVoice* pXAudio2MasterVoice = nullptr;
-	CRM((RESULT)m_pXAudio2->CreateMasteringVoice(&pXAudio2MasterVoice, 2, 48000), "Failed to create XAudio2 Master Voice");
+	if (m_wstrAudioOutputDeviceGUID.compare(L"default") == 0) {
+		CRM((RESULT)m_pXAudio2->CreateMasteringVoice(&pXAudio2MasterVoice, 2, 48000), 
+			"Failed to create default XAudio2 Master Voice");
+	}
+	else {
+		CRM((RESULT)m_pXAudio2->CreateMasteringVoice(&pXAudio2MasterVoice, 2, 48000, NULL, m_wstrAudioOutputDeviceGUID.c_str()), 
+			"Failed to create XAudio2 Master Voice");
+	}
+
 	CNM(pXAudio2MasterVoice, "Failed to allocate XAudio2 master voice");
 	m_pXAudio2MasterVoice = std::shared_ptr<IXAudio2MasteringVoice>(pXAudio2MasterVoice);
 

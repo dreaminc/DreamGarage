@@ -75,7 +75,8 @@ class DreamOS :
 	public CloudController::PeerConnectionObserver,
 	public CloudController::EnvironmentObserver,
 	public CloudController::UserObserver,
-	public DreamPeerApp::DreamPeerAppObserver
+	public DreamPeerApp::DreamPeerAppObserver,
+	public DreamSoundSystem::observer
 {
 	friend class CloudTestSuite;
 	friend class DreamAppBase;
@@ -450,6 +451,11 @@ protected:
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);
 	RESULT UnregisterSoundSystemObserver();
+
+	// DreamSoundSystem::observer
+	virtual RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) override;
+
+public:
 	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);

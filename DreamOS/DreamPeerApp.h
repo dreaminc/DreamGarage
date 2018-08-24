@@ -31,6 +31,8 @@ class DreamOS;
 class user;
 class text;
 class font;
+class SpatialSoundObject;
+class AudioDataMessage;
 
 struct InteractionObjectEvent;
 
@@ -134,6 +136,8 @@ public:
 	RESULT UpdateMouth(float mouthScale);
 	RESULT RotateByDeg(float degX, float degY, float degZ);
 	
+	RESULT HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage);
+
 	RESULT SetUsernameAnimationDuration(float animationDuration);
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
@@ -148,6 +152,7 @@ private:
 	
 	DreamPeerApp::state m_state = DreamPeerApp::state::UNINITIALIZED;
 
+	std::shared_ptr<SpatialSoundObject> m_pSpatialSoundObject = nullptr;
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserModel = false;
 	bool m_fGazeInteraction = false;

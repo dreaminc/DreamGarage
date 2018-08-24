@@ -10,6 +10,9 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "UI/UIView.h"
 
+#include "Sound/SpatialSoundObject.h"
+#include "DreamGarage/AudioDataMessage.h"
+
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
 	m_pDOS(pDOS),
@@ -89,6 +92,11 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CR(GetComposite()->AddObject(m_pUserModel));
 
 		m_fPendingAssignedUserModel = false;
+	}
+
+	if (m_pSpatialSoundObject == nullptr) {
+		m_pSpatialSoundObject = GetDOS()->AddSpatialSoundObject(point(), vector(), vector());
+		CN(m_pSpatialSoundObject);
 	}
 
 	//if (m_pSphere == nullptr) {
@@ -493,6 +501,10 @@ RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	//m_pUserModel->GetHead()->SetPosition(ptPosition);
 	GetComposite()->SetPosition(ptPosition);
 
+	if (m_pSpatialSoundObject != nullptr) {
+		m_pSpatialSoundObject->SetPosition(ptPosition);
+	}
+
 Error:
 	return r;
 }
@@ -502,6 +514,10 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 
 	CN(m_pUserModel);
 	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+
+	if (m_pSpatialSoundObject != nullptr) {
+		m_pSpatialSoundObject->SetOrientation(qOrientation);
+	}
 
 Error:
 	return r;
@@ -514,6 +530,59 @@ RESULT DreamPeerApp::RotateByDeg(float degX, float degY, float degZ) {
 	//m_pUserModel->RotateByDeg(degX, degY, degZ);
 	m_pUserModel->GetHead()->RotateByDeg(degX, degY, degZ);
 	//GetComposite()->RotateByDeg(degX, degY, degZ);
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage) {
+	RESULT r = R_PASS;
+
+	int16_t *pAudioDataBuffer = (int16_t*)(pAudioDataMessage->GetAudioMessageBuffer());
+	CN(pAudioDataBuffer);
+
+	size_t numFrames = pAudioDataMessage->GetNumFrames();
+
+	// TODO: Handle channels?
+	size_t channels = pAudioDataMessage->GetNumChannels();
+
+	// Play
+	if (m_pSpatialSoundObject != nullptr) {
+
+		// Not sure if we need to allocate new memory here or not
+
+		int16_t *pInt16Soundbuffer = new int16_t[numFrames];
+		memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * numFrames);
+
+		if (pInt16Soundbuffer != nullptr) {
+			CR(m_pSpatialSoundObject->PushMonoAudioBuffer((int)numFrames, pInt16Soundbuffer));
+		}
+	}
+
+	// Mouth Position
+	/*
+	{
+		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
+		CN(pAudioBuffer);
+
+		size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
+		float averageAccumulator = 0.0f;
+
+		for (int i = 0; i < numSamples; ++i) {
+			//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
+			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
+			float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+
+			averageAccumulator += std::abs(scaledValue);
+		}
+
+		float mouthScale = averageAccumulator / numSamples;
+		mouthScale *= 10.0f;
+
+		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+		UpdateMouth(mouthScale);
+	}
+	*/
 
 Error:
 	return r;
