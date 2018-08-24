@@ -198,6 +198,9 @@ public:
 	RESULT UpdateDepth(float depthDiff);
 	RESULT UpdateScale(float scale);
 
+	vector GetDepthVector();
+	RESULT SetDepth(float depth);
+
 	// capture current settings values relative to the head to save
 	RESULT GetSettingsRelativeHeightAndDepth(float& height, float& depth);
 

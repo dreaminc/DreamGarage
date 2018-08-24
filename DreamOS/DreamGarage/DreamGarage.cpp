@@ -698,7 +698,8 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
-		pCamera->SetHMDAdjustedPosition(ptSeatPosition);
+		//pCamera->SetHMDAdjustedPosition(ptSeatPosition);
+		pCamera->SetHMDAdjustedPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
 
@@ -1116,7 +1117,7 @@ RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
 	CR(m_pDreamUserApp->UpdateHeight(height));
-	CR(m_pDreamUserApp->UpdateDepth(depth));
+	CR(m_pDreamUserApp->SetDepth(depth));
 	CR(m_pDreamUserApp->UpdateScale(scale));
 
 Error:

@@ -683,20 +683,12 @@ RESULT DreamUserApp::SetAppCompositeOrientation(quaternion qOrientation) {
 RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	RESULT r = R_PASS;
 
-	
 	stereocamera *pCamera = GetDOS()->GetCamera();
 
-	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
-	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
-	vAppLook.Normalize();
-	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-	vector vDiff = 2*m_userSettings->m_depth * vAppLookXZ;
-	//vDiff = vector(vDiff.z(), vDiff.y(), vDiff.x());
-
-	//point ptHeadset = GetDOS()->GetHMD()->GetHeadPointOrigin();
+	vector vDiff = GetDepthVector();
 	//point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f));
 	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f) + vDiff);
-	//ptComposite += point(ptHeadset.x(), 0.0f, ptHeadset.z());
+
 	m_pAppBasis->SetPosition(ptComposite);
 	GetComposite()->SetPosition(ptComposite);
 
@@ -916,6 +908,21 @@ RESULT DreamUserApp::UpdateScale(float scale) {
 
 	m_userSettings->m_scale = scale;
 	GetComposite()->SetScale(scale);
+
+	return R_PASS;
+}
+
+vector DreamUserApp::GetDepthVector() {
+	
+	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+	vAppLook.Normalize();
+	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+	return m_userSettings->m_depth * vAppLookXZ;
+}
+
+RESULT DreamUserApp::SetDepth(float depth) {
+	m_userSettings->m_depth = depth;
 
 	return R_PASS;
 }
