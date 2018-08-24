@@ -89,6 +89,7 @@ private:
 	// Environment positioning information (non-island) 
 public:
 	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
+	float GetUIOffsetOrientation(int seatIndex);
 
 private:
 	float m_environmentSceneScale = 0.025f;

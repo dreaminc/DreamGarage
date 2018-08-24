@@ -682,10 +682,11 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 	point ptSeatPosition;
 	quaternion qOffset;
-	quaternion qOffset2 = quaternion::MakeQuaternionWithEuler(0.0f, 90.0f * (float)M_PI / 180.0f, 0.0f);
+	quaternion qOffset2;// = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qOffset, seatingPosition));
+	qOffset2 = quaternion::MakeQuaternionWithEuler(0.0f, m_pDreamEnvironmentApp->GetUIOffsetOrientation(seatingPosition) * (float)M_PI / 180.0f, 0.0f);
 
 	CN(m_pDreamUserApp);
 	CR(m_pDreamUserApp->SetAppCompositeOrientation(qOffset*qOffset2));

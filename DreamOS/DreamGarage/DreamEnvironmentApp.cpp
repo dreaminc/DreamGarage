@@ -295,3 +295,31 @@ RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& p
 Error:
 	return r;
 }
+
+float DreamEnvironmentApp::GetUIOffsetOrientation(int seatIndex) {
+	RESULT r = R_PASS;
+
+	switch (seatIndex) {
+	case 0: {
+		return 90.0f;
+	} break;
+	case 1: {
+		return -90.0f;
+	} break;
+	case 2: {
+		return 30.0f;
+	} break;
+	case 3: {
+		return -30.0f;
+	} break;
+	case 4: {
+		return 0.0f;
+	} break;
+	case 5: {
+		return 0.0f;
+	} break;
+	}
+
+Error:
+	return r;
+}
