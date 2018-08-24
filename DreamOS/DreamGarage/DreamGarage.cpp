@@ -699,7 +699,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
 		//pCamera->SetHMDAdjustedPosition(ptSeatPosition);
-		pCamera->SetHMDAdjustedPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
+		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
 
@@ -1059,6 +1059,13 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
 		m_pDreamUserControlArea->OnDreamFormSuccess();
+		if (strMessage == "DreamSettingsApp.OnSuccess") {
+			float height; 
+			float depth;
+
+			m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth);
+			m_pUserController->SetSettings(m_strAccessToken, height, depth, m_pDreamUserApp->GetScale());
+		}
 	}
 	else {
 		if (strMessage == "DreamSettingsApp.OnSuccess") {
@@ -1098,6 +1105,9 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 				height,
 				depth,
 				m_pDreamUserApp->GetScale()));	
+
+			m_pDreamUserApp->SetHeight(height);
+			m_pDreamUserApp->SetDepth(depth);
 
 			// TODO: potentially where the lobby environment changes to the team environment
 			// could also be once the environment id is set

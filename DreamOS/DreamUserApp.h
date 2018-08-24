@@ -198,6 +198,7 @@ public:
 	RESULT UpdateDepth(float depthDiff);
 	RESULT UpdateScale(float scale);
 
+	RESULT SetHeight(float height);
 	vector GetDepthVector();
 	RESULT SetDepth(float depth);
 

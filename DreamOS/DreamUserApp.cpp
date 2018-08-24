@@ -912,6 +912,11 @@ RESULT DreamUserApp::UpdateScale(float scale) {
 	return R_PASS;
 }
 
+RESULT DreamUserApp::SetHeight(float height) {
+	m_userSettings->m_height = height;
+	return R_PASS;
+}
+
 vector DreamUserApp::GetDepthVector() {
 	
 	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
