@@ -234,12 +234,19 @@ RESULT DreamUIBar::ResetAppComposite() {
 	GetComposite()->SetOrientation(qOrigin);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);
-	vCameraToMenu = GetComposite()->GetPosition(true) - GetDOS()->GetCameraPosition();
-	vCameraToMenu.y() = 0.0f;
-	vCameraToMenu.Normalize();
+
+	{
+		// Set shader orientation based on seating direction		
+		RotationMatrix matLook = RotationMatrix(qOrigin);
+		vector vAppLook;
+		vector vAppLookXZ;
+		vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+		vAppLook.Normalize();
+		vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+		m_pUIStageProgram->SetOriginDirection(vAppLookXZ);
+	}
 
 	m_pUIStageProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
-	m_pUIStageProgram->SetOriginDirection(vCameraToMenu);
 
 Error:
 	return r;
