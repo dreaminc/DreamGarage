@@ -37,7 +37,7 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
-	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingPlane), std::string("u_vec4ClippingPlane")));
 	
@@ -97,13 +97,15 @@ RESULT OGLProgramReflection::OGLInitialize(version versionOGL) {
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	//CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
 
 	// Vertex
-	CRM(MakeVertexShader(L"standard_clipping.vert"), "Failed to create vertex shader");
+	//CRM(MakeVertexShader(L"standard_clipping.vert"), "Failed to create vertex shader");
+	CRM(MakeVertexShader(L"minimalTexture.vert"), "Failed to create vertex shader");
 
 	// Fragment
-	CRM(MakeFragmentShader(L"standard_clipping.frag"), "Failed to create fragment shader");
+	//CRM(MakeFragmentShader(L"standard_clipping.frag"), "Failed to create fragment shader");
+	CRM(MakeFragmentShader(L"minimalTexture_clipping.frag"), "Failed to create fragment shader");
 
 	// Link the program
 	CRM(LinkProgram(), "Failed to link program");
@@ -271,7 +273,6 @@ RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();
-	//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	if (m_pReflectionObject != nullptr) {
 		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();		
@@ -287,9 +288,16 @@ RESULT OGLProgramReflection::SetCameraUniforms(camera *pCamera) {
 		matV = matFlip * matV * matReflection;
 	}
 
-	m_pUniformViewMatrix->SetUniform(matV);
-	m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	auto matVP = matP * matV;
+
+	if(m_pUniformViewMatrix != nullptr)
+		m_pUniformViewMatrix->SetUniform(matV);
+
+	if(m_pUniformProjectionMatrix != nullptr)
+		m_pUniformProjectionMatrix->SetUniform(matP);
+
+	if(m_pUniformViewProjectionMatrix != nullptr)
+		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return r;
 }
@@ -316,9 +324,16 @@ RESULT OGLProgramReflection::SetCameraUniforms(stereocamera* pStereoCamera, EYE_
 		matV = matFlip * matV * matReflection;
 	}
 
-	m_pUniformViewMatrix->SetUniform(matV);
-	m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	auto matVP = matP * matV;
+
+	if (m_pUniformViewMatrix != nullptr)
+		m_pUniformViewMatrix->SetUniform(matV);
+
+	if (m_pUniformProjectionMatrix != nullptr)
+		m_pUniformProjectionMatrix->SetUniform(matP);
+
+	if (m_pUniformViewProjectionMatrix != nullptr)
+		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return r;
 }

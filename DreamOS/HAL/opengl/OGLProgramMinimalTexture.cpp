@@ -57,13 +57,57 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramMinimalTexture::OGLInitialize(version versionOGL) {
+	RESULT r = R_PASS;
+
+	CR(OGLInitialize());
+
+	m_versionOGL = versionOGL;
+
+	// Create and set the shaders
+
+	// Global
+	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"fogCommon.shader"), "Failed to add shared shader code");
+
+	// Vertex
+	CRM(MakeVertexShader(L"minimalTexture.vert"), "Failed to create vertex shader");
+
+	// Fragment
+	CRM(MakeFragmentShader(L"minimalTexture.frag"), "Failed to create fragment shader");
+
+	// Link the program
+	CRM(LinkProgram(), "Failed to link program");
+
+	// TODO: This could all be done in one call in the OGLShader honestly
+	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
+
+	//CR(PrintActiveAttributes());
+
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
+
+	// Uniform Blocks
+	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+
+	// TODO:  Currently using a global material 
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+
+Error:
+	return r;
+}
+
 RESULT OGLProgramMinimalTexture::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
