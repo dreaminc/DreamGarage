@@ -17,6 +17,8 @@
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
 
+#include "DreamGarage\DreamGamepadCameraApp.h"
+
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -30,6 +32,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestWaterShader());
+
 	CR(AddTestModel());
 
 	CR(AddTestFadeShader());
@@ -37,8 +41,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestSkybox());
 
 	CR(AddTestToonShader());
-
-	CR(AddTestWaterShader());
 
 	CR(AddTestStandardShader());
 
@@ -1233,8 +1235,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			//pTestContext->pReflectionQuad = m_pDreamOS->MakeQuad(5.0f, 5.0f, 1, 1, nullptr, vector::jVector());
 			pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
 			CN(pTestContext->pWaterQuad);
-			//pTestContext->pWaterQuad->SetPosition(0.0f, -1.25f, 0.0f);
-			pTestContext->pWaterQuad->SetPosition(0.0f, -0.1f, 0.0f);
+			pTestContext->pWaterQuad->SetPosition(90.0f, -1.25f, -25.0f);
+			
+			//pTestContext->pWaterQuad->SetPosition(0.0f, -0.1f, 0.0f);
+			
 			//pTestContext->pWaterQuad->SetBumpTexture(pBumpTextureWater);
 			//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 			//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
@@ -1244,7 +1248,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			float sceneScale = 0.025f;
 			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
-			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave_no_water_ib.fbx");
+			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
 			//model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave_exported.fbx");
 			
 			CN(pCaveModel);
@@ -1307,6 +1311,10 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 			CR(pVolume->SetVertexColor(COLOR_BLUE));
 			*/
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp)
+			
 		}
 
 	Error:

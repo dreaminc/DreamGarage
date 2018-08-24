@@ -1,4 +1,4 @@
-// minimalTexture.vert
+// minimalTexture_clipping.vert
 // shadertype=glsl
 
 // This is a minimal texture shader that simply displays
@@ -16,13 +16,20 @@ uniform sampler2D u_textureColor;
 
 layout (location = 0) out vec4 out_vec4Color;
 
+uniform vec4 u_vec4ClippingPlane;
+
 //vec4 g_ambient = vec4(0.05f);
 vec4 g_ambient = vec4(0.0f);
 
-uniform mat4 u_mat4View;
-
 void main(void) {  
+	// Clip fragments on our side of the plane
+	float fragmentClipPosition = dot(DataIn.vertWorldSpace.xyz, normalize(u_vec4ClippingPlane.xyz)) + u_vec4ClippingPlane.w;
+    if (fragmentClipPosition < 0.0) {
+		discard;
+    }
+	
 	vec4 textureColor = vec4(1.0f);
+	
 	if (u_hasTextureColor == true) {
 		textureColor = texture(u_textureColor, DataIn.uvCoord);
 	}
@@ -30,15 +37,7 @@ void main(void) {
 		textureColor = DataIn.color;
 	}
 
-	// Might want to pop this up to client
-	FogConfiguration fogConfig = {
-		50.0f,
-		300.0f,
-		0.05f,
-		vec3(161.0f / 255.0f, 197.0f / 255.0f, 202.0f / 255.0f)
-	};
-	
-	vec4 shaderColor = material.m_colorDiffuse * textureColor + g_ambient;
-
-	out_vec4Color = MixWithFog(FOG_TYPE_LINEAR, shaderColor, DataIn.vertDepth, fogConfig);
+	out_vec4Color = material.m_colorDiffuse * textureColor + g_ambient;
+	//out_vec4Color = material.m_colorDiffuse;
+	//out_vec4Color = DataIn.color * textureColor + g_ambient;
 }

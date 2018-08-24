@@ -173,6 +173,9 @@ private:
 	UIStageProgram *m_pUIProgramNode = nullptr;
 	std::vector<SkyboxScatterProgram*> m_skyboxProgramNodes;
 	OGLProgramScreenFade *m_pScreenFadeProgramNode = nullptr;
+	ProgramNode* m_pRenderEnvironmentProgramNode = nullptr;
+	ProgramNode* m_pRefractionProgramNode = nullptr;
+	ProgramNode* m_pReflectionProgramNode = nullptr;
 
 	std::shared_ptr<DreamEnvironmentApp> m_pDreamEnvironmentApp = nullptr;
 	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
