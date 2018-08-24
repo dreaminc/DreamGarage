@@ -59,9 +59,10 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 			fShowModels = false;
 		}
 	}
-//#ifdef _DEBUG
-//	fShowModels = false;
-//#endif
+
+#ifdef _DEBUG
+	fShowModels = false;
+#endif
 
 	if (fShowModels) {
 		CR(LoadAllEnvironments());

@@ -2355,8 +2355,8 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			pTestContext->pEnvironmentApp->SetScreenFadeProgram(pTestContext->pScreenFadeProgram);
 			pTestContext->pEnvironmentApp->SetSkyboxPrograms(skyboxProgramNodes);
 
-			auto pDreamGamepadAdd = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CN(pDreamGamepadAdd);
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp);
 
 			 CR(pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 			 CR(pReflectionProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
