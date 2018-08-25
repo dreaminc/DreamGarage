@@ -307,8 +307,10 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
 	long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
 
-	long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-	long answerEnvironmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
+	//long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+	//long answerEnvironmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
+
+	// TODO: Add Session ID
 	
 	// TODO: Make sure they match
 

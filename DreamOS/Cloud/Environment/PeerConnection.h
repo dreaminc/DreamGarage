@@ -143,11 +143,11 @@ public:
 		RESULT r = R_PASS;
 
 		long userID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-		long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		//long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
 		m_offerPosition = jsonOfferSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetOfferUserID(userID));
-		CR(SetEnvironmentID(environmentID));
+		//CR(SetEnvironmentID(environmentID));
 
 	Error:
 		return r;
@@ -157,11 +157,11 @@ public:
 		RESULT r = R_PASS;
 
 		long peerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-		long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
+		//long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
 		m_answerPosition = jsonAnswerSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetAnswerUserID(peerUserId));
-		CR(SetEnvironmentID(environmentID));
+		//CR(SetEnvironmentID(environmentID));
 
 	Error:
 		return r;
