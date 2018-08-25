@@ -949,6 +949,7 @@ bool DreamUIBar::IsEmpty() {
 
 RESULT DreamUIBar::ShouldUpdateMenuShader() {
 	m_fShouldResetShader = true;
+	return R_PASS;
 }
 
 DreamAppHandle* DreamUIBar::GetAppHandle() {
