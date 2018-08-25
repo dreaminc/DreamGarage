@@ -138,7 +138,7 @@ RESULT OGLProgramWater::SetupConnections() {
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	//CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Reflection Map
@@ -149,6 +149,16 @@ RESULT OGLProgramWater::SetupConnections() {
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	{
+		// Make our own lights
+		vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
+		float lightIntensity = 3.5f;
+		auto pLight = m_pParentImp->MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
+		CN(pLight);
+
+		m_lights.push_back(pLight);
+	}
 
 Error:
 	return r;
@@ -174,10 +184,9 @@ Error:
 RESULT OGLProgramWater::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
-
-	std::vector<light*> *pLights = nullptr;
-	pObjectStore->GetLights(pLights);
+	//ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
+	//std::vector<light*> *pLights = nullptr;
+	//pObjectStore->GetLights(pLights);
 
 	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
@@ -188,7 +197,7 @@ RESULT OGLProgramWater::ProcessNode(long frameID) {
 
 	glEnable(GL_BLEND);
 
-	SetLights(pLights);
+	SetLights(&m_lights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 

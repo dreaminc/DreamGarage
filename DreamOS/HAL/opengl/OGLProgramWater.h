@@ -41,7 +41,8 @@ public:
 
 private:
 	stereocamera *m_pCamera = nullptr;
-	ObjectStore *m_pSceneGraph = nullptr;
+	//ObjectStore *m_pSceneGraph = nullptr;
+	std::vector<light*> m_lights;
 
 	OGLFramebuffer *m_pOGLReflectionFramebuffer_in = nullptr;
 	OGLFramebuffer *m_pOGLRefractionFramebuffer_in = nullptr;

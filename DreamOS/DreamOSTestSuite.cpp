@@ -2249,7 +2249,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			CN(pWaterProgramNode);
 			// Still need scene graph for lights 
 			// TODO: make lights a different node
-			CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			//CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 			// TODO: This is not particularly general yet
@@ -2319,7 +2319,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			quad *pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f);
 			point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
 			pWaterQuad->SetPosition(ptQuadOffset);
-			pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 88.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+			pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
 			CN(pWaterQuad);
 
 			if (pWaterProgramNode != nullptr) {
