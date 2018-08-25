@@ -58,7 +58,8 @@ uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4Reflection;
 
-float g_normalDisplacementFactor = 0.025f;
+// Was 0.025 before
+float g_normalDisplacementFactor = 0.10f;
 
 float g_refractiveIndexAir = 1.0f;
 float g_refractiveIndexWater = 1.333f;
@@ -123,12 +124,12 @@ void main(void) {
 		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
 		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
 		
-		//TBNNormal = 0.45f * normalHHHF + 0.05f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
-		TBNNormal = 1.0f * normalHF + 0.25f * normalLF;
+		TBNNormal = 0.0f * normalHHHF + 0.05f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
+		//TBNNormal = 1.0f * normalHHF + 0.5f * normalHF;
 		TBNNormal = normalize(TBNNormal);
 		
-		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth)/100.0f, 0.0f, 1.0f));
-		TBNNormal.z *= 10.0f;
+		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth) / 100.0f, 0.0f, 1.0f));
+		TBNNormal.z *= 5.0f;
 		TBNNormal = normalize(TBNNormal);
 
 		// Turn off bumps
@@ -153,6 +154,7 @@ void main(void) {
 	vTextureReflection += g_normalDisplacementFactor * TBNNormal.xy;
 
 	vec4 colorDiffuse = material.m_colorDiffuse; 
+	//vec4 colorDiffuse = vec4(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f); 
 
 	float waterOpacity = 0.0f;
 
@@ -171,12 +173,13 @@ void main(void) {
 		// Water Color / Opacity
 		// Ctint = Cwater * (Omin + (1 - Omin) * sqrt (min (thickness / Dopaque, 1)))
 	
-		float minWaterOpacity = 0.1f;
+		float minWaterOpacity = 0.025f;
 		float depthOpaque = 4.0f;
 		
 		waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 		
-		colorRefraction = mix(vec4(0.0f, 0.0f, 0.15f, 1.0f), colorRefraction, 1.0f - waterOpacity);
+		//colorRefraction = mix(vec4(0.0f, 0.0f, 0.15f, 1.0f), colorRefraction, 1.0f - waterOpacity);
+		colorRefraction = refractionCoefficient * mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
 		colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 	}
 
@@ -188,10 +191,11 @@ void main(void) {
 		if(dot(TBNNormal, directionLight) > 0.0f) {
 			// provide shine param
 			CalculateFragmentLightValue(lights[i].m_power, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			//CalculateFragmentLightValue(3.5f, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
-			//vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
-			vec4LightValue += specularValue * lights[i].m_colorSpecular * vec4(1.0f);
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+			//vec4LightValue += specularValue * lights[i].m_colorSpecular * vec4(1.0f);
 		}
 	}
 

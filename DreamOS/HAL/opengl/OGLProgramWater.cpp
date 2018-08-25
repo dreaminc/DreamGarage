@@ -150,12 +150,15 @@ RESULT OGLProgramWater::SetupConnections() {
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
-	// Make our own lights
-	vector vWaterLightDirection = vector(0.0f, -1.0f, -0.25f);
-	auto pLight = m_pParentImp->MakeLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
-	CN(pLight);
+	{
+		// Make our own lights
+		vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
+		float lightIntensity = 3.5f;
+		auto pLight = m_pParentImp->MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
+		CN(pLight);
 
-	m_lights.push_back(pLight);
+		m_lights.push_back(pLight);
+	}
 
 Error:
 	return r;
