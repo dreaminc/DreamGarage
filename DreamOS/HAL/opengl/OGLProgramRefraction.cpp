@@ -115,7 +115,7 @@ RESULT OGLProgramRefraction::OGLInitialize(version versionOGL) {
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
-	//CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"fogCommon.shader"), "Failed to add shared shader code");
 
 	// Vertex
 	//CRM(MakeVertexShader(L"standard_clipping.vert"), "Failed to create vertex shader");
