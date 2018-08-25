@@ -47,7 +47,7 @@
 
 //#include "DreamLogger/DreamLogger.h"
 
-#include "Sound/DreamSoundSystem.h"
+#include "DreamGarage/DreamSoundSystem.h"
 
 #include "UI/UIKeyboard.h"
 
