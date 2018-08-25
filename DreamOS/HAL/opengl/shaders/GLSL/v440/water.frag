@@ -179,7 +179,7 @@ void main(void) {
 		waterOpacity = (minWaterOpacity + (1.0f - minWaterOpacity) * (min(waterDepth / depthOpaque, 1.0f)));
 		
 		//colorRefraction = mix(vec4(0.0f, 0.0f, 0.15f, 1.0f), colorRefraction, 1.0f - waterOpacity);
-		colorRefraction = refractionCoefficient * mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
+		colorRefraction = mix(colorDiffuse, colorRefraction, 1.0f - waterOpacity);
 		colorDiffuse = mix(colorDiffuse, colorRefraction, refractionCoefficient);
 	}
 
