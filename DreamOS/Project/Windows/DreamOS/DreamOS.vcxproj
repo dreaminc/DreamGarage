@@ -1024,8 +1024,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
     <ClCompile Include="..\..\..\Sound\AudioPacket.cpp" />
-    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.cpp" />
-    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.h" />
     <ClCompile Include="..\..\..\Sound\SoundBuffer.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClient.cpp" />
     <ClCompile Include="..\..\..\Sound\SoundClientFactory.cpp" />

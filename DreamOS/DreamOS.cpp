@@ -8,7 +8,7 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
-#include "Sound/DreamSoundSystem.h"
+//#include "DreamGarage/DreamSoundSystem.h"
 #include "Sound/AudioPacket.h"
 #include "DreamGarage/AudioDataMessage.h"
 

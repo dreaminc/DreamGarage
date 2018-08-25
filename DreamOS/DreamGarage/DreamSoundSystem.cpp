@@ -4,9 +4,9 @@
 
 #include "Scene/ObjectStoreNode.h"
 
-#include "SoundClientFactory.h"
-#include "SoundFile.h"
-#include "SpatialSoundObject.h"
+#include "Sound/SoundClientFactory.h"
+#include "Sound/SoundFile.h"
+#include "Sound/SpatialSoundObject.h"
 
 DreamSoundSystem::DreamSoundSystem(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamSoundSystem>(pDreamOS, pContext)
@@ -86,46 +86,48 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		}
 	}
 
-	// WASAPI Capture Client
-	// This can fail - if this is the case then capture will not fire (obviously)
-	auto pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-	
-	if (pWASAPICaptureClient != nullptr) {
-		m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
-		CN(m_pWASAPICaptureClient);
-
-		CR(m_pWASAPICaptureClient->RegisterObserver(this));
-		CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
-	}
-
-	// Use the WASAPI enumerator to get the full thing
-	wstrHMDDeviceOutGUID = pWASAPICaptureClient->GetDeviceIDFromDeviceID(wstrDeviceOutID);
-
-	// XAudio2 Spatial and Render Client
-	// This cannot fail - we need a default audio device, if none exists this will blow up
-	auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2, &wstrHMDDeviceOutGUID);
-	CNM(pXAudio2AudioClient, "Failed to create XAudio2 Client");
-	m_pXAudio2AudioClient =std::shared_ptr<SoundClient>(pXAudio2AudioClient);
-	CN(m_pXAudio2AudioClient);
-
-	CRM(m_pXAudio2AudioClient->StartSpatial(), "Failed to start spatial for XAudio2");
-	CRM(m_pXAudio2AudioClient->StartRender(), "Failed to start render for XAudio2");
-
-	CR(ClearSpatialSoundObjects());
-
-	/*
 	{
-		// This is BULL
-		m_pTestSpatialSoundObject = AddSpatialSoundObject(point(0.0f, 0.0f, 2.0f), vector(), vector());
-		CN(m_pTestSpatialSoundObject);
+		// WASAPI Capture Client
+		// This can fail - if this is the case then capture will not fire (obviously)
+		auto pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
 
-		m_pSoundFile = LoadSoundFile(L"OceanWavesMikeKoenig980635527_48K.wav", SoundFile::type::WAVE);
-		CN(m_pSoundFile);
+		if (pWASAPICaptureClient != nullptr) {
+			m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
+			CN(m_pWASAPICaptureClient);
 
-		//m_pTestSpatialSoundObject->LoopSoundFile(m_pSoundFile.get());
-		m_pTestSpatialSoundObject->PlaySoundFile(m_pSoundFile.get());
+			CR(m_pWASAPICaptureClient->RegisterObserver(this));
+			CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
+		}
+
+		// Use the WASAPI enumerator to get the full thing
+		wstrHMDDeviceOutGUID = pWASAPICaptureClient->GetDeviceIDFromDeviceID(wstrDeviceOutID);
+
+		// XAudio2 Spatial and Render Client
+		// This cannot fail - we need a default audio device, if none exists this will blow up
+		auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2, &wstrHMDDeviceOutGUID);
+		CNM(pXAudio2AudioClient, "Failed to create XAudio2 Client");
+		m_pXAudio2AudioClient = std::shared_ptr<SoundClient>(pXAudio2AudioClient);
+		CN(m_pXAudio2AudioClient);
+
+		CRM(m_pXAudio2AudioClient->StartSpatial(), "Failed to start spatial for XAudio2");
+		CRM(m_pXAudio2AudioClient->StartRender(), "Failed to start render for XAudio2");
+
+		CR(ClearSpatialSoundObjects());
+
+		/*
+		{
+			// This is BULL
+			m_pTestSpatialSoundObject = AddSpatialSoundObject(point(0.0f, 0.0f, 2.0f), vector(), vector());
+			CN(m_pTestSpatialSoundObject);
+
+			m_pSoundFile = LoadSoundFile(L"OceanWavesMikeKoenig980635527_48K.wav", SoundFile::type::WAVE);
+			CN(m_pSoundFile);
+
+			//m_pTestSpatialSoundObject->LoopSoundFile(m_pSoundFile.get());
+			m_pTestSpatialSoundObject->PlaySoundFile(m_pSoundFile.get());
+		}
+		*/
 	}
-	*/
 
 Error:
 	return r;
