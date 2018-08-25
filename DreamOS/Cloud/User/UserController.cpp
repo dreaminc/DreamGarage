@@ -56,6 +56,10 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 
 
 	switch (userMethod) {
+		case UserMethod::GETDREAMVERSION: {
+			strURI = strAPIURL + "/client/settings";
+		} break;
+
 		case UserMethod::LOGIN: {
 			strURI = strAPIURL + "/token/";
 		} break;
@@ -221,6 +225,36 @@ User UserController::GetUser() {
 
 TwilioNTSInformation UserController::GetTwilioNTSInformation() {
 	return m_twilioNTSInformation;
+}
+
+std::wstring UserController::RequestDreamVersion() {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+	nlohmann::json jsonResponse;
+	std::string strResponse;
+	std::string strVersion;
+	std::string strURI = GetMethodURI(UserMethod::GETDREAMVERSION);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+
+	pHTTPController->GET(strURI, HTTPController::ContentHttp(), httpResponse);
+
+	strResponse = std::string(httpResponse.PullResponse());
+	strResponse = strResponse.substr(0, strResponse.find('\r'));
+	jsonResponse = nlohmann::json::parse(strResponse);
+
+	DEBUG_LINEOUT(jsonResponse.dump().c_str());
+
+	//CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
+	if (jsonResponse["/data/client_settings/minimum_version"_json_pointer].is_string()) {
+		strVersion = jsonResponse["/data/client_settings/minimum_version"_json_pointer].get<std::string>();
+	}
+
+	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
+	SetIsLoggedIn(true);
+
+	return util::StringToWideString(strVersion);
 }
 
 RESULT UserController::LoginFromCommandline() {

@@ -50,6 +50,7 @@ public:
 		LOAD_TWILIO_NTS_INFO,
 
 		// new
+		GETDREAMVERSION,
 		GET_FORM,
 		GET_ACCESS_TOKEN,
 		SETTINGS,
@@ -66,6 +67,8 @@ public:
 	// Read username and password from file and login, get a token
 	RESULT LoginFromFilename(const std::wstring& file);
 	RESULT LoginFromCommandline();
+
+	std::wstring RequestDreamVersion();
 
 	// obsolete. to be removed
 	//RESULT Login_Json(const std::wstring& strFilename);

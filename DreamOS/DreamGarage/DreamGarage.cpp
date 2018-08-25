@@ -441,28 +441,31 @@ RESULT DreamGarage::DidFinishLoading() {
 		}
 	}
 #endif
-
 	// Initial step of login flow:
-	if (m_pSandbox->GetDreamVersion().compare(L"0.4.20") != 0) {
-		if (m_pDreamEnvironmentApp != nullptr) {
-			CR(m_pDreamEnvironmentApp->);
+	{
+#ifdef PRODUCTION_BUILD || OCULUS_PRODUCTION_BUILD
+		std::wstring wstrMinimumDreamVersion = m_pUserController->RequestDreamVersion();
+		if (GetDreamVersion().compare(wstrMinimumDreamVersion) != 0) {
+			if (m_pDreamEnvironmentApp != nullptr) {
+				return m_pDreamEnvironmentApp->FadeIn();
+			}
+		}
+#endif
+		// if there has already been a successful login, try to authenticate
+		if (!m_fFirstLogin && m_fHasCredentials) {
+			m_pUserController->GetAccessToken(m_strRefreshToken);
+		}
+		else {
+			// Otherwise, start by showing the settings form
+
+			strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+			CR(m_pUserController->GetFormURL(strFormType));
+
+			if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+				CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+			}
 		}
 	}
-
-	// if there has already been a successful login, try to authenticate
-	else if (!m_fFirstLogin && m_fHasCredentials) {
-		m_pUserController->GetAccessToken(m_strRefreshToken);
-	}
-	else {
-		// Otherwise, start by showing the settings form
-
-		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
-		CR(m_pUserController->GetFormURL(strFormType));
-		if (m_pDreamEnvironmentApp != nullptr) {	
-			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
-		}
-	}
-	
 Error:
 	return r;
 }
