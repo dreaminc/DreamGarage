@@ -695,6 +695,10 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
 	}
 
+	if (m_pDreamUserControlArea != nullptr) {
+		m_pDreamUserControlArea->ResetAppComposite();
+	}
+
 Error:
 	return r;
 }
@@ -743,10 +747,6 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
-		
-		if (m_pDreamUserControlArea != nullptr) {
-			m_pDreamUserControlArea->ResetAppComposite();
-		}
 	}
 
 Error:
