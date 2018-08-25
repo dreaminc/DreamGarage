@@ -206,14 +206,29 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 RESULT OGLProgramReflection::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
+	OGLTexture *pTexture = nullptr;
+
 	// Bump
 	//SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
 	// Material textures
 	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
 	
-	if (pOGLObj->GetOGLTextureDiffuse() != nullptr) {
-		SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 0);
+	//if (pOGLObj->GetOGLTextureDiffuse() != nullptr) {
+	//	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 0);
+	//}
+
+	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
+		//pTexture->OGLActivateTexture(0);
+		//m_pUniformTextureColor->SetUniform(pTexture);
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+		m_pUniformTextureColor->SetUniform(0);
+		m_pUniformHasTextureColor->SetUniform(true);
+	}
+	else {
+		m_pUniformHasTextureColor->SetUniform(false);
 	}
 
 	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
