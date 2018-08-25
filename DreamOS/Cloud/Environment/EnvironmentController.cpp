@@ -147,8 +147,9 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 
 	//m_environment = Environment(user.GetDefaultEnvironmentID());
 
-	SetEnvironmentID(environmentID);
-	m_environment = Environment(environmentID);
+	SetEnvironmentID(user.GetDefaultEnvironmentID());
+
+	m_environment = Environment(user.GetDefaultEnvironmentID());
 
 	std::string strURI = GetMethodURI(EnvironmentMethod::CONNECT_SOCKET);
 	strURI += std::to_string(m_environment.GetEnvironmentID()); 

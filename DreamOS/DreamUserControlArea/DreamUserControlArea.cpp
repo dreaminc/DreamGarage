@@ -29,9 +29,8 @@ DreamUserControlArea::DreamUserControlArea(DreamOS *pDreamOS, void *pContext) :
 	// empty
 }
 
-DreamUserControlArea::~DreamUserControlArea() 
-{
-
+DreamUserControlArea::~DreamUserControlArea()  {
+	// empty
 }
 
 RESULT DreamUserControlArea::InitializeApp(void *pContext) {
@@ -40,7 +39,7 @@ RESULT DreamUserControlArea::InitializeApp(void *pContext) {
 	m_fCanPressButton[0] = false;
 	m_fCanPressButton[1] = false;
 
-//Error:
+Error:
 	return r;
 }
 
@@ -109,6 +108,12 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		
 		pKeyboard->InitializeWithParent(this);
 		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
+	}
+
+	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
+		CR(m_pDreamUIBar->ResetAppComposite());
+
+		m_fUpdateDreamUIBar = false;
 	}
 
 	CNR(m_pDreamUserApp, R_SKIPPED);
@@ -817,8 +822,7 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 	pRenderContext->SetOrientation(qOrigin);
 	//*/
 
-	CR(m_pDreamUIBar->ResetAppComposite());
-
+	m_fUpdateDreamUIBar = true;
 
 Error:
 	return r;
