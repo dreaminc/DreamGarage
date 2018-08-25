@@ -146,7 +146,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CN(pWaterProgramNode);
 		// Still need scene graph for lights 
 		// TODO: make lights a different node
-		CR(pWaterProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		//CR(pWaterProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pWaterProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 		// TODO: This is not particularly general yet

@@ -2249,7 +2249,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			CN(pWaterProgramNode);
 			// Still need scene graph for lights 
 			// TODO: make lights a different node
-			CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			//CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 			// TODO: This is not particularly general yet
