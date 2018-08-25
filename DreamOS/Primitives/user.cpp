@@ -38,6 +38,7 @@ RESULT user::Initialize() {
 	}
 
 	m_pHead = AddModel(util::StringToWideString(strHeadPath));
+	m_pHead->SetMaterialShininess(2.0f, true);
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
 	m_pHead->SetScale(0.028f);

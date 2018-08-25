@@ -38,7 +38,8 @@ public:
 private:
 		
 	//std::string k_strDefaultHeadPath = "\\face4\\untitled.obj";
-	std::string k_strDefaultHeadPath = "\\head_01\\head_01.FBX";
+	//std::string k_strDefaultHeadPath = "\\head_01\\head_01.FBX";
+	std::string k_strDefaultHeadPath = "\\Avatar 1\\avatar_1.FBX";
 	// Storage of models and textures for head
 	std::shared_ptr<model> m_pHead;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
