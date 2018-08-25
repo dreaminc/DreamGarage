@@ -25,7 +25,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	auto pDreamOS = GetDOS();
 
 	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 1.0f;
+	m_directionalIntensity = 2.0f;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 	HMD *pHMD = nullptr;
@@ -40,11 +40,19 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 #endif
 
 	// One strong "SUN" directional light, and a second dimmer "ambient" light from the opposite direction
-	vector vFakeSunDirection = vector(0.0f, -1.0f, -0.5f);
-	vector vFakeAmbientDirection = (vector)(-1.0f * vFakeSunDirection);
+	float downwardAngle = 45.0f * (float)M_PI / 180.0f;
 
-	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vFakeSunDirection));
-	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.45f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vFakeAmbientDirection);
+	vector vLight1 = vector(1.0f, -1.0f, 1.0f);
+	vector vLight2 = vector(-1.0f, -1.0f, 1.0f);
+	vector vLight3 = vector(0.0f, -1.0f, -1.0f);
+
+	vector vLight4 = vector(0.0f, 1.0f, 0.0f);
+
+	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight1);
+	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight2);
+	pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight3);
+
+	pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.2f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight4);
 
 	//pDirectionalLight->EnableShadows();
 
