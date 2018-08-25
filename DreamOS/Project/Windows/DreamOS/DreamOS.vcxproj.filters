@@ -946,12 +946,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.h">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sound\DreamSoundSystem.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamModule.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>

@@ -9,11 +9,11 @@
 // Initializes, manages and maintains all things sound / audio related
 
 #include "DreamModule.h"
-#include "SoundCommon.h"
+#include "Sound/SoundCommon.h"
 
-#include "SoundClient.h"
+#include "Sound/SoundClient.h"
 
-#include "SoundFile.h"
+#include "Sound/SoundFile.h"
 
 #include <memory>
 
