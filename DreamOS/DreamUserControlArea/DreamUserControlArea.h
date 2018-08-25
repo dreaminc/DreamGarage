@@ -227,6 +227,8 @@ private:
 
 	std::string m_strDesktopTitle = TITLE_DESKTOP;
 	std::string m_strWebsiteTitle = TITLE_WEBSITE;
+
+	bool m_fUpdateDreamUIBar = false;
 };
 
 #endif // ! DREAM_USER_CONTROL_AREA_H_
