@@ -215,6 +215,12 @@ RESULT user::UpdateMouth(float mouthScale) {
 	CN(m_pMouth);
 
 //	m_pMouth->Scale(0.01f + 8.0f * mouthScale);
+	/*
+	if (mouthScale != 0.0f) {
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture1.get());
+	}
+	//*/
+	//*
 	if (mouthScale < 0.25f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
 	}
@@ -227,6 +233,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	else if (mouthScale < 1.0f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture1.get());
 	}
+	//*/
 
 Error:
 	return r;

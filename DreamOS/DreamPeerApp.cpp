@@ -439,6 +439,7 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
+	m_pUserModel->SetDreamOS(GetDOS());
 	m_fPendingAssignedUserModel = true;
 
 Error:
