@@ -498,8 +498,9 @@ RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	//m_pUserModel->GetHead()->SetPosition(ptPosition);
+	//m_pUserModel->SetPosition(ptPosition);
 	GetComposite()->SetPosition(ptPosition);
+	m_pUserModel->SetMouthPosition(ptPosition);
 
 	if (m_pSpatialSoundObject != nullptr) {
 		m_pSpatialSoundObject->SetPosition(ptPosition);
@@ -513,7 +514,8 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+	m_pUserModel->SetOrientation(qOrientation);
+	m_pUserModel->SetMouthOrientation(qOrientation);
 
 	if (m_pSpatialSoundObject != nullptr) {
 		m_pSpatialSoundObject->SetOrientation(qOrientation);

@@ -58,6 +58,9 @@ private:
 	std::shared_ptr<quad> m_pMouthQuad = nullptr;
 	std::shared_ptr<composite> m_pMouthComposite = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture = nullptr;
+	std::shared_ptr<texture> m_pMouthTexture1 = nullptr;
+	std::shared_ptr<texture> m_pMouthTexture2 = nullptr;
+	std::shared_ptr<texture> m_pMouthTexture3 = nullptr;
 
 	std::vector<std::shared_ptr<texture>> m_mouthStates;
 
