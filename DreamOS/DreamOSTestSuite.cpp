@@ -2370,6 +2370,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			pTestContext->m_users.emplace_back(m_pDreamOS->AddUser());
 			pTestContext->m_users[i]->SetVisible(true);
 			pTestContext->m_users[i]->SetDreamOS(m_pDreamOS);
+			pTestContext->m_users[i]->UpdateAvatarModelWithID(1);
 		}
 
 		{

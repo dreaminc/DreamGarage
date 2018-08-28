@@ -20,6 +20,7 @@ public:
 	User() :
 		m_userID(-1),
 		m_defaultEnvironmentID(-1),
+		m_defaultAvatarID(-1),
 		m_strEmail(""),
 		m_strFirstName(""),
 		m_strLastName(""),
@@ -43,13 +44,14 @@ public:
 	}
 	*/
 
-	User(long userID, long defaultEnvironmentID, 
+	User(long userID, long defaultEnvironmentID, long defaultAvatarID,
 		std::string strEmail, std::string strScreename, 
 		std::string strFirstName, std::string strLastName, 
 		version userVersion
 	) :
 		m_userID(userID),
 		m_defaultEnvironmentID(defaultEnvironmentID),
+		m_defaultAvatarID(defaultAvatarID),
 		m_strEmail(strEmail),
 		m_strScreenName(strScreename),
 		m_strFirstName(strFirstName),
@@ -97,6 +99,7 @@ public:
 private:
 	long m_userID;
 	long m_defaultEnvironmentID;
+	long m_defaultAvatarID;
 
 	std::string	m_strEmail;
 	std::string	m_strFirstName;

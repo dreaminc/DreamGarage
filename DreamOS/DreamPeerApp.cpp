@@ -422,8 +422,14 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	m_pPeerConnection = pPeerConnection;
 	m_peerUserID = m_pPeerConnection->GetPeerUserID();	
 	
-	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);
+	UserController* pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	// TODO: async version?
+	pUserController->GetPeerProfile(m_peerUserID);
+
+	m_strScreenName = pUserController->GetPeerScreenName(m_peerUserID);
+	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
+//	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
 Error:
 	return r;
@@ -440,6 +446,7 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
 	m_pUserModel->SetDreamOS(GetDOS());
+	m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId);
 	m_fPendingAssignedUserModel = true;
 
 Error:
@@ -529,7 +536,7 @@ Error:
 RESULT DreamPeerApp::RotateByDeg(float degX, float degY, float degZ) {
 	RESULT r = R_PASS;
 
-	CN(m_pUserModel);
+	CNR(m_pUserModel, R_SKIPPED);
 	//m_pUserModel->RotateByDeg(degX, degY, degZ);
 	m_pUserModel->GetHead()->RotateByDeg(degX, degY, degZ);
 	//GetComposite()->RotateByDeg(degX, degY, degZ);

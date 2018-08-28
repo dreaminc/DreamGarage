@@ -145,6 +145,7 @@ private:
 private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
+	long m_avatarModelId = -1;
 
 	DreamOS *m_pDOS = nullptr;
 	
