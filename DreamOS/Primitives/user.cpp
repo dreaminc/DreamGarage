@@ -47,6 +47,7 @@ RESULT user::Initialize() {
 		vHeadOffset = vector(-(float)(M_PI_2), (float)(M_PI), 0.0f);
 	}
 	m_pMouthComposite = MakeComposite();
+	CN(m_pMouthComposite);
 
 	m_pMouthComposite->SetScale(0.028f);
 	m_pMouthComposite->SetPosition(point(0.0f, -0.35f, HEAD_POS));
@@ -56,13 +57,18 @@ RESULT user::Initialize() {
 	//m_pHead = AddModel(util::StringToWideString(strHeadPath));
 	
 	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthPath));
+	CN(m_pMouth);
 	
+	// TODO: should be a part of an avatar folder once there are multiple mouths, 
+	// could also help inform a loop with different naming
 	m_mouthStates.push_back(MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_03.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_02.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_01.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
-	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pMouthTexture1 = MakeTexture(L"mouth_01.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pMouthTexture2 = MakeTexture(L"mouth_02.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pMouthTexture3 = MakeTexture(L"mouth_03.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	for (int i = 0; i < 4; i++) {
+		CN(m_mouthStates[i]);
+	}
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
 
@@ -89,7 +95,7 @@ RESULT user::Initialize() {
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -146,16 +152,22 @@ Error:
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
+	CB(m_avatarModelId != AVATAR_INVALID);
+
 	switch (m_avatarModelId) {
-	case 1: {
-		m_pHead = AddModel(L"\\Avatar 1\\avatar_1.FBX");
-	} break;
-	case 2: {
-		m_pHead = AddModel(L"\\Avatar 2\\avatar_2.FBX");
-	} break;
+
+		case AVATAR_TYPE::WOMAN: {
+			m_pHead = AddModel(L"\\Avatar_Woman\\avatar_1.FBX");
+		} break;
+
+		case AVATAR_TYPE::BRUCE: {
+			m_pHead = AddModel(L"\\Avatar_Bruce\\avatar_2.FBX");
+		} break;
 	}
 
-	return R_PASS;
+
+Error:
+	return r;
 }
 
 RESULT user::SetMouthPosition(point ptPosition) {
@@ -207,25 +219,26 @@ RESULT user::UpdateMouth(float mouthScale) {
 
 	// Simple IIR filter
 	{
-		// a and b control how fast the mouth scale responds to sustained volume
+		// controls how fast the mouth scale responds to sustained volume
 		float newAmount = 0.2f;
 		float newMouthScale = mouthScale * 8.0f + 0.01f;
 
 		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
 	}
 
-	// TODO: mouth textures need to be dependent on avatar id once the assets are available
-	if (m_mouthScale < 0.25f) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
+	float numBins = (float)(m_numMouthStates);
+	int rangedValue = (int)(m_mouthScale * numBins);
+
+	if (rangedValue > 3) {
+		rangedValue = 3;
 	}
-	else if (m_mouthScale < 0.5f) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture3.get());
+
+	if (rangedValue < 0) {
+		rangedValue = 0;
 	}
-	else if (m_mouthScale < 0.75f) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture2.get());
-	}
-	else if (m_mouthScale < 1.0f) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture1.get());
+
+	if (m_pMouth != nullptr) {
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[rangedValue].get());
 	}
 
 Error:

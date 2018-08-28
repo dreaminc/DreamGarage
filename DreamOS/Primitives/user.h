@@ -24,6 +24,12 @@ public:
 		CONTROLLER_INVALID
 	} CONTROLLER_TYPE;
 
+	typedef enum AvatarType {
+		WOMAN = 1,
+		BRUCE = 2,
+		AVATAR_INVALID
+	} AVATAR_TYPE;
+
 public:
 	user(HALImp* pHALImp);
 	user(HALImp* pHALImp, DreamOS *pDreamOS);
@@ -47,11 +53,11 @@ private:
 
 private:
 	
-	long m_avatarModelId = -1;
+	long m_avatarModelId = AVATAR_INVALID;
 
 	//std::string k_strDefaultHeadPath = "\\face4\\untitled.obj";
 	//std::string k_strDefaultHeadPath = "\\head_01\\head_01.FBX";
-	std::string k_strDefaultHeadPath = "\\Avatar 1\\avatar_1.FBX";
+	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
 	std::string k_strMouthPath = "\\mouth.FBX";
 	// Storage of models and textures for head
 	std::shared_ptr<model> m_pHead;
@@ -75,6 +81,7 @@ private:
 	DreamOS *m_pDreamOS = nullptr;
 
 	float m_mouthScale = 0.0f;
+	int m_numMouthStates = 4;
 };
 
 #endif	// ! PRIMITIVE_USER_H_
