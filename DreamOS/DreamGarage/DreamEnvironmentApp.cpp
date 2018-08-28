@@ -55,6 +55,14 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.2f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight4);
 
 	//pDirectionalLight->EnableShadows();
+	
+	m_pMessageQuad = GetComposite()->AddQuad(m_messageQuadWidth, m_messageQuadHeight, 1, 1, nullptr);
+	// Default for when user isn't seated yet.
+	m_pMessageQuad->SetPosition(-2.5f, 1.3f, 0);
+	m_pMessageQuad->RotateYByDeg(-90);
+	m_pMessageQuad->RotateZByDeg(90);
+	pDreamOS->AddObjectToUIGraph(m_pMessageQuad.get());
+	m_pMessageQuad->SetVisible(false);
 
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
@@ -221,6 +229,30 @@ RESULT DreamEnvironmentApp::FadeIn() {
 
 	CNR(m_pFadeProgram, R_SKIPPED);
 	m_pFadeProgram->FadeIn();
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::FadeInWithMessageQuad(StartupMessage startupMessage) {
+	RESULT r = R_PASS;
+
+	// TODO: Calculate position and orientation of message board again if the user is seated - so basically only on logout
+
+	switch (startupMessage) {
+	case StartupMessage::WELCOME: {
+		// stub
+	} break;
+
+	case StartupMessage::UPDATE_REQUIRED: {
+		texture* pMessageTexture = GetDOS()->MakeTexture(L"launch-update-required.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
+		m_pMessageQuad->SetVisible(true);
+	} break;
+
+	}
+	
+	CR(FadeIn());
 
 Error:
 	return r;

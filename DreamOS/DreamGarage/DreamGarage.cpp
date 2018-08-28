@@ -447,7 +447,7 @@ RESULT DreamGarage::DidFinishLoading() {
 		std::wstring wstrMinimumDreamVersion = m_pUserController->RequestDreamVersion();
 		if (GetDreamVersion().compare(wstrMinimumDreamVersion) != 0) {
 			if (m_pDreamEnvironmentApp != nullptr) {
-				return m_pDreamEnvironmentApp->FadeIn();
+				return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);
 			}
 		}
 #endif
