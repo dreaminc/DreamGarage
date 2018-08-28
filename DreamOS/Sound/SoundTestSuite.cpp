@@ -15,6 +15,8 @@
 #include "WebBrowser\WebBrowserController.h"
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
+#include "DreamGarage\DreamGamepadCameraApp.h"
+
 SoundTestSuite::SoundTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -589,17 +591,33 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 		RESULT OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 			RESULT r = R_PASS;
 
+			float *pFloatAudioBuffer = nullptr;
+
 			//// Simply pushes the capture buffer to the render buffer
 			if (pXAudioSpatialSoundObject != nullptr) {
 				CR(pXAudioSpatialSoundObject->PushMonoAudioBuffer(numFrames, pCaptureBuffer));
 			}
-			
+
+			CNM(pCaptureBuffer, "Soundbuffer invalid");
+
+			//pFloatAudioBuffer = (float*)malloc(sizeof(float) * numFrames);
+			pFloatAudioBuffer = new float[numFrames];
+			CNM(pFloatAudioBuffer, "Failed to allocate float buffer");
+
+			// This is safe since we control the type of buffer that goes into 
+			// the spatial sound object - the soundbuffer we get from capture 
+			// could be any type
+
+			CRM(pCaptureBuffer->LoadDataToInterlacedTargetBufferTargetType(pFloatAudioBuffer, numFrames), "Failed to load data into buffer");
+
 			//// Simply pushes the capture buffer to the render buffer
 			//if (pWASAPISoundClient != nullptr) {
 			//	CR(pWASAPISoundClient->PushMonoAudioBufferToRenderBuffer(numFrames, pCaptureBuffer));
 			//}
 
 		Error:
+			delete pFloatAudioBuffer;
+
 			return r;
 		}
 
@@ -617,8 +635,19 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 		CN(pTestContext);
 		{
 
-			light *pLight;
-			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+			//light *pLight;
+			//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+			vector vLight1 = vector(1.0f, -0.5f, 1.0f);
+			vector vLight2 = vector(-1.0f, -0.5f, 1.0f);
+			vector vLight3 = vector(0.0f, -0.5f, -1.0f);
+
+			vector vLight4 = vector(0.0f, 1.0f, 0.0f);
+			float m_directionalIntensity = 0.45f;
+
+			m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight1);
+			m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight2);
+			m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight3);
+			m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.2f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLight4);
 
 			point ptPosition = point(0.0f, 0.0f, -radius);
 			vector vEmitterDireciton = point(0.0f, 0.0f, 0.0f) - ptPosition;
@@ -640,6 +669,8 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 			CN(pTestContext->pXAudioSpatialSoundObject);
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 		}
 
 	Error:

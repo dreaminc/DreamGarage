@@ -73,6 +73,8 @@ private:
 
 	// add mouths to UI shader 
 	DreamOS *m_pDreamOS = nullptr;
+
+	float m_mouthScale = 0.0f;
 };
 
 #endif	// ! PRIMITIVE_USER_H_

@@ -13,6 +13,8 @@
 #include "Sound/SpatialSoundObject.h"
 #include "DreamGarage/AudioDataMessage.h"
 
+#include "Core/Utilities.h"
+
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
 	m_pDOS(pDOS),
@@ -570,12 +572,12 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 	}
 
 	// Mouth Position
-	/*
+	//*
 	{
 		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
 		CN(pAudioBuffer);
 
-		size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
+		size_t numSamples = pAudioDataMessage->GetNumChannels() * pAudioDataMessage->GetNumFrames();
 		float averageAccumulator = 0.0f;
 
 		for (int i = 0; i < numSamples; ++i) {
@@ -592,7 +594,7 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
 		UpdateMouth(mouthScale);
 	}
-	*/
+	//*/
 
 Error:
 	return r;

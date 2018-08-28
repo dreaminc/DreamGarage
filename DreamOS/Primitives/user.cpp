@@ -203,28 +203,30 @@ Error:
 RESULT user::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 	
-	CN(m_pMouth);
+	CNR(m_pMouth, R_SKIPPED);
 
-//	m_pMouth->Scale(0.01f + 8.0f * mouthScale);
-	/*
-	if (mouthScale != 0.0f) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture1.get());
+	// Simple IIR filter
+	{
+		// a and b control how fast the mouth scale responds to sustained volume
+		float newAmount = 0.2f;
+		float newMouthScale = mouthScale * 8.0f + 0.01f;
+
+		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
 	}
-	//*/
-	//*
-	if (mouthScale < 0.25f) {
+
+	// TODO: mouth textures need to be dependent on avatar id once the assets are available
+	if (m_mouthScale < 0.25f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
 	}
-	else if (mouthScale < 0.5f) {
+	else if (m_mouthScale < 0.5f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture3.get());
 	}
-	else if (mouthScale < 0.75f) {
+	else if (m_mouthScale < 0.75f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture2.get());
 	}
-	else if (mouthScale < 1.0f) {
+	else if (m_mouthScale < 1.0f) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture1.get());
 	}
-	//*/
 
 Error:
 	return r;
