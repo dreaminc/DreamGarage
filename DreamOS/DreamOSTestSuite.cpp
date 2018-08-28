@@ -2184,6 +2184,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 		std::shared_ptr<DreamEnvironmentApp> pEnvironmentApp = nullptr;
 
 		std::vector<user*> m_users;
+		std::shared_ptr<texture> m_pTestTexture;
 
 		bool fFirst = true;
 	};
@@ -2364,10 +2365,12 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 		}
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
-
+		pTestContext->m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 		for (int i = 0; i < 6; i++) {
 			pTestContext->m_users.emplace_back(m_pDreamOS->AddUser());
 			pTestContext->m_users[i]->SetVisible(true);
+			pTestContext->m_users[i]->SetDreamOS(m_pDreamOS);
+			pTestContext->m_users[i]->UpdateAvatarModelWithID((i % 2) + 1);
 		}
 
 		{
@@ -2378,6 +2381,16 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 				pTestContext->pEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptPosition, qOrientation, i);
 				pTestContext->m_users[i]->SetPosition(ptPosition + point(0.0f, 1.0f, 0.0f));
 				pTestContext->m_users[i]->SetOrientation(qOrientation);
+				pTestContext->m_users[i]->SetMouthPosition(ptPosition + point(0.0f, 1.0f, 0.0f));
+				pTestContext->m_users[i]->SetMouthOrientation(qOrientation);
+
+				/*
+				auto pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
+				pQuad->SetPosition(ptPosition);
+				pQuad->SetOrientation(qOrientation);
+				pQuad->SetDiffuseTexture(pTestContext->m_pTestTexture.get());
+				m_pDreamOS->AddObjectToUIGraph(pQuad);
+				//*/
 			}
 		}
 		//pTestContext->m_users[0]->SetPosition()

@@ -171,7 +171,7 @@ std::wstring WASAPISoundClient::GetDeviceName(IMMDevice *pDevice) {
 
 	CR((RESULT)pPropertyStore->GetValue(PKEY_Device_FriendlyName, &propVariantFriendlyName));
 
-	///* Moar infoz
+	/* Moar infoz
 	DWORD numProps;
 	pPropertyStore->GetCount(&numProps);
 	
@@ -976,7 +976,7 @@ RESULT WASAPISoundClient::Initialize() {
 	CR(EnumerateWASAPIDevices());
 
 	//// Initialize the render audio client
-	CRM(InitializeRenderAudioClient(), "Failed to initialize wasapi render");
+	//CRM(InitializeRenderAudioClient(), "Failed to initialize wasapi render");
 	
 	// Initialize the capture audio client
 	CRM(InitializeCaptureAudioClient(), "Failed to initialize wasapi capture");

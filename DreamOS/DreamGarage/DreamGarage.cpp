@@ -712,7 +712,8 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
 
-	pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
+	//pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
+	pDreamPeer->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
 
 Error:

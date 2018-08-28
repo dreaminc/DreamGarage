@@ -13,6 +13,8 @@
 #include "Sound/SpatialSoundObject.h"
 #include "DreamGarage/AudioDataMessage.h"
 
+#include "Core/Utilities.h"
+
 DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	DreamApp<DreamPeerApp>(pDOS, pContext),
 	m_pDOS(pDOS),
@@ -422,8 +424,14 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	m_pPeerConnection = pPeerConnection;
 	m_peerUserID = m_pPeerConnection->GetPeerUserID();	
 	
-	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	m_strScreenName = pUserControllerProxy->GetPeerScreenName(m_peerUserID);
+	UserController* pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+	// TODO: async version?
+	pUserController->GetPeerProfile(m_peerUserID);
+
+	m_strScreenName = pUserController->GetPeerScreenName(m_peerUserID);
+	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
+//	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
 Error:
 	return r;
@@ -439,6 +447,8 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	CN(pUserModel);
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
+	m_pUserModel->SetDreamOS(GetDOS());
+	m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId);
 	m_fPendingAssignedUserModel = true;
 
 Error:
@@ -498,8 +508,9 @@ RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	//m_pUserModel->GetHead()->SetPosition(ptPosition);
+	//m_pUserModel->SetPosition(ptPosition);
 	GetComposite()->SetPosition(ptPosition);
+	m_pUserModel->SetMouthPosition(ptPosition);
 
 	if (m_pSpatialSoundObject != nullptr) {
 		m_pSpatialSoundObject->SetPosition(ptPosition);
@@ -513,7 +524,8 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->GetHead()->SetOrientation(qOrientation);
+	m_pUserModel->SetOrientation(qOrientation);
+	m_pUserModel->SetMouthOrientation(qOrientation);
 
 	if (m_pSpatialSoundObject != nullptr) {
 		m_pSpatialSoundObject->SetOrientation(qOrientation);
@@ -526,7 +538,7 @@ Error:
 RESULT DreamPeerApp::RotateByDeg(float degX, float degY, float degZ) {
 	RESULT r = R_PASS;
 
-	CN(m_pUserModel);
+	CNR(m_pUserModel, R_SKIPPED);
 	//m_pUserModel->RotateByDeg(degX, degY, degZ);
 	m_pUserModel->GetHead()->RotateByDeg(degX, degY, degZ);
 	//GetComposite()->RotateByDeg(degX, degY, degZ);
@@ -560,12 +572,12 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 	}
 
 	// Mouth Position
-	/*
+	//*
 	{
 		auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
 		CN(pAudioBuffer);
 
-		size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
+		size_t numSamples = pAudioDataMessage->GetNumChannels() * pAudioDataMessage->GetNumFrames();
 		float averageAccumulator = 0.0f;
 
 		for (int i = 0; i < numSamples; ++i) {
@@ -582,7 +594,7 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
 		UpdateMouth(mouthScale);
 	}
-	*/
+	//*/
 
 Error:
 	return r;

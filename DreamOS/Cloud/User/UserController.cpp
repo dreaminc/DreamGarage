@@ -333,6 +333,7 @@ RESULT UserController::LoadProfile() {
 			jsonResponse["/data/id"_json_pointer].get<long>(),
 			//jsonResponse["/data/default_environment"_json_pointer].get<long>(),
 			m_defaultEnvironmentId,
+			jsonResponse["/data/avatar_model_id"_json_pointer].get<int>(),
 			jsonResponse["/data/email"_json_pointer].get<std::string>(),
 			jsonResponse["/data/public_name"_json_pointer].get<std::string>(),
 			jsonResponse["/data/first_name"_json_pointer].get<std::string>(),
@@ -385,8 +386,7 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 
 		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
 			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
-			// TODO: with avatar implementation
-			//m_avatarID = jsonResponse["/data/avatar_model_id"_json_pointer].get<int>();
+			m_avatarModelId = jsonResponse["/data/avatar_model_id"_json_pointer].get<int>();
 		}
 		
 		DEBUG_LINEOUT("User Profile Loaded");
@@ -684,15 +684,13 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 	m_user = User(
 		jsonData["/id"_json_pointer].get<long>(),
 		m_defaultEnvironmentId,
+		jsonData["/avatar_model_id"_json_pointer].get<int>(),
 		jsonData["/email"_json_pointer].get<std::string>(),
 		jsonData["/public_name"_json_pointer].get<std::string>(),
 		jsonData["/first_name"_json_pointer].get<std::string>(),
 		jsonData["/last_name"_json_pointer].get<std::string>(),
 		version(1.0f)	// version
 	);
-
-	// TODO: for avatar implementation
-	//jsonData["/avatar_model_id"_json_pointer].get<int>();
 
 	m_loginState.fHasUserProfile = true;
 	CR(UpdateLoginState());
@@ -849,8 +847,12 @@ std::string UserController::GetUserToken() {
 }
 
 std::string UserController::GetPeerScreenName(long peerUserID) {
-	GetPeerProfile(peerUserID);
+	//GetPeerProfile(peerUserID);
 	return m_strPeerScreenName;
+}
+
+int UserController::GetPeerAvatarModelID(long peerUserID) {
+	return m_avatarModelId;
 }
 
 CLOUD_CONTROLLER_TYPE UserController::GetControllerType() {

@@ -4,9 +4,19 @@
 
 #include "Core/Utilities.h"
 #include "Sandbox/CommandLineManager.h"
+#include "DreamOS.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
+{
+	m_pHeadTextures.clear();
+
+	Initialize();
+}
+
+user::user(HALImp* pHALImp, DreamOS *pDreamOS) :
+	composite(pHALImp),
+	m_pDreamOS(pDreamOS)
 {
 	m_pHeadTextures.clear();
 
@@ -36,13 +46,31 @@ RESULT user::Initialize() {
 	else {
 		vHeadOffset = vector(-(float)(M_PI_2), (float)(M_PI), 0.0f);
 	}
+	m_pMouthComposite = MakeComposite();
+	CN(m_pMouthComposite);
 
-	m_pHead = AddModel(util::StringToWideString(strHeadPath));
-	m_pHead->SetMaterialShininess(2.0f, true);
-	m_pHead->SetOrientationOffset(vHeadOffset);
-	m_pHead->SetPosition(point(0.0f, -0.35f, HEAD_POS));
-	m_pHead->SetScale(0.028f);
-	//m_pHead->SetScale(0.018f);
+	m_pMouthComposite->SetScale(0.028f);
+	m_pMouthComposite->SetPosition(point(0.0f, -0.35f, HEAD_POS));
+	m_pMouthComposite->SetOrientationOffset(vHeadOffset);
+	m_pMouthComposite->SetMaterialShininess(2.0f, true);
+
+	//m_pHead = AddModel(util::StringToWideString(strHeadPath));
+	
+	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthPath));
+	CN(m_pMouth);
+	
+	// TODO: should be a part of an avatar folder once there are multiple mouths, 
+	// could also help inform a loop with different naming
+	m_mouthStates.push_back(MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_03.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_02.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(L"mouth_01.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+
+	for (int i = 0; i < 4; i++) {
+		CN(m_mouthStates[i]);
+	}
+
+	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
 
 #else
 	//m_pHead = AddComposite();
@@ -58,19 +86,6 @@ RESULT user::Initialize() {
 #ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
 
-	m_pMouth = m_pHead->AddQuad(0.3, 1.0);
-	m_pMouth->MoveTo(0.0f, 12.0f, 8.35f);
-	
-	m_pMouth->RotateXByDeg(90);
-	m_pMouth->RotateZByDeg(90);
-	
-	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	
-	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
-	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
-	
-	m_pMouth->Scale(0.1f);
-
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT);
 	m_pLeftHand->OnLostTrack();
 	
@@ -80,7 +95,7 @@ RESULT user::Initialize() {
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -104,6 +119,64 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 	m_pLeftHand->SetVisible(false);
 	m_pRightHand->SetVisible(false);
 
+	return R_PASS;
+}
+
+RESULT user::SetDreamOS(DreamOS *pDreamOS) {
+	m_pDreamOS = pDreamOS;
+
+	if (m_pDreamOS != nullptr) {
+		m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get());
+	}
+
+	return R_PASS;
+}
+
+RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
+	RESULT r = R_PASS;
+
+	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
+
+	CBM(m_pHead == nullptr, "avatar model already set");
+	m_avatarModelId = avatarModelID;
+	CR(LoadHeadModelFromID());
+
+	m_pHead->SetScale(0.028f);
+	m_pHead->SetOrientationOffset(vHeadOffset);
+	m_pHead->SetMaterialShininess(2.0f, true);
+
+Error:
+	return r;
+}
+
+RESULT user::LoadHeadModelFromID() {
+	RESULT r = R_PASS;
+
+	CB(m_avatarModelId != AVATAR_INVALID);
+
+	switch (m_avatarModelId) {
+
+		case AVATAR_TYPE::WOMAN: {
+			m_pHead = AddModel(L"\\Avatar_Woman\\avatar_1.FBX");
+		} break;
+
+		case AVATAR_TYPE::BRUCE: {
+			m_pHead = AddModel(L"\\Avatar_Bruce\\avatar_2.FBX");
+		} break;
+	}
+
+
+Error:
+	return r;
+}
+
+RESULT user::SetMouthPosition(point ptPosition) {
+	m_pMouthComposite->SetPosition(ptPosition);
+	return R_PASS;
+}
+
+RESULT user::SetMouthOrientation(quaternion qOrientation) {
+	m_pMouthComposite->SetOrientation(qOrientation);
 	return R_PASS;
 }
 
@@ -142,9 +215,31 @@ Error:
 RESULT user::UpdateMouth(float mouthScale) {
 	RESULT r = R_PASS;
 	
-	CN(m_pMouth);
+	CNR(m_pMouth, R_SKIPPED);
 
-	m_pMouth->Scale(0.01f + 8.0f * mouthScale);
+	// Simple IIR filter
+	{
+		// controls how fast the mouth scale responds to sustained volume
+		float newAmount = 0.2f;
+		float newMouthScale = mouthScale * 8.0f + 0.01f;
+
+		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
+	}
+
+	float numBins = (float)(m_numMouthStates);
+	int rangedValue = (int)(m_mouthScale * numBins);
+
+	if (rangedValue > 3) {
+		rangedValue = 3;
+	}
+
+	if (rangedValue < 0) {
+		rangedValue = 0;
+	}
+
+	if (m_pMouth != nullptr) {
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[rangedValue].get());
+	}
 
 Error:
 	return r;
