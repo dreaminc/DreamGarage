@@ -100,6 +100,10 @@ Error:
 	return r;
 }
 
+std::string DreamTestApp::GetDreamStringVersion() {
+	return "0.0.0";		// This is... a placeholder?
+}
+
 // Cloud
 RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	return R_NOT_IMPLEMENTED;

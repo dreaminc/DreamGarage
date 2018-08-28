@@ -387,8 +387,6 @@ public:
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
-	std::wstring GetDreamVersion() { return m_wstrVersion; }
-
 	CameraNode* GetCameraNode() { return m_pCamera; }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
@@ -409,8 +407,6 @@ protected:
 	CommandLineManager *m_pCommandLineManager = nullptr;
 	PathManager *m_pPathManager = nullptr;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext = nullptr;		// TODO: fix it!
-	
-	std::wstring m_wstrVersion = L"";
 
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph = nullptr;	

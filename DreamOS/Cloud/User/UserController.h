@@ -50,7 +50,7 @@ public:
 		LOAD_TWILIO_NTS_INFO,
 
 		// new
-		GETDREAMVERSION,
+		GET_DREAM_VERSION,
 		GET_FORM,
 		GET_ACCESS_TOKEN,
 		SETTINGS,
@@ -68,7 +68,7 @@ public:
 	RESULT LoginFromFilename(const std::wstring& file);
 	RESULT LoginFromCommandline();
 
-	std::wstring RequestDreamVersion();
+	std::string RequestDreamVersion();
 
 	// obsolete. to be removed
 	//RESULT Login_Json(const std::wstring& strFilename);

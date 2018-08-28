@@ -44,12 +44,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 			title = title.substr(title.find_last_of(L"/\\") + 1);
 	}
 
-	size_t position = 0;
-	if (title.find(L".") != std::wstring::npos) {
-		position = title.find_first_of(L".");
-		m_wstrVersion = title.substr(position + 1, title.size());
-	}
-
 	m_hInstance = GetModuleHandle(0);
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);

@@ -364,6 +364,9 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
+	std::vector<std::string> vDreamVersion = util::TokenizeString(DREAM_VERSION, ".");
+	m_versionDreamClient = version(std::stoi(vDreamVersion[0]), std::stoi(vDreamVersion[1]), std::stoi(vDreamVersion[2]));
+
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
@@ -441,12 +444,14 @@ RESULT DreamGarage::DidFinishLoading() {
 		}
 	}
 #endif
+	
 	// Initial step of login flow:
 	{
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
-		std::wstring wstrMinimumDreamVersion = m_pUserController->RequestDreamVersion();
-		std::wstring wstrDreamVersion = GetDreamVersion();
-		if (GetDreamVersion().compare(wstrMinimumDreamVersion) != 0) {
+		std::string strMinimumDreamVersion = m_pUserController->RequestDreamVersion();
+		std::string strDreamClientVersion = m_versionDreamClient.GetString(true);
+		
+		if (strDreamClientVersion.compare(strMinimumDreamVersion) != 0) {
 			if (m_pDreamEnvironmentApp != nullptr) {
 				return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);
 			}
@@ -469,6 +474,10 @@ RESULT DreamGarage::DidFinishLoading() {
 	}
 Error:
 	return r;
+}
+
+std::string DreamGarage::GetDreamStringVersion() {
+	return m_versionDreamClient.GetString(true);	// assuming they want the minorminor as well.
 }
 
 RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {

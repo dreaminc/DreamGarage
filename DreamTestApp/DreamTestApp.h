@@ -32,6 +32,7 @@ public:
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
 	virtual RESULT Update(void) override;
+	virtual std::string GetDreamStringVersion() override;
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
