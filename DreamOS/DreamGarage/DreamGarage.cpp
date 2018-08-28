@@ -443,8 +443,9 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 	// Initial step of login flow:
 	{
-#ifdef PRODUCTION_BUILD || OCULUS_PRODUCTION_BUILD
+#if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
 		std::wstring wstrMinimumDreamVersion = m_pUserController->RequestDreamVersion();
+		std::wstring wstrDreamVersion = GetDreamVersion();
 		if (GetDreamVersion().compare(wstrMinimumDreamVersion) != 0) {
 			if (m_pDreamEnvironmentApp != nullptr) {
 				return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);

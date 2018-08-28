@@ -45,9 +45,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	}
 
 	size_t position = 0;
-	std::wstring delimiter = L".";
-	if (position = title.find(delimiter) != std::wstring::npos) {
-		m_wstrVersion = title.substr(position, title.size());
+	if (title.find(L".") != std::wstring::npos) {
+		position = title.find_first_of(L".");
+		m_wstrVersion = title.substr(position + 1, title.size());
 	}
 
 	m_hInstance = GetModuleHandle(0);
