@@ -30,13 +30,13 @@ RESULT SoundTestSuite::AddTests() {
 
 	// Add the tests
 
+	CR(AddTestCaptureSound());
+
 	CR(AddTestSpatialSound());
 
 	CR(AddTestSoundSystemModule());
 
 	CR(AddTestBrowserSoundRouting());
-
-	CR(AddTestCaptureSound());
 
 	CR(AddTestPlaySound());
 
@@ -580,7 +580,7 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 	int nRepeats = 1;
 	float radius = 2.0f;
 
-	struct TestContext : public SoundClient::observer {
+	struct TestContext : public DreamSoundSystem::observer {
 		SoundClient *pWASAPISoundClient = nullptr;
 		SoundClient *pXAudioSoundClient = nullptr;
 		sphere *pSphere = nullptr;
@@ -629,29 +629,15 @@ RESULT SoundTestSuite::AddTestCaptureSound() {
 			pTestContext->pSphere->SetPosition(ptPosition);
 
 			// Open a sound file
-			SoundFile *pNewSoundFile;
-			pNewSoundFile = SoundFile::LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
+			std::shared_ptr<SoundFile> pNewSoundFile;
+			pNewSoundFile = m_pDreamOS->LoadSoundFile(L"95BPMPiano01.wav", SoundFile::type::WAVE);
 			CN(pNewSoundFile);
 
-			// Create the capture client
-			pTestContext->pWASAPISoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
-			CN(pTestContext->pWASAPISoundClient);
-			CR(pTestContext->pWASAPISoundClient->RegisterObserver(pTestContext));
+			m_pDreamOS->UnregisterSoundSystemObserver();
+			m_pDreamOS->RegisterSoundSystemObserver(pTestContext);
 
-			//CR(pTestContext->pWASAPISoundClient->StartRender());
-			
-
-			///*
-			pTestContext->pXAudioSoundClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2);
-			CN(pTestContext->pXAudioSoundClient);
-
-			pTestContext->pXAudioSpatialSoundObject = pTestContext->pXAudioSoundClient->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
+			pTestContext->pXAudioSpatialSoundObject = m_pDreamOS->AddSpatialSoundObject(ptPosition, vEmitterDireciton, vListenerDireciton);
 			CN(pTestContext->pXAudioSpatialSoundObject);
-
-			CR(pTestContext->pXAudioSoundClient->StartSpatial());
-
-			CR(pTestContext->pWASAPISoundClient->StartCapture());
-			//*/
 
 			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.0f, 0.0f);
 		}

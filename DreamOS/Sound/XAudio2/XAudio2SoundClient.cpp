@@ -48,7 +48,7 @@ RESULT XAudio2SoundClient::AudioRenderProcess() {
 
 Error:
 
-	DEBUG_LINEOUT("XAudio2SoundClient: AudioRenderProcess End");
+	DEBUG_LINEOUT("XAudio2SoundClient: AudioRenderProcess End (expected)");
 
 	return r;
 }
