@@ -101,6 +101,13 @@ RESULT DreamEnvironmentApp::Update(void *pContext) {
 		pProgram->SetSunDirection(m_vSunDirection);
 	}
 
+	if (m_fShowUpdateRequired) {
+		texture* pMessageTexture = GetDOS()->MakeTexture(L"launch-update-required.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
+		m_pMessageQuad->SetVisible(true);
+		m_fShowUpdateRequired = false;
+	}
+
 	return R_PASS;
 }
 
@@ -245,9 +252,7 @@ RESULT DreamEnvironmentApp::FadeInWithMessageQuad(StartupMessage startupMessage)
 	} break;
 
 	case StartupMessage::UPDATE_REQUIRED: {
-		texture* pMessageTexture = GetDOS()->MakeTexture(L"launch-update-required.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
-		m_pMessageQuad->SetVisible(true);
+		m_fShowUpdateRequired = true;
 	} break;
 
 	}

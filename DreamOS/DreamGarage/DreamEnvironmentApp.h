@@ -113,6 +113,8 @@ private:
 	point m_ptMessageQuadOffset = point(-0.5f, 1.0f, 0.0f);
 	std::shared_ptr<quad> m_pMessageQuad = nullptr;
 
+	bool m_fShowUpdateRequired = false;
+
 	float m_environmentSceneScale = 0.025f;
 
 	float m_tableWidth = 112.5f * m_environmentSceneScale;

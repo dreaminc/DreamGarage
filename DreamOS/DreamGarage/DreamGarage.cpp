@@ -449,6 +449,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	{
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
+//*
 #else
 		// if there has already been a successful login, try to authenticate
 		if (!m_fFirstLogin && m_fHasCredentials) {
@@ -465,6 +466,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			}
 		}
 #endif
+//*/
 	}
 Error:
 	return r;
