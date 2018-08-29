@@ -91,6 +91,9 @@ public:
 public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT RunAppLoop();
+
+	bool IsShuttingDown();
+	RESULT PendShutdown();
 	RESULT Shutdown();
 
 	virtual RESULT InitializeSandbox() = 0;
@@ -453,6 +456,7 @@ protected:
 
 private:
 	bool m_fRunning = false;
+	bool m_fPendingShutdown = false;
 
 private:
 	UID m_uid;
