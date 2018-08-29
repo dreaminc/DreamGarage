@@ -44,7 +44,8 @@ public:
 	RESULT AddTestMinimalTextureShader();
 	RESULT AddTestBlinnPhongShaderBlur();
 	RESULT AddTestDepthPeelingShader();
-	RESULT AddTestObjectMaterials();
+	RESULT AddTestObjectMaterialsBump();
+	RESULT AddTestObjectMaterialsColors();
 
 	// Environments
 	RESULT AddTestStandardShader();

@@ -89,6 +89,35 @@ public:
 		return R_PASS;
 	}
 
+	RESULT IncrementRGB(float amount) {
+		RESULT r = R_PASS;
+
+		this->r() += amount;
+
+		if (this->r() > 1.0f) {
+			float diffR = this->r() - 1.0f;
+
+			this->r() = 1.0f;
+			this->g() += diffR;
+
+			if (this->g() > 1.0f) {
+				float diffG = this->g() - 1.0f;
+
+				this->g() = 0.0f;
+				this->b() += diffG;
+
+				if (this->b() > 1.0f) {
+					this->r() = 0.0f; 
+					this->g() = 0.0f; 
+					this->b() = 0.0f;
+				}
+			}
+		}
+
+	Error:
+		return r;
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline color_precision &r() { return this->element(0, 0); }
 	inline color_precision &g() { return this->element(1, 0); }

@@ -148,8 +148,16 @@ RESULT DimObj::SetWireframe(bool fWireframe) {
 	return R_PASS; 
 }
 
-color DimObj::GetColor() {
+color DimObj::GetDiffuseColor() {
 	return GetMaterial()->GetDiffuseColor();
+}
+
+color DimObj::GetSpecularColor() {
+	return GetMaterial()->GetSpecularColor();
+}
+
+color DimObj::GetAmbientColor() {
+	return GetMaterial()->GetAmbientColor();
 }
 
 RESULT DimObj::SetVertexColor(color c, bool fSetChildren) {

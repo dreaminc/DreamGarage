@@ -20,12 +20,16 @@ public:
 	~material();
 
 	RESULT SetColors(color colorAmbient, color colorDiffuse, color colorSpecular);
+
 	RESULT SetAmbientColor(color colorAmbient);
 	RESULT SetDiffuseColor(color colorDiffuse);
 	RESULT SetSpecularColor(color colorSpecular);
 
 	RESULT SetAmbientIntensity(float ambient);
+	
 	color GetDiffuseColor();
+	color GetSpecularColor();
+	color GetAmbientColor();
 
 	RESULT SetShininess(float shine);
 	RESULT SetBumpiness(float bumpiness);

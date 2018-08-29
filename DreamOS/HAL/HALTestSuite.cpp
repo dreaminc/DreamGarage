@@ -32,6 +32,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestObjectMaterialsColors());
+
 	CR(AddTestWaterShader());
 
 	CR(AddTestModel());
@@ -44,7 +46,7 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestStandardShader());
 
-	CR(AddTestObjectMaterials());
+	CR(AddTestObjectMaterialsBump());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
@@ -3534,8 +3536,111 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::AddTestObjectMaterialsColors() {
+	RESULT r = R_PASS;
 
-RESULT HALTestSuite::AddTestObjectMaterials() {
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float radius = 1.2f;
+
+	float padding = 0.5f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode *pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		{
+			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			light *pLight = m_pDreamOS->AddLight(LIGHT_POINT, 2.0f, point(-5.0f, 5.0f, 5.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
+
+			pTestContext->pSphere = m_pDreamOS->AddSphere(radius, 20, 20);
+			CN(pTestContext->pSphere);
+
+			float ambientVal = 0.0f;
+			float shineVal = 5.0f;
+			material tempMaterial = material(shineVal, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE), ambientVal);
+			pTestContext->pSphere->SetMaterial(tempMaterial);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			// Change materials 
+			color curColor = pTestContext->pSphere->GetDiffuseColor();
+			curColor.IncrementRGB(0.0001f);
+
+			CR(pTestContext->pSphere->SetMaterialDiffuseColor(curColor));
+		}
+	
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Material Color Test");
+	pNewTest->SetTestDescription("Testing the changing of material color properties");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT HALTestSuite::AddTestObjectMaterialsBump() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 40.0f;
