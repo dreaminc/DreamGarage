@@ -130,6 +130,8 @@ public:
 	inline point GetHeadPointOrigin() { return m_ptOrigin; }
 	inline vector GetHMDTrackerDeviation() { return GetHeadPointOrigin(); }
 
+	virtual RESULT RecenterHMD() = 0;
+
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
 

@@ -192,6 +192,11 @@ private:
 	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
 	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamePadCameraApp = nullptr;
+
+	volume* m_pVolume = nullptr;
+	volume* m_pVolume1 = nullptr;
+	volume* m_pVolume2 = nullptr;
+	volume* m_pVolume3 = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

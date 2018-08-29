@@ -367,6 +367,14 @@ RESULT DreamGarage::DidFinishLoading() {
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
+	m_pVolume = AddVolume(0.1f);
+	m_pVolume->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pVolume1 = AddVolume(0.1f);
+	m_pVolume1->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pVolume2 = AddVolume(0.1f);
+	m_pVolume2->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pVolume3 = AddVolume(0.1f);
+	m_pVolume3->SetPosition(0.0f, 0.0f, 0.0f);
 
 	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CN(m_pDreamUserApp);
@@ -732,9 +740,19 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
 	}
 	else {
+		m_pVolume1->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
+		m_pVolume2->SetPosition(ptSeatPosition);
+
 		pCamera->SetOffsetOrientation(qOffset);
-		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
-		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
+		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
+
+		m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition);
+
+		m_pVolume3->SetPosition(pCamera->GetPosition());
+
+		point ptUser;
+		m_pDreamUserApp->GetAppBasisPosition(ptUser);
+		m_pVolume->SetPosition(ptUser);
 	}
 
 	if (m_pDreamUserControlArea != nullptr) {

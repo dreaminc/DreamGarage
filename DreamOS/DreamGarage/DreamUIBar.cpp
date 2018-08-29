@@ -92,7 +92,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	//m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
-	m_pView->SetPosition(0.0f, -0.2f, 0.1f);
+	//m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUISpatialScrollView();

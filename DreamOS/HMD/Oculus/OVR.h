@@ -64,6 +64,13 @@ public:
 	virtual HMDDeviceType GetDeviceType() override;
 	virtual std::string GetDeviceTypeString() override;
 
+	virtual RESULT RecenterHMD() override;
+	bool ShouldRecenterHMD();
+private:
+	bool m_fShouldRecenterHMD = false;
+
+public:
+
 	RESULT ShutdownParentSandbox();
 
 	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) override;

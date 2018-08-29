@@ -91,7 +91,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		m_TrackerDescriptions.push_back(ovr_GetTrackerDesc(m_ovrSession, i));
 
 	// FloorLevel will give tracking poses where the floor height is 0
-	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
+	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_EyeLevel));
 
 	// Set up the mirror texture
 	if (wndWidth == 0)
@@ -188,6 +188,27 @@ HMDDeviceType OVRHMD::GetDeviceType() {
 
 std::string OVRHMD::GetDeviceTypeString() {
 	return "HMDType.OculusRift";
+}
+
+RESULT OVRHMD::RecenterHMD() {
+	RESULT r = R_PASS;
+
+	m_fShouldRecenterHMD = true;
+
+	return r;
+}
+
+bool OVRHMD::ShouldRecenterHMD() {
+	RESULT r = R_PASS;
+
+	ovrSessionStatus pSessionStatus;
+
+	ovr_GetSessionStatus(m_ovrSession, &pSessionStatus);
+
+	return (m_fShouldRecenterHMD || pSessionStatus.ShouldRecenter) && pSessionStatus.HmdMounted;
+
+Error:
+	return false;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
@@ -322,6 +343,11 @@ RESULT OVRHMD::UpdateHMD() {
 	double fTiming = ovr_GetTimeInSeconds();
 #endif
 	ovrTrackingState trackingState = ovr_GetTrackingState(m_ovrSession, fTiming, true);
+
+	if (ShouldRecenterHMD()) {
+		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
+		m_fShouldRecenterHMD = false;
+	}
 
 	if (trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;
