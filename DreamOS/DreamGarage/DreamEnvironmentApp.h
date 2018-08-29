@@ -110,7 +110,8 @@ public:
 private:
 	double m_messageQuadHeight = MESSAGE_QUAD_HEIGHT;
 	double m_messageQuadWidth = MESSAGE_QUAD_WIDTH;
-	point m_ptMessageQuadOffset = point(-0.5f, 1.0f, 0.0f);
+	// TODO: Generalize this? For seated and unseated scenarios
+	point m_ptMessageQuadPosition = point(-2.5f, 1.3f, 0);
 	std::shared_ptr<quad> m_pMessageQuad = nullptr;
 
 	bool m_fShowUpdateRequired = false;

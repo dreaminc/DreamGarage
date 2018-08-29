@@ -58,7 +58,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	
 	m_pMessageQuad = GetComposite()->AddQuad(m_messageQuadWidth, m_messageQuadHeight, 1, 1, nullptr);
 	// Default for when user isn't seated yet.
-	m_pMessageQuad->SetPosition(-2.5f, 1.3f, 0);
+	m_pMessageQuad->SetPosition(m_ptMessageQuadPosition);
 	m_pMessageQuad->RotateYByDeg(-90);
 	m_pMessageQuad->RotateZByDeg(90);
 	pDreamOS->AddObjectToUIGraph(m_pMessageQuad.get());
