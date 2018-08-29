@@ -1,113 +1,49 @@
 #ifndef OGLPROGRAM_SKYBOX_H_
 #define OGLPROGRAM_SKYBOX_H_
 
+#include "./RESULT/EHM.h"
+
 // Dream OS
 // DreamOS/HAL/opengl/OGLProgramSkybox.h
 // OGLProgramSkybox is an OGLProgram that encapsulates the OGLProgram 
 // for a skybox shader
 
-#include "./RESULT/EHM.h"
 #include "OGLProgram.h"
+
+class skybox;
+class stereocamera;
 
 class OGLProgramSkybox : public OGLProgram {
 public:
-	OGLProgramSkybox(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp, "oglskybox")
-	{
-		// empty
-	}
+	OGLProgramSkybox(OpenGLImp *pParentImp);
 
-	RESULT OGLInitialize() {
-		RESULT r = R_PASS;
+	virtual RESULT OGLInitialize() override;
+	virtual RESULT OGLInitialize(version versionOGL) override;
 
-		CR(OGLProgram::OGLInitialize());
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID) override;
 
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeNormal), std::string("inV_vec4Normal")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeUVCoord), std::string("inV_vec4UVCoord")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeTangent), std::string("inV_vec4Tangent")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeBitangent), std::string("inV_vec4Bitangent")));
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
-		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
-		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
-		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewOrientationMatrix), std::string("u_mat4ViewOrientation")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureCubeMap), std::string("u_textureCubeMap")));
-
-	Error:
-		return r;
-	}
-
-	virtual RESULT SetupConnections() override {
-		// TODO: do it
-		return R_NOT_IMPLEMENTED;
-	}
-
-	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
-	}
-
-	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		//auto matModel = pDimObj->GetModelMatrix();
-		//m_pUniformModelMatrix->SetUniform(matModel);
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(camera *pCamera) {
-	
-		//auto ptEye = pCamera->GetOrigin();
-		//auto matV = pCamera->GetViewMatrix();
-		auto matP = pCamera->GetProjectionMatrix();
-		//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		auto matViewOrientation = pCamera->GetOrientationMatrix();
-
-		
-		//m_pUniformViewMatrix->SetUniform(matV);
-		m_pUniformProjectionMatrix->SetUniform(matP);
-		// m_pUniformModelViewMatrix
-		//m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		m_pUniformViewOrientationMatrix->SetUniform(matViewOrientation);
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-		//auto ptEye = pStereoCamera->GetEyePosition(eye);
-		//auto matV = pStereoCamera->GetViewMatrix(eye);
-		auto matP = pStereoCamera->GetProjectionMatrix(eye);
-		//auto matVP = pStereoCamera->GetProjectionMatrix() * pStereoCamera->GetViewMatrix(eye);
-		auto matViewOrientation = pStereoCamera->GetOrientationMatrix();
-		
-		//m_pUniformViewMatrix->SetUniform(matV);
-		m_pUniformProjectionMatrix->SetUniform(matP);
-		// m_pUniformModelViewMatrix
-		//m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		m_pUniformViewOrientationMatrix->SetUniform(matViewOrientation);
-
-		return R_PASS;
-	}
+protected:
+	stereocamera *m_pCamera = nullptr;
+	skybox *m_pSkybox = nullptr;
 
 private:
-	// TODO: Pretty sure the Skybox doesn't need all of this
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeVector *m_pVertexAttributeNormal;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
-	OGLVertexAttributeVector *m_pVertexAttributeTangent;
-	OGLVertexAttributeVector *m_pVertexAttributeBitangent;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
 
 	//OGLUniformMatrix4 *m_pUniformModelMatrix;
 	//OGLUniformMatrix4 *m_pUniformViewMatrix;
-	OGLUniformMatrix4 *m_pUniformProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	//OGLUniformMatrix4 *m_pUniformModelViewMatrix;
 	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
-	OGLUniformMatrix4 *m_pUniformViewOrientationMatrix;
+	OGLUniformMatrix4 *m_pUniformViewOrientationMatrix = nullptr;
 
-	OGLUniformSamplerCube *m_pUniformTextureCubeMap;
+	OGLUniformSamplerCube *m_pUniformTextureCubeMap = nullptr;
 };
 
 #endif // ! OGLPROGRAM_SKYBOX_H_

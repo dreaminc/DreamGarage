@@ -1,8 +1,6 @@
 // skybox.vert
 // shadertype=glsl
 
-#version 440 core
-
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
@@ -31,28 +29,6 @@ uniform mat4 u_mat4ViewOrientation;
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 
-/*
-// TODO: Move to GLSL shared lib
-// Note that a quat is (w, x, y, z) so w is actually .x and so indices are used instead
-vec3 RotateVectorByQuaternion(vec4 q, vec3 v) {
-	vec3 retVal = vec3(0.0f);
-
-	retVal.x = v.x * (1.0f - 2.0f * ((q[2]*q[2]) + (q[3]*q[3]))) +
-			   v.y * (2.0f * ((q[1]*q[2]) + (q[0]*q[3])))		 +
-			   v.z * (2.0f * ((q[1]*q[3]) - (q[0]*q[2])));
-
-	retVal.y = v.x * (2.0f * ((q[1]*q[2]) - (q[0]*q[3])))		 +
-			   v.y * (1.0f - 2.0f * ((q[1]*q[1]) + (q[3]*q[3]))) +
-			   v.z * (2.0f * ((q[2]*q[3]) + (q[0]*q[1])));
-
-	retVal.z = v.x * (2.0f * ((q[1]*q[3]) + (q[0]*q[2]))) +
-			   v.y * (2.0f * ((q[2]*q[3]) - (q[0]*q[1]))) +
-			   v.z * (1.0f - 2.0f * ((q[1]*q[1]) + (q[2]*q[2])));
-
-	return retVal;
-}
-*/
-
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
@@ -65,8 +41,11 @@ void main(void) {
 	// Projected Vert Position
 	//vec3 rotatedPoint = RotateVectorByQuaternion(u_vec4ViewOrientationQuaternion, inV_vec4Position.xyz);
 	//vec3 rotatedPoint = RotateVectorByQuaternion(vec4(0.0f, 0.0f, 0.0f, -1.0f), inV_vec4Position.xyz);
-	vec4 transformedPosition = u_mat4Projection * u_mat4ViewOrientation * vec4(inV_vec4Position.xyz, 1.0f);
 	//vec4 transformedPosition = u_mat4Projection * vec4(rotatedPoint, 1.0f);
+	
+	vec4 transformedPosition = u_mat4Projection * u_mat4ViewOrientation * vec4(inV_vec4Position.xyz, 1.0f);
+
 	gl_Position = transformedPosition;
+	
 	DataOut.position = inV_vec4Position.xyz;
 }

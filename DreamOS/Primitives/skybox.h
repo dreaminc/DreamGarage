@@ -10,6 +10,8 @@
 #include "volume.h"
 #include "texture.h"
 
+// TODO: Not sure that this needs to be an explicit primitive 
+
 #define DEFAULT_SKYBOX_SIZE 1000.0f
 
 class skybox : public volume {
@@ -29,6 +31,7 @@ public:
 		RESULT r = R_PASS;
 
 		CBM((m_pCubeMapTexture == nullptr), "Cannot overwrite cube map texture");
+
 		m_pCubeMapTexture = pTexture;
 		m_pCubeMapTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_CUBE);
 
