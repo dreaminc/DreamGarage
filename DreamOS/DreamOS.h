@@ -125,7 +125,7 @@ public:
 	// These are used to set paths for path manager
 	virtual bool UseInstallPath() { return false; }
 	virtual std::wstring GetDreamFolderPath() { return std::wstring(L""); }
-	virtual std::string GetDreamStringVersion() = 0;
+	virtual version GetDreamVersion() = 0;
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
@@ -182,7 +182,7 @@ public:
 	}
 
 	//User Observer
-	virtual RESULT OnDreamVersion(std::string strDreamVersion) {
+	virtual RESULT OnDreamVersion(version dreamVersion) {
 		return R_NOT_IMPLEMENTED;
 	}
 

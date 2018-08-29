@@ -89,7 +89,7 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 			return R_NOT_IMPLEMENTED; 
 		}
 
-		virtual RESULT OnDreamVersion(std::string strDreamVersion) override {
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
 			DEBUG_LINEOUT("OnDreamVersion");
 
 			return R_NOT_HANDLED;

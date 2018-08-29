@@ -100,8 +100,8 @@ Error:
 	return r;
 }
 
-std::string DreamTestApp::GetDreamStringVersion() {
-	return "0.0.0";		// This is... a placeholder?
+version DreamTestApp::GetDreamVersion() {
+	return version("0.0.0");		// This is... a placeholder?
 }
 
 // Cloud

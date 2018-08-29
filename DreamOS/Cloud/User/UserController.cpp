@@ -4,6 +4,7 @@
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
+#include "Primitives/version.h"
 
 #include <fstream>
 #include <sstream>
@@ -264,8 +265,10 @@ void UserController::OnDreamVersion(std::string&& strResponse) {
 		strDreamVersion = jsonData["/client_settings/minimum_version"_json_pointer].get<std::string>();
 	}
 
-	CNM(m_pUserControllerObserver, "user observer is nullptr");
-	CR(m_pUserControllerObserver->OnDreamVersion(strDreamVersion));
+	if (m_pUserControllerObserver != nullptr) {
+		version dreamVersion = version(strDreamVersion);
+		CR(m_pUserControllerObserver->OnDreamVersion(dreamVersion));
+	}
 
 Error:
 	return;

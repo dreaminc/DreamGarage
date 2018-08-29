@@ -1,4 +1,5 @@
 #include "version.h"
+#include "Core/Utilities.h"
 #include <math.h>
 
 version::version(const version &ver) {
@@ -18,6 +19,10 @@ version::version(float fVer) {
 
 version::version(long lVer) {
 	SetVersion(lVer);
+}
+
+version::version(std::string strVer) {
+	SetVersion(strVer);
 }
 
 version::~version() {
@@ -71,6 +76,18 @@ RESULT version::SetVersion(long lVer) {
 	m_major = (int)((lVer % 1000) / 100);
 	m_minor = (int)((lVer % 100) / 10);
 	m_doubleminor = (int)((lVer % 10) / 1);
+
+	return r;
+}
+
+// Takes a . delimited string - X.Y.Z
+RESULT version::SetVersion(std::string strVer) {
+	RESULT r = R_PASS;
+
+	std::vector<std::string> vVersion = util::TokenizeString(strVer, ".");
+	m_major = std::stoi(vVersion[0]);
+	m_minor = std::stoi(vVersion[1]);
+	m_doubleminor = std::stoi(vVersion[2]);
 
 	return r;
 }

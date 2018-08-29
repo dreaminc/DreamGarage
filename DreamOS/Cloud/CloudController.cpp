@@ -456,11 +456,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDreamVersion(std::string strDreamVersion) {
+RESULT CloudController::OnDreamVersion(version dreamVersion) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnDreamVersion(strDreamVersion));
+		CR(m_pUserObserver->OnDreamVersion(dreamVersion));
 	}
 
 Error:

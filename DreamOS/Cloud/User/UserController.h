@@ -167,7 +167,7 @@ public:
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
-		virtual RESULT OnDreamVersion(std::string strDreamVersion) = 0;
+		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

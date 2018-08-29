@@ -364,9 +364,6 @@ std::shared_ptr<DreamPeerApp> g_pDreamPeerApp = nullptr;
 RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
-	std::vector<std::string> vDreamVersion = util::TokenizeString(DREAM_VERSION, ".");
-	m_versionDreamClient = version(std::stoi(vDreamVersion[0]), std::stoi(vDreamVersion[1]), std::stoi(vDreamVersion[2]));
-
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
@@ -472,13 +469,12 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDreamVersion(std::string strDreamVersion) {
+RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
 	RESULT r = R_PASS;
 
 	std::string strFormType;
-	std::string strDreamClientVersion = m_versionDreamClient.GetString(true);
 
-	if (strDreamClientVersion.compare(strDreamVersion) != 0) {
+	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update... 
 		if (m_pDreamEnvironmentApp != nullptr) {
 			return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);
 		}
@@ -503,8 +499,8 @@ Error:
 	return r;
 }
 
-std::string DreamGarage::GetDreamStringVersion() {
-	return m_versionDreamClient.GetString(true);	// assuming they want the minorminor as well.
+version DreamGarage::GetDreamVersion() {
+	return m_versionDreamClient;
 }
 
 RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {

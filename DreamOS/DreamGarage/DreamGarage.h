@@ -74,7 +74,7 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
-	virtual std::string GetDreamStringVersion() override;
+	virtual version GetDreamVersion() override;
 
 	// Cloud Controller
 	//RESULT InitializeCloudControllerCallbacks();
@@ -111,7 +111,7 @@ public:
 	virtual RESULT OnCloseAsset() override;
 
 	// User Observer
-	virtual RESULT OnDreamVersion(std::string strDreamVersion) override;
+	virtual RESULT OnDreamVersion(version dreamVersion) override;
 
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
@@ -160,7 +160,7 @@ private:
 
 
 private:
-	version m_versionDreamClient = version(0,0,0);
+	version m_versionDreamClient = version(DREAM_VERSION);
 
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
