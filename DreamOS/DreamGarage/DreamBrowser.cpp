@@ -738,10 +738,8 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
-
-	// TODO: Either put this back in or move it to a different layer
-	//CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	//CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
