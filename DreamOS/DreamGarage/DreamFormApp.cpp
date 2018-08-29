@@ -117,6 +117,13 @@ Error:
 }
 
 RESULT DreamFormApp::Shutdown(void *pContext) {
+
+	if (m_pDreamBrowserForm != nullptr) {
+		m_pDreamBrowserForm->CloseSource();
+		GetDOS()->ShutdownDreamApp<DreamBrowser>(m_pDreamBrowserForm);
+		m_pDreamBrowserForm = nullptr;
+	}
+
 	return R_PASS;
 }
 

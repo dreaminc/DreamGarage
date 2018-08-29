@@ -4,6 +4,7 @@
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
+#include "Primitives/version.h"
 
 #include <fstream>
 #include <sstream>
@@ -56,6 +57,10 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 
 
 	switch (userMethod) {
+		case UserMethod::GET_DREAM_VERSION: {
+			strURI = strAPIURL + "/client/settings";
+		} break;
+
 		case UserMethod::LOGIN: {
 			strURI = strAPIURL + "/token/";
 		} break;
@@ -221,6 +226,52 @@ User UserController::GetUser() {
 
 TwilioNTSInformation UserController::GetTwilioNTSInformation() {
 	return m_twilioNTSInformation;
+}
+
+RESULT UserController::RequestDreamVersion() {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+	nlohmann::json jsonResponse;
+	std::string strResponse;
+	std::string strVersion;
+	std::string strURI = GetMethodURI(UserMethod::GET_DREAM_VERSION);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnDreamVersion, this, std::placeholders::_1)));	
+
+Error:
+	return r;
+}
+
+void UserController::OnDreamVersion(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	std::string strDreamVersion;
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	nlohmann::json jsonForm;
+	int statusCode;
+
+	//TODO: these function are void instead of RESULT
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	CBM(!jsonData["/client_settings/minimum_version"_json_pointer].is_null(), "minimum version was null");
+
+	if (jsonData["/client_settings/minimum_version"_json_pointer].is_string()) {
+		strDreamVersion = jsonData["/client_settings/minimum_version"_json_pointer].get<std::string>();
+	}
+
+	if (m_pUserControllerObserver != nullptr) {
+		version dreamVersion = version(strDreamVersion);
+		CR(m_pUserControllerObserver->OnDreamVersion(dreamVersion));
+	}
+
+Error:
+	return;
 }
 
 RESULT UserController::LoginFromCommandline() {

@@ -441,8 +441,45 @@ RESULT DreamGarage::DidFinishLoading() {
 		}
 	}
 #endif
-
+	
 	// Initial step of login flow:
+	{
+#if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+		CR(m_pUserController->RequestDreamVersion());
+//*
+#else
+		// if there has already been a successful login, try to authenticate
+		if (!m_fFirstLogin && m_fHasCredentials) {
+			m_pUserController->GetAccessToken(m_strRefreshToken);
+		}
+		else {
+			// Otherwise, start by showing the settings form
+
+			strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+			CR(m_pUserController->GetFormURL(strFormType));
+
+			if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
+				CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
+			}
+		}
+#endif
+//*/
+	}
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
+	RESULT r = R_PASS;
+
+	std::string strFormType;
+
+	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update... 
+		if (m_pDreamEnvironmentApp != nullptr) {
+			return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);
+		}
+	}
+
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
 		m_pUserController->GetAccessToken(m_strRefreshToken);
@@ -452,13 +489,18 @@ RESULT DreamGarage::DidFinishLoading() {
 
 		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
 		CR(m_pUserController->GetFormURL(strFormType));
-		if (m_pDreamEnvironmentApp != nullptr) {	
+
+		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
 			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
 		}
 	}
-	
+
 Error:
 	return r;
+}
+
+version DreamGarage::GetDreamVersion() {
+	return m_versionDreamClient;
 }
 
 RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {

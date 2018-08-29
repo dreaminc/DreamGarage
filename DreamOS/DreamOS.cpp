@@ -4,6 +4,7 @@
 #include "DreamAppManager.h"
 
 #include "Primitives/font.h"
+#include "Core/Utilities.h"
 
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"

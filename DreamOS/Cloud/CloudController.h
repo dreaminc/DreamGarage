@@ -93,6 +93,7 @@ public:
 
 	class UserObserver {
 	public:
+		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 
@@ -200,6 +201,7 @@ public:
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
 	// UserControllerObserver
+	virtual RESULT OnDreamVersion(version dreamVersion) override;
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 

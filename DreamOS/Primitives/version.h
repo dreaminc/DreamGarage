@@ -16,11 +16,13 @@ public:
 	version(int major, int minor = 0, int doubleminor = 0);
 	version(float fVer);
 	version(long lVer);
+	version(std::string strVer);
 	~version();
 
 	RESULT SetVersion(int major, int minor = 0, int doubleminor = 0);
 	RESULT SetVersion(float fVer);
 	RESULT SetVersion(long lVer);
+	RESULT SetVersion(std::string strVer);
 
 	std::string GetString(bool fShowMinorMinor = false);
 

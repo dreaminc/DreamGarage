@@ -24,24 +24,24 @@
     <tags>native, dreamos</tags>
   </metadata>
   <files>
-    <file src="x64\OculusProduction\*.exe" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.lib" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.dll" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.bin" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.dat" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.pak" target="\DreamOS\src\" />
-    <file src="x64\OculusProduction\*.js" target="\DreamOS\src\" />
+    <file src="x64\OculusProduction\*.exe" target="" />
+    <file src="x64\OculusProduction\*.lib" target="" />
+    <file src="x64\OculusProduction\*.dll" target="" />
+    <file src="x64\OculusProduction\*.bin" target="" />
+    <file src="x64\OculusProduction\*.dat" target="" />
+    <file src="x64\OculusProduction\*.pak" target="" />
+    <file src="x64\OculusProduction\*.js" target="" />
 
-    <file src=".\..\..\..\dreampaths.txt" target="\DreamOS\src\dreampaths.txt" />
-    <file src=".\..\..\..\HAL\**" target="\DreamOS\src\HAL\" />
-    <file src=".\..\..\..\Models\**" target="\DreamOS\src\Models\" />
-    <file src=".\..\..\..\Resources\**" target="\DreamOS\src\Resources\" />
-    <file src=".\..\..\..\Texture\**" target="\DreamOS\src\Texture\" />
+    <file src=".\..\..\..\dreampaths.txt" target="dreampaths.txt" />
+    <file src=".\..\..\..\HAL\**" target="\HAL\" />
+    <file src=".\..\..\..\Models\**" target="\Models\" />
+    <file src=".\..\..\..\Resources\**" target="\Resources\" />
+    <file src=".\..\..\..\Texture\**" target="\Texture\" />
 
-    <file src=".\..\..\..\distribution\*" target="\DreamOS\src\" />
+    <file src=".\..\..\..\distribution\*" target="" />
 
-    <file src="x64\OculusProduction\locales\**" target="\DreamOS\src\locales\" />
+    <file src="x64\OculusProduction\locales\**" target="\locales\" />
 
-    <file src="DreamOS.targets" target="\DreamOS\build\DreamOS.targets" />
+    <file src="DreamOS.targets" target="\build\DreamOS.targets" />
   </files>
 </package>

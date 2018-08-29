@@ -407,7 +407,7 @@ protected:
 	CommandLineManager *m_pCommandLineManager = nullptr;
 	PathManager *m_pPathManager = nullptr;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext = nullptr;		// TODO: fix it!
-	
+
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph = nullptr;	
 	ObjectStore *m_pInteractionGraph = nullptr;

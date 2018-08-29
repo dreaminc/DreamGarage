@@ -11,6 +11,7 @@
 #include "DreamOS.h"
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
+#include "Primitives/version.h"
 
 class DreamUIBar;
 class DreamContentView;
@@ -73,6 +74,8 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
+	virtual version GetDreamVersion() override;
+
 	// Cloud Controller
 	//RESULT InitializeCloudControllerCallbacks();
 
@@ -108,6 +111,8 @@ public:
 	virtual RESULT OnCloseAsset() override;
 
 	// User Observer
+	virtual RESULT OnDreamVersion(version dreamVersion) override;
+
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 
@@ -155,9 +160,10 @@ private:
 
 
 private:
+	version m_versionDreamClient = version(DREAM_VERSION);
+
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
-
 
 	long m_pendingAssetReceiveUserID = -1;
 

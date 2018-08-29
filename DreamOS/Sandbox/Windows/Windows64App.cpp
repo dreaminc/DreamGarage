@@ -44,8 +44,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 			title = title.substr(title.find_last_of(L"/\\") + 1);
 	}
 
-	title = L"Dream " + title;
-
 	m_hInstance = GetModuleHandle(0);
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);

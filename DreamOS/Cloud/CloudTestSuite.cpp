@@ -88,6 +88,12 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override { 
 			return R_NOT_IMPLEMENTED; 
 		}
+
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
 		
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override { 
 			RESULT r = R_PASS;

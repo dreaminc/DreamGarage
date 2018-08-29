@@ -456,6 +456,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnDreamVersion(version dreamVersion) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnDreamVersion(dreamVersion));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 

@@ -535,6 +535,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
 			RESULT r = R_PASS;
 
