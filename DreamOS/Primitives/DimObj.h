@@ -100,7 +100,10 @@ public:
 	bool IsWireframe();
 	RESULT SetWireframe(bool fWireframe = true);
 
-	color GetColor();
+	color GetDiffuseColor();
+	color GetSpecularColor();
+	color GetAmbientColor();
+
 	RESULT SetVertexColor(color c, bool fSetChildren = false);
 	RESULT SetAlpha(color_precision a);
 

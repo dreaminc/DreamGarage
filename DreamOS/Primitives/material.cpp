@@ -77,6 +77,14 @@ color material::GetDiffuseColor() {
 	return m_colorDiffuse;
 }
 
+color material::GetSpecularColor() {
+	return m_colorDiffuse;
+}
+
+color material::GetAmbientColor() {
+	return m_colorDiffuse;
+}
+
 RESULT material::SetShininess(float shine) {
 	m_shine = shine;
 	return R_PASS;
