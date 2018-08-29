@@ -227,7 +227,7 @@ TwilioNTSInformation UserController::GetTwilioNTSInformation() {
 	return m_twilioNTSInformation;
 }
 
-std::string UserController::RequestDreamVersion() {
+RESULT UserController::RequestDreamVersion() {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -237,20 +237,38 @@ std::string UserController::RequestDreamVersion() {
 	std::string strURI = GetMethodURI(UserMethod::GET_DREAM_VERSION);
 
 	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
 
-	pHTTPController->GET(strURI, HTTPController::ContentHttp(), httpResponse);
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnDreamVersion, this, std::placeholders::_1)));	
 
-	strResponse = std::string(httpResponse.PullResponse());
-	strResponse = strResponse.substr(0, strResponse.find('\r'));
-	jsonResponse = nlohmann::json::parse(strResponse);
+Error:
+	return r;
+}
 
-	DEBUG_LINEOUT(jsonResponse.dump().c_str());
+void UserController::OnDreamVersion(std::string&& strResponse) {
+	RESULT r = R_PASS;
 
-	if (jsonResponse["/data/client_settings/minimum_version"_json_pointer].is_string()) {
-		strVersion = jsonResponse["/data/client_settings/minimum_version"_json_pointer].get<std::string>();
+	std::string strDreamVersion;
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	nlohmann::json jsonForm;
+	int statusCode;
+
+	//TODO: these function are void instead of RESULT
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	CB(statusCode == 200);
+
+	CBM(!jsonData["/client_settings/minimum_version"_json_pointer].is_null(), "minimum version was null");
+
+	if (jsonData["/client_settings/minimum_version"_json_pointer].is_string()) {
+		strDreamVersion = jsonData["/client_settings/minimum_version"_json_pointer].get<std::string>();
 	}
 
-	return strVersion;
+	CNM(m_pUserControllerObserver, "user observer is nullptr");
+	CR(m_pUserControllerObserver->OnDreamVersion(strDreamVersion));
+
+Error:
+	return;
 }
 
 RESULT UserController::LoginFromCommandline() {

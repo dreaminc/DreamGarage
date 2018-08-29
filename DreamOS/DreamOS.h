@@ -182,6 +182,10 @@ public:
 	}
 
 	//User Observer
+	virtual RESULT OnDreamVersion(std::string strDreamVersion) {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;
 	}

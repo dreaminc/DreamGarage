@@ -111,6 +111,8 @@ public:
 	virtual RESULT OnCloseAsset() override;
 
 	// User Observer
+	virtual RESULT OnDreamVersion(std::string strDreamVersion) override;
+
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 

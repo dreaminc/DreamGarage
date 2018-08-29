@@ -67,9 +67,7 @@ public:
 	// Read username and password from file and login, get a token
 	RESULT LoginFromFilename(const std::wstring& file);
 	RESULT LoginFromCommandline();
-
-	std::string RequestDreamVersion();
-
+	
 	// obsolete. to be removed
 	//RESULT Login_Json(const std::wstring& strFilename);
 	
@@ -142,6 +140,9 @@ public:
 	RESULT RequestTwilioNTSInformation(std::string& strAccessToken);
 	void OnTwilioNTSInformation(std::string&& strResponse);
 
+	RESULT RequestDreamVersion();
+	void OnDreamVersion(std::string&& strResponse);
+
 // basic http error handling
 private:
 	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode);
@@ -166,6 +167,7 @@ public:
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
+		virtual RESULT OnDreamVersion(std::string strDreamVersion) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);
