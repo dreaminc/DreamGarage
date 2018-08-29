@@ -600,8 +600,15 @@ Error:
 }
 
 RESULT DreamOS::Exit(RESULT exitcode) {
+	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString().c_str(), exitcode);
-	return exitcode;
+
+	CR(m_pSandbox->PendShutdown());
+	CR(exitcode);
+
+Error:
+	return r;
 }
 
 InteractionEngineProxy *DreamOS::GetInteractionEngineProxy() {

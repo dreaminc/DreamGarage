@@ -468,6 +468,9 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CR(pUserController->Logout());
 
 				}
+				else if (strScope == "SystemScope.Close") {
+					CR(GetDOS()->Exit(r));
+				}
 				else if (strScope == "FormScope.Form") {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");

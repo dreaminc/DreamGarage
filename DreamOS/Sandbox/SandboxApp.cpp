@@ -341,6 +341,15 @@ inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
 }
 
+bool SandboxApp::IsShuttingDown() {
+	return m_fPendingShutdown;
+}
+
+RESULT SandboxApp::PendShutdown() {
+	m_fPendingShutdown = true;
+	return R_PASS;
+}
+
 RESULT SandboxApp::Shutdown() {
 	RESULT r = R_SUCCESS;
 
@@ -445,7 +454,7 @@ RESULT SandboxApp::RunAppLoop() {
 		SwapDisplayBuffers();
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+		if (IsShuttingDown() || GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 		}
 	}
