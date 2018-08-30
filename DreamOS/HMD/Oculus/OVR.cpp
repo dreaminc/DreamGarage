@@ -320,8 +320,12 @@ RESULT OVRHMD::UpdateHMD() {
 		ShutdownParentSandbox();
 	}
 
-	if (ShouldRecenterHMD(OVRSessionStatus)) {
+	if (OVRSessionStatus.ShouldRecenter) {
 		DOSLOG(INFO, "ShouldRecenter");
+		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
+	}
+
+	if (ShouldRecenterHMD(OVRSessionStatus)) {
 		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
 		m_fShouldRecenterHMD = false;
 	}
