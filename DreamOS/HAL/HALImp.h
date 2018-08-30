@@ -190,6 +190,8 @@ public:
 	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) = 0;
 
+	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) = 0;
+
 	virtual skybox *MakeSkybox() = 0;
 
 	//virtual model *MakeModel(wchar_t *pszModelName) = 0;

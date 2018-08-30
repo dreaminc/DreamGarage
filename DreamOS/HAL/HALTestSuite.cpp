@@ -16,6 +16,7 @@
 #include "HAL/opengl/OGLProgramWater.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
 
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
@@ -4536,6 +4537,11 @@ RESULT HALTestSuite::AddTestCubeMap() {
 			sphere *pSphere;
 			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 			CN(pSphere);
+
+			cubemap *pCubemap = m_pDreamOS->MakeCubemap(L"LarnacaCastle");
+			CN(pCubemap);
+
+			CR(dynamic_cast<OGLProgramSkybox*>(pRenderProgramNode)->SetCubemap(pCubemap));
 
 		}
 

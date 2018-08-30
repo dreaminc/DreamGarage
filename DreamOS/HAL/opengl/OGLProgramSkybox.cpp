@@ -96,6 +96,13 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramSkybox::SetCubemap(cubemap *pCubemap) {
+
+	m_pCubemap = pCubemap;
+
+	return R_PASS;
+}
+
 RESULT OGLProgramSkybox::SetupConnections() {
 	RESULT r = R_PASS;
 

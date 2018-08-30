@@ -10,12 +10,11 @@
 #include "Primitives/texture.h"
 
 #include "OpenGLCommon.h"
-#include "OpenGLImp.h"
+
+class OpenGLImp;
 
 class OGLTexture : public texture {
 public:
-	
-
 	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 	OGLTexture(const OGLTexture &pOGLTexture);
 
@@ -51,8 +50,6 @@ public:
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
-	static GLenum GetOGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
-
 	GLenum GetOGLTextureTarget() { return m_textureTarget; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
@@ -73,19 +70,6 @@ public:
 	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename);
 	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
 	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
-
-	// TODO: Move to OGLCubeMap
-	//static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels);
-	//RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
-	//RESULT SetDefaultCubeMapParams();
-	//const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-	//};
 
 private:
 	OpenGLImp *m_pParentImp = nullptr;

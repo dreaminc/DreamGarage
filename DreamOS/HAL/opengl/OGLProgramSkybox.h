@@ -12,6 +12,7 @@
 
 class skybox;
 class stereocamera;
+class cubemap;
 
 class OGLProgramSkybox : public OGLProgram {
 public:
@@ -28,9 +29,14 @@ public:
 	virtual RESULT SetCameraUniforms(camera *pCamera) override;
 	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
+	// Temporary until we set up nodes
+	RESULT SetCubemap(cubemap *pCubemap);
+
 protected:
 	stereocamera *m_pCamera = nullptr;
 	skybox *m_pSkybox = nullptr;
+
+	cubemap *m_pCubemap = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;

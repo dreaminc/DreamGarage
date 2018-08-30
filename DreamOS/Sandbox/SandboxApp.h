@@ -335,6 +335,8 @@ public:
 	texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n);
 
+	cubemap* MakeCubemap(const std::wstring &wstrCubemapName);
+
 	skybox *AddSkybox();
 
 	//model *AddModel(wchar_t *pszModelName);

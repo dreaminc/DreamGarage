@@ -854,6 +854,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLComposite.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLCubemap.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLCylinder.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFlatContext.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
@@ -900,6 +901,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLUser.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVolume.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLCommon.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
@@ -1177,6 +1179,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCubemap.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFlatContext.h" />

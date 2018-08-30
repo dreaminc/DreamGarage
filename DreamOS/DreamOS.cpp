@@ -1076,6 +1076,10 @@ texture* DreamOS::MakeTexture(texture::type type, int width, int height, PIXEL_F
 	return m_pSandbox->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
+cubemap* DreamOS::MakeCubemap(const std::wstring &wstrCubemapName) {
+	return m_pSandbox->MakeCubemap(wstrCubemapName);
+}
+
 skybox *DreamOS::AddSkybox() {
 	return m_pSandbox->AddSkybox();
 }

@@ -79,6 +79,8 @@ public:
 	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) override;
 	virtual texture* MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) override;
 	
+	virtual cubemap* MakeCubemap(const std::wstring &wstrCubemapName) override;
+
 	skybox *MakeSkybox();
 
 	//mesh *MakeMesh(wchar_t *pszModelName);

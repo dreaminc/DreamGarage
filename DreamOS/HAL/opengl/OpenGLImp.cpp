@@ -28,6 +28,7 @@
 #include "OGLModel.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
+#include "OGLCubemap.h"
 #include "OGLSkybox.h"
 #include "OGLUser.h"
 #include "OGLHand.h"
@@ -937,7 +938,7 @@ texture* OpenGLImp::MakeTexture(texture::type type, const wchar_t *pszFilename) 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
 	CN(pTexture);
 
-//Success:
+Success:
 	return pTexture;
 
 Error:
@@ -998,6 +999,24 @@ Error:
 	if (pTexture != nullptr) {
 		delete pTexture;
 		pTexture = nullptr;
+	}
+
+	return nullptr;
+}
+
+cubemap* OpenGLImp::MakeCubemap(const std::wstring &wstrCubemapName) {
+	RESULT r = R_PASS;
+
+	cubemap *pCubemap = OGLCubemap::MakeCubemapFromName(this, wstrCubemapName);
+	CN(pCubemap);
+
+Success:
+	return pCubemap;
+
+Error:
+	if (pCubemap != nullptr) {
+		delete pCubemap;
+		pCubemap = nullptr;
 	}
 
 	return nullptr;
