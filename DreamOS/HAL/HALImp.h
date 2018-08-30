@@ -185,10 +185,10 @@ public:
 	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 
-	virtual texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
-	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(const texture &srcTexture) = 0;
+	virtual texture* MakeTexture(texture::type type, const wchar_t *pszFilename) = 0;
+	virtual texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) = 0;
+	virtual texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) = 0;
 
 	virtual skybox *MakeSkybox() = 0;
 

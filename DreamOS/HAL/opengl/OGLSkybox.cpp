@@ -28,6 +28,7 @@ Error:
 //RESULT Render() {
 RESULT OGLSkybox::Render() {
 	RESULT r = R_PASS;
+
 	bool fCullingEnabled = glIsEnabled(GL_CULL_FACE) != 0;
 
 	glDisable(GL_CULL_FACE);

@@ -32,6 +32,12 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestObjectMaterialsBump());
+
+	CR(AddTestMinimalTextureShader());
+
+	CR(AddTestCubeMap());
+
 	CR(AddTestObjectMaterialsColors());
 
 	CR(AddTestWaterShader());
@@ -45,8 +51,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestToonShader());
 
 	CR(AddTestStandardShader());
-
-	CR(AddTestObjectMaterialsBump());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
@@ -85,8 +89,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestMouseDrag());
 
 	CR(AddTestMinimalShader());
-
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestQuadObject());
 
@@ -474,20 +476,20 @@ RESULT HALTestSuite::AddTestEnvironments() {
 		//model* pModel = m_pDreamOS->AddModel(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\006.fbx"); // cave
 
 		// Ambient Occlusion textures
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\001_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\002_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\004_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\005_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\006_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\008_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\009_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\010_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\001_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\002_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\004_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\005_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\006_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\007_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\008_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\009_AO.png"));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\TestEnvironments\\DREAM_OS_2018_05_07\\map\\010_AO.png"));
 
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"..\\Models\\Map\\ao_color.tga", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\007_AO.png"));
+		pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"..\\Models\\Map\\ao_color.tga"));
 
-		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\006_AO.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		//pModel->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"\\DREAM_OS_2018_05_22\\DREAM_OS_2018_05_22\\map\\006_AO.png"));
 
 		//pModel->RotateXByDeg(-90.0f);
 		//pModel->RotateYByDeg(90.0f);
@@ -802,7 +804,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		{
 
 			//texture *pColorTexture;
-			//pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			//
 			//volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
 			//CN(pVolume);
@@ -1209,14 +1211,14 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vLightDirection);
 			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.70f * lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f * vLightDirection));
 
-			texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_bump.jpg");
 
 			texture *pBumpTextureWater;
 
-			//pBumpTextureWater = m_pDreamOS->MakeTexture(L"Dirt-1-2048-normal.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			//pBumpTextureWater = m_pDreamOS->MakeTexture(L"normal-map-bumpy.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			pBumpTextureWater = m_pDreamOS->MakeTexture(L"water_new_height.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Dirt-1-2048-normal.png");
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"normal-map-bumpy.png");
+			pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"water_new_height.png");
 
 			/*
 			pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
@@ -1263,8 +1265,8 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			//texture *pLandColorTexture;
 			//texture *pLandHeightTexture;
 
-			//pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			//pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//pLandColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
+			//pLandHeightTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-height.jpg");
 			//
 			//pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 500, 500, pLandHeightTexture);
 			//CN(pTestContext->pLandQuad);
@@ -1483,10 +1485,10 @@ RESULT HALTestSuite::AddTestStandardShader() {
 #else
 
 		texture *pColorTexture;
-		pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 
 		texture *pBumpTexture;
-		pBumpTexture = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_bump.jpg");
 
 		sphere *pSphere;
 		pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
@@ -2333,7 +2335,7 @@ RESULT HALTestSuite::AddTestModelOrientation() {
 			pTestContext->pModelRight->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
 			*/
 
-			//texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//texture *pColorTexture2 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"crate_color.png");
 
 			pTestContext->pModelLeft = m_pDreamOS->AddModel(L"\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
 			CN(pTestContext->pModelLeft);
@@ -2492,8 +2494,8 @@ RESULT HALTestSuite::AddTestHeightQuadObject() {
 			//pTestContext->pReflectionQuad->RotateZByDeg(45.0f);
 			//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
-			texture *pLandColorTexture = m_pDreamOS->MakeTexture(L"island-diffuse.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pLandHeightTexture = m_pDreamOS->MakeTexture(L"island-height.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pLandColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
+			texture *pLandHeightTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-height.jpg");
 
 			quad *pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 200, 200, pLandHeightTexture);
 			CN(pLandQuad);
@@ -2930,7 +2932,7 @@ RESULT HALTestSuite::AddTestText() {
 			auto pComposite = m_pDreamOS->AddComposite();
 			auto pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", pComposite, true);
 
-			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"Fonts/Basis_Grotesque_Pro.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Fonts/Basis_Grotesque_Pro.png");
 			auto pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hi", 1.0f, true);
 
 			m_pDreamOS->RenderToTexture(pFlatContext);
@@ -3087,14 +3089,14 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 
 		{
 			
-			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"emboss-texture-256.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"emboss-texture-256.jpg");
+			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			
-			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"SimpleNormals.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"diamond-pattern-bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"emboss-normalmap-256.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			texture *pBumpTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"PyramidNormal_01.jpg");
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"SimpleNormals.png");
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"diamond-pattern-bump.jpg");
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"emboss-normalmap-256.jpg");
+			//texture *pBumpTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_bump.jpg");
 			
 			
 
@@ -3108,8 +3110,8 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBump() {
 			pTestContext->m_pQuad->SetBumpTexture(pBumpTexture1);
 
 			/*
-			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			texture *pColorTexture2 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"crate_color.png");
 
 			texture *pColorTextureCopy = m_pDreamOS->MakeTexture(*pColorTexture1);
 
@@ -3243,8 +3245,8 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 		{
 			/*
-			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			texture *pColorTexture2 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"crate_color.png");
 
 			texture *pColorTextureCopy = m_pDreamOS->MakeTexture(*pColorTexture1);
 
@@ -3683,7 +3685,7 @@ RESULT HALTestSuite::AddTestObjectMaterialsBump() {
 			light *pLight = m_pDreamOS->AddLight(LIGHT_POINT, 2.0f, point(-5.0f, 5.0f, 5.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -1.0f, -1.0f));
 			
 			sphere *pSphere = nullptr;
-			texture *pBumpTexture = m_pDreamOS->MakeTexture(L"PyramidNormal_01.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"PyramidNormal_01.jpg");
 
 			for (int i = 0; i < numObjs; i++) {
 				for (int j = 0; j < numObjs; j++) {
@@ -4123,7 +4125,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 			CN(pVolume);
 			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
-			texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pColorTexture);
 
 			CR(pVolume->SetDiffuseTexture(pColorTexture));
@@ -4418,7 +4420,88 @@ Error:
 	return r;
 }
 
-HALImp* HALTestSuite::GetHALImp() {
-	return m_pDreamOS->GetHALImp();
-}
+RESULT HALTestSuite::AddTestCubeMap() {
+	RESULT r = R_PASS;
 
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.3f;
+	float alpha = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("skybox");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		{
+
+			volume *pVolume;
+			pVolume = nullptr;
+
+			sphere *pSphere;
+			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+			CN(pSphere);
+
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Cube Map Test");
+	pNewTest->SetTestDescription("Test cube map shaders and cube map pipeline nodes");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}

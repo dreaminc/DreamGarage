@@ -364,9 +364,7 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 
 	}
 
-	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-
-//Error:
+Error:
 	return r;
 }
 
@@ -376,7 +374,6 @@ RESULT DimObj::SetDiffuseTexture(texture *pTexture) {
 	CN(pTexture);
 
 	m_pTextureDiffuse = pTexture;
-	m_pTextureDiffuse->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 Error:
 	return R_PASS;
@@ -388,7 +385,6 @@ RESULT DimObj::SetSpecularTexture(texture *pTexture) {
 	CN(pTexture);
 
 	m_pTextureSpecular = pTexture;
-	m_pTextureSpecular->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_SPECULAR);
 
 Error:
 	return R_PASS;
@@ -400,7 +396,6 @@ RESULT DimObj::SetAmbientTexture(texture *pTexture) {
 	CN(pTexture);
 
 	m_pTextureAmbient = pTexture;
-	m_pTextureAmbient->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_AMBIENT);
 
 Error:
 	return R_PASS;
@@ -412,7 +407,6 @@ RESULT DimObj::SetBumpTexture(texture *pTexture) {
 	CN(pTexture);
 
 	m_pBumpTexture = pTexture;
-	m_pBumpTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
 Error:
 	return r;

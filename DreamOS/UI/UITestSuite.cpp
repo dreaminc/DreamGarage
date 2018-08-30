@@ -432,7 +432,7 @@ RESULT UITestSuite::AddTestUIMenuItem() {
 			l.pFont = pFont;
 			l.strLabel = "testing";
 
-			texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture* pPNG = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icons_600\\icon_png_600.png");
 			i.pTexture = pPNG;
 
 			pMenuItem->Update(i, l);

@@ -76,7 +76,7 @@ RESULT OGLProgramWater::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(1));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());

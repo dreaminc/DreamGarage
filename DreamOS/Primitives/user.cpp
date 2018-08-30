@@ -61,10 +61,10 @@ RESULT user::Initialize() {
 	
 	// TODO: should be a part of an avatar folder once there are multiple mouths, 
 	// could also help inform a loop with different naming
-	m_mouthStates.push_back(MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_mouthStates.push_back(MakeTexture(L"mouth_03.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_mouthStates.push_back(MakeTexture(L"mouth_02.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_mouthStates.push_back(MakeTexture(L"mouth_01.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth.png"));
+	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_03.png"));
+	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_02.png"));
+	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_01.png"));
 
 	for (int i = 0; i < 4; i++) {
 		CN(m_mouthStates[i]);

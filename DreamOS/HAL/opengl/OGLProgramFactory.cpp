@@ -112,7 +112,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		case OGLPROGRAM_SKYBOX: {
 			pOGLProgram = new OGLProgramSkybox(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", versionOGL), 
+			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL skybox Program");
 		} break;
 

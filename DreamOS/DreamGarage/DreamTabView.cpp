@@ -133,7 +133,7 @@ RESULT DreamTabView::InitializeWithParent(DreamUserControlArea *pParent) {
 		m_pScrollView->GetRenderContext()->AddObject(m_pScrollView);
 	}
 
-	m_pBackgroundTexture = GetDOS()->MakeTexture(k_wszTabBackground, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszTabBackground);
 	CN(m_pBackgroundTexture);
 
 	m_pBackgroundQuad->SetDiffuseTexture(m_pBackgroundTexture);

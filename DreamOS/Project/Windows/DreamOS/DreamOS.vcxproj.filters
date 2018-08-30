@@ -952,6 +952,12 @@
     <ClCompile Include="..\..\..\DreamModuleManager.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkybox.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\cubemap.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2094,6 +2100,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamModuleManager.h">
       <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\cubemap.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

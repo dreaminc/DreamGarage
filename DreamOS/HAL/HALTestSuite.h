@@ -14,7 +14,8 @@
 #include <functional>
 #include <memory>
 
-class DreamOS;
+#include "DreamOS.h"
+
 class HALImp;
 
 class HALTestSuite : public TestSuite {
@@ -62,18 +63,14 @@ public:
 	RESULT AddTestUIShaderStage();
 	RESULT AddTestFlatContextNesting();
 
+	RESULT AddTestCubeMap();
+
 	RESULT TestNestedOBB();
-
 	RESULT AddTestRotation();
-
-	
 
 	RESULT AddTestMouseDrag();
 	
-
 	RESULT AddTestSenseHaptics();
-
-	
 
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
@@ -85,10 +82,12 @@ private:
 	RESULT ResetTest(void *pContext);
 
 private:
-	HALImp *GetHALImp();
+	HALImp* GetHALImp() {
+		return m_pDreamOS->GetHALImp();
+	}
 
 private:
-	DreamOS *m_pDreamOS;
+	DreamOS *m_pDreamOS = nullptr;
 	HALImp *m_pHALImp = nullptr;
 };
 

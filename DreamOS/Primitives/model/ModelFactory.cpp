@@ -36,7 +36,7 @@ std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::
 
 		// Automatically detect if absolute path, dream path, or local path
 		std::wstring wstrFilename = pModel->GetModelDirectoryPath() + util::CStringToWideCString(aistrTextureFilepath.C_Str());
-		texture* pTexture = pModel->MakeTextureRaw(const_cast<wchar_t*>(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		texture* pTexture = pModel->MakeTextureRaw(texture::type::TEXTURE_2D, const_cast<wchar_t*>(wstrFilename.c_str()));
 		CN(pTexture);
 
 		retTextures.push_back(pTexture);

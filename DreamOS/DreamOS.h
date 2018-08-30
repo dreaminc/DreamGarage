@@ -389,10 +389,10 @@ public:
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	DimPlane* AddPlane(point ptOrigin = point(), vector vNormal = vector::jVector(1.0f));
 
-	texture* MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
-	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(const texture &srcTexture);
+	texture* MakeTexture(texture::type type, const wchar_t *pszFilename);
+	texture* MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n);
+	texture *MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n);
 
 	skybox *AddSkybox();
 	skybox *MakeSkybox();

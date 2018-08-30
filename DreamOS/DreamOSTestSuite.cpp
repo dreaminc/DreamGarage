@@ -1467,7 +1467,7 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
 			pDreamShareView->Show();
 
-			auto pCastTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
 
 			pTestContext->pDreamShareView = pDreamShareView;
@@ -1562,7 +1562,7 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 			pDreamShareView = m_pDreamOS->LaunchDreamApp<DreamShareView>(this);
 			pDreamShareView->Show();
 
-			auto pCastTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
 
 			pTestContext->pDreamShareView = pDreamShareView;
@@ -1690,7 +1690,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			m_pDataBuffer_n = pxHeight*pxWidth*4;
 			m_pDataBuffer = (unsigned char*)malloc(m_pDataBuffer_n);
 
-			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
 
 			m_pDataBuffer_n = 0;
 			pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture);
@@ -2365,7 +2365,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 		}
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
-		pTestContext->m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTestContext->m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"mouth.png"));
 		for (int i = 0; i < 6; i++) {
 			pTestContext->m_users.emplace_back(m_pDreamOS->AddUser());
 			pTestContext->m_users[i]->SetVisible(true);

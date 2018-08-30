@@ -556,8 +556,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	m_pLoadingScreenTexture = GetComposite()->MakeTexture((wchar_t*)(L"client-loading-1366-768.png"), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	m_pLoadingScreenTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, (wchar_t*)(L"client-loading-1366-768.png"));
 	CN(m_pLoadingScreenTexture);
 	//m_pBrowserTexture = m_pLoadingScreenTexture;
 

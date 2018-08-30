@@ -43,18 +43,18 @@ RESULT OGLProgramBlendQuad::OGLInitialize() {
 
 	// Color attachment
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, GL_DEPTH_COMPONENT32F, GL_FLOAT));
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
-	g_pColorTexture1 = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	g_pColorTexture2 = (OGLTexture *)m_pParentImp->MakeTexture(L"brick1_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	g_pColorTexture1 = (OGLTexture *)m_pParentImp->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+	g_pColorTexture2 = (OGLTexture *)m_pParentImp->MakeTexture(texture::type::TEXTURE_2D, L"brick1_color.jpg");
 
 Error:
 	return r;

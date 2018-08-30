@@ -645,7 +645,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 			pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
-				texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+				texture::type::TEXTURE_2D,
 				pxWidth,
 				pxHeight,
 				PIXEL_FORMAT::RGBA,
@@ -949,7 +949,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		// Temporary
 		///*
 		pTestContext->pQuadTexture = m_pDreamOS->MakeTexture(
-			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
+			texture::type::TEXTURE_2D, 
 			pxWidth, 
 			pxHeight, 
 			PIXEL_FORMAT::RGBA,
@@ -962,7 +962,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCVideoStream() {
 		pTestContext->pQuad->SetDiffuseTexture(pTestContext->pQuadTexture);
 
 		pTestContext->pSourceTexture = m_pDreamOS->MakeTexture(
-			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+			texture::type::TEXTURE_2D,
 			pxWidth,
 			pxHeight,
 			PIXEL_FORMAT::RGBA,

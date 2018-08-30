@@ -58,8 +58,8 @@ RESULT UISpatialScrollView::Initialize() {
 	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 
-	m_pLeftScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pRightScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pLeftScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"chevron-left.png"));
+	m_pRightScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"chevron-right.png"));
 
 	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 
@@ -293,7 +293,7 @@ RESULT UISpatialScrollView::InitializeWithWidth(float totalWidth) {
 
 	float titleWidth = m_titleWidth * totalWidth;
 	m_pTitleQuad = m_pTitleView->AddQuad(titleWidth, titleWidth * m_titleAspectRatio);
-	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-menu.png"));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(titleWidth / 2.0f, totalWidth * m_titleHeight, 0.0f));
 	m_pTitleQuad->SetVisible(false);

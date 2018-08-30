@@ -875,6 +875,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReflection.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramRefraction.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkybox.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramStandard.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
@@ -955,6 +956,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\CapturedObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\CircularBuffer.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\cubemap.cpp" />
     <ClCompile Include="..\..\..\Primitives\cylinder.cpp" />
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\DimPlane.cpp" />
@@ -1296,6 +1298,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\CircularBuffer.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
+    <ClInclude Include="..\..\..\Primitives\cubemap.h" />
     <ClInclude Include="..\..\..\Primitives\cylinder.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\DimPlane.h" />

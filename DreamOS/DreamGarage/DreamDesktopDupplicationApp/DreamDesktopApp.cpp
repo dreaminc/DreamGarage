@@ -149,8 +149,8 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	SetAppDescription("A Shared Desktop View");
 
 	// Initialize texture
-	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
-	m_pLoadingScreenTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
+	m_pLoadingScreenTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen));
 
 	CR(GetComposite()->SetVisible(true));
 

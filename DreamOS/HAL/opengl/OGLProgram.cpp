@@ -326,12 +326,12 @@ RESULT OGLProgram::InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffe
 		CR(pOGLFramebuffer->Bind());
 		CR(pOGLFramebuffer->MakeColorAttachment());
 
-		CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 		CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 		//CR(pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 		CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-		CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+		CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, typeDepth, internalDepthFormat));
 		//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 		CR(pOGLFramebuffer->InitializeOGLDrawBuffers(1));
@@ -354,7 +354,7 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, G
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+	CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, typeDepth, internalDepthFormat));
 	//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 	//CR(pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
@@ -400,12 +400,12 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 
 	// Color attachment
 	CR(pFramebuffer->MakeColorAttachment());
-	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	// Depth attachment 
 	CR(pFramebuffer->MakeDepthAttachment());
-	CR(pFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(texture::type::TEXTURE_2D, GL_DEPTH_COMPONENT16, GL_FLOAT));
 	CR(pFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
@@ -424,7 +424,7 @@ RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum ty
 RESULT OGLProgram::InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE); 
+	pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::type::TEXTURE_2D);
 	CN(pOGLRenderTexture);
 
 	CR(pOGLRenderTexture->SetWidth(pxWidth));
