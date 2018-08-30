@@ -138,6 +138,8 @@ public:
 	HMD *GetHMD();
 	HWND GetDreamHWND();
 
+	RESULT RecenterHMD();
+
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
 	virtual RESULT OnNewSocketConnection(int seatPosition) = 0;

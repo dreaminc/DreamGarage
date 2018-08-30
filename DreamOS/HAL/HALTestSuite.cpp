@@ -3673,6 +3673,8 @@ RESULT HALTestSuite::AddTestCamera() {
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 0.0f, 0.0f));
 
+		m_pDreamOS->RecenterHMD();
+
 	Error:
 		return r;
 	};
@@ -3684,7 +3686,6 @@ RESULT HALTestSuite::AddTestCamera() {
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
 
-//		m_pDreamOS->RecenterH
 		return R_PASS;
 	};
 
