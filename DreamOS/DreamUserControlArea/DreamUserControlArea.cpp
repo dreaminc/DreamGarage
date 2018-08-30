@@ -85,8 +85,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 		point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
-		//point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, 0.0f);
-		//point ptOrigin = point(0.0f, 0.0f, 0.0f);
 		
 		GetComposite()->SetOrientation(qViewQuadOrientation);
 		GetComposite()->SetPosition(ptOrigin);
