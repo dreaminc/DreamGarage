@@ -199,13 +199,7 @@ RESULT OVRHMD::RecenterHMD() {
 }
 
 bool OVRHMD::ShouldRecenterHMD(ovrSessionStatus sessionStatus) {
-	RESULT r = R_PASS;
-
-
 	return (m_fShouldRecenterHMD || sessionStatus.ShouldRecenter) && sessionStatus.HmdMounted;
-
-Error:
-	return false;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
