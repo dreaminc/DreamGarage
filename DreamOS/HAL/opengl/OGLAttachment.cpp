@@ -128,7 +128,7 @@ RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum atta
 	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
 }
 
-RESULT OGLAttachment::MakeOGLDepthTexture(GLenum internalGLFormat, GLenum pixelDataType, texture::TEXTURE_TYPE type) {
+RESULT OGLAttachment::MakeOGLDepthTexture(texture::type type, GLenum internalGLFormat, GLenum pixelDataType) {
 	RESULT r = R_PASS;
 
 	m_pOGLTexture = OGLTexture::MakeTextureWithFormat(m_pParentImp, 
@@ -144,7 +144,7 @@ Error:
 	return r;
 }
 
-RESULT OGLAttachment::MakeOGLTexture(texture::TEXTURE_TYPE type) {
+RESULT OGLAttachment::MakeOGLTexture(texture::type type) {
 	RESULT r = R_PASS;
 
 	if (m_sampleCount == 1) {
@@ -162,7 +162,7 @@ Error:
 RESULT OGLAttachment::MakeOGLTextureMultisample() {
 	RESULT r = R_PASS;
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, GL_TEXTURE_2D_MULTISAMPLE);
+	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::type::TEXTURE_2D, GL_TEXTURE_2D_MULTISAMPLE);
 	CN(m_pOGLTexture);
 
 	m_pOGLTexture->SetWidth(m_width);

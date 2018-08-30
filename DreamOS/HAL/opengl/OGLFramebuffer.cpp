@@ -69,7 +69,7 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 
 		///*
 		if (m_pOGLColorAttachment->GetOGLTexture() != nullptr) {
-			texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
+			texture::type colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
 			CR(DeleteColorAttachment());
 
 			CR(MakeColorAttachment());
@@ -92,11 +92,11 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 
 		///*
 		if (m_pOGLDepthAttachment->GetOGLTexture() != nullptr) {
-			texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
+			texture::type depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
 			CR(DeleteDepthAttachment());
 
 			CR(MakeDepthAttachment());
-			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
+			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(depthTextureType, internalDepthFormat, typeDepth));
 			CR(m_pOGLDepthAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 		}
 		else if (m_pOGLDepthAttachment->GetOGLRenderBuffer() != nullptr) {

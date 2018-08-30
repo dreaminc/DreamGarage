@@ -32,23 +32,23 @@ RESULT UIControlBar::Initialize() {
 	m_pDreamOS->AddObjectToInteractionGraph(this);
 
 	// create textures 
-	m_pBackTexture = m_pDreamOS->MakeTexture(k_wszBack, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pForwardTexture = m_pDreamOS->MakeTexture(k_wszForward, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pBackDisabledTexture = m_pDreamOS->MakeTexture(k_wszBackDisabled, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pForwardDisabledTexture = m_pDreamOS->MakeTexture(k_wszForwardDisabled, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pHideTexture = m_pDreamOS->MakeTexture(k_wszHide, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pShowTexture = m_pDreamOS->MakeTexture(k_wszShow, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pOpenTexture = m_pDreamOS->MakeTexture(k_wszOpen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pCloseTexture = m_pDreamOS->MakeTexture(k_wszClose, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pURLTexture = m_pDreamOS->MakeTexture(k_wszURL, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pShareTexture = m_pDreamOS->MakeTexture(k_wszShare, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pStopSharingTexture = m_pDreamOS->MakeTexture(k_wszStopSharing, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pKeyboardTexture = m_pDreamOS->MakeTexture(k_wszKeyboard, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pTabTexture = m_pDreamOS->MakeTexture(k_wszTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pCantTabTexture = m_pDreamOS->MakeTexture(k_wszCantTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pBackTabTexture = m_pDreamOS->MakeTexture(k_wszBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pCantBackTabTexture = m_pDreamOS->MakeTexture(k_wszCantBackTab, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pDoneTexture = m_pDreamOS->MakeTexture(k_wszDone, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack);
+	m_pForwardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward);
+	m_pBackDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled);
+	m_pForwardDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled);
+	m_pHideTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide);
+	m_pShowTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow);
+	m_pOpenTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen);
+	m_pCloseTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose);
+	m_pURLTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL);
+	m_pShareTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare);
+	m_pStopSharingTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing);
+	m_pKeyboardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard);
+	m_pTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszTab);
+	m_pCantTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab);
+	m_pBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab);
+	m_pCantBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab);
+	m_pDoneTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszDone);
 
 	// create buttons
 

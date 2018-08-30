@@ -57,26 +57,26 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");	
 
-	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pMenuIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pOpenIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"thumbnail-default.png"));
+	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-default.png"));
+	m_pMenuIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-menu.png"));
+	m_pOpenIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-open.png"));
+	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"thumbnail-text-background.png"));
 
 	//TODO: could move this logic up to DreamUserObserver, and then only 
 	if (GetDOS()->GetHMD() != nullptr) {
 		switch (GetDOS()->GetHMD()->GetDeviceType()) {
 		case HMDDeviceType::OCULUS: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(L"left-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(L"right-controller-overlay-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"left-controller-overlay-active.png");
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"right-controller-overlay-active.png");
 		} break;
 		case HMDDeviceType::VIVE: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-left-active.png");
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-right-active.png");
 		} break;
 		case HMDDeviceType::META: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-active.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-left-active.png");
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-right-active.png");
 		} break;
 		}
 
@@ -574,7 +574,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		uint8_t* pBuffer = &(m_pPendingIconTextureBuffer->operator[](0));
 		size_t pBuffer_n = m_pPendingIconTextureBuffer->size();
 
-		m_pPendingIconTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pPendingIconTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
 		CN(m_pPendingIconTexture);
 
 		if (m_pKeyboardHandle != nullptr) {
@@ -712,7 +712,7 @@ RESULT DreamUIBar::ProcessDownloadMenuItemTexture() {
 		uint8_t* pBuffer = &(pBufferVector->operator[](0));
 		size_t pBuffer_n = pBufferVector->size();
 
-		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		pTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
 		CN(pTexture);
 
 		pMenuNode->SetThumbnailTexture(pTexture);

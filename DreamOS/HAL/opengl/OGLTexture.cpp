@@ -3,7 +3,7 @@
 #include "Primitives/image/image.h"
 #include "Primitives/image/ImageFactory.h"
 
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget) :
+OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget) :
 	texture(type),
 	m_textureIndex(0),
 	m_textureTarget(textureTarget),
@@ -24,65 +24,6 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 	// empty
 	// NOTE: this will not copy buffers on either GPU or CPU side
 }
-
-/*
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
-	texture(type, width, height, format, channels, pBuffer, pBuffer_n),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
-	texture(type, width, height, channels, pBuffer, pBuffer_n),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-// Load from File Buffer (file loaded into buffer)
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
-	texture(type, pBuffer, pBuffer_n),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) :
-	texture(type, width, height, channels),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint textureID, int width, int height, int channels) :
-	texture(type, width, height, channels),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type) :
-	texture(pszFilename, type),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) :
-	texture(pszName, vstrCubeMapFiles),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-*/
 
 OGLTexture::~OGLTexture() {
 	texture::~texture();
@@ -160,7 +101,7 @@ Error:
 	return r;
 }
 
-OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type,
+OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::type type,
 											  int width, int height, int channels, 
 											  GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType, 
 											  int levels, int samples) 
@@ -170,7 +111,7 @@ OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TE
 	OGLTexture *pTexture = nullptr;
 
 	// TODO: Get rid of other texture targets and do 2d, cube, rectangle (others?)
-	if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+	if (type == texture::type::RECTANGLE) {
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
 		CN(pTexture);
 	}
@@ -299,13 +240,13 @@ Error:
 	return nullptr;
 }
 
-OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels, int samples) {
+OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels, int samples) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
 
 	// TODO: Get rid of other texture targets and do 2d, cube, rectangle (others?)
-	if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+	if (type == texture::type::RECTANGLE) {
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
 		CN(pTexture);
 	}
@@ -325,7 +266,7 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels, int samples) {
+OGLTexture* OGLTexture::MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels, int samples) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -340,41 +281,51 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) {
+// TODO: Move to OGLCubeMap
+//OGLTexture* OGLTexture::MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels) {
+//	RESULT r = R_PASS;
+//	
+//	OGLTexture *pTexture = nullptr;
+//
+//	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+//	CN(pTexture);
+//
+//	GLenum textureTarget = GL_TEXTURE_CUBE_MAP;
+//
+//	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+//		size_t pCubeMapSideOffset = pTexture->GetTextureSize();
+//		CR(pTexture->AllocateGLTexture(pCubeMapSideOffset));
+//		
+//		// TODO: Is this needed here?  I think it can be out of the for loop
+//		// TODO: Rename or remove this / specialize more
+//		CR(pTexture->SetDefaultCubeMapParams());
+//	}
+//
+//Error:
+//	return pTexture;
+//}
+
+OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename) {
 	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	// TODO: Move into cube map
+	//if (type == texture::type::CUBE) {
+	//	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	//	CN(pTexture);
+	//
+	//	CR(pTexture->LoadCubeMapByName(wstrFilename.c_str()));
+	//}
+	// TODO: Rename or remove this / specialize more
+	// TODO: Move into cube map
+	//if (type == texture::type::CUBE) {
+	//	CR(pTexture->SetDefaultCubeMapParams());
+	//}
 	
-	OGLTexture *pTexture = nullptr;
-
-	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
-	CN(pTexture);
-
-	GLenum textureTarget = GL_TEXTURE_CUBE_MAP;
-
-	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		size_t pCubeMapSideOffset = pTexture->GetTextureSize();
-		CR(pTexture->AllocateGLTexture(pCubeMapSideOffset));
-		
-		// TODO: Is this needed here?  I think it can be out of the for loop
-		// TODO: Rename or remove this / specialize more
-		CR(pTexture->SetDefaultCubeMapParams());
-	}
-
-Error:
-	return pTexture;
-}
-
-OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename) {
-	RESULT r = R_PASS;
-
-	OGLTexture *pTexture = nullptr;
-
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
-		CN(pTexture);
-
-		CR(pTexture->LoadCubeMapByName(wstrFilename.c_str()));
-	}
-	else if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+	
+	// TODO: Rectangle is only used rarely - should create special lane
+	if (type == texture::type::RECTANGLE) {
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
 		CN(pTexture);
 
@@ -390,30 +341,29 @@ OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXT
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->AllocateGLTexture());
 
-	// TODO: Rename or remove this / specialize more
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		CR(pTexture->SetDefaultCubeMapParams());
-	}
-	else {
-		CR(pTexture->SetDefaultTextureParams());
-	}
+
+	CR(pTexture->SetDefaultTextureParams());
 
 Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, PIXEL_FORMAT pixelFormat, void *pBuffer, size_t pBuffer_n) {
+OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT pixelFormat, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
 
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
-	}
-	else {
-		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
-	}
-
+	// TODO: Make into cube map
+	//if (type == texture::type::CUBE) {
+	//	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	//}
+	// TODO: Rename or remove this / specialize more
+	// TODO: Move into cube map
+	//if (type == texture::type::CUBE) {
+	//	CR(pTexture->SetDefaultCubeMapParams());
+	//}
+	
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
 	CN(pTexture);
 
 	CR(pTexture->OGLInitialize(NULL));
@@ -427,13 +377,8 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 	//CR(pTexture->AllocateGLTexture());
 	CR(pTexture->AllocateGLTexture((unsigned char*)(pBuffer), internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
-	// TODO: Rename or remove this / specialize more
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		CR(pTexture->SetDefaultCubeMapParams());
-	}
-	else {
-		CR(pTexture->SetDefaultTextureParams());
-	}
+	
+	CR(pTexture->SetDefaultTextureParams());
 
 	// TODO: Temp
 	CRM(pTexture->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
@@ -443,18 +388,21 @@ Error:
 	return pTexture;
 }
 
-OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, void *pBuffer, size_t pBuffer_n) {
+OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
 
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
-	}
-	else {
-		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
-	}
+	// TODO: Move into cube
+	//if (type == texture::type::CUBE) {
+	//	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	//}
+	// TODO: Rename or remove this / specialize more
+	//if (type == texture::type::CUBE) {
+	//	CR(pTexture->SetDefaultCubeMapParams());
+	//}
 
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
 	CN(pTexture);
 
 	CR(pTexture->OGLInitialize(NULL));
@@ -462,18 +410,14 @@ OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture
 	CR(pTexture->LoadTextureFromFileBuffer((uint8_t*)pBuffer, pBuffer_n));
 	CR(pTexture->AllocateGLTexture());
 
-	// TODO: Rename or remove this / specialize more
-	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		CR(pTexture->SetDefaultCubeMapParams());
-	}
-	else {
-		CR(pTexture->SetDefaultTextureParams());
-	}
+
+	CR(pTexture->SetDefaultTextureParams());
 
 Error:
 	return pTexture;
 }
 
+/* TODO: Move into cube map
 RESULT OGLTexture::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber) {
 	RESULT r = R_PASS;
 
@@ -506,6 +450,7 @@ RESULT OGLTexture::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNum
 Error:
 	return r;
 }
+*/
 
 RESULT OGLTexture::SetDefaultDepthTextureParams() {
 	RESULT r = R_PASS;
@@ -533,6 +478,7 @@ Error:
 	return r;
 }
 
+/* TOOD: Move into cube map
 RESULT OGLTexture::SetDefaultCubeMapParams() {
 	RESULT r = R_PASS;
 
@@ -546,6 +492,7 @@ RESULT OGLTexture::SetDefaultCubeMapParams() {
 Error:
 	return r;
 }
+*/
 
 RESULT OGLTexture::OGLInitialize(GLuint textureID) {
 	RESULT r = R_PASS;

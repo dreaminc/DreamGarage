@@ -48,7 +48,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	CR(m_pCastQuad->SetVisible(false));
 
 	m_pVideoCastTexture = GetComposite()->MakeTexture(
-		texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, 
+		texture::type::TEXTURE_2D,
 		m_castpxWidth, 
 		m_castpxHeight, 
 		PIXEL_FORMAT::RGBA, 
@@ -57,7 +57,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 		pxSize);	
 	CN(m_pVideoCastTexture);
 
-	m_pLoadingTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pLoadingTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen));
 	CN(m_pLoadingTexture);
 
 	m_pCastQuad->SetDiffuseTexture(m_pLoadingTexture.get());
@@ -456,7 +456,7 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 		//float pxSize = m_pendingFrame.pxWidth * m_pendingFrame.pxHeight * 4;
 		//*
 		m_pVideoCastTexture = GetComposite()->MakeTexture(
-			texture::TEXTURE_TYPE::TEXTURE_DIFFUSE,
+			texture::type::TEXTURE_2D,
 			m_pendingFrame.pxWidth,
 			m_pendingFrame.pxHeight,
 			PIXEL_FORMAT::RGBA,

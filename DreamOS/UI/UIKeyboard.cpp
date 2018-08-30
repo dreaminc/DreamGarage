@@ -113,18 +113,18 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pFont->SetLineHeight(m_lineHeight);
 
 	// textures for keycaps and objects
-	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pKeyTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"key-background.png");
+	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"text-input-background.png");
 
-	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pNumbersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-123-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pReturnTexture = GetComposite()->MakeTexture(L"Keycaps\\key-return-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pShiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-shift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-	m_pDefaultIconTexture = GetComposite()->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pDeleteTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-delete-background.png");
+	m_pLettersTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-abc-background.png");
+	m_pNumbersTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-123-background.png");
+	m_pReturnTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-return-background.png");
+	m_pShiftTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-shift-background.png");
+	m_pSpaceTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-space-background.png");
+	m_pSymbolsTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-symbol-background.png");
+	m_pUnshiftTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-unshift-background.png");
+	m_pDefaultIconTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;

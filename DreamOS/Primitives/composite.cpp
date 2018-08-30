@@ -149,11 +149,11 @@ Error:
 }
 
 
-std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+std::shared_ptr<texture> composite::MakeTexture(texture::type type, wchar_t *pszFilename) {
 
 	RESULT r = R_PASS;
 
-	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(pszFilename, type));
+	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, pszFilename));
 
 	//Success:
 	return pTexture;
@@ -162,7 +162,7 @@ std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::T
 	return nullptr;
 }
 
-std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+std::shared_ptr<texture> composite::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n));
@@ -171,10 +171,10 @@ std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int 
 	return pTexture;
 }
 
-texture* composite::MakeTextureRaw(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* composite::MakeTextureRaw(texture::type type, wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	texture* pTexture = m_pHALImp->MakeTexture(pszFilename, type);
+	texture* pTexture = m_pHALImp->MakeTexture(type, pszFilename);
 	CN(pTexture);
 
 	//Success:

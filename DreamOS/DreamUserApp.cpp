@@ -180,20 +180,20 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 		auto deviceType = pHMD->GetDeviceType();
 		switch (deviceType) {
 		case HMDDeviceType::OCULUS: {
-			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"right-controller-overlay-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(L"Controller-Overlay.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"left-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"right-controller-overlay-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"right-controller-overlay-test.png");
+			//m_pTextureDefaultGaze = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"Controller-Overlay.png");
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"left-controller-overlay-inactive.png");
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"right-controller-overlay-inactive.png");
 		} break;
 		case HMDDeviceType::VIVE: {
-			//m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			//m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-test.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			//m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-left-test.png");
+			//m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-right-test.png");
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-left-inactive.png");
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-right-inactive.png");
 		} break;
 		case HMDDeviceType::META: {
-			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(L"vive-controller-overlay-left-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(L"vive-controller-overlay-right-inactive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pTextureDefaultGazeLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-left-inactive.png");
+			m_pTextureDefaultGazeRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"vive-controller-overlay-right-inactive.png");
 		} break;
 		}
 		CN(m_pTextureDefaultGazeLeft);

@@ -45,7 +45,6 @@ private:
 
 	OGLMaterialBlock *m_pMaterialsBlock;
 
-	
 	bool m_fPassThru = true;
 };
 

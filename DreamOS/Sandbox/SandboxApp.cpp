@@ -1388,16 +1388,16 @@ texture* SandboxApp::MakeTexture(const texture &srcTexture) {
 	return m_pHALImp->MakeTexture(srcTexture);
 }
 
-texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
+texture* SandboxApp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pHALImp->MakeTexture(type, width, height, pixelFormat, channels, pBuffer, pBuffer_n);
 }
 
-texture* SandboxApp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
-	return m_pHALImp->MakeTexture(pszFilename, type);
+texture* SandboxApp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
+	return m_pHALImp->MakeTexture(type, pszFilename);
 }
 
-texture* SandboxApp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
-	return m_pHALImp->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+texture* SandboxApp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
+	return m_pHALImp->MakeTextureFromFileBuffer(type, pBuffer, pBuffer_n);
 }
 
 skybox* SandboxApp::MakeSkybox() {

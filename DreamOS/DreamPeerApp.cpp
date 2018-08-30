@@ -148,7 +148,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		
 		m_pNameBackground->SetVisible(false);
 		
-		m_pTextBoxTexture = GetComposite()->MakeTexture(L"user-nametag-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
 		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 		m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);

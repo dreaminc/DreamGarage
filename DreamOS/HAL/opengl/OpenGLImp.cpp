@@ -380,7 +380,7 @@ FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbCha
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
@@ -665,7 +665,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -710,7 +710,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -755,7 +755,7 @@ text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -800,7 +800,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -846,7 +846,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -893,7 +893,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeColorAttachment());
-	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::type::TEXTURE_2D));
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -913,7 +913,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(const wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTexture(texture::type type, const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
@@ -949,7 +949,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
+texture* OpenGLImp::MakeTexture(texture::type type, int width, int height, PIXEL_FORMAT pixelFormat, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, pixelFormat, pBuffer, pBuffer_n);
@@ -967,7 +967,7 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+texture* OpenGLImp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);

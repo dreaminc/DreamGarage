@@ -80,29 +80,34 @@ Error:
 }
 */
 
+// TODO: Remove all of the binding stuff?
 RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
-	RESULT r = R_PASS;
 
+	/*
 	switch (pTexture->GetTextureType()) {
-		case texture::TEXTURE_TYPE::TEXTURE_DIFFUSE: {
-			//CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
-			CR(SetColorTextureUniform(pTexture->GetOGLTextureIndex()));
-		} break;
 
-		case texture::TEXTURE_TYPE::TEXTURE_BUMP: {
-			//CR(SetBumpTextureUniform(pTexture->GetTextureNumber()));
-			CR(SetBumpTextureUniform(pTexture->GetOGLTextureIndex()));
-		} break;
+		RESULT r = R_PASS;
+
+		//case texture::type::TEXTURE_DIFFUSE: {
+		//	//CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
+		//	CR(SetColorTextureUniform(pTexture->GetOGLTextureIndex()));
+		//} break;
+		//
+		//case texture::type::TEXTURE_BUMP: {
+		//	//CR(SetBumpTextureUniform(pTexture->GetTextureNumber()));
+		//	CR(SetBumpTextureUniform(pTexture->GetOGLTextureIndex()));
+		//} break;
 
 		default: {
 			CB(false);
 		} break;
 	}
+	*/
 
 	//CR(pTexture->OGLActivateTexture());
 
 Error:
-	return r;
+	return R_DEPRECATED;
 }
 
 

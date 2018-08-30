@@ -195,7 +195,6 @@ RESULT MenuNode::SetName(std::string strName) {
 RESULT MenuNode::SetThumbnailTexture(texture* pTexture) {
 	
 	m_pThumbnailTexture = pTexture;
-	m_pThumbnailTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 	return R_PASS;
 }

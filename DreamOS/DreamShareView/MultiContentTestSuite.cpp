@@ -65,8 +65,8 @@ RESULT MultiContentTestSuite::Initialize() {
 
 	CN(m_pDreamOS);
 
-	m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-menu.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png"));
+	m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-menu.png"));
 
 	CN(m_pTestTextureUser1);
 	CN(m_pTestTextureUser2);
@@ -215,7 +215,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		//pTestContext->pFlatScrollView->RotateXByDeg(90.0f);
 		pTestContext->pFlatScrollView->SetRenderQuad(pTestContext->pRenderQuad, nullptr); // deprec
 
-		auto pTexture = m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		auto pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 
 		auto pScrollContext = pTestContext->pFlatScrollView;// ->GetRenderContext();
 
@@ -241,7 +241,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 				pQuad = pScrollContext->AddQuad(0.5f, 0.5f);
 				pQuad->SetPosition(-1.0f, 0.0f, 0.0f);
 				CN(pQuad);
-				pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-url.png"));
 				//*/
 				//*
 		pTestButton->SetPosition(point(-0.5f, 0.0f, 0.0f));
@@ -249,7 +249,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		//pTestContext->pTestButton->GetSurface()->SetPosition(point(-0.5f, 0.0f, 0.0f));
 		pTestButton->GetSurface()->RotateXByDeg(-90.0f);
 		//CN(pButton);
-		pTestButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-close.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTestButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-close.png"));
 		//*/
 
 		pQuad = pScrollContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.0f, 1.0f));
@@ -275,7 +275,7 @@ RESULT MultiContentTestSuite::AddTestDreamTabView() {
 		pTestQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
 		pTestQuad->RotateXByDeg(90.0f);
 		pTestQuad->SetDiffuseTexture(pTexture);
-		pTestQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTestQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-url.png"));
 
 		//pTestContext->pFlatScrollView->GetRenderContext()->AddObject(pQuad);
 
@@ -1083,7 +1083,7 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 
 		pTestContext->pUserApp->GetComposite()->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 0.5f, -0.5f));
 
-		pTestContext->pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture((wchar_t*)(L"client-loading-1366-768.png"), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTestContext->pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, (wchar_t*)(L"client-loading-1366-768.png")));
 
 	Error:
 		return r;
@@ -1908,35 +1908,35 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		// Control View background
 		auto pControlBackground = m_pDreamOS->MakeQuad(borderWidth, borderHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pControlBackground);
-		pControlBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-main-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pControlBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png"));
 		pControlBackground->SetPosition(point(0.0f, 0.0f, -0.0005f));
 
 		//TODO: move to Tabs app
 		auto pTabBackground = m_pDreamOS->MakeQuad(tabBarBorderWidth, tabBarBorderHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pTabBackground);
-		pTabBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-list-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pTabBackground->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-list-background.png"));
 		pTabBackground->SetPosition(point(borderWidth / 2.0f + spaceSize + tabBarBorderWidth / 2.0f, (borderHeight - tabBarBorderHeight) / 2, -0.0005f));
 
 		//TODO: make control bar app
 		point ptBarLeft = point(-borderWidth / 2.0f, -borderHeight / 2.0f - spaceSize - (toolbarButtonHeight / 2.0f), 0.0f);
 		auto pBackButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pBackButton);
-		pBackButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-back.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pBackButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-back.png"));
 		pBackButton->SetPosition(ptBarLeft + point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
 
 		auto pForwardButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pForwardButton);
-		pForwardButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-forward.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pForwardButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-forward.png"));
 		pForwardButton->SetPosition(ptBarLeft + point(3 * toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
 
 		auto pCloseButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pCloseButton);
-		pCloseButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-close.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pCloseButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-close.png"));
 		pCloseButton->SetPosition(ptBarLeft + point(5 * toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
 		
 		auto pURLButton = m_pDreamOS->MakeQuad(toolbarURLWidth, toolbarURLHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pURLButton);
-		pURLButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-url.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pURLButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-url.png"));
 		point ptURL = point(0.0f, ptBarLeft.y(), 0.0f);
 		pURLButton->SetPosition(ptURL);
 
@@ -1944,17 +1944,17 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 
 		auto pShareButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pShareButton);
-		pShareButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pShareButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-share.png"));
 		pShareButton->SetPosition(ptBarRight+ point(toolbarButtonWidth / 2.0f, 0.0f, 0.0f));
 
 		auto pOpenButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pOpenButton);
-		pOpenButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-open.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pOpenButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-open.png"));
 		pOpenButton->SetPosition(ptBarRight + point(3*toolbarButtonWidth / 2.0f + spaceSize, 0.0f, 0.0f));
 
 		auto pMinimizeButton = m_pDreamOS->MakeQuad(toolbarButtonWidth, toolbarButtonHeight, 1, 1, nullptr, vNormal);
 		m_pDreamOS->AddObjectToUIGraph(pMinimizeButton);
-		pMinimizeButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"control-view-minimize.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+		pMinimizeButton->SetDiffuseTexture(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-minimize.png"));
 		pMinimizeButton->SetPosition(ptBarRight+ point(5*toolbarButtonWidth / 2.0f + 2*spaceSize, 0.0f, 0.0f));
 
 		/*
@@ -2264,11 +2264,11 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 			CRM(m_pDreamOS->GetCloudController()->Start(strUsername, strPassword, environmentID), "Failed to log in");
 
 			if (m_strID == "1") {
-				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png"));
 				m_pTestTexture = m_pTestTextureUser1;
 			}
 			else if (m_strID == "2") {
-				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-share.png"));
 				m_pTestTexture = m_pTestTextureUser2;
 			}
 
@@ -2453,11 +2453,11 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBrowser() {
 
 			if (m_strID == "1") {
 				m_strURL = "https://www.youtube.com/watch?v=5vZ4lCKv1ik";
-				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png"));
 				//m_pTestTexture = m_pTestTextureUser1;
 			}
 			else if (m_strID == "2") {
-				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+				//m_pTestTexture = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-share.png"));
 				//m_pTestTexture = m_pTestTextureUser2;
 				m_strURL = "https://www.youtube.com/watch?v=8ulEMXUNyRo";
 			}
@@ -2535,11 +2535,11 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 					m_pDreamShareView->m_fReceivingStream = false;
 					/*
 					if (m_strID == "1") {
-						m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"website.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+						m_pTestTextureUser1 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png"));
 						m_pTestTexture = m_pTestTextureUser1;
 					}
 					else if (m_strID == "2") {
-						m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+						m_pTestTextureUser2 = std::shared_ptr<texture>(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"icon-share.png"));
 						m_pTestTexture = m_pTestTextureUser2;
 					}
 					//*/

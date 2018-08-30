@@ -30,7 +30,7 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 
 	// Texture needs to be upside down, and flipped on y-axis
-	m_pLoadingScreenTexture = GetDOS()->MakeTexture(k_wszLoadingScreen, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pLoadingScreenTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen);
 	CN(m_pLoadingScreenTexture);
 
 	m_hiddenScale = 0.2f;
@@ -41,16 +41,16 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	if (GetDOS()->GetHMD() != nullptr) {
 		switch (GetDOS()->GetHMD()->GetDeviceType()) {
 		case HMDDeviceType::OCULUS: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(k_wszOculusOverlayLeft, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(k_wszOculusOverlayRight, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayLeft);
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayRight);
 		} break;
 		case HMDDeviceType::VIVE: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(k_wszViveOverlayLeft, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(k_wszViveOverlayRight, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
 		} break;
 		case HMDDeviceType::META: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(k_wszViveOverlayLeft, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			m_pOverlayRight = GetDOS()->MakeTexture(k_wszViveOverlayRight, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
 		} break;
 		}
 
@@ -222,7 +222,7 @@ RESULT DreamControlView::InitializeWithUserApp(DreamUserApp *pParent) {
 
 	m_pViewBackground = m_pView->AddQuad(width * m_borderWidth, width * m_borderHeight);
 	CB(m_pViewBackground);
-	m_pBackgroundTexture = GetDOS()->MakeTexture(L"control-view-main-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
 	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
 
 	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));

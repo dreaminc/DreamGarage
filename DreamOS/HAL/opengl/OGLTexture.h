@@ -14,33 +14,10 @@
 
 class OGLTexture : public texture {
 public:
-	const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-	};
+	
 
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget = GL_TEXTURE_2D);
+	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 	OGLTexture(const OGLTexture &pOGLTexture);
-private: 
-
-	// TODO: remove all these
-	/*
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint textureID, int width, int height, int channels);
-
-	// From Buffers
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
-
-	// Load from File 
-	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
-	*/
 
 
 public:
@@ -53,12 +30,12 @@ public:
 	RESULT OGLInitialize(GLuint textureID);
 
 	RESULT OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer = nullptr, GLint border = 0);
-	RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
+	
 	RESULT OGLInitializeMultisample(int multisample = 4);
 
 	RESULT SetDefaultTextureParams();
 	RESULT SetDefaultDepthTextureParams();
-	RESULT SetDefaultCubeMapParams();
+	
 	
 	RESULT OGLActivateTexture(int value);
 
@@ -90,13 +67,25 @@ private:
 
 public:
 	static OGLTexture *MakeTexture(const texture &srcTexture);
-	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels = 0, int samples = 1);
-	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
-	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
-	static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
-	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename);
-	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
-	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
+	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::type type, std::wstring wstrFilename);
+	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
+
+	// TODO: Move to OGLCubeMap
+	//static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels);
+	//RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
+	//RESULT SetDefaultCubeMapParams();
+	//const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
+	//	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+	//};
 
 private:
 	OpenGLImp *m_pParentImp = nullptr;

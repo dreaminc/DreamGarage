@@ -986,10 +986,10 @@ RESULT UIViewTestSuite::AddTestCurvedTitle() {	// can adjust scroll view depth w
 				pButtons.emplace_back(pView->MakeUIButton());
 			}
 			
-			texture *pTexturePlaceholder = m_pDreamOS->MakeTexture(L"menu-item-background.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureDropbox = m_pDreamOS->MakeTexture(L"dropbox.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureDrive = m_pDreamOS->MakeTexture(L"google-drive.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-			texture *pTextureCloud = m_pDreamOS->MakeTexture(L"cloud-storage.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+			texture *pTexturePlaceholder = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"menu-item-background.png");
+			texture *pTextureDropbox = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"dropbox.png");
+			texture *pTextureDrive = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"google-drive.png");
+			texture *pTextureCloud = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"cloud-storage.png");
 
 			pScrollView->UpdateMenuButtons(pButtons);
 			

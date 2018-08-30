@@ -8,7 +8,8 @@
 // Skybox Primitive
 
 #include "volume.h"
-#include "texture.h"
+
+#include "cubemap.h"
 
 // TODO: Not sure that this needs to be an explicit primitive 
 
@@ -16,24 +17,20 @@
 
 class skybox : public volume {
 
-protected:
-	texture *m_pCubeMapTexture;
-
 public:
 	skybox() :
 		volume(DEFAULT_SKYBOX_SIZE),
-		m_pCubeMapTexture(nullptr)
+		m_pCubemap(nullptr)
 	{
 		// empty
 	}
 
-	RESULT SetCubeMapTexture(texture *pTexture) {
+	RESULT SetCubeMapTexture(cubemap *pCubemap) {
 		RESULT r = R_PASS;
 
-		CBM((m_pCubeMapTexture == nullptr), "Cannot overwrite cube map texture");
+		CBM((m_pCubemap == nullptr), "Cannot overwrite cube map texture");
 
-		m_pCubeMapTexture = pTexture;
-		m_pCubeMapTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_CUBE);
+		m_pCubemap = pCubemap;
 
 	Error:
 		return r;
@@ -42,12 +39,15 @@ public:
 	RESULT ClearCubeMapTexture() {
 		RESULT r = R_PASS;
 
-		CB((m_pCubeMapTexture != nullptr));
-		m_pCubeMapTexture = nullptr;
+		CB((m_pCubemap != nullptr));
+		m_pCubemap = nullptr;
 
 	Error:
 		return r;
 	}
+
+protected:
+	cubemap * m_pCubemap;
 };
 
 #endif	// ! SKY_BOX_H_

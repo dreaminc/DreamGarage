@@ -165,7 +165,7 @@ font::font(const std::wstring& strFontFilename, composite *pContext, bool fDista
 	std::wstring strFile = L"Fonts/" + GetFontImageFile();
 	const wchar_t* pszFile = strFile.c_str();
 	
-	m_pTexture = pContext->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+	m_pTexture = pContext->MakeTexture(texture::type::TEXTURE_2D, const_cast<wchar_t*>(pszFile));
 }
 
 font::font(const std::wstring& strFontFilename, bool fDistanceMap) :
