@@ -32,6 +32,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCamera());
+
 	CR(AddTestObjectMaterialsBump());
 
 	CR(AddTestMinimalTextureShader());
@@ -3641,6 +3643,68 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::AddTestCamera() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float radius = 0.2f;
+
+	struct TestContext {
+		volume *pVolume1 = nullptr;
+		volume *pVolume2 = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CR(SetupSkyboxPipeline("minimal_texture"));
+
+		pTestContext->pVolume1 = m_pDreamOS->AddVolume(0.1f);
+		pTestContext->pVolume1->SetPosition(point(0.0f, 0.0f, 0.0f));
+		
+		pTestContext->pVolume2 = m_pDreamOS->AddVolume(0.1f);
+		pTestContext->pVolume2->SetPosition(point(0.0f, 0.0f, -0.25f));
+
+		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 0.0f, 0.0f));
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+
+//		m_pDreamOS->RecenterH
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Shader HMD");
+	pNewTest->SetTestDescription("Blinn phong shader HMD test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT HALTestSuite::AddTestObjectMaterialsBump() {
 	RESULT r = R_PASS;

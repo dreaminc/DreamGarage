@@ -198,14 +198,11 @@ RESULT OVRHMD::RecenterHMD() {
 	return r;
 }
 
-bool OVRHMD::ShouldRecenterHMD() {
+bool OVRHMD::ShouldRecenterHMD(ovrSessionStatus sessionStatus) {
 	RESULT r = R_PASS;
 
-	ovrSessionStatus pSessionStatus;
 
-	ovr_GetSessionStatus(m_ovrSession, &pSessionStatus);
-
-	return (m_fShouldRecenterHMD || pSessionStatus.ShouldRecenter) && pSessionStatus.HmdMounted;
+	return (m_fShouldRecenterHMD || sessionStatus.ShouldRecenter) && sessionStatus.HmdMounted;
 
 Error:
 	return false;
@@ -329,10 +326,10 @@ RESULT OVRHMD::UpdateHMD() {
 		ShutdownParentSandbox();
 	}
 
-	if (OVRSessionStatus.ShouldRecenter) {
-		DOSLOG(INFO, "ShouldRecenter from Oculus");
-		CR((RESULT)ovr_RecenterTrackingOrigin(OVRSession));
-		//ovr_ClearShouldRecenterFlag(OVRSession);	// this is a void call :/
+	if (ShouldRecenterHMD(OVRSessionStatus)) {
+		DOSLOG(INFO, "ShouldRecenter");
+		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
+		m_fShouldRecenterHMD = false;
 	}
 
 	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");
@@ -343,11 +340,6 @@ RESULT OVRHMD::UpdateHMD() {
 	double fTiming = ovr_GetTimeInSeconds();
 #endif
 	ovrTrackingState trackingState = ovr_GetTrackingState(m_ovrSession, fTiming, true);
-
-	if (ShouldRecenterHMD()) {
-		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
-		m_fShouldRecenterHMD = false;
-	}
 
 	if (trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;

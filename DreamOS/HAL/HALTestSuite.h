@@ -78,6 +78,8 @@ public:
 
 	RESULT AddTestRemoveObjects();
 
+	RESULT AddTestCamera();
+
 private:
 	RESULT ResetTest(void *pContext);
 
