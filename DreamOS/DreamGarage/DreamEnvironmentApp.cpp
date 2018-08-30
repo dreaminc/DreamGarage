@@ -102,7 +102,7 @@ RESULT DreamEnvironmentApp::Update(void *pContext) {
 	}
 
 	if (m_fShowUpdateRequired) {
-		texture* pMessageTexture = GetDOS()->MakeTexture(L"launch-update-required.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		texture* pMessageTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"launch-update-required.png");
 		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
 		m_pMessageQuad->SetVisible(true);
 		m_fShowUpdateRequired = false;
