@@ -310,14 +310,12 @@ RESULT OVRHMD::SubmitFrame() {
 RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
 
-	ovrSession OVRSession = GetOVRSession();
-
 	ovrSessionStatus OVRSessionStatus;
-	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
+	ovr_GetSessionStatus(m_ovrSession, &OVRSessionStatus);
 
 	if (OVRSessionStatus.ShouldQuit) {
 		DOSLOG(INFO, "ShouldQuit received from Oculus, shutting down sandbox")
-		ShutdownParentSandbox();
+		m_pParentSandbox->PendShutdown();
 	}
 
 	if (OVRSessionStatus.ShouldRecenter) {

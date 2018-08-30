@@ -67,7 +67,7 @@ public:
 	virtual RESULT RecenterHMD() override;
 	bool ShouldRecenterHMD(ovrSessionStatus sessionStatus);
 private:
-	bool m_fShouldRecenterHMD = true;
+	bool m_fShouldRecenterHMD = false;
 
 public:
 
