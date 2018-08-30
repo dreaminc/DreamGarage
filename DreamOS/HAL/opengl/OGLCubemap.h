@@ -15,7 +15,7 @@ class OpenGLImp;
 
 class OGLCubemap : public cubemap {
 public:
-	const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
+	const GLenum m_kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
 		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
@@ -30,15 +30,15 @@ public:
 
 	~OGLCubemap();
 
-	RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
+	//RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
 
 	// Note: these are shared in OGLTexture - not a lot of code
-	// so not sure if it's worth going through the virtual inheritence guantlet yet
+	// so not sure if it's worth going through the virtual inheritance gauntlet yet
 	RESULT Bind();
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	RESULT OGLInitialize(GLuint textureID);
-	RESULT AllocateGLTexture(size_t optOffset = 0);
-	RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
+	RESULT AllocateGLTexture();
+	//RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	RESULT SetDefaultCubeMapParams();
 

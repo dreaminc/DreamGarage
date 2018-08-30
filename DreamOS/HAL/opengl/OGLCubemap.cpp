@@ -67,6 +67,7 @@ Error:
 }
 
 // TODO: Border?
+/*
 RESULT OGLCubemap::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType) {
 	RESULT r = R_PASS;
 
@@ -82,26 +83,54 @@ RESULT OGLCubemap::AllocateGLTexture(unsigned char *pImageBuffer, GLint internal
 Error:
 	return r;
 }
+*/
 
-RESULT OGLCubemap::AllocateGLTexture(size_t optOffset) {
+RESULT OGLCubemap::AllocateGLTexture() {
 	RESULT r = R_PASS;
 
+	CN(m_pImageBuffer);
+
 	GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
-	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);
-	
-	unsigned char *pImageBuffer = nullptr;
+	//GLenum glFormat = GL_RGBA;
 
-	if (m_pImage != nullptr) {
-		pImageBuffer = m_pImage->GetImageBuffer() + (optOffset);
+	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);	
+	//GLint internalGLFormat = GL_RGB;
+
+	//CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
+
+	m_glInternalFormat = internalGLFormat;
+	m_glFormat = glFormat;
+	m_glPixelDataType = GL_UNSIGNED_BYTE;
+
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+
+		size_t sizeSide = GetTextureSize();
+
+		unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
+
+		CR(m_pParentImp->TexImage2D(m_kGLCubeMapEnums[i], 
+									0, 
+									m_glInternalFormat, 
+									m_width, 
+									m_height, 
+									0, 
+									m_glFormat, 
+									m_glPixelDataType, 
+									ptrOffset));
+
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 	}
-
-	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
 Error:
 	return r;
 }
 
-
+/*
 RESULT OGLCubemap::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber) {
 	RESULT r = R_PASS;
 
@@ -116,7 +145,9 @@ RESULT OGLCubemap::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNum
 
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 		//size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+		
 		size_t sizeSide = GetTextureSize();
+
 		unsigned char *ptrOffset = pImageBuffer + (i * (sizeSide));
 
 		CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptrOffset));
@@ -134,6 +165,7 @@ RESULT OGLCubemap::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNum
 Error:
 	return r;
 }
+*/
 
 
 RESULT OGLCubemap::SetDefaultCubeMapParams() {
