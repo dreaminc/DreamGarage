@@ -298,7 +298,21 @@ RESULT OVRHMD::SubmitFrame() {
 RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
 
-	//ovr_RecenterTrackingOrigin(m_ovrSession);
+	ovrSession OVRSession = GetOVRSession();
+
+	ovrSessionStatus OVRSessionStatus;
+	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
+
+	if (OVRSessionStatus.ShouldQuit) {
+		DOSLOG(INFO, "ShouldQuit received from Oculus, shutting down sandbox")
+		ShutdownParentSandbox();
+	}
+
+	if (OVRSessionStatus.ShouldRecenter) {
+		DOSLOG(INFO, "ShouldRecenter from Oculus");
+		CR((RESULT)ovr_RecenterTrackingOrigin(OVRSession));
+		//ovr_ClearShouldRecenterFlag(OVRSession);	// this is a void call :/
+	}
 
 	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");
 

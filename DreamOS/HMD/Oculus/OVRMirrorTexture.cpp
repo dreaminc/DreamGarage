@@ -93,7 +93,7 @@ RESULT OVRMirrorTexture::DestroyMirrorTexture() {
 	RESULT r = R_PASS;
 
 	ovr_DestroyMirrorTexture(m_ovrSession, m_pOVRMirrorTexture);
-	CBM(m_pOVRMirrorTexture == nullptr, "Error Destroying ovrMirrorTexture");
+	m_pOVRMirrorTexture = nullptr;
 
 Error:
 	return r;

@@ -142,7 +142,7 @@ RESULT OVRHMDSinkNode::SubmitFrame() {
 
 	CR((RESULT)ovr_SubmitFrame(OVRSession, 0, nullptr, &layers, 1));
 
-	//* TODO: Might want to check on session
+	/* TODO: Might want to check on session
 	ovrSessionStatus OVRSessionStatus;
 	ovr_GetSessionStatus(OVRSession, &OVRSessionStatus);
 
