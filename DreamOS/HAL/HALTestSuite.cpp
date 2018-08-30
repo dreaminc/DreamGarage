@@ -36,11 +36,11 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestCamera());
 
+	CR(AddTestCubeMap());
+
 	CR(AddTestObjectMaterialsBump());
 
 	CR(AddTestMinimalTextureShader());
-
-	CR(AddTestCubeMap());
 
 	CR(AddTestObjectMaterialsColors());
 
