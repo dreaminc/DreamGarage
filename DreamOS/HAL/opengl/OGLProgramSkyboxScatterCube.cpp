@@ -1,4 +1,4 @@
-#include "OGLProgramSkyboxScatter.h"
+#include "OGLProgramSkyboxScatterCube.h"
 
 #include "Scene/ObjectStoreImp.h"
 #include "Scene/ObjectStore.h"
@@ -11,13 +11,13 @@
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
-OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglskyboxscatter")
+OGLProgramSkyboxScatterCube::OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "oglskyboxscattercube")
 {
 	// empty
 }
 
-RESULT OGLProgramSkyboxScatter::OGLInitialize() {
+RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -34,31 +34,39 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_intViewHeight")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_vecSunDirection")));
 
-	// Framebuffer Output
-	/*
-	int pxWidth = m_pParentImp->GetViewport().Width();
-	int pxHeight = m_pParentImp->GetViewport().Height();
+	// Cubemap Framebuffer Output
+	int pxWidth = 1024;
+	int pxHeight = 1024;
 
-	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
-	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->Bind());
+	m_pOGLFramebufferCubemap = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CN(m_pOGLFramebufferCubemap);
 
-	CR(m_pOGLFramebuffer->SetSampleCount(4));
+	CR(m_pOGLFramebufferCubemap->OGLInitialize());
+	CR(m_pOGLFramebufferCubemap->Bind());
 
-	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(m_pOGLFramebufferCubemap->SetSampleCount(1));
 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
-	*/
+	CR(m_pOGLFramebufferCubemap->MakeColorAttachment());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->MakeOGLCubemap());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebufferCubemap->MakeDepthAttachment());
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->OGLInitializeRenderBuffer());
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+	CRM(m_pOGLFramebufferCubemap->CheckStatus(), "Frame buffer messed up");
+
+	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
+
+	// Debugging (this will eventually be rendered to)
+	m_pOutputCubemap = m_pParentImp->MakeCubemap(L"LarnacaCastle");
+	CN(m_pOutputCubemap);
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatter::OGLInitialize(version versionOGL) {
+RESULT OGLProgramSkyboxScatterCube::OGLInitialize(version versionOGL) {
 	RESULT r = R_PASS;
 
 	CR(OGLInitialize());
@@ -101,7 +109,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatter::SetReflectionObject(VirtualObj *pReflectionObject) {
+RESULT OGLProgramSkyboxScatterCube::SetReflectionObject(VirtualObj *pReflectionObject) {
 	RESULT r = R_PASS;
 
 	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
@@ -113,7 +121,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatter::SetSunDirection(vector vSunDirection) {
+RESULT OGLProgramSkyboxScatterCube::SetSunDirection(vector vSunDirection) {
 	RESULT r = R_PASS;
 	
 	m_sunDirection = vSunDirection;
@@ -121,7 +129,7 @@ RESULT OGLProgramSkyboxScatter::SetSunDirection(vector vSunDirection) {
 	return R_PASS;
 }
 
-RESULT OGLProgramSkyboxScatter::SetupConnections() {
+RESULT OGLProgramSkyboxScatterCube::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
@@ -129,20 +137,16 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs
-	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
-
-	// The render output is passed through
-	// TODO: Flag?
-	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));
+	CR(MakeOutput<cubemap>("output_cubemap", m_pOutputCubemap));
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
+RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -162,10 +166,11 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		//BindToFramebuffer(m_pOGLFramebuffer);
-		m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
+		BindToFramebuffer(m_pOGLFramebuffer);
+		//m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
 	}
 
+	/*
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
@@ -174,23 +179,24 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	CR(RenderObject(pSkybox));
 
 	UnbindFramebuffer();
+	*/
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatter::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramSkyboxScatterCube::SetObjectTextures(OGLObj *pOGLObj) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT OGLProgramSkyboxScatter::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramSkyboxScatterCube::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramSkyboxScatterCube::SetCameraUniforms(camera *pCamera) {
 
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();	
@@ -238,7 +244,7 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(camera *pCamera) {
 	return R_PASS;
 }
 
-RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramSkyboxScatterCube::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);

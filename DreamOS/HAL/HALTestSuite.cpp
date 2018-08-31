@@ -39,13 +39,13 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestCubeMap());
 
+	CR(AddTestWaterShader());
+	
 	CR(AddTestObjectMaterialsBump());
 
 	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestObjectMaterialsColors());
-
-	CR(AddTestWaterShader());
 
 	CR(AddTestFadeShader());
 
@@ -1163,7 +1163,7 @@ RESULT HALTestSuite::AddTestWaterShader() {
 		pWaterProgramNode = nullptr;
 		pWaterProgramNode = pHAL->MakeProgramNode("water");
 		CN(pWaterProgramNode);
-		CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		//CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		
 		// TODO: This is not particularly general yet
@@ -4517,7 +4517,7 @@ RESULT HALTestSuite::AddTestCubeMap() {
 
 		// Skybox
 		ProgramNode* pSkyboxProgram;
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));

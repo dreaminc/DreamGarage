@@ -964,6 +964,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLCommon.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatterCube.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2111,6 +2114,9 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLCubemap.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatterCube.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>

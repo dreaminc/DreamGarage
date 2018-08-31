@@ -877,6 +877,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramRefraction.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkybox.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatterCube.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramStandard.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
@@ -1204,6 +1205,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReflection.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramRefraction.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenFade.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatterCube.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramStandard.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />

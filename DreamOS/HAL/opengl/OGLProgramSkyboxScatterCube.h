@@ -1,12 +1,11 @@
-#ifndef OGLPROGRAM_SKYBOX_SCATTER_H_
-#define OGLPROGRAM_SKYBOX_SCATTER_H_
-
-// Dream OS
-// DreamOS/HAL/opengl/OGLProgramSkybox.h
-// OGLProgramSkybox is an OGLProgram that encapsulates the OGLProgram 
-// for a skybox shader
+#ifndef OGLPROGRAM_SKYBOX_SCATTER_CUBE_H_
+#define OGLPROGRAM_SKYBOX_SCATTER_CUBE_H_
 
 #include "./RESULT/EHM.h"
+
+// Dream OS
+// DreamOS/HAL/opengl/OGLProgramSkyboxCube.h
+
 #include "OGLProgram.h"
 #include "../SkyboxScatterProgram.h"
 
@@ -14,9 +13,9 @@
 
 class cubemap;
 
-class OGLProgramSkyboxScatter : public OGLProgram, public SkyboxScatterProgram {
+class OGLProgramSkyboxScatterCube : public OGLProgram, public SkyboxScatterProgram {
 public:
-	OGLProgramSkyboxScatter(OpenGLImp *pParentImp);
+	OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -47,7 +46,9 @@ private:
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
-	OGLFramebuffer* m_pOGLFramebuffer = nullptr;
+	
+	OGLFramebuffer* m_pOGLFramebufferCubemap = nullptr;
+	cubemap* m_pOutputCubemap = nullptr;
 
 	vector m_sunDirection = vector(0.0f, 1.0f, 0.0f);
 
@@ -64,4 +65,4 @@ private:
 	OGLUniform *m_pUniformViewHeight;
 	OGLUniformVector *m_pUniformSunDirection;
 };
-#endif // ! OGLPROGRAM_SKYBOX_SCATTER_H_
+#endif // ! OGLPROGRAM_SKYBOX_SCATTER_CUBE_H_
