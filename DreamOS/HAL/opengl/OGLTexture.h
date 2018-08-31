@@ -35,7 +35,7 @@ public:
 	RESULT SetDefaultTextureParams();
 	RESULT SetDefaultDepthTextureParams();
 	
-	
+	// TODO: remove?
 	RESULT OGLActivateTexture(int value);
 
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -50,7 +50,7 @@ public:
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
-	GLenum GetOGLTextureTarget() { return m_textureTarget; }
+	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
 
@@ -74,8 +74,8 @@ public:
 private:
 	OpenGLImp *m_pParentImp = nullptr;
 
-	GLuint m_textureIndex = 0;
-	GLenum m_textureTarget = 0;
+	GLuint m_glTextureIndex = 0;
+	GLenum m_glTextureTarget = 0;
 
 	// Note: this will work as long as the client is the one to allocate the texture
 	// if not these values may be incorrect 

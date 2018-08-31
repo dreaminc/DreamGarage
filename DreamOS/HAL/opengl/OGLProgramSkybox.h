@@ -49,7 +49,8 @@ private:
 	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformViewOrientationMatrix = nullptr;
 
-	OGLUniformSamplerCube *m_pUniformTextureCubeMap = nullptr;
+	OGLUniformBool *m_pUniformHasTextureCubemap = nullptr;
+	OGLUniformSamplerCube *m_pUniformTextureCubemap = nullptr;
 };
 
 #endif // ! OGLPROGRAM_SKYBOX_H_

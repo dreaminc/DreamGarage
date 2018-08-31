@@ -8,6 +8,7 @@
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
+#include "OGLCubemap.h"
 
 OGLProgramSkybox::OGLProgramSkybox(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglskybox")
@@ -29,7 +30,9 @@ RESULT OGLProgramSkybox::OGLInitialize() {
 	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewOrientationMatrix), std::string("u_mat4ViewOrientation")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureCubeMap), std::string("u_textureCubeMap")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureCubemap), std::string("u_hasTextureCubemap")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureCubemap), std::string("u_textureCubeMap")));
 
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
@@ -147,7 +150,25 @@ Error:
 }
 
 RESULT OGLProgramSkybox::SetObjectTextures(OGLObj *pOGLObj) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	OGLCubemap *pOGLCubemap = dynamic_cast<OGLCubemap*>(m_pCubemap);
+
+	if (m_pUniformTextureCubemap != nullptr && m_pUniformHasTextureCubemap != nullptr) {
+		if (pOGLCubemap != nullptr) {
+			m_pParentImp->glActiveTexture(GL_TEXTURE1);
+			m_pParentImp->BindTexture(pOGLCubemap->GetOGLTextureTarget(), pOGLCubemap->GetOGLTextureIndex());
+
+			m_pUniformTextureCubemap->SetUniform(1);
+			m_pUniformHasTextureCubemap->SetUniform(true);
+		}
+		else {
+			m_pUniformHasTextureCubemap->SetUniform(false);
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramSkybox::SetObjectUniforms(DimObj *pDimObj) {

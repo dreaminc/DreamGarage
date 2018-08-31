@@ -61,8 +61,8 @@ RESULT cubemap::LoadCubeMapByName(const wchar_t *pszName) {
 	CR(GetCubeMapFiles(pszName, vstrCubeMapFiles));
 	CR(LoadCubeMapFromFiles(pszName, vstrCubeMapFiles));
 
-	CN(m_pImageBuffer);
-	CB((m_pImageBuffer_n > 0));
+	//CN(m_pImageBuffer);
+	//CB((m_pImageBuffer_n > 0));
 
 Error:
 	return r;
@@ -105,7 +105,7 @@ RESULT cubemap::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::ws
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
-	image *pCubemapImages[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	CN(pPathManager);
 
 	CBM((vstrCubeMapFiles.size() == 6), "LoadCubeMapFromFiles expects 6 files to be provided only %llu found", vstrCubeMapFiles.size());
 
@@ -115,47 +115,31 @@ RESULT cubemap::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::ws
 		int CubeMapFace = static_cast<int>(GetCubeMapTypeFromFilename(strFilename));
 		CRM(pPathManager->GetFilePathForName(PATH_TEXTURE_CUBE, pszName, strFilename, wstrFilePath), "Failed to get %S path for %S cube map", pszName, strFilename.c_str());
 
-		pCubemapImages[CubeMapFace] = ImageFactory::MakeImageFromPath(IMAGE_FREEIMAGE, wstrFilePath);
-		CN(pCubemapImages[CubeMapFace]);
+		m_pCubemapImages[CubeMapFace] = ImageFactory::MakeImageFromPath(IMAGE_FREEIMAGE, wstrFilePath);
+		CN(m_pCubemapImages[CubeMapFace]);
+
+		// For posterity 
+		m_pCubemapImages[CubeMapFace]->FlipVertical();
 
 		// Ensure all heights are the same
 		if(m_width == 0) {
-			m_width = pCubemapImages[CubeMapFace]->GetWidth();
-			m_height = pCubemapImages[CubeMapFace]->GetHeight();
-			m_channels = pCubemapImages[CubeMapFace]->GetChannels();
+			m_width = m_pCubemapImages[CubeMapFace]->GetWidth();
+			m_height = m_pCubemapImages[CubeMapFace]->GetHeight();
+			m_channels = m_pCubemapImages[CubeMapFace]->GetChannels();
 		}
 		else {
-			CBM((m_width == pCubemapImages[CubeMapFace]->GetWidth()), 
-				"Cube map width %d mismatches %d", pCubemapImages[CubeMapFace]->GetWidth(), m_width);
+			CBM((m_width == m_pCubemapImages[CubeMapFace]->GetWidth()),
+				"Cube map width %d mismatches %d", m_pCubemapImages[CubeMapFace]->GetWidth(), m_width);
 
-			CBM((m_height == pCubemapImages[CubeMapFace]->GetHeight()), 
-				"Cube map height %d mismatches %d", pCubemapImages[CubeMapFace]->GetHeight(), m_height);
+			CBM((m_height == m_pCubemapImages[CubeMapFace]->GetHeight()),
+				"Cube map height %d mismatches %d", m_pCubemapImages[CubeMapFace]->GetHeight(), m_height);
 
-			CBM((m_channels == pCubemapImages[CubeMapFace]->GetChannels()), 
-				"Cube map channels %d mismatches %d", pCubemapImages[CubeMapFace]->GetChannels(), m_channels);
+			CBM((m_channels == m_pCubemapImages[CubeMapFace]->GetChannels()),
+				"Cube map channels %d mismatches %d", m_pCubemapImages[CubeMapFace]->GetChannels(), m_channels);
 		}
-	}
-
-	// Stitch it together here
-	size_t sizeSide = GetTextureSize();
-	m_pImageBuffer_n = sizeSide * NUM_CUBE_MAP_TEXTURES;
-
-	m_pImageBuffer = new unsigned char[m_pImageBuffer_n];
-	CNM(m_pImageBuffer, "Failed to allocate Image Buffer for cube map");
-
-	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		unsigned char *ptrOffset = m_pImageBuffer + i * (sizeSide);
-		memcpy(ptrOffset, pCubemapImages[i]->GetImageBuffer(), sizeSide);
 	}
 
 Error:
-	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		if(pCubemapImages[i] != nullptr) {
-			delete pCubemapImages[i];
-			pCubemapImages[i] = nullptr;
-		}
-	}
-
 	return r;
 }
 

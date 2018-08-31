@@ -93,6 +93,7 @@ public:
 class OGLUniformSamplerCube : public OGLUniform {
 public:
 	RESULT SetUniform(OGLTexture *pTexture);
+	RESULT SetUniform(GLint textureIndex);
 };
 
 #endif // ! OGL_UNIFORM_H_

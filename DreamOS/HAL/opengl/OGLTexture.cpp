@@ -7,8 +7,8 @@
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget) :
 	texture(type),
-	m_textureIndex(0),
-	m_textureTarget(textureTarget),
+	m_glTextureIndex(0),
+	m_glTextureTarget(textureTarget),
 	m_pParentImp(pParentImp)
 {
 	// This constructor should be used when deeper configuration is sought 
@@ -16,8 +16,8 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum texture
 
 OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 	texture((const texture&)(pOGLTexture)),
-	m_textureIndex(0),
-	m_textureTarget(pOGLTexture.m_textureTarget),
+	m_glTextureIndex(0),
+	m_glTextureTarget(pOGLTexture.m_glTextureTarget),
 	m_pParentImp(pOGLTexture.m_pParentImp),
 	m_glFormat(pOGLTexture.m_glFormat),
 	m_glInternalFormat(pOGLTexture.m_glInternalFormat),
@@ -30,14 +30,14 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 OGLTexture::~OGLTexture() {
 	texture::~texture();
 
-	if (m_textureIndex != 0) {
-		m_pParentImp->DeleteTextures(1, &m_textureIndex);
-		m_textureIndex = 0;
+	if (m_glTextureIndex != 0) {
+		m_pParentImp->DeleteTextures(1, &m_glTextureIndex);
+		m_glTextureIndex = 0;
 	}
 }
 
 RESULT OGLTexture::Bind() {
-	return m_pParentImp->BindTexture(m_textureTarget, m_textureIndex);
+	return m_pParentImp->BindTexture(m_glTextureTarget, m_glTextureIndex);
 }
 
 RESULT OGLTexture::SetTextureParameter(GLenum paramName, GLint paramVal) {
@@ -46,7 +46,7 @@ RESULT OGLTexture::SetTextureParameter(GLenum paramName, GLint paramVal) {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	CR(Bind());
-	CR(m_pParentImp->TexParameteri(m_textureTarget, paramName, paramVal));
+	CR(m_pParentImp->TexParameteri(m_glTextureTarget, paramName, paramVal));
 
 Error:
 	return r;
@@ -59,7 +59,7 @@ RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internal
 	CR(Bind());
 
 	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
+	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
 
 	m_glInternalFormat = internalGLFormat;
 	m_glFormat = glFormat;
@@ -197,7 +197,7 @@ RESULT OGLTexture::CopyTextureBufferFromTexture(OGLTexture *pTexture) {
 
 	// Bind Texture
 	CR(Bind());
-	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, pTextureBuffer));
+	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, pTextureBuffer));
 
 	CRM(m_pParentImp->CheckGLError(), "glCopyTexImage2D failed");
 
@@ -400,10 +400,10 @@ RESULT OGLTexture::OGLInitialize(GLuint textureID) {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	if (textureID == NULL) {
-		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+		CR(m_pParentImp->GenerateTextures(1, &m_glTextureIndex));
 	}
 	else {
-		m_textureIndex = textureID;
+		m_glTextureIndex = textureID;
 	}
 
 Error:
@@ -415,9 +415,9 @@ RESULT OGLTexture::OGLInitializeTexture(GLenum textureTarget, GLint level, GLint
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
-	CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+	CR(m_pParentImp->GenerateTextures(1, &m_glTextureIndex));
 
-	CR(m_pParentImp->BindTexture(textureTarget, m_textureIndex));
+	CR(m_pParentImp->BindTexture(textureTarget, m_glTextureIndex));
 
 	CR(m_pParentImp->TexImage2D(textureTarget, level, internalformat, m_width, m_height, border, format, type, pBuffer));
 
@@ -430,12 +430,12 @@ RESULT OGLTexture::OGLInitializeMultisample(int multisample) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
-	CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+	CR(m_pParentImp->GenerateTextures(1, &m_glTextureIndex));
 
-	CB((m_textureTarget == GL_TEXTURE_2D_MULTISAMPLE));
+	CB((m_glTextureTarget == GL_TEXTURE_2D_MULTISAMPLE));
 
-	CR(m_pParentImp->BindTexture(m_textureTarget, m_textureIndex));
-	CR(m_pParentImp->glTexImage2DMultisample(m_textureTarget, multisample, GL_RGBA8, m_width, m_height, true));
+	CR(m_pParentImp->BindTexture(m_glTextureTarget, m_glTextureIndex));
+	CR(m_pParentImp->glTexImage2DMultisample(m_glTextureTarget, multisample, GL_RGBA8, m_width, m_height, true));
 
 Error:
 	return r;
@@ -445,7 +445,7 @@ RESULT OGLTexture::OGLActivateTexture(int value) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine(value)));
-	CR(m_pParentImp->BindTexture(m_textureTarget, m_textureIndex));
+	CR(m_pParentImp->BindTexture(m_glTextureTarget, m_glTextureIndex));
 
 Error:
 	return r;
@@ -456,7 +456,7 @@ GLenum OGLTexture::GetGLTextureNumberDefine(int value) {
 }
 
 GLuint OGLTexture::GetOGLTextureIndex() {
-	return m_textureIndex;
+	return m_glTextureIndex;
 }
 
 RESULT OGLTexture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
@@ -471,7 +471,7 @@ RESULT OGLTexture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	uint8_t *pBuffer = m_pImage->GetImageBuffer();
 	size_t pBuffer_n = m_pImage->GetImageBufferSize();
 
-	m_pParentImp->GetTextureImage(m_textureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer));
+	m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer));
 
 	CN(pBuffer);
 
@@ -493,7 +493,7 @@ RESULT OGLTexture::UpdateDimensions(int pxWidth, int pxHeight) {
 	CR(Bind());
 
 	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
+	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
 
 Error:
 	return r;

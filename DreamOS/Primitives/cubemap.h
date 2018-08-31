@@ -39,8 +39,10 @@ public:
 	static texture_type GetCubeMapTypeFromFilename(std::wstring strFilename);
 
 protected:
-	uint8_t *m_pImageBuffer = nullptr;
-	size_t m_pImageBuffer_n = 0;
+	//uint8_t *m_pImageBuffer = nullptr;
+	//size_t m_pImageBuffer_n = 0;
+
+	image *m_pCubemapImages[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 };
 

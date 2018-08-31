@@ -7,7 +7,7 @@
 
 OGLCubemap::OGLCubemap(OpenGLImp *pParentImp) :
 	cubemap(),
-	m_textureIndex(0),
+	m_glTextureIndex(0),
 	m_pParentImp(pParentImp)
 {
 	// This constructor should be used when deeper configuration is sought 
@@ -15,7 +15,7 @@ OGLCubemap::OGLCubemap(OpenGLImp *pParentImp) :
 
 OGLCubemap::OGLCubemap(const OGLCubemap &pOGLCubemap) :
 	cubemap((const cubemap&)(pOGLCubemap)),
-	m_textureIndex(0),
+	m_glTextureIndex(0),
 	m_pParentImp(pOGLCubemap.m_pParentImp),
 	m_glFormat(pOGLCubemap.m_glFormat),
 	m_glInternalFormat(pOGLCubemap.m_glInternalFormat),
@@ -28,14 +28,14 @@ OGLCubemap::OGLCubemap(const OGLCubemap &pOGLCubemap) :
 OGLCubemap::~OGLCubemap() {
 	cubemap::~cubemap();
 
-	if (m_textureIndex != 0) {
-		m_pParentImp->DeleteTextures(1, &m_textureIndex);
-		m_textureIndex = 0;
+	if (m_glTextureIndex != 0) {
+		m_pParentImp->DeleteTextures(1, &m_glTextureIndex);
+		m_glTextureIndex = 0;
 	}
 }
 
 RESULT OGLCubemap::Bind() {
-	return m_pParentImp->BindTexture(m_textureTarget, m_textureIndex);
+	return m_pParentImp->BindTexture(m_glTextureTarget, m_glTextureIndex);
 }
 
 RESULT OGLCubemap::SetTextureParameter(GLenum paramName, GLint paramVal) {
@@ -44,7 +44,7 @@ RESULT OGLCubemap::SetTextureParameter(GLenum paramName, GLint paramVal) {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	CR(Bind());
-	CR(m_pParentImp->TexParameteri(m_textureTarget, paramName, paramVal));
+	CR(m_pParentImp->TexParameteri(m_glTextureTarget, paramName, paramVal));
 
 Error:
 	return r;
@@ -56,42 +56,23 @@ RESULT OGLCubemap::OGLInitialize(GLuint textureID) {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	if (textureID == NULL) {
-		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+		CR(m_pParentImp->GenerateTextures(1, &m_glTextureIndex));
 	}
 	else {
-		m_textureIndex = textureID;
+		m_glTextureIndex = textureID;
 	}
 
 Error:
 	return r;
 }
-
-// TODO: Border?
-/*
-RESULT OGLCubemap::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType) {
-	RESULT r = R_PASS;
-
-	CR(Bind());
-
-	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
-
-	m_glInternalFormat = internalGLFormat;
-	m_glFormat = glFormat;
-	m_glPixelDataType = pixelDataType;
-
-Error:
-	return r;
-}
-*/
 
 RESULT OGLCubemap::AllocateGLTexture() {
 	RESULT r = R_PASS;
 
-	CN(m_pImageBuffer);
+	//CN(m_pImageBuffer);
 
-	GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
-	//GLenum glFormat = GL_RGBA;
+	//GLenum glFormat = GetOpenGLPixelFormat(m_pixelFormat, m_channels);
+	GLenum glFormat = GL_BGRA;
 
 	GLint internalGLFormat = GetOpenGLPixelFormat(PIXEL_FORMAT::Unspecified, m_channels);	
 	//GLint internalGLFormat = GL_RGB;
@@ -104,16 +85,19 @@ RESULT OGLCubemap::AllocateGLTexture() {
 
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 
-		size_t sizeSide = GetTextureSize();
+		//size_t sizeSide = m_pCubemapImages[i]->GetImageBufferSize();
 
-		unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
+		//size_t sizeSide = m_width * m_height * m_channels * sizeof(uint8_t);
+		uint8_t *ptrOffset = m_pCubemapImages[i]->GetImageBuffer();
+
+		CN(ptrOffset);
 
 		CR(m_pParentImp->TexImage2D(m_kGLCubeMapEnums[i], 
-									0, 
+									0,				// level
 									m_glInternalFormat, 
 									m_width, 
 									m_height, 
-									0, 
+									0,				// border
 									m_glFormat, 
 									m_glPixelDataType, 
 									ptrOffset));
@@ -126,46 +110,17 @@ RESULT OGLCubemap::AllocateGLTexture() {
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 	}
 
-Error:
-	return r;
-}
-
-/*
-RESULT OGLCubemap::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber) {
-	RESULT r = R_PASS;
-
-	CR(m_pParentImp->MakeCurrentContext());
-	CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
-
-	unsigned char *pImageBuffer = nullptr;
-
-	if (m_pImage != nullptr) {
-		m_pImage->GetImageBuffer();
-	}
-
+	// Release the images 
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		//size_t sizeSide = m_width * m_height * sizeof(unsigned char);
-		
-		size_t sizeSide = GetTextureSize();
-
-		unsigned char *ptrOffset = pImageBuffer + (i * (sizeSide));
-
-		CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptrOffset));
-
-		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
-		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
-
-		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
-		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
-		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+		if(m_pCubemapImages[i] != nullptr) {
+			delete m_pCubemapImages[i];
+			m_pCubemapImages[i] = nullptr;
+		}
 	}
-
-	// TODO: Delete the image data here?
 
 Error:
 	return r;
 }
-*/
 
 
 RESULT OGLCubemap::SetDefaultCubeMapParams() {

@@ -178,7 +178,7 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pUniformHasTextureColor->SetUniform(false);
 	}
 
-	//	Error:
+Error:
 	return r;
 }
 

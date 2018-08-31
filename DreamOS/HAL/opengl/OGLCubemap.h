@@ -30,15 +30,17 @@ public:
 
 	~OGLCubemap();
 
-	//RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
-
 	// Note: these are shared in OGLTexture - not a lot of code
 	// so not sure if it's worth going through the virtual inheritance gauntlet yet
 	RESULT Bind();
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	RESULT OGLInitialize(GLuint textureID);
 	RESULT AllocateGLTexture();
-	//RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
+
+	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
+	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
+	GLenum GetOGLFormat() { return m_glFormat; }
+	GLuint GetOGLTextureIndex() { return m_glTextureIndex; }
 
 	RESULT SetDefaultCubeMapParams();
 
@@ -46,10 +48,10 @@ public:
 	static OGLCubemap *MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapNam);
 
 public:
-	OpenGLImp * m_pParentImp = nullptr;
+	OpenGLImp *m_pParentImp = nullptr;
 
-	GLuint m_textureIndex = 0;
-	GLenum m_textureTarget = GL_TEXTURE_CUBE_MAP;
+	GLuint m_glTextureIndex = 0;
+	GLenum m_glTextureTarget = GL_TEXTURE_CUBE_MAP;
 
 	// Note: this will work as long as the client is the one to allocate the texture
 	// if not these values may be incorrect 
