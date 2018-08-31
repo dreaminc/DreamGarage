@@ -97,7 +97,7 @@ RESULT UIControlBar::Initialize() {
 
 	// Set-up text for url/title
 	{
-		auto pFont = m_pDreamOS->MakeFont(L"Basis_grotesque_pro.fnt", true);
+		auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
 
 		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
