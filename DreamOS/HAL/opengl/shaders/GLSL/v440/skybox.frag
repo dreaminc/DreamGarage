@@ -20,9 +20,10 @@ void main(void) {
 		//outColor = texture(u_textureCubeMap, normalize(DataIn.position));
 		outColor = texture(u_textureCubeMap, DataIn.position);
 	}
-
-	// DEBUG
-	//outColor = vec4(normalize(DataIn.position), 1.0f);
+	else {
+		// DEBUG
+		//outColor = vec4(normalize(DataIn.position), 1.0f);
+	}
 
 	out_vec4Color = vec4(outColor.rgb, 1.0f);
 }

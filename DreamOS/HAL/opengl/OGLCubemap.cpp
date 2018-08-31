@@ -66,7 +66,7 @@ Error:
 	return r;
 }
 
-RESULT OGLCubemap::AllocateGLTexture() {
+RESULT OGLCubemap::AllocateGLCubemap() {
 	RESULT r = R_PASS;
 
 	//CN(m_pImageBuffer);
@@ -137,30 +137,53 @@ Error:
 	return r;
 }
 
-// TODO: Move to OGLCubeMap
-//OGLTexture* OGLTexture::MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels) {
-//	RESULT r = R_PASS;
-//	
-//	OGLTexture *pTexture = nullptr;
-//
-//	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
-//	CN(pTexture);
-//
-//	GLenum textureTarget = GL_TEXTURE_CUBE_MAP;
+RESULT OGLCubemap::AllocateGLCubemap(size_t pxWidth, size_t pxHeight, int numChannels) {
+	RESULT r = R_PASS;
 
-//for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-//	size_t pCubeMapSideOffset = pTexture->GetTextureSize();
-//	CR(pTexture->AllocateGLTexture(pCubeMapSideOffset));
-//
-//	// TODO: Is this needed here?  I think it can be out of the for loop
-//	// TODO: Rename or remove this / specialize more
-//	CR(pTexture->SetDefaultCubeMapParams());
-//}
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+		//size_t pCubeMapSideOffset = pCubemap->GetTextureSize();
 
-//
-//Error:
-//	return pTexture;
-//}
+		// Allocate the texture GPU side
+		CR(m_pParentImp->TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+									0,		// level
+									GL_RGBA, 
+									(GLsizei)pxWidth,
+									(GLsizei)pxHeight,
+									0,		// border
+									GL_RGBA, 
+									GL_UNSIGNED_BYTE, 
+									nullptr));
+
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+	}
+
+Error:
+	return r;
+}
+
+OGLCubemap* OGLCubemap::MakeCubemap(OpenGLImp *pParentImp, int width, int height, int channels) {
+	RESULT r = R_PASS;
+	
+	OGLCubemap *pCubemap = nullptr;
+
+	pCubemap = new OGLCubemap(pParentImp);
+	CN(pCubemap);
+
+	CR(pCubemap->OGLInitialize(NULL));
+	CR(pCubemap->Bind());
+
+	CR(pCubemap->AllocateGLCubemap(width, height, channels));
+		
+	CR(pCubemap->SetDefaultCubeMapParams());
+
+Error:
+	return pCubemap;
+}
 
 OGLCubemap* OGLCubemap::MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapName) {
 	RESULT r = R_PASS;
@@ -173,7 +196,7 @@ OGLCubemap* OGLCubemap::MakeCubemapFromName(OpenGLImp *pParentImp, const std::ws
 	CR(pCubemap->LoadCubeMapByName(wstrCubemapName.c_str()));
 
 	CR(pCubemap->OGLInitialize(NULL));
-	CR(pCubemap->AllocateGLTexture());
+	CR(pCubemap->AllocateGLCubemap());
 	
 	CR(pCubemap->SetDefaultCubeMapParams());
 

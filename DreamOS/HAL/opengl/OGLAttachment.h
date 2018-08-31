@@ -11,6 +11,8 @@
 //#include "Primitives/Framebuffer.h"
 
 class OGLRenderbuffer;
+class OGLTexture;
+class OGLCubemap;
 
 class OGLAttachment {
 public:
@@ -36,7 +38,12 @@ public:
 	GLuint GetOGLTextureIndex();
 	GLenum GetOGLTextureTarget();
 
+	// Cubemap
+	RESULT MakeOGLCubemap();
+	RESULT AttachCubemapToFramebuffer(GLenum target, GLenum attachment);
+
 	OGLTexture *GetOGLTexture() { return m_pOGLTexture; }
+	OGLCubemap *GetOGLCubemap() { return m_pOGLCubemap; }
 	OGLRenderbuffer *GetOGLRenderBuffer() { return m_pOGLRenderbuffer; }
 
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -74,6 +81,7 @@ private:
 
 	OGLRenderbuffer *m_pOGLRenderbuffer = nullptr;
 	OGLTexture *m_pOGLTexture = nullptr;
+	OGLCubemap *m_pOGLCubemap = nullptr;
 };
 
 #endif // ! OGL_DEPTHBUFFER_H_

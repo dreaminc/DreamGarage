@@ -1,6 +1,7 @@
 #include "OGLAttachment.h"
 
 #include "OGLTexture.h"
+#include "OGLCubemap.h"
 #include "OGLRenderbuffer.h"
 
 OGLAttachment::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
@@ -117,15 +118,33 @@ Error:
 }
 
 RESULT OGLAttachment::AttachToFramebuffer(GLenum target, GLenum attachment) {
-	return m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0);
+	RESULT r = R_PASS;
+
+	CN(m_pOGLTexture);
+	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
 }
 
 RESULT OGLAttachment::AttachTextureToFramebuffer(GLenum target, GLenum attachment) {
-	return m_pParentImp->glFramebufferTexture2D(target, attachment, m_pOGLTexture->GetOGLTextureTarget(), m_pOGLTexture->GetOGLTextureIndex(), 0);
+	RESULT r = R_PASS;
+
+	CN(m_pOGLTexture);
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, m_pOGLTexture->GetOGLTextureTarget(), m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
 }
 
 RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget) {
-	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
+	RESULT r = R_PASS;
+
+	CN(m_pOGLRenderbuffer);
+	CR(m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex()));
+
+Error:
+	return r;
 }
 
 RESULT OGLAttachment::MakeOGLDepthTexture(texture::type type, GLenum internalGLFormat, GLenum pixelDataType) {
@@ -154,6 +173,37 @@ RESULT OGLAttachment::MakeOGLTexture(texture::type type) {
 	else {
 		CR(MakeOGLTextureMultisample());
 	}
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::MakeOGLCubemap() {
+	RESULT r = R_PASS;
+
+	if (m_sampleCount == 1) {
+		m_pOGLCubemap = OGLCubemap::MakeCubemap(m_pParentImp, m_width, m_height, m_channels);
+		CN(m_pOGLCubemap);
+	}
+	else {
+		CBM((false), "Not currently supporting multi-sample cube maps");
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::AttachCubemapToFramebuffer(GLenum target, GLenum attachment) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLCubemap);
+
+	CR(m_pParentImp->glFramebufferTexture2D(target,
+											attachment,
+											//m_pOGLCubemap->GetOGLTextureTarget(), 
+											GL_TEXTURE_CUBE_MAP_POSITIVE_X,				// why this?
+											m_pOGLCubemap->GetOGLTextureIndex(),
+											0));
 
 Error:
 	return r;

@@ -336,3 +336,13 @@ Error:
 RESULT OGLFramebuffer::Unbind() {
 	return m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+RESULT OGLFramebuffer::CheckStatus() {
+	RESULT r = R_PASS;
+
+	// Check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}

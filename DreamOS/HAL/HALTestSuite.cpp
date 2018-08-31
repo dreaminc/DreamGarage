@@ -4515,10 +4515,18 @@ RESULT HALTestSuite::AddTestCubeMap() {
 
 		CR(pHAL->MakeCurrentContext());
 
+		// Skybox
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("skybox");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("cubemap", pSkyboxProgram->Output("output_cubemap")));
 
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -4538,10 +4546,11 @@ RESULT HALTestSuite::AddTestCubeMap() {
 			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 			CN(pSphere);
 
-			cubemap *pCubemap = m_pDreamOS->MakeCubemap(L"LarnacaCastle");
-			CN(pCubemap);
+			//cubemap *pCubemap = m_pDreamOS->MakeCubemap(L"LarnacaCastle");
+			//CN(pCubemap);
 
-			CR(dynamic_cast<OGLProgramSkybox*>(pRenderProgramNode)->SetCubemap(pCubemap));
+			//CR(dynamic_cast<OGLProgramSkybox*>(pRenderProgramNode)->SetCubemap(pCubemap));
+			//CR(pRenderProgramNode->ConnectToInput("cubemap", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		}
 

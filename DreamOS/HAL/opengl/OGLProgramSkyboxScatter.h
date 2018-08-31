@@ -12,6 +12,8 @@
 
 #include "Primitives/matrix/RotationMatrix.h"
 
+class cubemap;
+
 class OGLProgramSkyboxScatter : public OGLProgram, public SkyboxScatterProgram {
 public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp);
@@ -46,6 +48,9 @@ private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 	OGLFramebuffer* m_pOGLFramebuffer = nullptr;
+	OGLFramebuffer* m_pOGLFramebufferCubemap = nullptr;
+
+	cubemap* m_pOutputCubemap = nullptr;
 
 	vector m_sunDirection = vector(0.0f, 1.0f, 0.0f);
 

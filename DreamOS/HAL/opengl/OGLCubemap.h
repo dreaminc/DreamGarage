@@ -35,7 +35,9 @@ public:
 	RESULT Bind();
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	RESULT OGLInitialize(GLuint textureID);
-	RESULT AllocateGLTexture();
+	
+	RESULT AllocateGLCubemap();
+	RESULT AllocateGLCubemap(size_t pxWidth, size_t pxHeight, int numChannels);
 
 	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
@@ -44,7 +46,7 @@ public:
 
 	RESULT SetDefaultCubeMapParams();
 
-	//static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels);
+	static OGLCubemap *MakeCubemap(OpenGLImp *pParentImp, int width, int height, int channels);
 	static OGLCubemap *MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapNam);
 
 public:

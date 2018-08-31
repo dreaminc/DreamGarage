@@ -63,6 +63,9 @@ public:
 	RESULT SetSampleCount(int samples) { m_samples = samples; return R_PASS; }
 	int GetSampleCount() { return m_samples; }
 
+	// Always check that our framebuffer is ok
+	RESULT CheckStatus();
+
 private:
 	OpenGLImp *m_pParentImp;
 

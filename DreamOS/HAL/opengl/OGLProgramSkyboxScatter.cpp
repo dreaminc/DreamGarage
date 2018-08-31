@@ -54,7 +54,33 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 	*/
 
+	// Cubemap Framebuffer Output
+	int pxWidth = 1024;
+	int pxHeight = 1024;
+
+	m_pOGLFramebufferCubemap = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CN(m_pOGLFramebufferCubemap);
+
+	CR(m_pOGLFramebufferCubemap->OGLInitialize());
+	CR(m_pOGLFramebufferCubemap->Bind());
+
+	CR(m_pOGLFramebufferCubemap->SetSampleCount(1));
+
+	CR(m_pOGLFramebufferCubemap->MakeColorAttachment());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->MakeOGLCubemap());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebufferCubemap->MakeDepthAttachment());
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->OGLInitializeRenderBuffer());
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+	CRM(m_pOGLFramebufferCubemap->CheckStatus(), "Frame buffer messed up");
+
 	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
+
+	// Debugging (this will eventually be rendered to)
+	m_pOutputCubemap = m_pParentImp->MakeCubemap(L"LarnacaCastle");
+	CN(m_pOutputCubemap);
 
 Error:
 	return r;
@@ -140,6 +166,8 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 	// TODO: Flag?
 	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
+	CR(MakeOutput<cubemap>("output_cubemap", m_pOutputCubemap));
+
 Error:
 	return r;
 }
@@ -168,15 +196,16 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 		m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
 	}
 
+	/*
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
-	//RenderObjectStore(m_pSceneGraph);
 	CR(RenderObject(pSkybox));
 
 	UnbindFramebuffer();
+	*/
 
 Error:
 	return r;
@@ -252,6 +281,7 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	int pxWidth = m_pOGLFramebuffer->GetWidth();
 	int pxHeight = m_pOGLFramebuffer->GetHeight();
+	
 	/*
 	point sunDirection = point(0.3f, sunY, -0.5f);
 	sunY += 0.0002f;
