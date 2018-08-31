@@ -98,7 +98,7 @@ private:
 		// legacy environment, potentially could be removed completely
 		// do not load during release startup
 	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\Cave\\cave_copy.FBX"}
+		{environment::CAVE, L"\\Cave\\cave.FBX"}
 	};
 
 	//populated in LoadAllEnvironments
