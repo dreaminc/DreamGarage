@@ -628,6 +628,10 @@ HWND DreamOS::GetDreamHWND() {
 	return m_pSandbox->GetWindowHandle();
 }
 
+RESULT DreamOS::RecenterHMD() {
+	return m_pSandbox->m_pHMD->RecenterHMD();
+}
+
 RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }

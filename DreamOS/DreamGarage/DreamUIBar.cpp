@@ -91,12 +91,10 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
-	//m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUISpatialScrollView();
-	//m_pScrollView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pScrollView);
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());

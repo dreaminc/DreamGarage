@@ -105,6 +105,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 			m_pUserApp->UpdateDepth(diff/4.0f);
 		}
 	}
+	/*
 	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
 		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
 			m_fLeftTriggerDown = true;
@@ -122,6 +123,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 			m_fRightTriggerDown = false;
 		}
 	}
+	//*/
 
 Error:
 	return r;
@@ -146,8 +148,8 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 			else {
 
 				// Reset user app to values at the beginning of the form
-				CR(m_pUserApp->UpdateHeight(m_initialHeight));
-				CR(m_pUserApp->UpdateDepth(m_initialDepth));
+				CR(m_pUserApp->UpdateHeight(m_pUserApp->GetHeight() - m_initialHeight));
+				CR(m_pUserApp->UpdateDepth(m_pUserApp->GetDepth() - m_initialDepth));
 				CR(m_pUserApp->UpdateScale(m_initialScale));
 
 				CR(Hide());

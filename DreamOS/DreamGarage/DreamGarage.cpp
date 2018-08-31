@@ -367,7 +367,6 @@ RESULT DreamGarage::DidFinishLoading() {
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
-
 	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CN(m_pDreamUserApp);
 
@@ -733,8 +732,14 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
-		CR(m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition));
-		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -2.0f);
+		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
+
+		m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition);
+
+		point ptUser;
+		m_pDreamUserApp->GetAppBasisPosition(ptUser);
+
+		RecenterHMD();
 	}
 
 	if (m_pDreamUserControlArea != nullptr) {

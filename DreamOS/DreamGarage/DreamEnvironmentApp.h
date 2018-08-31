@@ -120,7 +120,7 @@ private:
 
 	float m_tableWidth = 112.5f * m_environmentSceneScale;
 	float m_tableLength = 187.5f * m_environmentSceneScale;
-	float m_tableHeight = 0.0f * m_environmentSceneScale;
+	float m_tableHeight = 25.0f * m_environmentSceneScale;
 
 	float m_baseTableAngle = 270.0f * (float)M_PI / 180.0f;
 	float m_frontAngle = 135.0f * (float)M_PI / 180.0f;
