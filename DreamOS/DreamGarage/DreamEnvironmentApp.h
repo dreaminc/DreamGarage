@@ -95,8 +95,10 @@ private:
 	// environment loading maps
 	//TODO: incorporate new environment
 	std::map<environment::type, std::wstring> m_environmentFilenames = {
-		{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
-		{environment::CAVE, L"\\Cave\\cave.FBX"}
+		// legacy environment, potentially could be removed completely
+		// do not load during release startup
+	//	{environment::ISLAND, L"\\FloatingIsland\\env.obj"},
+		{environment::CAVE, L"\\Cave\\cave_copy.FBX"}
 	};
 
 	//populated in LoadAllEnvironments
