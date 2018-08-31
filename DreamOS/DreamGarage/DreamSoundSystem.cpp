@@ -114,7 +114,7 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 
 		CR(ClearSpatialSoundObjects());
 
-		/*
+		//*
 		{
 			// This is BULL
 			m_pTestSpatialSoundObject = AddSpatialSoundObject(point(0.0f, 0.0f, 2.0f), vector(), vector());
@@ -126,7 +126,7 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 			//m_pTestSpatialSoundObject->LoopSoundFile(m_pSoundFile.get());
 			m_pTestSpatialSoundObject->PlaySoundFile(m_pSoundFile.get());
 		}
-		*/
+		//*/
 	}
 
 Error:
