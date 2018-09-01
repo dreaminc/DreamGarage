@@ -48,6 +48,8 @@ public:
 	RESULT SetMouthPosition(point ptPosition);
 	RESULT SetMouthOrientation(quaternion qOrientation);
 
+	long GetAvatarModelId();
+
 private:
 	RESULT LoadHeadModelFromID();
 	bool IsFemaleModel();

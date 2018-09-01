@@ -210,6 +210,10 @@ RESULT user::SetMouthOrientation(quaternion qOrientation) {
 	return R_PASS;
 }
 
+long user::GetAvatarModelId() {
+	return m_avatarModelId;
+}
+
 //TODO: why doesn't this use hand::SetHandState(pHandState)
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;

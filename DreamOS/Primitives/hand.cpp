@@ -49,31 +49,70 @@ std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
 RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	RESULT r = R_PASS;
 
+
+	// why
+	SetPosition(point(0.0f, 0.0f, -1.0f));
+
+	m_handType = type;
+	
+	m_fOriented = false;
+
+	m_qRotation = GetOrientation();
+
+	m_fTracked = false;
+	//Start all visibility at false
+	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
+
+	// This is the "hitbox" for the controller overlay 
+	m_pPhantomVolume = MakeVolume(m_volumeWidth, m_volumeHeight, m_volumeDepth);	
+	CN(m_pPhantomVolume);
+	m_pPhantomVolume->SetVisible(false);
+	AddObject(m_pPhantomVolume);
+
+	m_avatarModelId = avatarModelID;
+
+	if (m_avatarModelId >= 1 && m_avatarModelId <= 4) {
+		LoadHandModel();
+	}
+
+Error:
+	return r;
+}
+
+RESULT hand::PendCreateHandModel(long avatarModelID) {
+	RESULT r = R_PASS;
+
+	CBM(avatarModelID >= 1 && avatarModelID <= 4, "invalid avatar model id %d", avatarModelID);
+	
+	m_fLoadHandModel = true;
+	m_avatarModelId = avatarModelID;
+
+Error:
+	return r;
+}
+
+RESULT hand::LoadHandModel() {
+	RESULT r = R_PASS;
+
 	// why
 	float palmRadius = 0.01f;
 	point ptModel = point(0.0f, 0.0f, 0.08f);
 	float scaleModel = 0.01f;
 
-	// why
-	SetPosition(point(0.0f, 0.0f, -1.0f));
-
-	// TODO: make these numbers discoverable 
-	CBM(avatarModelID >= 1 && avatarModelID <= 4, "invalid model id: %d", avatarModelID);
-
 #ifndef _DEBUG
 
-	if (type == HAND_TYPE::HAND_LEFT) {
+	if (m_handType == HAND_TYPE::HAND_LEFT) {
 
-		std::wstring wstrModel = k_wstrFolder + k_wstrLeft + std::to_wstring(avatarModelID) + k_wstrFileType;
+		std::wstring wstrModel = k_wstrFolder + k_wstrLeft + std::to_wstring(m_avatarModelId) + k_wstrFileType;
 		m_pModel = AddModel(wstrModel);
 
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
 		m_pModel->SetOrientationOffset(vLeftHandOffset);
 	}
 	
-	if (type == HAND_TYPE::HAND_RIGHT) {
+	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
-		std::wstring wstrModel = k_wstrFolder + k_wstrRight + std::to_wstring(avatarModelID) + k_wstrFileType;
+		std::wstring wstrModel = k_wstrFolder + k_wstrRight + std::to_wstring(m_avatarModelId) + k_wstrFileType;
 		m_pModel = AddModel(wstrModel);
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
@@ -85,11 +124,7 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	m_pModel->SetPosition(ptModel);
 	m_pModel->SetScale(scaleModel);
 
-	// This is the "hitbox" for the controller overlay 
-	m_pPhantomVolume = MakeVolume(m_volumeWidth, m_volumeHeight, m_volumeDepth);	
-	CN(m_pPhantomVolume);
-	m_pPhantomVolume->SetVisible(false);
-	AddObject(m_pPhantomVolume);
+	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
 
 #else
 
@@ -98,14 +133,8 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	m_pModel = AddModel(L"cube.obj");
 	m_pModel->SetScale(0.02f);
 #endif
-	
-	m_fOriented = false;
 
-	m_qRotation = GetOrientation();
-
-	m_fTracked = false;
-	//Start all visibility at false
-	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
+	m_fLoadHandModel = false;
 
 Error:
 	return r;
@@ -194,7 +223,9 @@ RESULT hand::SetModelState(ModelState modelState) {
 
 	switch (m_modelState) {
 	case ModelState::HAND: {
-		HideModel();
+		if (m_pModel != nullptr) {
+			HideModel();
+		}
 	} break;
 	case ModelState::CONTROLLER: {
 		HideController();
@@ -203,7 +234,9 @@ RESULT hand::SetModelState(ModelState modelState) {
 
 	switch (modelState) {
 	case ModelState::HAND: {
-		ShowModel();
+		if (m_pModel != nullptr) {
+			ShowModel();
+		}
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
@@ -221,9 +254,15 @@ Error:
 RESULT hand::Update() {
 	RESULT r = R_PASS;
 
+	if (m_fLoadHandModel) {
+		CR(LoadHandModel());
+	}
+
 	switch (m_modelState) {
 	case ModelState::HAND: {
-		m_pModel->SetVisible(m_fTracked);
+		if (m_pModel != nullptr) {
+			m_pModel->SetVisible(m_fTracked);
+		}
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
@@ -234,6 +273,7 @@ RESULT hand::Update() {
 	} break;
 	}
 
+Error:
 	return r;
 }
 
@@ -309,8 +349,10 @@ bool hand::IsTracked() {
 RESULT hand::OnLostTrack() {
 	m_fTracked = false;
 	
-	m_pModel->SetVisible(m_fTracked);
-	
+	if (m_pModel != nullptr) {
+		m_pModel->SetVisible(m_fTracked);
+	}
+
 	//m_pPalm->SetVisible(m_fTracked);
 
 	return R_PASS;
@@ -352,7 +394,9 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	if (!m_fTracked)
 		OnLostTrack();
 
-	m_pModel->SetOrientation(pHandState.qOrientation);
+	if (m_pModel != nullptr) {
+		m_pModel->SetOrientation(pHandState.qOrientation);
+	}
 
 //Error:
 	return r;

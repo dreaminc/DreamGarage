@@ -67,7 +67,7 @@ public:
 	hand(HALImp* pHALImp, HAND_TYPE type);
 	hand(HALImp* pHALImp, HAND_TYPE type, long avatarModelID);
 
-	RESULT Initialize(HAND_TYPE type, long avatarModelID = 1);
+	RESULT Initialize(HAND_TYPE type, long avatarModelID = -1);
 	RESULT InitializeWithContext(DreamOS *pDreamOS);
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
@@ -96,6 +96,9 @@ public:
 	std::shared_ptr<volume> GetPhantomVolume();
 	RESULT Update(); // TODO: app?
 	RESULT SetVisible(bool fVisible = true, bool fSetChildren = true);
+
+	RESULT PendCreateHandModel(long avatarModelID);
+	RESULT LoadHandModel();
 
 protected:
 	//Animations
@@ -146,6 +149,9 @@ protected:
 	float m_volumeDepth = OVERLAY_VOLUME_DEPTH;
 
 	ModelState m_modelState = ModelState::HAND;
+
+	bool m_fLoadHandModel = false;
+	long m_avatarModelId = -1;
 };
 
 #endif	// ! HAND_H_

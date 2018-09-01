@@ -787,6 +787,8 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		quaternion qScreenRotation;
 		float screenScale;
 
+		long avatarID;
+
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		
@@ -795,6 +797,11 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		CR(SetRoundtablePosition(seatPosition));
 		m_fSeated = true;
+
+		avatarID = m_pUserController->GetUser().GetAvatarID();
+
+		GetHMD()->GetHand(HAND_TYPE::HAND_LEFT)->PendCreateHandModel(avatarID);
+		GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT)->PendCreateHandModel(avatarID);
 	}
 
 Error:

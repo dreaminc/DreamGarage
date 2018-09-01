@@ -45,8 +45,8 @@ public:
 	*/
 
 	User(long userID, long defaultEnvironmentID, long defaultAvatarID,
-		std::string strEmail, std::string strScreename, 
-		std::string strFirstName, std::string strLastName, 
+		std::string strEmail, std::string strScreename,
+		std::string strFirstName, std::string strLastName,
 		version userVersion
 	) :
 		m_userID(userID),
@@ -62,7 +62,7 @@ public:
 	}
 
 	RESULT PrintUser() {
-		
+
 		DEBUG_LINEOUT("User %d Version %s", m_userID, m_version.GetString().c_str());
 		DEBUG_LINEOUT("Default Environment %d", m_defaultEnvironmentID);
 		DEBUG_LINEOUT("email: %s", m_strEmail.c_str());
@@ -72,10 +72,12 @@ public:
 
 		return R_PASS;
 	}
-	
+
 	long GetUserID() const { return m_userID; }
 	long GetDefaultEnvironmentID() const { return m_defaultEnvironmentID; }
 	RESULT SetDefaultEnvironmentID(long environmentID) { m_defaultEnvironmentID = environmentID; return R_PASS; }
+
+	long GetAvatarID() { return m_defaultAvatarID; };
 
 	const std::string&	GetEmail() const { return m_strEmail; }
 	const std::string&	GetFirstName() const  { return m_strFirstName; }
