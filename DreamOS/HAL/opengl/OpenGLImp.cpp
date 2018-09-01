@@ -615,6 +615,24 @@ Error:
 	return nullptr;
 }
 
+hand* OpenGLImp::MakeHand(HAND_TYPE type, long avatarID) {
+	RESULT r = R_PASS;
+
+	hand *pHand = new OGLHand(this, type, avatarID);
+	CN(pHand);
+
+	//Success:
+	return pHand;
+
+Error:
+	if (pHand != nullptr) {
+		delete pHand;
+		pHand = nullptr;
+	}
+	return nullptr;
+
+}
+
 volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 

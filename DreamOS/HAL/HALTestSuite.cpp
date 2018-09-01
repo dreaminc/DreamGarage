@@ -32,6 +32,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestModel());
+
 	CR(AddTestCamera());
 
 	CR(AddTestObjectMaterialsBump());
@@ -43,8 +45,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestObjectMaterialsColors());
 
 	CR(AddTestWaterShader());
-
-	CR(AddTestModel());
 
 	CR(AddTestFadeShader());
 
@@ -2142,7 +2142,7 @@ RESULT HALTestSuite::AddTestModel() {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
-		CR(SetupSkyboxPipeline("minimal"));
+		CR(SetupSkyboxPipeline("standard"));
 
 		// Objects 
 
@@ -2178,7 +2178,7 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 
-			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\Avatars\\righthand_4.FBX");
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
 			pTestContext->pModel->SetScale(0.1f);
 

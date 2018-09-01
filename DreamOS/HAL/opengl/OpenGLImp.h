@@ -90,7 +90,9 @@ public:
 
 	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
+
 	hand* MakeHand(HAND_TYPE type);
+	hand* MakeHand(HAND_TYPE type, long avatarID);
 
 	// TODO: Fix w/ scene graph not here
 	//composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));

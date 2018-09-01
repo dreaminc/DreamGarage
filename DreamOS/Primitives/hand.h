@@ -65,8 +65,9 @@ public:
 
 public:
 	hand(HALImp* pHALImp, HAND_TYPE type);
+	hand(HALImp* pHALImp, HAND_TYPE type, long avatarModelID);
 
-	RESULT Initialize(HAND_TYPE type);
+	RESULT Initialize(HAND_TYPE type, long avatarModelID = 1);
 	RESULT InitializeWithContext(DreamOS *pDreamOS);
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
@@ -110,8 +111,10 @@ protected:
 
 protected:
 
-	std::string k_strDefaultLeftHandPath = "\\face4\\LeftHand.obj";
-	std::string k_strDefaultRightHandPath = "\\face4\\RightHand.obj";
+	std::wstring k_wstrFolder = L"\\Avatars\\";
+	std::wstring k_wstrLeft = L"lefthand_";
+	std::wstring k_wstrRight = L"righthand_";
+	std::wstring k_wstrFileType = L".FBX";
 
 	HAND_TYPE m_handType;
 

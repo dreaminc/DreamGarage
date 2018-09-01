@@ -21,6 +21,19 @@ Error:
 	return;
 }
 
+hand::hand(HALImp* pHALImp, HAND_TYPE type, long avatarModelID) :
+	composite(pHALImp)
+{
+	RESULT r = R_PASS;
+	CR(Initialize(type, avatarModelID));
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
 
 	if (!CompareParent(pParent.get()) && pHandState.fOriented)
@@ -33,51 +46,37 @@ std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
 	return m_pModel;
 }
 
-RESULT hand::Initialize(HAND_TYPE type) {
+RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	RESULT r = R_PASS;
 
+	// why
 	float palmRadius = 0.01f;
 	point ptModel = point(0.0f, 0.0f, 0.08f);
-	float scaleModel = 0.015f;
+	float scaleModel = 0.01f;
 
-	//m_pPalm = AddSphere(palmRadius, 10, 10);
-
+	// why
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
-	std::string strLeftHandPath = "default";
-	std::string strRightHandPath = "default";
-
-#ifndef PRODUCTION_BUILD
-	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	strLeftHandPath = pCommandLineManager->GetParameterValue("lefthand.path");
-	strRightHandPath = pCommandLineManager->GetParameterValue("righthand.path");
-#endif
+	// TODO: make these numbers discoverable 
+	CBM(avatarModelID >= 1 && avatarModelID <= 4, "invalid model id: %d", avatarModelID);
 
 #ifndef _DEBUG
 
 	if (type == HAND_TYPE::HAND_LEFT) {
-		vector vLeftHandOffset;
-		if (strLeftHandPath == "default") {
-			vLeftHandOffset = vector((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
-			strLeftHandPath = k_strDefaultLeftHandPath;
-		}
-		else {
-			vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
-		}
-		m_pModel = AddModel(util::StringToWideString(strLeftHandPath));
+
+		std::wstring wstrModel = k_wstrFolder + k_wstrLeft + std::to_wstring(avatarModelID) + k_wstrFileType;
+		m_pModel = AddModel(wstrModel);
+
+		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
 		m_pModel->SetOrientationOffset(vLeftHandOffset);
 	}
 	
 	if (type == HAND_TYPE::HAND_RIGHT) {
-		vector vRightHandOffset;
-		if (strRightHandPath == "default") {
-			vRightHandOffset = vector((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
-			strRightHandPath = k_strDefaultRightHandPath;
-		}
-		else {
-			vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
-		}
-		m_pModel = AddModel(util::StringToWideString(strRightHandPath));
+
+		std::wstring wstrModel = k_wstrFolder + k_wstrRight + std::to_wstring(avatarModelID) + k_wstrFileType;
+		m_pModel = AddModel(wstrModel);
+
+		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
 		m_pModel->SetOrientationOffset(vRightHandOffset);
 	}
 
