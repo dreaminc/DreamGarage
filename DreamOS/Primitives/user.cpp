@@ -59,19 +59,18 @@ RESULT user::Initialize() {
 	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthPath));
 	CN(m_pMouth);
 	
-	// TODO: should be a part of an avatar folder once there are multiple mouths, 
-	// could also help inform a loop with different naming
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_04.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_03.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_02.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_01.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_04.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_03.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_02.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_01.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_04.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_03.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_02.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_01.png"));
+
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_04.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_03.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_02.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_01.png"));
 
 	for (int i = 0; i < 8; i++) {
-		CN(m_mouthStates[i]);
+		CN(m_mouthStatesMen[i]);
 	}
 
 //	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
@@ -143,11 +142,11 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	//*
 	// women model ids
 	if (IsFemaleModel()) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[4].get());
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[0].get());
 	}
 	// men mouths
 	else {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[0].get());
 	}
 	//*/
 
@@ -271,12 +270,13 @@ RESULT user::UpdateMouth(float mouthScale) {
 		rangedValue = 0;
 	}
 
-	if (!IsFemaleModel()) {
-		rangedValue += 4;
-	}
-
 	if (m_pMouth != nullptr) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[rangedValue].get());
+		if (IsFemaleModel()) {
+			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[rangedValue].get());
+		}
+		else {
+			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[rangedValue].get());
+		}
 	}
 
 Error:

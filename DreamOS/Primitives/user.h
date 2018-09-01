@@ -78,7 +78,8 @@ private:
 	std::shared_ptr<texture> m_pMouthTexture2 = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture3 = nullptr;
 
-	std::vector<std::shared_ptr<texture>> m_mouthStates;
+	std::vector<std::shared_ptr<texture>> m_mouthStatesMen;
+	std::vector<std::shared_ptr<texture>> m_mouthStatesWomen;
 
 	// add mouths to UI shader 
 	DreamOS *m_pDreamOS = nullptr;
