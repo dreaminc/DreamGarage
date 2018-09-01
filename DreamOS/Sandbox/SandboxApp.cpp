@@ -383,6 +383,7 @@ RESULT SandboxApp::RunAppLoop() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 	
+#ifdef OCULUS_PRODUCTION_BUILD
 	/*//////////////////////////////////////////////////////////
 	______________ ___ .___  _________ .___  _________    _____      ___ ___    _____  _________  ____  __.
 	\__    ___/   |   \|   |/   _____/ |   |/   _____/   /  _  \    /   |   \  /  _  \ \_   ___ \|    |/ _|
@@ -396,6 +397,7 @@ RESULT SandboxApp::RunAppLoop() {
 	m_pHALImp->Render();
 	SwapDisplayBuffers();
 	/*//////////////////////////////////////////////////////////*/
+#endif
 
 	SetSandboxRunning(true);
 
