@@ -4519,14 +4519,15 @@ RESULT HALTestSuite::AddTestCubeMap() {
 		ProgramNode* pSkyboxProgram;
 		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
 		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		//CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("skybox");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pRenderProgramNode->ConnectToInput("cubemap", pSkyboxProgram->Output("output_cubemap")));
+		//CR(pRenderProgramNode->ConnectToInput("cubemap", pSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxProgram->Output("output_framebuffer_cube")));
 
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");

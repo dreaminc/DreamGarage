@@ -5,6 +5,15 @@
 
 #include "OpenGLImp.h"
 
+const GLenum OGLCubemap::kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
+	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+	GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+};
+
 OGLCubemap::OGLCubemap(OpenGLImp *pParentImp) :
 	cubemap(),
 	m_glTextureIndex(0),
@@ -92,7 +101,7 @@ RESULT OGLCubemap::AllocateGLCubemap() {
 
 		CN(ptrOffset);
 
-		CR(m_pParentImp->TexImage2D(m_kGLCubeMapEnums[i], 
+		CR(m_pParentImp->TexImage2D(kGLCubeMapEnums[i], 
 									0,				// level
 									m_glInternalFormat, 
 									m_width, 
@@ -140,18 +149,22 @@ Error:
 RESULT OGLCubemap::AllocateGLCubemap(size_t pxWidth, size_t pxHeight, int numChannels) {
 	RESULT r = R_PASS;
 
-	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		//size_t pCubeMapSideOffset = pCubemap->GetTextureSize();
+	m_width = (int)pxWidth;
+	m_height = (int)pxHeight;
 
+	//m_pParentImp->glActiveTexture(GL_TEXTURE1);
+
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 		// Allocate the texture GPU side
-		CR(m_pParentImp->TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+		CR(m_pParentImp->TexImage2D(kGLCubeMapEnums[i],
 									0,		// level
 									GL_RGBA, 
-									(GLsizei)pxWidth,
-									(GLsizei)pxHeight,
+									(GLsizei)m_width,
+									(GLsizei)m_height,
 									0,		// border
 									GL_RGBA, 
-									GL_UNSIGNED_BYTE, 
+									//GL_UNSIGNED_BYTE, 
+									GL_FLOAT,
 									nullptr));
 
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
@@ -160,6 +173,9 @@ RESULT OGLCubemap::AllocateGLCubemap(size_t pxWidth, size_t pxHeight, int numCha
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+
+		//glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 Error:

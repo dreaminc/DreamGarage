@@ -15,14 +15,7 @@ class OpenGLImp;
 
 class OGLCubemap : public cubemap {
 public:
-	const GLenum m_kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
-		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-		GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-	};
+	static const GLenum kGLCubeMapEnums[NUM_CUBE_MAP_TEXTURES];
 
 public:
 	OGLCubemap(OpenGLImp *pParentImp);
@@ -48,6 +41,10 @@ public:
 
 	static OGLCubemap *MakeCubemap(OpenGLImp *pParentImp, int width, int height, int channels);
 	static OGLCubemap *MakeCubemapFromName(OpenGLImp *pParentImp, const std::wstring &wstrCubemapNam);
+
+	static GLenum GetGLCubeMapEnums(int lookup) {
+		return (kGLCubeMapEnums[lookup]);
+	}
 
 public:
 	OpenGLImp *m_pParentImp = nullptr;

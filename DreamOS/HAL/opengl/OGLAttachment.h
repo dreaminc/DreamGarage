@@ -41,6 +41,8 @@ public:
 	// Cubemap
 	RESULT MakeOGLCubemap();
 	RESULT AttachCubemapToFramebuffer(GLenum target, GLenum attachment);
+	GLuint GetOGLCubemapIndex();
+	GLenum GetOGLCubemapTarget();
 
 	OGLTexture *GetOGLTexture() { return m_pOGLTexture; }
 	OGLCubemap *GetOGLCubemap() { return m_pOGLCubemap; }

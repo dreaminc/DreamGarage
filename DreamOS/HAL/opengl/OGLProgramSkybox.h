@@ -37,6 +37,7 @@ protected:
 	skybox *m_pSkybox = nullptr;
 
 	cubemap *m_pCubemap = nullptr;
+	OGLFramebuffer* m_pOGLInputFramebufferCubemap = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;

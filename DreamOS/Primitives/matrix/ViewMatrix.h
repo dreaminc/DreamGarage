@@ -34,12 +34,14 @@ public:
 	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll);
 	ViewMatrix(point ptPosition, quaternion qLook);
 	ViewMatrix(point ptPosition, vector vLook);
+	ViewMatrix(point ptPosition, BasisMatrix matBasis);
 
 	~ViewMatrix();
 
 	RESULT SetViewMatrixPitchYawRoll(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll);
 	RESULT SetViewMatrixPointQuaternion(point ptPosition, quaternion qLook);
 	RESULT SetViewMatrixPointVector(point ptPosition, vector vLook);
+	RESULT SetViewMatrixPointBasis(point ptPosition, BasisMatrix matBasis);
 
 	RotationMatrix GetRotationMatrix();
 

@@ -111,7 +111,8 @@ RESULT OGLProgramSkybox::SetupConnections() {
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<cubemap>("cubemap", &m_pCubemap, DCONNECTION_FLAGS::PASSIVE));
+	//CR(MakeInput<cubemap>("cubemap", &m_pCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap));
 
 	// TODO: Input cube map node
 
@@ -160,7 +161,15 @@ RESULT OGLProgramSkybox::SetObjectTextures(OGLObj *pOGLObj) {
 			m_pParentImp->glActiveTexture(GL_TEXTURE1);
 			m_pParentImp->BindTexture(pOGLCubemap->GetOGLTextureTarget(), pOGLCubemap->GetOGLTextureIndex());
 
-			m_pUniformTextureCubemap->SetUniform(2);
+			m_pUniformTextureCubemap->SetUniform(20);
+			m_pUniformHasTextureCubemap->SetUniform(true);
+		}
+		else if (m_pOGLInputFramebufferCubemap != nullptr) {
+			m_pParentImp->glActiveTexture(GL_TEXTURE0);
+			m_pParentImp->BindTexture(m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapTarget(), 
+									  m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapIndex());
+
+			m_pUniformTextureCubemap->SetUniform(0);
 			m_pUniformHasTextureCubemap->SetUniform(true);
 		}
 		else {

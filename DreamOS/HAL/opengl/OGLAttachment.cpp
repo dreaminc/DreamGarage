@@ -209,6 +209,22 @@ Error:
 	return r;
 }
 
+GLenum OGLAttachment::GetOGLCubemapTarget() {
+	if (m_pOGLCubemap != nullptr) {
+		return m_pOGLCubemap->GetOGLTextureTarget();
+	}
+
+	return 0;
+}
+
+GLuint OGLAttachment::GetOGLCubemapIndex() {
+	if (m_pOGLCubemap != nullptr) {
+		return m_pOGLCubemap->GetOGLTextureIndex();
+	}
+
+	return 0;
+}
+
 RESULT OGLAttachment::MakeOGLTextureMultisample() {
 	RESULT r = R_PASS;
 

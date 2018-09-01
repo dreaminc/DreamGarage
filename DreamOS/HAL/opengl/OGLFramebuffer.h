@@ -39,6 +39,7 @@ public:
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
 	// TODO: These should not be directly used 
+	RESULT SetOGLCubemapToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetDepthTexture(int textureNumber);
 	

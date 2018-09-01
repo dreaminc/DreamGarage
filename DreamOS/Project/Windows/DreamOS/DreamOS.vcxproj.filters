@@ -967,6 +967,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatterCube.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\BasisMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">

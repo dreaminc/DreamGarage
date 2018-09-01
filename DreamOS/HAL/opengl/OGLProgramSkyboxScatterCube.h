@@ -12,25 +12,25 @@
 #include "Primitives/matrix/RotationMatrix.h"
 
 class cubemap;
+class skybox;
 
 class OGLProgramSkyboxScatterCube : public OGLProgram, public SkyboxScatterProgram {
 public:
 	OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp);
 
-	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;
 
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
 
-	RESULT SetObjectTextures(OGLObj *pOGLObj);
-	RESULT SetObjectUniforms(DimObj *pDimObj);
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
 
-	RESULT SetCameraUniforms(camera *pCamera);
-	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
-public:
-	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
+	RESULT SetCameraUniforms(GLenum glCubeMapFace, int pxWidth, int pxHeight);
 
 // SkyboxScatterProgram
 public:
@@ -41,16 +41,16 @@ private:
 	float m_theta = 0.0f;
 	float m_delta = 0.001f;	//0.00005f;
 
-	VirtualObj *m_pReflectionObject = nullptr;
+	skybox *m_pSkybox = nullptr;
 
 private:
 	stereocamera *m_pCamera = nullptr;
-	ObjectStore *m_pSceneGraph = nullptr;
 	
 	OGLFramebuffer* m_pOGLFramebufferCubemap = nullptr;
 	cubemap* m_pOutputCubemap = nullptr;
 
-	vector m_sunDirection = vector(0.0f, 1.0f, 0.0f);
+	//vector m_sunDirection = vector(0.0f, 1.0f, 1.0f);
+	vector m_sunDirection = vector(0.0f, 0.0f, 1.0f);
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

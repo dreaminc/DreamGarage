@@ -142,6 +142,15 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::SetOGLCubemapToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
+	RESULT r = R_PASS;
+
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLCubemapIndex(), 0));
+
+Error:
+	return r;
+}
+
 /*
 RESULT OGLFramebuffer::SetOGLTexture(GLuint textureIndex) {
 	RESULT r = R_PASS;

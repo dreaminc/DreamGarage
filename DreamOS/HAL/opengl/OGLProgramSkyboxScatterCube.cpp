@@ -4,10 +4,14 @@
 #include "Scene/ObjectStore.h"
 
 #include "Primitives/stereocamera.h"
+#include "Primitives/skybox.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
+
+#include "OGLSkybox.h"
+#include "OGLCubemap.h"
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
@@ -34,6 +38,7 @@ RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_intViewHeight")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_vecSunDirection")));
 
+	///*
 	// Cubemap Framebuffer Output
 	int pxWidth = 1024;
 	int pxHeight = 1024;
@@ -42,25 +47,33 @@ RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 	CN(m_pOGLFramebufferCubemap);
 
 	CR(m_pOGLFramebufferCubemap->OGLInitialize());
-	CR(m_pOGLFramebufferCubemap->Bind());
+	//CR(m_pOGLFramebufferCubemap->Bind());
+
+	CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
 
 	CR(m_pOGLFramebufferCubemap->SetSampleCount(1));
 
-	CR(m_pOGLFramebufferCubemap->MakeColorAttachment());
-	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->MakeOGLCubemap());
-	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
-
 	CR(m_pOGLFramebufferCubemap->MakeDepthAttachment());
 	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->OGLInitializeRenderBuffer());
-	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+	CR(m_pOGLFramebufferCubemap->MakeColorAttachment());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->MakeOGLCubemap());
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	
 
 	CRM(m_pOGLFramebufferCubemap->CheckStatus(), "Frame buffer messed up");
 
-	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
+	// Create skybox volume
+	m_pSkybox = m_pParentImp->MakeSkybox();
+	CN(m_pSkybox);
 
-	// Debugging (this will eventually be rendered to)
-	m_pOutputCubemap = m_pParentImp->MakeCubemap(L"LarnacaCastle");
-	CN(m_pOutputCubemap);
+	//*/
+
+	//// Debugging (this will eventually be rendered to)
+	//m_pOutputCubemap = m_pParentImp->MakeCubemap(L"LarnacaCastle");
+	//CN(m_pOutputCubemap);
 
 Error:
 	return r;
@@ -109,18 +122,6 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramSkyboxScatterCube::SetReflectionObject(VirtualObj *pReflectionObject) {
-	RESULT r = R_PASS;
-
-	quad *pQuad = dynamic_cast<quad*>(pReflectionObject);
-	CNM(pQuad, "Object not supported for reflection");
-
-	m_pReflectionObject = pQuad;
-
-Error:
-	return r;
-}
-
 RESULT OGLProgramSkyboxScatterCube::SetSunDirection(vector vSunDirection) {
 	RESULT r = R_PASS;
 	
@@ -133,14 +134,56 @@ RESULT OGLProgramSkyboxScatterCube::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	//TODO: CR(MakeInput("lights"));
-
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 
 	// Outputs
-	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));
-	CR(MakeOutput<cubemap>("output_cubemap", m_pOutputCubemap));
+	CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));
+	//CR(MakeOutput<cubemap>("output_cubemap", m_pOutputCubemap));
+
+Error:
+	return r;
+}
+
+
+RESULT OGLProgramSkyboxScatterCube::SetCameraUniforms(GLenum glCubeMapFace, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	matrix<float, 4, 4> mat4View;
+
+	mat4View.identity(1.0f);
+
+	switch (glCubeMapFace) {
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_X: {
+			mat4View = RotationMatrix(RotationMatrix::Z_AXIS, (float)(M_PI)) * mat4View;
+			mat4View = RotationMatrix(RotationMatrix::Y_AXIS, (float)(-M_PI / 2.0f)) * mat4View;
+		} break;
+
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_X: {
+			mat4View = RotationMatrix(RotationMatrix::Z_AXIS, (float)(M_PI)) * mat4View;
+			mat4View = RotationMatrix(RotationMatrix::Y_AXIS, (float)(M_PI / 2.0f)) * mat4View;
+		} break;
+
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y: {
+			mat4View = BasisMatrix(BasisMatrix::NEG_Y);
+		} break;
+
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_Y: {
+			mat4View = BasisMatrix(BasisMatrix::POS_Y);
+		} break;
+
+		case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z: {
+			mat4View = RotationMatrix(RotationMatrix::Z_AXIS, (float)(M_PI)) * mat4View;
+		} break;
+
+		case GL_TEXTURE_CUBE_MAP_POSITIVE_Z: {
+			mat4View = RotationMatrix(RotationMatrix::Z_AXIS, (float)(M_PI)) * mat4View;
+			mat4View = RotationMatrix(RotationMatrix::Y_AXIS, (float)(M_PI)) * mat4View;
+		} break;
+	}
+
+	// No translation in orientation
+	m_pUniformViewMatrix->SetUniform(mat4View);
+	m_pUniformViewOrientationMatrix->SetUniform(mat4View);
 
 Error:
 	return r;
@@ -149,37 +192,66 @@ Error:
 RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
-
-	std::vector<light*> *pLights = nullptr;
-	pObjectStore->GetLights(pLights);
+	ProjectionMatrix projMatrix;
 
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
-	// TODO: Replace with a static volume here
-	skybox *pSkybox = nullptr;
-	CR(pObjectStore->GetSkybox(pSkybox));
+	CN(m_pSkybox);
 
-	if (pSkybox == nullptr)
+	static bool fRendered = false;
+
+	if (fRendered)
 		return r;
 
 	UseProgram();
 
-	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
-		//m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
+	//if (m_pOGLFramebufferCubemap != nullptr) {
+	//	BindToFramebuffer(m_pOGLFramebufferCubemap);
+	//}
+
+	int pxWidth = m_pOGLFramebufferCubemap->GetWidth();
+	int pxHeight = m_pOGLFramebufferCubemap->GetHeight();
+
+	glViewport(0, 0, pxWidth, pxHeight);
+	CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// uniforms for all passes
+	m_pUniformSunDirection->SetUniform(m_sunDirection);
+	m_pUniformViewWidth->SetUniformInteger(pxWidth);
+	m_pUniformViewHeight->SetUniformInteger(pxHeight);
+
+	projMatrix = ProjectionMatrix(PROJECTION_MATRIX_PERSPECTIVE,
+		static_cast<projection_precision>(pxWidth),
+		static_cast<projection_precision>(pxHeight),
+		static_cast<projection_precision>(DEFAULT_NEAR_PLANE),
+		static_cast<projection_precision>(DEFAULT_FAR_PLANE),
+		static_cast<projection_precision>(90.0f));
+	m_pUniformProjectionMatrix->SetUniform(projMatrix);
+
+	//OGLSkybox *pOGLSkybox = dynamic_cast<OGLSkybox*>(m_pSkybox);
+	//if (pOGLSkybox != nullptr) {
+	if(m_pSkybox != nullptr) {
+		for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+			
+			GLenum glCubeMapFace = OGLCubemap::GetGLCubeMapEnums(i);
+
+			CR(m_pOGLFramebufferCubemap->SetOGLCubemapToFramebuffer2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glCubeMapFace));
+
+			CR(SetCameraUniforms(glCubeMapFace, pxWidth, pxHeight));
+
+			// Render the skybox with above params
+			//pOGLSkybox->Render();
+			RenderObject(m_pSkybox);
+		}
 	}
 
-	/*
-	SetLights(pLights);
-
-	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-
-	// 3D Object / skybox
-	CR(RenderObject(pSkybox));
+	fRendered = true;
 
 	UnbindFramebuffer();
-	*/
+	//*/
 
 Error:
 	return r;
@@ -201,21 +273,6 @@ RESULT OGLProgramSkyboxScatterCube::SetCameraUniforms(camera *pCamera) {
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();	
 	auto matVO = pCamera->GetOrientationMatrix();
-
-	if (m_pReflectionObject != nullptr) {
-		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
-
-		plane householderReflectionPlane = reflectionPlane;
-		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
-
-		auto matReflection = ReflectionMatrix(reflectionPlane);
-		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
-
-		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
-
-		matV = matFlip * matV * matReflection;
-		matVO = matFlip * matVO * matHouseholderReflection;
-	}
 
 	auto matVP = matP * matV;
 
@@ -261,21 +318,6 @@ RESULT OGLProgramSkyboxScatterCube::SetCameraUniforms(stereocamera* pStereoCamer
 	sunY += 0.0002f;
 	DEBUG_OUT("%f\n", sunY);
 	*/
-
-	if (m_pReflectionObject != nullptr) {
-		plane reflectionPlane = dynamic_cast<quad*>(m_pReflectionObject)->GetPlane();
-
-		plane householderReflectionPlane = reflectionPlane;
-		householderReflectionPlane.SetPlanePosition(point(0.0f, 0.0f, 0.0f));
-
-		auto matReflection = ReflectionMatrix(reflectionPlane);
-		auto matHouseholderReflection = ReflectionMatrix(householderReflectionPlane);
-
-		auto matFlip = ReflectionMatrix(plane(plane::type::XZ));
-
-		matV = matFlip * matV * matReflection;
-		matVO = matFlip * matVO * matHouseholderReflection;
-	}
 
 	//auto matVP = matP * matV;
 

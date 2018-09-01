@@ -171,5 +171,6 @@ void main(void) {
 		mieDirection).xyz, 1.0);
 
 	// clamp the color values to [0,1] with high dynamic range
-	out_vec4Color = 1.0 - exp(-2.5*atmColor);
+	out_vec4Color = 1.0 - exp(-2.5 * atmColor);
+	//out_vec4Color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
