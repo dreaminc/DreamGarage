@@ -66,8 +66,10 @@ private:
 	RESULT ClearSpatialSoundObjects();
 
 private:
-	std::shared_ptr<SoundClient> m_pWASAPICaptureClient = nullptr;
-	std::shared_ptr<SoundClient> m_pXAudio2AudioClient = nullptr;
+	//std::shared_ptr<SoundClient> m_pWASAPICaptureClient = nullptr;
+	//std::shared_ptr<SoundClient> m_pXAudio2AudioClient = nullptr;
+	SoundClient *m_pWASAPICaptureClient = nullptr;
+	SoundClient *m_pXAudio2AudioClient = nullptr;
 
 	HMD *m_pHMD = nullptr;
 	DreamSoundSystem::observer *m_pObserver = nullptr;

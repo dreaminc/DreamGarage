@@ -234,7 +234,7 @@ RESULT DreamUserApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	if (m_pWebBrowserManager != nullptr) {
-		CR(m_pWebBrowserManager->Shutdown());
+		//CR(m_pWebBrowserManager->Shutdown());
 		m_pWebBrowserManager = nullptr;
 	}
 

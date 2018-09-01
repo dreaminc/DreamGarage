@@ -92,7 +92,8 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		auto pWASAPICaptureClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_WASAPI);
 
 		if (pWASAPICaptureClient != nullptr) {
-			m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
+			//m_pWASAPICaptureClient = std::shared_ptr<SoundClient>(pWASAPICaptureClient);
+			m_pWASAPICaptureClient = pWASAPICaptureClient;
 			CN(m_pWASAPICaptureClient);
 
 			CR(m_pWASAPICaptureClient->RegisterObserver(this));
@@ -106,7 +107,8 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 		// This cannot fail - we need a default audio device, if none exists this will blow up
 		auto pXAudio2AudioClient = SoundClientFactory::MakeSoundClient(SOUND_CLIENT_TYPE::SOUND_CLIENT_XAUDIO2, &wstrHMDDeviceOutGUID);
 		CNM(pXAudio2AudioClient, "Failed to create XAudio2 Client");
-		m_pXAudio2AudioClient = std::shared_ptr<SoundClient>(pXAudio2AudioClient);
+		//m_pXAudio2AudioClient = std::shared_ptr<SoundClient>(pXAudio2AudioClient);
+		m_pXAudio2AudioClient = pXAudio2AudioClient;
 		CN(m_pXAudio2AudioClient);
 
 		CRM(m_pXAudio2AudioClient->StartSpatial(), "Failed to start spatial for XAudio2");
