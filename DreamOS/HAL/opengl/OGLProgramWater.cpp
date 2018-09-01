@@ -153,7 +153,8 @@ RESULT OGLProgramWater::SetupConnections() {
 	{
 		// Make our own lights
 		vector vWaterLightDirection = vector(-1.0f, -0.35f, 0.1f);
-		float lightIntensity = 3.5f;
+		//float lightIntensity = 3.5f;
+		float lightIntensity = 2.0f;
 		auto pLight = m_pParentImp->MakeLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 10.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), (vector)(vWaterLightDirection));
 		CN(pLight);
 

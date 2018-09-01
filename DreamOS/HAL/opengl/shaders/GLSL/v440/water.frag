@@ -133,7 +133,7 @@ void main(void) {
 		TBNNormal = normalize(TBNNormal);
 
 		// Turn off bumps
-		//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	}
 	
 	// Reflection

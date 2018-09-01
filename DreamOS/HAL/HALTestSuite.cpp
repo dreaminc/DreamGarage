@@ -1251,30 +1251,35 @@ RESULT HALTestSuite::AddTestWaterShader() {
 			//pReflectionQuad->SetDiffuseTexture(dynamic_cast<OGLProgram*>(pReflectionProgramNode)->GetOGLFramebufferColorTexture());
 
 
+			/*
 			point ptSceneOffset = point(90, -5.0, -25);
 			float sceneScale = 0.025f;
 			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
-
+			
 			model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
 			//model *pCaveModel = m_pDreamOS->AddModel(L"\\Cave\\cave_exported.fbx");
-			
 			CN(pCaveModel);
 			pCaveModel->SetScale(sceneScale);
 
 			m_pDreamOS->GetCamera()->SetPosition(-5.0f, 4.0f, -5.0f);
 			m_pDreamOS->GetCamera()->RotateYByDeg(90.0f);
+			*/
 
+			///*
+			texture *pLandColorTexture;
+			texture *pLandHeightTexture;
 
-			//texture *pLandColorTexture;
-			//texture *pLandHeightTexture;
+			pLandColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
+			pLandHeightTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-height.jpg");
+			
+			pTestContext->pLandQuad = m_pDreamOS->AddQuad(50.0f, 50.0f, 500, 500, pLandHeightTexture);
+			CN(pTestContext->pLandQuad);
+			pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
+			pTestContext->pLandQuad->SetPosition(0.0f, -0.75f, 0.0f);
 
-			//pLandColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-diffuse.jpg");
-			//pLandHeightTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"island-height.jpg");
-			//
-			//pTestContext->pLandQuad = m_pDreamOS->AddQuad(20.0f, 20.0f, 500, 500, pLandHeightTexture);
-			//CN(pTestContext->pLandQuad);
-			//pTestContext->pLandQuad->SetDiffuseTexture(pLandColorTexture);
-			//pTestContext->pLandQuad->SetPosition(0.0f, -0.75f, 0.0f);
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 0.25f, 20.0f);
+			pTestContext->pWaterQuad->SetPosition(0.0f, -0.1f, 0.0f);
+			//*/
 
 			if (pWaterProgramNode != nullptr) {
 				CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pTestContext->pWaterQuad));
