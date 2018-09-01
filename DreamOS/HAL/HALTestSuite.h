@@ -35,6 +35,7 @@ public:
 	// Shader Tests
 	RESULT AddTestFadeShader();
 	RESULT AddTestWaterShader();
+	RESULT AddTestWaterShaderCube();
 	RESULT AddTestGeometryShader();
 	RESULT AddTestIncludeShader();
 	RESULT AddTestToonShader();

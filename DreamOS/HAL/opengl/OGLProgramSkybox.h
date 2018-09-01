@@ -29,6 +29,9 @@ public:
 	virtual RESULT SetCameraUniforms(camera *pCamera) override;
 	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
+public:
+	RESULT SetReflectionObject(VirtualObj *pReflectionObject);
+
 	// Temporary until we set up nodes
 	RESULT SetCubemap(cubemap *pCubemap);
 
@@ -38,6 +41,8 @@ protected:
 
 	cubemap *m_pCubemap = nullptr;
 	OGLFramebuffer* m_pOGLInputFramebufferCubemap = nullptr;
+
+	VirtualObj *m_pReflectionObject = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
@@ -52,6 +57,8 @@ private:
 
 	OGLUniformBool *m_pUniformHasTextureCubemap = nullptr;
 	OGLUniformSamplerCube *m_pUniformTextureCubemap = nullptr;
+
+	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_SKYBOX_H_

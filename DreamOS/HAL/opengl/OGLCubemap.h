@@ -32,7 +32,9 @@ public:
 	RESULT AllocateGLCubemap();
 	RESULT AllocateGLCubemap(size_t pxWidth, size_t pxHeight, int numChannels);
 
-	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
+	// TODO: this is getting messed up somewhere
+	//GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
+	GLenum GetOGLTextureTarget() { return GL_TEXTURE_CUBE_MAP; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
 	GLuint GetOGLTextureIndex() { return m_glTextureIndex; }

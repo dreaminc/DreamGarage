@@ -62,8 +62,8 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	//int pxWidth = m_pParentImp->GetViewport().Width();
 	//int pxHeight = m_pParentImp->GetViewport().Height();
 
-	int pxWidth = 256*2;
-	int pxHeight = 256*2;
+	int pxWidth = 256 * 2;
+	int pxHeight = 256 * 2;
 
 	//m_frameBufferDivisionFactor = 4;
 

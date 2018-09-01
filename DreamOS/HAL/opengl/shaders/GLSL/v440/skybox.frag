@@ -8,7 +8,7 @@ in Data {
 	vec4 vertViewSpace;
 } DataIn;
 
-uniform samplerCube u_textureCubeMap;
+layout (binding = 0)uniform samplerCube u_textureCubeMap;
 uniform bool u_hasTextureCubemap;
 
 layout (location = 0) out vec4 out_vec4Color;

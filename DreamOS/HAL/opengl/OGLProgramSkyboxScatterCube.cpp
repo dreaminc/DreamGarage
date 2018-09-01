@@ -55,13 +55,13 @@ RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 
 	CR(m_pOGLFramebufferCubemap->MakeDepthAttachment());
 	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->OGLInitializeRenderBuffer());
-	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	CR(m_pOGLFramebufferCubemap->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 
 	CR(m_pOGLFramebufferCubemap->MakeColorAttachment());
 	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->MakeOGLCubemap());
-	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(m_pOGLFramebufferCubemap->GetColorAttachment()->AttachCubemapToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	
+	CR(m_pOGLFramebufferCubemap->InitializeOGLDrawBuffers(1));
 
 	CRM(m_pOGLFramebufferCubemap->CheckStatus(), "Frame buffer messed up");
 
@@ -138,6 +138,7 @@ RESULT OGLProgramSkyboxScatterCube::SetupConnections() {
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
 	//CR(MakeOutput<cubemap>("output_cubemap", m_pOutputCubemap));
 
 Error:
@@ -199,7 +200,6 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 	CN(m_pSkybox);
 
 	static bool fRendered = false;
-
 	if (fRendered)
 		return r;
 
@@ -213,7 +213,7 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 	int pxHeight = m_pOGLFramebufferCubemap->GetHeight();
 
 	glViewport(0, 0, pxWidth, pxHeight);
-	CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -238,7 +238,7 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 			
 			GLenum glCubeMapFace = OGLCubemap::GetGLCubeMapEnums(i);
 
-			CR(m_pOGLFramebufferCubemap->SetOGLCubemapToFramebuffer2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glCubeMapFace));
+			CR(m_pOGLFramebufferCubemap->SetOGLCubemapToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glCubeMapFace));
 
 			CR(SetCameraUniforms(glCubeMapFace, pxWidth, pxHeight));
 
