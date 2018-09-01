@@ -65,8 +65,9 @@ public:
 
 public:
 	hand(HALImp* pHALImp, HAND_TYPE type);
+	hand(HALImp* pHALImp, HAND_TYPE type, long avatarModelID);
 
-	RESULT Initialize(HAND_TYPE type);
+	RESULT Initialize(HAND_TYPE type, long avatarModelID = -1);
 	RESULT InitializeWithContext(DreamOS *pDreamOS);
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
@@ -96,6 +97,9 @@ public:
 	RESULT Update(); // TODO: app?
 	RESULT SetVisible(bool fVisible = true, bool fSetChildren = true);
 
+	RESULT PendCreateHandModel(long avatarModelID);
+	RESULT LoadHandModel();
+
 protected:
 	//Animations
 	//TODO: generalize
@@ -110,8 +114,10 @@ protected:
 
 protected:
 
-	std::string k_strDefaultLeftHandPath = "\\face4\\LeftHand.obj";
-	std::string k_strDefaultRightHandPath = "\\face4\\RightHand.obj";
+	std::wstring k_wstrFolder = L"\\Avatars\\";
+	std::wstring k_wstrLeft = L"lefthand_";
+	std::wstring k_wstrRight = L"righthand_";
+	std::wstring k_wstrFileType = L".FBX";
 
 	HAND_TYPE m_handType;
 
@@ -143,6 +149,9 @@ protected:
 	float m_volumeDepth = OVERLAY_VOLUME_DEPTH;
 
 	ModelState m_modelState = ModelState::HAND;
+
+	bool m_fLoadHandModel = false;
+	long m_avatarModelId = -1;
 };
 
 #endif	// ! HAND_H_

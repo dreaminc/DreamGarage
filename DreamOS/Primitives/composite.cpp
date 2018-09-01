@@ -209,6 +209,30 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<hand> composite::MakeHand(HAND_TYPE type, long avatarID) {
+
+	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand(type, avatarID));
+
+	//Success:
+	return pHand;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<hand> composite::AddHand(HAND_TYPE type, long avatarID) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<hand> pHand = MakeHand(type, avatarID);
+	CR(AddObject(pHand));
+
+	//Success:
+	return pHand;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<user> composite::MakeUser() {
 	RESULT r = R_PASS;
 

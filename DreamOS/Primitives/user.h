@@ -48,8 +48,11 @@ public:
 	RESULT SetMouthPosition(point ptPosition);
 	RESULT SetMouthOrientation(quaternion qOrientation);
 
+	long GetAvatarModelId();
+
 private:
 	RESULT LoadHeadModelFromID();
+	bool IsFemaleModel();
 
 private:
 	
@@ -58,7 +61,7 @@ private:
 	//std::string k_strDefaultHeadPath = "\\face4\\untitled.obj";
 	//std::string k_strDefaultHeadPath = "\\head_01\\head_01.FBX";
 	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
-	std::string k_strMouthPath = "\\mouth.FBX";
+	std::string k_strMouthPath = "\\Avatars\\mouth.FBX";
 	// Storage of models and textures for head
 	std::shared_ptr<model> m_pHead;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
@@ -75,7 +78,8 @@ private:
 	std::shared_ptr<texture> m_pMouthTexture2 = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture3 = nullptr;
 
-	std::vector<std::shared_ptr<texture>> m_mouthStates;
+	std::vector<std::shared_ptr<texture>> m_mouthStatesMen;
+	std::vector<std::shared_ptr<texture>> m_mouthStatesWomen;
 
 	// add mouths to UI shader 
 	DreamOS *m_pDreamOS = nullptr;

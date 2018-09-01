@@ -2370,7 +2370,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			pTestContext->m_users.emplace_back(m_pDreamOS->AddUser());
 			pTestContext->m_users[i]->SetVisible(true);
 			pTestContext->m_users[i]->SetDreamOS(m_pDreamOS);
-			pTestContext->m_users[i]->UpdateAvatarModelWithID((i % 2) + 1);
+			pTestContext->m_users[i]->UpdateAvatarModelWithID((i % 4) + 1);
 		}
 
 		{
@@ -2409,6 +2409,9 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 		if (pTestContext->fFirst) {
 			pTestContext->pEnvironmentApp->ShowEnvironment(nullptr);
 			pTestContext->fFirst = false;
+		}
+		for (int i = 0; i < 6; i++) {
+			pTestContext->m_users[i]->SetVisible(true);
 		}
 
 	Error:

@@ -146,6 +146,9 @@ public:
 	std::shared_ptr<hand> MakeHand(HAND_TYPE type);
 	std::shared_ptr<hand> AddHand(HAND_TYPE type);
 
+	std::shared_ptr<hand> MakeHand(HAND_TYPE type, long avatarID);
+	std::shared_ptr<hand> AddHand(HAND_TYPE type, long avatarID);
+
 	std::shared_ptr<user> MakeUser();
 	std::shared_ptr<user> AddUser();
 

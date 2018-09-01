@@ -49,7 +49,7 @@ RESULT user::Initialize() {
 	m_pMouthComposite = MakeComposite();
 	CN(m_pMouthComposite);
 
-	m_pMouthComposite->SetScale(0.028f);
+	m_pMouthComposite->SetScale(0.013f);
 	m_pMouthComposite->SetPosition(point(0.0f, -0.35f, HEAD_POS));
 	m_pMouthComposite->SetOrientationOffset(vHeadOffset);
 	m_pMouthComposite->SetMaterialShininess(2.0f, true);
@@ -59,18 +59,21 @@ RESULT user::Initialize() {
 	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthPath));
 	CN(m_pMouth);
 	
-	// TODO: should be a part of an avatar folder once there are multiple mouths, 
-	// could also help inform a loop with different naming
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_03.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_02.png"));
-	m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_01.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_04.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_03.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_02.png"));
+	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_01.png"));
 
-	for (int i = 0; i < 4; i++) {
-		CN(m_mouthStates[i]);
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_04.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_03.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_02.png"));
+	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_01.png"));
+
+	for (int i = 0; i < 8; i++) {
+		CN(m_mouthStatesMen[i]);
 	}
 
-	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
+//	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
 
 #else
 	//m_pHead = AddComposite();
@@ -83,15 +86,6 @@ RESULT user::Initialize() {
 #endif
 
 
-#ifndef _DEBUG
-	// for now the mouth is in a hardcoded position attached to the face model
-
-	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT);
-	m_pLeftHand->OnLostTrack();
-	
-	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT);
-	m_pRightHand->OnLostTrack();
-#endif
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -141,21 +135,50 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
 
-	m_pHead->SetScale(0.028f);
+	m_pHead->SetScale(0.013f);
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetMaterialShininess(2.0f, true);
+
+	//*
+	// women model ids
+	if (IsFemaleModel()) {
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[0].get());
+	}
+	// men mouths
+	else {
+		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[0].get());
+	}
+	//*/
+
+#ifndef _DEBUG
+	// for now the mouth is in a hardcoded position attached to the face model
+
+	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
+//	m_pLeftHand->OnLostTrack();
+	m_pLeftHand->SetVisible(true);
+	
+	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
+//	m_pRightHand->OnLostTrack();
+	m_pRightHand->SetVisible(true);
+
+#endif
 
 Error:
 	return r;
 }
 
+bool user::IsFemaleModel() {
+	return m_avatarModelId == 1 || m_avatarModelId == 4;
+}
+
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
-	CB(m_avatarModelId != AVATAR_INVALID);
+	//CB(m_avatarModelId != AVATAR_INVALID);
 
 	switch (m_avatarModelId) {
 
+		/*
 		case AVATAR_TYPE::WOMAN: {
 			m_pHead = AddModel(L"\\Avatar_Woman\\avatar_1.FBX");
 		} break;
@@ -163,6 +186,12 @@ RESULT user::LoadHeadModelFromID() {
 		case AVATAR_TYPE::BRUCE: {
 			m_pHead = AddModel(L"\\Avatar_Bruce\\avatar_2.FBX");
 		} break;
+		//*/
+
+	case 1: m_pHead = AddModel(L"\\Avatars\\avatar_1.FBX"); break;
+	case 2: m_pHead = AddModel(L"\\Avatars\\avatar_2.FBX"); break;
+	case 3: m_pHead = AddModel(L"\\Avatars\\avatar_3.FBX"); break;
+	case 4: m_pHead = AddModel(L"\\Avatars\\avatar_4.FBX"); break;
 	}
 
 
@@ -178,6 +207,10 @@ RESULT user::SetMouthPosition(point ptPosition) {
 RESULT user::SetMouthOrientation(quaternion qOrientation) {
 	m_pMouthComposite->SetOrientation(qOrientation);
 	return R_PASS;
+}
+
+long user::GetAvatarModelId() {
+	return m_avatarModelId;
 }
 
 //TODO: why doesn't this use hand::SetHandState(pHandState)
@@ -238,7 +271,12 @@ RESULT user::UpdateMouth(float mouthScale) {
 	}
 
 	if (m_pMouth != nullptr) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[rangedValue].get());
+		if (IsFemaleModel()) {
+			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[rangedValue].get());
+		}
+		else {
+			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[rangedValue].get());
+		}
 	}
 
 Error:
