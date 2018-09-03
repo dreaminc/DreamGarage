@@ -32,6 +32,7 @@ void main(void) {
 
 		if(dot(normal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, material.m_shine, normal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			//CalculateFragmentLightValue(lights[i].m_power, 60.0f, normal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;

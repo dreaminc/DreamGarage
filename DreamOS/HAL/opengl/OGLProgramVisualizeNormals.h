@@ -31,6 +31,9 @@ protected:
 
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
+
+private:
+	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_VISUALIZE_NORMALS_H_

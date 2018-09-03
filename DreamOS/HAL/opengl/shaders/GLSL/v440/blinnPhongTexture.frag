@@ -7,6 +7,7 @@ in vec3 inF_vec3Color;
 
 in Data {
     vec4 normal;
+	vec4 tangent;
     vec3 directionEye;
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
@@ -20,20 +21,33 @@ in Data {
 uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
 
+uniform mat4 u_mat4Model;
+uniform mat4 u_mat4View;
+
 layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
+// TODO: Move to CPU side
+mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
+mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
+
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	float diffuseValue = 0.0f, specularValue = 0.0f;
+	float diffuseValue = 0.0f;
+	float specularValue = 0.0f;
 	
+	//mat3 tangentBitangentNormalMatrix = CalculateTBNMatrix(g_mat4InvTransposeModelView, DataIn.tangent, DataIn.normal);
+
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 
 	for(int i = 0; i < numLights; i++) {
+		//vec3 directionLight = tangentBitangentNormalMatrix * normalize(DataIn.directionLight[i]);
+		//vec3 directionEye = tangentBitangentNormalMatrix * normalize(DataIn.directionEye);
+
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 		vec3 directionEye = normalize(DataIn.directionEye);
 

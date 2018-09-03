@@ -13,7 +13,15 @@ class HALImp;
 
 class ModelFactory  {
 public:
-	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename);
+	enum flags : uint32_t {
+		NONE						= 0,
+		PRETRANSFORM_VERTICES		= 1 << 0,
+		FLIP_WINDING				= 1 << 1,
+		INVALID						= 0xFFFFFFFF
+	};
+
+public:
+	static model* MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename, ModelFactory::flags modelFactoryFlags = ModelFactory::flags::NONE);
 };
 
 #endif // ! MODEL_FACTORY_H_

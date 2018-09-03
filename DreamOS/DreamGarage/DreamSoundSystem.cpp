@@ -49,7 +49,7 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 	std::wstring wstrDeviceOutID;
 	//std::wstring wstrDeviceInGUID;
 
-	std::wstring wstrHMDDeviceOutGUID;
+	std::wstring wstrHMDDeviceOutGUID = L"default";
 	//std::wstring wstrHMDDeviceInGUID;
 
 	m_pHMD = GetDOS()->GetHMD();
@@ -98,10 +98,10 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 
 			CR(m_pWASAPICaptureClient->RegisterObserver(this));
 			CRM(m_pWASAPICaptureClient->StartCapture(), "Failed to start WASAPI Capture");
-		}
 
-		// Use the WASAPI enumerator to get the full thing
-		wstrHMDDeviceOutGUID = pWASAPICaptureClient->GetDeviceIDFromDeviceID(wstrDeviceOutID);
+			// Use the WASAPI enumerator to get the full thing
+			wstrHMDDeviceOutGUID = pWASAPICaptureClient->GetDeviceIDFromDeviceID(wstrDeviceOutID);
+		}
 
 		// XAudio2 Spatial and Render Client
 		// This cannot fail - we need a default audio device, if none exists this will blow up
