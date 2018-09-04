@@ -113,7 +113,7 @@ RESULT hand::LoadHandModel() {
 	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
 		std::wstring wstrModel = k_wstrFolder + k_wstrRight + std::to_wstring(m_avatarModelId) + k_wstrFileType;
-		m_pModel = AddModel(wstrModel);
+		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
 		m_pModel->SetOrientationOffset(vRightHandOffset);
