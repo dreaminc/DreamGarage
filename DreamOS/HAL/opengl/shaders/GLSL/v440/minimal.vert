@@ -36,8 +36,8 @@ uniform mat4 u_mat4ViewProjection;
 
 void main(void) {	
 	// Vert Color
-	//DataOut.color = inV_vec4Color;
-	DataOut.color = material.m_colorSpecular;
+	DataOut.color = inV_vec4Color;
+	//DataOut.color = material.m_colorSpecular;
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);

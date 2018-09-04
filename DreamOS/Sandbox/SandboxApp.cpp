@@ -1538,7 +1538,7 @@ model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTe
 
 	// TODO: Other bits (position, scale, rotation)
 
-	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename);
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, ModelFactory::flags::NONE);
 	CN(pModel);
 
 // Success:
@@ -1562,6 +1562,46 @@ model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTex
 	CR(AddObject(pModel));
 
 // Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *SandboxApp::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename, modelFactoryFlags);
+	CN(pModel);
+
+	// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model *SandboxApp::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	RESULT r = R_PASS;
+
+	model *pModel = MakeModel(wstrModelFilename, modelFactoryFlags);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	// Success:
 	return pModel;
 
 Error:

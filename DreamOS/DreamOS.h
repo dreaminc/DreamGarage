@@ -49,6 +49,8 @@
 
 #include "DreamGarage/DreamSoundSystem.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
@@ -406,6 +408,8 @@ public:
 
 	model *MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	model *AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	model *MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
+	model *AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
 
 	composite *AddComposite();
 	composite *MakeComposite();

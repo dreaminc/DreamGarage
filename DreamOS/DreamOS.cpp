@@ -1106,6 +1106,14 @@ model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTextur
 	return m_pSandbox->AddModel(wstrModelFilename, pTexture);
 }
 
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	return m_pSandbox->MakeModel(wstrModelFilename, modelFactoryFlags);
+}
+
+model *DreamOS::AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags) {
+	return m_pSandbox->AddModel(wstrModelFilename, modelFactoryFlags);
+}
+
 composite *DreamOS::AddComposite() {
 	return m_pSandbox->AddComposite();
 }

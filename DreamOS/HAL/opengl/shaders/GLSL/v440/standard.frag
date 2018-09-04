@@ -8,6 +8,7 @@ in vec3 inF_vec3Color;
 
 in Data {
     vec4 normal;
+	vec4 tangent;
     vec3 directionEye;
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
@@ -19,6 +20,9 @@ in Data {
 	vec3 vertTBNSpace;
 	float riverAnimationDisplacement;
 } DataIn;
+
+uniform mat4 u_mat4Model;
+uniform mat4 u_mat4View;
 
 uniform	bool u_hasBumpTexture;
 uniform sampler2D u_textureBump;
@@ -39,6 +43,10 @@ uniform bool	u_fRiverAnimation;
 uniform bool	u_fAREnabled;
 
 layout (location = 0) out vec4 out_vec4Color;
+
+// TODO: Move to CPU side
+mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
+mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 
 void EnableBlending(float ambientAlpha, float diffuseAlpha) {
 	// Fakes blending by moving clear fragments behind the skybox
@@ -77,6 +85,8 @@ void main(void) {
 	float diffuseValue = 0.0f;
 	float specularValue = 0.0f;
 	vec2 uvCoord = DataIn.uvCoord;
+
+	mat3 tangentBitangentNormalMatrix = CalculateTBNMatrix(g_mat4InvTransposeModelView, DataIn.tangent, DataIn.normal);
 	
 	// tile the textures
 	uvCoord.x *= material.m_tilingU;
@@ -108,15 +118,14 @@ void main(void) {
 		colorSpecular *= texture(u_textureSpecular, uvCoord);
 	}
 
-	//if (u_fRiverAnimation) {
-	//	colorAmbient = EnableRiverAnimation();	
-	//	colorDiffuse = EnableRiverAnimation();	
-	//}
-
-	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
+	//vec3 directionEye = normalize(-DataIn.vertTBNSpace);
+	vec3 directionEye = tangentBitangentNormalMatrix * normalize(DataIn.directionEye);
 
 	for(int i = 0; i < numLights; i++) {
-		vec3 directionLight = normalize(DataIn.directionLight[i]);
+		//vec3 directionLight = normalize(DataIn.directionLight[i]);
+		
+		vec3 directionLight = tangentBitangentNormalMatrix * normalize(DataIn.directionLight[i]);
+		
 
 		if(dot(TBNNormal, directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, material.m_shine, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);

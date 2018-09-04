@@ -38,6 +38,8 @@
 #include "Sense/SenseController.h"
 #include "Sense/SenseGamepadController.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 class light; 
 class quad;
 class FlatContext;
@@ -348,6 +350,9 @@ public:
 	//composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 	model* MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	model* AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+
+	model *MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
+	model *AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
 
 	composite* AddComposite();
 	composite* MakeComposite();

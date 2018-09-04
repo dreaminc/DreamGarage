@@ -35,6 +35,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestWaterShaderCube());
 	
+	CR(AddTestGeometryShader());
+  
 	CR(AddTestModel());
 
 	CR(AddTestCamera());
@@ -66,8 +68,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestHeightQuadObject());
 
 	CR(AddTestIncludeShader());
-
-	CR(AddTestGeometryShader());
 
 	CR(AddTestEnvironments());
 
@@ -736,6 +736,11 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 	float padding = 0.5f;
 
+	struct TestContext {
+		model *pModel = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
@@ -752,7 +757,9 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 		///*
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		//pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture");
+		//pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -773,6 +780,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		///*
 		ProgramNode* pVisualNormalsProgram;
 		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
 		CN(pVisualNormalsProgram);
 		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -804,9 +812,13 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 		// Objects 
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, -0.5f));
 
 		{
+
+			TestContext *pTestContext;
+			pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
 
 			//texture *pColorTexture;
 			//pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
@@ -831,10 +843,45 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 			//CR(pVolume->SetVertexColor(COLOR_BLUE));
 
-			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			model *pModel = nullptr;
+			
+			pModel = m_pDreamOS->AddModel(L"\\Avatars\\lefthand_1.FBX");
 			CN(pModel);
-			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pModel->SetPosition(point(-1.0f, -3.0f, -3.0f));
 			pModel->SetScale(0.1f);
+			pModel->SetMaterialShininess(60.0f, true);
+			//pModel->RotateXByDeg(-90.0f);
+			pModel->SetMaterialColors(COLOR_WHITE, true);
+			
+			pModel = m_pDreamOS->AddModel(L"\\Avatars\\righthand_1.FBX", ModelFactory::flags::FLIP_WINDING);
+			CN(pModel);
+			pModel->SetPosition(point(1.0f, -3.0f, -3.0f));
+			pModel->SetScale(0.1f);
+			pModel->SetMaterialShininess(60.0f, true);
+			//pModel->RotateXByDeg(-90.0f);
+			pModel->SetMaterialColors(COLOR_WHITE, true);
+			
+			pModel = m_pDreamOS->AddModel(L"\\Avatars\\avatar_1.FBX");
+			CN(pModel);
+			pModel->SetPosition(point(1.0f, -1.0f, -3.0f));
+			pModel->SetScale(0.1f);
+			//pModel->RotateXByDeg(-90.0f);
+			pModel->SetMaterialShininess(60.0f, true);
+			pModel->SetMaterialColors(COLOR_WHITE, true);
+
+			pTestContext->pModel = pModel;
+
+			sphere *pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
+			CN(pSphere);
+			pSphere->SetPosition(point(-1.0f, -1.0f, -3.0f));
+			pSphere->SetMaterialShininess(60.0f, true);
+			pSphere->SetMaterialColors(COLOR_WHITE, true);
+
+			//pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");
+			//CN(pModel);
+			//pModel->SetScale(0.1f);	
+			//pModel->SetPosition(point(0.0f, -10.0f, 0.0f));
+			//pModel->RotateXByDeg(-90.0f);
 		}
 
 	Error:
@@ -848,7 +895,17 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(pTestContext->pModel);
+		pTestContext->pModel->RotateYByDeg(0.015f);
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
@@ -857,7 +914,7 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Environment Shader");
