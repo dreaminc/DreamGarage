@@ -33,6 +33,9 @@ class stereocamera;
 
 class DreamOS;
 
+#include "Primitives/model/ModelFactory.h"
+
+
 class composite : public virtual DimObj {
 public:
 	composite(HALImp *pHALImp);
@@ -142,6 +145,8 @@ public:
 
 	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
+	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, ModelFactory::flags modelFactoryFlags);
 
 	std::shared_ptr<hand> MakeHand(HAND_TYPE type);
 	std::shared_ptr<hand> AddHand(HAND_TYPE type);
