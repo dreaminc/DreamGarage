@@ -198,7 +198,6 @@ RESULT user::LoadHeadModelFromID() {
 	case 4: m_pHead = AddModel(L"\\Avatars\\avatar_4.FBX"); break;
 	}
 
-
 Error:
 	return r;
 }
