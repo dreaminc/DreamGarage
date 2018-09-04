@@ -332,7 +332,6 @@ RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
 	RESULT r = R_PASS;
 
 	GetMaterial()->SetColors(c,c,c);
-//	GetMaterial()->SetDiffuseColor(c);
 
 	if (fSetChildren && HasChildren()) {
 		for (auto& pChild : GetChildren()) {
