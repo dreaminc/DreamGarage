@@ -204,15 +204,11 @@ RESULT OGLProgramStandard::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	// Bump
-	if (pOGLObj->GetOGLTextureBump() != nullptr) {
-		SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
-	}
+	SetTextureUniform(pOGLObj->GetOGLTextureBump(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
 	// Material textures
 	//SetTextureUniform(pOGLObj->GetOGLTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
-	if (pOGLObj->GetOGLTextureDiffuse() != nullptr) {
-		SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
-	}
+	SetTextureUniform(pOGLObj->GetOGLTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
 	//SetTextureUniform(pOGLObj->GetOGLTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	//	Error:
@@ -293,16 +289,19 @@ RESULT OGLProgramStandard::SetRiverAnimation(bool fRiverAnimation) {
 RESULT OGLProgramStandard::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
 	RESULT r = R_PASS;
 	
-	if (pTexture) {
-		pBoolUniform->SetUniform(true);
+	if (pTexture != nullptr && pTextureUniform != nullptr) {
+		if (pBoolUniform != nullptr) {
+			pBoolUniform->SetUniform(true);
 
-		m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
-		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+			m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
+			m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 
-		pTextureUniform->SetUniform(texUnit);
+			pTextureUniform->SetUniform(texUnit);
+		}
 	}
 	else {
-		pBoolUniform->SetUniform(false);
+		if (pBoolUniform != nullptr)
+			pBoolUniform->SetUniform(false);
 	}
 
 //Error:

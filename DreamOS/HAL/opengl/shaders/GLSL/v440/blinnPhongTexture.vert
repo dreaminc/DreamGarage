@@ -12,6 +12,7 @@ layout (location = 5) in vec4 inV_vec4Bitangent;
 
 out Data {
 	vec4 normal;
+	vec4 tangent;
 	vec3 directionEye;
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
@@ -40,7 +41,14 @@ void main(void) {
 	// TBN Matrix
 	DataOut.TangentBitangentNormalMatrix = CalculateTBNMatrix(g_mat4InvTransposeModelView, inV_vec4Tangent, inV_vec4Normal);
 	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
-	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
+	DataOut.normal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
+
+	//DataOut.normal = inV_vec4Normal;
+	//DataOut.tangent = inV_vec4Tangent;
+	//DataOut.directionEye = -vertViewSpace.xyz;
+
+	//DataOut.normal = g_mat4InvTransposeModelView * vec4(inV_vec4Normal.xyz, 0.0f);
+	//DataOut.directionEye = -vertViewSpace.xyz;
 
 	for(int i = 0; i < numLights; i++) {
 		ProcessLightVertex(lights[i], u_mat4View, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
@@ -51,7 +59,7 @@ void main(void) {
 
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
-	DataOut.normal = vec4ModelNormal;
+	
 	DataOut.uvCoord = inV_vec2UVCoord;
 
 	// Vert Color
