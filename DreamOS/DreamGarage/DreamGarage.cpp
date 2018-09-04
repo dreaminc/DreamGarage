@@ -305,8 +305,10 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	for (auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
+			//pDreamPeer->GetUserModel()->GetMouth()->SetVisible(false);
 			userModelPair.first = nullptr;
 			userModelPair.second->SetVisible(false);
+			userModelPair.second->GetMouth()->SetVisible(false);
 			return R_PASS;
 		}
 	}
@@ -415,7 +417,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		std::map<int, std::string> testRefreshTokens = {
 			{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
@@ -442,7 +444,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 	
 	// Initial step of login flow:
 	{

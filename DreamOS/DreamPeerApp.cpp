@@ -474,6 +474,7 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 	CN(m_pUserModel);
 	CR(m_pUserModel->SetVisible(fVisible));
+	CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
 	
 	if (m_pNameComposite != nullptr) {
 		m_pNameComposite->SetVisible(fVisible, false);
@@ -524,7 +525,8 @@ RESULT DreamPeerApp::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->SetOrientation(qOrientation);
+	//m_pUserModel->SetOrientation(qOrientation);
+	m_pUserModel->GetHead()->SetOrientation(qOrientation);
 	m_pUserModel->SetMouthOrientation(qOrientation);
 
 	if (m_pSpatialSoundObject != nullptr) {

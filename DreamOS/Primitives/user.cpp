@@ -97,6 +97,10 @@ std::shared_ptr<composite> user::GetHead() {
 	return m_pHead;
 }
 
+std::shared_ptr<model> user::GetMouth() {
+	return m_pMouth;
+}
+
 std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
 	if (type == HAND_TYPE::HAND_LEFT) {
 		return m_pLeftHand;
@@ -152,14 +156,14 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 #ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
-
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
-//	m_pLeftHand->OnLostTrack();
+	//	m_pLeftHand->OnLostTrack();
 	m_pLeftHand->SetVisible(true);
-	
+
 	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
-//	m_pRightHand->OnLostTrack();
+	//	m_pRightHand->OnLostTrack();
 	m_pRightHand->SetVisible(true);
+
 
 #endif
 
@@ -218,7 +222,7 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
 	point ptHand = pHandState.ptPalm;
-	ptHand = ptHand - GetPosition(true) + point(0.0f, -0.35f, HEAD_POS);
+	ptHand = ptHand - GetPosition(true);
 
 	quaternion qHandOrientation = pHandState.qOrientation;
 
