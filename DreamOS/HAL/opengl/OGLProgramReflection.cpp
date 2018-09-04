@@ -65,7 +65,10 @@ RESULT OGLProgramReflection::OGLInitialize() {
 
 	//int pxWidth = 256*4;
 	//int pxHeight = 256*4;
-	m_frameBufferDivisionFactor = 2;
+	//m_frameBufferDivisionFactor = 2;
+
+	//int pxWidth = 256 * 2;
+	//int pxHeight = 256 * 2;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
@@ -80,6 +83,8 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
 Error:
 	return r;

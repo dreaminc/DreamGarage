@@ -14,32 +14,32 @@
 #include "Primitives/vector.h"
 
 #ifdef FLOAT_PRECISION
-typedef float basis_precision;
+	typedef float basis_precision;
 #elif defined(DOUBLE_PRECISION)
-typedef double basis_precision;
+	typedef double basis_precision;
 #endif
 
 class BasisMatrix : public matrix<basis_precision, 4, 4> {
 public:
-	BasisMatrix(vector vXAxis, vector vYAxis, vector vZAxis) {
-		identity(1.0f);
+	enum type {
+		POS_X,
+		NEG_X,
+		POS_Y,
+		NEG_Y,
+		POS_Z,
+		NEG_Z,
+		INVALID
+	};
 
-		this->element(0, 0) = vXAxis.x();
-		this->element(1, 0) = vXAxis.y();
-		this->element(2, 0) = vXAxis.z();
+public:
+	BasisMatrix(vector vXAxis, vector vYAxis, vector vZAxis);
+	BasisMatrix(BasisMatrix::type matType);
 
-		this->element(0, 1) = vYAxis.x();
-		this->element(1, 1) = vYAxis.y();
-		this->element(2, 1) = vYAxis.z();
+	~BasisMatrix();
 
-		this->element(0, 2) = vZAxis.x();
-		this->element(1, 2) = vZAxis.y();
-		this->element(2, 2) = vZAxis.z();
-	}
-
-	~BasisMatrix() {
-		// empty stub
-	}
+private:
+	RESULT SetBasisMatrixType(BasisMatrix::type matType);
+	RESULT SetBasisMatrixVectors(vector vA, vector vB, vector vC);
 
 	RESULT PrintMatrix() {
 		DEBUG_LINEOUT("Basis Matrix");

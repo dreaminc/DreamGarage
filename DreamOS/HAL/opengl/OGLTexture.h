@@ -10,12 +10,11 @@
 #include "Primitives/texture.h"
 
 #include "OpenGLCommon.h"
-#include "OpenGLImp.h"
+
+class OpenGLImp;
 
 class OGLTexture : public texture {
 public:
-	
-
 	OGLTexture(OpenGLImp *pParentImp, texture::type type, GLenum textureTarget = GL_TEXTURE_2D);
 	OGLTexture(const OGLTexture &pOGLTexture);
 
@@ -36,7 +35,7 @@ public:
 	RESULT SetDefaultTextureParams();
 	RESULT SetDefaultDepthTextureParams();
 	
-	
+	// TODO: remove?
 	RESULT OGLActivateTexture(int value);
 
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -51,9 +50,7 @@ public:
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
-	static GLenum GetOGLPixelFormat(PIXEL_FORMAT pixelFormat, int channels = 3);
-
-	GLenum GetOGLTextureTarget() { return m_textureTarget; }
+	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
 	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
 	GLenum GetOGLFormat() { return m_glFormat; }
 
@@ -74,24 +71,11 @@ public:
 	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels, PIXEL_FORMAT format, void *pBuffer, size_t pBuffer_n);
 	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::type type, void *pBuffer, size_t pBuffer_n);
 
-	// TODO: Move to OGLCubeMap
-	//static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::type type, int width, int height, int channels);
-	//RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
-	//RESULT SetDefaultCubeMapParams();
-	//const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-	//	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-	//	GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-	//};
-
 private:
 	OpenGLImp *m_pParentImp = nullptr;
 
-	GLuint m_textureIndex = 0;
-	GLenum m_textureTarget = 0;
+	GLuint m_glTextureIndex = 0;
+	GLenum m_glTextureTarget = 0;
 
 	// Note: this will work as long as the client is the one to allocate the texture
 	// if not these values may be incorrect 

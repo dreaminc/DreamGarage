@@ -28,6 +28,7 @@ light *g_pLight = nullptr;
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramStandard.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -106,20 +107,25 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	{
 
-		// Reflection 
+		// Skybox
 
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+		// Reflection 
 		
 		m_pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
 		CN(m_pReflectionProgramNode);
 		//CR(m_pReflectionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(m_pReflectionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
-		ProgramNode* pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		ProgramNode* pReflectionSkyboxProgram;
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox");
 		CN(pReflectionSkyboxProgram);
-		CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pReflectionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", m_pReflectionProgramNode->Output("output_framebuffer")));
 
 		// Refraction
@@ -131,14 +137,11 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(m_pRefractionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 		//ProgramNode* pRefractionSkyboxProgram;
-		//pRefractionSkyboxProgram = nullptr;
-		//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox");
 		//CN(pRefractionSkyboxProgram);
-		//CR(pRefractionSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
-		//CR(pRefractionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-		//
-		//// Connect output as pass-thru to internal blend program
-		//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", pRefractionProgramNode->Output("output_framebuffer")));
+		//CR(pRefractionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", m_pRefractionProgramNode->Output("output_framebuffer")));
 
 		// "Water"
 
@@ -180,12 +183,11 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox");
 		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
@@ -204,8 +206,9 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 		// save interfaces to skybox nodes
-		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
-		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
+		m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
+		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
+		//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
 
 		auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
@@ -255,7 +258,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		}
 
 		if (pReflectionSkyboxProgram != nullptr) {
-			CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
 		}
 
 	}
@@ -800,8 +803,10 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		avatarID = m_pUserController->GetUser().GetAvatarID();
 
-		GetHMD()->GetHand(HAND_TYPE::HAND_LEFT)->PendCreateHandModel(avatarID);
-		GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT)->PendCreateHandModel(avatarID);
+		if (GetHMD() != nullptr) {
+			GetHMD()->GetHand(HAND_TYPE::HAND_LEFT)->PendCreateHandModel(avatarID);
+			GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT)->PendCreateHandModel(avatarID);
+		}
 	}
 
 Error:

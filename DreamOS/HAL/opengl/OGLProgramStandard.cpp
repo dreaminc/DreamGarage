@@ -77,6 +77,8 @@ RESULT OGLProgramStandard::OGLInitialize() {
 		CR(m_pOGLFramebuffer->MakeDepthAttachment());
 		CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 		CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+		CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 	}
 
 	m_deltaTime = 0.0f;

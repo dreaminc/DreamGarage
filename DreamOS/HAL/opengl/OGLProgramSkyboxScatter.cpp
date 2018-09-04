@@ -54,8 +54,6 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 	*/
 
-	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
-
 Error:
 	return r;
 }
@@ -173,7 +171,6 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
-	//RenderObjectStore(m_pSceneGraph);
 	CR(RenderObject(pSkybox));
 
 	UnbindFramebuffer();
@@ -252,6 +249,7 @@ RESULT OGLProgramSkyboxScatter::SetCameraUniforms(stereocamera* pStereoCamera, E
 
 	int pxWidth = m_pOGLFramebuffer->GetWidth();
 	int pxHeight = m_pOGLFramebuffer->GetHeight();
+	
 	/*
 	point sunDirection = point(0.3f, sunY, -0.5f);
 	sunY += 0.0002f;

@@ -26,6 +26,11 @@ ViewMatrix::ViewMatrix(point ptPosition, vector vLook) {
 	SetViewMatrixPointVector(ptPosition, vLook);
 }
 
+ViewMatrix::ViewMatrix(point ptPosition, BasisMatrix matBasis) {
+	identity(1.0f);
+	SetViewMatrixPointBasis(ptPosition, matBasis);
+}
+
 ViewMatrix::~ViewMatrix() {
 	// empty stub
 }
@@ -49,7 +54,7 @@ RESULT ViewMatrix::SetViewMatrixPointQuaternion(point ptPosition, quaternion qLo
 
 RESULT ViewMatrix::SetViewMatrixPointVector(point ptPosition, vector vLook) {
 
-	// Use a basis 
+	// Create a basis from the j vector
 
 	vector vUp = vector::jVector(1.0f);
 	vector vLeft = vLook.NormalizedCross(vUp);
@@ -59,6 +64,11 @@ RESULT ViewMatrix::SetViewMatrixPointVector(point ptPosition, vector vLook) {
 
 	SetMatrix(matBasis * TranslationMatrix(ptPosition));
 
+	return R_PASS;
+}
+
+RESULT ViewMatrix::SetViewMatrixPointBasis(point ptPosition, BasisMatrix matBasis) {
+	SetMatrix(matBasis * TranslationMatrix(ptPosition));
 	return R_PASS;
 }
 

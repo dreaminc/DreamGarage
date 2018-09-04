@@ -4,6 +4,7 @@
 #include "OGLProgramReferenceGeometry.h"
 #include "OGLProgramSkybox.h"
 #include "OGLProgramSkyboxScatter.h"
+#include "OGLProgramSkyboxScatterCube.h"
 #include "OGLProgramBlinnPhong.h"
 #include "OGLProgramBlinnPhongShadow.h"
 #include "OGLProgramMinimalTexture.h"
@@ -32,6 +33,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "minimal_texture", OGLPROGRAM_MINIMAL_TEXTURE },
 	{ "skybox", OGLPROGRAM_SKYBOX },
 	{ "skybox_scatter", OGLPROGRAM_SKYBOX_SCATTER },
+	{ "skybox_scatter_cube", OGLPROGRAM_SKYBOX_SCATTER_CUBE},
 	{ "blinnphong", OGLPROGRAM_BLINNPHONG },
 	{ "blinnphong_shadow", OGLPROGRAM_BLINNPHONG_SHADOW },
 	{ "blinnphong_texture", OGLPROGRAM_BLINNPHONG_TEXTURE },
@@ -121,6 +123,14 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL skybox scatter Program");
+		} break;
+
+			
+		case OGLPROGRAM_SKYBOX_SCATTER_CUBE: {
+			pOGLProgram = new OGLProgramSkyboxScatterCube(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL skybox scatter cube Program");
 		} break;
 		
 		case OGLPROGRAM_BLINNPHONG: {

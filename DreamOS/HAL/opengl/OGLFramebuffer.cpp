@@ -142,6 +142,15 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::SetOGLCubemapToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
+	RESULT r = R_PASS;
+
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLCubemapIndex(), 0));
+
+Error:
+	return r;
+}
+
 /*
 RESULT OGLFramebuffer::SetOGLTexture(GLuint textureIndex) {
 	RESULT r = R_PASS;
@@ -335,4 +344,14 @@ Error:
 
 RESULT OGLFramebuffer::Unbind() {
 	return m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+RESULT OGLFramebuffer::CheckStatus() {
+	RESULT r = R_PASS;
+
+	// Check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
 }

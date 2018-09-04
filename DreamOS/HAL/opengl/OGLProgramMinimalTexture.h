@@ -33,17 +33,17 @@ protected:
 	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
 
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
-	OGLUniformBool *m_pUniformHasTextureColor;
-	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
-	OGLMaterialBlock *m_pMaterialsBlock;
+	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 
 	bool m_fPassThru = true;
 };

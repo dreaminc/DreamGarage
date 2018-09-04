@@ -39,6 +39,7 @@ public:
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
 	// TODO: These should not be directly used 
+	RESULT SetOGLCubemapToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetDepthTexture(int textureNumber);
 	
@@ -62,6 +63,9 @@ public:
 
 	RESULT SetSampleCount(int samples) { m_samples = samples; return R_PASS; }
 	int GetSampleCount() { return m_samples; }
+
+	// Always check that our framebuffer is ok
+	RESULT CheckStatus();
 
 private:
 	OpenGLImp *m_pParentImp;

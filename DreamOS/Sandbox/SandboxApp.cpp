@@ -1407,6 +1407,10 @@ texture* SandboxApp::MakeTextureFromFileBuffer(texture::type type, uint8_t *pBuf
 	return m_pHALImp->MakeTextureFromFileBuffer(type, pBuffer, pBuffer_n);
 }
 
+cubemap* SandboxApp::MakeCubemap(const std::wstring &wstrCubemapName) {
+	return m_pHALImp->MakeCubemap(wstrCubemapName);
+}
+
 skybox* SandboxApp::MakeSkybox() {
 	return m_pHALImp->MakeSkybox();
 }

@@ -132,3 +132,7 @@ RESULT OGLUniformSampler2D::SetUniform(GLint textureIndex) {
 RESULT OGLUniformSamplerCube::SetUniform(OGLTexture *pTexture) {
 	return SetUniformInteger(pTexture->GetOGLTextureIndex());
 }
+
+RESULT OGLUniformSamplerCube::SetUniform(GLint textureIndex) {
+	return SetUniformInteger(textureIndex);
+}
