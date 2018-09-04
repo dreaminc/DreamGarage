@@ -30,6 +30,8 @@ DimObj* AnimationState::ApplyTransform(DimObj *pObj) {
 }
 
 DimObj* AnimationState::ApplyColor(DimObj *pObj) {
-	pObj->SetMaterialColors(cColor, true);
+//	pObj->SetMaterialColors(cColor, true);
+	pObj->SetMaterialDiffuseColor(cColor, true);
+	pObj->SetMaterialAmbientColor(cColor, true);
 	return pObj;
 }

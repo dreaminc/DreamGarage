@@ -125,6 +125,7 @@ RESULT hand::LoadHandModel() {
 	m_pModel->SetScale(scaleModel);
 
 	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
+	m_pModel->SetMaterialShininess(2.0f, true);
 
 #else
 
@@ -457,16 +458,17 @@ RESULT hand::ShowModel() {
 		return r;
 	};
 
+	color matColor = m_pModel->GetDiffuseColor();
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(),
-		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		color(matColor.r(), matColor.g(), matColor.b(), 0.0f),
 		HAND_ANIMATION_DURATION, 
 		AnimationCurveType::SIGMOID, 
 		AnimationFlags()));
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pModel.get(), 
-		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		m_pModel.get(),
+		color(matColor.r(), matColor.g(), matColor.b(), 1.0f),
 		HAND_ANIMATION_DURATION, 
 		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
