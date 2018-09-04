@@ -33,9 +33,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWaterShaderCube());
-	
 	CR(AddTestGeometryShader());
+	
+	CR(AddTestWaterShaderCube());
   
 	CR(AddTestModel());
 
@@ -849,32 +849,36 @@ RESULT HALTestSuite::AddTestGeometryShader() {
 			CN(pModel);
 			pModel->SetPosition(point(-1.0f, -3.0f, -3.0f));
 			pModel->SetScale(0.1f);
-			pModel->SetMaterialShininess(60.0f, true);
+			pModel->SetMaterialShininess(2.0f, true);
 			//pModel->RotateXByDeg(-90.0f);
-			pModel->SetMaterialColors(COLOR_WHITE, true);
+			//pModel->SetMaterialColors(COLOR_WHITE, true);
 			
 			pModel = m_pDreamOS->AddModel(L"\\Avatars\\righthand_1.FBX", ModelFactory::flags::FLIP_WINDING);
 			CN(pModel);
 			pModel->SetPosition(point(1.0f, -3.0f, -3.0f));
 			pModel->SetScale(0.1f);
-			pModel->SetMaterialShininess(60.0f, true);
+			pModel->SetMaterialShininess(2.0f, true);
 			//pModel->RotateXByDeg(-90.0f);
-			pModel->SetMaterialColors(COLOR_WHITE, true);
+			//pModel->SetMaterialColors(COLOR_WHITE, true);
 			
 			pModel = m_pDreamOS->AddModel(L"\\Avatars\\avatar_1.FBX");
 			CN(pModel);
 			pModel->SetPosition(point(1.0f, -1.0f, -3.0f));
 			pModel->SetScale(0.1f);
 			//pModel->RotateXByDeg(-90.0f);
-			pModel->SetMaterialShininess(60.0f, true);
-			pModel->SetMaterialColors(COLOR_WHITE, true);
+			pModel->SetMaterialShininess(2.0f, true);
+			//pModel->SetMaterialColors(COLOR_WHITE, true);
+			//pModel->SetMaterialColors(color(1.0f, 0.5f, 0.0f, 0.0f), true);
+			//pModel->SetMaterialSpecularColor(COLOR_WHITE, true);
+			//pModel->SetMaterialDiffuseColor(COLOR_WHITE, true);
+			pModel->SetMaterialAmbientColor(COLOR_WHITE, true);
 
 			pTestContext->pModel = pModel;
 
 			sphere *pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
 			CN(pSphere);
 			pSphere->SetPosition(point(-1.0f, -1.0f, -3.0f));
-			pSphere->SetMaterialShininess(60.0f, true);
+			pSphere->SetMaterialShininess(2.0f, true);
 			pSphere->SetMaterialColors(COLOR_WHITE, true);
 
 			//pModel = m_pDreamOS->AddModel(L"\\Cave\\cave.FBX");

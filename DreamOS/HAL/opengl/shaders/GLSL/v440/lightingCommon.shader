@@ -46,14 +46,14 @@ void ProcessLightVertex(in Light light, in mat4 mat4View, in vec4 vertViewSpace,
 
 void CalculateFragmentLightValue(in float power, in float shine, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1.0f / pow(distanceLight, 2);
-	float attenuation = 1.0f / (1.0 + 0.1 * distanceLight + 0.01 * distanceLight*distanceLight);
+	float attenuation = 1.0f / (1.0 + 0.1 * distanceLight + 0.01 * distanceLight * distanceLight);
 
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
 
 	if (diffuseValue > 0.0f) {
 		vec3 halfVector = normalize(directionLight + directionEye);
-		specularValue = pow(max(0.0f, dot(vectorNormal, halfVector)), shine) * attenuation;
+		specularValue = pow(max(0.0f, dot(vectorNormal, halfVector)), shine) * attenuation * power;
 	}
 	else {
 		specularValue = 0.0f;
