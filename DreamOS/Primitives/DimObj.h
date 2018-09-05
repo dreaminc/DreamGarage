@@ -130,6 +130,8 @@ public:
 	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
 	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
+	RESULT SetMaterialReflectivity(float reflectivity, bool fSetChildren = false);
+	RESULT SetMaterialRefractivity(float refractivity, bool fSetChildren = false);
 	RESULT SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren = false);
 	
 

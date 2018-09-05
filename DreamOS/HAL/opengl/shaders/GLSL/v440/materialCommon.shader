@@ -13,8 +13,8 @@ struct Material {
 	vec4 m_colorSpecular;
 	float m_tilingU;
 	float m_tilingV;
-	float reserved1;
-	float reserved2;
+	float m_reflectivity;
+	float m_refractivity;
 };
 
 layout(std140) uniform ub_material{
