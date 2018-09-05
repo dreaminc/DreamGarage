@@ -258,6 +258,7 @@ RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
 RESULT DreamPeerApp::HideUserNameField() {
 	RESULT r = R_PASS;
 	
+	/*
 	auto fnStartCallback = [&](void *pContext) {
 		return R_PASS;
 	};
@@ -266,19 +267,6 @@ RESULT DreamPeerApp::HideUserNameField() {
 		m_pNameComposite->SetVisible(false);
 		return R_PASS;
 	};
-	/*
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pTextUserName.get(),
-		m_hiddenColor,
-		0.5,
-		AnimationCurveType::LINEAR,
-		AnimationFlags(),
-		fnStartCallback,
-		fnEndCallback,
-		this
-	));
-	//*/
-	///*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pTextUserName.get(),
 		m_hiddenColor,
@@ -308,6 +296,7 @@ Error:
 RESULT DreamPeerApp::ShowUserNameField() {
 	RESULT r = R_PASS;
 
+	/*
 	auto fnStartCallback = [&](void *pContext) {
 		m_pNameComposite->SetVisible(true);
 		return R_PASS;
@@ -319,7 +308,8 @@ RESULT DreamPeerApp::ShowUserNameField() {
 	};	
 
 	m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
-	//* quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
+	//* 
+	quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
 	/*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameComposite.get(),
@@ -331,7 +321,6 @@ RESULT DreamPeerApp::ShowUserNameField() {
 		fnEndCallback,
 		this
 	));
-	//*/
 	///*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameBackground.get(),
