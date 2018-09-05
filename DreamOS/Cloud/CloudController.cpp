@@ -842,7 +842,7 @@ Error:
 RESULT CloudController::BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CB(m_fRunning);
+	CBR(m_fRunning, R_SKIPPED);	// Because otherwise this clogs the logs
 
 	CN(m_pEnvironmentController);
 	CN(m_pEnvironmentController->BroadcastAudioPacket(strAudioTrackLabel, pendingAudioPacket));
