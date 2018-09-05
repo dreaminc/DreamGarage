@@ -500,15 +500,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 #ifdef OCULUS_PRODUCTION_BUILD	
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));
 #else
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
 #endif
 
 #ifdef USE_LOCALHOST
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
-#else
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
 #endif
 
 	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
