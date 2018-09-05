@@ -172,6 +172,9 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
+		// NOTE: Add this in if you want to have reflective objects
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", m_pRenderEnvironmentProgramNode->Output("output_framebuffer")));
 
 		// Reference Geometry Shader Program

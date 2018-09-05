@@ -36,12 +36,18 @@ public:
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 	RESULT SetRiverAnimation(bool fRiverAnimation);
 
+public:
+	RESULT SetCubemap(cubemap *pCubemap);
+
 private:
 	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
 
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
+
+	cubemap *m_pCubemap = nullptr;
+	OGLFramebuffer* m_pOGLInputFramebufferCubemap = nullptr;
 
 	bool m_fAREnabled = false;
 
@@ -73,6 +79,9 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureDiffuse = nullptr;
 	OGLUniformBool *m_pUniformHasTextureSpecular = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureSpecular = nullptr;
+
+	OGLUniformBool *m_pUniformHasCubemapEnvironment = nullptr;
+	OGLUniformSamplerCube *m_pUniformCubemapEnvironment = nullptr;
 
 	OGLUniformBool *m_pUniformRiverAnimation = nullptr;
 	OGLUniformBool *m_pUniformAREnabled = nullptr;

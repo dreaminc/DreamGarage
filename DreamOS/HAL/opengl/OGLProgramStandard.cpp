@@ -8,6 +8,7 @@
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
+#include "OGLCubemap.h"
 
 OGLProgramStandard::OGLProgramStandard(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglenvironment"),
@@ -49,6 +50,9 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDiffuse), std::string("u_textureDiffuse")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureSpecular), std::string("u_hasTextureSpecular")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureSpecular), std::string("u_textureSpecular")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformCubemapEnvironment), std::string("u_cubemapEnvironment")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasCubemapEnvironment), std::string("u_hasCubemapEnvironment")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformRiverAnimation), std::string("u_fRiverAnimation")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformAREnabled), std::string("u_fAREnabled")));
@@ -141,6 +145,8 @@ RESULT OGLProgramStandard::SetupConnections() {
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
+
 	// Reflection Map
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
 
@@ -156,6 +162,13 @@ RESULT OGLProgramStandard::SetupConnections() {
 
 Error:
 	return r;
+}
+
+RESULT OGLProgramStandard::SetCubemap(cubemap *pCubemap) {
+
+	m_pCubemap = pCubemap;
+
+	return R_PASS;
 }
 
 RESULT OGLProgramStandard::ProcessNode(long frameID) {
@@ -187,6 +200,35 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	m_pUniformAREnabled->SetUniform(m_fAREnabled);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+
+	// Environment map
+	if (m_pOGLInputFramebufferCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
+		if (m_pUniformHasCubemapEnvironment != nullptr) {
+			m_pUniformHasCubemapEnvironment->SetUniform(true);
+
+			m_pParentImp->glActiveTexture(GL_TEXTURE5);
+			m_pParentImp->BindTexture(m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
+										m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapIndex());
+
+			m_pUniformCubemapEnvironment->SetUniform(5);
+		}
+	}
+	//else if(m_pCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
+	//	OGLCubemap *pOGLCubemap = dynamic_cast<OGLCubemap*>(m_pCubemap);
+	//
+	//	if (m_pUniformHasCubemapEnvironment != nullptr && pOGLCubemap != nullptr) {
+	//		m_pUniformHasCubemapEnvironment->SetUniform(true);
+	//
+	//		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+	//		m_pParentImp->BindTexture(pOGLCubemap->GetOGLTextureTarget(), pOGLCubemap->GetOGLTextureIndex());
+	//	
+	//		m_pUniformCubemapEnvironment->SetUniform(0);
+	//	}
+	//}
+	else {
+		if (m_pUniformHasCubemapEnvironment != nullptr)
+			m_pUniformHasCubemapEnvironment->SetUniform(false);
+	}
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);

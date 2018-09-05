@@ -9,7 +9,9 @@ material::material() :
 	m_colorDiffuse(COLOR_WHITE),
 	m_colorSpecular(COLOR_WHITE),
 	m_tilingU(1.0f),
-	m_tilingV(1.0f)
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
@@ -23,7 +25,9 @@ material::material(float shine, color colorAmbient, color colorDiffuse, color co
 	m_colorDiffuse(colorDiffuse),
 	m_colorSpecular(colorSpecular),
 	m_tilingU(1.0f),
-	m_tilingV(1.0f)
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
@@ -37,7 +41,9 @@ material::material(float shine, float bump, color colorAmbient, color colorDiffu
 	m_colorDiffuse(colorDiffuse),
 	m_colorSpecular(colorSpecular),
 	m_tilingU(1.0f),
-	m_tilingV(1.0f)
+	m_tilingV(1.0f),
+	m_reflectivity(0.0f),
+	m_refractivity(0.0f)
 {
 	// empty
 }
@@ -92,6 +98,16 @@ RESULT material::SetShininess(float shine) {
 
 RESULT material::SetBumpiness(float bumpiness) {
 	m_bumpiness = bumpiness;
+	return R_PASS;
+}
+
+RESULT material::SetReflectivity(float reflectivity) {
+	m_reflectivity = reflectivity;
+	return R_PASS;
+}
+
+RESULT material::SetRefractivity(float refractivity){
+	m_refractivity = refractivity;
 	return R_PASS;
 }
 

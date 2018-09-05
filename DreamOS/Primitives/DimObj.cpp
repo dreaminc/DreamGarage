@@ -328,6 +328,39 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialReflectivity(float reflectivity, bool fSetChildren){
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetReflectivity(reflectivity);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialReflectivity(reflectivity, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+RESULT DimObj::SetMaterialRefractivity(float refractivity, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetRefractivity(refractivity);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialRefractivity(refractivity, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
 	RESULT r = R_PASS;
 

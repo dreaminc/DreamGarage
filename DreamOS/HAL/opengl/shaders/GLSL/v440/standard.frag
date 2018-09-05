@@ -24,20 +24,23 @@ in Data {
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
 
-uniform	bool u_hasBumpTexture;
-uniform sampler2D u_textureBump;
+uniform bool u_hasBumpTexture;
+layout (binding = 0) uniform sampler2D u_textureBump;
 
-uniform bool	u_hasTextureAmbient;
-uniform sampler2D u_textureAmbient;
+uniform bool u_hasTextureAmbient;
+layout (binding = 1) uniform sampler2D u_textureAmbient;
 
-uniform bool	u_hasTextureDiffuse;
-uniform sampler2D u_textureDiffuse;
+uniform bool u_hasTextureDiffuse;
+layout (binding = 2) uniform sampler2D u_textureDiffuse;
 
-uniform bool	u_hasTextureColor;
-uniform sampler2D u_textureColor;
+uniform bool u_hasTextureColor;
+layout (binding = 3) uniform sampler2D u_textureColor;
 
-uniform bool	u_hasTextureSpecular;
-uniform sampler2D u_textureSpecular;
+uniform bool u_hasTextureSpecular;
+layout (binding = 4) uniform sampler2D u_textureSpecular;
+
+uniform bool u_hasCubemapEnvironment;
+layout (binding = 5) uniform samplerCube u_cubemapEnvironment;
 
 uniform bool	u_fRiverAnimation;
 uniform bool	u_fAREnabled;
@@ -155,6 +158,23 @@ void main(void) {
 	// Increasing the saturation
 	if (u_fAREnabled) {
 		out_vec4Color = IncreaseColorSaturation(outColor);
+	}
+
+	if(u_hasCubemapEnvironment) {
+		if(material.m_reflectivity > 0.0f) {
+			vec3 vReflection = reflect(normalize(-DataIn.directionEye).xyz, normalize(g_mat4InvTransposeModelView * DataIn.normal).xyz);
+			vec4 colorReflect = vec4(texture(u_cubemapEnvironment, vReflection).rgb, 1.0);
+			outColor = mix(outColor, colorReflect, material.m_reflectivity);
+		}
+
+		if(material.m_refractivity > 0.0f) {
+			float refractRatio = 1.00 / 1.52;
+			vec3 vRefract = refract(normalize(-DataIn.directionEye).xyz, normalize(g_mat4InvTransposeModelView * DataIn.normal).xyz, refractRatio);
+
+			vec4 colorRefract = vec4(texture(u_cubemapEnvironment, vRefract).rgb, 1.0);
+
+			outColor = mix(outColor, colorRefract, material.m_refractivity);
+		}
 	}
 
 	out_vec4Color = outColor;

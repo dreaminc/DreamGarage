@@ -17,6 +17,7 @@
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 #include "HAL/opengl/OGLProgramScreenFade.h"
 #include "HAL/opengl/OGLProgramSkybox.h"
+#include "HAL/opengl/OGLProgramStandard.h"
 
 #include "DreamGarage\DreamGamepadCameraApp.h"
 
@@ -33,9 +34,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestGeometryShader());
-	
+	CR(AddTestEnvironmentMapping());
+
 	CR(AddTestWaterShaderCube());
+	
+	CR(AddTestGeometryShader());
   
 	CR(AddTestModel());
 
@@ -1425,6 +1428,187 @@ RESULT HALTestSuite::AddTestWaterShader() {
 
 		//m_pDreamOS->GetCamera()->translateZ(0.0001f);
 		//m_pDreamOS->GetCamera()->translateY(0.0001f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Environment Shader");
+	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestEnvironmentMapping() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 300.0f;
+	int nRepeats = 1;
+
+	float width		= 2.0f; 
+	float height	= 2.0f;
+	float length	= 2.0f;
+	float padding	= 0.25f;
+
+	struct TestContext {
+		sphere *pSphere = nullptr;
+		volume *pVolume = nullptr;
+	};
+	TestContext *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+
+		// Skybox
+
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Standard Shader
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		// Skybox
+
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToAllInputs(pSkyboxProgram->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		volume *pVolume;
+		sphere *pSphere;
+
+		{
+			float lightIntensity = 1.0f;
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, lightIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -1.0f));
+
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_bump.jpg");
+
+			texture *pBumpTextureWater;
+
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Dirt-1-2048-normal.png");
+			//pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"normal-map-bumpy.png");
+			pBumpTextureWater = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"water_new_height.png");
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			//pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+			pVolume->SetMaterialRefractivity(0.5f);
+			pVolume->SetMaterialReflectivity(0.5f);
+
+			pTestContext->pVolume = pVolume;
+
+			pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
+			CN(pSphere);
+			pSphere->SetPosition(-2.0f, 0.0f, 0.0f);
+			pSphere->SetMaterialReflectivity(0.9f);
+
+			pTestContext->pSphere = pSphere;
+
+			//cubemap *pCubemap = m_pDreamOS->MakeCubemap(L"LarnacaCastle");
+			//CN(pCubemap);
+			//
+			//CR(dynamic_cast<OGLProgramStandard*>(pRenderProgramNode)->SetCubemap(pCubemap));
+
+			/*
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			CR(pVolume->SetVertexColor(COLOR_RED));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			CR(pVolume->SetVertexColor(COLOR_BLUE));
+			//*/
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp)
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->pSphere->translateY(-0.001f);
+		//pTestContext->pVolume->translateY(0.001f);
+
+		//pTestContext->pReflectionQuad->translateY(-0.0001f);
+		//pTestContext->pReflectionQuad->RotateZByDeg(0.01f);
+		//pTestContext->pWaterQuad->RotateXByDeg(0.002f);
+
+		//m_pDreamOS->GetCamera()->translateZ(0.0001f);
+		//m_pDreamOS->GetCamera()->translateY(0.0001f);
+
+		if (pTestContext->pVolume != nullptr) {
+			pTestContext->pVolume->RotateBy(0.00025f, 0.0005f, 0.000125f);
+		}
 
 	Error:
 		return r;

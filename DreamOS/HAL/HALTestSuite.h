@@ -48,6 +48,7 @@ public:
 	RESULT AddTestDepthPeelingShader();
 	RESULT AddTestObjectMaterialsBump();
 	RESULT AddTestObjectMaterialsColors();
+	RESULT AddTestEnvironmentMapping();
 
 	// Environments
 	RESULT AddTestStandardShader();

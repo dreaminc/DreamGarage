@@ -33,6 +33,8 @@ public:
 
 	RESULT SetShininess(float shine);
 	RESULT SetBumpiness(float bumpiness);
+	RESULT SetReflectivity(float reflectivity);
+	RESULT SetRefractivity(float refractivity);
 
 	RESULT SetUVTiling(float uTiling, float vTiling);
 
@@ -46,8 +48,8 @@ private:
 	color m_colorSpecular;
 	float m_tilingU;
 	float m_tilingV;
-	float reserved1;
-	float reserved2;
+	float m_reflectivity;
+	float m_refractivity;
 };
 
 #endif // ! MATERIAL_H_
