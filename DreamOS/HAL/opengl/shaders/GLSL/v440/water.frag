@@ -97,7 +97,7 @@ mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
 						 0.0f, 0.0f, 1.0f, 0.0f,
 						 0.0f, 0.0f, 0.0f, 1.0f);
 
-/*
+///*
 vec3 noiseNormal(vec2 uvCoord) {
 	vec3 normalHHHF = getNoiseNormal(vec2(uvCoord * 500000.0) + 0.5f * u_time);
 	vec3 normalHHF = getNoiseNormal(vec2(uvCoord * 5000.0) - 0.25f * u_time);
@@ -133,8 +133,9 @@ float noiseHeight(vec2 uvCoord) {
 }
 //*/
 
-float g_scaling = 5000.0f;
+float g_scaling = 1000.0f;
 
+/*
 // simple
 vec3 noiseNormal(vec2 uvCoord) {
 	vec3 vNormal = getNoiseNormal(vec2(uvCoord * g_scaling) - 0.1f * u_time);
@@ -145,6 +146,7 @@ float noiseHeight(vec2 uvCoord) {
 	float val = noise(vec2(uvCoord * g_scaling) - 0.1f * u_time) * 0.5f + 0.5f;
 	return val;
 }
+//*/
 
 // Define this function (used to look up)
 float ParallaxMapping_HeightFunction(vec2 uvCoord) {
@@ -157,7 +159,9 @@ void main(void) {
 	
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
-	vec2 parallaxTexCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement / g_scaling);
+	// un comment this to apply parallax to water
+	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement / g_scaling);
+	vec2 texCoords = DataIn.uvCoord;
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
@@ -176,7 +180,7 @@ void main(void) {
 	}
 	else {
 		//TBNNormal = noiseNormal(DataIn.uvCoord);
-		TBNNormal = noiseNormal(parallaxTexCoords);
+		TBNNormal = noiseNormal(texCoords);
 
 		// Turn off bumps
 		//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
