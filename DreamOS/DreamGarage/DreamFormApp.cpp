@@ -60,7 +60,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
-		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
+		GetComposite()->SetPosition(point(0.0f, -0.2f, -0.1f));
 
 		float viewAngleRad = m_pUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
@@ -111,6 +111,10 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pDreamBrowserForm->SetURI(m_strURL);
 	}
 
+	if (m_fPendShowFormView) {
+		GetComposite()->SetVisible(true, false);
+		CR(Show());
+	}
 
 Error:
 	return r;
@@ -260,7 +264,6 @@ Error:
 RESULT DreamFormApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
-	//pUserControllerProxy->RequestSetSettings(GetDOS()->GetHardwareID(),"HMDType.OculusRift", m_height, m_depth, m_scale);	
 	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 
@@ -320,6 +323,9 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 			else {
 				CR(Hide());
 			}
+		}
+		else {
+			m_pUserApp->ResetAppComposite();
 		}
 		
 	} break;
@@ -427,10 +433,16 @@ RESULT DreamFormApp::Show() {
 	RESULT r = R_PASS;
 
 	//CNR(m_pFormView, R_SKIPPED);
-	CR(m_pFormView->Show());
-	CR(m_pUserApp->SetEventApp(m_pFormView.get()));
-	CR(m_pUserApp->SetHasOpenApp(true));	// For login/logout
-	m_fFormVisible = true;
+	if (m_pFormView == nullptr) {
+		m_fPendShowFormView = true;
+	}
+	else {
+		CR(m_pFormView->Show());
+		CR(m_pUserApp->SetEventApp(m_pFormView.get()));
+		CR(m_pUserApp->SetHasOpenApp(true));	// For login/logout
+		m_fFormVisible = true;
+		m_fPendShowFormView = false;
+	}
 
 Error:
 	return r;

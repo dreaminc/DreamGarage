@@ -53,7 +53,7 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestEnvironmentSeating());
-	
+
 	CR(AddTestModuleManager());
 
 	CR(AddTestDreamBrowser());
@@ -2226,7 +2226,7 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 
 			ProgramNode* pReflectionSkyboxProgram;
 			pReflectionSkyboxProgram = nullptr;
-			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
 			CN(pReflectionSkyboxProgram);
 			CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));

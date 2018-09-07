@@ -90,6 +90,7 @@ protected:
 	bool m_fUpdateFormURL = false;
 
 	bool m_fFormVisible = false;
+	bool m_fPendShowFormView = false;
 
 };
 

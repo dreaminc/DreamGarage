@@ -113,9 +113,6 @@ public:
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
 
-	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
-	virtual RESULT OnSetSettings() override;
-
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
 
@@ -158,6 +155,8 @@ private:
 
 	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
+private:
+	RESULT AuthenticateFromStoredCredentials();
 
 private:
 	version m_versionDreamClient = version(DREAM_VERSION);

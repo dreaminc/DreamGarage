@@ -187,23 +187,10 @@ public:
 	float GetViewAngle();
 	float GetAnimationDuration();
 	float GetSpacingSize();
-	float GetHeight();
-	float GetDepth();
-	float GetScale();
-	RESULT SetScale(float widthScale);
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
-	RESULT UpdateHeight(float heightDiff);
-	RESULT UpdateDepth(float depthDiff);
-	RESULT UpdateScale(float scale);
-
-	RESULT SetHeight(float height);
 	vector GetDepthVector();
-	RESULT SetDepth(float depth);
-
-	// capture current settings values relative to the head to save
-	RESULT GetSettingsRelativeHeightAndDepth(float& height, float& depth);
 
 private:
 	//user *m_pUserModel = nullptr;
@@ -242,10 +229,6 @@ public:
 		float m_baseHeight;
 
 		float m_animationDuration = ANIMATION_DURATION_SECONDS;
-
-		float m_scale = 1.0f;
-		float m_height = 0.0f;
-		float m_depth = 0.0f;
 	};
 
 private:

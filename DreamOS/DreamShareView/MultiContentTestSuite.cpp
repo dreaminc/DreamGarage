@@ -704,26 +704,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		virtual RESULT HandleDOSMessage(std::string& strMessage) override {
 			RESULT r = R_PASS;
 
-			if (strMessage == "DreamSettingsApp.OnSuccess") {
-				fFirst = false;
-				std::string strFormType;
-				// this specific case is only when: not first login, has credentials, has no settings, has no team
-				if (!fFirstLogin && fHasCreds) {
-					strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-					pUserController->GetFormURL(strFormType);
-				}
-				else if (fFirstLogin) {
-					strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
-					pUserController->GetFormURL(strFormType);
-					pLoginApp->Show();
-				}
-				else {
-					strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
-					pUserController->GetFormURL(strFormType);
-					pLoginApp->Show();
-				}
-			}
-			else if (strMessage == "DreamLoginApp.OnSuccess") {
+			if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
 				CR(pLoginApp->SetLaunchDate());
 				CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));

@@ -304,6 +304,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
+	//CR(ResetAppComposite());
 Error:
 	return r;
 }
@@ -720,42 +721,51 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	CN(pCamera);
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
-		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
 
-		//ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
-		ptMid = point::midpoint(m_pLeftMallet->GetMalletHead()->GetPosition(true), m_pRightMallet->GetMalletHead()->GetPosition(true));
-		vCameraToMenu = ptMid - ptCameraOrigin;	
-
-		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
-		vCameraToBrowser.y() = 0;
+		//RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+		RotationMatrix matLook = RotationMatrix(pCamera->GetWorldOrientation());
+		vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+		vAppLook.Normalize();
+		vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 
 		float menuDepth = vCameraToMenu.magnitude();
-		
+
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vAppLookXZ));
+
 		// min and max menu depths
 		util::Clamp(menuDepth, MENU_DEPTH_MIN, MENU_DEPTH_MAX);
-		
-		// Reposition Menu to be on the vector between Camera and Browser
-		point ptMenuPosition = menuDepth * vCameraToBrowser.Normal();
-		vCameraToMenu = (ptCameraOrigin + ptMenuPosition) - ptCameraOrigin;	
-		vCameraToMenu.y() = 0.0f;
+
 		point ptCamera = pCamera->GetPosition();
 
-		/*
-		vector vPos;
-		for (auto& hand : { m_pLeftHand, m_pRightHand }) {	// which hand is closer
-			point ptHand = hand->GetPosition(true);
-			vector vHand = ptHand - pCamera->GetOrigin(true);
-			vector vTempPos = vCameraToMenu * (vHand.dot(vCameraToMenu));
-			if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
-				vPos = vTempPos;
-		} 
+		//*
+		if (m_pLeftMallet != nullptr && m_pRightMallet != nullptr &&
+			m_pLeftHand != nullptr && m_pRightHand != nullptr) {
+
+			vector vPos;
+
+			for (auto& mallet : { m_pLeftMallet, m_pRightMallet }) {	// which hand is closer
+
+				RotationMatrix qOffset;
+				auto pHand = mallet == m_pLeftMallet ? m_pLeftHand : m_pRightHand;
+				qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+				//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
+
+				point ptHand = mallet->GetMalletHead()->GetPosition(true);
+				vector vHand = ptHand - pCamera->GetOrigin(true);
+				vHand = vector(vHand.x(), 0.0f, vHand.z());
+				//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+				vector vTempPos = vAppLookXZ * vHand.magnitude();
+				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
+					vPos = vTempPos;
+			}
+			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
+			m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
+		}
 		
-		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
-		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		*/
+		//*/
 		
-		m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToMenu));
+		//m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
 		GetComposite()->SetPosition(m_pAppBasis->GetPosition());
 		GetComposite()->SetOrientation(m_pAppBasis->GetOrientation());
 	}
@@ -837,25 +847,8 @@ float DreamUserApp::GetAnimationDuration() {
 	return m_userSettings->m_animationDuration;
 }
 
-float DreamUserApp::GetHeight() {
-	return m_userSettings->m_height;
-}
-
-float DreamUserApp::GetDepth() {
-	return m_userSettings->m_depth;
-}
-
-float DreamUserApp::GetScale() {
-	return m_userSettings->m_scale;
-}
-
 float DreamUserApp::GetSpacingSize() {
 	return m_userSettings->m_spacingSize;
-}
-
-RESULT DreamUserApp::SetScale(float widthScale) {
-	m_userSettings->m_scale = widthScale;
-	return R_PASS;
 }
 
 std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
@@ -871,50 +864,6 @@ Error:
 	return m_pWebBrowserManager;
 }
 
-RESULT DreamUserApp::UpdateHeight(float heightDiff) {
-
-	point ptComposite = GetComposite()->GetPosition();
-	ptComposite += point(0.0f, heightDiff, 0.0f);
-
-	m_userSettings->m_height += heightDiff;
-
-	GetComposite()->SetPosition(ptComposite);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::UpdateDepth(float depthDiff) {
-
-	stereocamera *pCamera = GetDOS()->GetCamera();
-
-	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
-	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
-	vAppLook.Normalize();
-	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-	vector vDiff = depthDiff * vAppLookXZ;
-
-	m_userSettings->m_depth += depthDiff;
-
-	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
-
-	pCamera->SetHMDAdjustedPosition(ptCamera + vDiff);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::UpdateScale(float scale) {
-
-	m_userSettings->m_scale = scale;
-	GetComposite()->SetScale(scale);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::SetHeight(float height) {
-	m_userSettings->m_height = height;
-	return R_PASS;
-}
-
 vector DreamUserApp::GetDepthVector() {
 	
 	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
@@ -922,28 +871,4 @@ vector DreamUserApp::GetDepthVector() {
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 	return m_userSettings->m_depth * vAppLookXZ;
-}
-
-RESULT DreamUserApp::SetDepth(float depth) {
-	m_userSettings->m_depth = depth;
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::GetSettingsRelativeHeightAndDepth(float& height, float& depth) {
-	
-	auto pHMD = GetDOS()->GetHMD();
-	if (pHMD != nullptr) {
-
-
-		point ptCamera = GetDOS()->GetCamera()->GetEyePosition(EYE_MONO) + pHMD->GetHeadPointOrigin();
-		point ptComposite = GetComposite()->GetPosition(true);
-		vector vDiff = vector(ptCamera.x() - ptComposite.x(), 0.0f, ptCamera.z() - ptComposite.z());
-		
-		depth = vDiff.magnitude();
-
-		height = GetComposite()->GetPosition(true).y();
-	}
-
-	return R_PASS;
 }
