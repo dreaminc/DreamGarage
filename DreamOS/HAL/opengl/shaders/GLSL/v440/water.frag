@@ -160,7 +160,8 @@ void main(void) {
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
 	// un comment this to apply parallax to water
-	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement / g_scaling);
+	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement);
+	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, 0.1f/15);
 	vec2 texCoords = DataIn.uvCoord;
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -179,7 +180,6 @@ void main(void) {
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 	else {
-		//TBNNormal = noiseNormal(DataIn.uvCoord);
 		TBNNormal = noiseNormal(texCoords);
 
 		// Turn off bumps
@@ -235,15 +235,14 @@ void main(void) {
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
+	// This looks a lot better
 	vec4LightValue = colorDiffuse;
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 	
 		if(dot(TBNNormal, directionLight) > 0.0f) {
-			// provide shine param
 			CalculateFragmentLightValue(lights[i].m_power, material.m_shine, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
-			//CalculateFragmentLightValue(3.5f, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
 			//vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
