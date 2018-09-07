@@ -847,25 +847,8 @@ float DreamUserApp::GetAnimationDuration() {
 	return m_userSettings->m_animationDuration;
 }
 
-float DreamUserApp::GetHeight() {
-	return m_userSettings->m_height;
-}
-
-float DreamUserApp::GetDepth() {
-	return m_userSettings->m_depth;
-}
-
-float DreamUserApp::GetScale() {
-	return m_userSettings->m_scale;
-}
-
 float DreamUserApp::GetSpacingSize() {
 	return m_userSettings->m_spacingSize;
-}
-
-RESULT DreamUserApp::SetScale(float widthScale) {
-	m_userSettings->m_scale = widthScale;
-	return R_PASS;
 }
 
 std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
