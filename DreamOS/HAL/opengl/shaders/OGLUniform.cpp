@@ -84,7 +84,7 @@ RESULT OGLUniform::Set44MatrixUniform(matrix<float, 4, 4> mat) {
 #elif defined(MATRIX_ROW_MAJOR)
 	pParentImp->glUniformMatrix4fv(location, 1, GL_TRUE, reinterpret_cast<GLfloat*>(&mat));
 #else 
-	#error "Colum or Row Major not defined"
+	#error "Column or Row Major not defined"
 #endif
 
 Error:

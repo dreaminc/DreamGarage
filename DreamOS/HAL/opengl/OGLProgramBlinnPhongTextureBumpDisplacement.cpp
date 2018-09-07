@@ -41,8 +41,10 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasBumpTexture), std::string("u_fHasBumpTexture")));
 
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureDisplacement")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasBumpTexture), std::string("u_fHasDisplacementTexture")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDisplacement), std::string("u_textureDisplacement")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasDisplacementTexture), std::string("u_fHasDisplacementTexture")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTime), std::string("u_time")));
 
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -95,6 +97,8 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::OGLInitialize(version versio
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
 	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"parallaxCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"noiseCommon.shader"), "Failed to add shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"blinnPhongTextureBumpDisplacement.vert"), "Failed to create vertex shader");
@@ -162,6 +166,12 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::ProcessNode(long frameID) {
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
+	if (m_pUniformTime != nullptr) {
+		static std::chrono::high_resolution_clock::time_point timeStart = std::chrono::high_resolution_clock::now();
+		float msTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - timeStart).count();
+		m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&msTime));
+	}
+
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
@@ -179,7 +189,9 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::SetObjectTextures(OGLObj *pO
 	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-		m_pUniformTextureColor->SetUniform(0);
+		
+		if (m_pUniformTextureColor != nullptr)
+			m_pUniformTextureColor->SetUniform(0);
 
 		m_pUniformHasColorTexture->SetUniform(true);
 	}
@@ -190,25 +202,27 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::SetObjectTextures(OGLObj *pO
 	if ((pTexture = pOGLObj->GetOGLTextureBump()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE1);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-		m_pUniformTextureBump->SetUniform(1);
+		
+		if(m_pUniformTextureBump != nullptr) 
+			m_pUniformTextureBump->SetUniform(1);
 
-		m_pUniformHasBumpTexture->SetUniform(true);
+		if(m_pUniformHasBumpTexture != nullptr)
+			m_pUniformHasBumpTexture->SetUniform(true);
 	}
 	else {
 		m_pUniformHasBumpTexture->SetUniform(false);
 	}
 
-	if (m_pUniformHasDisplacementTexture != nullptr) {
-		if ((pTexture = pOGLObj->GetOGLTextureDisplacement()) != nullptr) {
-			m_pParentImp->glActiveTexture(GL_TEXTURE2);
-			m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-			m_pUniformTextureDisplacement->SetUniform(2);
+	if ((pTexture = pOGLObj->GetOGLTextureDisplacement()) != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE2);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+			
+		m_pUniformTextureDisplacement->SetUniform(2);
 
-			m_pUniformHasDisplacementTexture->SetUniform(true);
-		}
-		else {
-			m_pUniformHasDisplacementTexture->SetUniform(false);
-		}
+		m_pUniformHasDisplacementTexture->SetUniform(true);
+	}
+	else {
+		m_pUniformHasDisplacementTexture->SetUniform(false);
 	}
 
 Error:
@@ -248,28 +262,33 @@ RESULT OGLProgramBlinnPhongTextureBumpDisplacement::SetObjectUniforms(DimObj *pD
 
 RESULT OGLProgramBlinnPhongTextureBumpDisplacement::SetCameraUniforms(camera *pCamera) {
 
-	//auto ptEye = pCamera->GetOrigin();
+	auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
-	m_pUniformViewMatrix->SetUniform(matV);
+	if (m_pUniformViewMatrix != nullptr)
+		m_pUniformViewMatrix->SetUniform(matV);
+
 	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformEye->SetUniform(ptEye);
+
+	m_pUniformEye->SetUniform(ptEye);
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return R_PASS;
 }
 
 RESULT OGLProgramBlinnPhongTextureBumpDisplacement::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-	//auto ptEye = pStereoCamera->GetEyePosition(eye);
+	auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
-	m_pUniformViewMatrix->SetUniform(matV);
+	if(m_pUniformViewMatrix!= nullptr)
+		m_pUniformViewMatrix->SetUniform(matV);
+
 	//m_pUniformProjectionMatrix->SetUniform(matP);
-	//m_pUniformEye->SetUniform(ptEye);
+	m_pUniformEye->SetUniform(ptEye);
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return R_PASS;

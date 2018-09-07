@@ -4,7 +4,7 @@ material::material() :
 	m_shine(DEFUALT_MATERIAL_SHINE),
 	m_bumpiness(1.0f),
 	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
-	reserved0(0.0f),
+	m_displacement(0.0f),
 	m_colorAmbient(COLOR_WHITE),
 	m_colorDiffuse(COLOR_WHITE),
 	m_colorSpecular(COLOR_WHITE),
@@ -20,7 +20,7 @@ material::material(float shine, color colorAmbient, color colorDiffuse, color co
 	m_shine(shine),
 	m_bumpiness(1.0f),
 	m_ambient(DEFAULT_MATERIAL_AMBIENT_LEVEL),
-	reserved0(0.0f),
+	m_displacement(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
 	m_colorSpecular(colorSpecular),
@@ -36,7 +36,7 @@ material::material(float shine, float bump, color colorAmbient, color colorDiffu
 	m_shine(shine),
 	m_bumpiness(bump),
 	m_ambient(ambient),
-	reserved0(1.0f),
+	m_displacement(0.0f),
 	m_colorAmbient(colorAmbient),
 	m_colorDiffuse(colorDiffuse),
 	m_colorSpecular(colorSpecular),
@@ -108,6 +108,11 @@ RESULT material::SetReflectivity(float reflectivity) {
 
 RESULT material::SetRefractivity(float refractivity){
 	m_refractivity = refractivity;
+	return R_PASS;
+}
+
+RESULT material::SetDisplacement(float displacement) {
+	m_displacement = displacement;
 	return R_PASS;
 }
 

@@ -35,30 +35,32 @@ private:
 
 private:
 	// Vertex Attribute
-	OGLVertexAttributePoint *m_pVertexAttributePosition;
-	OGLVertexAttributeColor *m_pVertexAttributeColor;
-	OGLVertexAttributeVector *m_pVertexAttributeNormal;
-	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
-	OGLVertexAttributeVector *m_pVertexAttributeTangent;
-	OGLVertexAttributeVector *m_pVertexAttributeBitangent;
+	OGLVertexAttributePoint *m_pVertexAttributePosition = nullptr;
+	OGLVertexAttributeColor *m_pVertexAttributeColor = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeNormal = nullptr;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeTangent = nullptr;
+	OGLVertexAttributeVector *m_pVertexAttributeBitangent = nullptr;
 
 	// Uniforms
-	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewMatrix;
+	OGLUniformMatrix4 *m_pUniformModelMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
 	//OGLUniformMatrix4 *m_pUniformProjectionMatrix;
-	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
+	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
-	OGLUniformPoint *m_pUniformEye;
+	OGLUniformPoint *m_pUniformEye = nullptr;
 
-	OGLUniformSampler2D *m_pUniformTextureColor;
-	OGLUniformBool *m_pUniformHasColorTexture;
+	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
+	OGLUniformBool *m_pUniformHasColorTexture = nullptr;
 
-	OGLUniformSampler2D *m_pUniformTextureBump;
-	OGLUniformBool *m_pUniformHasBumpTexture;
+	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;
+	OGLUniformBool *m_pUniformHasBumpTexture = nullptr;
 
-	OGLUniformBool *m_pUniformHasDisplacementTexture;
-	OGLUniformSampler2D *m_pUniformTextureDisplacement;
+	OGLUniformBool *m_pUniformHasDisplacementTexture = nullptr;
+	OGLUniformSampler2D *m_pUniformTextureDisplacement = nullptr;
+
+	OGLUniform *m_pUniformTime = nullptr;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;

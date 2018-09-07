@@ -34,6 +34,10 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
+
+	CR(AddTestBlinnPhongShaderTextureBump());
+
 	CR(AddTestEnvironmentMapping());
 
 	CR(AddTestWaterShaderCube());
@@ -61,8 +65,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestToonShader());
 
 	CR(AddTestStandardShader());
-
-	CR(AddTestBlinnPhongShaderTextureBump());
 
 	CR(AddTestBlinnPhongShader());
 
@@ -3568,6 +3570,175 @@ RESULT HALTestSuite::AddTestText() {
 
 	pNewTest->SetTestName("Blinn Phong Text Test");
 	pNewTest->SetTestDescription("Blinn phong text shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestBlinnPhongShaderTextureBumpDisplacement() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 200.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	struct TestContext {
+		quad *m_pQuad = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_texture_bump_displacement");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		TestContext *pTestContext;
+		pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		volume *pVolume;
+		pVolume = nullptr;
+
+		light *pLight;
+		//pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.5f, point(0.0f, 1.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 1.0f));
+		pLight = m_pDreamOS->AddLight(LIGHT_POINT, 0.5f, point(0.0f, 1.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, 0.0f));
+
+		{
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"bricks2_diffuse.jpg");
+			texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"bricks2_normal.jpg");
+
+			//texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			//texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_bump.jpg");
+			
+			//texture *pBumpTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"PyramidNormal_01.jpg");
+			texture *pDisplacementTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"bricks2_displacement.jpg");
+
+			pTestContext->m_pQuad = m_pDreamOS->AddQuad(5.0f, 5.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+			CN(pTestContext->m_pQuad);
+			pTestContext->m_pQuad->SetMaterialShininess(25.0f);
+
+			//pTestContext->m_pQuad->RotateXByDeg(90.0f);
+
+			pTestContext->m_pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+			pTestContext->m_pQuad->SetDiffuseTexture(pColorTexture);
+			pTestContext->m_pQuad->SetBumpTexture(pBumpTexture);
+			pTestContext->m_pQuad->SetDisplacementTexture(pDisplacementTexture);
+			pTestContext->m_pQuad->SetMaterialDisplacement(0.1f);
+
+			/*
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			texture *pColorTexture2 = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"crate_color.png");
+
+			texture *pColorTextureCopy = m_pDreamOS->MakeTexture(*pColorTexture1);
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+			pVolume->SetDiffuseTexture(pColorTexture1);
+			//CR(pVolume->SetColor(COLOR_WHITE));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
+			//CR(pVolume->SetColor(COLOR_GREEN));
+			pVolume->SetDiffuseTexture(pColorTexture2);
+
+			auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+			CN(pQuad);
+			pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
+			//CR(pVolume->SetColor(COLOR_GREEN));
+			pQuad->SetDiffuseTexture(pColorTextureCopy);
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+			CR(pVolume->SetVertexColor(COLOR_RED));
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+			CR(pVolume->SetVertexColor(COLOR_BLUE));
+			//*/
+
+			/*
+			auto pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			CN(pModel);
+			pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
+			pModel->SetScale(0.1f);
+			//*/
+
+			m_pDreamOS->GetCamera()->SetPosition(0.0f, 1.0f, 3.5f);
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp)
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//pTestContext->m_pQuad->RotateYByDeg(0.005f);
+		//pTestContext->m_pQuad->RotateZByDeg(0.005f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Texture Normal Displacement Shader");
+	pNewTest->SetTestDescription("Blinn phong texture bump maapping and displacement parallax shader test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

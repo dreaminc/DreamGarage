@@ -328,6 +328,23 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialDisplacement(float displacement, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetDisplacement(displacement);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialDisplacement(displacement, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialReflectivity(float reflectivity, bool fSetChildren){
 	RESULT r = R_PASS;
 
@@ -443,6 +460,21 @@ RESULT DimObj::SetBumpTexture(texture *pTexture) {
 
 Error:
 	return r;
+}
+
+RESULT DimObj::SetDisplacementTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CN(pTexture);
+
+	m_pDisplacementTexture = pTexture;
+
+Error:
+	return r;
+}
+
+texture* DimObj::GetDisplacementTexture() {
+	return m_pDisplacementTexture;
 }
 
 texture* DimObj::GetBumpTexture() {

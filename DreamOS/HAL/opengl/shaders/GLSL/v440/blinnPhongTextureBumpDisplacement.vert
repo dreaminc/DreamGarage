@@ -24,7 +24,7 @@ out Data {
 	vec4 color;
 	vec2 uvCoord;
 	vec4 vertViewSpace;
-	//mat3 TangentBitangentNormalMatrix;
+	vec4 vertWorldSpace;
 } DataOut;
 
 uniform mat4 u_mat4Model;
@@ -45,12 +45,13 @@ void main(void) {
 	//DataOut.TangentBitangentNormalMatrix = CalculateTBNMatrix(u_mat4Model, inV_vec4Tangent, inV_vec4Normal);	
 	
 	for(int i = 0; i < numLights; i++) {
-		ProcessLightVertex(lights[i], u_mat4View, vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
+		ProcessLightVertex(lights[i], mat4(1.0f), vertViewSpace, vertWorldSpace, DataOut.directionLight[i], DataOut.distanceLight[i]);
 
 		// Apply TBN matrix 
 		//DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * DataOut.directionLight[i]);		
 	}
 
+	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = inV_vec4Normal;
 	DataOut.tangent = inV_vec4Tangent;

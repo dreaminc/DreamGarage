@@ -870,6 +870,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
@@ -1199,6 +1200,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h" />
@@ -1487,6 +1489,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBumpDisplacement.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBumpDisplacement.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1501,6 +1505,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\fogCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\mathCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture_clipping.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\parallaxCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.frag" />
