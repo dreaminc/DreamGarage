@@ -78,7 +78,7 @@ void main(void) {
 
 	vec3 directionEye = tangentBitangentNormalMatrix * normalize(u_vec4Eye.xyz - DataIn.vertWorldSpace.xyz);
 
-	vec2 parallaxTexCoords = ParallaxMapping(DataIn.uvCoord, directionEye, 0.1f);
+	vec2 parallaxTexCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement);
 	
 	// Discard fragments that don't hit anything
 	if(parallaxTexCoords.x > 1.0f || parallaxTexCoords.y > 1.0f || parallaxTexCoords.x < 0.0 || parallaxTexCoords.y < 0.0)

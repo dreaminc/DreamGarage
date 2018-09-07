@@ -34,13 +34,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestWaterShaderCube());
+
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
 
 	CR(AddTestEnvironmentMapping());
-
-	CR(AddTestWaterShaderCube());
 	
 	CR(AddTestGeometryShader());
   
@@ -1785,6 +1785,12 @@ RESULT HALTestSuite::AddTestWaterShaderCube() {
 			pTestContext->pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
 			CN(pTestContext->pWaterQuad);
 			pTestContext->pWaterQuad->SetPosition(90.0f, -1.25f, -25.0f);
+			pTestContext->pWaterQuad->SetMaterialDisplacement(0.1f);
+			pTestContext->pWaterQuad->SetMaterialShininess(16.0f);
+
+			color cWater;
+			cWater.SetColor(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f);
+			pTestContext->pWaterQuad->SetMaterialDiffuseColor(cWater);
 			
 			//pTestContext->pWaterQuad->SetPosition(0.0f, -0.1f, 0.0f);
 			

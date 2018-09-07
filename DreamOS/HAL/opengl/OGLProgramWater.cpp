@@ -100,6 +100,7 @@ RESULT OGLProgramWater::OGLInitialize(version versionOGL) {
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
 	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"parallaxCommon.shader"), "Failed to add shared vertex shader code");
 	CRM(AddSharedShaderFilename(L"noiseCommon.shader"), "Failed to add shared shader code");
 
 	// Vertex
