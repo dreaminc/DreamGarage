@@ -84,7 +84,8 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
-		point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+		//point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, VIEW_POS_DEPTH);
+		point ptOrigin = point(0.0f, VIEW_POS_HEIGHT, -VIEW_POS_DEPTH);
 		
 		GetComposite()->SetOrientation(qViewQuadOrientation);
 		GetComposite()->SetPosition(ptOrigin);
@@ -822,7 +823,9 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 	pRenderContext->SetOrientation(qOrigin);
 	//*/
 
-	m_fUpdateDreamUIBar = true;
+//	m_fUpdateDreamUIBar = true;
+	m_pDreamUserApp->ResetAppComposite();
+	m_pDreamUIBar->ResetAppComposite();
 
 Error:
 	return r;
@@ -1018,6 +1021,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 
 		else if ((!m_fHasOpenApp && m_pDreamUIBar->IsEmpty()) || (!m_pDreamUserApp->m_fHasOpenApp && !m_fHasOpenApp)) {	// Pulling up Menu from nothing
+			ResetAppComposite();
 			CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT));
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 			m_pDreamUserApp->SetHasOpenApp(true);
@@ -1025,6 +1029,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 		
 		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
+			ResetAppComposite();
 			Hide();
 			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);
 			m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());

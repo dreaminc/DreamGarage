@@ -93,7 +93,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
-	m_pView->SetPosition(0.0f, -0.2f, 0.0f);
+	//m_pView->SetPosition(0.0f, -0.2f, 0.0f);
 	//m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
@@ -616,7 +616,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 	}
 	
 	CR(m_pScrollView->Update());
-	CR(ResetAppComposite());
+	//CR(ResetAppComposite());
 
 Error:
 	return r;
@@ -921,6 +921,7 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	totalWidth = m_pParentApp->GetTotalWidth();
 
 	m_pScrollView->InitializeWithWidth(totalWidth);
+	m_pView->SetPosition(point(0.0f, -0.2f, -m_pScrollView->GetWidth() / 2.0f));
 	m_pScrollView->RegisterObserver(this);
 
 	if (m_pUIStageProgram != nullptr) {

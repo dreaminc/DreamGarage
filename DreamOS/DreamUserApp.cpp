@@ -304,7 +304,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
-	CR(ResetAppComposite());
+	//CR(ResetAppComposite());
 Error:
 	return r;
 }
@@ -753,7 +753,9 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 				point ptHand = mallet->GetMalletHead()->GetPosition(true);
 				vector vHand = ptHand - pCamera->GetOrigin(true);
-				vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+				vHand = vector(vHand.x(), 0.0f, vHand.z());
+				//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+				vector vTempPos = vAppLookXZ * vHand.magnitude();
 				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
 					vPos = vTempPos;
 			}

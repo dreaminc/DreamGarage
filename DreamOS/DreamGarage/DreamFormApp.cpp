@@ -60,7 +60,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
-		GetComposite()->SetPosition(point(0.0f, -0.2f, 0.1f));
+		GetComposite()->SetPosition(point(0.0f, -0.2f, -0.1f));
 
 		float viewAngleRad = m_pUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
