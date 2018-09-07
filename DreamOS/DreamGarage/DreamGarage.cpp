@@ -1101,55 +1101,14 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
 		m_pDreamUserControlArea->OnDreamFormSuccess();
-		if (strMessage == "DreamSettingsApp.OnSuccess") {
-			float height; 
-			float depth;
-
-			m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth);
-			m_pUserController->SetSettings(m_strAccessToken, height, depth, m_pDreamUserApp->GetScale());
-		}
 	}
 	else {
-		if (strMessage == "DreamSettingsApp.OnSuccess") {
-			std::string strFormType;
-			// this specific case is only when: not first login, has credentials, has no settings, has no team
-			if (!m_fFirstLogin && m_fHasCredentials) {
-				strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-				m_pUserController->GetFormURL(strFormType);
-				m_pDreamLoginApp->Show();
-			}
-			// after the user has defined their settings, show sign up/sign in 
-			// based on whether this is the first launch or not
-			else if (m_fFirstLogin) {
-				strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
-				m_pUserController->GetFormURL(strFormType);
-				m_pDreamLoginApp->Show();
-			}
-			else {
-				strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
-				m_pUserController->GetFormURL(strFormType);
-				m_pDreamLoginApp->Show();
-			}
-		}
-		// once login has succeeded, save the settings from earlier and the launch date
+		// once login has succeeded, save the launch date
 		// environment id should have been set through DreamLoginApp responding to javascript
-		else if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
-			//else if (strMessage == "DreamLoginApp.OnSuccess") {
+		if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
 			m_strAccessToken = m_pDreamLoginApp->GetAccessToken();
 
-			float height;
-			float depth;
-			CR(m_pDreamUserApp->GetSettingsRelativeHeightAndDepth(height, depth));
-
 			CR(m_pDreamLoginApp->SetLaunchDate());
-
-			CR(m_pUserController->SetSettings(m_strAccessToken,
-				height,
-				depth,
-				m_pDreamUserApp->GetScale()));	
-
-			m_pDreamUserApp->SetHeight(height);
-			m_pDreamUserApp->SetDepth(depth);
 
 			// TODO: potentially where the lobby environment changes to the team environment
 			// could also be once the environment id is set
@@ -1163,23 +1122,6 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 
 Error:
 	return r;
-}
-
-RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
-	RESULT r = R_PASS;
-
-	/*
-	CR(m_pDreamUserApp->UpdateHeight(height));
-	CR(m_pDreamUserApp->SetDepth(depth));
-	CR(m_pDreamUserApp->UpdateScale(scale));
-	//*/
-
-Error:
-	return r;
-}
-
-RESULT DreamGarage::OnSetSettings() {
-	return R_PASS;
 }
 
 RESULT DreamGarage::OnLogin() {
@@ -1298,14 +1240,10 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	if (!fSuccess) {
 		// need to create a team, since the user has no teams
 		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-		//CR(pUserController->GetFormURL(strFormType));
 	}
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
 		CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(environment::type(environmentModelId)));
-		
-		//CR(m_pUserController->RequestUserProfile(m_strAccessToken));
-		//CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 	}
 
 Error:

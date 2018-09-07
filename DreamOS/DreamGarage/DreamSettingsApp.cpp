@@ -50,13 +50,6 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 
 	CR(DreamFormApp::Update());
 
-	if (m_fLeftTriggerDown) {
-		m_pUserApp->UpdateScale(m_pUserApp->GetScale() + m_scaleTick);
-	}
-	else if (m_fRightTriggerDown) {
-		m_pUserApp->UpdateScale(m_pUserApp->GetScale() - m_scaleTick);
-	}
-
 	if (m_fPendShowFormView) {
 		GetComposite()->SetVisible(true, false);
 		CR(SetInitialSettingsValues());
@@ -95,36 +88,6 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 	CBR(m_fFormVisible, R_SKIPPED);
 	CNR(m_pUserApp, R_SKIPPED);
 
-	if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
-		float diff = pEvent->state.ptTouchpad.y() * 0.015f;
-		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-			m_pUserApp->UpdateHeight(diff);
-		}
-		else {
-			//TODO: scale depth in variable
-			m_pUserApp->UpdateDepth(diff/4.0f);
-		}
-	}
-	/*
-	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
-		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-			m_fLeftTriggerDown = true;
-		}
-
-		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-			m_fRightTriggerDown = true;
-		}
-	}
-	else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_UP) {
-		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-			m_fLeftTriggerDown = false;
-		}
-		else {
-			m_fRightTriggerDown = false;
-		}
-	}
-	//*/
-
 Error:
 	return r;
 }
@@ -146,12 +109,6 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 				CR(m_pFormView->HandleKeyboardDown());
 			}
 			else {
-
-				// Reset user app to values at the beginning of the form
-				CR(m_pUserApp->UpdateHeight(m_pUserApp->GetHeight() - m_initialHeight));
-				CR(m_pUserApp->UpdateDepth(m_pUserApp->GetDepth() - m_initialDepth));
-				CR(m_pUserApp->UpdateScale(m_initialScale));
-
 				CR(Hide());
 			}
 		}

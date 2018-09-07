@@ -881,50 +881,6 @@ Error:
 	return m_pWebBrowserManager;
 }
 
-RESULT DreamUserApp::UpdateHeight(float heightDiff) {
-
-	point ptComposite = GetComposite()->GetPosition();
-	ptComposite += point(0.0f, heightDiff, 0.0f);
-
-	m_userSettings->m_height += heightDiff;
-
-	GetComposite()->SetPosition(ptComposite);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::UpdateDepth(float depthDiff) {
-
-	stereocamera *pCamera = GetDOS()->GetCamera();
-
-	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
-	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
-	vAppLook.Normalize();
-	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-	vector vDiff = depthDiff * vAppLookXZ;
-
-	m_userSettings->m_depth += depthDiff;
-
-	point ptCamera = pCamera->GetEyePosition(EYE_MONO);
-
-	pCamera->SetHMDAdjustedPosition(ptCamera + vDiff);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::UpdateScale(float scale) {
-
-	m_userSettings->m_scale = scale;
-	GetComposite()->SetScale(scale);
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::SetHeight(float height) {
-	m_userSettings->m_height = height;
-	return R_PASS;
-}
-
 vector DreamUserApp::GetDepthVector() {
 	
 	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
@@ -932,28 +888,4 @@ vector DreamUserApp::GetDepthVector() {
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 	return m_userSettings->m_depth * vAppLookXZ;
-}
-
-RESULT DreamUserApp::SetDepth(float depth) {
-	m_userSettings->m_depth = depth;
-
-	return R_PASS;
-}
-
-RESULT DreamUserApp::GetSettingsRelativeHeightAndDepth(float& height, float& depth) {
-	
-	auto pHMD = GetDOS()->GetHMD();
-	if (pHMD != nullptr) {
-
-
-		point ptCamera = GetDOS()->GetCamera()->GetEyePosition(EYE_MONO) + pHMD->GetHeadPointOrigin();
-		point ptComposite = GetComposite()->GetPosition(true);
-		vector vDiff = vector(ptCamera.x() - ptComposite.x(), 0.0f, ptCamera.z() - ptComposite.z());
-		
-		depth = vDiff.magnitude();
-
-		height = GetComposite()->GetPosition(true).y();
-	}
-
-	return R_PASS;
 }

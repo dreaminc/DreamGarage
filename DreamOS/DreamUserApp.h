@@ -194,16 +194,7 @@ public:
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
-	RESULT UpdateHeight(float heightDiff);
-	RESULT UpdateDepth(float depthDiff);
-	RESULT UpdateScale(float scale);
-
-	RESULT SetHeight(float height);
 	vector GetDepthVector();
-	RESULT SetDepth(float depth);
-
-	// capture current settings values relative to the head to save
-	RESULT GetSettingsRelativeHeightAndDepth(float& height, float& depth);
 
 private:
 	//user *m_pUserModel = nullptr;

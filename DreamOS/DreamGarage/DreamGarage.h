@@ -113,9 +113,6 @@ public:
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
 
-	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
-	virtual RESULT OnSetSettings() override;
-
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
 
