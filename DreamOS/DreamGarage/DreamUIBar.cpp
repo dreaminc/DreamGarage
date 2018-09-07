@@ -89,9 +89,12 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(GetComposite()->InitializeOBB());
 	CR(GetDOS()->AddObjectToInteractionGraph(GetComposite()));
 
+	m_pVolume = GetComposite()->AddVolume(0.1f);
+
 	// Initialize UISpatialScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
-	m_pView->SetPosition(0.0f, -0.2f, 0.1f);
+	m_pView->SetPosition(0.0f, -0.2f, 0.0f);
+	//m_pView->SetPosition(0.0f, -0.2f, 0.1f);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUISpatialScrollView();
@@ -207,7 +210,6 @@ RESULT DreamUIBar::ResetAppComposite() {
 	point ptOrigin;
 	quaternion qOrigin;
 	vector vCameraToMenu;
-	//*
 	if(m_pUserHandle == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 
@@ -230,6 +232,7 @@ RESULT DreamUIBar::ResetAppComposite() {
 	
 	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);
+	m_pVolume->SetVisible(true);
 
 	CNR(m_pUIStageProgram, R_SKIPPED);
 
@@ -613,6 +616,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 	}
 	
 	CR(m_pScrollView->Update());
+	CR(ResetAppComposite());
 
 Error:
 	return r;

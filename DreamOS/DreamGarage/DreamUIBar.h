@@ -198,6 +198,7 @@ private:
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	DreamUserControlArea *m_pParentApp = nullptr;
+	std::shared_ptr<volume> m_pVolume = nullptr;
 };
 
 

@@ -304,6 +304,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
+	CR(ResetAppComposite());
 Error:
 	return r;
 }
@@ -720,42 +721,49 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	CN(pCamera);
 	{
 		point ptCameraOrigin = pCamera->GetOrigin(true);
-		point ptBrowserOrigin = point(0.0f, 2.0f, -2.0f);
 
-		//ptMid = (m_pLeftHand->GetPosition(true) + m_pRightHand->GetPosition(true)) / 2;
-		ptMid = point::midpoint(m_pLeftMallet->GetMalletHead()->GetPosition(true), m_pRightMallet->GetMalletHead()->GetPosition(true));
-		vCameraToMenu = ptMid - ptCameraOrigin;	
-
-		vCameraToBrowser = ptBrowserOrigin - ptCameraOrigin;
-		vCameraToBrowser.y() = 0;
+		//RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+		RotationMatrix matLook = RotationMatrix(pCamera->GetWorldOrientation());
+		vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+		vAppLook.Normalize();
+		vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 
 		float menuDepth = vCameraToMenu.magnitude();
-		
+
+		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vAppLookXZ));
+
 		// min and max menu depths
 		util::Clamp(menuDepth, MENU_DEPTH_MIN, MENU_DEPTH_MAX);
-		
-		// Reposition Menu to be on the vector between Camera and Browser
-		point ptMenuPosition = menuDepth * vCameraToBrowser.Normal();
-		vCameraToMenu = (ptCameraOrigin + ptMenuPosition) - ptCameraOrigin;	
-		vCameraToMenu.y() = 0.0f;
+
 		point ptCamera = pCamera->GetPosition();
 
-		/*
-		vector vPos;
-		for (auto& hand : { m_pLeftHand, m_pRightHand }) {	// which hand is closer
-			point ptHand = hand->GetPosition(true);
-			vector vHand = ptHand - pCamera->GetOrigin(true);
-			vector vTempPos = vCameraToMenu * (vHand.dot(vCameraToMenu));
-			if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
-				vPos = vTempPos;
-		} 
+		//*
+		if (m_pLeftMallet != nullptr && m_pRightMallet != nullptr &&
+			m_pLeftHand != nullptr && m_pRightHand != nullptr) {
+
+			vector vPos;
+
+			for (auto& mallet : { m_pLeftMallet, m_pRightMallet }) {	// which hand is closer
+
+				RotationMatrix qOffset;
+				auto pHand = mallet == m_pLeftMallet ? m_pLeftHand : m_pRightHand;
+				qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+				//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
+
+				point ptHand = mallet->GetMalletHead()->GetPosition(true);
+				vector vHand = ptHand - pCamera->GetOrigin(true);
+				vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
+					vPos = vTempPos;
+			}
+			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
+			m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
+		}
 		
-		point lookOffset = vPos + point(0.0f, yPos, 0.0f);
-		m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-		*/
+		//*/
 		
-		m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
-		m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraToMenu));
+		//m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
 		GetComposite()->SetPosition(m_pAppBasis->GetPosition());
 		GetComposite()->SetOrientation(m_pAppBasis->GetOrientation());
 	}
