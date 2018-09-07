@@ -455,20 +455,7 @@ RESULT DreamGarage::DidFinishLoading() {
 		CR(m_pUserController->RequestDreamVersion());
 //*
 #else
-		// if there has already been a successful login, try to authenticate
-		if (!m_fFirstLogin && m_fHasCredentials) {
-			m_pUserController->GetAccessToken(m_strRefreshToken);
-		}
-		else {
-			// Otherwise, start by showing the settings form
-
-			strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
-			CR(m_pUserController->GetFormURL(strFormType));
-
-			if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
-				CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
-			}
-		}
+		CR(AuthenticateFromStoredCredentials());
 #endif
 //*/
 	}
@@ -483,23 +470,11 @@ RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
 
 	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update... 
 		if (m_pDreamEnvironmentApp != nullptr) {
-			return m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED);
+			CR(m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED));
 		}
-	}
-
-	// if there has already been a successful login, try to authenticate
-	if (!m_fFirstLogin && m_fHasCredentials) {
-		m_pUserController->GetAccessToken(m_strRefreshToken);
 	}
 	else {
-		// Otherwise, start by showing the settings form
-
-		strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
-		CR(m_pUserController->GetFormURL(strFormType));
-
-		if (m_pDreamEnvironmentApp != nullptr) {	// these checks are for debug, see 334
-			CR(m_pDreamEnvironmentApp->FadeIn()); // fade into lobby (with no environment showing)
-		}
+		CR(AuthenticateFromStoredCredentials());
 	}
 
 Error:
@@ -508,6 +483,36 @@ Error:
 
 version DreamGarage::GetDreamVersion() {
 	return m_versionDreamClient;
+}
+
+RESULT DreamGarage::AuthenticateFromStoredCredentials() {
+	RESULT r = R_PASS;
+
+	std::string strFormType;
+	// if there has already been a successful login, try to authenticate
+	if (!m_fFirstLogin && m_fHasCredentials) {
+		m_pUserController->GetAccessToken(m_strRefreshToken);
+	}
+	else {
+		// Otherwise, start by showing the login form
+
+		if (!m_fFirstLogin) {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+		}
+		else {
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+		}
+
+		CR(m_pUserController->GetFormURL(strFormType));
+
+		if (m_pDreamEnvironmentApp != nullptr) {	
+			// fade into lobby (with no environment showing)
+			CR(m_pDreamEnvironmentApp->FadeIn()); 
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
@@ -1163,9 +1168,11 @@ Error:
 RESULT DreamGarage::OnGetSettings(float height, float depth, float scale) {
 	RESULT r = R_PASS;
 
+	/*
 	CR(m_pDreamUserApp->UpdateHeight(height));
 	CR(m_pDreamUserApp->SetDepth(depth));
 	CR(m_pDreamUserApp->UpdateScale(scale));
+	//*/
 
 Error:
 	return r;
@@ -1201,8 +1208,8 @@ RESULT DreamGarage::OnLogout() {
 
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-	// reset settings before signing back in
-	std::string strFormType = DreamFormApp::StringFromType(FormType::SETTINGS);
+	// Show login form, given this is not the first launch.
+	std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
 
 	CNM(pUserController, "User controller was nullptr");
 
@@ -1217,6 +1224,8 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+
+	// TODO: clear out DreamPeerApp and user assets
 
 	m_fSeated = false;
 
@@ -1259,7 +1268,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		m_strAccessToken = strAccessToken;
 
 		CR(m_pDreamLoginApp->SetAccessToken(m_strAccessToken));
-		CR(m_pUserController->GetSettings(m_strAccessToken));
+		//CR(m_pUserController->GetSettings(m_strAccessToken));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 		CR(m_pUserController->GetTeam(m_strAccessToken));

@@ -158,6 +158,8 @@ private:
 
 	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
+private:
+	RESULT AuthenticateFromStoredCredentials();
 
 private:
 	version m_versionDreamClient = version(DREAM_VERSION);
