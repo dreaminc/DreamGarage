@@ -39,9 +39,6 @@ public:
 public:
 	std::string GetSuccessString();
 
-private:
-	RESULT SetInitialSettingsValues();
-
 public:
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	

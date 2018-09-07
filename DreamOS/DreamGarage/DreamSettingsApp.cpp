@@ -52,7 +52,6 @@ RESULT DreamSettingsApp::Update(void *pContext) {
 
 	if (m_fPendShowFormView) {
 		GetComposite()->SetVisible(true, false);
-		CR(SetInitialSettingsValues());
 		CR(Show());
 	}
 
@@ -67,18 +66,6 @@ RESULT DreamSettingsApp::Shutdown(void *pContext) {
 DreamSettingsApp* DreamSettingsApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamSettingsApp *pDreamApp = new DreamSettingsApp(pDreamOS, pContext);
 	return pDreamApp;
-}
-
-RESULT DreamSettingsApp::SetInitialSettingsValues() {
-	RESULT r = R_PASS;
-
-	// Save initial settings values so that if the form is cancelled, 
-	// the settings can be reset
-	m_initialHeight = m_pUserApp->GetHeight();
-	m_initialDepth = m_pUserApp->GetDepth();
-	m_initialScale = m_pUserApp->GetScale();
-
-	return r;
 }
 
 RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
@@ -141,7 +128,6 @@ RESULT DreamSettingsApp::Show() {
 		m_fPendShowFormView = true;
 	}
 	else {
-		CR(SetInitialSettingsValues());
 		CR(DreamFormApp::Show());
 		m_fPendShowFormView = false;
 	}

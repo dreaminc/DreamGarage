@@ -933,18 +933,6 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::UpdateWidth(float totalWidth) {
-	RESULT r = R_PASS;
-
-	m_pScrollView->UpdateWithWidth(totalWidth);
-	if (m_pUIStageProgram != nullptr) {
-		m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
-		m_pUIStageProgram->SetClippingRate(m_pScrollView->GetClippingRate());
-	}
-
-	return r;
-}
-
 bool DreamUIBar::IsEmpty() {
 	bool fEmpty = false;
 	if (m_pathStack.empty() && !m_fWaitingForMenuResponse) {

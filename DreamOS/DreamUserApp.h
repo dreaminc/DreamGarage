@@ -52,6 +52,11 @@ class CEFBrowserManager;
 
 #define ANIMATION_DURATION_SECONDS 0.175f
 
+#define MESSAGE_QUAD_WIDTH 2.40f
+#define MESSAGE_QUAD_HEIGHT (MESSAGE_QUAD_WIDTH * 9.0f / 16.0f)
+
+#define BACKGROUND_SCALE 1.0323f;
+
 enum class UserObserverEventType {
 	BACK,
 	DISMISS,
@@ -190,7 +195,46 @@ public:
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
-	vector GetDepthVector();
+public:
+	enum class StartupMessage {
+		WELCOME,
+		WELCOME_BACK,
+		UPDATE_REQUIRED,
+		INVALID
+	};
+
+public:
+	RESULT SetStartupMessageType(StartupMessage messageType);
+
+	RESULT ShowMessageQuad();
+	RESULT HideMessageQuad();
+
+	RESULT FadeInWithMessageQuad(StartupMessage startupMessage);
+
+private:
+	std::wstring k_wstrUpdateRequired = L"LaunchQuad/launch-update-required.png"; 
+	std::wstring k_wstrWelcome = L"LaunchQuad/launch-welcome.png"; 
+	std::wstring k_wstrWelcomeBack = L"LaunchQuad/launch-welcome-back.png"; 
+
+private:
+	std::map<StartupMessage, std::wstring> m_textureStringFromStartupMessage = {
+		{ StartupMessage::UPDATE_REQUIRED, k_wstrUpdateRequired },
+		{ StartupMessage::WELCOME, k_wstrWelcome },
+		{ StartupMessage::WELCOME_BACK, k_wstrWelcomeBack }
+	};
+
+private:
+	std::shared_ptr<composite> m_pMessageComposite = nullptr;
+	std::shared_ptr<quad> m_pMessageQuad = nullptr;
+	std::shared_ptr<quad> m_pMessageQuadBackground = nullptr;
+
+	bool m_fShowLaunchQuad = false;
+	StartupMessage m_currentLaunchMessage;
+
+	float m_messageQuadHeight = MESSAGE_QUAD_HEIGHT;
+	float m_messageQuadWidth = MESSAGE_QUAD_WIDTH;
+	float m_messageBackgroundScale = BACKGROUND_SCALE;
+
 
 private:
 	//user *m_pUserModel = nullptr;
@@ -248,7 +292,6 @@ private:
 	texture *m_pTextureDefaultGazeRight = nullptr;
 
 	std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
-
 };
 
 #endif // ! DREAM_USER_APP_H_

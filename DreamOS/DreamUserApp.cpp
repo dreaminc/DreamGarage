@@ -201,6 +201,23 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	}
 
+
+	m_pMessageComposite = GetComposite()->MakeComposite();
+	m_pMessageComposite->SetVisible(true);
+	m_pMessageComposite->SetPosition(0.0f, 0.0f, -2.0f);
+	pDreamOS->AddObjectToUIGraph(m_pMessageComposite.get());
+
+	m_pMessageQuad = m_pMessageComposite->AddQuad(m_messageQuadWidth, m_messageQuadHeight, 1, 1, nullptr);
+	m_pMessageQuad->SetVisible(true);
+	m_pMessageQuad->RotateXByDeg(90);
+
+	m_pMessageQuadBackground = m_pMessageComposite->AddQuad(m_messageQuadWidth * m_messageBackgroundScale, m_messageQuadHeight * m_messageBackgroundScale, 1, 1, nullptr);
+	m_pMessageQuadBackground->SetPosition(point(0.0f, 0.0f, -0.001f));
+	m_pMessageQuadBackground->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png"));
+	m_pMessageQuadBackground->SetVisible(true);
+	m_pMessageQuadBackground->RotateXByDeg(90);
+
+
 	// user settings
 	m_userSettings = new UserSettings();
 
@@ -304,6 +321,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
+	if (m_fShowLaunchQuad) {
+		texture* pMessageTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"launch-update-required.png");
+		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
+		m_pMessageComposite->SetVisible(true);
+		m_fShowLaunchQuad = false;
+	}
 	//CR(ResetAppComposite());
 Error:
 	return r;
@@ -547,6 +570,9 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 
 	} break;
+	case INTERACTION_EVENT_MENU: {
+		HideMessageQuad();
+	}
 	}
 //Error:
 	return r;
@@ -686,10 +712,8 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 
 	stereocamera *pCamera = GetDOS()->GetCamera();
 
-	point ptComposite = point(ptPosition + point(0.0f, m_userSettings->m_height, 0.0f));
-
-	m_pAppBasis->SetPosition(ptComposite);
-	GetComposite()->SetPosition(ptComposite);
+	m_pAppBasis->SetPosition(ptPosition);
+	GetComposite()->SetPosition(ptPosition);
 
 	return R_PASS;
 }
@@ -864,11 +888,35 @@ Error:
 	return m_pWebBrowserManager;
 }
 
-vector DreamUserApp::GetDepthVector() {
-	
-	RotationMatrix matLook = RotationMatrix(m_pAppBasis->GetOrientation());
+RESULT DreamUserApp::SetStartupMessageType(StartupMessage messageType) {
+	m_currentLaunchMessage = messageType;
+	return R_PASS;
+}
+
+RESULT DreamUserApp::ShowMessageQuad() {
+	RESULT r = R_PASS;
+
+	m_pMessageQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, m_textureStringFromStartupMessage[m_currentLaunchMessage].c_str()));
+
+
+	RotationMatrix matLook = RotationMatrix(GetComposite()->GetOrientation());
 	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
 	vAppLook.Normalize();
 	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-	return m_userSettings->m_depth * vAppLookXZ;
+
+	m_pMessageComposite->SetPosition(GetComposite()->GetPosition() + vAppLookXZ * 2.0f);
+	m_pMessageComposite->SetOrientation(GetComposite()->GetOrientation());
+	m_pMessageComposite->SetVisible(true, false);
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::HideMessageQuad() {
+	RESULT r = R_PASS;
+
+	CR(m_pMessageComposite->SetVisible(false, false));
+
+Error:
+	return r;
 }
