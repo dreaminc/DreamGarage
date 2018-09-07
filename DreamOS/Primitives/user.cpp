@@ -69,8 +69,9 @@ RESULT user::Initialize() {
 	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_02.png"));
 	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_01.png"));
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 4; i++) {
 		CN(m_mouthStatesMen[i]);
+		CN(m_mouthStatesWomen[i]);
 	}
 
 //	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
