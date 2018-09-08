@@ -56,6 +56,7 @@ protected:
 	texture *m_pTextureAmbient = nullptr;
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
+	texture *m_pDisplacementTexture = nullptr;
 
 private:
 	bool m_fVisible;
@@ -119,6 +120,9 @@ public:
 
 	RESULT SetBumpTexture(texture *pBumpTexture);
 	texture *GetBumpTexture();
+
+	RESULT SetDisplacementTexture(texture *pDisplacementTexture);
+	texture* GetDisplacementTexture();
 	
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialColors(color c, bool fSetChildren = false);
@@ -130,6 +134,7 @@ public:
 	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
 	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
 	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
+	RESULT SetMaterialDisplacement(float displacement, bool fSetChildren = false);
 	RESULT SetMaterialReflectivity(float reflectivity, bool fSetChildren = false);
 	RESULT SetMaterialRefractivity(float refractivity, bool fSetChildren = false);
 	RESULT SetMaterialUVTiling(float uTiling, float vTiling, bool fSetChildren = false);

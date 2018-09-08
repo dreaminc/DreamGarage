@@ -40,6 +40,7 @@ public:
 	OGLTexture *GetOGLTextureAmbient();
 	OGLTexture *GetOGLTextureDiffuse();
 	OGLTexture *GetOGLTextureSpecular();
+	OGLTexture* GetOGLTextureDisplacement();
 	
 	OGLObj *GetOGLBoundingVolume();
 

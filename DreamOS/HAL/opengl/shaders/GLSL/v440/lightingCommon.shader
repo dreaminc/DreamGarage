@@ -37,9 +37,10 @@ void ProcessLightVertex(in Light light, in mat4 mat4View, in vec4 vertViewSpace,
 	}
 	else  {
 		// Point Light
-		vec3 ptLightViewSpace = vec3(mat4View * vec4(light.m_ptOrigin.xyz, 1.0f));
+		//vec3 ptLightViewSpace = vec3(mat4View * vec4(light.m_ptOrigin.xyz, 1.0f));
+		//vLightDirection = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
 		
-		vLightDirection = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+		vLightDirection = normalize(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
 		lightDistance = length(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
 	}
 }

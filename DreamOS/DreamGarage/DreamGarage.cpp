@@ -72,7 +72,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	SandboxApp::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
-	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fMouseLook = false;
 	sandboxconfig.fUseGamepad = false;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;

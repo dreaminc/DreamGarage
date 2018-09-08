@@ -16,6 +16,7 @@
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureShadow.h"
 #include "OGLProgramBlinnPhongTextureBump.h"
+#include "OGLProgramBlinnPhongTextureBumpDisplacement.h"
 #include "OGLProgramTextureBitBlit.h"
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramStandard.h"
@@ -39,6 +40,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "blinnphong_texture", OGLPROGRAM_BLINNPHONG_TEXTURE },
 	{ "blinnphong_texture_shadow", OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW },
 	{ "blinnphong_texture_bump", OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP },
+	{ "blinnphong_texture_bump_displacement", OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP_DISPLACEMENT },
 	{ "texture_bitblit", OGLPROGRAM_TEXTURE_BITBLIT },
 	{ "flat", OGLPROGRAM_FLAT },
 	{ "toon", OGLPROGRAM_TOON },
@@ -166,6 +168,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL blinnPhongTextureBump Program");
+		} break;
+
+		case OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP_DISPLACEMENT: {
+			pOGLProgram = new OGLProgramBlinnPhongTextureBumpDisplacement(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL blinnPhongTextureBumpDisplacement Program");
 		} break;
 
 		case OGLPROGRAM_TEXTURE_BITBLIT: {

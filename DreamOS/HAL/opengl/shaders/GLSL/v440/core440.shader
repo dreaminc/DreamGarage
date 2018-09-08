@@ -12,11 +12,11 @@
 mat3 CalculateTBNMatrix(in mat4 mat3ModelView, in vec4 vTangent, in vec4 vNormal) {
 	
 	// BTN Matrix
-	mat3 TBNTransformMatrix = mat3(mat3ModelView);
+	//mat3 TBNTransformMatrix = mat3(mat3ModelView);
 
 	// Either the tangent of certain geometry is wrong, or this is not needed
-	vec3 vModelTangent = normalize(TBNTransformMatrix * vTangent.xyz);
-	vec3 vModelNormal = normalize(TBNTransformMatrix * vNormal.xyz);
+	vec3 vModelTangent = normalize(vec3(mat3ModelView * vec4(vTangent.xyz, 0.0f)));
+	vec3 vModelNormal = normalize(vec3(mat3ModelView * vec4(vNormal.xyz, 0.0f)));
 
 	// Re-orthogonalize T with respect to N with Gram-Schmidt process
 	vModelTangent = normalize(vModelTangent - dot(vModelTangent, vModelNormal) * vModelNormal);

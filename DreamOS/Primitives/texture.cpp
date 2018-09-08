@@ -261,6 +261,7 @@ RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	m_channels = m_pImage->GetChannels();
 
 	m_pixelFormat = PIXEL_FORMAT::BGRA;	// TODO: move this into image
+	//m_pixelFormat = PIXEL_FORMAT::RGBA;	// TODO: move this into image
 
 	// Flip image
 	//CR(m_pImage->FlipVertical());

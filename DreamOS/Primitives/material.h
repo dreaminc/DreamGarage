@@ -35,6 +35,7 @@ public:
 	RESULT SetBumpiness(float bumpiness);
 	RESULT SetReflectivity(float reflectivity);
 	RESULT SetRefractivity(float refractivity);
+	RESULT SetDisplacement(float displacement);
 
 	RESULT SetUVTiling(float uTiling, float vTiling);
 
@@ -42,7 +43,7 @@ private:
 	float m_shine;				// specular
 	float m_bumpiness;				// bumpiness 
 	float m_ambient;
-	float reserved0;
+	float m_displacement;
 	color m_colorAmbient;
 	color m_colorDiffuse;
 	color m_colorSpecular;

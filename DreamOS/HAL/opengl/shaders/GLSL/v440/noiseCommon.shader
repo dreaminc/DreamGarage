@@ -49,9 +49,9 @@ vec3 getNoiseNormal(vec2 st) {
 
 	float xNormal = (value - valueX) / deltaSize;
 	float yNormal = (value - valueY) / deltaSize;
-	float zNormal = 2.0;
+	float zNormal = 1.0;
 
-	vec3 vNormal = normalize(vec3(xNormal, yNormal, zNormal));
+	vec3 vNormal = normalize(vec3(-xNormal, -yNormal, zNormal));
 
 	//vNormal = smoothstep(.15, .55, vNormal);
 

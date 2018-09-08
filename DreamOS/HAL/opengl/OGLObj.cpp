@@ -306,6 +306,11 @@ Error:
 	return r;
 }
 
+OGLTexture* OGLObj::GetOGLTextureDisplacement() {
+	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(DimObj::GetDisplacementTexture());
+	return pTexture;
+}
+
 OGLTexture* OGLObj::GetOGLTextureBump() {
 	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(DimObj::GetBumpTexture());
 	return pTexture;

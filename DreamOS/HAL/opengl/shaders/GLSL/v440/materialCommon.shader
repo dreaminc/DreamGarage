@@ -7,7 +7,7 @@ struct Material {
 	float m_shine;
 	float m_bumpiness;
 	float m_ambient;
-	float reserved3;
+	float m_displacement;
 	vec4 m_colorAmbient;
 	vec4 m_colorDiffuse;
 	vec4 m_colorSpecular;

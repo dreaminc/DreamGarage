@@ -97,9 +97,72 @@ mat4 xzFlipMatrix = mat4(1.0f, 0.0f, 0.0f, 0.0f,
 						 0.0f, 0.0f, 1.0f, 0.0f,
 						 0.0f, 0.0f, 0.0f, 1.0f);
 
+///*
+vec3 noiseNormal(vec2 uvCoord) {
+	vec3 normalHHHF = getNoiseNormal(vec2(uvCoord * 500000.0) + 0.5f * u_time);
+	vec3 normalHHF = getNoiseNormal(vec2(uvCoord * 5000.0) - 0.25f * u_time);
+	vec3 normalHF = getNoiseNormal(vec2(uvCoord * 1500.0) + 0.3f * u_time);
+	vec3 normalLF = getNoiseNormal(vec2(uvCoord * 100.0) - 0.1f * u_time);
+		
+	vec3 vNormal = 0.0f * normalHHHF + 0.05f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
+	//vec3 vNormal = 1.0f * normalHHF + 0.5f * normalHF;
+	vNormal = normalize(vNormal);
+		
+	vNormal = mix(vNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth) / 100.0f, 0.0f, 1.0f));
+	vNormal.z *= 5.0f;
+	vNormal = normalize(vNormal);
+
+	return vNormal;
+}
+
+float noiseHeight(vec2 uvCoord) {
+	float valHHHF = noise(vec2(uvCoord * 500000.0) + 0.5f * u_time);
+	float valHHF = noise(vec2(uvCoord * 5000.0) - 0.25f * u_time);
+	float valHF = noise(vec2(uvCoord * 1500.0) + 0.3f * u_time);
+	float valLF = noise(vec2(uvCoord * 100.0) - 0.1f * u_time);
+		
+	float val = 0.0f * valHHHF + 0.05f * valHHF + 1.0f * valHF + 0.25f * valLF;
+	//float val = 1.0f * valHHF + 0.5f * valHF;
+	
+	val = mix(val, 0.0f, clamp(abs(DataIn.vertDepth) / 100.0f, 0.0f, 1.0f));
+	val /= 5.0f;
+
+	val = val * 0.5f + 0.5f;
+	
+	return val;
+}
+//*/
+
+float g_scaling = 1000.0f;
+
+/*
+// simple
+vec3 noiseNormal(vec2 uvCoord) {
+	vec3 vNormal = getNoiseNormal(vec2(uvCoord * g_scaling) - 0.1f * u_time);
+	return normalize(vNormal);
+}
+
+float noiseHeight(vec2 uvCoord) {
+	float val = noise(vec2(uvCoord * g_scaling) - 0.1f * u_time) * 0.5f + 0.5f;
+	return val;
+}
+//*/
+
+// Define this function (used to look up)
+float ParallaxMapping_HeightFunction(vec2 uvCoord) {
+	// TODO: displacement texture?
+
+	return noiseHeight(uvCoord);
+}
+
 void main(void) {  
 	
 	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
+
+	// un comment this to apply parallax to water
+	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement);
+	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, 0.1f/15);
+	vec2 texCoords = DataIn.uvCoord;
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;
@@ -117,20 +180,7 @@ void main(void) {
 		TBNNormal = normalize(TBNNormal * 2.0f - 1.0f); 
 	}
 	else {
-		vec2 pos = vec2(DataIn.uvCoord * 500.0);
-		
-		vec3 normalHHHF = getNoiseNormal(vec2(DataIn.uvCoord * 500000.0) + 0.5f * u_time);
-		vec3 normalHHF = getNoiseNormal(vec2(DataIn.uvCoord * 5000.0) - 0.25f * u_time);
-		vec3 normalHF = getNoiseNormal(vec2(DataIn.uvCoord * 1500.0) + 0.3f * u_time);
-		vec3 normalLF = getNoiseNormal(vec2(DataIn.uvCoord * 100.0) - 0.1f * u_time);
-		
-		TBNNormal = 0.0f * normalHHHF + 0.05f * normalHHF + 1.0f * normalHF + 0.25f * normalLF;
-		//TBNNormal = 1.0f * normalHHF + 0.5f * normalHF;
-		TBNNormal = normalize(TBNNormal);
-		
-		TBNNormal = mix(TBNNormal, vec3(0.0f, 0.0f, 1.0f), clamp(abs(DataIn.vertDepth) / 100.0f, 0.0f, 1.0f));
-		TBNNormal.z *= 5.0f;
-		TBNNormal = normalize(TBNNormal);
+		TBNNormal = noiseNormal(texCoords);
 
 		// Turn off bumps
 		//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
@@ -185,15 +235,16 @@ void main(void) {
 
 	vec4 colorAmbient = material.m_ambient * material.m_colorAmbient;
 
+	// This looks a lot better
+	vec4LightValue = colorDiffuse;
+
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 	
 		if(dot(TBNNormal, directionLight) > 0.0f) {
-			// provide shine param
-			CalculateFragmentLightValue(lights[i].m_power, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
-			//CalculateFragmentLightValue(3.5f, 50.0f, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			CalculateFragmentLightValue(lights[i].m_power, material.m_shine, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			
-			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
+			//vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 			//vec4LightValue += specularValue * lights[i].m_colorSpecular * vec4(1.0f);
 		}
