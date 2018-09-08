@@ -111,6 +111,12 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pDreamBrowserForm->SetURI(m_strURL);
 	}
 
+	if (m_fSetAsActive) {
+		m_pUserApp->SetHasOpenApp(true);
+		m_pUserApp->SetEventApp(m_pFormView.get());
+		m_fSetAsActive = false;
+	}
+
 	if (m_fPendShowFormView) {
 		GetComposite()->SetVisible(true, false);
 		CR(Show());
@@ -302,6 +308,11 @@ Error:
 	return r;
 }
 
+RESULT DreamFormApp::SetAsActive() {
+	m_fSetAsActive = true;
+	return R_PASS;
+}
+
 RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
@@ -325,6 +336,9 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 			}
 		}
 		else {
+			if (m_pFormView != nullptr && !m_pFormView->GetViewQuad()->IsVisible()) {
+				Show();
+			}
 			m_pUserApp->ResetAppComposite();
 		}
 		

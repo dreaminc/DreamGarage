@@ -1,9 +1,6 @@
 #ifndef DREAM_ENVIRONMENT_H_
 #define DREAM_ENVIRONMENT_H_
 
-#define MESSAGE_QUAD_WIDTH 2.40f
-#define MESSAGE_QUAD_HEIGHT (MESSAGE_QUAD_WIDTH * 9.0f / 16.0f)
-
 #include "./RESULT/EHM.h"
 #include "DreamApp.h"
 #include "Primitives/point.h"
@@ -11,6 +8,7 @@
 #include <map>
 
 class DreamOS;
+class DreamUserApp;
 class quad;
 class model;
 class light;
@@ -35,10 +33,6 @@ class DreamEnvironmentApp : public DreamApp<DreamEnvironmentApp> {
 	// DreamApp
 public:
 	
-	enum class StartupMessage {
-		WELCOME,
-		UPDATE_REQUIRED
-	};
 
 	DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -63,7 +57,6 @@ public:
 	RESULT HideEnvironment(void *pContext);
 	RESULT ShowEnvironment(void *pContext);
 	RESULT FadeIn();
-	RESULT FadeInWithMessageQuad(StartupMessage startupMessage);
 
 
 	RESULT SwitchToEnvironment(environment::type type);
@@ -83,6 +76,7 @@ private:
 	light *m_pDirectionalSunLight = nullptr;
 	light *m_pDirectionalAmbientLight = nullptr;
 
+	DreamUserApp* m_pUserApp = nullptr;
 
 	// shader programs
 	std::vector<SkyboxScatterProgram*> m_skyboxPrograms;
@@ -110,14 +104,6 @@ public:
 	quaternion GetUIOffsetOrientation(int seatIndex);
 
 private:
-	double m_messageQuadHeight = MESSAGE_QUAD_HEIGHT;
-	double m_messageQuadWidth = MESSAGE_QUAD_WIDTH;
-	// TODO: Generalize this? For seated and unseated scenarios
-	point m_ptMessageQuadPosition = point(-2.5f, 1.3f, 0);
-	std::shared_ptr<quad> m_pMessageQuad = nullptr;
-
-	bool m_fShowUpdateRequired = false;
-
 	float m_environmentSceneScale = 0.025f;
 
 	float m_tableWidth = 112.5f * m_environmentSceneScale;

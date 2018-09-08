@@ -67,6 +67,8 @@ public:
 	RESULT HandleCanTabNext(bool fCanNext) override;
 	RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
+	RESULT SetAsActive();
+
 private:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
@@ -91,6 +93,7 @@ protected:
 
 	bool m_fFormVisible = false;
 	bool m_fPendShowFormView = false;
+	bool m_fSetAsActive = false;
 
 };
 

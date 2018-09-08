@@ -11,6 +11,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "Core/Utilities.h"
 
+#include "DreamUserApp.h"
+
 #include "Scene/ObjectStoreNode.h"
 
 DreamEnvironmentApp::DreamEnvironmentApp(DreamOS *pDreamOS, void *pContext) :
@@ -56,14 +58,6 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	//pDirectionalLight->EnableShadows();
 	
-	m_pMessageQuad = GetComposite()->AddQuad(m_messageQuadWidth, m_messageQuadHeight, 1, 1, nullptr);
-	// Default for when user isn't seated yet.
-	m_pMessageQuad->SetPosition(m_ptMessageQuadPosition);
-	m_pMessageQuad->RotateYByDeg(-90);
-	m_pMessageQuad->RotateZByDeg(90);
-	pDreamOS->AddObjectToUIGraph(m_pMessageQuad.get());
-	m_pMessageQuad->SetVisible(false);
-
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 	CB(m_pSceneGraph->incRefCount());
@@ -96,19 +90,24 @@ RESULT DreamEnvironmentApp::OnAppDidFinishInitializing(void *pContext) {
 }
 
 RESULT DreamEnvironmentApp::Update(void *pContext) {
+	RESULT r = R_PASS;
 
 	for (auto pProgram : m_skyboxPrograms) {
 		pProgram->SetSunDirection(m_vSunDirection);
 	}
 
-	if (m_fShowUpdateRequired) {
-		texture* pMessageTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"launch-update-required.png");
-		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
-		m_pMessageQuad->SetVisible(true);
-		m_fShowUpdateRequired = false;
+	if(m_pUserApp == nullptr) {
+		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
+
+		CB(userUIDs.size() == 1);
+		auto userUID = userUIDs[0];
+
+		m_pUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(userUID, this));
+		CN(m_pUserApp);
 	}
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DreamEnvironmentApp::Shutdown(void *pContext) {
@@ -187,6 +186,11 @@ RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
 	auto fnOnFadeOut = [&](void *pContext) {
 		m_pCurrentEnvironmentModel->SetVisible(false);
 		m_pFadeProgram->FadeIn();
+
+		// Assuming we want to show welcome back quad here
+		m_pUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME_BACK);
+		m_pUserApp->ShowMessageQuad();
+
 		return R_PASS;
 	};
 
@@ -204,6 +208,7 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 	auto fnOnFadeOut = [&](void *pContext) {
 		if (m_pCurrentEnvironmentModel != nullptr) {
 			m_pCurrentEnvironmentModel->SetVisible(true);
+			m_pUserApp->HideMessageQuad();
 		}
 
 		m_pFadeProgram->FadeIn();
@@ -236,28 +241,6 @@ RESULT DreamEnvironmentApp::FadeIn() {
 
 	CNR(m_pFadeProgram, R_SKIPPED);
 	m_pFadeProgram->FadeIn();
-
-Error:
-	return r;
-}
-
-RESULT DreamEnvironmentApp::FadeInWithMessageQuad(StartupMessage startupMessage) {
-	RESULT r = R_PASS;
-
-	// TODO: Calculate position and orientation of message board again if the user is seated - so basically only on logout
-
-	switch (startupMessage) {
-	case StartupMessage::WELCOME: {
-		// stub
-	} break;
-
-	case StartupMessage::UPDATE_REQUIRED: {
-		m_fShowUpdateRequired = true;
-	} break;
-
-	}
-	
-	CR(FadeIn());
 
 Error:
 	return r;

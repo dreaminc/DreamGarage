@@ -469,8 +469,11 @@ RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
 	std::string strFormType;
 
 	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update... 
-		if (m_pDreamEnvironmentApp != nullptr) {
-			CR(m_pDreamEnvironmentApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED));
+		if (m_pDreamUserApp != nullptr) {
+		//	CR(m_pDreamUserApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED));
+			m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::UPDATE_REQUIRED);
+			m_pDreamUserApp->ShowMessageQuad();
+			m_pDreamEnvironmentApp->FadeIn();
 		}
 	}
 	else {
@@ -498,10 +501,14 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 
 		if (!m_fFirstLogin) {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME_BACK));
 		}
 		else {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME));
 		}
+
+		CR(m_pDreamUserApp->ShowMessageQuad());
 
 		CR(m_pUserController->GetFormURL(strFormType));
 
@@ -745,7 +752,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	}
 	else {
 		pCamera->SetOffsetOrientation(qOffset);
-		pCamera->SetPosition(ptSeatPosition + m_pDreamUserApp->GetDepthVector() * -1.0f);
+		pCamera->SetPosition(ptSeatPosition);
 
 		m_pDreamUserApp->SetAppCompositePosition(ptSeatPosition);
 
@@ -1191,7 +1198,10 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
 	//	m_pDreamLoginApp->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
-		CR(m_pDreamLoginApp->Show());
+		//CR(m_pDreamLoginApp->Show());
+
+		// Login app doesn't show at the start, but it needs to receive the controller events in the lobby
+		m_pDreamLoginApp->SetAsActive();
 	}
 	// TODO: general form?
 

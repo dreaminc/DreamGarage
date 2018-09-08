@@ -128,7 +128,6 @@ public:
 
 	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
-	RESULT UpdateWidth(float totalWidth);
 	bool IsEmpty();
 
 	RESULT ShouldUpdateMenuShader();

@@ -74,9 +74,6 @@ public:
 
 	// 
 	RESULT SetViewHeight(float height);
-	// Set Base width and update everything else
-	RESULT ScaleViewWidth(float scale);
-	float GetViewScale();
 
 	// absolute positions
 	point GetCenter();
