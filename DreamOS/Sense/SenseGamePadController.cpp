@@ -16,7 +16,7 @@ SenseGamepadController::~SenseGamepadController() {
 RESULT SenseGamepadController::SetGamepadState(SenseGamepadState gpState) {
 	RESULT r = R_PASS;
 
-	if (gpState.leftJoystick != m_currentGamepadState.leftJoystick) {
+	if (!gpState.leftJoystick.IsZero() && !m_currentGamepadState.leftJoystick.IsZero()) {
 		NotifySubscribers(SENSE_GAMEPAD_JOYSTICK_LEFT, &SenseGamepadEvent(SENSE_GAMEPAD_JOYSTICK_LEFT, gpState.leftJoystick));
 	}
 	if (gpState.rightJoystick != m_currentGamepadState.rightJoystick) {

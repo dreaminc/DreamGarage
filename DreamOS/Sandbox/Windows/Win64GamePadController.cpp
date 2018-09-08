@@ -67,7 +67,6 @@ RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad)
 		if (leftMagnitude > 32767) {
 			leftMagnitude = 32767;
 		}
-
 		// adjust magnitude relative to the end of the dead zone
 		leftMagnitude -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 
@@ -79,9 +78,11 @@ RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad)
 		normalizedLX = 0;
 		normalizedLY = 0;
 	}
+
+	// if the joystick state changed, set new values
 	if (m_leftJoystick(0,0) != normalizedLX && m_leftJoystick(0,1) != normalizedLY) {
-		m_leftJoystick(0,0) = normalizedLX;
-		m_leftJoystick(0,1) = normalizedLY;
+		m_leftJoystick(0,0) = normalizedLX * normalizedLeftMagnitude;
+		m_leftJoystick(0,1) = normalizedLY * normalizedLeftMagnitude;
 		m_currentGamepadState.leftJoystick = m_leftJoystick;
 	}
 	
@@ -99,9 +100,10 @@ RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad)
 		normalizedRX = 0;
 		normalizedRY = 0;
 	}
+
 	if (m_rightJoystick(0,0) != normalizedRX && m_rightJoystick(0,1) != normalizedRY) {
-		m_rightJoystick(0,0) = normalizedRX;
-		m_rightJoystick(0,1) = normalizedRY;
+		m_rightJoystick(0,0) = normalizedRX * normalizedRightMagnitude;
+		m_rightJoystick(0,1) = normalizedRY * normalizedRightMagnitude;
 		m_currentGamepadState.rightJoystick = m_rightJoystick;
 	}
 

@@ -241,7 +241,6 @@ Global
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|ARM64.ActiveCfg = Production|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|ARM64.Build.0 = Production|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|x64.ActiveCfg = Debug|x64
-		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|x64.Build.0 = Debug|x64
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|x86.ActiveCfg = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.Testing|x86.Build.0 = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|Any CPU.ActiveCfg = Release|Any CPU
@@ -251,7 +250,6 @@ Global
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|ARM64.ActiveCfg = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|ARM64.Build.0 = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|x64.ActiveCfg = Release|x64
-		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|x64.Build.0 = Release|x64
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|x86.ActiveCfg = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingRelease|x86.Build.0 = Release|Any CPU
 		{72DE702F-CC98-4A96-B158-D6C718C4853F}.TestingWithReleaseBinaries|Any CPU.ActiveCfg = TestingWithReleaseBinaries|Any CPU
@@ -311,7 +309,6 @@ Global
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|ARM.Build.0 = Release|x64
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|ARM64.ActiveCfg = Testing|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|x64.ActiveCfg = Testing|x64
-		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|x64.Build.0 = Testing|x64
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|x86.ActiveCfg = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.Testing|x86.Build.0 = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|Any CPU.ActiveCfg = Release|x64
@@ -320,7 +317,6 @@ Global
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|ARM.Build.0 = Release|x64
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|ARM64.ActiveCfg = TestingRelease|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|x64.ActiveCfg = TestingRelease|x64
-		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|x64.Build.0 = TestingRelease|x64
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|x86.ActiveCfg = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingRelease|x86.Build.0 = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.TestingWithReleaseBinaries|Any CPU.ActiveCfg = TestingWithReleaseBinaries|Win32
