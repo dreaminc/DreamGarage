@@ -587,7 +587,7 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		// Acquire manifold accordingly
 		if (activeObjectType == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
-
+			
 			if (pDimObj->Intersect(interactionEvent.m_interactionRay)) {
 				manifold = pDimObj->Collide(interactionEvent.m_interactionRay);
 				fIntersect = true;

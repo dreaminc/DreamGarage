@@ -33,6 +33,13 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
+	// Lets fake a sphere test for early exit
+	vector vScale = GetScale(true);
+	vector vHV = vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
+	float distance = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin()).magnitude();
+	if (abs(distance) > (rhs.GetRadius() + vHV.magnitude()))
+		return false;
+
 	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin();
 	point ptMax = GetMaxPoint();
 	point ptMin = GetMinPoint();

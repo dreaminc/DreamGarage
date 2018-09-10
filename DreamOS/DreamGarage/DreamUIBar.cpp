@@ -525,6 +525,7 @@ Error:
 
 RESULT DreamUIBar::Update(void *pContext) {
 	RESULT r = R_PASS;
+
 	DreamOS *pDreamOS = GetDOS();
 
 	// Makes sense for UIBar to always have a user run with it for now

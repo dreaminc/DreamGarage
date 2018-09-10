@@ -60,6 +60,7 @@ public:
 	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) override;
 
 	virtual RESULT RenderHMDMirror() override;
+	virtual RESULT RecenterHMD() override;
 
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;

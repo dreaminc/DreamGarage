@@ -80,6 +80,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fUseGamepad = true;
+	sandboxconfig.fInitSound = false;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -422,6 +424,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	// DEBUG:
 #ifdef _DEBUG
 	{
+		m_fHasCredentials = true;
+
 		std::map<int, std::string> testRefreshTokens = {
 			{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
 			{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },

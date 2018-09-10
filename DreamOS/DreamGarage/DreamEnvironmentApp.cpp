@@ -92,9 +92,9 @@ RESULT DreamEnvironmentApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamEnvironmentApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	for (auto pProgram : m_skyboxPrograms) {
-		pProgram->SetSunDirection(m_vSunDirection);
-	}
+	//for (auto pProgram : m_skyboxPrograms) {
+	//	pProgram->SetSunDirection(m_vSunDirection);
+	//}
 
 	if(m_pUserApp == nullptr) {
 		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");

@@ -702,6 +702,11 @@ RESULT OpenVRDevice::RenderHMDMirror() {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT OpenVRDevice::RecenterHMD() {
+	return R_NOT_IMPLEMENTED;
+}
+
+
 ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	vr::EVREye eyeType = (eye == EYE_LEFT) ? vr::Eye_Left : vr::Eye_Right;
 
