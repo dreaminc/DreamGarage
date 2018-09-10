@@ -392,7 +392,7 @@ RESULT DreamGarage::DidFinishLoading() {
 		m_pDreamEnvironmentApp->SetScreenFadeProgram(m_pScreenFadeProgramNode);
 	}
 
-	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this);
+	m_pDreamShareView = LaunchDreamApp<DreamShareView>(this, false);
 	CN(m_pDreamShareView);
 
 	m_pDreamSettings = LaunchDreamApp<DreamSettingsApp>(this, false);

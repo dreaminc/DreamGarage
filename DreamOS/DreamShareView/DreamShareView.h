@@ -85,9 +85,15 @@ private:
 private:
 	// Quad related members
 	std::shared_ptr<quad> m_pCastQuad = nullptr;
+	std::shared_ptr<quad> m_pCastBackgroundQuad = nullptr;
+
 	std::shared_ptr<texture> m_pCastTexture = nullptr;
+	std::shared_ptr<texture> m_pCastBackgroundTexture = nullptr;
 	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
+
+	std::shared_ptr<quad> m_pTestTeamLabelQuad = nullptr;
+	std::shared_ptr<quad> m_pTestTeamLabelTexture = nullptr;
 
 	int m_castpxWidth = PX_WIDTH;
 	int m_castpxHeight = PX_HEIGHT;
@@ -105,6 +111,9 @@ private:
 	DreamShareViewMessage::type m_currentAckType;
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
+
+private:
+//	std::shared_ptr<UIView> 
 
 };
 
