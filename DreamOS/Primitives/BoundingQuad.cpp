@@ -114,6 +114,7 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 
 bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 	
+	// TODO: Change the arch to utilize inheritence and not duplicate this code
 	// Lets fake a sphere test for early exit
 	vector vScale = GetScale(true);
 	//vector vHV = vector(m_width/2.0f * vScale.x(), m_height/2.0f * vScale.y(), length * vScale.z());
