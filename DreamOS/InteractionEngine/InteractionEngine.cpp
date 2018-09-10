@@ -798,16 +798,18 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	auto timeNow = std::chrono::high_resolution_clock::now();
-	auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
-	m_lastUpdateTime = timeNow;
+	// turning off time step for now
 
-	m_elapsedTime += timeDelta;
-
-	if (m_elapsedTime >= m_sTimeStep) {
-
-		//m_elapsedTime = m_elapsedTime - m_sTimeStep;
-		m_elapsedTime = 0;
+	//auto timeNow = std::chrono::high_resolution_clock::now();
+	//auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
+	//m_lastUpdateTime = timeNow;
+	//
+	//m_elapsedTime += timeDelta;
+	//
+	//if (m_elapsedTime >= m_sTimeStep) {
+	//
+	//	//m_elapsedTime = m_elapsedTime - m_sTimeStep;
+	//	m_elapsedTime = 0;
 
 		//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
 		for (auto &activeObjectQueue : m_activeObjectQueues) {
@@ -842,7 +844,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 			CR(UpdateCapturedObjectStore());
 		}
 
-	}
+	//}
 
 Error:
 	return r;
