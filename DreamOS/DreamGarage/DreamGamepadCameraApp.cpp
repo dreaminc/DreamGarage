@@ -69,15 +69,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		// X
 		// moving right
 		if (m_leftStick(0, 0) > 0.15) {
-			if (m_leftStick(0, 0) > 0.1) {
-				m_xVelocity += msTimeStep / (100.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
-				util::Clamp<float>(m_xVelocity, 0.0001f, 15.0f * m_leftStick(0, 0));
-			}
+			m_xVelocity += msTimeStep / (100.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
 		}
 		// moving left
 		else if (m_leftStick(0,0) < -0.15) {
 			m_xVelocity += msTimeStep / (100.0 / m_leftStick(0, 0));
-			util::Clamp<float>(m_xVelocity, 15.0f * m_leftStick(0, 0), -.0001f);
 		}
 		else {
 			if (m_xVelocity < 0) {
@@ -98,7 +94,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_pCamera->RotateCameraByDiffXY(m_rightStick(0, 0), -m_rightStick(0, 1));
 
 		m_pCamera->MoveUp(m_leftTriggerValue + m_rightTriggerValue);
-		DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)m_xVelocity, (double)m_leftStick(0, 0));	// *10000 for readability
+		DEBUG_LINEOUT_RETURN("Camera moving: vel:%0.8f stick:%0.8f", (double)m_xVelocity, (double)m_leftStick(0, 0));	
 	}
 
 Error:

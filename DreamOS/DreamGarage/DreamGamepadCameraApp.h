@@ -44,8 +44,6 @@ private:
 
 	point2D m_rightStick;
 
-	point2D m_leftStickPrevious = 0.0f;
-
 	float m_xVelocity = 0.0f;
 	float m_yVelocity = 0.0f;
 	float m_zVelocity = 0.0f;
