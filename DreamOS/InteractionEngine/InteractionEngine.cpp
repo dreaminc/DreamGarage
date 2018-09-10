@@ -798,37 +798,50 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
-	for (auto &activeObjectQueue : m_activeObjectQueues) {
+	auto timeNow = std::chrono::high_resolution_clock::now();
+	auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
+	m_lastUpdateTime = timeNow;
 
-		std::vector<VirtualObj*> capturedObjectsToRemove;
-		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
+	m_elapsedTime += timeDelta;
 
-		//TODO: extend capture object implementation to handle multiple captured objects
+	if (m_elapsedTime >= m_sTimeStep) {
 
-		// TODO: First pass (no state tracking yet)
-		// Set all objects to non-intersected - below will set it to intersected, then remaining
-		// non-intersected objects are clearly no longer in the active set
-		CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
+		//m_elapsedTime = m_elapsedTime - m_sTimeStep;
+		m_elapsedTime = 0;
 
-		CR(UpdateCapturedObjectStore());
+		//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
+		for (auto &activeObjectQueue : m_activeObjectQueues) {
 
-		for (auto &pInteractionObject : m_interactionObjects) {
-			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
-			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+			std::vector<VirtualObj*> capturedObjectsToRemove;
+			std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
 
-			UpdateCapturedObjects(pInteractionObject);
+			//TODO: extend capture object implementation to handle multiple captured objects
 
-			for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
-				// Add to remove list if not intersected in current frame
-				if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+			// TODO: First pass (no state tracking yet)
+			// Set all objects to non-intersected - below will set it to intersected, then remaining
+			// non-intersected objects are clearly no longer in the active set
+			CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
+
+			CR(UpdateCapturedObjectStore());
+
+			for (auto &pInteractionObject : m_interactionObjects) {
+				//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
+				CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+
+				UpdateCapturedObjects(pInteractionObject);
+
+				for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
+					// Add to remove list if not intersected in current frame
+					if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+						activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+					}
 				}
+				auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
+				CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
 			}
-			auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
-			CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
+			CR(UpdateCapturedObjectStore());
 		}
-		CR(UpdateCapturedObjectStore());
+
 	}
 
 Error:
