@@ -208,18 +208,22 @@ Error:
 }
 
 bool Windows64App::CheckForInternetConnection() {
-	{
-	INetworkListManager* pNetworkListManager;
+	INetworkListManager* pNetworkListManager = nullptr;
 
 	if (SUCCEEDED(CoCreateInstance(CLSID_NetworkListManager, NULL, CLSCTX_ALL, IID_INetworkListManager, (LPVOID*)&pNetworkListManager))) {
 		// Creating the object was successful.
 
-		VARIANT_BOOL* pfIsConnected;	// it's a pointer to a bool?!
+		VARIANT_BOOL pfIsConnected;	// it's a pointer to a bool?!
 
-		if (SUCCEEDED(pNetworkListManager->get_IsConnectedToInternet(pfIsConnected))) {
-			// The function call succeeded.
+		pNetworkListManager->get_IsConnectedToInternet(&pfIsConnected);
+		// The function call succeeded.
+		if (pfIsConnected == VARIANT_TRUE) {
 			CoUninitialize();
 			return true;
+		}
+		else {
+			CoUninitialize();
+			return false;
 		}
 	}
 	// Uninitialize COM.
