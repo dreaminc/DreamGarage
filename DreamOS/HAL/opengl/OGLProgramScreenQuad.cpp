@@ -127,7 +127,7 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	UpdateFramebufferToCamera(m_pParentImp->GetCamera(), GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
-	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+	//CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
 
 	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
