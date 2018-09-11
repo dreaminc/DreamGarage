@@ -50,14 +50,10 @@ RESULT UIFlatScrollView::Update() {
 		
 	}
 
-	//static bool fFirst = true;
-
 	if (m_pRenderContext != nullptr && m_pRenderQuad != nullptr) {
 		m_pRenderContext->RenderToQuad(m_pRenderQuad.get(), 0.0f, 0.0f);
 	}
-
-	//fFirst = false;
-		
+			
 	m_frameMs = msNow;
 	return r;
 }
