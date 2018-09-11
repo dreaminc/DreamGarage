@@ -35,11 +35,11 @@ RESULT CEFBrowserManager::Initialize() {
 
 	JOBOBJECT_CPU_RATE_CONTROL_INFORMATION jobCRCI = { 0 };
 	//jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
-	m_dreamJobHandle = CreateJobObjectW(nullptr, L"DreamJob");
-	CNM(m_dreamJobHandle, "Failed to create job object");
+	m_hDreamJob = CreateJobObjectW(nullptr, L"DreamJob");
+	CNM(m_hDreamJob, "Failed to create job object");
 
-	SetInformationJobObject(m_dreamJobHandle, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
-	SetInformationJobObject(m_dreamJobHandle, JobObjectCpuRateControlInformation, &jobCRCI, sizeof(jobCRCI));
+	SetInformationJobObject(m_hDreamJob, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
+	SetInformationJobObject(m_hDreamJob, JobObjectCpuRateControlInformation, &jobCRCI, sizeof(jobCRCI));
 
 	CR(CEFManagerThread());
 
@@ -359,22 +359,22 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 		PROCESSENTRY32 processInfo;
 		processInfo.dwSize = sizeof(PROCESSENTRY32);
 
-		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+		if (hSnapshot != nullptr) {
+			if (Process32First(hSnapshot, &processInfo) == TRUE) {
+				while (Process32Next(hSnapshot, &processInfo) == TRUE) {
+					if (wcscmp(processInfo.szExeFile, L"DreamCef.exe") == 0) {
+						HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.th32ProcessID);
 
-		if (Process32First(snapshot, &processInfo) == TRUE)
-		{
-			while (Process32Next(snapshot, &processInfo) == TRUE)
-			{
-				if (wcscmp(processInfo.szExeFile, L"DreamCef.exe") == 0)
-				{
-					HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.th32ProcessID);
-
-					AssignProcessToJobObject(m_dreamJobHandle, hProcess);
-					CloseHandle(hProcess);
+						if (hProcess != nullptr) {
+							AssignProcessToJobObject(m_hDreamJob, hProcess);
+							CloseHandle(hProcess);
+						}
+					}
 				}
 			}
+			CloseHandle(hSnapshot);
 		}
-		CloseHandle(snapshot);
 	}
 
 	// Success:

@@ -80,7 +80,7 @@ private:
 	const std::string k_CEFProcessName = CEF_PROCESS_NAME_DEFAULT;
 	std::thread m_ServiceThread;
 
-	HANDLE m_dreamJobHandle = nullptr;
+	HANDLE m_hDreamJob = nullptr;
 
 	std::mutex m_mutex;
 };
