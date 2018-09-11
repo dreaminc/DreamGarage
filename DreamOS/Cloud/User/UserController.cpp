@@ -830,6 +830,19 @@ Error:
 	return r;
 }
 
+RESULT UserController::ClearLoginState() {
+	RESULT r = R_PASS;
+
+	m_loginState = { 0 };
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CN(pEnvironmentController);
+	pEnvironmentController->DisconnectFromEnvironmentSocket();
+
+Error:
+	return r;
+}
+
 RESULT UserController::UpdateLoginState() {
 	RESULT r = R_PASS;
 

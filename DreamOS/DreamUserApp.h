@@ -198,8 +198,10 @@ public:
 public:
 	enum class StartupMessage {
 		WELCOME,
-		WELCOME_BACK,
+		SIGN_IN,
 		UPDATE_REQUIRED,
+		INVALID_REFRESH_TOKEN,
+		INTERNET_REQUIRED,
 		INVALID
 	};
 
@@ -214,13 +216,16 @@ public:
 private:
 	std::wstring k_wstrUpdateRequired = L"LaunchQuad/launch-update-required.png"; 
 	std::wstring k_wstrWelcome = L"LaunchQuad/launch-welcome.png"; 
-	std::wstring k_wstrWelcomeBack = L"LaunchQuad/launch-welcome-back.png"; 
+	std::wstring k_wstrSignIn = L"LaunchQuad/launch-sign-in.png"; 
+	std::wstring k_wstrInternetRequired = L"LaunchQuad/launch-internet-required.png"; 
 
 private:
 	std::map<StartupMessage, std::wstring> m_textureStringFromStartupMessage = {
 		{ StartupMessage::UPDATE_REQUIRED, k_wstrUpdateRequired },
 		{ StartupMessage::WELCOME, k_wstrWelcome },
-		{ StartupMessage::WELCOME_BACK, k_wstrWelcomeBack }
+		{ StartupMessage::SIGN_IN, k_wstrSignIn },
+		{ StartupMessage::INVALID_REFRESH_TOKEN, k_wstrSignIn },
+		{ StartupMessage::INTERNET_REQUIRED, k_wstrInternetRequired }
 	};
 
 private:
