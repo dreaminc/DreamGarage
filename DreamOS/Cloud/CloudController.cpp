@@ -128,7 +128,7 @@ RESULT CloudController::Start(bool fLoginOnStart) {
 
 	m_fLoginOnStart = fLoginOnStart;
 
-	m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
+	//m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
 
 Error:
 	return r;
@@ -143,7 +143,7 @@ RESULT CloudController::Start(std::string strUsername, std::string strPassword, 
 
 	m_fLoginOnStart = true;
 
-	m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
+	//m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
 
 Error:
 	return r;

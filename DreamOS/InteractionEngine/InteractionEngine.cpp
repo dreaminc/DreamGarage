@@ -587,7 +587,7 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		// Acquire manifold accordingly
 		if (activeObjectType == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
-
+			
 			if (pDimObj->Intersect(interactionEvent.m_interactionRay)) {
 				manifold = pDimObj->Collide(interactionEvent.m_interactionRay);
 				fIntersect = true;
@@ -798,38 +798,53 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
-	for (auto &activeObjectQueue : m_activeObjectQueues) {
+	// turning off time step for now
 
-		std::vector<VirtualObj*> capturedObjectsToRemove;
-		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
+	//auto timeNow = std::chrono::high_resolution_clock::now();
+	//auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
+	//m_lastUpdateTime = timeNow;
+	//
+	//m_elapsedTime += timeDelta;
+	//
+	//if (m_elapsedTime >= m_sTimeStep) {
+	//
+	//	//m_elapsedTime = m_elapsedTime - m_sTimeStep;
+	//	m_elapsedTime = 0;
 
-		//TODO: extend capture object implementation to handle multiple captured objects
+		//TODO: this should be called activeObjectQueuePair, because only the second value is the activeObjectQueue
+		for (auto &activeObjectQueue : m_activeObjectQueues) {
 
-		// TODO: First pass (no state tracking yet)
-		// Set all objects to non-intersected - below will set it to intersected, then remaining
-		// non-intersected objects are clearly no longer in the active set
-		CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
+			std::vector<VirtualObj*> capturedObjectsToRemove;
+			std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
 
-		CR(UpdateCapturedObjectStore());
+			//TODO: extend capture object implementation to handle multiple captured objects
 
-		for (auto &pInteractionObject : m_interactionObjects) {
-			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
-			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+			// TODO: First pass (no state tracking yet)
+			// Set all objects to non-intersected - below will set it to intersected, then remaining
+			// non-intersected objects are clearly no longer in the active set
+			CR(activeObjectQueue.second.SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
 
-			UpdateCapturedObjects(pInteractionObject);
+			CR(UpdateCapturedObjectStore());
 
-			for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
-				// Add to remove list if not intersected in current frame
-				if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+			for (auto &pInteractionObject : m_interactionObjects) {
+				//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
+				CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+
+				UpdateCapturedObjects(pInteractionObject);
+
+				for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
+					// Add to remove list if not intersected in current frame
+					if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+						activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+					}
 				}
+				auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
+				CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
 			}
-			auto removePair = std::pair<ActiveObject::type, ActiveObjectQueue*>(activeObjectQueue.first, &activeObjectQueue.second);
-			CR(RemoveActiveObjects(activeObjectsToRemove, removePair, pInteractionObject));
+			CR(UpdateCapturedObjectStore());
 		}
-		CR(UpdateCapturedObjectStore());
-	}
+
+	//}
 
 Error:
 	return r;

@@ -139,13 +139,33 @@ RESULT OpenGLImp::CheckGLError() {
 
 	GLenum glerr = glGetError();
 	switch (glerr) {
-		case GL_NO_ERROR: return R_PASS; break;
-		case GL_INVALID_ENUM: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_ENUM"); break;
-		case GL_INVALID_VALUE: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_VALUE"); break;
-		case GL_INVALID_OPERATION: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_OPERATION"); break;
-		case GL_STACK_OVERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_OVERFLOW"); break;
-		case GL_STACK_UNDERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_UNDERFLOW"); break;
-		case GL_OUT_OF_MEMORY: CBRM(false, R_FAIL, "CheckGLError: GL_OUT_OF_MEMORY"); break;
+		case GL_NO_ERROR: {
+			return R_PASS;
+		} break;
+
+		case GL_INVALID_ENUM: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_ENUM");
+		} break;
+
+		case GL_INVALID_VALUE: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_VALUE");
+		} break;
+
+		case GL_INVALID_OPERATION: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_OPERATION");
+		} break;
+
+		case GL_STACK_OVERFLOW: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_STACK_OVERFLOW");
+		} break;
+
+		case GL_STACK_UNDERFLOW: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_STACK_UNDERFLOW");
+		} break;
+
+		case GL_OUT_OF_MEMORY: {
+			CBRM(false, R_FAIL, "CheckGLError: GL_OUT_OF_MEMORY");
+		} break;
 	}
 
 Error:
@@ -1814,13 +1834,13 @@ Error:
 }
 
 RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
-	//RESULT r = R_PASS;
+	RESULT r = R_PASS;
 
 	glBindTexture(target, texture);
 	//CRM(CheckGLError(), "glBindTexture failed");
 
-//Error:
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {

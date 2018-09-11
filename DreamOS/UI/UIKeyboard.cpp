@@ -230,7 +230,7 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 
 		auto pView = m_pSurfaceContainer->AddUIView(GetDOS());
-		m_pUIControlBar = pView->AddUIControlBar();
+		m_pUIControlBar = pView->AddUIControlBar(BarType::KEYBOARD);
 
 
 		m_pUIControlBar->RegisterObserver(this);

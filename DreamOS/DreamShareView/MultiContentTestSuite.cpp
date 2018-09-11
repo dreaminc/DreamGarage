@@ -707,7 +707,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			if (strMessage == "DreamLoginApp.OnSuccess") {
 				// TODO:
 				CR(pLoginApp->SetLaunchDate());
-				CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
+				//CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
 
 				/*
 				CR(pUserController->RequestSetSettings(wstrHardwareId,
@@ -726,9 +726,9 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 			RESULT r = R_PASS;
 
-			CR(pUserApp->UpdateHeight(height));
-			CR(pUserApp->UpdateDepth(depth));
-			CR(pUserApp->UpdateScale(scale));
+			//CR(pUserApp->UpdateHeight(height));
+			//CR(pUserApp->UpdateDepth(depth));
+			//CR(pUserApp->UpdateScale(scale));
 
 			// get team 
 			pUserController->GetTeam(pLoginApp->GetAccessToken());
@@ -1161,14 +1161,14 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_DOWN) {// && pEvent->state.triggerRange < 0.5f) {
 				if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
-					m_scale = pUserControlArea->GetViewScale() + 0.003f;
+//					m_scale = pUserControlArea->GetViewScale() + 0.003f;
 					fLeft = true;
 				}
 				else {
-					m_scale = pUserControlArea->GetViewScale() - 0.003f;
+//					m_scale = pUserControlArea->GetViewScale() - 0.003f;
 					fRight = true;
 				}
-				pUserControlArea->ScaleViewWidth(m_scale);
+//				pUserControlArea->ScaleViewWidth(m_scale);
 			}
 
 			else if (pEvent->type == SENSE_CONTROLLER_TRIGGER_UP) {
@@ -1198,7 +1198,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			point ptCamera = pCamera->GetEyePosition(EYE_MONO);
 			pCamera->SetHMDAdjustedPosition(point(ptCamera.x(), ptCamera.y(), m_depth + ptCamera.z()));
 
-			pUserControlArea->ScaleViewWidth(m_scale);
+//			pUserControlArea->ScaleViewWidth(m_scale);
 
 		//Error:
 			return r;
@@ -1296,7 +1296,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		}
 
-//*
+/*
 		if (pTestContext->fLeft) {
 			pTestContext->pUserControlArea->ScaleViewWidth(pTestContext->pUserControlArea->GetViewScale() + 0.003f);
 		}

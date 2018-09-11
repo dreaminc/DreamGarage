@@ -298,7 +298,7 @@ RESULT DreamUserApp::Update(void *pContext) {
 		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
 		m_pOrientationRay->SetVisible(false);
-		CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
+		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 	m_pOrientationRay->SetPosition(pCameraNode->GetPosition());
 

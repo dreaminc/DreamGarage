@@ -53,7 +53,7 @@ RESULT UIFlatScrollView::Update() {
 	if (m_pRenderContext != nullptr && m_pRenderQuad != nullptr) {
 		m_pRenderContext->RenderToQuad(m_pRenderQuad.get(), 0.0f, 0.0f);
 	}
-		
+			
 	m_frameMs = msNow;
 	return r;
 }

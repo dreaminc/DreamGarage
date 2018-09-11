@@ -113,6 +113,16 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 }
 
 bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
+	
+	// TODO: Change the arch to utilize inheritence and not duplicate this code
+	// Lets fake a sphere test for early exit
+	vector vScale = GetScale(true);
+	//vector vHV = vector(m_width/2.0f * vScale.x(), m_height/2.0f * vScale.y(), length * vScale.z());
+	float quadRadiusSquared = pow((m_width / 2.0f)*vScale.x(), 2.0f) + pow((m_height / 2.0f)*vScale.y(), 2.0f);
+	double distance = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin()).magnitude();
+	if ((distance * distance) > (rhs.GetRadiusSquared() + quadRadiusSquared))
+		return false;
+	
 	// First calculate rotation per normal and re-orient
 
 	//quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
@@ -120,7 +130,8 @@ bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 	RotationMatrix matRotation = RotationMatrix(qOrientation);
 
 	point ptSphereOrigin = inverse(matRotation) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
-	double distance = ptSphereOrigin.y();
+	//double distance = ptSphereOrigin.y();
+	distance = ptSphereOrigin.y();
 
 	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
 		//point ptMax = GetMaxPoint();

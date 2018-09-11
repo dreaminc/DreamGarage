@@ -78,8 +78,10 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitSound = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fUseGamepad = true;
+	sandboxconfig.fInitSound = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -232,13 +234,14 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
+		//ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenFade);
 		CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 		m_pScreenFadeProgramNode = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
 		// Connect Program to Display
-		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
 
 		//CR(pHAL->ReleaseCurrentContext());
 
@@ -422,6 +425,8 @@ RESULT DreamGarage::DidFinishLoading() {
 	// DEBUG:
 #ifdef _DEBUG
 	{
+		m_fHasCredentials = true;
+
 		std::map<int, std::string> testRefreshTokens = {
 			{ 0, "NakvA43v1eVBqvvTJuqUdXHWL02CNuDqrgHMEBrIY6P5FoHZ2GtgbCVDYvHMaRTw" },
 			{ 1, "daehZbIcTcXaPh29tWQy75ZYSLrRL4prhBoBYMRQtU48NMs6svnt5CkzCA5RLKJq" },
