@@ -207,7 +207,7 @@ Error:
 	return r;
 }
 
-bool Windows64App::CheckForInternetConnection() {
+bool Windows64App::IsConnectedToInternet() {
 	INetworkListManager* pNetworkListManager = nullptr;
 
 	if (SUCCEEDED(CoCreateInstance(CLSID_NetworkListManager, NULL, CLSCTX_ALL, IID_INetworkListManager, (LPVOID*)&pNetworkListManager))) {
