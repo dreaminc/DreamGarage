@@ -396,7 +396,7 @@ RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	
 	m_pParentApp = pParentApp;
 	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture, this);
-	CRM(StartDuplicationProcess(), "Error starting duplication process");
+	//CRM(StartDuplicationProcess(), "Error starting duplication process");
 	
 Error:
 	return r;

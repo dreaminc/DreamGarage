@@ -10,6 +10,9 @@
 
 #include "Sandbox/PathManager.h"
 
+#include <tlhelp32.h>
+#include <windows.h>
+
 CEFBrowserManager::CEFBrowserManager() {
 	// empty
 }
@@ -27,9 +30,20 @@ Error:
 RESULT CEFBrowserManager::Initialize() {
 	RESULT r = R_PASS;
 
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobELI = { 0 };	// In case we want to add memory limits, and can track peak usage
+	jobELI.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+	JOBOBJECT_CPU_RATE_CONTROL_INFORMATION jobCRCI = { 0 };
+	//jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
+	m_hDreamJob = CreateJobObjectW(nullptr, L"DreamJob");
+	CNM(m_hDreamJob, "Failed to create job object");
+
+	SetInformationJobObject(m_hDreamJob, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
+	SetInformationJobObject(m_hDreamJob, JobObjectCpuRateControlInformation, &jobCRCI, sizeof(jobCRCI));
+
 	CR(CEFManagerThread());
 
-	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");
+	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");	
 
 // Success:
 	return r;
@@ -308,13 +322,13 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	std::wstring wstrAppDataPath;
 	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
 	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
-	
+
 	CefString(&cefSettings.cache_path) = wstrAppDataPath;
 #endif
-	
+
 	cefSettings.remote_debugging_port = 8080;
 	cefSettings.background_color = CefColorSetARGB(255, 255, 255, 255);
-	
+
 #ifdef _DEBUG
 	cefSettings.single_process = true;
 #endif
@@ -340,6 +354,28 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	//*/
 
 	DOSLOG(INFO, "CEF thread complete...");
+
+	{
+		PROCESSENTRY32 processInfo;
+		processInfo.dwSize = sizeof(PROCESSENTRY32);
+
+		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+		if (hSnapshot != nullptr) {
+			if (Process32First(hSnapshot, &processInfo) == TRUE) {
+				while (Process32Next(hSnapshot, &processInfo) == TRUE) {
+					if (wcscmp(processInfo.szExeFile, L"DreamCef.exe") == 0) {
+						HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.th32ProcessID);
+
+						if (hProcess != nullptr) {
+							AssignProcessToJobObject(m_hDreamJob, hProcess);
+							CloseHandle(hProcess);
+						}
+					}
+				}
+			}
+			CloseHandle(hSnapshot);
+		}
+	}
 
 	// Success:
 	return r;
