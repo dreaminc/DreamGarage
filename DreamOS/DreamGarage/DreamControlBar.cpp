@@ -27,7 +27,7 @@ RESULT DreamControlBar::InitializeApp(void *pContext) {
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	CN(m_pView);
 
-	m_pUIControlBar = m_pView->AddUIControlBar();
+	m_pUIControlBar = m_pView->AddUIControlBar(BarType::BROWSER);
 	CN(m_pUIControlBar);
 	m_pUIControlBar->RegisterObserver(this);
 

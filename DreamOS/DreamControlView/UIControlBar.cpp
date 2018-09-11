@@ -5,8 +5,9 @@
 #include "Primitives/text.h"
 #include "Primitives/font.h"
 
-UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
-	UIView(pHALImp,pDreamOS)
+UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS, BarType barType) :
+	UIView(pHALImp,pDreamOS),
+	m_barType(barType)
 {
 	RESULT r = R_PASS;
 
@@ -31,85 +32,94 @@ RESULT UIControlBar::Initialize() {
 	CN(m_pDreamOS);
 	m_pDreamOS->AddObjectToInteractionGraph(this);
 
+
 	// create textures 
-	m_pBackTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack);
-	m_pForwardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward);
-	m_pBackDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled);
-	m_pForwardDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled);
-	m_pHideTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide);
-	m_pShowTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow);
-	m_pOpenTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen);
-	m_pCloseTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose);
-	m_pURLTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL);
-	m_pShareTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare);
-	m_pStopSharingTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing);
-	m_pKeyboardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard);
-	m_pTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszTab);
-	m_pCantTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab);
-	m_pBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab);
-	m_pCantBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab);
-	m_pDoneTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszDone);
+	if (m_barType == BarType::BROWSER || m_barType == BarType::DESKTOP) {
+		m_pBackTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack);
+		m_pForwardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward);
+		m_pBackDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled);
+		m_pForwardDisabledTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled);
+		m_pHideTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide);
+		m_pShowTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow);
+		m_pOpenTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen);
+		m_pCloseTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose);
+		m_pURLTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL);
+		m_pShareTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare);
+		m_pStopSharingTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing);
+		m_pKeyboardTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard);
+	}
+	else if (m_barType == BarType::KEYBOARD) {
+		m_pTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszTab);
+		m_pCantTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab);
+		m_pBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab);
+		m_pCantBackTabTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab);
+		m_pDoneTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszDone);
+	}
 
 	// create buttons
 
-	m_pBackButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
+	if (m_barType == BarType::BROWSER || m_barType == BarType::DESKTOP) {
+		m_pBackButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
 
-	m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+		m_pForwardButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
 
-	m_pKeyboardButton = AddUIButton((2.0f * m_itemSide + m_itemSpacing), m_itemSide);
-	m_pKeyboardButton->GetSurface()->SetDiffuseTexture(m_pKeyboardTexture);
+		m_pKeyboardButton = AddUIButton((2.0f * m_itemSide + m_itemSpacing), m_itemSide);
+		m_pKeyboardButton->GetSurface()->SetDiffuseTexture(m_pKeyboardTexture);
 
-	m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
+		m_pToggleButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pToggleButton->GetSurface()->SetDiffuseTexture(m_pHideTexture);
 
-	m_pOpenButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pOpenButton->GetSurface()->SetDiffuseTexture(m_pOpenTexture);
+		m_pOpenButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pOpenButton->GetSurface()->SetDiffuseTexture(m_pOpenTexture);
 
-	m_pCloseButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pCloseButton->GetSurface()->SetDiffuseTexture(m_pCloseTexture);
+		m_pCloseButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pCloseButton->GetSurface()->SetDiffuseTexture(m_pCloseTexture);
 
-	m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
-	m_pShareToggleButton->GetSurface()->SetDiffuseTexture(m_pShareTexture);
+		m_pShareToggleButton = AddUIButton(m_itemSide, m_itemSide);
+		m_pShareToggleButton->GetSurface()->SetDiffuseTexture(m_pShareTexture);
 
-	m_pTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
-	m_pTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
+		m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
+		m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
 
-	m_pBackTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
-	m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pBackTabTexture);
+		// Set-up text for url/title
+		{
+			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
 
-	m_pDoneButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
-	m_pDoneButton->GetSurface()->SetDiffuseTexture(m_pDoneTexture);
+			auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+			m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
+				"",
+				m_urlWidth - m_itemSpacing,
+				m_itemSide - (2.0f*m_itemSpacing),
+				textFlags));
 
-	m_pURLButton = AddUIButton(m_urlWidth, m_itemSide);
-	m_pURLButton->GetSurface()->SetDiffuseTexture(m_pURLTexture);
+			m_pURLText->RotateXByDeg(90.0f);
+			m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+			m_pURLButton->AddObject(m_pURLText);
+		}
+	}
+	else if (m_barType == BarType::KEYBOARD) {
+		m_pTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
+		m_pTabButton->GetSurface()->SetDiffuseTexture(m_pTabTexture);
+
+		m_pBackTabButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
+		m_pBackTabButton->GetSurface()->SetDiffuseTexture(m_pBackTabTexture);
+
+		m_pDoneButton = AddUIButton(m_itemSide*2.0f + m_itemSpacing, m_itemSide);
+		m_pDoneButton->GetSurface()->SetDiffuseTexture(m_pDoneTexture);
+	}
 
 	// register all of the buttons (except for the URL button) for the selection event
 	// URL button has become less useful with the addition of the open button
 	for (auto pButton : { m_pBackButton, m_pForwardButton, m_pKeyboardButton, m_pToggleButton, m_pCloseButton, m_pOpenButton, m_pShareToggleButton, m_pTabButton, m_pBackTabButton, m_pDoneButton/*, m_pURLButton*/ }) {
-		CN(pButton);
-		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		if (pButton != nullptr) {
+			CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
-		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
-	}
-
-	// Set-up text for url/title
-	{
-		auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
-
-		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
-			"",
-			m_urlWidth - m_itemSpacing,
-			m_itemSide - (2.0f*m_itemSpacing),
-			textFlags));
-
-		m_pURLText->RotateXByDeg(90.0f);
-		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-		m_pURLButton->AddObject(m_pURLText);
+			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
+				std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
+		}
 	}
 
 	CR(UpdateButtonsWithType(m_barType));
@@ -152,17 +162,22 @@ RESULT UIControlBar::Initialize() {
 		};
 
 		// update button trigger events to match the observer
-		CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
-		CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
-		CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
-		CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
-		CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnShareCallback));
-		CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
-		CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
-		CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
-		CR(m_pTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnTabCallback));
-		CR(m_pBackTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
-		CR(m_pDoneButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnDoneCallback));
+
+		if (m_barType == BarType::BROWSER || m_barType == BarType::DESKTOP) {
+			CR(m_pCloseButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCloseCallback));
+			CR(m_pToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnToggleCallback));
+			CR(m_pForwardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnForwardCallback));
+			CR(m_pBackButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackCallback));
+			CR(m_pShareToggleButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnShareCallback));
+			CR(m_pOpenButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnOpenCallback));
+			CR(m_pURLButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnURLCallback));
+			CR(m_pKeyboardButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnKeyboardCallback));
+		}
+		else if (m_barType == BarType::KEYBOARD) {
+			CR(m_pTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnTabCallback));
+			CR(m_pBackTabButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnBackTabCallback));
+			CR(m_pDoneButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnDoneCallback));
+		}
 	}
 
 Error:
@@ -305,9 +320,11 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 			m_pForwardButton->SetVisible(false);
 		}
 
+		/*
 		m_pBackTabButton->SetVisible(false);
 		m_pTabButton->SetVisible(false);
 		m_pDoneButton->SetVisible(false);
+		//*/
 	}
 	else if (m_barType == BarType::KEYBOARD) {
 		point ptLeft = point(-m_totalWidth / 2.0f + m_itemSpacing / 2.0f, 0.0f, 0.0f);
@@ -321,6 +338,7 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 		point ptClose = ptRight + point(-m_pDoneButton->GetSurface()->GetWidth()/2.0f, 0.0f, 0.0f);
 		m_pDoneButton->SetPosition(ptClose);
 
+		/*
 		m_pKeyboardButton->SetVisible(false);
 		m_pBackButton->SetVisible(false);
 		m_pForwardButton->SetVisible(false);
@@ -329,6 +347,7 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 		m_pOpenButton->SetVisible(false);
 		m_pToggleButton->SetVisible(false);
 		m_pCloseButton->SetVisible(false);
+		//*/
 	}
 //Error:
 	return r;
