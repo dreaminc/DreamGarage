@@ -18,6 +18,7 @@ class UIMenuItem;
 class UIControlBar;
 class UISurface;
 class DreamOS;
+enum class BarType;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
@@ -44,8 +45,8 @@ public:
 	std::shared_ptr<UIMenuItem> MakeUIMenuItem(float width, float height);
 	std::shared_ptr<UIMenuItem> AddUIUIMenuItem(float width, float height);
 
-	std::shared_ptr<UIControlBar> MakeUIControlBar();
-	std::shared_ptr<UIControlBar> AddUIControlBar();
+	std::shared_ptr<UIControlBar> MakeUIControlBar(BarType barType);
+	std::shared_ptr<UIControlBar> AddUIControlBar(BarType barType);
 
 	std::shared_ptr<UISpatialScrollView> MakeUISpatialScrollView();
 	std::shared_ptr<UISpatialScrollView> AddUISpatialScrollView();

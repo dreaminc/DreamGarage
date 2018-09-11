@@ -5,8 +5,9 @@
 #include "Primitives/text.h"
 #include "Primitives/font.h"
 
-UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
-	UIView(pHALImp,pDreamOS)
+UIControlBar::UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS, BarType barType) :
+	UIView(pHALImp,pDreamOS),
+	m_barType(barType)
 {
 	RESULT r = R_PASS;
 

@@ -43,7 +43,7 @@ public:
 
 class UIControlBar : public UIView {
 public:
-	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
+	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS, BarType barType);
 	~UIControlBar();
 
 	RESULT Initialize();
