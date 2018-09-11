@@ -486,6 +486,8 @@ public:
 	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
 	RESULT RemoveCredential(std::wstring wstrKey, CredentialManager::type credType);
 
+	bool IsConnectedToInternet();
+
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();

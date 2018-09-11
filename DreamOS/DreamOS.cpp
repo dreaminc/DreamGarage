@@ -1288,6 +1288,10 @@ RESULT DreamOS::RemoveCredential(std::wstring wstrKey, CredentialManager::type c
 	return m_pSandbox->RemoveKeyValue(wstrKey, credType);
 }
 
+bool DreamOS::IsConnectedToInternet() {
+	return m_pSandbox->IsConnectedToInternet();
+}
+
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }

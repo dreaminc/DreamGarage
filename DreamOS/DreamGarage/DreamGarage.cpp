@@ -455,7 +455,8 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 	
 	// Initial step of login flow:
-	{
+	if(IsConnectedToInternet()) {
+
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
 //*
@@ -464,6 +465,12 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 //*/
 	}
+	else {
+		m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INTERNET_REQUIRED);
+		m_pDreamUserApp->ShowMessageQuad();
+		m_pDreamEnvironmentApp->FadeIn();
+	}
+
 Error:
 	return r;
 }
