@@ -23,6 +23,8 @@
 
 #include "Sound/SoundBuffer.h"
 
+#include <thread>
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -803,7 +805,8 @@ RESULT DreamBrowser::AudioProcess() {
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 
 		//if (m_pRenderSoundBuffer != nullptr ) {
-		if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
+		//if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
+		if (m_pRenderSoundBuffer) {
 			
 			int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
 
@@ -833,6 +836,11 @@ RESULT DreamBrowser::AudioProcess() {
 			m_pRenderSoundBuffer->UnlockBuffer();
 
 		}
+
+		// Sleep the thread for 10 ms
+		Sleep(10);
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
 	}
 
 Error:
