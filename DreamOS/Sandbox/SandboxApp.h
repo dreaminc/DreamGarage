@@ -149,7 +149,8 @@ public:
 	virtual RESULT GetStackTrace() = 0;
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
 	virtual HWND GetWindowHandle() = 0;
-	
+	virtual bool CheckForInternetConnection() = 0;
+
 	// HAL
 	virtual RESULT InitializeHAL();
 	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon

@@ -19,6 +19,8 @@
 
 #include <string>
 
+#include <netlistmgr.h>
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
@@ -203,6 +205,27 @@ RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CredentialManager::typ
 
 Error:
 	return r;
+}
+
+bool Windows64App::CheckForInternetConnection() {
+	{
+	INetworkListManager* pNetworkListManager;
+
+	if (SUCCEEDED(CoCreateInstance(CLSID_NetworkListManager, NULL, CLSCTX_ALL, IID_INetworkListManager, (LPVOID*)&pNetworkListManager))) {
+		// Creating the object was successful.
+
+		VARIANT_BOOL* pfIsConnected;	// it's a pointer to a bool?!
+
+		if (SUCCEEDED(pNetworkListManager->get_IsConnectedToInternet(pfIsConnected))) {
+			// The function call succeeded.
+			CoUninitialize();
+			return true;
+		}
+	}
+	// Uninitialize COM.
+	// (This should be called on application shutdown.)
+	CoUninitialize();
+	return false;
 }
 
 /*
