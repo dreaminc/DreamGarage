@@ -364,6 +364,7 @@ RESULT WebRTCConductor::Initialize() {
 		//return webrtc::AudioDeviceModuleImpl::Create(webrtc::VoEId(1, -1), webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio);
 		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kPlatformDefaultAudio, this);
 		//return CreateAudioDeviceWithDataCapturer(0, webrtc::AudioDeviceModule::AudioLayer::kDummyAudio, this);
+		
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kDummyAudio);
 		//return webrtc::AudioDeviceModule::Create(0, webrtc::AudioDeviceModule::kPlatformDefaultAudio);
 

@@ -238,6 +238,10 @@ private:
 	SandboxApp *m_pSandbox = nullptr;
 	double m_interactionPadAccumulator = 0.0f;
 
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastUpdateTime;
+	double m_sTimeStep = 0.015f;		// time step in seconds 
+	double m_elapsedTime;
+
 private:
 	UID m_uid;
 };

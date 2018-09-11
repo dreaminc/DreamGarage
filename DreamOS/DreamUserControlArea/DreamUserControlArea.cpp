@@ -801,6 +801,8 @@ Error:
 RESULT DreamUserControlArea::ResetAppComposite() {
 	RESULT r = R_PASS;
 
+	CN(m_pDreamUserApp);
+
 	/*
 	auto pRenderContext = m_pDreamTabView->m_pScrollView->GetRenderContext();
 	point ptOrigin = m_pDreamTabView->GetComposite()->GetPosition(true);
@@ -810,8 +812,12 @@ RESULT DreamUserControlArea::ResetAppComposite() {
 	//*/
 
 //	m_fUpdateDreamUIBar = true;
+	
 	m_pDreamUserApp->ResetAppComposite();
-	m_pDreamUIBar->ResetAppComposite();
+	
+	if (m_pDreamUIBar != nullptr) {
+		m_pDreamUIBar->ResetAppComposite();
+	}
 
 Error:
 	return r;

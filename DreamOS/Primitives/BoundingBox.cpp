@@ -33,6 +33,14 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
+	// TODO: Change the arch to utilize inheritence and not duplicate this code
+	// Lets fake a sphere test for early exit
+	vector vScale = GetScale(true);
+	vector vHV = vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
+	float distance = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin()).magnitude();
+	if (abs(distance) > (rhs.GetRadius() + vHV.magnitude()))
+		return false;
+
 	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin();
 	point ptMax = GetMaxPoint();
 	point ptMin = GetMinPoint();
@@ -1308,6 +1316,15 @@ CollisionManifold BoundingBox::CollideBruteForce(const BoundingBox& rhs) {
 // https://tavianator.com/fast-branchless-raybounding-box-intersections/
 bool BoundingBox::Intersect(const ray& r) {
 	double tmin = -INFINITY, tmax = INFINITY;
+
+	// TODO: Change the arch to utilize inheritence and not duplicate this code
+	// Do an early out sphere test
+	vector vRayCircle = static_cast<ray>(r).ptOrigin() - GetAbsoluteOrigin();
+	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
+	float cValue = vRayCircle.dot(vRayCircle) - pow(GetHalfVector(true).magnitude(), 2.0f);
+	float resultValue = pow(bValue, 2.0f) - cValue;
+	if (resultValue < 0.0f) 
+		return false;
 
 	// Rotate the ray by the Rotation Matrix
 	// Get origin in reference to object
