@@ -144,12 +144,19 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 			m_pUniformColorTextureMS_n->SetUniformInteger(sampleCount);
 
 			if (m_fRenderDepth) {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex()
+				);
 			}
 			else {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex()
+				);
 			}
 
+			//m_pUniformColorTextureMS->SetUniform(1);
 			m_pFUniformTextureMS->SetUniform(true);
 		}
 		else {
