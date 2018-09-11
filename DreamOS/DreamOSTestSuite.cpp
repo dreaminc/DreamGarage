@@ -12,6 +12,7 @@
 #include "HAL/opengl/OGLProgramReflection.h"
 #include "HAL/opengl/OGLProgramRefraction.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
 
 #include "DreamModule.h"
 
@@ -2215,65 +2216,75 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 		CN(pTestContext);
 
 		{
-			// Reflection 
+			// Skybox
 
-			ProgramNode* pReflectionProgramNode;
-			pReflectionProgramNode = nullptr;
-			pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
-			CN(pReflectionProgramNode);
-			//CR(pReflectionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-			CR(pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+			ProgramNode* pScatteringSkyboxProgram;
+			pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+			CN(pScatteringSkyboxProgram);
+			CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			// Reflection 
+			
+			auto m_pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
+			CN(m_pReflectionProgramNode);
+			//CR(m_pReflectionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+			CR(m_pReflectionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 			ProgramNode* pReflectionSkyboxProgram;
-			pReflectionSkyboxProgram = nullptr;
-			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+			pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox");
 			CN(pReflectionSkyboxProgram);
-			CR(pReflectionSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-			// Connect output as pass-thru to internal blend program
-			CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNode->Output("output_framebuffer")));
+			CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+			CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", m_pReflectionProgramNode->Output("output_framebuffer")));
 
 			// Refraction
 
-			ProgramNode* pRefractionProgramNode;
-			pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
-			CN(pRefractionProgramNode);
-			//CR(pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-			CR(pRefractionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+			
+			auto m_pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
+			CN(m_pRefractionProgramNode);
+			//CR(pRefractionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+			CR(m_pRefractionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			//ProgramNode* pRefractionSkyboxProgram;
+			//pRefractionSkyboxProgram = pHAL->MakeProgramNode("skybox");
+			//CN(pRefractionSkyboxProgram);
+			//CR(pRefractionSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+			//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+			//CR(pRefractionSkyboxProgram->ConnectToInput("input_framebuffer", m_pRefractionProgramNode->Output("output_framebuffer")));
 
 			// "Water"
 
-			ProgramNode* pWaterProgramNode;
-			pWaterProgramNode = nullptr;
-			pWaterProgramNode = pHAL->MakeProgramNode("water");
+			ProgramNode* pWaterProgramNode = pHAL->MakeProgramNode("water");
 			CN(pWaterProgramNode);
 			// Still need scene graph for lights 
 			// TODO: make lights a different node
-			//CR(pWaterProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			//CR(pWaterProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 			CR(pWaterProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 			// TODO: This is not particularly general yet
 			// Uncomment below to turn on water effects
-			CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNode->Output("output_framebuffer")));
+			CR(pWaterProgramNode->ConnectToInput("input_refraction_map", m_pRefractionProgramNode->Output("output_framebuffer")));
 			CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
 
 			// Environment shader
-			
-			ProgramNode* pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("minimal_texture");
-			CN(pRenderEnvironmentProgramNode);
-			//CR(pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-			CR(pRenderEnvironmentProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-			CR(pRenderEnvironmentProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+			auto m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("minimal_texture");
+			CN(m_pRenderEnvironmentProgramNode);
+			//CR(m_pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(m_pRenderEnvironmentProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			CR(m_pRenderEnvironmentProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 			// Everything else
 			ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
 			CN(pRenderProgramNode);
 			CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-			
-			CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pRenderEnvironmentProgramNode->Output("output_framebuffer")));
+
+			// NOTE: Add this in if you want to have reflective objects
+			//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+			CR(pRenderProgramNode->ConnectToInput("input_framebuffer", m_pRenderEnvironmentProgramNode->Output("output_framebuffer")));
 
 			// Reference Geometry Shader Program
 			ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
@@ -2284,12 +2295,11 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 			// Skybox
-			ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+			ProgramNode* pSkyboxProgram;
+			pSkyboxProgram = pHAL->MakeProgramNode("skybox");
 			CN(pSkyboxProgram);
-			CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 			CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-			// Connect output as pass-thru to internal blend program
+			CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 			CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 			ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
@@ -2304,18 +2314,36 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			// Connect output as pass-thru to internal blend program
 			CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-			EnvironmentProgram* pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderEnvironmentProgramNode);
+			// save interface for UI apps
+			m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+
+			// save interfaces to skybox nodes
+			std::vector<SkyboxScatterProgram*> m_skyboxProgramNodes;
+			m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pScatteringSkyboxProgram));
+			//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pReflectionSkyboxProgram));
+			//m_skyboxProgramNodes.emplace_back(dynamic_cast<SkyboxScatterProgram*>(pSkyboxProgram));
+
+			auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+
+			/*
+			ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+			CN(pUIProgramNode);
+			CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+			CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+			CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+			//*/
 
 			// Screen Quad Shader (opt - we could replace this if we need to)
 			ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
 			CN(pRenderScreenFade);
 			CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
-			pTestContext->pScreenFadeProgram = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
-
+			auto m_pScreenFadeProgramNode = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
 			// Connect Program to Display
+			//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
-			//CR(pDestSinkNode->ConnectToAllInputs(pUIProgramNode->Output("output_framebuffer")));
+
+			//CR(pHAL->ReleaseCurrentContext());
 
 			quad *pWaterQuad = m_pDreamOS->MakeQuad(1000.0f, 1000.0f);
 			point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
@@ -2327,16 +2355,16 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 				CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
 			}
 
-			if (pReflectionProgramNode != nullptr) {
-				CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
+			if (m_pReflectionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramReflection*>(m_pReflectionProgramNode)->SetReflectionObject(pWaterQuad));
 			}
 
-			if (pRefractionProgramNode != nullptr) {
-				CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
+			if (m_pRefractionProgramNode != nullptr) {
+				CR(dynamic_cast<OGLProgramRefraction*>(m_pRefractionProgramNode)->SetRefractionObject(pWaterQuad));
 			}
 
 			if (pReflectionSkyboxProgram != nullptr) {
-				CR(dynamic_cast<OGLProgramSkyboxScatter*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+				CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
 			}
 
 			/*
@@ -2359,9 +2387,9 @@ RESULT DreamOSTestSuite::AddTestEnvironmentSeating() {
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
 
-			 CR(pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
-			 CR(pReflectionProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
-			 CR(pRefractionProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+			 CR(m_pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+			 CR(m_pReflectionProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+			 CR(m_pRefractionProgramNode->ConnectToInput("scenegraph", pTestContext->pEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 		}
 
 		m_pDreamOS->GetCamera()->SetPosition(point(0.0f, 5.0f, 0.0f));
