@@ -49,7 +49,7 @@ RESULT OGLProgramSkyboxScatterCube::OGLInitialize() {
 	CR(m_pOGLFramebufferCubemap->OGLInitialize());
 	//CR(m_pOGLFramebufferCubemap->Bind());
 
-	CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebufferCubemap->GetFramebufferIndex()));
 
 	CR(m_pOGLFramebufferCubemap->SetSampleCount(1));
 
