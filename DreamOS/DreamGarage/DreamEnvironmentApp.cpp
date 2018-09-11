@@ -188,7 +188,7 @@ RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
 		m_pFadeProgram->FadeIn();
 
 		// Assuming we want to show welcome back quad here
-		m_pUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME_BACK);
+		m_pUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::SIGN_IN);
 		m_pUserApp->ShowMessageQuad();
 
 		return R_PASS;

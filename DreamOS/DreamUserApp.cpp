@@ -203,7 +203,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 
 	m_pMessageComposite = GetComposite()->MakeComposite();
-	m_pMessageComposite->SetVisible(true);
+	m_pMessageComposite->SetVisible(false, false);
 	m_pMessageComposite->SetPosition(0.0f, 0.0f, -2.0f);
 	pDreamOS->AddObjectToUIGraph(m_pMessageComposite.get());
 
@@ -322,9 +322,18 @@ RESULT DreamUserApp::Update(void *pContext) {
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
 
 	if (m_fShowLaunchQuad) {
-		texture* pMessageTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"launch-update-required.png");
-		m_pMessageQuad->SetDiffuseTexture(pMessageTexture);
-		m_pMessageComposite->SetVisible(true);
+
+		m_pMessageQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, m_textureStringFromStartupMessage[m_currentLaunchMessage].c_str()));
+
+		RotationMatrix matLook = RotationMatrix(GetComposite()->GetOrientation());
+		vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
+		vAppLook.Normalize();
+		vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
+
+		m_pMessageComposite->SetPosition(GetComposite()->GetPosition() + vAppLookXZ * 2.0f);
+		m_pMessageComposite->SetOrientation(GetComposite()->GetOrientation());
+		m_pMessageComposite->SetVisible(true, false);
+
 		m_fShowLaunchQuad = false;
 	}
 	//CR(ResetAppComposite());
@@ -896,17 +905,7 @@ RESULT DreamUserApp::SetStartupMessageType(StartupMessage messageType) {
 RESULT DreamUserApp::ShowMessageQuad() {
 	RESULT r = R_PASS;
 
-	m_pMessageQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, m_textureStringFromStartupMessage[m_currentLaunchMessage].c_str()));
-
-
-	RotationMatrix matLook = RotationMatrix(GetComposite()->GetOrientation());
-	vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
-	vAppLook.Normalize();
-	vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
-
-	m_pMessageComposite->SetPosition(GetComposite()->GetPosition() + vAppLookXZ * 2.0f);
-	m_pMessageComposite->SetOrientation(GetComposite()->GetOrientation());
-	m_pMessageComposite->SetVisible(true, false);
+	m_fShowLaunchQuad = true;
 
 Error:
 	return r;

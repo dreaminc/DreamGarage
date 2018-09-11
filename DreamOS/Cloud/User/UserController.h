@@ -149,6 +149,7 @@ private:
 
 public:
 	RESULT UpdateLoginState();
+	RESULT ClearLoginState();
 	std::string GetSavedAccessToken();
 
 private:

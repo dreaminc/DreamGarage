@@ -501,7 +501,7 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 
 		if (!m_fFirstLogin) {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
-			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME_BACK));
+			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::SIGN_IN));
 		}
 		else {
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
@@ -1213,7 +1213,19 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
 	if (!fSuccess) {
-		CR(m_pDreamLoginApp->ClearTokens());
+
+		std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
+
+		m_pDreamLoginApp->ClearTokens();
+
+		CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INVALID_REFRESH_TOKEN));
+		CR(m_pDreamUserApp->ShowMessageQuad());
+
+		CR(m_pUserController->GetFormURL(strFormType));
+
+		if (m_pDreamEnvironmentApp != nullptr) {
+			CR(m_pDreamEnvironmentApp->FadeIn());
+		}
 	}
 	else {
 		// TODO: should be temporary
