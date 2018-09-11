@@ -85,6 +85,7 @@ RESULT CEFBrowserManager::Update() {
 			}
 			CloseHandle(hSnapshot);
 		}
+		m_fUpdateJob = false;
 	}
 
 Error:
