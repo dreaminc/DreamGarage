@@ -837,7 +837,7 @@ RESULT UserController::ClearLoginState() {
 
 	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CN(pEnvironmentController);
-	pEnvironmentController->DisconnectFromEnvironmentSocket();
+	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
 
 Error:
 	return r;
