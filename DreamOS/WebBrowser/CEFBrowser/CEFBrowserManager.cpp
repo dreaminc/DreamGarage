@@ -65,8 +65,36 @@ RESULT CEFBrowserManager::Update() {
 		CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
 	}
 
+	if (m_fUpdateJob) {		// catching child processes
+		PROCESSENTRY32 processInfo;
+		processInfo.dwSize = sizeof(PROCESSENTRY32);
+
+		HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
+		if (hSnapshot != nullptr) {
+			if (Process32First(hSnapshot, &processInfo) == TRUE) {
+				while (Process32Next(hSnapshot, &processInfo) == TRUE) {
+					if (wcscmp(processInfo.szExeFile, L"DreamCef.exe") == 0) {
+						HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processInfo.th32ProcessID);
+
+						if (hProcess != nullptr) {
+							AssignProcessToJobObject(m_hDreamJob, hProcess);
+							CloseHandle(hProcess);
+						}
+					}
+				}
+			}
+			CloseHandle(hSnapshot);
+		}
+		m_fUpdateJob = false;
+	}
+
 Error:
 	return r;
+}
+
+RESULT CEFBrowserManager::UpdateJobProcesses() {
+	m_fUpdateJob = true;
+	return R_PASS;
 }
 
 RESULT CEFBrowserManager::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {

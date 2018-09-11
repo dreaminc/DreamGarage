@@ -50,6 +50,7 @@ public:
 	virtual RESULT Shutdown() override;
 
 	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) override;
+	virtual RESULT UpdateJobProcesses() override;
 
 	virtual RESULT DeleteCookies() override;
 
@@ -81,6 +82,7 @@ private:
 	std::thread m_ServiceThread;
 
 	HANDLE m_hDreamJob = nullptr;
+	bool m_fUpdateJob = false;
 
 	std::mutex m_mutex;
 };
