@@ -444,7 +444,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			int testUserNumber = stoi(strTestUserNumber);
 
 			std::string strDebugRefreshToken = testRefreshTokens[testUserNumber];
-			//return m_pUserController->GetAccessToken(strDebugRefreshToken);
+			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
 #endif
