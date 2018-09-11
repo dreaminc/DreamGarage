@@ -126,6 +126,7 @@ RESULT CloudController::Start(bool fLoginOnStart) {
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fRunning = true;
 	m_fLoginOnStart = fLoginOnStart;
 
 	//m_cloudThread = std::thread(&CloudController::CloudThreadProcess, this);
@@ -141,6 +142,7 @@ RESULT CloudController::Start(std::string strUsername, std::string strPassword, 
 
 	DEBUG_LINEOUT("CloudController::Start");
 
+	m_fRunning = true;
 	m_fLoginOnStart = true;
 
 	//m_cloudThread = std::thread(&CloudController::CloudThreadProcessParams, this, strUsername, strPassword, environmentID);
