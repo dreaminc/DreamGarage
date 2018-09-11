@@ -36,6 +36,10 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestWaterShaderCube());
 
+	CR(AddTestCubeMap());
+
+	CR(AddTestMinimalTextureShader());
+
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
@@ -48,13 +52,9 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestCamera());
 
-	CR(AddTestCubeMap());
-
 	CR(AddTestWaterShader());
 	
 	CR(AddTestObjectMaterialsBump());
-
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestObjectMaterialsColors());
 
@@ -1735,12 +1735,13 @@ RESULT HALTestSuite::AddTestWaterShaderCube() {
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReflectionSkyboxProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pSkyboxProgram->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pSkyboxProgram->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 

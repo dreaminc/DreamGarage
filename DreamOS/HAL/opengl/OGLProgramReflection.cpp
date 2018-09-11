@@ -86,6 +86,8 @@ RESULT OGLProgramReflection::OGLInitialize() {
 
 	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+
 Error:
 	return r;
 }

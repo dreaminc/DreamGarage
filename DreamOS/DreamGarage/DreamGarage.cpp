@@ -78,10 +78,10 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitSound = true;
 
 #ifdef _DEBUG
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
-	sandboxconfig.fInitSound = false;
+	sandboxconfig.fInitSound = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -234,13 +234,14 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenfade");
+		//ProgramNode *pRenderScreenFade = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenFade);
 		CR(pRenderScreenFade->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 		m_pScreenFadeProgramNode = dynamic_cast<OGLProgramScreenFade*>(pRenderScreenFade);
 		// Connect Program to Display
-		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenFade->Output("output_framebuffer")));
 
 		//CR(pHAL->ReleaseCurrentContext());
 

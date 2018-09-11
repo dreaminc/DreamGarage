@@ -8,8 +8,8 @@ in Data {
 	vec2 uvCoord;
 } DataIn;
 
-uniform sampler2D u_textureColor;
-uniform sampler2DMS u_textureColorMS;
+layout (binding = 0) uniform sampler2D u_textureColor;
+layout (binding = 1) uniform sampler2DMS u_textureColorMS;
 uniform int u_textureColorMS_n;
 
 uniform	bool u_fTextureMS;

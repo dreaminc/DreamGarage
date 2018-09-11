@@ -58,6 +58,10 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	//CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	//*/
 
+	//CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+
 Error:
 	return r;
 }
@@ -113,11 +117,17 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	UseProgram();
 
+	// Set up texture bindings
+	//m_pUniformColorTexture->SetUniform(0);
+	//m_pUniformColorTextureMS->SetUniform(1);
+
 	//glDisable(GL_CULL_FACE);
 
 	// Seems to be killing our texture
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	UpdateFramebufferToCamera(m_pParentImp->GetCamera(), GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
 
 	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
@@ -140,20 +150,24 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
 			}
 
-			m_pUniformColorTextureMS->SetUniform(1);
 			m_pFUniformTextureMS->SetUniform(true);
 		}
 		else {
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-
+			
 			if (m_fRenderDepth) {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex()
+				);
 			}
 			else {
-				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+				m_pParentImp->BindTexture(
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), 
+					m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex()
+				);
 			}
-
-			m_pUniformColorTextureMS->SetUniform(0);
+			
 			m_pFUniformTextureMS->SetUniform(false);
 		}
 	}
@@ -162,7 +176,7 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 

@@ -99,6 +99,8 @@ RESULT OGLProgramRefraction::OGLInitialize() {
 	//
 	//CR(m_pParentImp->glDrawBuffers(2, pDrawBuffers));
 
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+
 Error:
 	return r;
 }

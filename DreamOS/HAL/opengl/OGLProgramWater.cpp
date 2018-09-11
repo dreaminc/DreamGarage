@@ -83,6 +83,10 @@ RESULT OGLProgramWater::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+
+	CRM(m_pOGLFramebuffer->CheckStatus(), "Frame buffer messed up");
+
 Error:
 	return r;
 }
