@@ -16,6 +16,11 @@ OVRTextureSwapChain::OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession sessi
 }
 
 OVRTextureSwapChain::~OVRTextureSwapChain() {
+	
+	if (m_pOVRTextureSwapChain != nullptr) {
+		DestroySwapChainTexture();
+	}
+
 	while (m_swapChainOGLTextures.size() > 0) {
 		OGLTexture *pTempOGLTexture = m_swapChainOGLTextures.back();
 		m_swapChainOGLTextures.pop_back();
@@ -27,10 +32,6 @@ OVRTextureSwapChain::~OVRTextureSwapChain() {
 	if (m_pOGLResolveFramebuffer != nullptr) {
 		delete m_pOGLResolveFramebuffer;
 		m_pOGLResolveFramebuffer = nullptr;
-	}
-
-	if (m_pOVRTextureSwapChain != nullptr) {
-		DestroySwapChainTexture();
 	}
 }
 

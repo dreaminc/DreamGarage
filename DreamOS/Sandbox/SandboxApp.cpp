@@ -376,6 +376,24 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::OVRShutdown() {
+	RESULT r = R_PASS;
+
+	DOSLOG(INFO, "OVRShutdown called");
+	if (m_pHMD != nullptr) {
+		DOSLOG(INFO, "Releasing HMD");
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+		DOSLOG(INFO, "HMD Released");
+	}
+
+	PendShutdown();
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RunAppLoop() {
 	RESULT r = R_PASS;
 

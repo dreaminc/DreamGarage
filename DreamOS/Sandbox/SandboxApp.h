@@ -97,6 +97,7 @@ public:
 	bool IsShuttingDown();
 	RESULT PendShutdown();
 	RESULT Shutdown();
+	RESULT OVRShutdown();
 
 	virtual RESULT InitializeSandbox() = 0;
 	virtual RESULT Show() = 0;
