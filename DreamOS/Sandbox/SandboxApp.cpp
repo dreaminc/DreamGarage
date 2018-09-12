@@ -497,7 +497,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Since DreamOS project doesn't get PRODUCTION pre-processors and the OCULUS_PRODUCTION_BUILD one is supposed to be temporary
 	//		 This will need to be reworked at that time as well.
-#ifdef OCULUS_PRODUCTION_BUILD	
+	// change it back jason
+#ifndef OCULUS_PRODUCTION_BUILD	
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));

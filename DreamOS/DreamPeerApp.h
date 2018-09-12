@@ -142,6 +142,10 @@ public:
 	RESULT HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage);
 
 	RESULT SetUsernameAnimationDuration(float animationDuration);
+
+	RESULT SetUserLabelPosition(point ptPosition);
+	RESULT SetUserLabelOrientation(quaternion qOrientation);
+
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 

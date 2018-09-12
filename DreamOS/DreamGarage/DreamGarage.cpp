@@ -72,7 +72,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	SandboxApp::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = false;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
@@ -427,7 +427,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -456,7 +456,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
@@ -791,6 +791,7 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 
 	point ptSeatPosition;
 	quaternion qRotation;
+	vector vCameraDirection;
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
@@ -798,6 +799,13 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	//pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
+
+	// update username label
+	vCameraDirection = ptSeatPosition - GetCamera()->GetPosition(true);
+	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z());
+
+	pDreamPeer->SetUserLabelPosition(ptSeatPosition);
+	pDreamPeer->SetUserLabelOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
 
 Error:
 	return r;

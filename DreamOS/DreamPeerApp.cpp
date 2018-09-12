@@ -86,9 +86,17 @@ RESULT DreamPeerApp::Update(void *pContext) {
 	}
 	
 	// update user label position
+	//*
 	if (m_pUserModel != nullptr) {
-		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+	//	m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
+	//	m_pNameComposite->SetOrientation(m_pUserModel->GetHead()->GetOrientation(true));
+
+		vector vCameraDirection;
+		vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
+		vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z());
+		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
 	}
+	//*/
 	
 Error:
 	return r;
@@ -98,7 +106,8 @@ RESULT DreamPeerApp::InitializeNameBackground() {
 	RESULT r = R_PASS;
 
 	if (m_pNameComposite == nullptr) {
-		m_pNameComposite = GetComposite()->AddComposite();
+		m_pNameComposite = GetComposite()->MakeComposite();
+		m_pNameComposite->SetPosition(GetComposite()->GetPosition(true));
 		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
 	}
 
@@ -152,6 +161,22 @@ Error:
 RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
 	m_userNameAnimationDuration = animationDuration;
 	return R_PASS;
+}
+
+RESULT DreamPeerApp::SetUserLabelPosition(point ptPosition) {
+	RESULT r = R_PASS;
+
+	m_pNameComposite->SetPosition(ptPosition);
+
+	return r;
+}
+
+RESULT DreamPeerApp::SetUserLabelOrientation(quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	m_pNameComposite->SetOrientation(qOrientation);
+
+	return r;
 }
 
 RESULT DreamPeerApp::HideUserNameField() {
@@ -347,8 +372,11 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_pUserModel = std::shared_ptr<user>(pUserModel);
 	m_pUserModel->SetVisible(m_fVisible);
 	m_pUserModel->SetDreamOS(GetDOS());
-	m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId);
+
 	m_fPendingAssignedUserModel = true;
+	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
+
+	CR(ShowUserNameField());
 
 Error:
 	return r;
