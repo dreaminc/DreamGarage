@@ -67,6 +67,7 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
+
 		CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
 	}
 
@@ -434,28 +435,29 @@ Error:
 	return r;
 }
 
+// Critical path
 RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
 	size_t pBuffer_n = width * height * 4;
 
-	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
-
 	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
-
 	if (fSizeChanged) {
 		m_bufferWidth = width;
 		m_bufferHeight = height;
 		DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
 	}
 
+	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+
 	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
 
 //Error:
-	return r;
+	//return r;
+	return R_PASS;
 }
 
 RESULT CEFBrowserController::OnAfterCreated() {

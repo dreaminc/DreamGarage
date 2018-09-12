@@ -727,14 +727,14 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	if (m_pBrowserTexture == nullptr) {
 		DOSLOG(INFO, "browser texture not initialized");
+		return R_SKIPPED;
 	}
 
-	CNR(m_pBrowserTexture, R_SKIPPED);
-
 	// Update texture dimensions if needed
-	CR(m_pBrowserTexture->UpdateDimensions(width, height));
+	
+	r = m_pBrowserTexture->UpdateDimensions(width, height);
 	if (r != R_NOT_HANDLED) {
-		DEBUG_LINEOUT("Changed chrome texture dimensions");
+		DOSLOG(INFO, "Changed chrome texture dimensions");
 	}
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));

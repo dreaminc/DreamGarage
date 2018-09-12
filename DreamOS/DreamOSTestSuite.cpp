@@ -53,11 +53,11 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
 	CR(AddTestEnvironmentSeating());
 
 	CR(AddTestModuleManager());
-
-	CR(AddTestDreamBrowser());
 
 	CR(AddTestCredentialStorage());
 

@@ -1834,13 +1834,13 @@ Error:
 }
 
 RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	glBindTexture(target, texture);
 	//CRM(CheckGLError(), "glBindTexture failed");
 
 Error:
-	return r;
+	return R_PASS;
 }
 
 RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
@@ -1874,14 +1874,21 @@ Error:
 	return r;
 }
 
+bool g_fSetPixelAlignment = false;
+
 RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
-	// fix alightment for odd value width size
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+	// TODO: Move to init?
+	// fix alignment for odd value width size
+	if (g_fSetPixelAlignment == false) {
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+		glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
+		g_fSetPixelAlignment = true;
+	}
 
 	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
@@ -1894,14 +1901,19 @@ Error:
 RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
-	// fix alightment for odd value width size
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+	// TODO: Move to init?
+	// fix alignment for odd value width size
+	if (g_fSetPixelAlignment == false) {
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+		glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
+		g_fSetPixelAlignment = true;
+	}
 
 	glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
-	CRM(CheckGLError(), "glTexSubImage2D failed");
+	//CRM(CheckGLError(), "glTexSubImage2D failed");
 
 Error:
 	return r;

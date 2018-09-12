@@ -502,20 +502,24 @@ Error:
 RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
-	CR(Bind());
+	//CR(Bind());
 
-	// Protect against copying larger than texture
-	int pxWidth = width;
-	int pxHeight = height;
+	// Assume it works (streamlined)
+	Bind();
+
+	//// Protect against copying larger than texture
+	//int pxWidth = width;
+	//int pxHeight = height;
 
 	// TODO: Flag an issue
-	if (pxWidth > m_width)
-		pxWidth = m_width;
+	if (width > m_width)
+		width = m_width;
 
-	if (pxHeight > m_height)
-		pxHeight = m_height;
+	if (height > m_height)
+		height = m_height;
 
-	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, pxWidth, pxHeight, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
+	// Remove CR for faster performance
+	m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer);
 
 Error:
 	return r;
