@@ -1817,7 +1817,7 @@ RESULT OpenGLImp::glActiveTexture(GLenum texture) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glActiveTexture(texture);
-	CRM(CheckGLError(), "glActiveTexture failed");
+	//CRM(CheckGLError(), "glActiveTexture failed");
 
 Error:
 	return r;
@@ -1892,7 +1892,7 @@ RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, G
 
 	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
-	CRM(CheckGLError(), "glTexImage2D failed");
+	//CRM(CheckGLError(), "glTexImage2D failed");
 
 Error:
 	return r;
