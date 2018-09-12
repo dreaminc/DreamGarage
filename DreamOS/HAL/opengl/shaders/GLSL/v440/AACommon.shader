@@ -208,7 +208,7 @@ vec4 GetFXAAColor(sampler2D screenBufferTexture, vec2 uvCoord, vec2 inverseScree
 	// If the luma variation is incorrect, do not offset.
 	float finalOffset = fCorrectVariation ? pixelOffset : 0.0;
 
-	///*
+	/*
 	// Sub-pixel shifting
 	// Full weighted average of the luma over the 3x3 neighborhood
 	float lumaAverage = (1.0f / 12.0f) * (2.0f * (lumaDownUp + lumaLeftRight) + lumaLeftCorners + lumaRightCorners);
