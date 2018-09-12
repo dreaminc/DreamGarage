@@ -91,9 +91,6 @@ private:
 	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
 
-	std::shared_ptr<quad> m_pTestTeamLabelQuad = nullptr;
-	std::shared_ptr<quad> m_pTestTeamLabelTexture = nullptr;
-
 	int m_castpxWidth = BROWSER_WIDTH;
 	int m_castpxHeight = BROWSER_HEIGHT;
 	float m_aspectRatio;
