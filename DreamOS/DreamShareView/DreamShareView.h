@@ -11,9 +11,6 @@
 
 #include "DreamGarage/UICommon.h"
 
-#define PX_WIDTH 1366
-#define PX_HEIGHT 768
-
 class quad;
 class texture;
 class AudioPacket;
@@ -97,12 +94,15 @@ private:
 	std::shared_ptr<quad> m_pTestTeamLabelQuad = nullptr;
 	std::shared_ptr<quad> m_pTestTeamLabelTexture = nullptr;
 
-	int m_castpxWidth = PX_WIDTH;
-	int m_castpxHeight = PX_HEIGHT;
+	int m_castpxWidth = BROWSER_WIDTH;
+	int m_castpxHeight = BROWSER_HEIGHT;
 	float m_aspectRatio;
 	float m_diagonalSize = 9.0f;
 	float m_borderWidth = BORDER_WIDTH;
 	float m_borderHeight = BORDER_HEIGHT;
+	float m_spacingSize = SPACING_SIZE;
+
+	float m_bottomBarHeight = 0.05376f;
 
 	// Streaming members
 	bool m_fStreaming = false;

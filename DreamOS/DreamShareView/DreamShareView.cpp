@@ -40,7 +40,8 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	float castHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
 
-	point ptPosition = point(0.0f, castWidth*m_borderHeight / 2.0f + castWidth * 0.0645 / 2.0f, 0.0f);
+	point ptPosition = point(0.0f, castWidth*m_borderHeight / 2.0f -castWidth * m_bottomBarHeight / 2.0f, 0.0f);
+	//point ptPosition = point(0.0f, castWidth*m_borderHeight / 2.0f + castWidth * m_spacingSize, 0.0f);
 
 	m_pCastQuad = GetComposite()->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
 	CN(m_pCastQuad);
@@ -57,8 +58,11 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pCastBackgroundQuad->SetVisible(false);
 	//m_pCastBackgroundQuad->SetPosition(point(0.0f, castHeight / 2.0f, -0.001f));
 
-	m_pTestTeamLabelQuad = GetComposite()->AddQuad(castWidth * m_borderWidth, castWidth * 0.0645f, 1, 1, nullptr, vNormal);
+	/*
+	m_pTestTeamLabelQuad = GetComposite()->AddQuad(castWidth * m_borderWidth, castWidth * m_bottomBarHeight, 1, 1, nullptr, vNormal);
 	m_pTestTeamLabelQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"share-view-test-quad.png"));
+	m_pTestTeamLabelQuad->SetPosition(point(0.0f, -castWidth * m_bottomBarHeight / 2.0f, 0.0f));
+	//*/
 
 	m_pVideoCastTexture = GetComposite()->MakeTexture(
 		texture::type::TEXTURE_2D,

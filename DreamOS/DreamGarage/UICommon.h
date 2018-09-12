@@ -7,3 +7,8 @@
 #define BORDER_HEIGHT 0.594624f;
 
 #define ITEM_SIZE 0.0645f;
+
+#define SPACING_SIZE 0.016129f;
+
+#define BROWSER_WIDTH 1280;
+#define BROWSER_HEIGHT 720;
