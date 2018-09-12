@@ -13,6 +13,8 @@
 #include "DreamAppHandle.h"
 #include "Primitives/HandType.h"
 
+#include "DreamGarage/UICommon.h"
+
 #include <map>
 #include <vector>
 #include <stack>
@@ -44,18 +46,12 @@ class CEFBrowserManager;
 // default user settings
 #define MAIN_DIAGONAL 0.70f
 
-#define SPACING_SIZE 0.016129f
-#define DEFAULT_PX_WIDTH 1366
-#define DEFAULT_PX_HEIGHT 768
-
 #define VIEW_ANGLE 32.0f
 
 #define ANIMATION_DURATION_SECONDS 0.175f
 
 #define MESSAGE_QUAD_WIDTH 2.40f
 #define MESSAGE_QUAD_HEIGHT (MESSAGE_QUAD_WIDTH * 9.0f / 16.0f)
-
-#define BACKGROUND_SCALE 1.0323f;
 
 enum class UserObserverEventType {
 	BACK,
@@ -238,7 +234,9 @@ private:
 
 	float m_messageQuadHeight = MESSAGE_QUAD_HEIGHT;
 	float m_messageQuadWidth = MESSAGE_QUAD_WIDTH;
-	float m_messageBackgroundScale = BACKGROUND_SCALE;
+
+	float m_messageBackgroundWidth = BORDER_WIDTH;
+	float m_messageBackgroundHeight = BORDER_HEIGHT;
 
 
 private:
@@ -267,8 +265,8 @@ private:
 public:
 	struct UserSettings {
 		float m_spacingSize = SPACING_SIZE;
-		float m_pxWidth = DEFAULT_PX_WIDTH;
-		float m_pxHeight = DEFAULT_PX_HEIGHT;
+		float m_pxWidth = BROWSER_WIDTH;
+		float m_pxHeight = BROWSER_HEIGHT;
 
 		float m_diagonalSize = MAIN_DIAGONAL;
 		float m_viewAngle = VIEW_ANGLE;

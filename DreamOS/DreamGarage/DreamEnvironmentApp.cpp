@@ -282,7 +282,7 @@ RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternio
 		scale = 1.0f;
 	} break;
 	case environment::CAVE: {
-		ptPosition = point(m_tableLength*0.75f, 1.25f, 0.0f);
+		ptPosition = point(m_tableLength*0.75f, 0.0f, 0.0f);
 		qOrientation = quaternion::MakeQuaternionWithEuler(0.0f, -90.0f * (float)M_PI / 180.0f, 0.0f);
 		scale = 0.75f;
 	} break;

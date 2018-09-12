@@ -9,8 +9,7 @@
 #include "DreamShareViewMessage.h"
 #include "DreamUserApp.h"
 
-#define PX_WIDTH 1366
-#define PX_HEIGHT 768
+#include "DreamGarage/UICommon.h"
 
 class quad;
 class texture;
@@ -85,14 +84,22 @@ private:
 private:
 	// Quad related members
 	std::shared_ptr<quad> m_pCastQuad = nullptr;
+	std::shared_ptr<quad> m_pCastBackgroundQuad = nullptr;
+
 	std::shared_ptr<texture> m_pCastTexture = nullptr;
+	std::shared_ptr<texture> m_pCastBackgroundTexture = nullptr;
 	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
 
-	int m_castpxWidth = PX_WIDTH;
-	int m_castpxHeight = PX_HEIGHT;
+	int m_castpxWidth = BROWSER_WIDTH;
+	int m_castpxHeight = BROWSER_HEIGHT;
 	float m_aspectRatio;
 	float m_diagonalSize = 9.0f;
+	float m_borderWidth = BORDER_WIDTH;
+	float m_borderHeight = BORDER_HEIGHT;
+	float m_spacingSize = SPACING_SIZE;
+
+	float m_bottomBarHeight = 0.05376f;
 
 	// Streaming members
 	bool m_fStreaming = false;
@@ -105,6 +112,9 @@ private:
 	DreamShareViewMessage::type m_currentAckType;
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
+
+private:
+//	std::shared_ptr<UIView> 
 
 };
 

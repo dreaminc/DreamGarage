@@ -31,6 +31,8 @@
 
 #include "Sound/SoundCommon.h"
 
+#include "DreamGarage/UICommon.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -212,8 +214,8 @@ private:
 
 	WebBrowserPoint m_lastWebBrowserPoint;	// This is so scrolling can get which frame the mouse is on - e.g. drop down menus are now scrollable
 
-	int m_browserWidth = 1366;
-	int m_browserHeight = 768;
+	int m_browserWidth = BROWSER_WIDTH;
+	int m_browserHeight = BROWSER_HEIGHT;
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;

@@ -151,6 +151,9 @@
     <ClInclude Include="..\..\..\DreamGarage\DreamSoundSystem.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UICommon.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\DreamOS\packages.config">
