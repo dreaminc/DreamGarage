@@ -32,7 +32,7 @@ Error:
 RESULT DreamSoundSystem::UnregisterObserver() {
 	RESULT r = R_PASS;
 
-	CNM((m_pObserver), "Observer already null");
+	CNRM((m_pObserver), R_SKIPPED, "Observer already null");
 
 	m_pObserver = nullptr;
 
@@ -260,7 +260,6 @@ RESULT DreamSoundSystem::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
 	m_pWASAPICaptureClient->StopCapture();
-	UnregisterObserver();
 	CR(r);
 
 Error:

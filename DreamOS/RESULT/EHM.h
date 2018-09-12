@@ -135,6 +135,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define WCB(condition) do{if(!(condition)) {r = R_WARNING; DOSLogError(ERR, "WCB", r);goto Error;}}while(0);
 #define CBR(condition, failCode) do{if(!(condition)) {r = failCode; if(r&0x80000000){DOSLogError(ERR, "CBR", r);} goto Error;}}while(0);
 #define CBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage(ERR, "CBM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
+#define WCBM(condition, msg, ...) do{if(!(condition)) { DOSLogErrorMessage(ERR, "WCBM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING;/*goto Error;*/}}while(0);
 #define CBRM(condition, failCode, msg, ...) do{if(!(condition)) {r = failCode; if(r&0x80000000){ DOSLogErrorMessage(ERR, "CBRM", msg, r); DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode;} goto Error; }}while(0);
 
 #define ACBM(condition, msg, ...) do{if(!condition){DOSLogErrorMessage(ERR, "ACBM", msg, R_FAIL); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);

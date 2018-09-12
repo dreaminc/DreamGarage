@@ -509,10 +509,11 @@ RESULT OVRHMD::ReleaseHMD() {
 	}
 
 	if (m_ovrSession != nullptr) {
+		DOSLOG(INFO, "ovr_Destroy");
 		ovr_Destroy(m_ovrSession);
 		m_ovrSession = nullptr;
 	}
-
+	DOSLOG(INFO, "ovr_Shutdown");
 	ovr_Shutdown();
 
 //Error:
