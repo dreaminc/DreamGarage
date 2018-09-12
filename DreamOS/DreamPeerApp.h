@@ -38,7 +38,7 @@ struct InteractionObjectEvent;
 
 class WebRTCPeerConnectionProxy;
 
-class DreamPeerApp : public DreamApp<DreamPeerApp>, public Subscriber<InteractionObjectEvent> {
+class DreamPeerApp : public DreamApp<DreamPeerApp> {
 	friend class DreamAppManager;
 
 public:
@@ -92,7 +92,10 @@ protected:
 	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	RESULT InitializeNameBackground();
+	RESULT InitializeUserNameText();
+
+public:
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();
 
@@ -156,16 +159,9 @@ private:
 	std::shared_ptr<SpatialSoundObject> m_pSpatialSoundObject = nullptr;
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserModel = false;
-	bool m_fGazeInteraction = false;
 	bool m_fVisible = false;
 
 	sphere *m_pSphere = nullptr;
-
-	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
-	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
-	
-	double m_msTimeGazeStart;
-	double m_msTimeUserNameDelay = 1250;
 
 	// appear and disappear duration in seconds (direct plug into PushAnimation)
 	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;

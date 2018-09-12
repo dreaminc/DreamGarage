@@ -24,15 +24,6 @@ DreamPeerApp::DreamPeerApp(DreamOS *pDOS, void *pContext) :
 	// empty
 }
 
-//DreamPeerApp::DreamPeerApp(DreamOS *pDOS, PeerConnection *pPeerConnection, void *pContext) :
-//	DreamApp<DreamPeerApp>(pDOS, pContext),
-//	m_pDOS(pDOS),
-//	m_state(DreamPeerApp::state::UNINITIALIZED),
-//	m_pPeerConnection(pPeerConnection)
-//{
-//	// empty
-//}
-
 DreamPeerApp* DreamPeerApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamPeerApp *pDreamApp = new DreamPeerApp(pDreamOS, pContext);
 	return pDreamApp;
@@ -41,24 +32,10 @@ DreamPeerApp* DreamPeerApp::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	// Subscribers (children)
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	//}
-
 	CR(SetState(state::INITIALIZED));
 
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
-
-	// NOTE: User Model is assigned externally
-	GetComposite()->InitializeOBB();
-
-	GetDOS()->AddObjectToInteractionGraph(GetComposite());
-
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	CR(GetDOS()->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
 
 Error:
 	return r;
@@ -92,7 +69,6 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 		CN(m_pUserModel);
 		CR(GetComposite()->AddObject(m_pUserModel));
-
 		m_fPendingAssignedUserModel = false;
 	}
 
@@ -101,150 +77,73 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CN(m_pSpatialSoundObject);
 	}
 
-	//if (m_pSphere == nullptr) {
-	//	m_pSphere = GetDOS()->AddSphere(0.025f, 10, 10);
-	//	CN(m_pSphere);
-	//}
-
-	/*
-	if (m_pOrientationRay == nullptr) {
-		m_pOrientationRay = GetComposite()->AddRay(point(0.0f), vector::kVector(-1.0f), 1.0f);
-		CN(m_pOrientationRay);
-		m_pOrientationRay->SetVisible(false);
-
-		// Adding the line below will register the peer look ray and will trigger an 
-		// event when the peer is looking at something that consumes these events
-		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
-	}
-	//*/
-
-	if (m_pPhantomVolume == nullptr) {
-		m_pPhantomVolume = GetComposite()->AddVolume(2.0f);
-		CN(m_pPhantomVolume);
-		m_pPhantomVolume->SetVisible(false);
-	}
-
-	///*
-	if (m_pNameComposite == nullptr) {
-		m_pNameComposite = GetComposite()->AddComposite();
-		
-		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
-	}
-
-	if (m_pFont == nullptr) {
-		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		CN(m_pFont);
-		m_pFont->SetLineHeight(NAME_LINE_HEIGHT);
-		
-	}
-
 	if (m_pNameBackground == nullptr) {
-		CN(m_pNameComposite);
-
-		m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
-		CN(m_pNameBackground);
-
-		m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
-		
-		m_pNameBackground->SetVisible(false);
-		
-		m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
-		m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
-		m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-		m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
+		CR(InitializeNameBackground());
 	}
 
 	if (m_pTextUserName == nullptr && m_strScreenName != "") {
-		m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
-			m_pFont,
-			m_strScreenName,
-			0.9 - NAMETAG_BORDER,
-			0.2 - NAMETAG_BORDER,
-			text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-		CN(m_pTextUserName);
-
-		m_pTextUserName->SetVisible(false);
-
-		m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
-		m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-		CR(m_pNameComposite->AddObject(m_pTextUserName));
-		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
-		m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
+		CR(InitializeUserNameText());
 	}
 	
+	// update user label position
 	if (m_pUserModel != nullptr) {
 		m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
 	}
 	
-	if (m_fGazeInteraction) {
-		std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-		if (msTimeNow - m_msTimeGazeStart > m_msTimeUserNameDelay && !IsUserNameVisible()) {
-			ShowUserNameField();
-			m_fGazeInteraction = false;
-		}
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::InitializeNameBackground() {
+	RESULT r = R_PASS;
+
+	if (m_pNameComposite == nullptr) {
+		m_pNameComposite = GetComposite()->AddComposite();
+		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
 	}
 
-	//*/
+	CN(m_pNameComposite);
+
+	m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
+	CN(m_pNameBackground);
+
+	m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
+	
+	m_pNameBackground->SetVisible(false);
+	
+	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
+	m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
+	m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+	m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
 
 Error:
 	return r;
 }
 
-RESULT DreamPeerApp::Notify(InteractionObjectEvent *mEvent) {
+RESULT DreamPeerApp::InitializeUserNameText() {
 	RESULT r = R_PASS;
 
-	if (mEvent->m_pInteractionObject != nullptr) {
-		CBR((mEvent->m_pInteractionObject != m_pOrientationRay.get()), R_SKIPPED);
-		CNR(m_pUserModel, R_SKIPPED);
+	if (m_pFont == nullptr) {
+		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+		CN(m_pFont);
+		m_pFont->SetLineHeight(NAME_LINE_HEIGHT);
 	}
 
-	//if (m_pSphere != nullptr) {
-	//	m_pSphere->SetPosition(mEvent->m_ptContact[0]);
-	//}
+	m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
+		m_pFont,
+		m_strScreenName,
+		0.9 - NAMETAG_BORDER,
+		0.2 - NAMETAG_BORDER,
+		text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	CN(m_pTextUserName);
 
-	// handle event
-	switch (mEvent->m_eventType) {
-		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			// can't rely on m_pUserModel existing as the peer enters and leaves
-			if (IsVisible() && !IsUserNameVisible()) {
-				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-				m_fGazeInteraction = true;
-			}
-		} break;
+	m_pTextUserName->SetVisible(false);
 
-		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			if (IsVisible() && !IsUserNameVisible() && !m_fGazeInteraction) {
-				std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-				m_msTimeGazeStart = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-				m_fGazeInteraction = true;
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			m_fGazeInteraction = false;
-			if (IsUserNameVisible()) {
-				HideUserNameField();
-			}
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_BEGAN: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
-			// stub
-		} break;
-
-		case InteractionEventType::ELEMENT_COLLIDE_ENDED: {
-			// stub
-		} break;
-	}
+	m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
+	m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
+	CR(m_pNameComposite->AddObject(m_pTextUserName));
+	m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+	m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 
 Error:
 	return r;
