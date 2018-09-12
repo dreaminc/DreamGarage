@@ -348,8 +348,9 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	// Environment App is rendered directly by the environment program node
-	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this, false);
+	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this, false).get();
 	CN(m_pDreamEnvironmentApp);
+	DOSLOG(INFO, "DreamEnvironmentApp Launched");
 
 	CNM(m_pDreamEnvironmentApp, "Dream Environment App not set");
 
@@ -363,8 +364,10 @@ RESULT DreamGarage::LoadScene() {
 	CR(m_pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 
 	CR(SetupUserModelPool());
+	DOSLOG(INFO, "UserModelPool has been setup");
 
 	AddSkybox();
+	DOSLOG(INFO, "Added Skybox");
 
 Error:
 	return r;
@@ -378,13 +381,14 @@ RESULT DreamGarage::DidFinishLoading() {
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
-	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
-	CN(m_pDreamUserApp);
+	auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+	CN(pDreamUserApp);
+	m_pDreamUserApp = pDreamUserApp.get();
 
-	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false);
+	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false).get();
 	CN(m_pDreamUserControlArea);
 
-	m_pDreamUserControlArea->SetDreamUserApp(m_pDreamUserApp);
+	m_pDreamUserControlArea->SetDreamUserApp(pDreamUserApp);
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 	if (m_pDreamEnvironmentApp != nullptr) {
@@ -405,7 +409,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamSettings);
 
 	if (GetSandboxConfiguration().fUseGamepad) {
-		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
 	}
 
 	// TODO: could be somewhere else(?)

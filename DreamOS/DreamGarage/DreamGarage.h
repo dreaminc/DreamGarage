@@ -182,15 +182,15 @@ private:
 	ProgramNode* m_pRefractionProgramNode = nullptr;
 	ProgramNode* m_pReflectionProgramNode = nullptr;
 
-	std::shared_ptr<DreamEnvironmentApp> m_pDreamEnvironmentApp = nullptr;
-	std::shared_ptr<DreamUserControlArea> m_pDreamUserControlArea = nullptr;
-	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
-	std::shared_ptr<DreamUIBar> m_pDreamUIBar = nullptr;
-	std::shared_ptr<DreamContentView> m_pDreamContentView = nullptr;
-	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
-	std::shared_ptr<DreamControlView> m_pDreamControlView = nullptr;
-	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
-	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamePadCameraApp = nullptr;
+	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
+	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
+	DreamUserApp* m_pDreamUserApp = nullptr;
+	DreamUIBar* m_pDreamUIBar = nullptr;
+	DreamContentView* m_pDreamContentView = nullptr;
+	DreamBrowser* m_pDreamBrowser = nullptr;
+	DreamControlView* m_pDreamControlView = nullptr;
+	DreamDesktopApp* m_pDreamDesktop = nullptr;
+	DreamGamepadCameraApp* m_pDreamGamePadCameraApp = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_
