@@ -357,7 +357,7 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 	CRM((RESULT)m_pAudioCaptureClient->Start(), "Failed to start capture audio device");
 
 	// Each loop fills one of the two buffers.
-	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT) {
+	while (audioDeviceFlags != AUDCLNT_BUFFERFLAGS_SILENT && m_captureState != sound::state::STOPPED) {
 
 		// Wait for next buffer event to be signaled.
 		DWORD retval = WaitForSingleObject(hCaptureBufferEvent, WASAPI_WAIT_BUFFER_TIMEOUT_MS);

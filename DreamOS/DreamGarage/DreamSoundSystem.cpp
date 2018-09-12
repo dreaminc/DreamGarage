@@ -259,6 +259,8 @@ Error:
 RESULT DreamSoundSystem::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	m_pWASAPICaptureClient->StopCapture();
+	UnregisterObserver();
 	CR(r);
 
 Error:
