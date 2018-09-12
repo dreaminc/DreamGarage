@@ -255,6 +255,19 @@ RESULT DreamUserApp::Shutdown(void *pContext) {
 		m_pWebBrowserManager = nullptr;
 	}
 
+	if (m_pMessageComposite != nullptr) {
+		m_pMessageComposite = nullptr;
+	}
+	if (m_pMessageQuad != nullptr) {
+		m_pMessageQuad = nullptr;
+	}
+	if (m_pMessageQuadBackground != nullptr) {
+		m_pMessageQuadBackground = nullptr;
+	}
+	if (m_pOrientationRay != nullptr) {
+		m_pOrientationRay = nullptr;
+	}
+
 Error:
 	return r;
 }
