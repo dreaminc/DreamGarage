@@ -569,9 +569,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 		m_SandboxConfiguration.fUseHMD = false;
 	}
 	CRM(InitializeHMD(), "Failed to initialize HMD");
+	DOSLOG(INFO, "HMD Initialized");
 
 	// Set up the pipeline
 	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
+	DOSLOG(INFO, "HAL Pipeline Setup Successful");
 
 	// Generalize this module pattern
 	if (m_SandboxConfiguration.fInitCloud) {
@@ -584,6 +586,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
+	DOSLOG(INFO, "Finished Initializing DreamAppManager");
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseLeap = false;
@@ -591,6 +594,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+	DOSLOG(INFO, "Finished Initializing Sandbox");
 
 	// TODO: Make these into modules
 	// TODO: These have dependencies potentially on previous modules

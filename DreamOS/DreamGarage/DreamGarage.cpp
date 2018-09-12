@@ -350,6 +350,7 @@ RESULT DreamGarage::LoadScene() {
 	// Environment App is rendered directly by the environment program node
 	m_pDreamEnvironmentApp = LaunchDreamApp<DreamEnvironmentApp>(this, false).get();
 	CN(m_pDreamEnvironmentApp);
+	DOSLOG(INFO, "DreamEnvironmentApp Launched");
 
 	CNM(m_pDreamEnvironmentApp, "Dream Environment App not set");
 
@@ -363,8 +364,10 @@ RESULT DreamGarage::LoadScene() {
 	CR(m_pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 
 	CR(SetupUserModelPool());
+	DOSLOG(INFO, "UserModelPool has been setup");
 
 	AddSkybox();
+	DOSLOG(INFO, "Added Skybox");
 
 Error:
 	return r;
