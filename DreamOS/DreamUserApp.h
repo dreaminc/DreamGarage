@@ -13,6 +13,8 @@
 #include "DreamAppHandle.h"
 #include "Primitives/HandType.h"
 
+#include "DreamGarage/UICommon.h"
+
 #include <map>
 #include <vector>
 #include <stack>
@@ -54,8 +56,6 @@ class CEFBrowserManager;
 
 #define MESSAGE_QUAD_WIDTH 2.40f
 #define MESSAGE_QUAD_HEIGHT (MESSAGE_QUAD_WIDTH * 9.0f / 16.0f)
-
-#define BACKGROUND_SCALE 1.0323f;
 
 enum class UserObserverEventType {
 	BACK,
@@ -238,7 +238,9 @@ private:
 
 	float m_messageQuadHeight = MESSAGE_QUAD_HEIGHT;
 	float m_messageQuadWidth = MESSAGE_QUAD_WIDTH;
-	float m_messageBackgroundScale = BACKGROUND_SCALE;
+
+	float m_messageBackgroundWidth = BORDER_WIDTH;
+	float m_messageBackgroundHeight = BORDER_HEIGHT;
 
 
 private:

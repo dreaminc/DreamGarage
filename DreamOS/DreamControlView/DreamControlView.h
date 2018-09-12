@@ -11,6 +11,8 @@
 #include "DreamUserApp.h"
 #include "UIControlBar.h"
 
+#include "DreamGarage/UICommon.h"
+
 #include "DreamUserControlArea/DreamUserControlArea.h"
 
 #include "Primitives/Subscriber.h"
@@ -25,9 +27,6 @@
 #define TYPING_ANGLE (42.0f * M_PI / 180.0f)
 #define KEYBOARD_ANIMATION_DURATION_SECONDS 0.1f
 #define SQUARED_DRAG_THRESHOLD 0.001f;
-
-#define BORDER_WIDTH 1.0323f;
-#define BORDER_HEIGHT 0.594624f;
 
 class quad; 
 class sphere;

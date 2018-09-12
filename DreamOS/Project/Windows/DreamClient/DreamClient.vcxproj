@@ -720,6 +720,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClInclude Include="..\..\..\DreamGarage\DreamSoundSystem.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UICommon.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateMouthMessage.h" />

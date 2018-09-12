@@ -211,7 +211,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuad->SetVisible(true);
 	m_pMessageQuad->RotateXByDeg(90);
 
-	m_pMessageQuadBackground = m_pMessageComposite->AddQuad(m_messageQuadWidth * m_messageBackgroundScale, m_messageQuadHeight * m_messageBackgroundScale, 1, 1, nullptr);
+	m_pMessageQuadBackground = m_pMessageComposite->AddQuad(m_messageQuadWidth * m_messageBackgroundWidth, m_messageQuadWidth * m_messageBackgroundHeight, 1, 1, nullptr);
 	m_pMessageQuadBackground->SetPosition(point(0.0f, 0.0f, -0.001f));
 	m_pMessageQuadBackground->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png"));
 	m_pMessageQuadBackground->SetVisible(true);
