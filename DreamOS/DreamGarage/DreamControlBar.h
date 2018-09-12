@@ -7,14 +7,14 @@
 
 #include "UI/UIView.h"
 #include "DreamControlView/UIControlBar.h"
+
+#include "DreamGarage/UICommon.h"
+
 //#include "DreamUserControlArea/DreamUserControlArea.h"
 class DreamUserControlArea;
 
 //All relative to parent app
-#define BUTTON_WIDTH 0.0645
-#define BUTTON_HEIGHT 0.0645
 #define URL_WIDTH 0.5484
-#define URL_HEIGHT 0.0645
 
 enum class ControlEventType {
 	OPEN,
@@ -93,10 +93,10 @@ private:
 	std::string m_strUpdateTitle = "";
 	BarType m_barType = BarType::DEFAULT;
 
-	double m_buttonWidth = BUTTON_WIDTH;
-	double m_buttonHeight = BUTTON_HEIGHT;
+	double m_buttonWidth = ITEM_SIZE;
+	double m_buttonHeight = ITEM_SIZE;
 	double m_urlWidth = URL_WIDTH;
-	double m_urlHeight = URL_HEIGHT;
+	double m_urlHeight = ITEM_SIZE;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_

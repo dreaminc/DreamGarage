@@ -9,6 +9,8 @@
 #include "DreamShareViewMessage.h"
 #include "DreamUserApp.h"
 
+#include "DreamGarage/UICommon.h"
+
 #define PX_WIDTH 1366
 #define PX_HEIGHT 768
 
@@ -99,6 +101,8 @@ private:
 	int m_castpxHeight = PX_HEIGHT;
 	float m_aspectRatio;
 	float m_diagonalSize = 9.0f;
+	float m_borderWidth = BORDER_WIDTH;
+	float m_borderHeight = BORDER_HEIGHT;
 
 	// Streaming members
 	bool m_fStreaming = false;

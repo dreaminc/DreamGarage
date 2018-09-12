@@ -5,3 +5,5 @@
 // proportional to content width
 #define BORDER_WIDTH 1.0323f;
 #define BORDER_HEIGHT 0.594624f;
+
+#define ITEM_SIZE 0.0645f;
