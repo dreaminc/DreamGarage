@@ -409,7 +409,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// TODO: MODULE
 		// Time Manager
-		CR(m_pTimeManager->Update());
+		// CR(m_pTimeManager->Update());
 
 		// App Manager
 		CR(m_pDreamAppManager->Update());
@@ -441,7 +441,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// TODO: MODULE
 		// Update Physics
-		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
+		// CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
 		// Update Interaction Engine
 		CR(m_pInteractionEngine->UpdateObjectStore(m_pInteractionGraph));
