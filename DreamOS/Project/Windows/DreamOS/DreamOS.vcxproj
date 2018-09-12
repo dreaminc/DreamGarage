@@ -1463,6 +1463,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\AACommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">

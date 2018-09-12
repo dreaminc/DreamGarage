@@ -34,9 +34,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWaterShaderCube());
-
 	CR(AddTestCubeMap());
+
+	CR(AddTestWaterShaderCube());
 
 	CR(AddTestMinimalTextureShader());
 
@@ -5284,6 +5284,7 @@ RESULT HALTestSuite::AddTestCubeMap() {
 			pVolume = m_pDreamOS->AddVolume(width, height, length);
 			CN(pVolume);
 			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pVolume->RotateZByDeg(1.0f);
 
 			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pColorTexture);

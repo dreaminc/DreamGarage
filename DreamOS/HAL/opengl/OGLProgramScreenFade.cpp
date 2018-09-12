@@ -30,6 +30,7 @@ RESULT OGLProgramScreenFade::OGLInitialize(version versionOGL) {
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"mathCommon.shader"), "Failed to add math global shared shader code");
+	CRM(AddSharedShaderFilename(L"AACommon.shader"), "Failed to add global shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"screenfade.vert"), "Failed to create vertex shader");

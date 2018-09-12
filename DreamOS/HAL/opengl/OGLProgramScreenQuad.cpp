@@ -31,6 +31,9 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBackgroundColor), std::string("u_vec4BackgroundColor")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformWindowWidth), std::string("u_windowWidth")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformWindowHeight), std::string("u_windowHeight")));
+
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
 	CN(m_pScreenQuad);
 
@@ -75,6 +78,7 @@ RESULT OGLProgramScreenQuad::OGLInitialize(version versionOGL) {
 
 	// Global
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
+	CRM(AddSharedShaderFilename(L"AACommon.shader"), "Failed to add global shared shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"screenquad.vert"), "Failed to create vertex shader");
@@ -132,6 +136,12 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
 	}
+
+	if(m_pUniformWindowWidth != nullptr)
+		m_pUniformWindowWidth->SetUniform((float)m_pOGLFramebufferInput->GetWidth());
+
+	if(m_pUniformWindowHeight != nullptr)
+		m_pUniformWindowHeight->SetUniform((float)m_pOGLFramebufferInput->GetHeight());
 
 	glDisable(GL_BLEND);
 

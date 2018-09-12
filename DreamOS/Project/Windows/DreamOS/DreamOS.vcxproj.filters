@@ -2360,6 +2360,9 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\parallaxCommon.shader">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\AACommon.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

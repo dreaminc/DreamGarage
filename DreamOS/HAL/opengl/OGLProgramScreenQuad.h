@@ -43,6 +43,9 @@ private:
 	OGLUniformBool *m_pFUniformTextureMS = nullptr;
 	OGLUniformInt *m_pUniformColorTextureMS_n = nullptr;
 
+	OGLUniformFloat *m_pUniformWindowWidth = nullptr;
+	OGLUniformFloat *m_pUniformWindowHeight = nullptr;
+
 	OGLUniformVector *m_pUniformBackgroundColor = nullptr;
 };
 

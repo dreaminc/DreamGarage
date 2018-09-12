@@ -21,6 +21,8 @@ bool g_fTextureMS = true;
 layout (location = 0) out vec4 out_vec4Color;
 
 uniform vec4 u_vec4BackgroundColor;
+uniform float u_windowWidth;
+uniform float u_windowHeight;
 
 void main(void) {  
 	// Look up texture by coord
@@ -37,7 +39,10 @@ void main(void) {
 		color = colorAccumulator / (u_textureColorMS_n);
 	}
 	else {
-		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
+		//color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
+
+		vec2 inverseScreenSize = vec2(1.0f / u_windowWidth, 1.0f / u_windowHeight);
+		color = GetFXAAColor(u_textureColor, DataIn.uvCoord, inverseScreenSize);
 	}
 	
 	// sigmoid(3.0f, 1.0f) = 0.9526f, so we need to scale it for a pure black during the fade
