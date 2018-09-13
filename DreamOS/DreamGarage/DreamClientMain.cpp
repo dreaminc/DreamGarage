@@ -48,7 +48,7 @@
 
 	Error:
 		DreamLogger::instance()->Flush();
-		DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
+		DOSLOG(INFO, "DREAM OS Exiting with Error 0x%x result", r);
 		DEBUG_SYSTEM_PAUSE();
 
 		return (int)(r);

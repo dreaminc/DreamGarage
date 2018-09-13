@@ -353,24 +353,50 @@ RESULT SandboxApp::PendShutdown() {
 RESULT SandboxApp::Shutdown() {
 	RESULT r = R_SUCCESS;
 
+	DOSLOG(INFO, "Begin sandbox shutdown.");
+
 	if (m_pDreamAppManager != nullptr) {
 		CR(m_pDreamAppManager->Shutdown());
 		m_pDreamAppManager = nullptr;
 	}
+	DOSLOG(INFO, "App Manager Shutdown");
 
 	if (m_pDreamModuleManager != nullptr) {
 		CR(m_pDreamModuleManager->Shutdown());
 		m_pDreamModuleManager = nullptr;
 	}
+	DOSLOG(INFO, "Module Manager Shutdown");
 
 	if (m_pHMD != nullptr) {
 		CR(m_pHMD->ReleaseHMD());
 		delete m_pHMD;
 		m_pHMD = nullptr;
 	}
+	DOSLOG(INFO, "Release HMD");
 
 	// Implementation specific shutdown
 	CR(ShutdownSandbox());
+	DOSLOG(INFO, "Sandbox Shutdown complete");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::HMDShutdown() {
+	RESULT r = R_PASS;
+
+	//*
+	DOSLOG(INFO, "OVRShutdown called");
+	if (m_pHMD != nullptr) {
+		DOSLOG(INFO, "Releasing HMD");
+		CR(m_pHMD->ReleaseHMD());
+		delete m_pHMD;
+		m_pHMD = nullptr;
+		DOSLOG(INFO, "HMD Released");
+	}
+	//*/
+
+	PendShutdown();
 
 Error:
 	return r;
@@ -462,6 +488,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
 		if (IsShuttingDown() || GetAsyncKeyState(VK_ESCAPE)) {
+			Sleep(1000);
 			Shutdown();
 		}
 	}
