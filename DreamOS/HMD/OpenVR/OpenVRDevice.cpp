@@ -69,7 +69,7 @@ std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::Tracke
 	return sResult;
 }
 
-RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
+RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 	vr::EVRInitError ivrResult = vr::VRInitError_None;
 	m_pHALImp = halimp;
@@ -89,7 +89,6 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 
 	// Eye Widths
 	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
-
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 	

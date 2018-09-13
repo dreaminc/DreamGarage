@@ -32,6 +32,16 @@ Error:
 	return r;
 }
 
+RESULT Pipeline::RunAuxiliaryPipeline() {
+	RESULT r = R_PASS;
+
+	CN(m_pAuxiliarySinkNode);
+	CR(m_pAuxiliarySinkNode->RenderNode((m_frameID > 0) ? m_frameID - 1 : 0));
+
+Error:
+	return r;
+}
+
 RESULT Pipeline::Reset(bool fResetDestination) {
 	RESULT r = R_PASS;
 
@@ -62,4 +72,20 @@ Error:
 
 SinkNode* Pipeline::GetDestinationSinkNode() {
 	return m_pDestinationSinkNode;
+}
+
+RESULT Pipeline::SetAuxiliarySinkNode(SinkNode* pAuxiliarySinkNode) {
+	RESULT r = R_PASS;
+
+	CN(pAuxiliarySinkNode);
+	CBM((m_pAuxiliarySinkNode == nullptr), "Auxiliary sink node already set - please disconnect it first");
+
+	m_pAuxiliarySinkNode = pAuxiliarySinkNode;
+
+Error:
+	return r;
+}
+
+SinkNode* Pipeline::GetAuxiliarySinkNode() {
+	return m_pAuxiliarySinkNode;
 }

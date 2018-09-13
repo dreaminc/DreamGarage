@@ -137,15 +137,16 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 		BindToFramebuffer(m_pOGLFramebuffer);
 	}
 
-	if(m_pUniformWindowWidth != nullptr)
-		m_pUniformWindowWidth->SetUniform((float)m_pOGLFramebufferInput->GetWidth());
-
-	if(m_pUniformWindowHeight != nullptr)
-		m_pUniformWindowHeight->SetUniform((float)m_pOGLFramebufferInput->GetHeight());
-
 	glDisable(GL_BLEND);
 
 	if (m_pOGLFramebufferInput != nullptr) {
+
+		if (m_pUniformWindowWidth != nullptr)
+			m_pUniformWindowWidth->SetUniform((float)m_pOGLFramebufferInput->GetWidth());
+
+		if (m_pUniformWindowHeight != nullptr)
+			m_pUniformWindowHeight->SetUniform((float)m_pOGLFramebufferInput->GetHeight());
+
 		int sampleCount = m_pOGLFramebufferInput->GetSampleCount();
 
 		if (sampleCount > 1) {

@@ -34,6 +34,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTest3rdPersonCamera());
+
 	CR(AddTestCubeMap());
 
 	CR(AddTestWaterShaderCube());
@@ -5203,6 +5205,111 @@ RESULT HALTestSuite::AddTestFramerateVolumes() {
 
 	pNewTest->SetTestName("Framerate Volumes");
 	pNewTest->SetTestDescription("Test frame rate vs many volumes");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTest3rdPersonCamera() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 400.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.3f;
+	float alpha = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		// Skybox
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pSkyboxProgramNode;
+		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgramNode);
+		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		{
+
+			volume *pVolume;
+			pVolume = nullptr;
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pVolume->RotateZByDeg(1.0f);
+
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pColorTexture);
+
+			CR(pVolume->SetDiffuseTexture(pColorTexture));
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Cube Map Test");
+	pNewTest->SetTestDescription("Test cube map shaders and cube map pipeline nodes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

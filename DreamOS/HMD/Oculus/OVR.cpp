@@ -63,7 +63,7 @@ HMDSourceNode* OVRHMD::GetHMDSourceNode() {
 	return nullptr;
 }
 
-RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
+RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 
 	ovrGraphicsLuid luid;
@@ -100,10 +100,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	if (wndHeight == 0)
 		wndHeight = m_ovrHMDDescription.Resolution.h / 2;
 
-	m_pOVRMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
-	
-	CN(m_pOVRMirrorTexture);
-	CR(m_pOVRMirrorTexture->OVRInitialize());
+	if (fHMDMirror == true) {
+		m_pOVRMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
+		CN(m_pOVRMirrorTexture);
+		CR(m_pOVRMirrorTexture->OVRInitialize());
+	}
 	
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
@@ -278,7 +279,11 @@ RESULT OVRHMD::SetUpFrame() {
 }
 
 RESULT OVRHMD::RenderHMDMirror() {
-	return m_pOVRMirrorTexture->RenderMirrorToBackBuffer();
+	if (m_pOVRMirrorTexture != nullptr) {
+		return m_pOVRMirrorTexture->RenderMirrorToBackBuffer();
+	}
+
+	return R_SKIPPED;
 }
 
 RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {

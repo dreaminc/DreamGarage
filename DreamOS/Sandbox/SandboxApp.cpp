@@ -757,7 +757,14 @@ RESULT SandboxApp::InitializeHMD() {
 	if (GetSandboxConfiguration().fUseHMD) {
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
-		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
+		m_pHMD = HMDFactory::MakeHMD(
+			HMD_ANY_AVAILABLE, 
+			this, 
+			m_pHALImp, 
+			pxWidth, 
+			pxHeight, 
+			GetSandboxConfiguration().fHMDMirror	// disable / enable mirror 
+		);
 
 		if (m_pHMD != nullptr) {
 			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -812,6 +819,21 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
 	CB(pDestSinkNode->incRefCount());
+
+	// Add 3rd person sink node if set
+	if (GetSandboxConfiguration().f3rdPersonCamera == true) {
+		SinkNode *p3rdPersonSinkNode = nullptr;
+		p3rdPersonSinkNode = m_pHALImp->MakeSinkNode("display");
+		CNM(p3rdPersonSinkNode, "Failed to create 3rd person sink node");
+
+		CNM(pRenderPipeline, "Pipeline not initialized");
+		CR(pRenderPipeline->SetAuxiliarySinkNode(p3rdPersonSinkNode));
+
+		p3rdPersonSinkNode = pRenderPipeline->GetAuxiliarySinkNode();
+		CNM(p3rdPersonSinkNode, "Auxiliary sink node isn't set");
+
+		CB(p3rdPersonSinkNode->incRefCount());
+	}
 
 Error:
 	return r;
