@@ -78,6 +78,8 @@ public:
 		unsigned fUseGamepad : 1;
 		unsigned fInitCloud : 1;
 		unsigned fInitSound : 1;
+		unsigned fHMDMirror : 1;
+		unsigned f3rdPersonCamera : 1;
 	};
 
 private:
