@@ -724,6 +724,7 @@ RESULT Windows64App::ShutdownSandbox() {
 		delete m_pCloudController;
 		m_pCloudController = nullptr;
 	}
+	DOSLOG(INFO, "Cloud controller shutdown");
 
 	// Shutdown and delete GL Rendering Context
 	if (m_pHALImp != nullptr) {
@@ -731,6 +732,7 @@ RESULT Windows64App::ShutdownSandbox() {
 		delete m_pHALImp;
 		m_pHALImp = nullptr;
 	}
+	DOSLOG(INFO, "HAL shutdown");
 
 	wglMakeCurrent(nullptr, nullptr);
 
