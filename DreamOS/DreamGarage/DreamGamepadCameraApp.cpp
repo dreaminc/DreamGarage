@@ -66,31 +66,71 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		if (m_fUpdateLeftStick) {
 			m_leftStick = m_pendLeftStick;
 		}
+		if (m_fUpdateRightStick) {
+			m_rightStick = m_pendRightStick;
+		}
+		if (m_fUpdateLeftTrigger) {
+			m_leftTriggerValue = m_pendLeftTriggerValue;
+		}
+		if (m_fUpdateRightTrigger) {
+			m_rightTriggerValue = m_pendRightTriggerValue;
+		}
+
 		// X
 		// moving right
 		if (m_leftStick(0, 0) > 0.15) {
-			m_xVelocity += msTimeStep / (100.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
+			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
 		}
 		// moving left
 		else if (m_leftStick(0,0) < -0.15) {
-			m_xVelocity += msTimeStep / (100.0 / m_leftStick(0, 0));
+			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));
 		}
 		else {
 			if (m_xVelocity < 0) {
-				m_xVelocity += msTimeStep / 200.0;
+				m_xVelocity += msTimeStep / 100.0;
 			}
 			else {
-				m_xVelocity -= msTimeStep / 200.0f;
+				m_xVelocity -= msTimeStep / 100.0f;
+			}
+		}
+
+		// Z
+		// moving forward
+		if (m_leftStick(0, 1) > 0.15) {
+			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
+		}
+		// moving backward
+		else if (m_leftStick(0, 1) < -0.15) {
+			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
+		}
+		else {
+			if (m_zVelocity < 0) {
+				m_zVelocity += msTimeStep / 100.0;
+			}
+			else {
+				m_zVelocity -= msTimeStep / 100.0f;
 			}
 		}
 
 		// cutoffs
+		// Maxs
+		if (m_xVelocity > 1.0f || m_xVelocity < -1.0f) {
+			util::Clamp(m_xVelocity, -1.0f, 1.0f);
+		}
+		if (m_zVelocity > 1.0f || m_zVelocity < -1.0f) {
+			util::Clamp(m_zVelocity, -1.0f, 1.0f);
+		}
+
+		// Mins
 		if (m_xVelocity < 0.001 && m_xVelocity > -0.001) {
 			m_xVelocity = 0.0f;
 		}
+		if (m_zVelocity < 0.001 && m_zVelocity > -0.001) {
+			m_zVelocity = 0.0f;
+		}
 
 		m_pCamera->MoveStrafe(m_xVelocity / m_cameraStrafeSpeed);
-		m_pCamera->MoveForward(m_leftStick(0, 1) / m_cameraStrafeSpeed);
+		m_pCamera->MoveForward(m_zVelocity / m_cameraStrafeSpeed);
 		m_pCamera->RotateCameraByDiffXY(m_rightStick(0, 0), -m_rightStick(0, 1));
 
 		m_pCamera->MoveUp(m_leftTriggerValue + m_rightTriggerValue);
@@ -107,23 +147,22 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 	switch (pEvent->gamepadEventType) {
 	case SENSE_GAMEPAD_JOYSTICK_LEFT: {
 		m_fUpdateLeftStick = true;
-		m_pendLeftStick = pEvent->eventData;
-		
+		m_pendLeftStick = pEvent->eventData;		
 	} break;
 
 	case SENSE_GAMEPAD_JOYSTICK_RIGHT: {
-		m_rightStick = pEvent->eventData / m_cameraRotateSpeed;		
-
+		m_fUpdateRightStick = true;
+		m_pendRightStick = pEvent->eventData;		
 	} break;
 
 	case SENSE_GAMEPAD_TRIGGER_LEFT: {
-		m_leftTriggerValue = -(pEvent->eventData(0,0) / m_cameraUpScale);
-
+		m_fUpdateLeftTrigger = true;
+		m_pendLeftTriggerValue = -(pEvent->eventData(0,0));
 	} break;
 
 	case SENSE_GAMEPAD_TRIGGER_RIGHT: {
-		m_rightTriggerValue = pEvent->eventData(0,0) / m_cameraUpScale;
-
+		m_fUpdateRightTrigger = true;
+		m_pendRightTriggerValue = pEvent->eventData(0, 0);
 	} break;
 
 	case SENSE_GAMEPAD_BUTTON_DOWN: {

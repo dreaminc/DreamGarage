@@ -43,13 +43,16 @@ private:
 	point2D m_pendLeftStick;
 
 	point2D m_rightStick;
+	point2D m_pendRightStick;
 
 	float m_xVelocity = 0.0f;
 	float m_yVelocity = 0.0f;
 	float m_zVelocity = 0.0f;
 
 	float m_leftTriggerValue = 0.0f;
+	float m_pendLeftTriggerValue = 0.0f;
 	float m_rightTriggerValue = 0.0f;
+	float m_pendRightTriggerValue = 0.0f;
 
 	double m_msTimeLastUpdated = 0.0;
 
@@ -58,7 +61,10 @@ private:
 	float m_cameraRotateSpeed = GAMEPAD_CAMERA_ROTATE_SCALE;
 
 	bool m_fUpdateLeftStick = false;
-	
+	bool m_fUpdateRightStick = false;
+	bool m_fUpdateLeftTrigger = false;
+	bool m_fUpdateRightTrigger = false;
+
 	bool m_fLockY = false;
 };
 
