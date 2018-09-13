@@ -382,7 +382,7 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::OVRShutdown() {
+RESULT SandboxApp::HMDShutdown() {
 	RESULT r = R_PASS;
 
 	//*

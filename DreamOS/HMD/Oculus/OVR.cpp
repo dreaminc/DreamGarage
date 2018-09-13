@@ -315,7 +315,7 @@ RESULT OVRHMD::UpdateHMD() {
 
 	if (OVRSessionStatus.ShouldQuit) {
 		DOSLOG(INFO, "ShouldQuit received from Oculus, shutting down sandbox")
-		m_pParentSandbox->OVRShutdown();
+		m_pParentSandbox->HMDShutdown();
 	}
 
 	if (OVRSessionStatus.ShouldRecenter) {
