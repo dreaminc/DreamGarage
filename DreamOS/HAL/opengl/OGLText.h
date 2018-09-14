@@ -32,7 +32,7 @@ public:
 	virtual RESULT SetText(const std::string& text) override;
 
 	virtual RESULT OGLInitialize() override;
-	virtual RESULT Render() override;
+	virtual RESULT Update() override;
 
 private:
 	//bool m_fChanged = false;

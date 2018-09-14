@@ -933,6 +933,60 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::UpdateObjectStore(ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = nullptr;
+
+	pObjectStore->Reset();
+
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+		if (pVirtualObj != nullptr && pVirtualObj->IsVisible() == true) {
+			UpdateObject((DimObj*)pVirtualObj);
+		}
+	}
+
+	//Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Remove this dynamic cast
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+	// IsVisible will return false for Virtual Objects
+	// TODO: Composite should be smarter than this
+	if (pOGLObj != nullptr) {
+		pOGLObj->Update();
+	}
+
+	if (pDimObj->HasChildren()) {
+		CR(UpdateChildren(pDimObj));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateChildren(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	for (auto &pVirtualObj : pDimObj->GetChildren()) {
+		//auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		//CR(RenderObject(pDimObjChild.get()));
+
+		if (pVirtualObj->IsVisible() == true)
+			UpdateObject((DimObj*)(pVirtualObj.get()));
+	}
+
+Error:
+	return r;
+}
+
 // Critical Path, EHM removed
 // Debug manually
 RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
@@ -1017,13 +1071,6 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 			CR(fnObjectCallback(this, nullptr));
 		}
 	}
-	else if (pOGLObj != nullptr) {
-		OGLText *pOGLText = dynamic_cast<OGLText*>(pOGLObj);
-
-		if (pOGLText != nullptr) {
-			pOGLObj->Render();
-		}
-	}
 
 	if (pDimObj->HasChildren()) {
 		CR(RenderChildren(pDimObj));
@@ -1063,7 +1110,7 @@ RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
 			RenderObject((DimObj*)(pVirtualObj.get()));
 	}
 
-//Error:
+Error:
 	return r;
 }
 

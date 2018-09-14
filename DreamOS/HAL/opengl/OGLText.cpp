@@ -72,8 +72,9 @@ RESULT OGLText::SetText(const std::string& strText) {
 	//m_fChanged = false;
 
 	// Update our stuff - prepare it for the next update
-	m_strPendingText = strText;
-	m_fPendingTextChange = true;
+	m_strPendingText.assign(strText);
+
+	SetDirty();
 
 Error:
 	return r;
@@ -84,10 +85,10 @@ RESULT OGLText::OGLInitialize() {
 	return R_SKIPPED;
 }
 
-RESULT OGLText::Render() {
+RESULT OGLText::Update() {
 	RESULT r = R_PASS;
 
-	if (m_fPendingTextChange) {
+	if (CheckAndCleanDirty()) {
 
 		CR(text::SetText(m_strPendingText));
 
@@ -98,8 +99,6 @@ RESULT OGLText::Render() {
 		//}
 
 		if (r != R_NO_EFFECT) {
-			//SetDirty();
-
 			// If the text has changed then do it up
 			if (m_pFramebuffer != nullptr && IsRenderToQuad()) {
 				CR(RenderToQuad());
