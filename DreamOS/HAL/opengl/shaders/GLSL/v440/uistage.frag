@@ -13,7 +13,7 @@ in Data {
 } DataIn;
 
 uniform bool u_hasTextureColor;
-uniform sampler2D u_textureColor;
+layout (binding = 0) uniform sampler2D u_textureColor;
 
 uniform bool u_clippingEnabled;
 uniform bool u_arEnabled;

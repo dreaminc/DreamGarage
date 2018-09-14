@@ -212,7 +212,7 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 			m_pParentImp->BindTexture(m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
 										m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapIndex());
 
-			m_pUniformCubemapEnvironment->SetUniform(5);
+			//m_pUniformCubemapEnvironment->SetUniform(5);
 		}
 	}
 	//else if(m_pCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
@@ -342,7 +342,7 @@ RESULT OGLProgramStandard::SetTextureUniform(OGLTexture* pTexture, OGLUniformSam
 			m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
 			m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 
-			pTextureUniform->SetUniform(texUnit);
+			//pTextureUniform->SetUniform(texUnit);
 		}
 	}
 	else {
