@@ -342,7 +342,7 @@ RESULT OGLProgramStandard::SetTextureUniform(OGLTexture* pTexture, OGLUniformSam
 			m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
 			m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 
-			//pTextureUniform->SetUniform(texUnit);
+			pTextureUniform->SetUniform(texUnit);
 		}
 	}
 	else {
