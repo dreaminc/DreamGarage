@@ -5,6 +5,7 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 #include "OGLTexture.h"
+#include "OGLText.h"
 
 #include "Scene/ObjectStore.h"
 
@@ -1014,6 +1015,13 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 		if ((fnObjectCallback = pOGLObj->GetOGLProgramPostCallback()) != nullptr) {
 			CR(fnObjectCallback(this, nullptr));
+		}
+	}
+	else if (pOGLObj != nullptr) {
+		OGLText *pOGLText = dynamic_cast<OGLText*>(pOGLObj);
+
+		if (pOGLText != nullptr) {
+			pOGLObj->Render();
 		}
 	}
 

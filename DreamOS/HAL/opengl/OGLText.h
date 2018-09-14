@@ -32,6 +32,12 @@ public:
 	virtual RESULT SetText(const std::string& text) override;
 
 	virtual RESULT OGLInitialize() override;
+	virtual RESULT Render() override;
+
+private:
+	//bool m_fChanged = false;
+	std::string m_strPendingText;
+	bool m_fPendingTextChange = false;
 };
 #pragma warning(pop)
 
