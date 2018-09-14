@@ -86,11 +86,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 		// X
 		// moving right
-		if (m_leftStick(0, 0) > 0.15) {
+		if (m_leftStick(0, 0) > 1.5) {
 			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
 		}
 		// moving left
-		else if (m_leftStick(0,0) < -0.15) {
+		else if (m_leftStick(0,0) < -1.5) {
 			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));
 		}
 		else {
@@ -104,11 +104,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 		// Z
 		// moving forward
-		if (m_leftStick(0, 1) > 0.15) {
+		if (m_leftStick(0, 1) > 1.5) {
 			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
 		}
 		// moving backward
-		else if (m_leftStick(0, 1) < -0.15) {
+		else if (m_leftStick(0, 1) < -1.5) {
 			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
 		}
 		else {
@@ -140,11 +140,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 		// Rotation
 		// looking left
-		if (m_rightStick(0, 0) > 0.15) {
+		if (m_rightStick(0, 0) > 15.0) {
 			m_lookXVelocity += msTimeStep / (200.0 / m_rightStick(0, 0));	// between 100 and 500 feels alright
 		}
 		// looking right
-		else if (m_rightStick(0, 0) < -0.15) {
+		else if (m_rightStick(0, 0) < -15.0) {
 			m_lookXVelocity += msTimeStep / (200.0 / m_rightStick(0, 0));
 		}
 		else {
@@ -156,11 +156,11 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			}
 		}
 		// looking up
-		if (m_rightStick(0, 1) > 0.15) {
+		if (m_rightStick(0, 1) > 15.0) {
 			m_lookYVelocity += msTimeStep / (200.0 / m_rightStick(0, 1));
 		}
 		// looking down
-		else if (m_rightStick(0, 1) < -0.15) {
+		else if (m_rightStick(0, 1) < -15.0) {
 			m_lookYVelocity += msTimeStep / (200.0 / m_rightStick(0, 1));
 		}
 		else {
