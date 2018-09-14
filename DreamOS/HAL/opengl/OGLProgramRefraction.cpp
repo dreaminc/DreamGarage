@@ -262,7 +262,7 @@ RESULT OGLProgramRefraction::SetObjectTextures(OGLObj *pOGLObj) {
 
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-		m_pUniformTextureColor->SetUniform(0);
+		//m_pUniformTextureColor->SetUniform(0);
 		m_pUniformHasTextureColor->SetUniform(true);
 	}
 	else {

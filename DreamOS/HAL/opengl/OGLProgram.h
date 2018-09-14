@@ -84,6 +84,11 @@ public:
 	RESULT RenderChildren(DimObj *pDimObj);	
 	RESULT RenderChildrenBoundingVolumes(DimObj *pDimObj);
 	//RESULT RenderObject(VirtualObj *pVirtualObj);
+
+	// Update
+	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+	RESULT UpdateObject(DimObj *pDimObj);
+	RESULT UpdateChildren(DimObj *pDimObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);

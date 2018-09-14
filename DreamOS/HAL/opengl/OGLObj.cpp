@@ -153,6 +153,10 @@ Error:
 	return r;
 }
 
+RESULT OGLObj::Update() {
+	return R_NOT_IMPLEMENTED;
+}
+
 // Override this method when necessary by a child object
 // Many objects will not need to though. 
 //virtual RESULT Render() {

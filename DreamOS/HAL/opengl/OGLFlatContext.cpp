@@ -16,3 +16,8 @@ OGLFlatContext::~OGLFlatContext() {
 RESULT OGLFlatContext::UpdateBuffers() {
 	return UpdateOGLBuffers();
 }
+
+// OGLText is a composite - no actual internal buffers
+RESULT OGLFlatContext::OGLInitialize() {
+	return R_SKIPPED;
+}

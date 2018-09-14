@@ -12,7 +12,7 @@ in Data {
 } DataIn;
 
 uniform bool	u_hasTextureColor;
-uniform sampler2D u_textureColor;
+layout (binding = 0) uniform sampler2D u_textureColor;
 
 layout (location = 0) out vec4 out_vec4Color;
 

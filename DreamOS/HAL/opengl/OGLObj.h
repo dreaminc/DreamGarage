@@ -32,6 +32,7 @@ public:
 	// Many objects will not need to though. 
 	//virtual RESULT Render() {
 	virtual RESULT Render();
+	virtual RESULT Update();
 
 	virtual RESULT RenderOGLBoundingVolume();
 	virtual RESULT UpdateOGLBoundingVolume();

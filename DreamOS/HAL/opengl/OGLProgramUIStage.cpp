@@ -101,9 +101,17 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
+	VirtualObj *pVirtualObj = nullptr;
+
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
+	// Update all of the UI objects
+
+	// Do this before we set the program or any GPU specific things
+	// since this gives objects the opportunity to do stuff on the GPU side
+	UpdateObjectStore(m_pClippingSceneGraph);
+	UpdateObjectStore(m_pSceneGraph);
 
 	UseProgram();
 
@@ -146,7 +154,7 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-		m_pUniformTextureColor->SetUniform(0);
+		//m_pUniformTextureColor->SetUniform(0);
 
 		m_pUniformHasTextureColor->SetUniform(true);
 	}

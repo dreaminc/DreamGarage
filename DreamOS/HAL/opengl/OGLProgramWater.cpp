@@ -259,7 +259,7 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
 			m_pOGLReflectionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
 		if(m_pUniformTextureReflection != nullptr)
-			m_pUniformTextureReflection->SetUniform(0);
+			//m_pUniformTextureReflection->SetUniform(0);
 
 		if(m_pUniformHasTextureReflection != nullptr)
 			m_pUniformHasTextureReflection->SetUniform(true);
@@ -275,8 +275,8 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureTarget(),
 			m_pOGLRefractionFramebuffer_in->GetColorAttachment()->GetOGLTextureIndex());
 		
-		if(m_pUniformTextureRefraction != nullptr)
-			m_pUniformTextureRefraction->SetUniform(1);
+		//if(m_pUniformTextureRefraction != nullptr)
+		//	m_pUniformTextureRefraction->SetUniform(1);
 		
 		if(m_pUniformHasTextureRefraction != nullptr)
 			m_pUniformHasTextureRefraction->SetUniform(true);
@@ -287,8 +287,8 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(m_pOGLRefractionFramebuffer_in->GetDepthAttachment()->GetOGLTextureTarget(),
 			m_pOGLRefractionFramebuffer_in->GetDepthAttachment()->GetOGLTextureIndex());
 		
-		if (m_pUniformTextureRefractionDepth != nullptr)
-			m_pUniformTextureRefractionDepth->SetUniform(2);
+		//if (m_pUniformTextureRefractionDepth != nullptr)
+		//	m_pUniformTextureRefractionDepth->SetUniform(2);
 
 		if (m_pUniformHasTextureRefractionDepth != nullptr)
 			m_pUniformHasTextureRefractionDepth->SetUniform(true);
@@ -310,8 +310,8 @@ RESULT OGLProgramWater::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(pOGLObj->GetOGLTextureBump()->GetOGLTextureTarget(), 
 			pOGLObj->GetOGLTextureBump()->GetOGLTextureIndex());
 
-		if(m_pUniformTextureNormal != nullptr)
-			m_pUniformTextureNormal->SetUniform(3);
+		//if(m_pUniformTextureNormal != nullptr)
+		//	m_pUniformTextureNormal->SetUniform(3);
 
 		if(m_pUniformHasTextureNormal != nullptr)
 			m_pUniformHasTextureNormal->SetUniform(true);

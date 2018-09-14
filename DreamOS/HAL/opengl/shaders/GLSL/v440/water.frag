@@ -24,19 +24,19 @@ in Data {
 
 
 uniform	bool u_hasTextureReflection;
-uniform sampler2D u_textureReflection;
+layout (binding = 0) uniform sampler2D u_textureReflection;
 //uniform sampler2DMS u_textureReflection;
 
 uniform bool	u_hasTextureRefraction;
-uniform sampler2D u_textureRefraction;
+layout (binding = 1) uniform sampler2D u_textureRefraction;
 //uniform sampler2DMS u_textureRefraction;
 
 uniform bool	u_hasTextureRefractionDepth;
-uniform sampler2D u_textureRefractionDepth;
+layout (binding = 2) uniform sampler2D u_textureRefractionDepth;
 //uniform sampler2DMS u_textureRefractionDepth;
 
 uniform bool	u_hasTextureNormal;
-uniform sampler2D u_textureNormal;
+layout (binding = 3) uniform sampler2D u_textureNormal;
 
 uniform float u_time;
 

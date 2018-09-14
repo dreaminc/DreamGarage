@@ -212,7 +212,7 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 			m_pParentImp->BindTexture(m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
 										m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapIndex());
 
-			m_pUniformCubemapEnvironment->SetUniform(5);
+			//m_pUniformCubemapEnvironment->SetUniform(5);
 		}
 	}
 	//else if(m_pCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
