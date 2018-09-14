@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
-	sandboxconfig.fHMDMirror = false;
-	sandboxconfig.f3rdPersonCamera = true;
+	sandboxconfig.fHMDMirror = true;
+	sandboxconfig.f3rdPersonCamera = false;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
