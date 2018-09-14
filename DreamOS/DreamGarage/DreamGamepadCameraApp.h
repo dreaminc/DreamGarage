@@ -1,9 +1,13 @@
 #ifndef DREAM_GAMEPAD_CAMERA_APP_H_
 #define DREAM_GAMEPAD_CAMERA_APP_H_
 
-#define GAMEPAD_STRAFESPEED_SCALE 70.0f	
-#define GAMEPAD_CAMERA_ROTATE_SCALE 0.65f
-#define GAMEPAD_CAMERA_UP_SCALE 20000.0f
+#define GAMEPAD_STRAFESPEED_SCALE 500.0f	
+#define GAMEPAD_CAMERA_ROTATE_SCALE 20.0f
+#define GAMEPAD_CAMERA_UP_SCALE 255.0f
+
+#define GAMEPAD_CAMERA_XZ_MAX_VELOCITY 1.5f;
+#define GAMEPAD_CAMERA_LOOK_MAX_VELOCITY 15.0f;
+#define GAMEPAD_CAMERA_Y_MAX_VELOCITY .8f;
 
 #include "RESULT/EHM.h"
 
@@ -49,6 +53,13 @@ private:
 	float m_yVelocity = 0.0f;
 	float m_zVelocity = 0.0f;
 
+	float m_lookXVelocity = 0.0f;
+	float m_lookYVelocity = 0.0f;
+
+	float m_xzMax = GAMEPAD_CAMERA_XZ_MAX_VELOCITY;
+	float m_yMax = GAMEPAD_CAMERA_Y_MAX_VELOCITY;
+	float m_lookMaxVelocity = GAMEPAD_CAMERA_LOOK_MAX_VELOCITY;
+
 	float m_leftTriggerValue = 0.0f;
 	float m_pendLeftTriggerValue = 0.0f;
 	float m_rightTriggerValue = 0.0f;
@@ -65,6 +76,7 @@ private:
 	bool m_fUpdateLeftTrigger = false;
 	bool m_fUpdateRightTrigger = false;
 
+	bool m_fFirstRun = false;
 	bool m_fLockY = false;
 };
 
