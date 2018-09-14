@@ -474,6 +474,7 @@ RESULT DreamPeerApp::SetPosition(const point& ptPosition) {
 	//m_pUserModel->SetPosition(ptPosition);
 	GetComposite()->SetPosition(ptPosition);
 	m_pUserModel->SetMouthPosition(ptPosition);
+	SetUserLabelPosition(ptPosition);
 
 	if (m_pSpatialSoundObject != nullptr) {
 		m_pSpatialSoundObject->SetPosition(ptPosition);
