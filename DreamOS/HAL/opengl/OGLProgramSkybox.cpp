@@ -148,7 +148,9 @@ Error:
 RESULT OGLProgramSkybox::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	if (m_fPassThru == false) {
+		UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	}
 
 	UseProgram();
 

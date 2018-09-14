@@ -349,6 +349,16 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 		m_fShowLaunchQuad = false;
 	}
+
+	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera && m_pUserModel == nullptr) {
+		m_pUserModel = std::shared_ptr<user>(GetDOS()->MakeUser());
+		CN(m_pUserModel);
+		m_pUserModel->UpdateAvatarModelWithID(1);
+		m_pUserModel->SetVisible(true);
+		m_pUserModel->SetDreamOS(GetDOS());
+		CR(GetComposite()->AddObject(m_pUserModel));
+	}
+
 	//CR(ResetAppComposite());
 Error:
 	return r;

@@ -63,5 +63,8 @@ private:
 	OGLUniform *m_pUniformViewWidth;
 	OGLUniform *m_pUniformViewHeight;
 	OGLUniformVector *m_pUniformSunDirection;
+
+	// TODO: Replace this with a pipeline node flag
+	bool m_fRendered = false;
 };
 #endif // ! OGLPROGRAM_SKYBOX_SCATTER_CUBE_H_

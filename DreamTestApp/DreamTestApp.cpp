@@ -23,8 +23,8 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
 	sandboxconfig.fInitSound = false;
-	sandboxconfig.fHMDMirror = true;
-	sandboxconfig.f3rdPersonCamera = false;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
 
 	SetSandboxConfiguration(sandboxconfig);
 

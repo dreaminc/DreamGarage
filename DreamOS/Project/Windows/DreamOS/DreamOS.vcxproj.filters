@@ -978,6 +978,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point2D.cpp">
       <Filter>Primitives</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.cpp">
+      <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2139,6 +2142,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\point2D.h">
       <Filter>Primitives</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

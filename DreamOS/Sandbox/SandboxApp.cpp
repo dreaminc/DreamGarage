@@ -823,7 +823,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	// Add 3rd person sink node if set
 	if (GetSandboxConfiguration().f3rdPersonCamera == true) {
 		SinkNode *p3rdPersonSinkNode = nullptr;
-		p3rdPersonSinkNode = m_pHALImp->MakeSinkNode("display");
+		p3rdPersonSinkNode = m_pHALImp->MakeSinkNode("displaycamera");
 		CNM(p3rdPersonSinkNode, "Failed to create 3rd person sink node");
 
 		CNM(pRenderPipeline, "Pipeline not initialized");

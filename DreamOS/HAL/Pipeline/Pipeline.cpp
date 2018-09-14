@@ -26,7 +26,13 @@ RESULT Pipeline::RunPipeline() {
 	RESULT r = R_PASS;
 
 	CN(m_pDestinationSinkNode);
-	CR(m_pDestinationSinkNode->RenderNode(m_frameID++));
+	CR(m_pDestinationSinkNode->RenderNode(m_frameID));
+
+	if (m_pAuxiliarySinkNode != nullptr) {
+		CR(RunAuxiliaryPipeline());
+	}
+
+	m_frameID++;
 
 Error:
 	return r;

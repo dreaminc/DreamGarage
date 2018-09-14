@@ -37,6 +37,7 @@
 #include "OGLAttachment.h"
 
 #include "OGLViewportDisplay.h"
+#include "OGLCameraViewportDisplay.h"
 
 #include "Core/Utilities.h"
 
@@ -1064,6 +1065,9 @@ SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
 		
 	if (strNodeName == "display") {
 		pSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
+	}
+	else if (strNodeName == "displaycamera") {
+		pSinkNode = DNode::MakeNode<OGLCameraViewportDisplay>(this);
 	}
 
 	return pSinkNode;
