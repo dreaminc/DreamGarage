@@ -292,6 +292,46 @@ RESULT DreamEnvironmentApp::GetSharedScreenPosition(point& ptPosition, quaternio
 	return r;
 }
 
+vector DreamEnvironmentApp::GetSeatVector(int seatIndex) {
+	RESULT r = R_PASS;
+
+	vector vDirection = vector(0.0f, 0.0f, -1.0f);
+	float theta;
+
+	CBM(seatIndex < m_maxSeatingIndex && seatIndex >= 0, "Peer index %d not supported by client", seatIndex);
+
+	switch (seatIndex) {
+	case 0: {
+		theta = m_baseTableAngle - m_frontAngle;
+	} break;
+
+	case 1: {
+		theta = m_baseTableAngle + m_frontAngle;
+	} break;
+
+	case 2: {
+		theta = m_baseTableAngle - m_middleAngle;
+	} break;
+
+	case 3: {
+		theta = m_baseTableAngle + m_middleAngle;
+	} break;
+
+	case 4: {
+		theta = m_baseTableAngle - m_backAngle;
+	} break;
+
+	case 5: {
+		theta = m_baseTableAngle + m_backAngle;
+	} break;
+	}
+
+	vDirection = vector(-sin(theta), 0.0f, -cos(theta));
+
+Error:
+	return vDirection;
+}
+
 RESULT DreamEnvironmentApp::GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex) {
 	RESULT r = R_PASS;
 

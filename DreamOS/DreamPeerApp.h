@@ -19,7 +19,7 @@
 #include "Primitives/hand.h"
 
 #define NAMETAG_BORDER 0.1f
-#define NAMETAG_HEIGHT 0.3f
+#define NAMETAG_HEIGHT 0.05f
 #define NAME_LINE_HEIGHT .12f
 #define USERNAME_ANIMATION_DURATION 0.3f
 
@@ -171,10 +171,11 @@ private:
 	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
-	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.75f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	std::shared_ptr<composite> m_pNameComposite = nullptr;
+	std::shared_ptr<composite> m_pBoundingComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
 

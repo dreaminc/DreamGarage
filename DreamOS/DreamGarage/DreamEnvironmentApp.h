@@ -101,6 +101,7 @@ private:
 	// Environment positioning information (non-island) 
 public:
 	RESULT GetEnvironmentSeatingPositionAndOrientation(point& ptPosition, quaternion& qOrientation, int seatIndex);
+	vector GetSeatVector(int seatIndex);
 	quaternion GetUIOffsetOrientation(int seatIndex);
 
 private:

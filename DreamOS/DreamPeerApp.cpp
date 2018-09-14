@@ -37,6 +37,12 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
 
+	m_pNameComposite = GetComposite()->MakeComposite();
+	m_pNameComposite->SetPosition(GetComposite()->GetPosition(true));
+	GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
+
+	m_pBoundingComposite = m_pNameComposite->AddComposite();
+
 Error:
 	return r;
 }
@@ -81,22 +87,37 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CR(InitializeNameBackground());
 	}
 
+	/*
 	if (m_pTextUserName == nullptr && m_strScreenName != "") {
 		CR(InitializeUserNameText());
 	}
+	//*/
 	
 	// update user label position
-	//*
 	if (m_pUserModel != nullptr) {
-	//	m_pNameComposite->SetPosition(m_pUserModel->GetHead()->GetPosition() + point(0.0f, 0.5f, 0.0f));
-	//	m_pNameComposite->SetOrientation(m_pUserModel->GetHead()->GetOrientation(true));
 
-		vector vCameraDirection;
-		vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
-		vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z());
-		m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
+		auto pHead = m_pUserModel->GetHead();
+
+		BoundingBox* pInnerBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetFirstChild<mesh>()->GetBoundingVolume().get());
+		float innerDistance = pInnerBoundingVolume->GetHalfVector().magnitude();
+
+		BoundingBox* pOuterBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetBoundingVolume().get());
+		float outerDistance = pOuterBoundingVolume->GetFarthestPointInDirection(vector(0.0f, 1.0f, 0.0f)).y();
+
+		//point ptOrigin = pOuterBoundingVolume->GetOrigin();
+		//point ptOrigin = pOuterBoundingVolume->GetOrigin();// -pHead->GetOrigin() + pHead->GetOrigin(true);
+		//quaternion qB = pOuterBoundingVolume->GetOrientation(true);
+		quaternion qB = m_pNameComposite->GetOrientation();
+		qB.Reverse();
+		qB = qB *pOuterBoundingVolume->GetOrientation(true);
+		//qB.Reverse();
+		point ptOrigin = RotationMatrix(qB) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
+		//point ptOrigin = ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
+		ptOrigin += pHead->GetOrigin();
+		//m_pBoundingComposite->SetPosition(0.0f, outerDistance, 0.0f);
+		m_pBoundingComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
+
 	}
-	//*/
 	
 Error:
 	return r;
@@ -105,22 +126,23 @@ Error:
 RESULT DreamPeerApp::InitializeNameBackground() {
 	RESULT r = R_PASS;
 
-	if (m_pNameComposite == nullptr) {
-		m_pNameComposite = GetComposite()->MakeComposite();
-		m_pNameComposite->SetPosition(GetComposite()->GetPosition(true));
-		GetDOS()->AddObjectToUIGraph(m_pNameComposite.get());
-	}
+	vector vCameraDirection;
+	vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
+	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
-	CN(m_pNameComposite);
+	CN(m_pBoundingComposite);
+	//m_pBoundingComposite->AddVolume(0.1f);
+	m_pBoundingComposite->SetVisible(true);
+	//m_pNameComposite->AddVolume(0.1f);
 
-	m_pNameBackground = m_pNameComposite->AddQuad(0.9f, 0.2f);
+	//m_pNameBackground = m_pBoundingComposite->AddQuad(0.4f, 0.4 * 0.241f,1,1,nullptr,-1.0f * vCameraDirection);
+	m_pNameBackground = m_pBoundingComposite->AddQuad(0.4f, 0.4 * 0.241f);
 	CN(m_pNameBackground);
 
 	m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
 	
-	m_pNameBackground->SetVisible(false);
-	
-	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
+	//m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
+	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-label-2.png");
 	m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 	m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 	m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
@@ -150,8 +172,7 @@ RESULT DreamPeerApp::InitializeUserNameText() {
 
 	m_pTextUserName->SetPosition(point(0.0f, NAMETAG_HEIGHT, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::CENTER);
 	m_pTextUserName->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-	CR(m_pNameComposite->AddObject(m_pTextUserName));
-	m_pNameComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+	CR(m_pBoundingComposite->AddObject(m_pTextUserName));
 	m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 
 Error:
@@ -256,7 +277,6 @@ RESULT DreamPeerApp::ShowUserNameField() {
 		this
 	));
 	//*/
-	///*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pNameBackground.get(),
 		m_backgroundColor,
@@ -268,6 +288,7 @@ RESULT DreamPeerApp::ShowUserNameField() {
 		this
 	));
 
+	/*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pTextUserName.get(),
 		m_visibleColor,
@@ -375,6 +396,20 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 
 	m_fPendingAssignedUserModel = true;
 	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
+
+	// use OBB to help with label positioning
+	// use OBB related to the mesh so that the size values don't change
+	/*
+	BoundingBox* pInnerBoundingVolume = dynamic_cast<BoundingBox*>(m_pUserModel->GetHead()->GetFirstChild<mesh>()->GetBoundingVolume().get());
+	
+	float innerDistance = pInnerBoundingVolume->GetHalfVector().magnitude();
+
+	BoundingBox* pOuterBoundingVolume = dynamic_cast<BoundingBox*>(m_pUserModel->GetHead()->GetBoundingVolume().get());
+
+	float outerDistance = pOuterBoundingVolume->GetHalfVector().magnitude();
+
+	m_pBoundingComposite->SetPosition(0.0f, outerDistance* 0.013f, innerDistance * 0.013f);
+	//*/
 
 	CR(ShowUserNameField());
 

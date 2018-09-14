@@ -341,7 +341,7 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = false;
+	halconf.fRenderReferenceGeometry = true;
 	halconf.fDrawWireframe = false;
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
@@ -792,6 +792,7 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	point ptSeatPosition;
 	quaternion qRotation;
 	vector vCameraDirection;
+	vector vCameraDifference;
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
@@ -802,10 +803,23 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 
 	// update username label
 	vCameraDirection = ptSeatPosition - GetCamera()->GetPosition(true);
-	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z());
+	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
 	pDreamPeer->SetUserLabelPosition(ptSeatPosition);
-	pDreamPeer->SetUserLabelOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
+
+	// Making a quaternion with two vectors uses cross product,
+	// vector(0,0,1) and vector(0,0,-1) are incompatible with vector(0,0,-1)
+	if (vCameraDirection == vector(0.0f, 0.0f, 1.0f)) {
+		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, 0.0f));
+	}
+	else if (vCameraDirection == vector(0.0f, 0.0f, -1.0f)) {
+		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f));
+	}
+	else {
+		pDreamPeer->SetUserLabelOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
+	}
+	//pDreamPeer->SetUserLabelOrientation(qRotation);
+	//pDreamPeer->SetUserLabelOrientation((quaternion(qRotation.RotateVector(vector(0.0f, 0.0f, -1.0f)), vCameraDirection)) * qRotation);
 
 Error:
 	return r;
