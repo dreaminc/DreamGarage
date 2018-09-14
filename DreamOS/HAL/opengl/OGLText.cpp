@@ -92,3 +92,8 @@ RESULT OGLText::SetText(const std::string& strText) {
 Error:
 	return r;
 }
+
+// OGLText is a composite - no actual internal buffers
+RESULT OGLText::OGLInitialize() {
+	return R_SKIPPED;
+}
