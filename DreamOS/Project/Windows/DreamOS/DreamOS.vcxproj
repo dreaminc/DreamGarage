@@ -941,6 +941,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\AirResistanceGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
@@ -1285,6 +1286,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\PeerAckMessage.h" />
     <ClInclude Include="..\..\..\PeerHandshakeMessage.h" />
     <ClInclude Include="..\..\..\PeerStayAliveMessage.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\AirResistanceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />

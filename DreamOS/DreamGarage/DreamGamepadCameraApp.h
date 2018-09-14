@@ -20,6 +20,8 @@
 
 #include "Primitives/camera.h"
 
+class AirResistanceGenerator;
+
 class DreamGamepadCameraApp : public DreamApp<DreamGamepadCameraApp>, public Subscriber<SenseGamepadEvent> {
 	friend class DreamAppManager;
 
@@ -78,6 +80,8 @@ private:
 
 	bool m_fFirstRun = false;
 	bool m_fLockY = false;
+
+	std::list<ForceGenerator*> m_pForceGenerators;
 };
 
 #endif // ! DREAM_GAMEPAD_APP_H_

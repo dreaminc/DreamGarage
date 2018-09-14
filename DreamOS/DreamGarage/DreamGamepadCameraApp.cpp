@@ -3,6 +3,9 @@
 #include "DreamOS.h"
 #include "Core/Utilities.h"
 
+#include "PhysicsEngine/ForceGeneratorFactory.h"
+#include "PhysicsEngine/AirResistanceGenerator.h"
+
 DreamGamepadCameraApp::DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamGamepadCameraApp>(pDreamOS, pContext)
 {
@@ -33,7 +36,12 @@ RESULT DreamGamepadCameraApp::InitializeApp(void *pContext) {
 	for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
 		GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this);
 	}
+	
+	AirResistanceGenerator* pAirResistanceForceGenerator = dynamic_cast<AirResistanceGenerator*>(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_AIR_RESISTANCE));
+	CN(pAirResistanceForceGenerator);
+	m_pForceGenerators.emplace_back(pAirResistanceForceGenerator);
 
+Error:
 	return r;
 }
 
@@ -55,7 +63,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	
 	if (m_pCamera == nullptr) {
 		m_pCamera = GetDOS()->GetCamera();
-		//m_pCamera->SetMass(1.0);
+		CR(m_pCamera->SetMass(1.0));
 		m_fFirstRun = true;
 	}
 	else {
@@ -65,7 +73,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		}
 
 		double msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-		double msTimeStep = msTimeNow - m_msTimeLastUpdated;
+		float msTimeStep = msTimeNow - m_msTimeLastUpdated;
 		m_msTimeLastUpdated = msTimeNow;
 		
 		if (m_fUpdateLeftStick) {
@@ -83,7 +91,19 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			m_rightTriggerValue = m_pendRightTriggerValue;
 		}
 		float totalTriggerValue = (m_leftTriggerValue + m_rightTriggerValue);
+		
+		m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_leftStick(0, 0) / 10000));
+		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_leftStick(0, 1) / 1000));
+		m_pCamera->Impulse(m_pCamera->GetUpVector() * totalTriggerValue);
 
+		//m_pCamera->AddAngularMomentum(vector(m_rightStick(0, 0), m_rightStick(0, 1), 0));
+
+		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
+
+		//DEBUG_LINEOUT("Camera Position: X:%0.8f Y:%0.8f Z:%0.8f", (double)m_pCamera->GetPosition().x(), (double)m_pCamera->GetPosition().y(), (double)m_pCamera->GetPosition().z());
+		DEBUG_LINEOUT_RETURN("Velocity: X:%0.8f Y:%0.8f Z:%0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
+
+		/*
 		// X
 		// moving right
 		if (m_leftStick(0, 0) > 1.5) {
@@ -219,6 +239,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 		m_pCamera->MoveUp(m_yVelocity / m_cameraUpScale);
 		DEBUG_LINEOUT("Camera moving: vel:%0.8f stick:%0.8f", (double)m_lookXVelocity, (double)m_rightStick(0,0));	
+		*/
 	}
 
 Error:

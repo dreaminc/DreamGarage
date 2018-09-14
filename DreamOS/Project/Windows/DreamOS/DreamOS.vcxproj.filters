@@ -973,6 +973,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\AirResistanceGenerator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2127,6 +2130,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\AirResistanceGenerator.h">
+      <Filter>PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
