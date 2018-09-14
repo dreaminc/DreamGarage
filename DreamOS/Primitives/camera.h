@@ -69,6 +69,7 @@ public:
 	RESULT Strafe(camera_precision amt);
 	RESULT MoveUp(camera_precision amt);
 	RESULT MoveStrafe(camera_precision amt);
+	RESULT MoveLockedY(camera_precision amt);
 
 	RESULT SetStrafeSpeed(camera_precision speed);
 	RESULT AddStrafeSpeed(camera_precision speed);

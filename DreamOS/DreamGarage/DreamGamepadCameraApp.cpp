@@ -209,7 +209,12 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		}
 
 		m_pCamera->MoveStrafe(m_xVelocity / m_cameraStrafeSpeed);
-		m_pCamera->MoveForward(m_zVelocity / m_cameraStrafeSpeed);
+		if (m_fLockY) {
+			m_pCamera->MoveLockedY(m_zVelocity / m_cameraStrafeSpeed);
+		}
+		else {
+			m_pCamera->MoveForward(m_zVelocity / m_cameraStrafeSpeed);
+		}
 		m_pCamera->RotateCameraByDiffXY(m_lookXVelocity / m_cameraRotateSpeed, -m_lookYVelocity / m_cameraRotateSpeed);
 
 		m_pCamera->MoveUp(m_yVelocity / m_cameraUpScale);
