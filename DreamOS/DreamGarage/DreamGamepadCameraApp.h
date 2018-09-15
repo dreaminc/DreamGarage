@@ -1,9 +1,9 @@
 #ifndef DREAM_GAMEPAD_CAMERA_APP_H_
 #define DREAM_GAMEPAD_CAMERA_APP_H_
 
-#define GAMEPAD_STRAFESPEED_SCALE 500.0f	
-#define GAMEPAD_CAMERA_ROTATE_SCALE 20.0f
-#define GAMEPAD_CAMERA_UP_SCALE 255.0f
+#define GAMEPAD_MOVE_SCALE 100000.0f;
+#define GAMEPAD_UP_SPEED_SCALE 1000000.0f;
+#define GAMEPAD_CAMERA_ROTATE_SCALE 20.0f;
 
 #define GAMEPAD_CAMERA_XZ_MAX_VELOCITY 1.5f;
 #define GAMEPAD_CAMERA_LOOK_MAX_VELOCITY 15.0f;
@@ -69,8 +69,8 @@ private:
 
 	double m_msTimeLastUpdated = 0.0;
 
-	float m_cameraStrafeSpeed = GAMEPAD_STRAFESPEED_SCALE;
-	float m_cameraUpScale = GAMEPAD_CAMERA_UP_SCALE;
+	float m_cameraMoveSpeedScale = GAMEPAD_MOVE_SCALE;
+	float m_cameraUpSpeedScale = GAMEPAD_UP_SPEED_SCALE;
 	float m_cameraRotateSpeed = GAMEPAD_CAMERA_ROTATE_SCALE;
 
 	bool m_fUpdateLeftStick = false;

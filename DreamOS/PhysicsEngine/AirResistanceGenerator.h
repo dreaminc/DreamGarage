@@ -8,7 +8,7 @@
 
 #include "ForceGenerator.h"
 
-#define DEFAULT_AIR_DENSITY 1.225f			// approximately 1.225 kg/m³ at sea level
+#define DEFAULT_AIR_DENSITY 10.225f			// approximately 1.225 kg/m³ at sea level
 #define DEFAULT_AIR_DRAG_COEFFICIENT 0.47f	// sphere
 #define DEFAULT_AIR_AREA 1.0f				// because I don't wanna deal with this
 

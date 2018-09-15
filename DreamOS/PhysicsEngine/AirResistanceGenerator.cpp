@@ -14,10 +14,11 @@ vector AirResistanceGenerator::GenerateForce(ObjectState *pObjectState, double s
 	// F = kv^2
 
 	vector vVelocity = pObjectState->GetVelocity();
-	double airResistanceMagnitude = m_kConstant * vVelocity.magnitudeSquared();
-	vector airResistanceForce = vector(-airResistanceMagnitude, -airResistanceMagnitude, -airResistanceMagnitude) * vVelocity;
-	DEBUG_LINEOUT("Velocity: X:%0.8f Y:%0.8f Z:%0.8f", vVelocity.x(), vVelocity.y(), vVelocity.z());
-	DEBUG_LINEOUT("ResistanceMag: %0.8f", airResistanceMagnitude);
+	float airResistanceMagnitude = m_kConstant * vVelocity.magnitudeSquared();
+	vector airResistanceForce = (vector)(-airResistanceMagnitude * vVelocity);
+	//airResistanceForce.Print("air resistance force");
+	//DEBUG_LINEOUT("Velocity: X:%0.8f Y:%0.8f Z:%0.8f", vVelocity.x(), vVelocity.y(), vVelocity.z());
+	//DEBUG_LINEOUT("ResistanceMag: %0.8f", airResistanceMagnitude);
 
 	return airResistanceForce;
 }

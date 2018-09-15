@@ -23,6 +23,8 @@ camera::camera(point ptOrigin, viewport cameraVieport) :
 	//m_ptOrigin = ptOrigin;
 	//m_qRotation = quaternion();
 	m_qOffsetOrientation = quaternion();
+	m_objectState.SetMass(1.0);
+	m_objectState.SetInertiaTensorSphere(1.0);
 }
 
 camera::~camera() {

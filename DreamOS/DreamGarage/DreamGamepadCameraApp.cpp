@@ -63,7 +63,6 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	
 	if (m_pCamera == nullptr) {
 		m_pCamera = GetDOS()->GetCamera();
-		CR(m_pCamera->SetMass(1.0));
 		m_fFirstRun = true;
 	}
 	else {
@@ -92,154 +91,19 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		}
 		float totalTriggerValue = (m_leftTriggerValue + m_rightTriggerValue);
 		
-		m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_leftStick(0, 0) / 10000));
-		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_leftStick(0, 1) / 1000));
-		m_pCamera->Impulse(m_pCamera->GetUpVector() * totalTriggerValue);
-
-		//m_pCamera->AddAngularMomentum(vector(m_rightStick(0, 0), m_rightStick(0, 1), 0));
+		if (m_pCamera->GetVelocity().magnitude() < 1.0f) {
+			m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_leftStick(0, 0) / m_cameraMoveSpeedScale));
+			m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_leftStick(0, 1) / m_cameraMoveSpeedScale));
+			m_pCamera->Impulse(m_pCamera->GetUpVector() * (totalTriggerValue / m_cameraUpSpeedScale));
+		}
+		m_pCamera->RotateCameraByDiffXY(m_rightStick(0,0) / m_cameraRotateSpeed, -m_rightStick(0,1) / m_cameraRotateSpeed);
 
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
 
-		//DEBUG_LINEOUT("Camera Position: X:%0.8f Y:%0.8f Z:%0.8f", (double)m_pCamera->GetPosition().x(), (double)m_pCamera->GetPosition().y(), (double)m_pCamera->GetPosition().z());
-		DEBUG_LINEOUT_RETURN("Velocity: X:%0.8f Y:%0.8f Z:%0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
-
-		/*
-		// X
-		// moving right
-		if (m_leftStick(0, 0) > 1.5) {
-			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));	// between 100 and 500 feels alright
+		if (m_pCamera->GetVelocity().magnitude() < 0.001 && m_leftStick(0,0) < 1.5 && m_leftStick(0,0) > -1.5 && m_leftStick(0, 1) < 1.5 && m_leftStick(0, 1) > -1.5) {
+			// could add a harder deceleration curve here, or set a min on the resistance value, but just setting 0 lol
+			m_pCamera->SetVelocity(0,0,0);
 		}
-		// moving left
-		else if (m_leftStick(0,0) < -1.5) {
-			m_xVelocity += msTimeStep / (200.0 / m_leftStick(0, 0));
-		}
-		else {
-			if (m_xVelocity < 0) {
-				m_xVelocity += msTimeStep / 100.0;
-			}
-			else if(m_xVelocity > 0) {
-				m_xVelocity -= msTimeStep / 100.0f;
-			}
-		}
-
-		// Z
-		// moving forward
-		if (m_leftStick(0, 1) > 1.5) {
-			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
-		}
-		// moving backward
-		else if (m_leftStick(0, 1) < -1.5) {
-			m_zVelocity += msTimeStep / (200.0 / m_leftStick(0, 1));
-		}
-		else {
-			if (m_zVelocity < 0) {
-				m_zVelocity += msTimeStep / 100.0;
-			}
-			else if(m_zVelocity > 0) {
-				m_zVelocity -= msTimeStep / 100.0f;
-			}
-		}
-
-		// Y
-		// moving Up
-		if (totalTriggerValue > 0.01) {
-			m_yVelocity += msTimeStep / (200.0 / totalTriggerValue);
-		}
-		// moving down
-		else if (totalTriggerValue < -0.01) {
-			m_yVelocity += msTimeStep / (200.0 / totalTriggerValue);
-		}
-		else {
-			if (m_yVelocity < 0) {
-				m_yVelocity += msTimeStep / 1000.0f;
-			}
-			else if (m_yVelocity > 0) {
-				m_yVelocity -= msTimeStep / 1000.0f;
-			}
-		}
-
-		// Rotation
-		// looking left
-		if (m_rightStick(0, 0) > 15.0) {
-			m_lookXVelocity += msTimeStep / (200.0 / m_rightStick(0, 0));	// between 100 and 500 feels alright
-		}
-		// looking right
-		else if (m_rightStick(0, 0) < -15.0) {
-			m_lookXVelocity += msTimeStep / (200.0 / m_rightStick(0, 0));
-		}
-		else {
-			if (m_lookXVelocity < 0) {
-				m_lookXVelocity += msTimeStep / 10.0;
-			}
-			else if (m_lookXVelocity > 0) {
-				m_lookXVelocity -= msTimeStep / 10.0f;
-			}
-		}
-		// looking up
-		if (m_rightStick(0, 1) > 15.0) {
-			m_lookYVelocity += msTimeStep / (200.0 / m_rightStick(0, 1));
-		}
-		// looking down
-		else if (m_rightStick(0, 1) < -15.0) {
-			m_lookYVelocity += msTimeStep / (200.0 / m_rightStick(0, 1));
-		}
-		else {
-			if (m_lookYVelocity < 0) {
-				m_lookYVelocity += msTimeStep / 10.0;
-			}
-			else if (m_lookYVelocity > 0) {
-				m_lookYVelocity -= msTimeStep / 10.0f;
-			}
-		}
-
-		// cutoffs
-		// Maxs
-		if (m_xVelocity > m_xzMax || m_xVelocity < -m_xzMax) {
-			util::Clamp(m_xVelocity, -m_xzMax, m_xzMax);
-		}
-		if (m_zVelocity > m_xzMax || m_zVelocity < -m_xzMax) {
-			util::Clamp(m_zVelocity, -m_xzMax, m_xzMax);
-		}
-		if (m_yVelocity > m_yMax || m_yVelocity < -m_yMax) {
-			util::Clamp(m_yVelocity, -m_yMax, m_yMax);
-		}
-		if (m_lookXVelocity > m_lookMaxVelocity || m_lookXVelocity < -m_lookMaxVelocity) {
-			util::Clamp(m_lookXVelocity, -m_lookMaxVelocity, m_lookMaxVelocity);
-		}
-		if (m_lookYVelocity > m_lookMaxVelocity || m_lookYVelocity < -m_lookMaxVelocity) {
-			util::Clamp(m_lookYVelocity, -m_lookMaxVelocity, m_lookMaxVelocity);
-		}
-
-
-		// Mins
-		if (m_xVelocity < 0.001 && m_xVelocity > -0.001) {
-			m_xVelocity = 0.0f;
-		}
-		if (m_zVelocity < 0.001 && m_zVelocity > -0.001) {
-			m_zVelocity = 0.0f;
-		}
-		if (m_yVelocity < 0.001 && m_yVelocity > -0.001) {
-			m_yVelocity = 0.0f;
-		}
-		if (m_lookXVelocity < 0.001 && m_lookXVelocity > -0.001) {
-			m_lookXVelocity = 0.0f;
-		}
-		if (m_lookYVelocity < 0.001 && m_lookYVelocity > -0.001) {
-			m_lookYVelocity = 0.0f;
-		}
-
-		m_pCamera->MoveStrafe(m_xVelocity / m_cameraStrafeSpeed);
-		if (m_fLockY) {
-			m_pCamera->MoveLockedY(m_zVelocity / m_cameraStrafeSpeed);
-		}
-		else {
-			m_pCamera->MoveForward(m_zVelocity / m_cameraStrafeSpeed);
-		}
-		m_pCamera->RotateCameraByDiffXY(m_lookXVelocity / m_cameraRotateSpeed, -m_lookYVelocity / m_cameraRotateSpeed);
-
-		m_pCamera->MoveUp(m_yVelocity / m_cameraUpScale);
-		DEBUG_LINEOUT("Camera moving: vel:%0.8f stick:%0.8f", (double)m_lookXVelocity, (double)m_rightStick(0,0));	
-		*/
 	}
 
 Error:
@@ -283,25 +147,25 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 
 		if (pEvent->gamepadButtonType == SENSE_GAMEPAD_DPAD_UP) {
 			if (m_leftStick(0, 0) > 0.0f || m_leftStick(0,1) > 0.0f) {
-				m_cameraStrafeSpeed -= 10.0f;
+				m_cameraMoveSpeedScale -= 10.0f;
 			}
 			else if (m_rightStick(0, 0) > 0.0f || m_rightStick(0,1) > 0.0f) {
-				m_cameraRotateSpeed -= 5.0f;
+				m_cameraRotateSpeed -= 1.0f;
 			}
 			else if (m_leftTriggerValue > 0.0f || m_rightTriggerValue > 0.0f) {
-				m_cameraUpScale -= 100.0f;
+				m_cameraUpSpeedScale -= 100.0f;
 			}
 			DEBUG_LINEOUT("DPAD UP");
 		}
 		else if (pEvent->gamepadButtonType == SENSE_GAMEPAD_DPAD_DOWN) {
 			if (m_leftStick(0, 0) > 0.0f || m_leftStick(0, 1) > 0.0f) {
-				m_cameraStrafeSpeed += 5.0f;
+				m_cameraMoveSpeedScale += 10.0f;
 			}
 			else if (m_rightStick(0, 0) > 0.0f || m_rightStick(0, 1) > 0.0f) {
-				m_cameraRotateSpeed += 0.05f;
+				m_cameraRotateSpeed += 1.0f;
 			}
 			else if (m_leftTriggerValue > 0.0f || m_rightTriggerValue > 0.0f) {
-				m_cameraUpScale += 100.0f;
+				m_cameraUpSpeedScale += 100.0f;
 			}
 			DEBUG_LINEOUT("DPAD DOWN");
 		}
