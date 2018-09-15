@@ -82,8 +82,11 @@ public:
 	// UserControllerProxy
 	UserControllerProxy* GetUserControllerProxy();
 	virtual std::string GetUserToken() override;
+
 	virtual std::string GetPeerScreenName(long peerUserID) override;
 	int GetPeerAvatarModelID(long peerUserID);
+	std::string GetPeerProfilePhotoURL(long peerUserID);
+
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) { return R_NOT_IMPLEMENTED; }
 
@@ -178,6 +181,7 @@ private:
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
 	long m_avatarModelId = -1;
+	std::string m_strProfilePhotoURL;
 
 	User m_user = User();
 	long m_defaultEnvironmentId = -1; // used in the case m_user is not initialized

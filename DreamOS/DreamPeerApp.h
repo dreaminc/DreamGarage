@@ -128,6 +128,10 @@ public:
 	PeerConnection *GetPeerConnection();
 	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
 
+	RESULT PendProfilePhotoDownload();
+	RESULT OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
+	RESULT UpdateProfilePhoto();
+
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
 	std::shared_ptr<user> GetUserModel();
@@ -169,6 +173,7 @@ private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
 	long m_avatarModelId = -1;
+	std::string m_strProfilePhotoURL;
 
 	DreamOS *m_pDOS = nullptr;
 	
@@ -189,6 +194,8 @@ private:
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.75f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
+
+	std::shared_ptr<std::vector<uint8_t>> m_pPendingPhotoTextureBuffer;
 
 private:
 	std::shared_ptr<composite> m_pNameComposite = nullptr;

@@ -106,6 +106,10 @@ RESULT DreamPeerApp::Update(void *pContext) {
 
 		m_pBoundingComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
 	}
+
+	if (m_pPendingPhotoTextureBuffer != nullptr) {
+		CR(UpdateProfilePhoto());
+	}
 	
 Error:
 	return r;
@@ -181,16 +185,6 @@ RESULT DreamPeerApp::InitializeUserNameText() {
 		0.4,
 		0.06,
 		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-
-	// old
-	/*
-	m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		m_strScreenName,
-		0.9 - NAMETAG_BORDER,
-		0.2 - NAMETAG_BORDER,
-		text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
-	//*/
 
 	CN(m_pTextUserName);
 
@@ -402,9 +396,62 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 
 	m_strScreenName = pUserController->GetPeerScreenName(m_peerUserID);
 	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
-//	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
+	m_strProfilePhotoURL = pUserController->GetPeerProfilePhotoURL(m_peerUserID);
+
+	if (m_strProfilePhotoURL != "empty") {
+		CR(PendProfilePhotoDownload());
+	}
 
 Error:
+	return r;
+}
+
+RESULT DreamPeerApp::PendProfilePhotoDownload() {
+	RESULT r = R_PASS;
+
+	std::string strAuthorizationToken;
+
+	auto pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	auto pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+	//auto strHeaders = HTTPController::ContentHttp();
+
+	CN(pUserControllerProxy);
+	CN(pHTTPControllerProxy);
+
+	CR(pHTTPControllerProxy->RequestFile(m_strProfilePhotoURL, std::vector<std::string>(), "", std::bind(&DreamPeerApp::OnProfilePhotoDownload, this, std::placeholders::_1, std::placeholders::_2), nullptr));
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
+	RESULT r = R_PASS;
+
+	CN(pBufferVector);
+	m_pPendingPhotoTextureBuffer = pBufferVector;
+
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::UpdateProfilePhoto() {
+	RESULT r = R_PASS;
+
+	texture *pTexture = nullptr;
+
+	CN(m_pPendingPhotoTextureBuffer);
+	uint8_t* pBuffer = &(m_pPendingPhotoTextureBuffer->operator[](0));
+	size_t pBuffer_n = m_pPendingPhotoTextureBuffer->size();
+
+	pTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
+	CN(pTexture);
+
+	m_pPhotoQuad->SetDiffuseTexture(pTexture);
+
+Error:
+	if (m_pPendingPhotoTextureBuffer != nullptr) {
+		m_pPendingPhotoTextureBuffer = nullptr;
+	}
 	return r;
 }
 
