@@ -23,6 +23,11 @@
 #define NAME_LINE_HEIGHT .12f
 #define USERNAME_ANIMATION_DURATION 0.3f
 
+#define BASE_LABEL_WIDTH 0.4f
+#define LABEL_HEIGHT (BASE_LABEL_WIDTH) * (80.0f / 332.0f)
+#define LABEL_PHOTO_WIDTH (LABEL_HEIGHT) // photo is square
+#define LABEL_GAP_WIDTH (BASE_LABEL_WIDTH) * (20.0f / 332.0f)
+
 class User;
 class PeerConnection;
 class composite;
@@ -150,6 +155,17 @@ private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
 private:
+	std::wstring k_wstrLeft = L"UserLabel/user-label-background-left.png";
+	std::wstring k_wstrMiddle = L"UserLabel/user-label-background-middle.png";
+	std::wstring k_wstrRight = L"UserLabel/user-label-background-right.png";
+
+	// Used instead of the left texture if the user does not have a profile picture
+	std::wstring k_wstrEmpty = L"UserLabel/user-label-background-left-empty.png";
+
+	// Used for photo while download is pending
+	std::wstring k_wstrPhoto = L"UserLabel/user-label-background-photo-temp.png";
+
+private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
 	long m_avatarModelId = -1;
@@ -174,12 +190,16 @@ private:
 	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.75f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
+private:
 	std::shared_ptr<composite> m_pNameComposite = nullptr;
 	std::shared_ptr<composite> m_pBoundingComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
 
+	std::shared_ptr<quad> m_pPhotoQuad = nullptr;
+	std::shared_ptr<quad> m_pLeftGap = nullptr;
 	std::shared_ptr<quad> m_pNameBackground = nullptr;
+	std::shared_ptr<quad> m_pRightGap = nullptr;
 	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
 
 private:

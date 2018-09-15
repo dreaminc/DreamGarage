@@ -83,40 +83,28 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CN(m_pSpatialSoundObject);
 	}
 
-	if (m_pNameBackground == nullptr) {
-		CR(InitializeNameBackground());
-	}
-
-	/*
 	if (m_pTextUserName == nullptr && m_strScreenName != "") {
 		CR(InitializeUserNameText());
+		CR(InitializeNameBackground());
 	}
-	//*/
 	
 	// update user label position
 	if (m_pUserModel != nullptr) {
 
 		auto pHead = m_pUserModel->GetHead();
 
-		BoundingBox* pInnerBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetFirstChild<mesh>()->GetBoundingVolume().get());
-		float innerDistance = pInnerBoundingVolume->GetHalfVector().magnitude();
-
 		BoundingBox* pOuterBoundingVolume = dynamic_cast<BoundingBox*>(pHead->GetBoundingVolume().get());
 		float outerDistance = pOuterBoundingVolume->GetFarthestPointInDirection(vector(0.0f, 1.0f, 0.0f)).y();
 
-		//point ptOrigin = pOuterBoundingVolume->GetOrigin();
-		//point ptOrigin = pOuterBoundingVolume->GetOrigin();// -pHead->GetOrigin() + pHead->GetOrigin(true);
-		//quaternion qB = pOuterBoundingVolume->GetOrientation(true);
+		// TODO: test pOuter->GetO * pName->GetO
 		quaternion qB = m_pNameComposite->GetOrientation();
 		qB.Reverse();
 		qB = qB *pOuterBoundingVolume->GetOrientation(true);
-		//qB.Reverse();
-		point ptOrigin = RotationMatrix(qB) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
-		//point ptOrigin = ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
-		ptOrigin += pHead->GetOrigin();
-		//m_pBoundingComposite->SetPosition(0.0f, outerDistance, 0.0f);
-		m_pBoundingComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
 
+		point ptOrigin = RotationMatrix(qB) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
+		ptOrigin += pHead->GetOrigin();
+
+		m_pBoundingComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
 	}
 	
 Error:
@@ -130,22 +118,49 @@ RESULT DreamPeerApp::InitializeNameBackground() {
 	vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
 	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
-	CN(m_pBoundingComposite);
-	//m_pBoundingComposite->AddVolume(0.1f);
-	m_pBoundingComposite->SetVisible(true);
-	//m_pNameComposite->AddVolume(0.1f);
+	// TODO: switch on profile picture
+	float totalWidth = m_pTextUserName->GetWidth() + LABEL_PHOTO_WIDTH + LABEL_GAP_WIDTH * 2.0f;
+	float photoX = -totalWidth/2.0f + LABEL_PHOTO_WIDTH / 2.0f;
+	float leftGapX = -totalWidth/2.0f + LABEL_PHOTO_WIDTH + LABEL_GAP_WIDTH / 2.0f;
+	float textboxX = -totalWidth / 2.0f + LABEL_PHOTO_WIDTH + LABEL_GAP_WIDTH + m_pTextUserName->GetWidth() / 2.0f;
+	float rightGapX = totalWidth / 2.0f - LABEL_GAP_WIDTH / 2.0f;
 
-	//m_pNameBackground = m_pBoundingComposite->AddQuad(0.4f, 0.4 * 0.241f,1,1,nullptr,-1.0f * vCameraDirection);
-	m_pNameBackground = m_pBoundingComposite->AddQuad(0.4f, 0.4 * 0.241f);
+	float backgroundDepth = -0.005f;
+
+	CN(m_pBoundingComposite);
+	m_pBoundingComposite->SetVisible(true);
+
+	m_pPhotoQuad = m_pBoundingComposite->AddQuad(LABEL_PHOTO_WIDTH, LABEL_HEIGHT);
+	CN(m_pPhotoQuad);
+	m_pPhotoQuad->SetPosition(point(photoX, NAMETAG_HEIGHT, backgroundDepth));
+	m_pPhotoQuad->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrPhoto[0]));
+	m_pPhotoQuad->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+	m_pPhotoQuad->SetMaterialDiffuseColor(m_backgroundColor);
+
+	m_pLeftGap = m_pBoundingComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
+	CN(m_pLeftGap);
+	m_pLeftGap->SetPosition(point(leftGapX, NAMETAG_HEIGHT, backgroundDepth));
+	m_pLeftGap->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrLeft[0]));
+	m_pLeftGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+	m_pLeftGap->SetMaterialDiffuseColor(m_backgroundColor);
+
+	m_pNameBackground = m_pBoundingComposite->AddQuad(m_pTextUserName->GetWidth(), LABEL_HEIGHT);
 	CN(m_pNameBackground);
 
-	m_pNameBackground->SetPosition(point(0.0f, NAMETAG_HEIGHT, -0.01f));
-	
-	//m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-nametag-background.png");
-	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"user-label-2.png");
+	m_pTextBoxTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, &k_wstrMiddle[0]);
+	m_pNameBackground->SetPosition(point(textboxX, NAMETAG_HEIGHT, backgroundDepth));
 	m_pNameBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 	m_pNameBackground->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
-	m_pNameBackground->SetMaterialDiffuseColor(m_hiddenColor);
+	m_pNameBackground->SetMaterialDiffuseColor(m_backgroundColor);
+
+	m_pTextUserName->SetPosition(point(textboxX, NAMETAG_HEIGHT, 0.0f));
+
+	m_pRightGap = m_pBoundingComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
+	CN(m_pRightGap);
+	m_pRightGap->SetPosition(point(rightGapX, NAMETAG_HEIGHT, backgroundDepth));
+	m_pRightGap->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrRight[0]));
+	m_pRightGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
+	m_pRightGap->SetMaterialDiffuseColor(m_backgroundColor);
 
 Error:
 	return r;
@@ -157,15 +172,26 @@ RESULT DreamPeerApp::InitializeUserNameText() {
 	if (m_pFont == nullptr) {
 		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 		CN(m_pFont);
-		m_pFont->SetLineHeight(NAME_LINE_HEIGHT);
+		m_pFont->SetLineHeight(0.06f);
 	}
 
+	m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
+		m_pFont,
+		m_strScreenName,
+		0.4,
+		0.06,
+		text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+
+	// old
+	/*
 	m_pTextUserName = std::shared_ptr<text>(GetDOS()->MakeText(
 		m_pFont,
 		m_strScreenName,
 		0.9 - NAMETAG_BORDER,
 		0.2 - NAMETAG_BORDER,
 		text::flags::TRAIL_ELLIPSIS | text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	//*/
+
 	CN(m_pTextUserName);
 
 	m_pTextUserName->SetVisible(false);
