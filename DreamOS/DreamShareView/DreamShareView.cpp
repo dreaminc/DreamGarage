@@ -322,7 +322,7 @@ RESULT DreamShareView::BeginStream() {
 	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
 	
 	// This is probably redundant!!!
-	CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+	//CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
 
 	SetStreamingState(true);
 
