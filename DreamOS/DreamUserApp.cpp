@@ -680,6 +680,22 @@ Error:
 	return r;
 }
 
+RESULT DreamUserApp::ClearHands() {
+	RESULT r = R_PASS;
+
+	CNR(m_pLeftHand, R_SKIPPED);
+	CNR(m_pRightHand, R_SKIPPED);
+
+	GetDOS()->RemoveObject(m_pLeftHand);
+	m_pLeftHand = nullptr;
+
+	GetDOS()->RemoveObject(m_pRightHand);
+	m_pRightHand = nullptr;
+
+Error:
+	return r;
+}
+
 UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
 
 	if (type == HAND_TYPE::HAND_LEFT) {

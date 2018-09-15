@@ -1211,6 +1211,7 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+	CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 
 	// TODO: clear out DreamPeerApp and user assets
 

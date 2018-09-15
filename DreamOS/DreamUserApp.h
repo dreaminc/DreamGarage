@@ -141,6 +141,7 @@ public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
 
 	RESULT SetHand(hand* pHand);
+	RESULT ClearHands();
 
 	virtual UIMallet *GetMallet(HAND_TYPE type) override;
 	hand *GetHand(HAND_TYPE type);
