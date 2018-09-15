@@ -108,11 +108,6 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 
 	// Update all of the UI objects
 
-	// Do this before we set the program or any GPU specific things
-	// since this gives objects the opportunity to do stuff on the GPU side
-	UpdateObjectStore(m_pClippingSceneGraph);
-	UpdateObjectStore(m_pSceneGraph);
-
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
@@ -142,7 +137,7 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 
 	UnbindFramebuffer();
 
-	//Error:
+Error:
 	return r;
 }
 
@@ -154,7 +149,7 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	if ((pTexture = pOGLObj->GetOGLTextureDiffuse()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
-		//m_pUniformTextureColor->SetUniform(0);
+		m_pUniformTextureColor->SetUniform(0);
 
 		m_pUniformHasTextureColor->SetUniform(true);
 	}

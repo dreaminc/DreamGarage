@@ -465,6 +465,12 @@ RESULT SandboxApp::RunAppLoop() {
 		// TODO: Do these need to be wired up this way?
 		// Why not just do an Update with retained graph
 
+		// Do this before we set the program or any GPU specific things
+		// since this gives objects the opportunity to do stuff on the GPU side
+		// TODO: why
+		OGLProgram::UpdateObjectStore(m_pUIClippingSceneGraph);
+		OGLProgram::UpdateObjectStore(m_pUISceneGraph);
+
 		// TODO: MODULE
 		// Update Physics
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
