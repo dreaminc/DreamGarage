@@ -943,7 +943,7 @@ RESULT OGLProgram::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
 		if (pVirtualObj != nullptr && pVirtualObj->IsVisible() == true) {
-			UpdateObject((DimObj*)pVirtualObj);
+			OGLProgram::UpdateObject((DimObj*)pVirtualObj);
 		}
 	}
 
@@ -964,7 +964,7 @@ RESULT OGLProgram::UpdateObject(DimObj *pDimObj) {
 	}
 
 	if (pDimObj->HasChildren()) {
-		CR(UpdateChildren(pDimObj));
+		CR(OGLProgram::UpdateChildren(pDimObj));
 	}
 
 Error:
@@ -980,7 +980,7 @@ RESULT OGLProgram::UpdateChildren(DimObj *pDimObj) {
 		//CR(RenderObject(pDimObjChild.get()));
 
 		if (pVirtualObj->IsVisible() == true)
-			UpdateObject((DimObj*)(pVirtualObj.get()));
+			OGLProgram::UpdateObject((DimObj*)(pVirtualObj.get()));
 	}
 
 Error:

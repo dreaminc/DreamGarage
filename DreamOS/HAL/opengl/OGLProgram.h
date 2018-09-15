@@ -86,9 +86,9 @@ public:
 	//RESULT RenderObject(VirtualObj *pVirtualObj);
 
 	// Update
-	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
-	RESULT UpdateObject(DimObj *pDimObj);
-	RESULT UpdateChildren(DimObj *pDimObj);
+	static RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+	static RESULT UpdateObject(DimObj *pDimObj);
+	static RESULT UpdateChildren(DimObj *pDimObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
