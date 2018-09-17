@@ -97,8 +97,7 @@ protected:
 	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeNameBackground();
-	RESULT InitializeUserNameText();
+	RESULT InitializeUserNameLabel();
 
 public:
 	RESULT ShowUserNameField();
@@ -155,6 +154,8 @@ public:
 	RESULT SetUserLabelPosition(point ptPosition);
 	RESULT SetUserLabelOrientation(quaternion qOrientation);
 
+	bool HasProfilePhoto();
+
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
 
@@ -164,7 +165,7 @@ private:
 	std::wstring k_wstrRight = L"UserLabel/user-label-background-right.png";
 
 	// Used instead of the left texture if the user does not have a profile picture
-	std::wstring k_wstrEmpty = L"UserLabel/user-label-background-left-empty.png";
+	std::wstring k_wstrLeftEmpty = L"UserLabel/user-label-background-left-empty.png";
 
 	// Used for photo while download is pending
 	std::wstring k_wstrPhoto = L"UserLabel/user-label-background-photo-temp.png";
