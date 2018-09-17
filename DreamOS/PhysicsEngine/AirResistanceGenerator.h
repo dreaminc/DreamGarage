@@ -8,9 +8,10 @@
 
 #include "ForceGenerator.h"
 
-#define DEFAULT_AIR_DENSITY 10.225f			// approximately 1.225 kg/m³ at sea level
+#define DEFAULT_AIR_DENSITY 100.225f			// approximately 1.225 kg/m³ at sea level
 #define DEFAULT_AIR_DRAG_COEFFICIENT 0.47f	// sphere
 #define DEFAULT_AIR_AREA 1.0f				// because I don't wanna deal with this
+#define DEFAULT_AIR_MIN_DRAG_TERM 0.001f	// so that stopping works
 
 class AirResistanceGenerator : public ForceGenerator {
 	friend class ForceGeneratorFactory;
@@ -32,6 +33,7 @@ public:
 
 private:
 	double m_kConstant = (DEFAULT_AIR_DENSITY * DEFAULT_AIR_DRAG_COEFFICIENT * DEFAULT_AIR_AREA) / 2;
+	double m_minConstant = DEFAULT_AIR_MIN_DRAG_TERM;
 	/*
 	double m_airDensity = DEFAULT_AIR_DENSITY;
 	double m_airDrag = DEFAULT_AIR_DRAG_COEFFICIENT;

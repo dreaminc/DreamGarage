@@ -1870,9 +1870,12 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-
+		
 		// Create the Shared View App
-		m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+		{
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamOS->GetCamera()));
+		}
 		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Sphere test

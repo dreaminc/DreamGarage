@@ -103,7 +103,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 	float totalTriggerValue = (m_leftTriggerValue + m_rightTriggerValue);
 		
-	if (m_pCamera->GetVelocity().magnitude() < 1.0f) {
+	if (m_pCamera->GetVelocity().magnitude() < 1.0f) {	// speed cap
 		m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_ptLeftStick(0, 0) / m_cameraMoveSpeedScale));
 		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_ptLeftStick(0, 1) / m_cameraMoveSpeedScale));
 		m_pCamera->Impulse(m_pCamera->GetUpVector() * (totalTriggerValue / m_cameraUpSpeedScale));
@@ -113,7 +113,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() / m_cameraRotateSpeed, -m_ptRightStick.y() / m_cameraRotateSpeed);
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
 
-		if (m_pCamera->GetVelocity().magnitude() < 0.001f &&
+		if (m_pCamera->GetVelocity().magnitude() < 0.002f &&
 			m_ptLeftStick.x() < 1.5f && m_ptLeftStick.x() > -1.5 &&
 			m_ptLeftStick.y() < 1.5 && m_ptLeftStick.y() > -1.5)
 		{
@@ -121,6 +121,9 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 			m_pCamera->SetVelocity(0.0f, 0.0f, 0.0f);
 		}
 	}
+	DEBUG_LINEOUT_RETURN("vel magn: %0.8f", m_pCamera->GetVelocity().magnitude());
+	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
+
 
 Error:
 	return r;
@@ -133,6 +136,7 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 		case SENSE_GAMEPAD_JOYSTICK_LEFT: {
 			m_fUpdateLeftStick = true;
 			m_ptPendLeftStick = pEvent->eventData;		
+			DEBUG_LINEOUT("pending x: %0.8f y: %0.8f", m_ptPendLeftStick.x(), m_ptPendLeftStick.y());
 		} break;
 
 		case SENSE_GAMEPAD_JOYSTICK_RIGHT: {
@@ -147,7 +151,7 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 
 		case SENSE_GAMEPAD_TRIGGER_RIGHT: {
 			m_fUpdateRightTrigger = true;
-			m_pendRightTriggerValue = pEvent->eventData.y();
+			m_pendRightTriggerValue = pEvent->eventData.x();
 		} break;
 
 		case SENSE_GAMEPAD_BUTTON_DOWN: {
