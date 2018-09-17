@@ -976,6 +976,9 @@
     <ClCompile Include="..\..\..\PhysicsEngine\AirResistanceGenerator.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\point2D.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2133,6 +2136,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\AirResistanceGenerator.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\point2D.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

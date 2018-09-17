@@ -24,12 +24,12 @@ RESULT SenseGamepadController::SetGamepadState(SenseGamepadState gpState) {
 	}
 	if (gpState.leftTriggerRange != m_currentGamepadState.leftTriggerRange) {
 		point2D triggerAsPoint;
-		triggerAsPoint(0,0) = gpState.leftTriggerRange;
+		triggerAsPoint(0, 0) = gpState.leftTriggerRange;
 		NotifySubscribers(SENSE_GAMEPAD_TRIGGER_LEFT, &SenseGamepadEvent(SENSE_GAMEPAD_TRIGGER_LEFT, triggerAsPoint));
 	}
 	if (gpState.rightTriggerRange != m_currentGamepadState.rightTriggerRange) {
 		point2D triggerAsPoint;
-		triggerAsPoint(0,0) = gpState.rightTriggerRange;
+		triggerAsPoint(0, 0) = gpState.rightTriggerRange;
 		NotifySubscribers(SENSE_GAMEPAD_TRIGGER_RIGHT, &SenseGamepadEvent(SENSE_GAMEPAD_TRIGGER_RIGHT, triggerAsPoint));
 	}
 
