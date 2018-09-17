@@ -193,13 +193,11 @@ std::string OVRHMD::GetDeviceTypeString() {
 RESULT OVRHMD::RecenterHMD() {
 	RESULT r = R_PASS;
 
-	m_fShouldRecenterHMD = true;
+	DOSLOG(INFO, "ShouldRecenter");
+	CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
 
+Error:
 	return r;
-}
-
-bool OVRHMD::ShouldRecenterHMD(ovrSessionStatus sessionStatus) {
-	return (m_fShouldRecenterHMD || sessionStatus.ShouldRecenter) && sessionStatus.HmdMounted;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
@@ -319,13 +317,7 @@ RESULT OVRHMD::UpdateHMD() {
 	}
 
 	if (OVRSessionStatus.ShouldRecenter) {
-		DOSLOG(INFO, "ShouldRecenter");
-		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
-	}
-
-	if (ShouldRecenterHMD(OVRSessionStatus)) {
-		CRM((RESULT)ovr_RecenterTrackingOrigin(m_ovrSession), "Failed to recenter OVRHMD");
-		m_fShouldRecenterHMD = false;
+		CR(RecenterHMD());
 	}
 
 	CRM(m_pOVRPlatform->Update(), "Oculus Platform passed an error");

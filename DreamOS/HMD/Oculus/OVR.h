@@ -65,9 +65,6 @@ public:
 	virtual std::string GetDeviceTypeString() override;
 
 	virtual RESULT RecenterHMD() override;
-	bool ShouldRecenterHMD(ovrSessionStatus sessionStatus);
-private:
-	bool m_fShouldRecenterHMD = true;
 
 public:
 
