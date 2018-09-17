@@ -64,9 +64,7 @@ public:
 	virtual HMDDeviceType GetDeviceType() override;
 	virtual std::string GetDeviceTypeString() override;
 
-	virtual RESULT RecenterHMD() override {
-		return R_NOT_IMPLEMENTED;
-	};
+	virtual RESULT RecenterHMD() override;
 
 public:
 
