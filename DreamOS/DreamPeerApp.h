@@ -19,9 +19,14 @@
 #include "Primitives/hand.h"
 
 #define NAMETAG_BORDER 0.1f
-#define NAMETAG_HEIGHT 0.3f
+#define NAMETAG_HEIGHT 0.05f
 #define NAME_LINE_HEIGHT .12f
 #define USERNAME_ANIMATION_DURATION 0.3f
+
+#define BASE_LABEL_WIDTH 0.4f
+#define LABEL_HEIGHT (BASE_LABEL_WIDTH) * (80.0f / 332.0f)
+#define LABEL_PHOTO_WIDTH (LABEL_HEIGHT) // photo is square
+#define LABEL_GAP_WIDTH (BASE_LABEL_WIDTH) * (20.0f / 332.0f)
 
 class User;
 class PeerConnection;
@@ -38,7 +43,7 @@ struct InteractionObjectEvent;
 
 class WebRTCPeerConnectionProxy;
 
-class DreamPeerApp : public DreamApp<DreamPeerApp>, public Subscriber<InteractionObjectEvent> {
+class DreamPeerApp : public DreamApp<DreamPeerApp> {
 	friend class DreamAppManager;
 
 public:
@@ -92,7 +97,9 @@ protected:
 	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	RESULT InitializeUserNameLabel();
+
+public:
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();
 
@@ -120,6 +127,10 @@ public:
 	PeerConnection *GetPeerConnection();
 	RESULT SetPeerConnection(PeerConnection *pPeerConnection);
 
+	RESULT PendProfilePhotoDownload();
+	RESULT OnProfilePhotoDownload(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
+	RESULT UpdateProfilePhoto();
+
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
 	std::shared_ptr<user> GetUserModel();
@@ -139,13 +150,31 @@ public:
 	RESULT HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage);
 
 	RESULT SetUsernameAnimationDuration(float animationDuration);
+
+	RESULT SetUserLabelPosition(point ptPosition);
+	RESULT SetUserLabelOrientation(quaternion qOrientation);
+
+	bool HasProfilePhoto();
+
 private:
 	RESULT SetState(DreamPeerApp::state peerState);
+
+private:
+	std::wstring k_wstrLeft = L"UserLabel/user-label-background-left.png";
+	std::wstring k_wstrMiddle = L"UserLabel/user-label-background-middle.png";
+	std::wstring k_wstrRight = L"UserLabel/user-label-background-right.png";
+
+	// Used instead of the left texture if the user does not have a profile picture
+	std::wstring k_wstrLeftEmpty = L"UserLabel/user-label-background-left-empty.png";
+
+	// Used for photo while download is pending
+	std::wstring k_wstrPhoto = L"UserLabel/user-label-background-photo-temp.png";
 
 private:
 	long m_peerUserID = -1;
 	std::string m_strScreenName;
 	long m_avatarModelId = -1;
+	std::string m_strProfilePhotoURL;
 
 	DreamOS *m_pDOS = nullptr;
 	
@@ -156,29 +185,29 @@ private:
 	std::shared_ptr<SpatialSoundObject> m_pSpatialSoundObject = nullptr;
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	bool m_fPendingAssignedUserModel = false;
-	bool m_fGazeInteraction = false;
 	bool m_fVisible = false;
 
 	sphere *m_pSphere = nullptr;
-
-	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
-	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
-	
-	double m_msTimeGazeStart;
-	double m_msTimeUserNameDelay = 1250;
 
 	// appear and disappear duration in seconds (direct plug into PushAnimation)
 	float m_userNameAnimationDuration = USERNAME_ANIMATION_DURATION;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
-	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_backgroundColor = color(1.0f, 1.0f, 1.0f, 0.75f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
-	std::shared_ptr<composite> m_pNameComposite = nullptr;
+	std::shared_ptr<std::vector<uint8_t>> m_pPendingPhotoTextureBuffer;
+
+private:
+	std::shared_ptr<composite> m_pUIObjectComposite = nullptr;
+	std::shared_ptr<composite> m_pUserLabelComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
 
+	std::shared_ptr<quad> m_pPhotoQuad = nullptr;
+	std::shared_ptr<quad> m_pLeftGap = nullptr;
 	std::shared_ptr<quad> m_pNameBackground = nullptr;
+	std::shared_ptr<quad> m_pRightGap = nullptr;
 	std::shared_ptr<texture> m_pTextBoxTexture = nullptr;
 
 private:

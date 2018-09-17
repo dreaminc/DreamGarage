@@ -10,5 +10,9 @@
 
 #define SPACING_SIZE 0.016129f;
 
+// dimensions for all content textures
 #define BROWSER_WIDTH 1280;
 #define BROWSER_HEIGHT 720;
+
+// avatar sizing
+#define HEAD_SCALE 0.013f;

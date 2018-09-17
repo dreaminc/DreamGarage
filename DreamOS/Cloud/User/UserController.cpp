@@ -438,6 +438,12 @@ RESULT UserController::GetPeerProfile(long peerUserID) {
 		if (peerUserID == jsonResponse["/data/id"_json_pointer].get<long>()) {
 			m_strPeerScreenName = jsonResponse["/data/public_name_short"_json_pointer].get<std::string>();
 			m_avatarModelId = jsonResponse["/data/avatar_model_id"_json_pointer].get<int>();
+			if (!jsonResponse["/data/user_label_photo_url"_json_pointer].is_null()) {
+				m_strProfilePhotoURL = jsonResponse["/data/user_label_photo_url"_json_pointer].get<std::string>();
+			}
+			else {
+				m_strProfilePhotoURL = "";
+			}
 		}
 		
 		DEBUG_LINEOUT("User Profile Loaded");
@@ -917,6 +923,10 @@ std::string UserController::GetPeerScreenName(long peerUserID) {
 
 int UserController::GetPeerAvatarModelID(long peerUserID) {
 	return m_avatarModelId;
+}
+
+std::string UserController::GetPeerProfilePhotoURL(long peerUserID) {
+	return m_strProfilePhotoURL;
 }
 
 CLOUD_CONTROLLER_TYPE UserController::GetControllerType() {

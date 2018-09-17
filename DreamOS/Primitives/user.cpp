@@ -36,7 +36,6 @@ RESULT user::Initialize() {
 #endif
 
 #ifndef _DEBUG
-	//SetScale(0.018f);
 
 	vector vHeadOffset;
 	if (strHeadPath == "default") {
@@ -49,46 +48,33 @@ RESULT user::Initialize() {
 	m_pMouthComposite = MakeComposite();
 	CN(m_pMouthComposite);
 
-	m_pMouthComposite->SetScale(0.013f);
-	m_pMouthComposite->SetPosition(point(0.0f, -0.35f, HEAD_POS));
+	m_pMouthComposite->SetScale(m_headScale);
 	m_pMouthComposite->SetOrientationOffset(vHeadOffset);
 	m_pMouthComposite->SetMaterialShininess(2.0f, true);
 
 	//m_pHead = AddModel(util::StringToWideString(strHeadPath));
 	
-	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthPath));
+	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthModelPath));
 	CN(m_pMouth);
 	
-	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_04.png"));
-	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_03.png"));
-	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_02.png"));
-	m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_men/mouth_man_01.png"));
+	// loop iteration is a quirk of how the files are named
+	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
+	for (int i = m_numMouthStates; i > 0; i--) {
+		std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
 
-	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_04.png"));
-	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_03.png"));
-	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_02.png"));
-	m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, L"mouth_women/mouth_women_01.png"));
+		wstrMouth = k_wstrMouthWomen + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
+	}
 
 	for (int i = 0; i < 4; i++) {
 		CN(m_mouthStatesMen[i]);
 		CN(m_mouthStatesWomen[i]);
 	}
 
-//	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_pMouthTexture.get());
-
 #else
-	//m_pHead = AddComposite();
-	//m_pHead->AddVolume(0.2f);
-
 	m_pHead = AddModel(L"\\cube.obj");
-	//m_pHead->SetVertexColor(COLOR_BLUE);
-	//m_pHead->SetMaterialDiffuseColor(COLOR_BLUE, true);
-
 #endif
-
-
-
-	SetPosition(point(0.0f, 0.0f, 0.0f));
 
 Error:
 	return r;
@@ -140,16 +126,15 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
 
-	m_pHead->SetScale(0.013f);
+	m_pHead->SetScale(m_headScale);
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetMaterialShininess(2.0f, true);
 
 	//*
-	// women model ids
+	// initial mouth for avatar models by id
 	if (IsFemaleModel()) {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[0].get());
 	}
-	// men mouths
 	else {
 		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[0].get());
 	}
@@ -158,11 +143,9 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 #ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
-	//	m_pLeftHand->OnLostTrack();
 	m_pLeftHand->SetVisible(true);
 
 	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
-	//	m_pRightHand->OnLostTrack();
 	m_pRightHand->SetVisible(true);
 
 
@@ -179,25 +162,10 @@ bool user::IsFemaleModel() {
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
-	//CB(m_avatarModelId != AVATAR_INVALID);
+	std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
 
-	switch (m_avatarModelId) {
-
-		/*
-		case AVATAR_TYPE::WOMAN: {
-			m_pHead = AddModel(L"\\Avatar_Woman\\avatar_1.FBX");
-		} break;
-
-		case AVATAR_TYPE::BRUCE: {
-			m_pHead = AddModel(L"\\Avatar_Bruce\\avatar_2.FBX");
-		} break;
-		//*/
-
-	case 1: m_pHead = AddModel(L"\\Avatars\\avatar_1.FBX"); break;
-	case 2: m_pHead = AddModel(L"\\Avatars\\avatar_2.FBX"); break;
-	case 3: m_pHead = AddModel(L"\\Avatars\\avatar_3.FBX"); break;
-	case 4: m_pHead = AddModel(L"\\Avatars\\avatar_4.FBX"); break;
-	}
+	m_pHead = AddModel(wstrHeadModel);
+	CN(m_pHead);
 
 Error:
 	return r;

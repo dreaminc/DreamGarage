@@ -72,7 +72,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	SandboxApp::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
-	sandboxconfig.fMouseLook = false;
+	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = false;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
@@ -791,13 +791,32 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 
 	point ptSeatPosition;
 	quaternion qRotation;
+	vector vCameraDirection;
+	vector vCameraDifference;
 
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
 
-	//pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
+
+	// update username label
+	vCameraDirection = ptSeatPosition - GetCamera()->GetPosition(true);
+	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
+
+	pDreamPeer->SetUserLabelPosition(ptSeatPosition);
+
+	// Making a quaternion with two vectors uses cross product,
+	// vector(0,0,1) and vector(0,0,-1) are incompatible with vector(0,0,-1)
+	if (vCameraDirection == vector::kVector(1.0f)) {
+		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, 0.0f));
+	}
+	else if (vCameraDirection == vector::kVector(-1.0f)) {
+		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f));
+	}
+	else {
+		pDreamPeer->SetUserLabelOrientation(quaternion(vector::kVector(-1.0f), vCameraDirection));
+	}
 
 Error:
 	return r;
@@ -1189,6 +1208,7 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+	CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 
 	// TODO: clear out DreamPeerApp and user assets
 

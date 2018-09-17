@@ -11,6 +11,8 @@
 #include "hand.h"
 #include "texture.h"
 
+#include "DreamGarage/UICommon.h"
+
 #include <vector>
 
 #define HEAD_POS 0.25f
@@ -56,13 +58,18 @@ private:
 	bool IsFemaleModel();
 
 private:
-	
-	long m_avatarModelId = AVATAR_INVALID;
-
-	//std::string k_strDefaultHeadPath = "\\face4\\untitled.obj";
-	//std::string k_strDefaultHeadPath = "\\head_01\\head_01.FBX";
 	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
-	std::string k_strMouthPath = "\\Avatars\\mouth.FBX";
+	std::string k_strMouthModelPath = "\\Avatars\\mouth.FBX";
+
+	std::wstring k_wstrAvatarPath = L"Avatars\\avatar_";
+	std::wstring k_wstrAvatarFileType = L".FBX";
+
+	// TODO: will change with avatar specific mouths
+	std::wstring k_wstrMouthMen = L"mouth_men/mouth_man_0";
+	std::wstring k_wstrMouthWomen = L"mouth_women/mouth_women_0";
+	std::wstring k_wstrMouthFileType = L".png";
+
+private:
 	// Storage of models and textures for head
 	std::shared_ptr<model> m_pHead;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
@@ -70,23 +77,22 @@ private:
 	std::shared_ptr<hand> m_pLeftHand;
 	std::shared_ptr<hand> m_pRightHand;
 
-//	std::shared_ptr<quad> m_pMouth = nullptr;
 	std::shared_ptr<model> m_pMouth = nullptr;
-	std::shared_ptr<quad> m_pMouthQuad = nullptr;
 	std::shared_ptr<composite> m_pMouthComposite = nullptr;
-	std::shared_ptr<texture> m_pMouthTexture = nullptr;
-	std::shared_ptr<texture> m_pMouthTexture1 = nullptr;
-	std::shared_ptr<texture> m_pMouthTexture2 = nullptr;
-	std::shared_ptr<texture> m_pMouthTexture3 = nullptr;
 
 	std::vector<std::shared_ptr<texture>> m_mouthStatesMen;
 	std::vector<std::shared_ptr<texture>> m_mouthStatesWomen;
 
-	// add mouths to UI shader 
+	// for adding mouths to UI shader 
 	DreamOS *m_pDreamOS = nullptr;
+
+private:
+
+	long m_avatarModelId = AVATAR_INVALID;
 
 	float m_mouthScale = 0.0f;
 	int m_numMouthStates = 4;
+	float m_headScale = HEAD_SCALE;
 };
 
 #endif	// ! PRIMITIVE_USER_H_
