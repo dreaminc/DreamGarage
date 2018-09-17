@@ -199,8 +199,8 @@ private:
 	std::shared_ptr<std::vector<uint8_t>> m_pPendingPhotoTextureBuffer;
 
 private:
-	std::shared_ptr<composite> m_pNameComposite = nullptr;
-	std::shared_ptr<composite> m_pBoundingComposite = nullptr;
+	std::shared_ptr<composite> m_pUIObjectComposite = nullptr;
+	std::shared_ptr<composite> m_pUserLabelComposite = nullptr;
 	std::shared_ptr<text> m_pTextUserName = nullptr;
 	std::shared_ptr<font> m_pFont = nullptr;
 

@@ -808,14 +808,14 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 
 	// Making a quaternion with two vectors uses cross product,
 	// vector(0,0,1) and vector(0,0,-1) are incompatible with vector(0,0,-1)
-	if (vCameraDirection == vector(0.0f, 0.0f, 1.0f)) {
+	if (vCameraDirection == vector::kVector(1.0f)) {
 		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, 0.0f));
 	}
-	else if (vCameraDirection == vector(0.0f, 0.0f, -1.0f)) {
+	else if (vCameraDirection == vector::kVector(-1.0f)) {
 		pDreamPeer->SetUserLabelOrientation(quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f));
 	}
 	else {
-		pDreamPeer->SetUserLabelOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
+		pDreamPeer->SetUserLabelOrientation(quaternion(vector::kVector(-1.0f), vCameraDirection));
 	}
 
 Error:
