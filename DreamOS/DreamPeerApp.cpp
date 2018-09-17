@@ -96,11 +96,11 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		float outerDistance = pOuterBoundingVolume->GetFarthestPointInDirection(vector(0.0f, 1.0f, 0.0f)).y();
 
 		// TODO: test pOuter->GetO * pName->GetO
-		quaternion qB = m_pNameComposite->GetOrientation();
-		qB.Reverse();
-		qB = qB *pOuterBoundingVolume->GetOrientation(true);
+		quaternion qNameComposite = m_pNameComposite->GetOrientation();
+		qNameComposite.Reverse();
+		qNameComposite = qNameComposite *pOuterBoundingVolume->GetOrientation(true);
 
-		point ptOrigin = RotationMatrix(qB) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
+		point ptOrigin = RotationMatrix(qNameComposite) * ScalingMatrix(pOuterBoundingVolume->GetScale(false)) * vector(pOuterBoundingVolume->GetCenter());
 		ptOrigin += pHead->GetOrigin();
 
 		m_pBoundingComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));

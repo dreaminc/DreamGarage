@@ -797,7 +797,6 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->GetEnvironmentSeatingPositionAndOrientation(ptSeatPosition, qRotation, seatingPosition));
 
-	//pDreamPeer->GetUserModel()->GetHead()->SetOrientation(qRotation);
 	pDreamPeer->SetOrientation(qRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
 
@@ -818,8 +817,6 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeerApp *pDreamPeer, int seatingP
 	else {
 		pDreamPeer->SetUserLabelOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vCameraDirection));
 	}
-	//pDreamPeer->SetUserLabelOrientation(qRotation);
-	//pDreamPeer->SetUserLabelOrientation((quaternion(qRotation.RotateVector(vector(0.0f, 0.0f, -1.0f)), vCameraDirection)) * qRotation);
 
 Error:
 	return r;
