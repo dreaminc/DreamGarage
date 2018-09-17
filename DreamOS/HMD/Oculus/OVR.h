@@ -64,10 +64,9 @@ public:
 	virtual HMDDeviceType GetDeviceType() override;
 	virtual std::string GetDeviceTypeString() override;
 
-	virtual RESULT RecenterHMD() override;
-	bool ShouldRecenterHMD(ovrSessionStatus sessionStatus);
-private:
-	bool m_fShouldRecenterHMD = true;
+	virtual RESULT RecenterHMD() override {
+		return R_NOT_IMPLEMENTED;
+	};
 
 public:
 
