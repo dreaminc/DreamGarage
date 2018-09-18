@@ -240,7 +240,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	{
 		// controls how fast the mouth scale responds to sustained volume
 		float newAmount = 0.2f;
-		float newMouthScale = mouthScale * 8.0f + 0.01f;
+		float newMouthScale = mouthScale*1.5f;
 
 		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
 	}
@@ -248,7 +248,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	float numBins = (float)(m_numMouthStates);
 	int rangedValue = (int)(m_mouthScale * numBins);
 
-	/*
+	//*
 	if (rangedValue > 3) {
 		rangedValue = 3;
 	}
@@ -257,20 +257,6 @@ RESULT user::UpdateMouth(float mouthScale) {
 		rangedValue = 0;
 	}
 	//*/
-
-	if (m_mouthScale < 0.3f) {
-		rangedValue = 0;
-	}
-	else if (m_mouthScale < 0.6f) {
-		rangedValue = 1;
-	}
-	else if (m_mouthScale < 0.9f) {
-		rangedValue = 2;
-	}
-	else {
-		rangedValue = 3;
-	}
-	
 
 	m_currentMouthPose = rangedValue;
 
