@@ -157,10 +157,6 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 
 	pDreamOS->AddObjectToInteractionGraph(GetComposite());
 
-	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_BEGAN, this));
-	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_MOVED, this));
-	//CR(pDreamOS->RegisterEventSubscriber(GetComposite(), ELEMENT_INTERSECT_ENDED, this));
-
 	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 
 	// Initialize mallets
@@ -294,24 +290,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 		if (keyUIDs.size() == 1) {
 			m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
 		}
-
-		//CN(m_pKeyboardHandle);
 	}
 	
-	/*
-	GetComposite()->SetPosition(pCameraNode->GetPosition());
-
-	qOrientation = (pCameraNode->GetOrientation());
-	qOrientation.Reverse();
-	GetComposite()->SetOrientation(qOrientation);
-	//*/
-
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = std::shared_ptr<DimRay>(GetDOS()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f));
-		//m_pOrientationRay = GetComposite()->AddRay(point(0.0f, 0.0f, -0.75f), vector::kVector(-1.0f), 1.0f);
 		CN(m_pOrientationRay);
 		m_pOrientationRay->SetVisible(false);
-		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
 	else {
 		m_pOrientationRay->SetPosition(pCameraNode->GetPosition());
@@ -385,9 +369,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 
-	
-
-	//CR(ResetAppComposite());
 Error:
 	return r;
 }
@@ -429,39 +410,6 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 	} 
 	else if (pHand->IsTracked() && m_pEventApp != nullptr && !pMallet->GetMalletHead()->IsVisible()) {
 		pMallet->Show();
-	}
-
-	// Update Overlay visibility / texture
-	if (fRayHandCollision) {
-		auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
-		double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
-
-		if (msNow - m_msGazeStart > m_msGazeOverlayDelay) {
-			bool fMeta = false;
-			auto pHMD = GetDOS()->GetHMD();
-			if (pHMD != nullptr) {
-				fMeta = pHMD->GetDeviceType() == HMDDeviceType::META;
-			}
-			//pHand->SetOverlayVisible(true);
-			if (m_pLeftHand != nullptr && !fMeta) {
-				m_pLeftHand->SetOverlayVisible(true);
-			}
-			if (m_pRightHand != nullptr && !fMeta) {
-				m_pRightHand->SetOverlayVisible(true);
-			}
-
-			//UpdateOverlayTexture(type);
-			UpdateOverlayTextures();
-			if (m_pEventApp == nullptr) {
-				//pHand->SetModelState(hand::ModelState::CONTROLLER);
-				if (m_pLeftHand != nullptr) {
-					m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
-				}
-				if (m_pRightHand != nullptr) {
-					m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
-				}
-			}
-		}
 	}
 
 Error:
@@ -693,11 +641,9 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 		pOtherHand = m_pLeftHand;
 	}
 	if (pOtherHand != nullptr) {
-		pHand->SetOverlayVisible(pOtherHand->IsOverlayVisible());
 		pHand->SetModelState(pOtherHand->GetModelState());
 	}
 	else {
-		pHand->SetOverlayVisible(false);
 		if (m_fHasOpenApp) {
 			pHand->SetModelState(hand::ModelState::CONTROLLER);
 		}
@@ -705,14 +651,6 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 			pHand->SetModelState(hand::ModelState::HAND);
 		}
 	}
-
-	auto pVolume = pHand->GetPhantomVolume().get();
-	CNR(pVolume, R_SKIPPED);
-	pDreamOS->AddObjectToInteractionGraph(pVolume);
-
-	CR(pDreamOS->RegisterEventSubscriber(pVolume, ELEMENT_INTERSECT_BEGAN, this));
-	CR(pDreamOS->RegisterEventSubscriber(pVolume, ELEMENT_INTERSECT_MOVED, this));
-	CR(pDreamOS->RegisterEventSubscriber(pVolume, ELEMENT_INTERSECT_ENDED, this));
 
 Error:
 	return r;

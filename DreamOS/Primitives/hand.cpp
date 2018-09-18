@@ -65,12 +65,6 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	//Start all visibility at false
 	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
 
-	// This is the "hitbox" for the controller overlay 
-	m_pPhantomVolume = MakeVolume(m_volumeWidth, m_volumeHeight, m_volumeDepth);	
-	CN(m_pPhantomVolume);
-	m_pPhantomVolume->SetVisible(false);
-	AddObject(m_pPhantomVolume);
-
 	m_avatarModelId = avatarModelID;
 
 	if (m_avatarModelId >= 1 && m_avatarModelId <= NUM_AVATARS) {
@@ -170,12 +164,15 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		float scale = OVR_OVERLAY_SCALE;
 		float overlayAspect = OVR_OVERLAY_ASPECT_RATIO;
 		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
 		m_pDreamOS->AddObjectToUIGraph(m_pController);
+		// re-enable if overlays are used again
+		/*
+		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
 		m_pOverlayQuad->SetPosition(point(scale * t * OVR_OVERLAY_POSITION_X, 
 										scale * OVR_OVERLAY_POSITION_Y, 
 										scale * OVR_OVERLAY_POSITION_Z));
 		m_pOverlayQuad->SetVisible(false);
+		//*/
 
 	} break;
 	case (HMDDeviceType::VIVE): {
@@ -183,12 +180,16 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		float scale = VIVE_OVERLAY_SCALE;
 		float overlayAspect = VIVE_ASPECT_RATIO;
 		float t = m_handType == HAND_TYPE::HAND_RIGHT ? 1.0f : -1.0f;
-		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
+
 		m_pDreamOS->AddObjectToUIGraph(m_pController);
+		// re-enable if overlays are used again
+		/*
+		m_pOverlayQuad = m_pController->AddQuad(scale / overlayAspect, scale);
 		m_pOverlayQuad->SetPosition(point(scale * t * VIVE_OVERLAY_POSITION_X, 
 										scale * VIVE_OVERLAY_POSITION_Y, 
 										scale * VIVE_OVERLAY_POSITION_Z));
 		m_pOverlayQuad->SetVisible(false);
+		//*/
 
 	} break;
 	case (HMDDeviceType::META): {
@@ -250,7 +251,6 @@ RESULT hand::SetModelState(ModelState modelState) {
 	} break;
 	case ModelState::CONTROLLER: {
 		ShowController();
-		//m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 	//	ShowObject(m_pController, HAND_ANIMATION_DURATION);
 	} break;
 	}
@@ -276,10 +276,6 @@ RESULT hand::Update() {
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
-//		if (!m_pOverlayQuad->IsVisible())
-//			m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_fTracked);
-		m_pOverlayQuad->SetVisible(m_fOverlayVisible && m_pOverlayQuad->IsVisible() && m_fTracked);
-		//m_fOverlayVisible = m_pOverlayQuad->IsVisible(); //??
 	} break;
 	}
 
@@ -306,17 +302,15 @@ RESULT hand::SetOverlayVisible(bool fVisible) {
 
 	if (m_fOverlayVisible != fVisible && m_pOverlayQuad != nullptr) {
 		if (fVisible) {
-			ShowOverlay();
+			CR(ShowOverlay());
 		}
 		else {
-			HideOverlay();
+			CR(HideOverlay());
 		}
 	}
 	m_fOverlayVisible = fVisible;
-//	CNR(m_pOverlayQuad, R_SKIPPED);
-//	m_pOverlayQuad->SetVisible(fVisible);
 
-//Error:
+Error:
 	return r;
 }
 
@@ -328,6 +322,10 @@ RESULT hand::SetOverlayTexture(texture *pOverlayTexture) {
 	RESULT r = R_PASS;
 
 	CN(pOverlayTexture);
+
+	// TODO: change to CN if overlays are re-enabled
+	CNR(m_pOverlayQuad, R_SKIPPED);
+
 	m_pOverlayQuad->SetDiffuseTexture(pOverlayTexture);
 
 Error:
@@ -470,10 +468,17 @@ RESULT hand::ShowModel() {
 
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
+
 		m_pModel->SetVisible(true && m_fTracked);
+		m_pOverlayQuad->SetVisible(false);
+
 		return r;
 	};
 	m_pModel->SetVisible(true && m_fTracked);
+
+	if (m_pOverlayQuad != nullptr) {
+		m_pOverlayQuad->SetVisible(false);
+	}
 
 	/*
 	color matColor = m_pModel->GetDiffuseColor();
@@ -539,14 +544,20 @@ RESULT hand::ShowController() {
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		m_pController->SetVisible(true && m_fTracked);
-		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
+		m_pOverlayQuad->SetVisible(false);
 		return r;
 	};
+
+	m_pController->SetVisible(true && m_fTracked);
 
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
-	m_pController->SetVisible(true && m_fTracked);
+
+	// TODO: re-enable if overlays come back
+	if (m_pOverlayQuad != nullptr) {
+		m_pOverlayQuad->SetVisible(false);
+	}
 
 	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
@@ -602,7 +613,7 @@ RESULT hand::ShowOverlay() {
 
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pOverlayQuad->SetVisible(true && m_fTracked && m_fOverlayVisible);
+		m_pOverlayQuad->SetVisible(m_fTracked && m_fOverlayVisible);
 		return r;
 	};
 
