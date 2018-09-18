@@ -190,7 +190,7 @@ private:
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	DreamControlView* m_pDreamControlView = nullptr;
 	DreamDesktopApp* m_pDreamDesktop = nullptr;
-	DreamGamepadCameraApp* m_pDreamGamePadCameraApp = nullptr;
+	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

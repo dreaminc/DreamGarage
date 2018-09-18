@@ -70,10 +70,10 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
-	sandboxconfig.fUseGamepad = false;
+	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
 
@@ -409,7 +409,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamSettings);
 
 	if (GetSandboxConfiguration().fUseGamepad) {
-		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
+		m_pDreamGamepadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
+		CN(m_pDreamGamepadCameraApp);
+		CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera()));
 	}
 
 	// TODO: could be somewhere else(?)

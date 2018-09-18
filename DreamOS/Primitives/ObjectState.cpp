@@ -50,7 +50,7 @@ RESULT ObjectState::RecalculateLinearVelocity() {
 }
 
 RESULT ObjectState::RecalculateAngularVelocity() {
-	m_vAngularVelocity = m_matInverseIntertiaTensor * m_vAngularMomentum;
+	m_vAngularVelocity = m_matInverseInertiaTensor * m_vAngularMomentum;
 
 	m_qRotation.Normalize();
 
@@ -113,7 +113,7 @@ bool ObjectState::IsImmovable() {
 
 RESULT ObjectState::SetRotationalVelocity(vector vRotationalVelocity) {
 	//m_vAngularVelocity = vRotationalVelocity;
-	m_vAngularMomentum = m_matIntertiaTensor * vRotationalVelocity;
+	m_vAngularMomentum = m_matInertiaTensor * vRotationalVelocity;
 
 	RecalculateAngularVelocity();
 	return R_SUCCESS;
@@ -143,7 +143,7 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 
 RESULT ObjectState::AddTorqueImpulse(vector vTorque) {
 	if (m_fImmovable == false) {
-		m_vAngularMomentum += m_matIntertiaTensor * vTorque;
+		m_vAngularMomentum += m_matInertiaTensor * vTorque;
 		//m_vAngularMomentum += vTorque;
 		RecalculateAngularVelocity();
 	}
@@ -226,14 +226,14 @@ RESULT ObjectState::SetInertiaTensor(MassDistributionType type, const matrix<poi
 
 	auto matInverseIntertiaTensor3x3 = inverse(matInertiaTensor);
 
-	m_matIntertiaTensor.identity(1.0f);
-	m_matInverseIntertiaTensor.identity(1.0f);
+	m_matInertiaTensor.identity(1.0f);
+	m_matInverseInertiaTensor.identity(1.0f);
 
 	// Convert to an identity 4x4 matrix to make transforms easy with our data types
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			m_matIntertiaTensor.element(i, j) = matInertiaTensor.element(i, j);
-			m_matInverseIntertiaTensor.element(i, j) = matInverseIntertiaTensor3x3.element(i, j);
+			m_matInertiaTensor.element(i, j) = matInertiaTensor.element(i, j);
+			m_matInverseInertiaTensor.element(i, j) = matInverseIntertiaTensor3x3.element(i, j);
 		}
 	}
 
@@ -443,7 +443,6 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::RK4>(float timeStart
 	// Get the effective rate of change by using a weighted sum of the derivatives using the Taylor series expansion
 	//vector rateOfChangeOrigin = (1.0f / 6.0f) * (derivativeA.m_vRateOfChangeOrigin + 2.0f * (derivativeB.m_vRateOfChangeOrigin + derivativeC.m_vRateOfChangeOrigin) + derivativeD.m_vRateOfChangeOrigin);
 	vector force = (1.0f / 6.0f) * (derivativeA.m_vForce + 2.0f * (derivativeB.m_vForce + derivativeC.m_vForce) + derivativeD.m_vForce);
-
 	// Position
 	m_vMomentum += force * timeDelta;
 	RecalculateLinearVelocity();

@@ -123,8 +123,8 @@ protected:
 	vector m_vMomentum;					// Momentum
 
 	point m_ptCenterOfMass;									// Center of Mass
-	matrix<point_precision, 4, 4> m_matIntertiaTensor;				// Intertia tensor
-	matrix<point_precision, 4, 4> m_matInverseIntertiaTensor;		// Inverse inertia tensor
+	matrix<point_precision, 4, 4> m_matInertiaTensor;				// Inertia tensor
+	matrix<point_precision, 4, 4> m_matInverseInertiaTensor;		// Inverse inertia tensor
 	MassDistributionType m_massDistributionType;			// Mass distribution type
 
 	double m_angularDamping = 0.0f;							// Angular Damping
