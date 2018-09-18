@@ -79,6 +79,7 @@ public:
 
 	RESULT StartCapture();
 	RESULT StopCapture();
+	float GetRunTimeCaptureAverage();
 
 	RESULT StartRender();
 	RESULT StopRender();
@@ -107,6 +108,8 @@ protected:
 	int m_renderSamplingRate = DEFAULT_SAMPLING_RATE;
 	int m_captureSamplingRate = DEFAULT_SAMPLING_RATE;
 	int m_spatialSamplingRate = DEFAULT_SAMPLING_RATE;
+
+	float m_runTimeCaptureAverage = 0.0f;
 
 	std::wstring m_wstrAudioOutputDeviceGUID;
 	//std::wstring m_wstrAudioInputDeviceGUID;

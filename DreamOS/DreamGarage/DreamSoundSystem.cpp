@@ -289,3 +289,11 @@ DreamSoundSystem* DreamSoundSystem::SelfConstruct(DreamOS *pDreamOS, void *pCont
 	DreamSoundSystem *pDreamModule = new DreamSoundSystem(pDreamOS, pContext);
 	return pDreamModule;
 }
+
+float DreamSoundSystem::GetRunTimeCaptureAverage() {
+	if (m_pWASAPICaptureClient != nullptr) {
+		return m_pWASAPICaptureClient->GetRunTimeCaptureAverage();
+	}
+
+	return 0.0f;
+}

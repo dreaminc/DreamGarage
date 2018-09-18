@@ -175,6 +175,8 @@ private:
 	std::string m_strAccessToken;
 	UserController* m_pUserController;
 
+	CameraNode* m_pAuxCamera = nullptr;
+
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode = nullptr;

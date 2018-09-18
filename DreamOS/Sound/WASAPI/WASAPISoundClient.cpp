@@ -396,9 +396,15 @@ RESULT WASAPISoundClient::AudioCaptureProcess() {
 				CN(pSigned16IntBuffer);
 
 				// Convert to signed int data buffer
+				double avgAccumulator = 0.0f;
+				
 				for (unsigned int i = 0; i < numFramesAvailable; i++) {
 					pSigned16IntBuffer[i] = pFloatDataBuffer[i] * std::numeric_limits<int16_t>::max();
+					avgAccumulator += std::abs(pFloatDataBuffer[i]);
 				}
+
+				// TODO: This is not actually the run time average
+				m_runTimeCaptureAverage = (avgAccumulator / numFramesAvailable);
 
 				m_pCaptureSoundBuffer->LockBuffer();
 				{

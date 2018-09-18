@@ -92,6 +92,10 @@ RESULT SoundClient::StopCapture() {
 	return R_PASS;
 }
 
+float SoundClient::GetRunTimeCaptureAverage() {
+	return m_runTimeCaptureAverage;
+}
+
 RESULT SoundClient::StartRender() {
 	DEBUG_LINEOUT("SoundClient::StartRender");
 

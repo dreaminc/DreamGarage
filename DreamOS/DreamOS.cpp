@@ -644,6 +644,10 @@ CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
 }
 
+std::shared_ptr<DreamSoundSystem> DreamOS::GetDreamSoundSystem() {
+	return m_pDreamSoundSystem;
+}
+
 long DreamOS::GetUserID() {
 	return m_pSandbox->m_pCloudController->GetUserID();
 }

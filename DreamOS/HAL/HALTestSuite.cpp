@@ -5310,6 +5310,9 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 
 		{
 
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+
 			volume *pVolume;
 			pVolume = nullptr;
 
