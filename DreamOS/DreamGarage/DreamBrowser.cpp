@@ -235,10 +235,6 @@ RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
-	
-	if (fkeyDown) {		// because if we explicitly sent an up, we probably don't want to send a down.
-		CR(m_pWebBrowserController->SendKeyEventChar(chKey, !fkeyDown));
-	}
 
 Error:
 	return r;

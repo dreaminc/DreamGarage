@@ -102,6 +102,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
+		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_UP, this));
 
 		float currentCenter = m_pControlView->GetBackgroundWidth() / 2.0f;
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
@@ -1044,42 +1045,42 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 	} break;
 
+	case INTERACTION_EVENT_KEY_UP:
 	case INTERACTION_EVENT_KEY_DOWN: {
 		char chkey = (char)(pSubscriberEvent->m_value);
-
+		bool fKeyDown = (pSubscriberEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 		CBR(chkey != 0x00, R_SKIPPED);	// To catch empty chars used to refresh textbox	
 
 		//TODO: re-enable typing in the browser
 		//*
 		if (m_fKeyboardUp) {
 			// CBR(chkey != SVK_RETURN, R_SKIPPED);		// might be necessary to prevent dupe returns being sent to browser.
-			//CBR(!(chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE), R_SKIPPED);
-
+			
+			bool fIsSpecialKey = (chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE);	// These are keys not actually on our keyboard that we send manually
 			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
-			if (chkey == SVK_RETURN) {
-				CR(m_pActiveSource->OnKeyPress(chkey, true));
-				if (m_pControlView->m_fIsShareURL) {
-					CR(SetActiveBrowserURI());
+			if (!fIsSpecialKey) {
+				if (chkey == SVK_RETURN && fKeyDown) {
+					CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
+					if (m_pControlView->m_fIsShareURL) {
+						CR(SetActiveBrowserURI());
+					}
 				}
-				/*
 				else {
+					CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
+				}
+			}
+			else if (fKeyDown) {
+				if (chkey == SVK_TAB) {
+					CR(pBrowser->HandleTabEvent());
+				}
+				else if (chkey == SVK_SHIFTTAB) {
+					CR(pBrowser->HandleBackTabEvent());
+				}
+				else if (chkey == SVK_CLOSE) {
+					//CR(pBrowser->HandleUnfocusEvent());
+					//CR(m_pControlView->HandleKeyboardDown());
 					CR(HideWebsiteTyping());
 				}
-				//*/
-			}
-			else if (chkey == SVK_TAB) {
-				CR(pBrowser->HandleTabEvent());
-			}
-			else if (chkey == SVK_SHIFTTAB) {
-				CR(pBrowser->HandleBackTabEvent());
-			}
-			else if (chkey == SVK_CLOSE) {
-				//CR(pBrowser->HandleUnfocusEvent());
-				//CR(m_pControlView->HandleKeyboardDown());
-				CR(HideWebsiteTyping());
-			}
-			else {
-				CR(m_pActiveSource->OnKeyPress(chkey, true));
 			}
 		}
 		else {
@@ -1100,6 +1101,10 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 
 	}
+	
+	//case INTERACTION_EVENT_KEY_UP: {
+
+	//}
 	}
 
 Error:
