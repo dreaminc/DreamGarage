@@ -15,4 +15,4 @@
 #define BROWSER_HEIGHT 720;
 
 // avatar sizing
-#define HEAD_SCALE 0.013f;
+#define HEAD_SCALE 0.01f;

@@ -117,15 +117,7 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetMaterialShininess(2.0f, true);
 
-	//*
-	// initial mouth for avatar models by id
-	if (IsFemaleModel()) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[0].get());
-	}
-	else {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[0].get());
-	}
-	//*/
+	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
 
 #ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
@@ -165,17 +157,14 @@ RESULT user::LoadHeadModelFromID() {
 	
 	// loop iteration is a quirk of how the files are named
 	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
-	for (int i = m_numMouthStates; i > 0; i--) {
-		std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
-
-		wstrMouth = k_wstrMouthWomen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
+	for (int i = 1; i <= m_numMouthStates; i++) {
+	//	std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
+		std::wstring wstrMouth = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/mouth-" + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
 	}
 
 	for (int i = 0; i < 4; i++) {
-		CN(m_mouthStatesMen[i]);
-		CN(m_mouthStatesWomen[i]);
+		CN(m_mouthStates[i]);
 	}
 
 Error:
@@ -192,8 +181,22 @@ RESULT user::SetMouthOrientation(quaternion qOrientation) {
 	return R_PASS;
 }
 
+RESULT user::UpdateMouthPose() {
+	RESULT r = R_PASS;
+
+	CNR(m_pMouth, R_SKIPPED)
+	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[m_currentMouthPose].get());
+
+Error:
+	return R_PASS;
+}
+
 long user::GetAvatarModelId() {
 	return m_avatarModelId;
+}
+
+int user::GetCurrentMouthPose() {
+	return m_currentMouthPose;
 }
 
 //TODO: why doesn't this use hand::SetHandState(pHandState)
@@ -253,16 +256,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 		rangedValue = 0;
 	}
 
-	/*
-	if (m_pMouth != nullptr) {
-		if (IsFemaleModel()) {
-			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[rangedValue].get());
-		}
-		else {
-			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[rangedValue].get());
-		}
-	}
-	//*/
+	m_currentMouthPose = rangedValue;
 
 Error:
 	return r;

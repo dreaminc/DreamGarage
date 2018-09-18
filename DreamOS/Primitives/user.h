@@ -51,7 +51,10 @@ public:
 	RESULT SetMouthPosition(point ptPosition);
 	RESULT SetMouthOrientation(quaternion qOrientation);
 
+	RESULT UpdateMouthPose();
+
 	long GetAvatarModelId();
+	int GetCurrentMouthPose();
 
 private:
 	RESULT LoadHeadModelFromID();
@@ -81,7 +84,7 @@ private:
 	std::shared_ptr<model> m_pMouth = nullptr;
 	std::shared_ptr<composite> m_pMouthComposite = nullptr;
 
-	std::vector<std::shared_ptr<texture>> m_mouthStatesMen;
+	std::vector<std::shared_ptr<texture>> m_mouthStates;
 	std::vector<std::shared_ptr<texture>> m_mouthStatesWomen;
 
 	// for adding mouths to UI shader 
@@ -94,6 +97,7 @@ private:
 	float m_mouthScale = 0.0f;
 	int m_numMouthStates = 4;
 	float m_headScale = HEAD_SCALE;
+	int m_currentMouthPose = 0;
 };
 
 #endif	// ! PRIMITIVE_USER_H_
