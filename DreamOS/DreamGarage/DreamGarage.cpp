@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
-	sandboxconfig.fHMDMirror = true;
-	sandboxconfig.f3rdPersonCamera = false;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
@@ -113,7 +113,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	// Aux
 
 	CameraNode* pAuxCamera;
-	pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(2560, 1386, 60));
+	pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 6.0f), viewport(2560, 1386, 60));
 	//pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(3840, 2107, 60));
 	CN(pAuxCamera);
 	CB(pAuxCamera->incRefCount());
@@ -544,7 +544,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
-	auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
+	auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	CN(pDreamUserApp);
 	m_pDreamUserApp = pDreamUserApp.get();
 

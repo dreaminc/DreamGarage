@@ -313,11 +313,12 @@ RESULT DreamUserApp::Update(void *pContext) {
 		m_pOrientationRay->SetVisible(false);
 		//CR(GetDOS()->AddInteractionObject(m_pOrientationRay.get()));
 	}
-	m_pOrientationRay->SetPosition(pCameraNode->GetPosition());
-
-	qOrientation = (pCameraNode->GetOrientation());
-	qOrientation.Reverse();
-	m_pOrientationRay->SetOrientation(qOrientation);
+	else {
+		m_pOrientationRay->SetPosition(pCameraNode->GetPosition());
+		qOrientation = (pCameraNode->GetOrientation());
+		qOrientation.Reverse();
+		m_pOrientationRay->SetOrientation(qOrientation);
+	}
 
 	auto pHMD = GetDOS()->GetHMD();
 	if (m_pLeftHand == nullptr && pHMD != nullptr) {
@@ -333,6 +334,21 @@ RESULT DreamUserApp::Update(void *pContext) {
 
 	CR(UpdateHand(HAND_TYPE::HAND_LEFT));
 	CR(UpdateHand(HAND_TYPE::HAND_RIGHT));
+
+	if (m_pUserModel != nullptr) {
+		m_pUserModel->SetPosition(pCameraNode->GetPosition());
+		m_pUserModel->SetOrientation(qOrientation);
+
+		m_pUserModel->SetMouthOrientation(qOrientation);
+		m_pUserModel->SetMouthPosition(pCameraNode->GetPosition());
+
+		// Local mouth scale
+		float mouthScale = GetDOS()->GetCloudController()->GetRunTimeMicAverage();
+		mouthScale *= 10.0f;
+
+		util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+		m_pUserModel->UpdateMouth(mouthScale);
+	}
 
 	if (m_fShowLaunchQuad) {
 
@@ -351,13 +367,17 @@ RESULT DreamUserApp::Update(void *pContext) {
 	}
 
 	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera && m_pUserModel == nullptr) {
-		m_pUserModel = std::shared_ptr<user>(GetDOS()->MakeUser());
+		m_pUserModel = std::shared_ptr<user>(GetDOS()->AddUser());
 		CN(m_pUserModel);
-		m_pUserModel->UpdateAvatarModelWithID(1);
-		m_pUserModel->SetVisible(true);
-		m_pUserModel->SetDreamOS(GetDOS());
-		CR(GetComposite()->AddObject(m_pUserModel));
+
+		CR(m_pUserModel->SetDreamOS(GetDOS()));
+		CR(m_pUserModel->UpdateAvatarModelWithID(1));
+		CR(m_pUserModel->SetVisible(true));
+		CR(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false));
+		CR(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false));
 	}
+
+	
 
 	//CR(ResetAppComposite());
 Error:

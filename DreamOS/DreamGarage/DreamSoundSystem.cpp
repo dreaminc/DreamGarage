@@ -138,7 +138,25 @@ Error:
 RESULT DreamSoundSystem::OnAudioDataCaptured(int numFrames, SoundBuffer *pCaptureBuffer) {
 	RESULT r = R_PASS;
 
-	// Don't do much now
+	// 
+	/* TEMP: (for 3rd person)
+	if(GetDOS()->GetSandboxConfiguration().f3rdPersonCamera) {
+		auto pAudioBuffer = pCaptureBuffer->GetAudioPacket;
+		CN(pAudioBuffer);
+
+		size_t numSamples = pCaptureBuffer->GetNumChannels() * pCaptureBuffer->GetNumFrames();
+		float averageAccumulator = 0.0f;
+
+		for (int i = 0; i < numSamples; ++i) {
+			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
+			float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+			averageAccumulator += std::abs(scaledValue);
+		}
+
+		float runTimeAverage = averageAccumulator / numSamples;
+		GetDOS()->GetCloudController()->SetRunTimeMicAverage(runTimeAverage);
+	}
+	//*/
 
 	if (m_pObserver) {
 		CRM(m_pObserver->OnAudioDataCaptured(numFrames, pCaptureBuffer), "OnAudioDataCaptured in observer failed");
