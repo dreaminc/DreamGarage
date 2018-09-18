@@ -73,15 +73,19 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
-	sandboxconfig.fUseGamepad = false;
+	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
+	sandboxconfig.fHMDMirror = true;
+	sandboxconfig.f3rdPersonCamera = false;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitSound = true;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
 #endif
 
 	SetSandboxConfiguration(sandboxconfig);
@@ -96,6 +100,151 @@ RESULT DreamGarage::ConfigureSandbox() {
 #include "HAL/opengl/OGLProgramWater.h"
 #include "HAL/opengl/OGLProgramSkyboxScatter.h"
 
+RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = GetHALImp();
+
+	SinkNode *pAuxSinkNode;
+	pAuxSinkNode = pRenderPipeline->GetAuxiliarySinkNode();
+	CNM(pAuxSinkNode, "Aux sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	// Aux
+
+	//m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 6.0f), viewport(2560, 1386, 60));
+	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(3840, 2107, 60));
+	CN(m_pAuxCamera);
+	CB(m_pAuxCamera->incRefCount());
+
+	{
+		// Skybox
+
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		// Reflection 
+
+		m_pReflectionProgramNodeMirror = pHAL->MakeProgramNode("reflection");
+		CN(m_pReflectionProgramNodeMirror);
+		CR(m_pReflectionProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		ProgramNode* pReflectionSkyboxProgram;
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		CN(pReflectionSkyboxProgram);
+		CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", m_pReflectionProgramNodeMirror->Output("output_framebuffer")));
+
+		// Refraction
+
+		m_pRefractionProgramNodeMirror = pHAL->MakeProgramNode("refraction");
+		CN(m_pRefractionProgramNodeMirror);
+		CR(m_pRefractionProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		// "Water"
+
+		ProgramNode* pWaterProgramNode = pHAL->MakeProgramNode("water");
+		CN(pWaterProgramNode);
+		// Still need scene graph for lights 
+		// TODO: make lights a different node
+		CR(pWaterProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		// TODO: This is not particularly general yet
+		// Uncomment below to turn on water effects
+		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", m_pRefractionProgramNodeMirror->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+		// Environment shader
+
+		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("minimal_texture");
+		CN(m_pRenderEnvironmentProgramNodeMirror);
+		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+
+		// Everything else
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		// NOTE: Add this in if you want to have reflective objects
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", m_pRenderEnvironmentProgramNodeMirror->Output("output_framebuffer")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		//m_pUIMirrorProgramNode = pUIProgramNode;
+		m_pUIMirrorProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
+
+		auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
+
+		// Connect Program to Display
+		// Connect to aux (we will likely need to reproduce the pipeline)
+		if (pAuxSinkNode != nullptr) {
+			CR(pAuxSinkNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+			CR(pAuxSinkNode->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+			//CR(pAuxSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		}
+
+		//CR(pHAL->ReleaseCurrentContext());
+
+		quad *pWaterQuad = MakeQuad(1000.0f, 1000.0f);
+		point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
+		pWaterQuad->SetPosition(ptQuadOffset);
+		pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+		CN(pWaterQuad);
+
+		if (pWaterProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+		}
+
+		if (m_pReflectionProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramReflection*>(m_pReflectionProgramNodeMirror)->SetReflectionObject(pWaterQuad));
+		}
+
+		if (m_pRefractionProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramRefraction*>(m_pRefractionProgramNodeMirror)->SetRefractionObject(pWaterQuad));
+		}
+
+		if (pReflectionSkyboxProgram != nullptr) {
+			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
@@ -108,7 +257,6 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	//CR(pHAL->MakeCurrentContext());
 
 	{
-
 		// Skybox
 
 		ProgramNode* pScatteringSkyboxProgram;
@@ -266,7 +414,10 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		if (pReflectionSkyboxProgram != nullptr) {
 			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
 		}
+	}
 
+	if (GetSandboxConfiguration().f3rdPersonCamera == true) {
+		CR(SetupMirrorPipeline(pRenderPipeline));
 	}
 
 Error:
@@ -363,6 +514,17 @@ RESULT DreamGarage::LoadScene() {
 	CN(m_pRefractionProgramNode);
 	CR(m_pRefractionProgramNode->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
 
+	if (GetSandboxConfiguration().f3rdPersonCamera) {
+		CN(m_pRenderEnvironmentProgramNodeMirror);
+		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+		CN(m_pReflectionProgramNodeMirror);
+		CR(m_pReflectionProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+		CN(m_pRefractionProgramNodeMirror);
+		CR(m_pRefractionProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+	}
+
 	CR(SetupUserModelPool());
 	DOSLOG(INFO, "UserModelPool has been setup");
 
@@ -381,6 +543,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	std::string strFormType;
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
+	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CN(pDreamUserApp);
 	m_pDreamUserApp = pDreamUserApp.get();
@@ -409,7 +572,15 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamSettings);
 
 	if (GetSandboxConfiguration().fUseGamepad) {
-		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
+		m_pDreamGamepadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
+		CN(m_pDreamGamepadCameraApp);
+		
+		if (m_pAuxCamera != nullptr) {
+			CR(m_pDreamGamepadCameraApp->SetCamera(m_pAuxCamera));
+		}
+		else {
+			CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera()));
+		}
 	}
 
 	// TODO: could be somewhere else(?)

@@ -53,6 +53,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestGamepadCamera());
+
 	CR(AddTestEnvironmentSeating());
 
 	CR(AddTestModuleManager());
@@ -60,8 +62,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestCredentialStorage());
-
-	CR(AddTestGamepadCamera());
 
 	CR(AddTestEnvironmentSwitching());
 	
@@ -159,6 +159,9 @@ RESULT DreamOSTestSuite::SetupPipeline(std::string strRenderProgramName) {
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+	{
+		light *pLight = m_pDreamOS->AddLight(LIGHT_SPOT, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+	}
 
 Error:
 	return r;
@@ -201,8 +204,9 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Skybox
-	/*
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	//*
+	ProgramNode* pSkyboxProgram;
+	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1835,7 +1839,7 @@ Error:
 RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 3000.0f;
+	double sTestTime = 30000.0f;
 	int nRepeats = 1;
 
 	struct TestContext {
@@ -1858,7 +1862,7 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		CR(SetupPipeline("minimal"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);
@@ -1866,16 +1870,19 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 
 		light *pLight;
 		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-
+		
 		// Create the Shared View App
-		m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+		{
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamOS->GetCamera()));
+		}
 		//CNM(pTestContext->pDreamUserApp, "Failed to create dream user app");
 
 		// Sphere test
-		pTestContext->pSphereGreen = m_pDreamOS->AddSphere(0.1f, 10, 10);
-		pTestContext->pSphereBlue = m_pDreamOS->AddSphere(0.1f, 10, 10);
-		pTestContext->pSphereRed = m_pDreamOS->AddSphere(0.1f, 10, 10);
-		pTestContext->pSphereWhite = m_pDreamOS->AddSphere(0.1f, 10, 10);
+		pTestContext->pSphereGreen = m_pDreamOS->AddSphere(1.1f, 10, 10);
+		pTestContext->pSphereBlue = m_pDreamOS->AddSphere(1.1f, 10, 10);
+		pTestContext->pSphereRed = m_pDreamOS->AddSphere(1.1f, 10, 10);
+		pTestContext->pSphereWhite = m_pDreamOS->AddSphere(1.1f, 10, 10);
 		
 		CN(pTestContext->pSphereGreen);
 		CN(pTestContext->pSphereBlue);
@@ -1887,10 +1894,10 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 		pTestContext->pSphereRed->SetMaterialColors(COLOR_RED);
 		pTestContext->pSphereWhite->SetMaterialColors(COLOR_WHITE);
 		
-		pTestContext->pSphereGreen->SetPosition(0, -1, 0);
-		pTestContext->pSphereBlue->SetPosition(0, 2, 0);
-		pTestContext->pSphereRed->SetPosition(2, 0, 0);
-		pTestContext->pSphereWhite->SetPosition(-2, 0, 0);
+		pTestContext->pSphereGreen->SetPosition(0, -10, 0);
+		pTestContext->pSphereBlue->SetPosition(0, 20, 0);
+		pTestContext->pSphereRed->SetPosition(20, 0, 0);
+		pTestContext->pSphereWhite->SetPosition(-20, 0, 0);
 
 	Error:
 		return r;

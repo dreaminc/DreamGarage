@@ -703,8 +703,9 @@ Error:
 
 float WebRTCConductor::GetRunTimeMicAverage() {
 	
-	//if (m_pWebRTCAudioDeviceModule != nullptr) {
-	//	return m_pWebRTCAudioDeviceModule->GetRunTimeMicAverage();
+	// TODO: 
+	//if (m_pAudioDeviceModule != nullptr) {
+	//	return m_pAudioDeviceModule->GetRunTimeMicAverage();
 	//}
 
 	return 0.0f;

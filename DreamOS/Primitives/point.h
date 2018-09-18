@@ -23,7 +23,11 @@ class vector;
 // Difference between two points will be a vector
 //vector operator-(const point &lhs, const point &rhs);
 
-typedef matrix<float, 2, 1> point2D;
+// TODO: This has been removed and a point2D object has been created
+// Next step is to move to a point interface that allows seamless creation/conversion
+// between point2,3,4 etc using templates and typed object definitions similar to how 
+// OGL Uniforms are done
+//typedef matrix<float, 2, 1> point2D;
 
 class point : public matrix <point_precision, 4, 1> {
 public:

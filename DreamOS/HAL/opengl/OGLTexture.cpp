@@ -388,6 +388,10 @@ RESULT OGLTexture::SetDefaultTextureParams() {
 	CRM(SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
 	CRM(SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
 
+	// EXP: Mip maps
+	//CRM(SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST), "Failed to set GL_TEXTURE_MIN_FILTER");
+	//CRM(m_pParentImp->glGenerateMipmap(m_glTextureTarget), "Failed to generate mip maps");
+
 Error:
 	return r;
 }

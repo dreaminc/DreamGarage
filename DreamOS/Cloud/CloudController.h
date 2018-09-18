@@ -128,6 +128,7 @@ public:
 	// Audio 
 	RESULT BroadcastAudioPacket(const std::string &strAudioTrackLabel, const AudioPacket &pendingAudioPacket);
 	float GetRunTimeMicAverage();
+	RESULT SetRunTimeMicAverage(float runTimeMicAverage);
 
 	// TODO: Generalize channels
 
@@ -219,7 +220,7 @@ public:
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	
+
 	// Proxy Objects
 public:
 	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
@@ -249,6 +250,9 @@ private:
 
 	RESULT CloudThreadProcess();
 	RESULT CloudThreadProcessParams(std::string strUsername, std::string strPassword, long environmentID);
+
+	// TEMP:
+	float m_runTimeMicAverage = 0.0f;
 };
 
 #endif

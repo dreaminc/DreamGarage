@@ -8,6 +8,7 @@
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
 #include "Primitives/point.h"
+#include "Primitives/point2D.h"
 
 typedef enum SenseGamepadEventType {
 	SENSE_GAMEPAD_JOYSTICK_LEFT,

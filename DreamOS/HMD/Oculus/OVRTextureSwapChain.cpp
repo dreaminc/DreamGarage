@@ -144,10 +144,12 @@ RESULT OVRTextureSwapChain::SetAndClearRenderSurface() {
 
 	glEnable(GL_MULTISAMPLE);
 
-	m_pOGLRenderFramebuffer->Bind();
-	m_pOGLRenderFramebuffer->SetAndClearViewport(true, true);
+	if (m_pOGLRenderFramebuffer != nullptr) {
+		m_pOGLRenderFramebuffer->Bind();
+		m_pOGLRenderFramebuffer->SetAndClearViewport(true, true);
+	}
 	
-//Error:
+Error:
 	return r;
 }
 
@@ -159,6 +161,9 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 
 	m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_MULTISAMPLE);
+
+	// TEMP:
+	CNR(m_pOGLRenderFramebuffer, R_SKIPPED);
 
 	if (m_pOVRTextureSwapChain) {
 		int currentIndex;

@@ -187,8 +187,8 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		//j *= (vRelativeVelocity.dot(vNormal)) + vRefCrossNormalA.dot(vAngularVelocityOfPointA) - vRefCrossNormalB.dot(vAngularVelocityOfPointB);
 		
 		double denom = (kgInverseMassA + kgInverseMassB);
-		double angularInertiaA = vRefCrossNormalA.dot(vector((pObjA->GetState().m_matInverseIntertiaTensor) * vRefCrossNormalA));
-		double angularInertiaB = vRefCrossNormalB.dot(vector((pObjB->GetState().m_matInverseIntertiaTensor) * vRefCrossNormalB));
+		double angularInertiaA = vRefCrossNormalA.dot(vector((pObjA->GetState().m_matInverseInertiaTensor) * vRefCrossNormalA));
+		double angularInertiaB = vRefCrossNormalB.dot(vector((pObjB->GetState().m_matInverseInertiaTensor) * vRefCrossNormalB));
 
 		denom += angularInertiaA;
 		denom += angularInertiaB;

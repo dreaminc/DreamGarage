@@ -7,7 +7,7 @@
 #endif
 
 // TODO: Sandbox might be enough, don't need to pass HAL as well
-HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth, int wndHeight) {
+HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth, int wndHeight, bool fHMDMirror) {
 	RESULT r = R_PASS;
 	HMD *pHMD = nullptr;
 
@@ -15,14 +15,14 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 		case HMD_OVR: {
 			pHMD = new OVRHMD(pParentSandbox);
 			CN(pHMD);
-			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight), "Failed to initialize HMD!");
+			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight, fHMDMirror), "Failed to initialize HMD!");
 		} break;
 
 		case HMD_OPENVR: {
 #ifndef OCULUS_PRODUCTION_BUILD
 			pHMD = new OpenVRDevice(pParentSandbox);
 			CN(pHMD);
-			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight), "Failed to initialize HMD!");
+			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight, fHMDMirror), "Failed to initialize HMD!");
 #endif
 		} break;
 
@@ -32,7 +32,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 			pHMD = new OVRHMD(pParentSandbox);
 			CN(pHMD);
 
-			if (pHMD->InitializeHMD(halimp, wndWidth, wndHeight) == R_PASS) {
+			if (pHMD->InitializeHMD(halimp, wndWidth, wndHeight, fHMDMirror) == R_PASS) {
 				break;
 			}
 			else {
@@ -48,7 +48,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 			pHMD = new OpenVRDevice(pParentSandbox);
 			CN(pHMD);
 
-			if (pHMD->InitializeHMD(halimp, wndWidth, wndHeight) == R_PASS) {
+			if (pHMD->InitializeHMD(halimp, wndWidth, wndHeight, fHMDMirror) == R_PASS) {
 				break;
 			}
 			else {

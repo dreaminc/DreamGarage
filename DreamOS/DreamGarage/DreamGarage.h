@@ -74,6 +74,8 @@ public:
 	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
+	RESULT SetupMirrorPipeline(Pipeline *pRenderPipeline);
+
 	virtual version GetDreamVersion() override;
 
 	// Cloud Controller
@@ -173,6 +175,8 @@ private:
 	std::string m_strAccessToken;
 	UserController* m_pUserController;
 
+	CameraNode* m_pAuxCamera = nullptr;
+
 	// UI
 	//ViewMatrix *m_pClippingView;
 	UIStageProgram *m_pUIProgramNode = nullptr;
@@ -182,6 +186,11 @@ private:
 	ProgramNode* m_pRefractionProgramNode = nullptr;
 	ProgramNode* m_pReflectionProgramNode = nullptr;
 
+	// For mirror
+	ProgramNode* m_pRenderEnvironmentProgramNodeMirror = nullptr;
+	ProgramNode* m_pRefractionProgramNodeMirror = nullptr;
+	ProgramNode* m_pReflectionProgramNodeMirror = nullptr;
+
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
 	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
 	DreamUserApp* m_pDreamUserApp = nullptr;
@@ -190,7 +199,7 @@ private:
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	DreamControlView* m_pDreamControlView = nullptr;
 	DreamDesktopApp* m_pDreamDesktop = nullptr;
-	DreamGamepadCameraApp* m_pDreamGamePadCameraApp = nullptr;
+	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
 };
 
 #endif	// DREAM_GARAGE_H_

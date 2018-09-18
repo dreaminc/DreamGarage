@@ -55,6 +55,8 @@ public:
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
 
+	float GetRunTimeCaptureAverage();
+
 protected:
 	static DreamSoundSystem* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 

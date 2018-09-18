@@ -34,6 +34,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTest3rdPersonCamera());
+
 	CR(AddTestCubeMap());
 
 	CR(AddTestWaterShaderCube());
@@ -5216,6 +5218,154 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::AddTest3rdPersonCamera() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 400.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.3f;
+	float alpha = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode *pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		SinkNode *pAuxSinkNode;
+		pAuxSinkNode = pPipeline->GetAuxiliarySinkNode();
+		//CNM(pAuxSinkNode, "Aux sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		///*
+		// Skybox
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pSkyboxProgramNode;
+		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgramNode);
+		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
+
+		// Connect to output
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//*/
+
+		// Aux
+
+		CameraNode* pAuxCamera;
+		pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(2560, 1386, 60));
+		//pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(3840, 2107, 60));
+		CN(pAuxCamera);
+		CB(pAuxCamera->incRefCount());
+
+		// Skybox
+		ProgramNode* pScatteringSkyboxProgram2;
+		pScatteringSkyboxProgram2 = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram2);
+		CR(pScatteringSkyboxProgram2->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+
+		ProgramNode* pRenderProgramNode2;
+		pRenderProgramNode2 = pHAL->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode2);
+		CR(pRenderProgramNode2->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode2->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+
+		ProgramNode* pSkyboxProgramNode2;
+		pSkyboxProgramNode2 = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgramNode2);
+		CR(pSkyboxProgramNode2->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxProgramNode2->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram2->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgramNode2->ConnectToInput("input_framebuffer", pRenderProgramNode2->Output("output_framebuffer")));
+
+		// Connect to aux (we will likely need to reproduce the pipeline)
+		if (pAuxSinkNode != nullptr) {
+			CR(pAuxSinkNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+			CR(pAuxSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgramNode2->Output("output_framebuffer")));
+		}
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		{
+
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+
+			volume *pVolume;
+			pVolume = nullptr;
+
+			pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+			pVolume->RotateZByDeg(1.0f);
+
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pColorTexture);
+
+			CR(pVolume->SetDiffuseTexture(pColorTexture));
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("3rd person camera test");
+	pNewTest->SetTestDescription("Test 3rd person camera auxiliary sink node target");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT HALTestSuite::AddTestCubeMap() {
 	RESULT r = R_PASS;
 
@@ -5268,7 +5418,7 @@ RESULT HALTestSuite::AddTestCubeMap() {
 		CN(pRenderScreenQuad);
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
 
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 

@@ -108,6 +108,7 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
+#ifndef _DEBUG
 	CBM(m_pHead == nullptr, "avatar model already set");
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
@@ -118,13 +119,13 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
 
-#ifndef _DEBUG
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
 	m_pLeftHand->SetVisible(true);
 
 	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
 	m_pRightHand->SetVisible(true);
+
 #endif
 
 Error:

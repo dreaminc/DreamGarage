@@ -22,7 +22,7 @@ typedef enum {
 class HMDFactory : public Factory {
 public:
 	//static HMD* MakeHMD(HMD_TYPE type, HALImp *halimp);
-	static HMD* MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
+	static HMD* MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true);
 };
 
 #endif // ! PATH_MANAGER_FACTORY_H_
