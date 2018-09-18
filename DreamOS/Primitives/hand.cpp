@@ -440,9 +440,9 @@ RESULT hand::HideModel() {
 		return r;
 	};
 
-	m_pModel->SetVisible(false);
+//	m_pModel->SetVisible(false);
 
-	/*
+	//*
 	color matColor = m_pModel->GetDiffuseColor();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
@@ -468,9 +468,9 @@ RESULT hand::ShowModel() {
 		m_pModel->SetVisible(true && m_fTracked);
 		return r;
 	};
-	m_pModel->SetVisible(true && m_fTracked);
+//	m_pModel->SetVisible(true && m_fTracked);
 
-	/*
+	//*
 	color matColor = m_pModel->GetDiffuseColor();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
@@ -508,9 +508,9 @@ RESULT hand::HideController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
-	m_pController->SetVisible(false);
+//	m_pController->SetVisible(false);
 
-	/*
+	//*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 
 		pMesh,
@@ -541,9 +541,9 @@ RESULT hand::ShowController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
-	m_pController->SetVisible(true && m_fTracked);
+//	m_pController->SetVisible(true && m_fTracked);
 
-	/*
+	//*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
