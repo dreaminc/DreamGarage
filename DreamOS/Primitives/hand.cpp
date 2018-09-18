@@ -8,6 +8,8 @@
 #include "InteractionEngine/AnimationItem.h"
 #include "Core/Utilities.h"
 
+#include "DreamGarage/UICommon.h"
+
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {
@@ -71,7 +73,7 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 
 	m_avatarModelId = avatarModelID;
 
-	if (m_avatarModelId >= 1 && m_avatarModelId <= 4) {
+	if (m_avatarModelId >= 1 && m_avatarModelId <= NUM_AVATARS) {
 		LoadHandModel();
 	}
 
@@ -82,7 +84,7 @@ Error:
 RESULT hand::PendCreateHandModel(long avatarModelID) {
 	RESULT r = R_PASS;
 
-	CBM(avatarModelID >= 1 && avatarModelID <= 4, "invalid avatar model id %d", avatarModelID);
+	CBM(avatarModelID >= 1 && avatarModelID <= NUM_AVATARS, "invalid avatar model id %d", avatarModelID);
 	
 	m_fLoadHandModel = true;
 	m_avatarModelId = avatarModelID;
@@ -129,6 +131,9 @@ RESULT hand::LoadHandModel() {
 	m_pModel->SetScale(scaleModel);
 
 	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
+
+	// TODO: this is bad
+	//m_pModel->SetMaterialDiffuseColor(m_pModel->GetDiffuseColor(), true);
 	m_pModel->SetMaterialShininess(2.0f, true);
 
 #else
@@ -440,9 +445,9 @@ RESULT hand::HideModel() {
 		return r;
 	};
 
-//	m_pModel->SetVisible(false);
+	m_pModel->SetVisible(false);
 
-	//*
+	/*
 	color matColor = m_pModel->GetDiffuseColor();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
@@ -468,9 +473,9 @@ RESULT hand::ShowModel() {
 		m_pModel->SetVisible(true && m_fTracked);
 		return r;
 	};
-//	m_pModel->SetVisible(true && m_fTracked);
+	m_pModel->SetVisible(true && m_fTracked);
 
-	//*
+	/*
 	color matColor = m_pModel->GetDiffuseColor();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
@@ -508,9 +513,9 @@ RESULT hand::HideController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
-//	m_pController->SetVisible(false);
+	m_pController->SetVisible(false);
 
-	//*
+	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 
 		pMesh,
@@ -541,9 +546,9 @@ RESULT hand::ShowController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
-//	m_pController->SetVisible(true && m_fTracked);
+	m_pController->SetVisible(true && m_fTracked);
 
-	//*
+	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 

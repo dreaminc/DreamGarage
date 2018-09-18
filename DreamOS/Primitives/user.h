@@ -26,12 +26,6 @@ public:
 		CONTROLLER_INVALID
 	} CONTROLLER_TYPE;
 
-	typedef enum AvatarType {
-		WOMAN = 1,
-		BRUCE = 2,
-		AVATAR_INVALID
-	} AVATAR_TYPE;
-
 public:
 	user(HALImp* pHALImp);
 	user(HALImp* pHALImp, DreamOS *pDreamOS);
@@ -62,7 +56,6 @@ private:
 private:
 
 	std::wstring k_wstrAvatarPath = L"/avatar/";
-	std::wstring k_wstrAvatarFileType = L".FBX";
 	std::wstring k_wstrMouthFileType = L".png";
 
 private:
@@ -84,7 +77,7 @@ private:
 
 private:
 
-	long m_avatarModelId = AVATAR_INVALID;
+	long m_avatarModelId = -1;
 
 	float m_mouthScale = 0.0f;
 	int m_numMouthStates = 4;

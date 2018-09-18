@@ -14,5 +14,6 @@
 #define BROWSER_WIDTH 1280;
 #define BROWSER_HEIGHT 720;
 
-// avatar sizing
-#define HEAD_SCALE 0.01f;
+// avatars
+#define NUM_AVATARS 12
+#define HEAD_SCALE 0.01f
