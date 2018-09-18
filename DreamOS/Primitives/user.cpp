@@ -248,6 +248,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	float numBins = (float)(m_numMouthStates);
 	int rangedValue = (int)(m_mouthScale * numBins);
 
+	/*
 	if (rangedValue > 3) {
 		rangedValue = 3;
 	}
@@ -255,6 +256,21 @@ RESULT user::UpdateMouth(float mouthScale) {
 	if (rangedValue < 0) {
 		rangedValue = 0;
 	}
+	//*/
+
+	if (m_mouthScale < 0.3f) {
+		rangedValue = 0;
+	}
+	else if (m_mouthScale < 0.6f) {
+		rangedValue = 1;
+	}
+	else if (m_mouthScale < 0.9f) {
+		rangedValue = 2;
+	}
+	else {
+		rangedValue = 3;
+	}
+	
 
 	m_currentMouthPose = rangedValue;
 
