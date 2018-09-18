@@ -854,13 +854,19 @@ Error:
 }
 
 float CloudController::GetRunTimeMicAverage() {
-	if (m_pEnvironmentController != nullptr) {
-		return m_pEnvironmentController->GetRunTimeMicAverage();
-	}
+	// TODO: Fix this
+	//if (m_pEnvironmentController != nullptr) {
+	//	return m_pEnvironmentController->GetRunTimeMicAverage();
+	//}
 
-	return 0.0f;
+	return m_runTimeMicAverage;
 }
 
+
+RESULT CloudController::SetRunTimeMicAverage(float runTimeMicAverage) {
+	m_runTimeMicAverage = runTimeMicAverage;
+	return R_PASS;
+}
 
 // Video
 RESULT CloudController::BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels) {

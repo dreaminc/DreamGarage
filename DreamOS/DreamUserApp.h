@@ -31,6 +31,7 @@ class VirtualObj;
 class UIKeyboard;
 class UIKeyboardHandle;
 class DimObj;
+class user;
 
 class CEFBrowserManager;
 
@@ -244,6 +245,7 @@ private:
 	//user *m_pUserModel = nullptr;
 	std::shared_ptr<DimRay> m_pOrientationRay = nullptr;
 	
+	std::shared_ptr<user> m_pUserModel = nullptr;
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
 

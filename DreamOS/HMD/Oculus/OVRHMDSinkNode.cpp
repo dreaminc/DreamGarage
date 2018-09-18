@@ -91,6 +91,7 @@ RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	}
 
 	m_pParentHMD->SubmitFrame();
+
 	m_pParentHMD->RenderHMDMirror();
 
 Error:

@@ -132,7 +132,9 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	if (m_fPassThru == false) {
+		UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	}
 
 	UseProgram();
 

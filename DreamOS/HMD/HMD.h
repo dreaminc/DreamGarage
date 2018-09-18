@@ -108,7 +108,7 @@ public:
 public:
 	// Called by factory to initialize HMD
 	//virtual RESULT InitializeHMD(HALImp *halimp) = 0;
-	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) = 0;
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true) = 0;
 
 	// Called to update/poll tracking info
 	virtual RESULT UpdateHMD() = 0;

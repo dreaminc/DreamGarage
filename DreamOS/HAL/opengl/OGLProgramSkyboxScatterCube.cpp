@@ -199,8 +199,7 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 
 	CN(m_pSkybox);
 
-	static bool fRendered = false;
-	if (fRendered)
+	if (m_fRendered)
 		return r;
 
 	UseProgram();
@@ -248,7 +247,7 @@ RESULT OGLProgramSkyboxScatterCube::ProcessNode(long frameID) {
 		}
 	}
 
-	fRendered = true;
+	m_fRendered = true;
 
 	UnbindFramebuffer();
 	//*/

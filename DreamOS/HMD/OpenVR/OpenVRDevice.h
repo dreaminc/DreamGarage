@@ -47,7 +47,7 @@ public:
 	virtual RESULT InitializeHMDSourceNode() override;
 	virtual RESULT InitializeHMDSinkNode() override;
 
-	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0, bool fHMDMirror = true) override;
 	virtual RESULT UpdateHMD() override;
 	virtual RESULT ReleaseHMD() override;
 

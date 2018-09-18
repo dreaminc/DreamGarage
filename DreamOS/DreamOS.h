@@ -261,6 +261,7 @@ private:
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();
 	CloudController *GetCloudController();
+	std::shared_ptr<DreamSoundSystem> GetDreamSoundSystem();
 	long GetUserID();
 
 protected:
@@ -510,6 +511,17 @@ public:
 	virtual RESULT SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture);
 	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 	virtual RESULT BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket);
+
+	// TODO: This is temporary code for the mirror stage - 
+	// in future should replace this with real functionality (that's generalized) 
+	// or remove it entirely 
+public:
+	UIStageProgram* GetMirrorUIStageProgram() {
+		return m_pUIMirrorProgramNode;
+	}
+
+protected:
+	UIStageProgram* m_pUIMirrorProgramNode = nullptr;
 
 // System Applications
 private:

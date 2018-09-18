@@ -245,9 +245,18 @@ RESULT DreamUIBar::ResetAppComposite() {
 		vAppLook.Normalize();
 		vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 		m_pUIStageProgram->SetOriginDirection(vAppLookXZ);
-	}
 
-	m_pUIStageProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
+		m_pUIStageProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
+
+		// For mirror
+		if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera) {
+			UIStageProgram* pMirrorUIProgram = GetDOS()->GetMirrorUIStageProgram();
+			if (pMirrorUIProgram != nullptr) {
+				pMirrorUIProgram->SetOriginDirection(vAppLookXZ);
+				pMirrorUIProgram->SetOriginPoint(m_pScrollView->GetMenuItemsView()->GetPosition(true));
+			}
+		}
+	}
 
 Error:
 	return r;
@@ -928,6 +937,14 @@ RESULT DreamUIBar::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	if (m_pUIStageProgram != nullptr) {
 		m_pUIStageProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
 		m_pUIStageProgram->SetClippingRate(m_pScrollView->GetClippingRate());
+
+		if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera) {
+			UIStageProgram* pMirrorUIProgram = GetDOS()->GetMirrorUIStageProgram();
+			if (pMirrorUIProgram != nullptr) {
+				pMirrorUIProgram->SetClippingThreshold(m_pScrollView->GetClippingThreshold());
+				pMirrorUIProgram->SetClippingRate(m_pScrollView->GetClippingRate());
+			}
+		}
 	}
 
 Error:

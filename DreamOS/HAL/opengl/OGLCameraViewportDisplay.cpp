@@ -1,17 +1,20 @@
-#include "OGLViewportDisplay.h"
+#include "OGLCameraViewportDisplay.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 
-OGLViewportDisplay::OGLViewportDisplay(OpenGLImp *pParentImp) :
-	SinkNode("oglviewportdisplay"),
+OGLCameraViewportDisplay::OGLCameraViewportDisplay(OpenGLImp *pParentImp) :
+	SinkNode("oglviewportdisplaycamera"),
 	m_pParentImp(pParentImp)
 {
 	// empty
 }
 
-RESULT OGLViewportDisplay::SetupConnections() {
+RESULT OGLCameraViewportDisplay::SetupConnections() {
 	RESULT r = R_PASS;
+
+	// Inputs
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLInputFramebuffer));
 
@@ -19,30 +22,34 @@ Error:
 	return r;
 }
 
-RESULT OGLViewportDisplay::PreProcessNode(long frameID) {
+RESULT OGLCameraViewportDisplay::PreProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	auto pCamera = m_pParentImp->GetCamera();
+	CNR(m_pCamera, R_SKIPPED);
 
-	pCamera->SetCameraEye(EYE_MONO);
+	m_pCamera->SetCameraEye(EYE_MONO);
 
-	m_pParentImp->SetViewTarget(EYE_MONO, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+	m_pParentImp->SetViewTarget(EYE_MONO, m_pCamera->GetViewWidth(), m_pCamera->GetViewHeight());
 
 Error:
 	return r;
 }
 
-RESULT OGLViewportDisplay::ProcessNode(long frameID) {
+RESULT OGLCameraViewportDisplay::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 	
 	// TODO: Implement this
 	// A lot of this is rendering the inputs, this should actually go into DNode
 
-	auto pCamera = m_pParentImp->GetCamera();
+	//int pxViewportWidth = m_pCamera->GetViewWidth();
+	//int pxViewportHeight = m_pCamera->GetViewHeight();
 
-	int pxViewportWidth = m_pParentImp->GetViewport().Width();
-	int pxViewportHeight = m_pParentImp->GetViewport().Height();
+	int pxViewportWidth = m_pOGLInputFramebuffer->GetWidth();
+	int pxViewportHeight = m_pOGLInputFramebuffer->GetHeight();
+
 	int channels = 4;
+
+	m_pParentImp->SetViewTarget(EYE_MONO, pxViewportWidth, pxViewportHeight);
 
 	if (m_pOGLInputFramebuffer != nullptr) {
 		// present to display
