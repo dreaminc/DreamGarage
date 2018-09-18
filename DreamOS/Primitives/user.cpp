@@ -43,7 +43,6 @@ RESULT user::Initialize() {
 
 	vector vHeadOffset;
 	if (strHeadPath == "default") {
-		strHeadPath = k_strDefaultHeadPath;
 		vHeadOffset = vector(0.0f, (float)M_PI, 0.0f);
 	}
 	else {
@@ -126,16 +125,10 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
 	m_pRightHand->SetVisible(true);
-
-
 #endif
 
 Error:
 	return r;
-}
-
-bool user::IsFemaleModel() {
-	return m_avatarModelId == 1 || m_avatarModelId == 4;
 }
 
 RESULT user::LoadHeadModelFromID() {
@@ -146,8 +139,8 @@ RESULT user::LoadHeadModelFromID() {
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	//std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
-	std::wstring wstrHeadModel = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/head.fbx";
-	std::wstring wstrMouthModel = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/mouth.fbx";
+	std::wstring wstrHeadModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/head.fbx";
+	std::wstring wstrMouthModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/mouth.fbx";
 
 	m_pHead = AddModel(wstrHeadModel);
 	CN(m_pHead);
@@ -158,8 +151,7 @@ RESULT user::LoadHeadModelFromID() {
 	// loop iteration is a quirk of how the files are named
 	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
 	for (int i = 1; i <= m_numMouthStates; i++) {
-	//	std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
-		std::wstring wstrMouth = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/mouth-" + std::to_wstring(i) + k_wstrMouthFileType;
+		std::wstring wstrMouth = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/mouth-" + std::to_wstring(i) + k_wstrMouthFileType;
 		m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
 	}
 
@@ -248,7 +240,6 @@ RESULT user::UpdateMouth(float mouthScale) {
 	float numBins = (float)(m_numMouthStates);
 	int rangedValue = (int)(m_mouthScale * numBins);
 
-	//*
 	if (rangedValue > 3) {
 		rangedValue = 3;
 	}
@@ -256,7 +247,6 @@ RESULT user::UpdateMouth(float mouthScale) {
 	if (rangedValue < 0) {
 		rangedValue = 0;
 	}
-	//*/
 
 	m_currentMouthPose = rangedValue;
 

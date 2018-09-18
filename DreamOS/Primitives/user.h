@@ -58,19 +58,11 @@ public:
 
 private:
 	RESULT LoadHeadModelFromID();
-	bool IsFemaleModel();
 
 private:
-	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
-	//std::string k_strMouthModelPath = "\\Avatars\\mouth.FBX";
-	std::string k_strMouthModelPath = "\\avatar\\4\\mouth.fbx";
 
-	std::wstring k_wstrAvatarPath = L"Avatars\\avatar_";
+	std::wstring k_wstrAvatarPath = L"/avatar/";
 	std::wstring k_wstrAvatarFileType = L".FBX";
-
-	// TODO: will change with avatar specific mouths
-	std::wstring k_wstrMouthMen = L"mouth_men/mouth_man_0";
-	std::wstring k_wstrMouthWomen = L"mouth_women/mouth_women_0";
 	std::wstring k_wstrMouthFileType = L".png";
 
 private:
