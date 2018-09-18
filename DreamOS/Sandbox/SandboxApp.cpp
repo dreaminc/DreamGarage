@@ -493,7 +493,11 @@ RESULT SandboxApp::RunAppLoop() {
 		SwapDisplayBuffers();
 
 		//DreamConsole::GetConsole()->OnFrameRendered();
+#ifdef _DEBUG
 		if (IsShuttingDown() || GetAsyncKeyState(VK_ESCAPE)) {
+#else
+		if (IsShuttingDown()) {
+#endif
 			Sleep(1000);
 			Shutdown();
 		}

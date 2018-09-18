@@ -122,7 +122,7 @@ public:
 
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT Start();
-	RESULT Exit(RESULT exitcode);
+	virtual RESULT Exit(RESULT exitcode);
 
 	// These are used to set paths for path manager
 	virtual bool UseInstallPath() { return false; }

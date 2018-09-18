@@ -1546,6 +1546,23 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::Exit(RESULT r) {
+
+	auto fnOnFadeOutCallback = [&](void *pContext) {
+
+		CRM(DreamOS::Exit(r), "Exit dream failed");
+
+	Error:
+		return r;
+	};
+
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->FadeOut(fnOnFadeOutCallback));
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 

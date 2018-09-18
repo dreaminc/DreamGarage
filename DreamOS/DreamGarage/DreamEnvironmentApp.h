@@ -57,6 +57,7 @@ public:
 	RESULT HideEnvironment(void *pContext);
 	RESULT ShowEnvironment(void *pContext);
 	RESULT FadeIn();
+	RESULT FadeOut(std::function<RESULT(void*)> fnFadeOutCallback = nullptr);
 
 
 	RESULT SwitchToEnvironment(environment::type type);
