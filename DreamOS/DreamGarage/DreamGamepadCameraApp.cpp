@@ -103,25 +103,22 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 
 	float totalTriggerValue = (m_leftTriggerValue + m_rightTriggerValue);
 		
-	if (m_pCamera->GetVelocity().magnitude() < 1.0f) {	// speed cap
-		m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_ptLeftStick(0, 0) / m_cameraMoveSpeedScale));
-		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_ptLeftStick(0, 1) / m_cameraMoveSpeedScale));
-		m_pCamera->Impulse(m_pCamera->GetUpVector() * (totalTriggerValue / m_cameraUpSpeedScale));
-	}
+	m_pCamera->Impulse(m_pCamera->GetRightVector() * (m_ptLeftStick.x() / m_cameraMoveSpeedScale));
+	m_pCamera->Impulse(m_pCamera->GetUpVector() * (totalTriggerValue / m_cameraUpSpeedScale));
 
+	if (m_fLockY) {
+		vector vLookVectorXZ = vector(m_pCamera->GetLookVector().x(), 0, m_pCamera->GetLookVector().z());
+		m_pCamera->Impulse(vLookVectorXZ * (m_ptLeftStick.y() / m_cameraMoveSpeedScale));
+	}
+	else {
+		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_ptLeftStick.y() / m_cameraMoveSpeedScale));
+	}
+	
 	if (m_pCamera != nullptr) {
 		m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() / m_cameraRotateSpeed, -m_ptRightStick.y() / m_cameraRotateSpeed);
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
-
-		if (m_pCamera->GetVelocity().magnitude() < 0.002f &&
-			m_ptLeftStick.x() < 1.5f && m_ptLeftStick.x() > -1.5 &&
-			m_ptLeftStick.y() < 1.5 && m_ptLeftStick.y() > -1.5)
-		{
-			// could add a harder deceleration curve here, or set a min on the resistance value, but just setting 0 lol
-			m_pCamera->SetVelocity(0.0f, 0.0f, 0.0f);
-		}
 	}
-	DEBUG_LINEOUT_RETURN("vel magn: %0.8f", m_pCamera->GetVelocity().magnitude());
+	//DEBUG_LINEOUT_RETURN("vel magn: %0.8f", m_pCamera->GetVelocity().magnitude());
 	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
 
 
@@ -136,7 +133,7 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 		case SENSE_GAMEPAD_JOYSTICK_LEFT: {
 			m_fUpdateLeftStick = true;
 			m_ptPendLeftStick = pEvent->eventData;		
-			DEBUG_LINEOUT("pending x: %0.8f y: %0.8f", m_ptPendLeftStick.x(), m_ptPendLeftStick.y());
+			//DEBUG_LINEOUT("pending x: %0.8f y: %0.8f", m_ptPendLeftStick.x(), m_ptPendLeftStick.y());
 		} break;
 
 		case SENSE_GAMEPAD_JOYSTICK_RIGHT: {
@@ -152,6 +149,7 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 		case SENSE_GAMEPAD_TRIGGER_RIGHT: {
 			m_fUpdateRightTrigger = true;
 			m_pendRightTriggerValue = pEvent->eventData.x();
+			//DEBUG_LINEOUT("pending x: %0.8f", (double)m_pendRightTriggerValue);
 		} break;
 
 		case SENSE_GAMEPAD_BUTTON_DOWN: {
@@ -167,26 +165,26 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 
 			if (pEvent->gamepadButtonType == SENSE_GAMEPAD_DPAD_UP) {
 				if (m_ptLeftStick.x() > 0.0f || m_ptLeftStick.y() > 0.0f) {
-					m_cameraMoveSpeedScale -= 10.0f;
+					m_cameraMoveSpeedScale -= m_cameraMoveSpeedScale * 0.1;
 				}
 				else if (m_ptRightStick.x() > 0.0f || m_ptRightStick.y() > 0.0f) {
-					m_cameraRotateSpeed -= 1.0f;
+					m_cameraRotateSpeed -= m_cameraRotateSpeed * 0.1;
 				}
 				else if (m_leftTriggerValue > 0.0f || m_rightTriggerValue > 0.0f) {
-					m_cameraUpSpeedScale -= 100.0f;
+					m_cameraUpSpeedScale -= m_cameraUpSpeedScale * 0.1;
 				}
 
 				DEBUG_LINEOUT("DPAD UP");
 			}
 			else if (pEvent->gamepadButtonType == SENSE_GAMEPAD_DPAD_DOWN) {
 				if (m_ptLeftStick.x() > 0.0f || m_ptLeftStick.y() > 0.0f) {
-					m_cameraMoveSpeedScale += 10.0f;
+					m_cameraMoveSpeedScale += m_cameraMoveSpeedScale * 0.1;
 				}
 				else if (m_ptRightStick.x() > 0.0f || m_ptRightStick.y() > 0.0f) {
-					m_cameraRotateSpeed += 1.0f;
+					m_cameraRotateSpeed += m_cameraRotateSpeed * 0.1;
 				}
 				else if (m_leftTriggerValue > 0.0f || m_rightTriggerValue > 0.0f) {
-					m_cameraUpSpeedScale += 100.0f;
+					m_cameraUpSpeedScale += m_cameraUpSpeedScale * 0.1;
 				}
 
 				DEBUG_LINEOUT("DPAD DOWN");

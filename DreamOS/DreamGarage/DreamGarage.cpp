@@ -409,9 +409,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pDreamSettings);
 
 	if (GetSandboxConfiguration().fUseGamepad) {
-		m_pDreamGamePadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
-		CN(m_pDreamGamePadCameraApp);
-		CR(m_pDreamGamePadCameraApp->SetCamera(GetCamera()));
+		m_pDreamGamepadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
+		CN(m_pDreamGamepadCameraApp);
+		CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera()));
 	}
 
 	// TODO: could be somewhere else(?)

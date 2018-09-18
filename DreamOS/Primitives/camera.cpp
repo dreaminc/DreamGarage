@@ -136,12 +136,6 @@ RESULT camera::MoveStrafe(camera_precision amt) {
 	return R_PASS;
 }
 
-RESULT camera::MoveLockedY(camera_precision amt) {
-	vector vLookVectorXZ = vector(GetLookVector().x(), 0, GetLookVector().z());
-	translate(vLookVectorXZ * amt);
-	return R_PASS;
-}
-
 RESULT camera::SetStrafeSpeed(camera_precision speed) {
 	m_cameraStrafeSpeed = speed;
 	return R_PASS;
