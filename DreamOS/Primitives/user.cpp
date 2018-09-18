@@ -37,9 +37,12 @@ RESULT user::Initialize() {
 
 #ifndef _DEBUG
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	vector vHeadOffset;
 	if (strHeadPath == "default") {
-		strHeadPath = k_strDefaultHeadPath;
 		vHeadOffset = vector(0.0f, (float)M_PI, 0.0f);
 	}
 	else {
@@ -54,23 +57,6 @@ RESULT user::Initialize() {
 
 	//m_pHead = AddModel(util::StringToWideString(strHeadPath));
 	
-	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthModelPath));
-	CN(m_pMouth);
-	
-	// loop iteration is a quirk of how the files are named
-	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
-	for (int i = m_numMouthStates; i > 0; i--) {
-		std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
-
-		wstrMouth = k_wstrMouthWomen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
-	}
-
-	for (int i = 0; i < 4; i++) {
-		CN(m_mouthStatesMen[i]);
-		CN(m_mouthStatesWomen[i]);
-	}
 
 #else
 	m_pHead = AddModel(L"\\cube.obj");
@@ -131,15 +117,7 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_pHead->SetOrientationOffset(vHeadOffset);
 	m_pHead->SetMaterialShininess(2.0f, true);
 
-	//*
-	// initial mouth for avatar models by id
-	if (IsFemaleModel()) {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[0].get());
-	}
-	else {
-		m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[0].get());
-	}
-	//*/
+	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
@@ -154,17 +132,33 @@ Error:
 	return r;
 }
 
-bool user::IsFemaleModel() {
-	return m_avatarModelId == 1 || m_avatarModelId == 4;
-}
-
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
-	std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
+	//std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
+	std::wstring wstrHeadModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/head.fbx";
+	std::wstring wstrMouthModel = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/mouth.fbx";
 
 	m_pHead = AddModel(wstrHeadModel);
 	CN(m_pHead);
+
+	m_pMouth = m_pMouthComposite->AddModel(wstrMouthModel);
+	CN(m_pMouth);
+	
+	// loop iteration is a quirk of how the files are named
+	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
+	for (int i = 1; i <= m_numMouthStates; i++) {
+		std::wstring wstrMouth = wstrAssetPath + k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + L"/mouth-" + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStates.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
+	}
+
+	for (int i = 0; i < 4; i++) {
+		CN(m_mouthStates[i]);
+	}
 
 Error:
 	return r;
@@ -180,8 +174,22 @@ RESULT user::SetMouthOrientation(quaternion qOrientation) {
 	return R_PASS;
 }
 
+RESULT user::UpdateMouthPose() {
+	RESULT r = R_PASS;
+
+	CNR(m_pMouth, R_SKIPPED)
+	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[m_currentMouthPose].get());
+
+Error:
+	return R_PASS;
+}
+
 long user::GetAvatarModelId() {
 	return m_avatarModelId;
+}
+
+int user::GetCurrentMouthPose() {
+	return m_currentMouthPose;
 }
 
 //TODO: why doesn't this use hand::SetHandState(pHandState)
@@ -225,7 +233,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 	{
 		// controls how fast the mouth scale responds to sustained volume
 		float newAmount = 0.2f;
-		float newMouthScale = mouthScale * 8.0f + 0.01f;
+		float newMouthScale = mouthScale*1.5f;
 
 		m_mouthScale = (1.0f - newAmount) * (m_mouthScale) + (newAmount) * (newMouthScale);
 	}
@@ -241,14 +249,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 		rangedValue = 0;
 	}
 
-	if (m_pMouth != nullptr) {
-		if (IsFemaleModel()) {
-			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[rangedValue].get());
-		}
-		else {
-			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[rangedValue].get());
-		}
-	}
+	m_currentMouthPose = rangedValue;
 
 Error:
 	return r;

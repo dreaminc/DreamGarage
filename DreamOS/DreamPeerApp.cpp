@@ -87,6 +87,7 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CR(InitializeUserNameLabel());
 	}
 	
+	
 	// update user label position
 	if (m_pUserModel != nullptr) {
 
@@ -106,6 +107,8 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		ptOrigin += pHead->GetOrigin();
 
 		m_pUserLabelComposite->SetPosition(point(ptOrigin.x(), outerDistance, ptOrigin.z()));
+
+		m_pUserModel->UpdateMouthPose();
 	}
 
 	if (m_pPendingPhotoTextureBuffer != nullptr) {

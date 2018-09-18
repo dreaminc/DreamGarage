@@ -163,6 +163,7 @@ RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
+	/*
 	// Skybox
 	ProgramNode* pSkyboxProgram;
 	pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
@@ -170,11 +171,12 @@ RESULT HALTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//*/
 
 	ProgramNode *pRenderScreenQuad;
 	pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
@@ -2736,7 +2738,11 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\Avatars\\righthand_1_ascii.FBX");
-			pTestContext->pModel = m_pDreamOS->AddModel(L"\\Avatars\\lefthand_1.FBX");
+			PathManager *pPathManager = PathManager::instance();
+			std::wstring wstrAssetPath;
+			pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+			std::wstring wstrHeadModel = wstrAssetPath + L"/avatar/" + std::to_wstring(6) + L"/head.fbx";
+			pTestContext->pModel = m_pDreamOS->AddModel(wstrHeadModel);
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, 0.0f));
 			pTestContext->pModel->SetScale(0.1f);
 

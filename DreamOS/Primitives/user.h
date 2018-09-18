@@ -26,12 +26,6 @@ public:
 		CONTROLLER_INVALID
 	} CONTROLLER_TYPE;
 
-	typedef enum AvatarType {
-		WOMAN = 1,
-		BRUCE = 2,
-		AVATAR_INVALID
-	} AVATAR_TYPE;
-
 public:
 	user(HALImp* pHALImp);
 	user(HALImp* pHALImp, DreamOS *pDreamOS);
@@ -51,22 +45,17 @@ public:
 	RESULT SetMouthPosition(point ptPosition);
 	RESULT SetMouthOrientation(quaternion qOrientation);
 
+	RESULT UpdateMouthPose();
+
 	long GetAvatarModelId();
+	int GetCurrentMouthPose();
 
 private:
 	RESULT LoadHeadModelFromID();
-	bool IsFemaleModel();
 
 private:
-	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
-	std::string k_strMouthModelPath = "\\Avatars\\mouth.FBX";
 
-	std::wstring k_wstrAvatarPath = L"Avatars\\avatar_";
-	std::wstring k_wstrAvatarFileType = L".FBX";
-
-	// TODO: will change with avatar specific mouths
-	std::wstring k_wstrMouthMen = L"mouth_men/mouth_man_0";
-	std::wstring k_wstrMouthWomen = L"mouth_women/mouth_women_0";
+	std::wstring k_wstrAvatarPath = L"/avatar/";
 	std::wstring k_wstrMouthFileType = L".png";
 
 private:
@@ -80,7 +69,7 @@ private:
 	std::shared_ptr<model> m_pMouth = nullptr;
 	std::shared_ptr<composite> m_pMouthComposite = nullptr;
 
-	std::vector<std::shared_ptr<texture>> m_mouthStatesMen;
+	std::vector<std::shared_ptr<texture>> m_mouthStates;
 	std::vector<std::shared_ptr<texture>> m_mouthStatesWomen;
 
 	// for adding mouths to UI shader 
@@ -88,11 +77,12 @@ private:
 
 private:
 
-	long m_avatarModelId = AVATAR_INVALID;
+	long m_avatarModelId = -1;
 
 	float m_mouthScale = 0.0f;
 	int m_numMouthStates = 4;
 	float m_headScale = HEAD_SCALE;
+	int m_currentMouthPose = 0;
 };
 
 #endif	// ! PRIMITIVE_USER_H_

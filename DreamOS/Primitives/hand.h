@@ -114,10 +114,10 @@ protected:
 
 protected:
 
-	std::wstring k_wstrFolder = L"\\Avatars\\";
-	std::wstring k_wstrLeft = L"lefthand_";
-	std::wstring k_wstrRight = L"righthand_";
-	std::wstring k_wstrFileType = L".FBX";
+	std::wstring k_wstrFolder = L"/avatar/";
+	std::wstring k_wstrLeft = L"left-hand";
+	std::wstring k_wstrRight = L"right-hand";
+	std::wstring k_wstrFileType = L".fbx";
 
 	HAND_TYPE m_handType;
 

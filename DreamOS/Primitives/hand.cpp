@@ -8,6 +8,8 @@
 #include "InteractionEngine/AnimationItem.h"
 #include "Core/Utilities.h"
 
+#include "DreamGarage/UICommon.h"
+
 hand::hand(HALImp* pHALImp, HAND_TYPE type) :
 	composite(pHALImp)
 {
@@ -71,7 +73,7 @@ RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 
 	m_avatarModelId = avatarModelID;
 
-	if (m_avatarModelId >= 1 && m_avatarModelId <= 4) {
+	if (m_avatarModelId >= 1 && m_avatarModelId <= NUM_AVATARS) {
 		LoadHandModel();
 	}
 
@@ -82,7 +84,7 @@ Error:
 RESULT hand::PendCreateHandModel(long avatarModelID) {
 	RESULT r = R_PASS;
 
-	CBM(avatarModelID >= 1 && avatarModelID <= 4, "invalid avatar model id %d", avatarModelID);
+	CBM(avatarModelID >= 1 && avatarModelID <= NUM_AVATARS, "invalid avatar model id %d", avatarModelID);
 	
 	m_fLoadHandModel = true;
 	m_avatarModelId = avatarModelID;
@@ -101,9 +103,13 @@ RESULT hand::LoadHandModel() {
 
 #ifndef _DEBUG
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	if (m_handType == HAND_TYPE::HAND_LEFT) {
 
-		std::wstring wstrModel = k_wstrFolder + k_wstrLeft + std::to_wstring(m_avatarModelId) + k_wstrFileType;
+		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrLeft + k_wstrFileType;
 		m_pModel = AddModel(wstrModel);
 
 		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
@@ -112,7 +118,7 @@ RESULT hand::LoadHandModel() {
 	
 	if (m_handType == HAND_TYPE::HAND_RIGHT) {
 
-		std::wstring wstrModel = k_wstrFolder + k_wstrRight + std::to_wstring(m_avatarModelId) + k_wstrFileType;
+		std::wstring wstrModel = wstrAssetPath + k_wstrFolder + std::to_wstring(m_avatarModelId) + L"/" + k_wstrRight + k_wstrFileType;
 		m_pModel = AddModel(wstrModel, ModelFactory::flags::FLIP_WINDING);
 
 		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
@@ -125,6 +131,9 @@ RESULT hand::LoadHandModel() {
 	m_pModel->SetScale(scaleModel);
 
 	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
+
+	// TODO: this is bad
+	//m_pModel->SetMaterialDiffuseColor(m_pModel->GetDiffuseColor(), true);
 	m_pModel->SetMaterialShininess(2.0f, true);
 
 #else
@@ -436,15 +445,22 @@ RESULT hand::HideModel() {
 		return r;
 	};
 
+	m_pModel->SetVisible(false);
+
+	/*
+	color matColor = m_pModel->GetDiffuseColor();
+
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(), 
-		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		color(matColor.r(), matColor.g(), matColor.b(), 0.0f),
 		HAND_ANIMATION_DURATION, 
 		AnimationCurveType::SIGMOID, 
 		AnimationFlags(),
 		nullptr,
 		fnVisibleCallback,
 		this));
+	//*/
+
 Error:
 	return r;
 }
@@ -457,8 +473,11 @@ RESULT hand::ShowModel() {
 		m_pModel->SetVisible(true && m_fTracked);
 		return r;
 	};
+	m_pModel->SetVisible(true && m_fTracked);
 
+	/*
 	color matColor = m_pModel->GetDiffuseColor();
+
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pModel.get(),
 		color(matColor.r(), matColor.g(), matColor.b(), 0.0f),
@@ -475,6 +494,7 @@ RESULT hand::ShowModel() {
 		fnVisibleCallback,
 		nullptr,
 		this));
+		//*/
 
 Error:
 	return r;
@@ -493,6 +513,9 @@ RESULT hand::HideController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
+	m_pController->SetVisible(false);
+
+	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 
 		pMesh,
@@ -503,6 +526,7 @@ RESULT hand::HideController() {
 		nullptr,
 		fnVisibleCallback,
 		this));
+		//*/
 
 Error:
 	return r;
@@ -522,6 +546,9 @@ RESULT hand::ShowController() {
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
 
+	m_pController->SetVisible(true && m_fTracked);
+
+	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
@@ -539,6 +566,7 @@ RESULT hand::ShowController() {
 		fnVisibleCallback,
 		nullptr,
 		this));
+		//*/
 
 Error:
 	return r;

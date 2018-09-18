@@ -12,6 +12,7 @@ TEXTURE			./Texture/
 TEXTURE_CUBE	./Texture/Cube/
 FONT			./Resources/Fonts/
 MODEL			./Models/
+ASSET			./Assets/
 DATA			./Data/
 SOUND			./Resources/Sounds/
 SCRIPTS			./Scripts/
