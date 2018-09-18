@@ -991,6 +991,9 @@ RESULT DreamUserControlArea::OnDreamFormSuccess() {
 		CR(Show());
 		m_pDreamUserApp->SetHasOpenApp(true);
 	}
+	else {
+		m_pDreamUserApp->SetHasOpenApp(false);
+	}
 	
 Error:
 	return r;

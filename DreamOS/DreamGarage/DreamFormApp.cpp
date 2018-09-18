@@ -272,6 +272,7 @@ RESULT DreamFormApp::HandleDreamFormSuccess() {
 
 	m_pUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
+	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 
 Error:
 	return r;
@@ -280,6 +281,7 @@ Error:
 RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
+	CR(m_pUserApp->SetHasOpenApp(false));
 	CR(Hide());
 
 Error:
@@ -332,6 +334,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 				CR(m_pFormView->HandleKeyboardDown());
 			}
 			else {
+				CR(m_pUserApp->SetHasOpenApp(false));
 				CR(Hide());
 			}
 		}
@@ -472,7 +475,6 @@ RESULT DreamFormApp::Hide() {
 	m_fFormVisible = false;
 	CR(m_pFormView->HandleKeyboardDown());
 	CR(m_pUserApp->SetEventApp(nullptr));
-	CR(m_pUserApp->SetHasOpenApp(false));
 
 //	m_pDreamBrowserForm->Shutdown();
 	m_pDreamBrowserForm->CloseSource();
