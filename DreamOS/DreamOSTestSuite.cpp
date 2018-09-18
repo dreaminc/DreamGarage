@@ -1862,7 +1862,7 @@ RESULT DreamOSTestSuite::AddTestGamepadCamera() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupDreamAppPipeline());
+		CR(SetupPipeline("minimal"));
 
 		TestContext *pTestContext;
 		pTestContext = reinterpret_cast<TestContext*>(pContext);

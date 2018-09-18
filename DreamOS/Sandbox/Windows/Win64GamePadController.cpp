@@ -80,9 +80,9 @@ RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad)
 	}
 
 	// if the joystick state changed, set new values
-	if (m_leftJoystick(0,0) != normalizedLX && m_leftJoystick(0,1) != normalizedLY) {
-		m_leftJoystick(0,0) = normalizedLX * normalizedLeftMagnitude;
-		m_leftJoystick(0,1) = normalizedLY * normalizedLeftMagnitude;
+	if (m_leftJoystick.x() != normalizedLX && m_leftJoystick(0,1) != normalizedLY) {
+		m_leftJoystick.x() = normalizedLX * normalizedLeftMagnitude;
+		m_leftJoystick.y() = normalizedLY * normalizedLeftMagnitude;
 		m_currentGamepadState.leftJoystick = m_leftJoystick;
 	}
 	
@@ -101,9 +101,9 @@ RESULT Win64GamepadController::ProcessGamepadState(XINPUT_GAMEPAD xInputGamepad)
 		normalizedRY = 0;
 	}
 
-	if (m_rightJoystick(0,0) != normalizedRX && m_rightJoystick(0,1) != normalizedRY) {
-		m_rightJoystick(0,0) = normalizedRX * normalizedRightMagnitude;
-		m_rightJoystick(0,1) = normalizedRY * normalizedRightMagnitude;
+	if (m_rightJoystick.x() != normalizedRX && m_rightJoystick(0,1) != normalizedRY) {
+		m_rightJoystick.x() = normalizedRX * normalizedRightMagnitude;
+		m_rightJoystick.y() = normalizedRY * normalizedRightMagnitude;
 		m_currentGamepadState.rightJoystick = m_rightJoystick;
 	}
 
