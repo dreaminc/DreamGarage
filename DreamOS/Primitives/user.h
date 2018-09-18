@@ -59,7 +59,8 @@ private:
 
 private:
 	std::string k_strDefaultHeadPath = "\\Avatar_Woman\\avatar_1.FBX";
-	std::string k_strMouthModelPath = "\\Avatars\\mouth.FBX";
+	//std::string k_strMouthModelPath = "\\Avatars\\mouth.FBX";
+	std::string k_strMouthModelPath = "\\avatar\\4\\mouth.fbx";
 
 	std::wstring k_wstrAvatarPath = L"Avatars\\avatar_";
 	std::wstring k_wstrAvatarFileType = L".FBX";

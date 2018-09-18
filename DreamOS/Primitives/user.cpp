@@ -37,6 +37,10 @@ RESULT user::Initialize() {
 
 #ifndef _DEBUG
 
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
 	vector vHeadOffset;
 	if (strHeadPath == "default") {
 		strHeadPath = k_strDefaultHeadPath;
@@ -54,23 +58,6 @@ RESULT user::Initialize() {
 
 	//m_pHead = AddModel(util::StringToWideString(strHeadPath));
 	
-	m_pMouth = m_pMouthComposite->AddModel(util::StringToWideString(k_strMouthModelPath));
-	CN(m_pMouth);
-	
-	// loop iteration is a quirk of how the files are named
-	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
-	for (int i = m_numMouthStates; i > 0; i--) {
-		std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
-
-		wstrMouth = k_wstrMouthWomen + std::to_wstring(i) + k_wstrMouthFileType;
-		m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
-	}
-
-	for (int i = 0; i < 4; i++) {
-		CN(m_mouthStatesMen[i]);
-		CN(m_mouthStatesWomen[i]);
-	}
 
 #else
 	m_pHead = AddModel(L"\\cube.obj");
@@ -162,10 +149,34 @@ bool user::IsFemaleModel() {
 RESULT user::LoadHeadModelFromID() {
 	RESULT r = R_PASS;
 
-	std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
+	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrAssetPath;
+	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
+
+	//std::wstring wstrHeadModel = k_wstrAvatarPath + std::to_wstring(m_avatarModelId) + k_wstrAvatarFileType;
+	std::wstring wstrHeadModel = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/head.fbx";
+	std::wstring wstrMouthModel = wstrAssetPath + L"/avatar/" + std::to_wstring(m_avatarModelId) + L"/mouth.fbx";
 
 	m_pHead = AddModel(wstrHeadModel);
 	CN(m_pHead);
+
+	m_pMouth = m_pMouthComposite->AddModel(wstrMouthModel);
+	CN(m_pMouth);
+	
+	// loop iteration is a quirk of how the files are named
+	// with avatar specific textures this will probably be done in LoadHeadModelFromID()
+	for (int i = m_numMouthStates; i > 0; i--) {
+		std::wstring wstrMouth = k_wstrMouthMen + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStatesMen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
+
+		wstrMouth = k_wstrMouthWomen + std::to_wstring(i) + k_wstrMouthFileType;
+		m_mouthStatesWomen.push_back(MakeTexture(texture::type::TEXTURE_2D, &wstrMouth[0]));
+	}
+
+	for (int i = 0; i < 4; i++) {
+		CN(m_mouthStatesMen[i]);
+		CN(m_mouthStatesWomen[i]);
+	}
 
 Error:
 	return r;
@@ -242,6 +253,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 		rangedValue = 0;
 	}
 
+	/*
 	if (m_pMouth != nullptr) {
 		if (IsFemaleModel()) {
 			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesWomen[rangedValue].get());
@@ -250,6 +262,7 @@ RESULT user::UpdateMouth(float mouthScale) {
 			m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStatesMen[rangedValue].get());
 		}
 	}
+	//*/
 
 Error:
 	return r;
