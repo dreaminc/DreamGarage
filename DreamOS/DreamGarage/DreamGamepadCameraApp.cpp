@@ -84,13 +84,13 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	m_msTimeLastUpdated = msTimeNow;
 		
 	if (m_fUpdateLeftStick) {
-		m_ptLeftStick.x() = 10.0f * m_ptPendLeftStick.x();
-		m_ptLeftStick.y() = 10.0f * m_ptPendLeftStick.y();
+		m_ptLeftStick.x() = m_ptPendLeftStick.x();
+		m_ptLeftStick.y() = m_ptPendLeftStick.y();
 	}
 
 	if (m_fUpdateRightStick) {
-		m_ptRightStick.x() = 100.0f * m_ptPendRightStick.x();
-		m_ptRightStick.y() = 100.0f * m_ptPendRightStick.y();
+		m_ptRightStick.x() = m_ptPendRightStick.x();
+		m_ptRightStick.y() = m_ptPendRightStick.y();
 	}
 	
 	if (m_fUpdateLeftTrigger) {
