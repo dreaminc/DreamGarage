@@ -1060,14 +1060,11 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 			if (!fIsSpecialKey) {
 				if (chkey == SVK_RETURN && fKeyDown) {
-					CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 					if (m_pControlView->m_fIsShareURL) {
 						CR(SetActiveBrowserURI());
 					}
 				}
-				else {
-					CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
-				}
+				CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 			}
 			else if (fKeyDown) {
 				if (chkey == SVK_TAB) {
@@ -1101,10 +1098,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 
 	}
-	
-	//case INTERACTION_EVENT_KEY_UP: {
-
-	//}
 	}
 
 Error:
