@@ -33,6 +33,7 @@ typedef enum {
 	PATH_TEXTURE_CUBE,
 	PATH_FONT,
 	PATH_MODEL,
+	PATH_ASSET,
 	PATH_DATA,
 	PATH_SOUND,
 	PATH_SCRIPTS,
@@ -69,6 +70,7 @@ class PathManager : public valid {
 		L"TEXTURE_CUBE",
 		L"FONT",
 		L"MODEL",
+		L"ASSET",
 		L"DATA",
 		L"SOUND",
 		L"SCRIPTS"
