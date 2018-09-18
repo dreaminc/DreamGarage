@@ -142,6 +142,8 @@ public:
 
 	user* ActivateUser(long userId);
 
+	virtual RESULT Exit(RESULT r) override;
+
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;

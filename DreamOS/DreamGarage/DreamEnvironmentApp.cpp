@@ -246,6 +246,16 @@ Error:
 	return r;
 }
 
+RESULT DreamEnvironmentApp::FadeOut(std::function<RESULT(void*)> fnFadeOutCallback) {
+	RESULT r = R_PASS;
+
+	CNR(m_pFadeProgram, R_SKIPPED);
+	m_pFadeProgram->FadeOut(fnFadeOutCallback);
+
+Error:
+	return r;
+}
+
 
 RESULT DreamEnvironmentApp::SwitchToEnvironment(environment::type type) {
 	RESULT r = R_PASS;
