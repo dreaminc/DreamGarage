@@ -294,6 +294,8 @@ private:
 	bool m_fCollisionRight = false;
 	bool m_fIsSharing = false;
 
+	bool m_fHeadsetAndHandsTracked = false;
+
 	texture *m_pTextureDefaultGazeLeft = nullptr;
 	texture *m_pTextureDefaultGazeRight = nullptr;
 
