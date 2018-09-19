@@ -5494,19 +5494,19 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pModel->SetScale(0.05f);
 			pModel->SetMaterialDiffuseColor(COLOR_WHITE, true);
 			pModel->SetMaterialSpecularColor(COLOR_WHITE, true);
-			pModel->SetMaterialShininess(2.0f, true);
+			pModel->SetMaterialShininess(3.0f, true);
 			pModel->RotateYByDeg(45.0f);
 
 			pModel = m_pDreamOS->AddModel(L"\\4\\left-hand.fbx");
 			CN(pModel);
 			pModel->SetPosition(point(3.5f, 0.0f, 0.0f));
 			pModel->SetScale(0.05f);
-			pModel->RotateXByDeg(-90.0f);
-			pModel->RotateYByDeg(45.0f);
+			//pModel->RotateXByDeg(-90.0f);
+			//pModel->RotateYByDeg(45.0f);
 
 			color handColor = pModel->GetChildMesh(0)->GetDiffuseColor();
 			pModel->SetMaterialSpecularColor(handColor, true);
-			pModel->SetMaterialShininess(2.0f, true);
+			pModel->SetMaterialShininess(4.0f, true);
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);

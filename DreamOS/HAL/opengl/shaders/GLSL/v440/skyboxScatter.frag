@@ -144,8 +144,8 @@ void main(void) {
 
 	// position of the planet, sky, and eye
 	float radiusPlanet = 6371e3;
-	//vec3 eyeOrigin = vec3(0,radiusPlanet + 5e2,0); // meters above the ground
-	vec3 eyeOrigin = vec3(0,radiusPlanet + 5e3,0); // meters above the ground
+	vec3 eyeOrigin = vec3(0,radiusPlanet + 2e3, 0); // meters above the ground
+	//vec3 eyeOrigin = vec3(0,radiusPlanet + 5e3, 0); // meters above the ground
 	float radiusAtmosphere = 6471e3;
 
 	// color of rayleigh and mie scattering (mie is gray)
@@ -172,6 +172,7 @@ void main(void) {
 		mieDirection).xyz, 1.0);
 
 	// clamp the color values to [0,1] with high dynamic range
-	out_vec4Color = 1.0 - exp(-2.5 * atmColor);
+	out_vec4Color = 1.0 - exp(-4.0f * atmColor);
+	//out_vec4Color = 1.0 - exp(-2.5 * atmColor);
 	//out_vec4Color = vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
