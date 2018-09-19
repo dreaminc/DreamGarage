@@ -144,7 +144,8 @@ void main(void) {
 
 	// position of the planet, sky, and eye
 	float radiusPlanet = 6371e3;
-	vec3 eyeOrigin = vec3(0,radiusPlanet + 5e2,0); // meters above the ground
+	//vec3 eyeOrigin = vec3(0,radiusPlanet + 5e2,0); // meters above the ground
+	vec3 eyeOrigin = vec3(0,radiusPlanet + 5e3,0); // meters above the ground
 	float radiusAtmosphere = 6471e3;
 
 	// color of rayleigh and mie scattering (mie is gray)

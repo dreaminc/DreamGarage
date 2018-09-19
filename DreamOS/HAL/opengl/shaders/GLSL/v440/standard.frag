@@ -18,9 +18,10 @@ in Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
-	float riverAnimationDisplacement;
+	vec4 normalOrig;
 } DataIn;
 
+uniform vec4 u_vec4Eye;
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
 
@@ -42,7 +43,9 @@ layout (binding = 4) uniform sampler2D u_textureSpecular;
 uniform bool u_hasCubemapEnvironment;
 layout (binding = 5) uniform samplerCube u_cubemapEnvironment;
 
-uniform bool	u_fRiverAnimation;
+uniform bool u_hasCubemapIrradiance;
+layout (binding = 6) uniform samplerCube u_cubemapIrradiance;
+
 uniform bool	u_fAREnabled;
 
 layout (location = 0) out vec4 out_vec4Color;
@@ -67,13 +70,6 @@ void EnableBlending(float ambientAlpha, float diffuseAlpha) {
 vec4 lightColor = vec4(76.0f / 255.0f, 203.0f / 255.0f, 247.0f / 255.0f, 1.0f);
 vec4 darkColor  = vec4(21.0f / 255.0f,  50.0f / 255.0f, 115.0f / 255.0f, 1.0f);
 //vec4 black		= vec4(0.0f, 0.0f, 0.0f, 0.0f);
-
-vec4 EnableRiverAnimation() {
-	float color = ((1.5f * DataIn.riverAnimationDisplacement) + 1.0f) / 2.0f;
-	vec4 guess = (color * lightColor) + ((1.0f - color) * darkColor);
-	return vec4(guess.xyz, 1.0f);
-}
-//*/
 
 vec4 IncreaseColorSaturation(vec4 color) {
 	//vec4 colorBrighter = color*2;
@@ -106,9 +102,10 @@ void main(void) {
 	}
 
 	// Generalize
-	vec4 colorDiffuse = material.m_colorDiffuse;
-	if(u_hasTextureDiffuse) {
-		colorDiffuse *= texture(u_textureDiffuse, uvCoord);
+
+	vec4 colorSpecular = material.m_colorSpecular; 
+	if(u_hasTextureSpecular) {
+		colorSpecular *= texture(u_textureSpecular, uvCoord);
 	}
 
 	vec4 colorAmbient = material.m_colorAmbient; 
@@ -116,10 +113,15 @@ void main(void) {
 		colorAmbient *= texture(u_textureAmbient, uvCoord);
 	}
 
-	vec4 colorSpecular = material.m_colorSpecular; 
-	if(u_hasTextureSpecular) {
-		colorSpecular *= texture(u_textureSpecular, uvCoord);
+	vec4 colorDiffuse = material.m_colorDiffuse;
+	if(u_hasTextureDiffuse) {
+		colorDiffuse *= texture(u_textureDiffuse, uvCoord);
+
+		// TODO: this is a bandage
+		colorSpecular *= texture(u_textureDiffuse, uvCoord);
+		colorAmbient *= texture(u_textureDiffuse, uvCoord);
 	}
+	
 
 	//vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 	vec3 directionEye = tangentBitangentNormalMatrix * normalize(DataIn.directionEye);
@@ -152,7 +154,15 @@ void main(void) {
 	}
 
 	//vec4 lightColorAmbient = effectiveAmbient * colorAmbient;
+
 	vec4 lightColorAmbient = effectiveAmbient * colorDiffuse;
+	
+	// Irradiance Mapping (toy BRDF)
+	if(u_hasCubemapIrradiance == true) {
+		lightColorAmbient = colorDiffuse * ambientIBL(u_cubemapIrradiance, u_mat4Model, u_vec4Eye, DataIn.vertWorldSpace, DataIn.normalOrig, true);
+		lightColorAmbient *= 2.0f;
+	}
+
 	vec4 outColor = max(vec4LightValue, lightColorAmbient);	
 
 	// Increasing the saturation
@@ -162,20 +172,17 @@ void main(void) {
 
 	if(u_hasCubemapEnvironment) {
 		if(material.m_reflectivity > 0.0f) {
-			vec3 vReflection = reflect(normalize(-DataIn.directionEye).xyz, normalize(g_mat4InvTransposeModelView * DataIn.normal).xyz);
-			vec4 colorReflect = vec4(texture(u_cubemapEnvironment, vReflection).rgb, 1.0);
+			vec4 colorReflect = reflectionIBL(u_cubemapEnvironment, u_mat4Model, u_vec4Eye, DataIn.vertWorldSpace, DataIn.normalOrig);
 			outColor = mix(outColor, colorReflect, material.m_reflectivity);
 		}
 
 		if(material.m_refractivity > 0.0f) {
-			float refractRatio = 1.00 / 1.52;
-			vec3 vRefract = refract(normalize(-DataIn.directionEye).xyz, normalize(g_mat4InvTransposeModelView * DataIn.normal).xyz, refractRatio);
-
-			vec4 colorRefract = vec4(texture(u_cubemapEnvironment, vRefract).rgb, 1.0);
-
+			vec4 colorRefract = refractionIBL(u_cubemapEnvironment, u_mat4Model, u_vec4Eye, DataIn.vertWorldSpace, DataIn.normalOrig);
 			outColor = mix(outColor, colorRefract, material.m_refractivity);
 		}
 	}
+
+	
 
 	out_vec4Color = outColor;
 }

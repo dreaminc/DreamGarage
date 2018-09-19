@@ -5415,11 +5415,12 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		ProgramNode* pRenderProgramNode;
-		pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
-		//pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		//pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		//pRenderProgramNode = pHAL->MakeProgramNode("gbuffer");
 		CN(pRenderProgramNode);
-		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
@@ -5473,8 +5474,10 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pColorTexture);
 
+			vector vSunDirection = vector(-1.0f, -0.25f, 0.1f);
+
 			light *pLight;
-			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -0.25f, 0.0f));
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vSunDirection);
 			
 			sphere * pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 			CN(pSphere);
@@ -5484,10 +5487,26 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 			//CR(pVolume->SetDiffuseTexture(pColorTexture));
 
-			model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			//model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			model *pModel = m_pDreamOS->AddModel(L"\\4\\head.fbx");
 			CN(pModel);
 			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
-			pModel->SetScale(0.15f);
+			pModel->SetScale(0.05f);
+			pModel->SetMaterialDiffuseColor(COLOR_WHITE, true);
+			pModel->SetMaterialSpecularColor(COLOR_WHITE, true);
+			pModel->SetMaterialShininess(2.0f, true);
+			pModel->RotateYByDeg(45.0f);
+
+			pModel = m_pDreamOS->AddModel(L"\\4\\left-hand.fbx");
+			CN(pModel);
+			pModel->SetPosition(point(3.5f, 0.0f, 0.0f));
+			pModel->SetScale(0.05f);
+			pModel->RotateXByDeg(-90.0f);
+			pModel->RotateYByDeg(45.0f);
+
+			color handColor = pModel->GetChildMesh(0)->GetDiffuseColor();
+			pModel->SetMaterialSpecularColor(handColor, true);
+			pModel->SetMaterialShininess(2.0f, true);
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
