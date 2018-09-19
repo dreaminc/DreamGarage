@@ -135,7 +135,7 @@ RESULT UISurface::Notify(SenseControllerEvent *pEvent) {
 	CBR(IsVisible(), R_SKIPPED);
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
-		int pxXDiff = pEvent->state.ptTouchpad.x() * SCROLL_CONSTANT;
+		int pxXDiff = -pEvent->state.ptTouchpad.x() * SCROLL_CONSTANT;
 		int pxYDiff = pEvent->state.ptTouchpad.y() * SCROLL_CONSTANT;
 
 		point ptScroll;
