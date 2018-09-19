@@ -129,6 +129,7 @@ public:
 	inline quaternion GetHMDOrientation() { return m_qOrientation; }
 	inline point GetHeadPointOrigin() { return m_ptOrigin; }
 	inline vector GetHMDTrackerDeviation() { return GetHeadPointOrigin(); }
+	virtual bool IsHMDTracked() = 0;
 
 	virtual RESULT RecenterHMD() = 0;
 

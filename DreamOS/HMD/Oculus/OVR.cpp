@@ -167,7 +167,16 @@ Error:
 	return r;
 }
 
+bool OVRHMD::IsHMDTracked() {
 
+	// this is used slightly differently in UpdateHMD(), 
+	// will need to change this if the timing method is different
+	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
+
+	ovrTrackingState trackingState = ovr_GetTrackingState(m_ovrSession, fTiming, true);
+
+	return trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked);
+}
 
 composite *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
 	switch (controllerType) {

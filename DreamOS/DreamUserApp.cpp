@@ -337,20 +337,34 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 
-	if (m_fShowLaunchQuad) {
+	// checks for the first time the headset and hands are tracked together
+	// this allows for settings to accurately be used to position the message quad
+	// this isn't as necessary for the menu because you at least have to press the menu button to get there
+
+	if (m_fShowLaunchQuad && m_fHeadsetAndHandsTracked) {
 
 		m_pMessageQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, m_textureStringFromStartupMessage[m_currentLaunchMessage].c_str()));
+
+		UpdateCompositeWithHands(0.0f);
 
 		RotationMatrix matLook = RotationMatrix(GetComposite()->GetOrientation());
 		vector vAppLook = matLook * vector(0.0f, 0.0f, -1.0f);
 		vAppLook.Normalize();
 		vector vAppLookXZ = vector(vAppLook.x(), 0.0f, vAppLook.z()).Normal();
 
-		m_pMessageComposite->SetPosition(GetComposite()->GetPosition() + vAppLookXZ * 2.0f);
+		m_pMessageComposite->SetPosition(GetComposite()->GetPosition() + (vAppLookXZ*2.0f));
 		m_pMessageComposite->SetOrientation(GetComposite()->GetOrientation());
 		m_pMessageComposite->SetVisible(true, false);
 
 		m_fShowLaunchQuad = false;
+	}
+
+	if (!m_fHeadsetAndHandsTracked) {
+		if (m_pLeftHand != nullptr && m_pRightHand != nullptr && GetDOS()->GetHMD() != nullptr) {
+			if (m_pLeftHand->IsTracked() && m_pRightHand->IsTracked() && GetDOS()->GetHMD()->IsHMDTracked()) {
+				m_fHeadsetAndHandsTracked = true;
+			}
+		}
 	}
 	
 	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera && m_pUserModel == nullptr) {
@@ -785,17 +799,22 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 				RotationMatrix qOffset;
 				auto pHand = mallet == m_pLeftMallet ? m_pLeftHand : m_pRightHand;
-				qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-				//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
+				// at least one of two hands should be tracked, since this is 
+				// called as a result of menu press
+				if (pHand->IsTracked()) {
+					qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-				point ptHand = mallet->GetMalletHead()->GetPosition(true);
-				vector vHand = ptHand - pCamera->GetOrigin(true);
-				vHand = vector(vHand.x(), 0.0f, vHand.z());
-				//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
-				vector vTempPos = vAppLookXZ * vHand.magnitude();
-				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
-					vPos = vTempPos;
+					//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
+
+					point ptHand = mallet->GetMalletHead()->GetPosition(true);
+					vector vHand = ptHand - pCamera->GetOrigin(true);
+					vHand = vector(vHand.x(), 0.0f, vHand.z());
+					//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+					vector vTempPos = vAppLookXZ * vHand.magnitude();
+					if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
+						vPos = vTempPos;
+				}
 			}
 			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 			m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
