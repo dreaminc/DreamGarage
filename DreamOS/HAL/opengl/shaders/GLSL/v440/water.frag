@@ -161,8 +161,8 @@ void main(void) {
 
 	// un comment this to apply parallax to water
 	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, material.m_displacement);
-	//vec2 texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, 0.1f/15);
 	vec2 texCoords = DataIn.uvCoord;
+	//texCoords = ParallaxMapping(DataIn.uvCoord, directionEye, 0.1f/15);
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f;

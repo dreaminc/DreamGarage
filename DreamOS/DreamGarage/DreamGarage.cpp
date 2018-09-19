@@ -315,7 +315,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("environment");
 		CN(m_pRenderEnvironmentProgramNode);
 		//CR(m_pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(m_pRenderEnvironmentProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
