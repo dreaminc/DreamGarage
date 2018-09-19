@@ -235,6 +235,7 @@ RESULT DreamBrowser::OnKeyPress(char chKey, bool fkeyDown) {
 
 	CNR(m_pWebBrowserController, R_SKIPPED);
 	CR(m_pWebBrowserController->SendKeyEventChar(chKey, fkeyDown));
+
 Error:
 	return r;
 }

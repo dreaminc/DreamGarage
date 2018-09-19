@@ -88,6 +88,8 @@ protected:
 //private:
 protected:
 	std::string m_strURL;
+	std::string m_strSuccess = "DreamFormApp.OnSuccess";
+
 	bool m_fInitBrowser = false;
 	bool m_fUpdateFormURL = false;
 
