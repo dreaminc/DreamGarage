@@ -469,12 +469,12 @@ RESULT hand::ShowModel() {
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		m_pModel->SetVisible(true && m_fTracked);
+		m_pModel->SetVisible(m_fTracked);
 		m_pOverlayQuad->SetVisible(false);
 
 		return r;
 	};
-	m_pModel->SetVisible(true && m_fTracked);
+	m_pModel->SetVisible(m_fTracked);
 
 	if (m_pOverlayQuad != nullptr) {
 		m_pOverlayQuad->SetVisible(false);
@@ -543,12 +543,12 @@ RESULT hand::ShowController() {
 
 	auto fnVisibleCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pController->SetVisible(true && m_fTracked);
+		m_pController->SetVisible(m_fTracked);
 		m_pOverlayQuad->SetVisible(false);
 		return r;
 	};
 
-	m_pController->SetVisible(true && m_fTracked);
+	m_pController->SetVisible(m_fTracked);
 
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
 	CNR(pMesh, R_SKIPPED);
