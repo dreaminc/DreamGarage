@@ -556,6 +556,23 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::ClearPeers() {
+	RESULT r = R_PASS;
+
+	std::map<long, std::shared_ptr<DreamPeerApp>>::iterator it;
+
+	for (auto &pairDreamPeer : m_dreamPeerApps) {
+
+		std::shared_ptr<DreamPeerApp> pDreamPeerApp = pairDreamPeer.second;
+		CRM(ShutdownDreamApp<DreamPeerApp>(pDreamPeerApp), "Failed to shut down dream peer app");
+	}
+
+Error:
+	m_dreamPeerApps.clear();
+
+	return r;
+}
+
 DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {
 	std::shared_ptr<DreamPeerApp> pDreamPeer = nullptr;
 

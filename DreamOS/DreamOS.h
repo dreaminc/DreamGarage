@@ -251,7 +251,10 @@ protected:
 	std::shared_ptr<DreamPeerApp> FindPeer(PeerConnection *pPeerConnection);
 	RESULT RemovePeer(long peerUserID);
 	RESULT RemovePeer(std::shared_ptr<DreamPeerApp> pDreamPeer);
+	RESULT ClearPeers();
+
 	DreamPeerApp::state GetPeerState(long peerUserID);
+
 
 	RESULT CheckDreamPeerAppStates();
 

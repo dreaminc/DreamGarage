@@ -1381,7 +1381,7 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
 	CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 
-	// TODO: clear out DreamPeerApp and user assets
+	CRM(ClearPeers(), "failed to remove all peers");
 
 	m_fSeated = false;
 
