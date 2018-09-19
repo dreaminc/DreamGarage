@@ -59,7 +59,7 @@ void main(void) {
 	vec3 vReflection = reflect(vWorldViewDirection.xyz, vWorldNormal.xyz);
 
 	//vec4 ambientColor = material.m_ambient * material.m_colorAmbient;
-	vec4 ambientColor = vec4(1.0f);
+	vec4 ambientColor = vec4(0.0f);
 
 	// Environment Map
 	if(u_hasTextureCubemap == true) {
@@ -70,7 +70,7 @@ void main(void) {
 		//vec3 albedo = material.m_colorDiffuse.xyz;
 		vec3 albedo = vec3(1.0f);
 		float ao = 1.0f;
-		float roughness = 0.5f;
+		float roughness = 0.25f;
 
 		vec3 kS = fresnelSchlickRoughness(max(dot(vWorldNormal.xyz, vWorldViewDirection.xyz), 0.0f), F0, roughness);
 		vec3 kD = vec3(1.0f) - kS;
@@ -79,7 +79,7 @@ void main(void) {
 		vec3 ambient = (kD * diffuse) * ao; 
 
 		// Try to average it
-		ambient = vec3(1.0f) * ((ambient.x + ambient.y + ambient.z) / 3.0f);
+		//ambient = vec3(1.0f) * ((ambient.x + ambient.y + ambient.z) / 3.0f);
 
 		ambientColor = vec4(ambient, 1.0f);
 
@@ -89,6 +89,8 @@ void main(void) {
 		// vec4LightValue = colorReflect + vec4LightValue * 0.2f;
 	}
 	
-	out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	//out_vec4Color = vec4LightValue;
+	//out_vec4Color = (vec4LightValue * DataIn.color) + ambientColor;
+
+	out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 }

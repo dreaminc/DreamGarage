@@ -5410,8 +5410,9 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
+		//pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
