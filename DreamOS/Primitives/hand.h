@@ -142,7 +142,8 @@ protected:
 	std::shared_ptr<quad> m_pOverlayQuad = nullptr;
 	bool m_fOverlayVisible = false;
 
-	// collision volume
+	// collision volume 
+	// currently deprecated, and uninitialized
 	std::shared_ptr<volume> m_pPhantomVolume = nullptr;
 	float m_volumeWidth = OVERLAY_VOLUME_WIDTH;
 	float m_volumeHeight = OVERLAY_VOLUME_HEIGHT;
