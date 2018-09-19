@@ -873,6 +873,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramCubemapConvolution.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.cpp" />
@@ -1208,6 +1209,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramCubemapConvolution.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.h" />
@@ -1509,6 +1511,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\core440.shader" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\cubemapConvolution.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\cubemapConvolution.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\fogCommon.shader" />

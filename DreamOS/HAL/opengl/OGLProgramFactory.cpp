@@ -22,6 +22,7 @@
 #include "OGLProgramStandard.h"
 #include "OGLProgramScreenQuad.h"
 #include "OGLProgramIrradianceMap.h"
+#include "OGLProgramCubemapConvolution.h"
 #include "OGLProgramScreenFade.h"
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
@@ -53,7 +54,8 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "standard", OGLPROGRAM_STANDARD },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
-	{ "irrandiance_map_lighting", OGLPROGRAM_IRRADIANCE_MAP},
+	{ "irrandiance_map_lighting", OGLPROGRAM_IRRADIANCE_MAP },
+	{ "cubemap_convolution", OGLPROGRAM_CUBEMAP_CONVOLUTION },
 	{ "screenfade", OGLPROGRAM_SCREEN_FADE },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
@@ -236,11 +238,18 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		} break;
 
 		case OGLPROGRAM_IRRADIANCE_MAP: {
-				pOGLProgram = new OGLProgramIrradianceMap(pParentImp);
-				CNM(pOGLProgram, "Failed to allocate OGLProgram");
-				CRM(pOGLProgram->OGLInitialize(versionOGL),
-					"Failed to initialize OGL irradiance map Program");
-			} break;
+			pOGLProgram = new OGLProgramIrradianceMap(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		case OGLPROGRAM_CUBEMAP_CONVOLUTION: {
+			pOGLProgram = new OGLProgramCubemapConvolution(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
 
 		case OGLPROGRAM_SCREEN_FADE: {
 			pOGLProgram = new OGLProgramScreenFade(pParentImp);

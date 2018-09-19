@@ -33,6 +33,7 @@ typedef enum {
 	OGLPROGRAM_REFERENCE,
 	OGLPROGRAM_SCREEN_QUAD,
 	OGLPROGRAM_IRRADIANCE_MAP,
+	OGLPROGRAM_CUBEMAP_CONVOLUTION,
 	
 	// Production shaders - using features from previous shaders 
 	OGLPROGRAM_STANDARD, // used for models in the environment such as head and hands

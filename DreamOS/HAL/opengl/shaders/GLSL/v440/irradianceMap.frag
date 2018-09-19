@@ -70,7 +70,7 @@ void main(void) {
 		//vec3 albedo = material.m_colorDiffuse.xyz;
 		vec3 albedo = vec3(1.0f);
 		float ao = 1.0f;
-		float roughness = 0.25f;
+		float roughness = 0.75f;
 
 		vec3 kS = fresnelSchlickRoughness(max(dot(vWorldNormal.xyz, vWorldViewDirection.xyz), 0.0f), F0, roughness);
 		vec3 kD = vec3(1.0f) - kS;
