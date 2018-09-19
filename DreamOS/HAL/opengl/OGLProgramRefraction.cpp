@@ -125,7 +125,8 @@ RESULT OGLProgramRefraction::OGLInitialize(version versionOGL) {
 
 	// Fragment
 	//CRM(MakeFragmentShader(L"standard_clipping.frag"), "Failed to create fragment shader");
-	CRM(MakeFragmentShader(L"minimalTexture_clipping.frag"), "Failed to create fragment shader");
+	//CRM(MakeFragmentShader(L"minimalTexture_clipping.frag"), "Failed to create fragment shader");
+	CRM(MakeFragmentShader(L"environment_clipping.frag"), "Failed to create fragment shader");
 
 	// Link the program
 	CRM(LinkProgram(), "Failed to link program");

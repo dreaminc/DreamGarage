@@ -102,7 +102,7 @@ private:
 
 	float m_deltaTime; 
 
-	bool m_fPassThru = false;
+	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_STANDARD_H_

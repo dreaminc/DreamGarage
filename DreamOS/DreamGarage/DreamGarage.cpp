@@ -264,6 +264,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CN(pScatteringSkyboxProgram);
 		CR(pScatteringSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
 		// Reflection 
 		
 		m_pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
@@ -321,6 +327,8 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		// NOTE: Add this in if you want to have reflective objects
 		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
