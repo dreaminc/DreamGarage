@@ -83,8 +83,12 @@ RESULT DreamPeerApp::Update(void *pContext) {
 		CN(m_pSpatialSoundObject);
 	}
 
-	if (m_pTextUserName == nullptr && m_strScreenName != "") {
+	if (m_pNameBackground == nullptr && m_pTextUserName != nullptr && !m_pTextUserName->IsDirty()) {
 		CR(InitializeUserNameLabel());
+	}
+
+	if (m_pTextUserName == nullptr && m_strScreenName != "") {
+		CR(InitializeUserNameText());
 	}
 	
 	
@@ -119,10 +123,8 @@ Error:
 	return r;
 }
 
-RESULT DreamPeerApp::InitializeUserNameLabel() {
+RESULT DreamPeerApp::InitializeUserNameText() {
 	RESULT r = R_PASS;
-
-	vector vCameraDirection;
 
 	if (m_pFont == nullptr) {
 		m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -146,6 +148,16 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	CR(m_pUserLabelComposite->AddObject(m_pTextUserName));
 	m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 
+Error:
+	return r;
+}
+
+RESULT DreamPeerApp::InitializeUserNameLabel() {
+	RESULT r = R_PASS;
+
+	vector vCameraDirection;
+
+
 	vCameraDirection = GetComposite()->GetPosition(true) - GetDOS()->GetCamera()->GetPosition(true);
 	vCameraDirection = vector(vCameraDirection.x(), 0.0f, vCameraDirection.z()).Normal();
 
@@ -164,6 +176,8 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	m_pUserLabelComposite->SetMaterialDiffuseColor(m_backgroundColor);
 
 	if (HasProfilePhoto()) {
+
+		CR(PendProfilePhotoDownload());
 		m_pPhotoQuad = m_pUserLabelComposite->AddQuad(LABEL_PHOTO_WIDTH, LABEL_HEIGHT);
 		CN(m_pPhotoQuad);
 		m_pPhotoQuad->SetPosition(point(photoX, NAMETAG_HEIGHT, backgroundDepth));
@@ -204,7 +218,8 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	m_pRightGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 	m_pRightGap->SetMaterialDiffuseColor(m_backgroundColor);
 
-	m_pUserLabelComposite->SetVisible(false);
+	m_pUserLabelComposite->SetVisible(true);
+
 Error:
 	return r;
 }
@@ -413,9 +428,6 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
 	m_strProfilePhotoURL = pUserController->GetPeerProfilePhotoURL(m_peerUserID);
 
-	if (m_strProfilePhotoURL != "") {
-		CR(PendProfilePhotoDownload());
-	}
 
 Error:
 	return r;
@@ -485,7 +497,9 @@ RESULT DreamPeerApp::AssignUserModel(user* pUserModel) {
 	m_fPendingAssignedUserModel = true;
 	CR(m_pUserModel->UpdateAvatarModelWithID(m_avatarModelId));
 
-	CR(ShowUserNameField());
+	//m_pUserLabelComposite->SetVisible(true);
+	m_pUIObjectComposite->SetVisible(true);
+	//CR(ShowUserNameField());
 
 Error:
 	return r;

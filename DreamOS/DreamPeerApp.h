@@ -97,6 +97,11 @@ protected:
 	static DreamPeerApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
+
+	// This needs to be called before InitializeUserNameLabel
+	// because it uses the width of the rendered text object
+	RESULT InitializeUserNameText();
+
 	RESULT InitializeUserNameLabel();
 
 public:
