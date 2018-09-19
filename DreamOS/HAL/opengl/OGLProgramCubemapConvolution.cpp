@@ -182,7 +182,6 @@ RESULT OGLProgramCubemapConvolution::ProcessNode(long frameID) {
 
 	CN(m_pSkybox);
 
-	bool m_fRendered = false;
 	if (m_fRendered)
 		return r;
 
