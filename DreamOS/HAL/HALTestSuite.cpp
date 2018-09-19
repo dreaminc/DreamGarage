@@ -5222,7 +5222,6 @@ Error:
 	return r;
 }
 
-<<<<<<< 347f502f667f8c8a335b3d5def7e957cb42655ed
 RESULT HALTestSuite::AddTest3rdPersonCamera() {
 	RESULT r = R_PASS;
 
@@ -5458,9 +5457,6 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		CR(pHAL->ReleaseCurrentContext());
 
 		{
-			volume *pVolume;
-			pVolume = nullptr;
-
 			//sphere *pSphere;
 			//pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 			//CN(pSphere);
@@ -5494,7 +5490,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pModel->SetScale(0.05f);
 			pModel->SetMaterialDiffuseColor(COLOR_WHITE, true);
 			pModel->SetMaterialSpecularColor(COLOR_WHITE, true);
-			pModel->SetMaterialShininess(3.0f, true);
+			pModel->SetMaterialShininess(4.0f, true);
 			pModel->RotateYByDeg(45.0f);
 
 			pModel = m_pDreamOS->AddModel(L"\\4\\left-hand.fbx");

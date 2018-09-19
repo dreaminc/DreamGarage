@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
-	sandboxconfig.fHMDMirror = true;
-	sandboxconfig.f3rdPersonCamera = false;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
@@ -161,7 +161,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("minimal_texture");
+		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("environment");
 		CN(m_pRenderEnvironmentProgramNodeMirror);
 		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
@@ -172,6 +172,8 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		// NOTE: Add this in if you want to have reflective objects
 		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
