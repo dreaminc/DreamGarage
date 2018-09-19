@@ -31,6 +31,10 @@
 #include "OGLProgramDebugOverlay.h"
 #include "OGLProgramVisualizeNormals.h"
 
+// Deferred 
+#include "OGLProgramGBuffer.h"
+#include "OGLProgramSSAO.h"
+
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
 	{ "minimal_texture", OGLPROGRAM_MINIMAL_TEXTURE },
@@ -56,6 +60,8 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
 	{ "irrandiance_map_lighting", OGLPROGRAM_IRRADIANCE_MAP },
 	{ "cubemap_convolution", OGLPROGRAM_CUBEMAP_CONVOLUTION },
+	{ "gbuffer", OGLPROGRAM_GBUFFER },
+	{ "ssao", OGLPROGRAM_SSAO },
 	{ "screenfade", OGLPROGRAM_SCREEN_FADE },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
@@ -246,6 +252,22 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 
 		case OGLPROGRAM_CUBEMAP_CONVOLUTION: {
 			pOGLProgram = new OGLProgramCubemapConvolution(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		// Deferred
+
+		case OGLPROGRAM_GBUFFER: {
+			pOGLProgram = new OGLProgramGBuffer(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		case OGLPROGRAM_SSAO: {
+			pOGLProgram = new OGLProgramSSAO(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL),
 				"Failed to initialize OGL irradiance map Program");

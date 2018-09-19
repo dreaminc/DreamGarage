@@ -32,6 +32,8 @@ OGLFramebuffer::~OGLFramebuffer() {
 RESULT OGLFramebuffer::ClearAttachments() {
 	RESULT r = R_PASS;
 
+	//ClearColorAttachments();
+
 	if (m_pOGLDepthAttachment != nullptr) {
 		delete m_pOGLDepthAttachment;
 		m_pOGLDepthAttachment = nullptr;
@@ -218,6 +220,37 @@ texture* OGLFramebuffer::GetColorTexture() {
 
 	return nullptr;
 }
+
+/*
+// TODO: Remove the Make functions and move all to Add 
+// but don't have time to do this right now
+RESULT OGLFramebuffer::AddColorAttachment(int index) {
+	RESULT r = R_PASS;
+
+	OGLAttachment *pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
+	CN(pOGLColorAttachment);
+
+	// TODO: Check for duplicate indexes 
+	m_oglColorAttachments[index] = pOGLColorAttachment;
+
+Error:
+	return r;
+}
+
+OGLAttachment* OGLFramebuffer::GetColorAttachment(int index) {
+	// TODO: check for non existent index
+	return m_oglColorAttachments[index];
+}
+
+RESULT OGLFramebuffer::ClearColorAttachments() {
+	RESULT r = R_PASS;
+
+	m_oglColorAttachments = std::map<int, OGLAttachment*>();
+
+Error:
+	return r;
+}
+*/
 
 RESULT OGLFramebuffer::MakeColorAttachment() {
 	RESULT r = R_PASS;
