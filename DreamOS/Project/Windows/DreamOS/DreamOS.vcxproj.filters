@@ -982,6 +982,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2146,6 +2149,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2379,6 +2385,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\AACommon.shader">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\irradianceMap.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\irradianceMap.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

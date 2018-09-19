@@ -38,6 +38,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTest3rdPersonCamera());
 
+	CR(AddTestEnvironmentMapping());
+
 	CR(AddTestCubeMap());
 
 	CR(AddTestWaterShaderCube());
@@ -47,8 +49,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
-
-	CR(AddTestEnvironmentMapping());
 	
 	CR(AddTestGeometryShader());
   
@@ -1459,10 +1459,11 @@ Error:
 	return r;
 }
 
+// TODO: FIX: Reflections are view dependent!! 
 RESULT HALTestSuite::AddTestEnvironmentMapping() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 300.0f;
+	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
 	float width		= 2.0f; 
@@ -1584,7 +1585,8 @@ RESULT HALTestSuite::AddTestEnvironmentMapping() {
 			//*/
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CN(pDreamGamepadApp)
+			CN(pDreamGamepadApp);
+			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
 
 		}
 
@@ -5375,7 +5377,7 @@ Error:
 RESULT HALTestSuite::AddTestIrradianceMap() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
+	double sTestTime = 500.0f;
 	int nRepeats = 1;
 
 	float width = 1.5f;
@@ -5413,12 +5415,21 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+		ProgramNode* pVisualNormalsProgram;
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
+		CN(pVisualNormalsProgram);
+		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
 		ProgramNode* pSkyboxProgramNode;
 		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
 		CN(pSkyboxProgramNode);
 		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
-		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pVisualNormalsProgram->Output("output_framebuffer")));
 
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -5442,16 +5453,30 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 
 			//CR(dynamic_cast<OGLProgramSkybox*>(pRenderProgramNode)->SetCubemap(pCubemap));
 			//CR(pRenderProgramNode->ConnectToInput("cubemap", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-			pVolume = m_pDreamOS->AddVolume(width, height, length);
-			CN(pVolume);
-			pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
-			pVolume->RotateZByDeg(1.0f);
-
+			
 			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pColorTexture);
 
-			CR(pVolume->SetDiffuseTexture(pColorTexture));
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+			
+			sphere * pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+			CN(pSphere);
+
+			volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+			//CR(pVolume->SetDiffuseTexture(pColorTexture));
+
+			//model *pCubeModel = m_pDreamOS->AddModel(L"\\cube.obj");
+			//model *pCubeModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			//CN(pCubeModel);
+			//pCubeModel->SetPosition(point(-2.0f, 0.0f, 0.0f));
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp);
+			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
+
 		}
 
 

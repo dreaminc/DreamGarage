@@ -875,6 +875,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReflection.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramRefraction.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenFade.cpp" />
@@ -1209,6 +1210,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDebugOverlay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramIrradianceMap.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReflection.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramRefraction.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenFade.h" />
@@ -1510,6 +1512,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\fogCommon.shader" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\irradianceMap.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\irradianceMap.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\mathCommon.shader" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture_clipping.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\parallaxCommon.shader" />
