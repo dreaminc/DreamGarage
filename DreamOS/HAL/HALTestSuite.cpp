@@ -5415,9 +5415,9 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		ProgramNode* pRenderProgramNode;
-		//pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
+		pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
 		//pRenderProgramNode = pHAL->MakeProgramNode("standard");
-		pRenderProgramNode = pHAL->MakeProgramNode("gbuffer");
+		//pRenderProgramNode = pHAL->MakeProgramNode("gbuffer");
 		CN(pRenderProgramNode);
 		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -5428,29 +5428,29 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 		//CN(pSSAOProgram);
 		//CR(pSSAOProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));		
 
-		//ProgramNode* pVisualNormalsProgram;
-		//pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
-		////pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
-		//CN(pVisualNormalsProgram);
-		//CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//
-		//CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-		//
-		//ProgramNode* pSkyboxProgramNode;
-		//pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
-		//CN(pSkyboxProgramNode);
-		//CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
-		////CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
-		//CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		ProgramNode* pVisualNormalsProgram;
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
+		CN(pVisualNormalsProgram);
+		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		
+		ProgramNode* pSkyboxProgramNode;
+		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgramNode);
+		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		//CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		ProgramNode *pRenderScreenQuad;
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
 		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSSAOProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -5484,10 +5484,10 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 			//CR(pVolume->SetDiffuseTexture(pColorTexture));
 
-			//model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
-			//CN(pModel);
-			//pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
-			//pModel->SetScale(0.15f);
+			model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			CN(pModel);
+			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pModel->SetScale(0.15f);
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
