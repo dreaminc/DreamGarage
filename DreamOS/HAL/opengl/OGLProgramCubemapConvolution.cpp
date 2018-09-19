@@ -182,8 +182,8 @@ RESULT OGLProgramCubemapConvolution::ProcessNode(long frameID) {
 
 	CN(m_pSkybox);
 
-	static bool fRendered = false;
-	if (fRendered)
+	bool m_fRendered = false;
+	if (m_fRendered)
 		return r;
 
 	UseProgram();
@@ -220,7 +220,7 @@ RESULT OGLProgramCubemapConvolution::ProcessNode(long frameID) {
 		}
 	}
 
-	fRendered = true;
+	m_fRendered = true;
 
 	UnbindFramebuffer();
 	//*/

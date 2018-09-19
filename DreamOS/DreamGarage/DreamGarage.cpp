@@ -127,6 +127,12 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CN(pScatteringSkyboxProgram);
 		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
 		// Reflection 
 
 		m_pReflectionProgramNodeMirror = pHAL->MakeProgramNode("reflection");

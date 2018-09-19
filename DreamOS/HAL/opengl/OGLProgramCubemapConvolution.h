@@ -65,6 +65,8 @@ private:
 
 	OGLUniformBool *m_pUniformHasTextureCubemap = nullptr;
 	OGLUniformSamplerCube *m_pUniformTextureCubemap = nullptr;
+
+	bool m_fRendered = false;
 };
 
 #endif // ! OGLPROGRAM_CUBEMAP_CONVOLUTION_H_
