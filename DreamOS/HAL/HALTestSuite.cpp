@@ -5458,7 +5458,7 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			CN(pColorTexture);
 
 			light *pLight;
-			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(1.0f, -0.25f, 0.0f));
 			
 			sphere * pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
 			CN(pSphere);
@@ -5468,10 +5468,10 @@ RESULT HALTestSuite::AddTestIrradianceMap() {
 			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 			//CR(pVolume->SetDiffuseTexture(pColorTexture));
 
-			//model *pCubeModel = m_pDreamOS->AddModel(L"\\cube.obj");
-			//model *pCubeModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
-			//CN(pCubeModel);
-			//pCubeModel->SetPosition(point(-2.0f, 0.0f, 0.0f));
+			model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			CN(pModel);
+			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pModel->SetScale(0.15f);
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			CN(pDreamGamepadApp);
