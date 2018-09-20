@@ -69,7 +69,9 @@ public:
 	virtual HMDDeviceType GetDeviceType() override;
 	virtual std::string GetDeviceTypeString() override;
 
-	virtual bool IsHMDTracked() = 0;
+	virtual bool IsHMDTracked() {
+		return true;
+	}
 
 	virtual RESULT GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) override;
 	virtual RESULT GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) override;
