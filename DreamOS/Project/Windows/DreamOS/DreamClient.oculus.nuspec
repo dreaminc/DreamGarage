@@ -35,6 +35,7 @@
     <file src=".\..\..\..\dreampaths.txt" target="dreampaths.txt" />
     <file src=".\..\..\..\HAL\**" target="\HAL\" />
     <file src=".\..\..\..\Models\**" target="\Models\" />
+    <file src=".\..\..\..\Assets\**" target="\Assets\" />
     <file src=".\..\..\..\Resources\**" target="\Resources\" />
     <file src=".\..\..\..\Texture\**" target="\Texture\" />
 
