@@ -3,7 +3,7 @@
 
 #define GAMEPAD_MOVE_SCALE 23914.0f;
 #define GAMEPAD_UP_SPEED_SCALE 25000000.0f;		// joystick values are 0-1, triggers are 0-255
-#define GAMEPAD_CAMERA_ROTATE_SCALE 0.41178f;
+#define GAMEPAD_CAMERA_ROTATE_SCALE 1.41178f;
 
 #include "RESULT/EHM.h"
 
@@ -55,6 +55,9 @@ private:
 	float m_rightTriggerValue = 0.0f;
 	float m_pendRightTriggerValue = 0.0f;
 	
+	float m_lookXVelocity = 0.0f;
+	float m_lookYVelocity = 0.0f;
+
 	double m_msTimeLastUpdated = 0.0;
 	
 	float m_cameraMoveSpeedScale = GAMEPAD_MOVE_SCALE;

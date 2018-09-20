@@ -113,11 +113,65 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 	else {
 		m_pCamera->Impulse(m_pCamera->GetLookVector() * (m_ptLeftStick.y() / m_cameraMoveSpeedScale));
 	}
+
+	//* variable rotation
+	// Rotation
+	// looking left
+	if (m_ptRightStick.x() > 0.15) {
+		m_lookXVelocity += msTimeStep / (200.0 / m_ptRightStick.x());	// between 100 and 500 feels alright
+	}
+	// looking right
+	else if (m_ptRightStick.x() < -0.15) {
+		m_lookXVelocity += msTimeStep / (200.0 / m_ptRightStick.x());
+	}
+	else {
+		if (m_lookXVelocity < 0) {
+			m_lookXVelocity += msTimeStep / 500.0;
+		}
+		else if (m_lookXVelocity > 0) {
+			m_lookXVelocity -= msTimeStep / 500.0f;
+		}
+	}
+	// looking up
+	if (m_ptRightStick.y() > 0.1) {
+		m_lookYVelocity += msTimeStep / (200.0 / m_ptRightStick.y());
+	}
+	// looking down
+	else if (m_ptRightStick.y() < -0.1) {
+		m_lookYVelocity += msTimeStep / (200.0 / m_ptRightStick.y());
+	}
+	else {
+		if (m_lookYVelocity < 0) {
+			m_lookYVelocity += msTimeStep / 500.0;
+		}
+		else if (m_lookYVelocity > 0) {
+			m_lookYVelocity -= msTimeStep / 500.0f;
+		}
+	}
 	
+	if (m_lookXVelocity > 1.0 || m_lookXVelocity < -1.0) {
+		util::Clamp(m_lookXVelocity, -1.0f, 1.0f);
+	}
+	if (m_lookYVelocity > 1.0 || m_lookYVelocity < -1.0) {
+		util::Clamp(m_lookYVelocity, -1.0f, 1.0f);
+	}
+
+	if (m_lookXVelocity < 0.01 && m_lookXVelocity > -0.01) {
+		m_lookXVelocity = 0.0f;
+	}
+	if (m_lookYVelocity < 0.01 && m_lookYVelocity > -0.01) {
+		m_lookYVelocity = 0.0f;
+	}
+	DEBUG_LINEOUT_RETURN("Camera Rotating: x: %0.8f y: %0.8f", m_lookXVelocity, m_lookYVelocity);
+	//*/
+
 	if (m_pCamera != nullptr) {
-		m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() / m_cameraRotateSpeed, -m_ptRightStick.y() / m_cameraRotateSpeed);
+		//	non-variable rotation
+		//m_pCamera->RotateCameraByDiffXY(m_ptRightStick.x() / m_cameraRotateSpeed, -m_ptRightStick.y() / m_cameraRotateSpeed);
+		m_pCamera->RotateCameraByDiffXY(m_lookXVelocity / m_cameraRotateSpeed, -m_lookYVelocity / m_cameraRotateSpeed);
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
 	}
+
 	//DEBUG_LINEOUT_RETURN("vel magn: %0.8f", m_pCamera->GetVelocity().magnitude());
 	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
 
