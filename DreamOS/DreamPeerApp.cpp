@@ -183,7 +183,7 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 		m_pPhotoQuad->SetPosition(point(photoX, NAMETAG_HEIGHT, backgroundDepth));
 		m_pPhotoQuad->SetDiffuseTexture(m_pDOS->MakeTexture(texture::type::TEXTURE_2D, &k_wstrPhoto[0]));
 		m_pPhotoQuad->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
-		m_pPhotoQuad->SetMaterialDiffuseColor(m_backgroundColor);
+		m_pPhotoQuad->SetMaterialDiffuseColor(m_visibleColor);
 	}
 
 	m_pLeftGap = m_pUserLabelComposite->AddQuad(LABEL_GAP_WIDTH, LABEL_HEIGHT);
