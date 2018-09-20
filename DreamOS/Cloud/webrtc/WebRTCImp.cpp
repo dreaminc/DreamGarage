@@ -45,6 +45,16 @@ RESULT WebRTCImp::Shutdown() {
 	return r;
 }
 
+RESULT WebRTCImp::CloseAllPeerConnections() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	m_pWebRTCConductor->CloseAllPeerConnections();
+
+Error:
+	return r;
+}
+
 // CloudImp Interface
 RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;

@@ -460,6 +460,24 @@ Error:
 	return r;
 }
 
+RESULT WebRTCConductor::CloseAllPeerConnections() {
+	RESULT r = R_PASS;
+
+	// Close all current peer connections
+	for (auto webRTCPeerConnection : m_webRTCPeerConnections) {
+		int peerUserID = webRTCPeerConnection->GetPeerUserID();
+		int peerConnectionID = webRTCPeerConnection->GetPeerConnectionID();
+
+		CRM(webRTCPeerConnection->CloseWebRTCPeerConnection(), "Closing WebRTCPeerConnection User: %d Connection: %d failed", peerUserID, peerConnectionID);
+	}
+
+	// Clear peer connections vector
+	CR(ClearPeerConnections());
+
+Error:
+	return r;
+}
+
 // WebRTCPeerConnectionObserver Interface
 // TODO: implement these and pass back the right vars
 RESULT WebRTCConductor::OnWebRTCConnectionStable(long peerConnectionID) {

@@ -463,7 +463,8 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
 			//pDreamPeer->GetUserModel()->GetMouth()->SetVisible(false);
-			userModelPair.first = nullptr;
+			userModelPair.first->GetUserLabelComposite()->SetVisible(false);
+			//userModelPair.first = nullptr;
 			userModelPair.second->SetVisible(false);
 			userModelPair.second->GetMouth()->SetVisible(false);
 			return R_PASS;
@@ -919,7 +920,7 @@ RESULT DreamGarage::Update(void) {
 
 	if (m_fClearPeers) {
 		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
-		CR(ClearPeers());
+		//CR(ClearPeers());
 	}
 
 Error:

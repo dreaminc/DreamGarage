@@ -41,6 +41,7 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	m_pUIObjectComposite->SetPosition(GetComposite()->GetPosition(true));
 	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get());
 
+	m_pUserLabelComposite = m_pUIObjectComposite->MakeComposite();
 	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();
 
 Error:
@@ -58,8 +59,6 @@ Error:
 
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
-
-	//CR(r);
 
 	m_pUserModel = nullptr;
 	m_pUIObjectComposite = nullptr;
@@ -228,6 +227,10 @@ Error:
 RESULT DreamPeerApp::SetUsernameAnimationDuration(float animationDuration) {
 	m_userNameAnimationDuration = animationDuration;
 	return R_PASS;
+}
+
+std::shared_ptr<composite> DreamPeerApp::GetUserLabelComposite() {
+	return m_pUIObjectComposite;
 }
 
 RESULT DreamPeerApp::SetUserLabelPosition(point ptPosition) {

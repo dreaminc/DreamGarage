@@ -69,6 +69,7 @@ public:
 	friend class WebRTCConductor;
 
 	RESULT Shutdown();
+	RESULT CloseAllPeerConnections();
 
 	// CloudImp Interface
 	RESULT Initialize();

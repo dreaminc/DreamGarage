@@ -215,6 +215,16 @@ RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConne
 	return R_NOT_FOUND;
 }
 
+RESULT PeerConnectionController::CloseAllPeerConnections() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+	m_pWebRTCImp->CloseAllPeerConnections();
+
+Error:
+	return r;
+}
+
 PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
 	PeerConnection *pPeerConnection = new PeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 	PeerConnection *pPeerConnectionTemp = nullptr;

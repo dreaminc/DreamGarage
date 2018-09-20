@@ -157,6 +157,7 @@ public:
 
 	RESULT SetUsernameAnimationDuration(float animationDuration);
 
+	std::shared_ptr<composite> GetUserLabelComposite();
 	RESULT SetUserLabelPosition(point ptPosition);
 	RESULT SetUserLabelOrientation(quaternion qOrientation);
 
