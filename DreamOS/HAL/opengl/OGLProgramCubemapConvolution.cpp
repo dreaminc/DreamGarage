@@ -36,8 +36,8 @@ RESULT OGLProgramCubemapConvolution::OGLInitialize() {
 
 	///*
 	// Cubemap Framebuffer Output
-	int pxWidth = 1024;
-	int pxHeight = 1024;
+	int pxWidth = 128;
+	int pxHeight = 128;
 
 	m_pOGLFramebufferCubemap = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CN(m_pOGLFramebufferCubemap);
