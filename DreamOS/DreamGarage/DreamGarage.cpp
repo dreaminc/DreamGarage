@@ -961,8 +961,6 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 
 		point ptUser;
 		m_pDreamUserApp->GetAppBasisPosition(ptUser);
-
-		RecenterHMD();
 	}
 
 	if (m_pDreamUserControlArea != nullptr) {
