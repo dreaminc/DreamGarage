@@ -181,6 +181,9 @@ RESULT UserController::Logout() {
 	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist.");
 	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
+
+	
+
 	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
 	CR(SetIsLoggedIn(false));
 
@@ -688,7 +691,7 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		// Allow force of environment ID in DEBUG
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
@@ -697,7 +700,7 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 		if ((strEnvironmentID.compare("default") == 0) == false) {
 			environmentId = stoi(strEnvironmentID);
 		}
-#endif
+//#endif
 
 		SetUserDefaultEnvironmentID(environmentId);
 

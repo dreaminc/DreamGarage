@@ -59,9 +59,10 @@ Error:
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	//CR(r);
 
 	m_pUserModel = nullptr;
+	m_pUIObjectComposite = nullptr;
 
 Error:
 	return r;
@@ -296,6 +297,12 @@ RESULT DreamPeerApp::HideUserNameField() {
 	));
 	//*/
 Error:
+	return r;
+}
+
+RESULT DreamPeerApp::ClearAssets() {
+	RESULT r = R_PASS;
+
 	return r;
 }
 

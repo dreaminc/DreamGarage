@@ -473,6 +473,11 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	return R_NOT_FOUND;
 }
 
+RESULT DreamGarage::PendClearPeers() {
+	m_fClearPeers = true;
+	return R_PASS;
+}
+
 user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
 	for (const auto& userModelPair : m_usersModelPool) {
 		if (userModelPair.first == pDreamPeer) {
@@ -598,7 +603,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -627,7 +632,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
@@ -910,6 +915,11 @@ RESULT DreamGarage::Update(void) {
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
 		CR(CheckDreamPeerAppStates());
 		g_lastPeerStateCheckTime = timeNow;
+	}
+
+	if (m_fClearPeers) {
+		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
+		CR(ClearPeers());
 	}
 
 Error:
@@ -1362,13 +1372,15 @@ RESULT DreamGarage::OnLogout() {
 	RESULT r = R_PASS;
 
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	//PeerConnectionController *pUserController = GetPeerConn
 
 	// Show login form, given this is not the first launch.
 	std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
 
 	CNM(pUserController, "User controller was nullptr");
 
-	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
+	// disabled for testing
+	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
 
 	// Don't clear last login on logout
 	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
@@ -1379,9 +1391,8 @@ RESULT DreamGarage::OnLogout() {
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
-	CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 
-	CRM(ClearPeers(), "failed to remove all peers");
+//	CR(PendClearPeers());
 
 	m_fSeated = false;
 

@@ -564,11 +564,12 @@ RESULT DreamOS::ClearPeers() {
 	for (auto &pairDreamPeer : m_dreamPeerApps) {
 
 		std::shared_ptr<DreamPeerApp> pDreamPeerApp = pairDreamPeer.second;
+		
 		CRM(ShutdownDreamApp<DreamPeerApp>(pDreamPeerApp), "Failed to shut down dream peer app");
 	}
 
 Error:
-	m_dreamPeerApps.clear();
+	//m_dreamPeerApps.clear();
 
 	return r;
 }

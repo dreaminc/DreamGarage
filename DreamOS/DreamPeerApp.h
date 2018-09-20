@@ -107,6 +107,7 @@ public:
 public:
 	RESULT ShowUserNameField();
 	RESULT HideUserNameField();
+	RESULT ClearAssets();
 
 public:
 	RESULT OnDataChannel();
