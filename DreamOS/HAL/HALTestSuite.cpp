@@ -34,7 +34,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestIrradianceMap());
+
 	CR(AddTest3rdPersonCamera());
+
+	CR(AddTestEnvironmentMapping());
 
 	CR(AddTestCubeMap());
 
@@ -45,8 +49,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 
 	CR(AddTestBlinnPhongShaderTextureBump());
-
-	CR(AddTestEnvironmentMapping());
 	
 	CR(AddTestGeometryShader());
   
@@ -1457,10 +1459,11 @@ Error:
 	return r;
 }
 
+// TODO: FIX: Reflections are view dependent!! 
 RESULT HALTestSuite::AddTestEnvironmentMapping() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 300.0f;
+	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
 	float width		= 2.0f; 
@@ -1582,7 +1585,8 @@ RESULT HALTestSuite::AddTestEnvironmentMapping() {
 			//*/
 
 			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CN(pDreamGamepadApp)
+			CN(pDreamGamepadApp);
+			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
 
 		}
 
@@ -5222,6 +5226,7 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 400.0f;
+
 	int nRepeats = 1;
 
 	float width = 1.5f;
@@ -5251,6 +5256,7 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 		CR(pHAL->MakeCurrentContext());
 
 		///*
+		
 		// Skybox
 		ProgramNode* pScatteringSkyboxProgram;
 		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
@@ -5260,6 +5266,7 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 		ProgramNode* pRenderProgramNode;
 		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
+
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
@@ -5359,6 +5366,177 @@ RESULT HALTestSuite::AddTest3rdPersonCamera() {
 
 	pNewTest->SetTestName("3rd person camera test");
 	pNewTest->SetTestDescription("Test 3rd person camera auxiliary sink node target");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestIrradianceMap() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 500.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.3f;
+	float alpha = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		// Skybox
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		ProgramNode* pRenderProgramNode;
+		//pRenderProgramNode = pHAL->MakeProgramNode("irrandiance_map_lighting");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		//pRenderProgramNode = pHAL->MakeProgramNode("gbuffer");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		//ProgramNode *pSSAOProgram;
+		//pSSAOProgram = pHAL->MakeProgramNode("ssao");
+		//CN(pSSAOProgram);
+		//CR(pSSAOProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));		
+
+		ProgramNode* pVisualNormalsProgram;
+		pVisualNormalsProgram = pHAL->MakeProgramNode("visualize_normals");
+		//pVisualNormalsProgram = pHAL->MakeProgramNode("minimal");
+		CN(pVisualNormalsProgram);
+		CR(pVisualNormalsProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pVisualNormalsProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		
+		CR(pVisualNormalsProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		
+		ProgramNode* pSkyboxProgramNode;
+		pSkyboxProgramNode = pHAL->MakeProgramNode("skybox");
+		CN(pSkyboxProgramNode);
+		CR(pSkyboxProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		//CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgramNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgramNode->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSSAOProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		{
+			//sphere *pSphere;
+			//pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+			//CN(pSphere);
+
+			//cubemap *pCubemap = m_pDreamOS->MakeCubemap(L"LarnacaCastle");
+			//CN(pCubemap);
+
+			//CR(dynamic_cast<OGLProgramSkybox*>(pRenderProgramNode)->SetCubemap(pCubemap));
+			//CR(pRenderProgramNode->ConnectToInput("cubemap", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+			
+			texture *pColorTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pColorTexture);
+
+			vector vSunDirection = vector(-1.0f, -0.25f, 0.1f);
+
+			light *pLight;
+			pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vSunDirection);
+			
+			sphere * pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+			CN(pSphere);
+
+			volume *pVolume = m_pDreamOS->AddVolume(width, height, length);
+			CN(pVolume);
+			pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+			//CR(pVolume->SetDiffuseTexture(pColorTexture));
+
+			//model *pModel = m_pDreamOS->AddModel(L"\\head_01\\head_01.FBX");
+			model *pModel = m_pDreamOS->AddModel(L"\\4\\head.fbx");
+			CN(pModel);
+			pModel->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pModel->SetScale(0.05f);
+			
+			color modelColor = pModel->GetChildMesh(0)->GetDiffuseColor();
+			pModel->SetMaterialSpecularColor(modelColor, true);
+			pModel->SetMaterialShininess(4.0f, true);
+			pModel->RotateYByDeg(45.0f);
+
+			pModel = m_pDreamOS->AddModel(L"\\4\\left-hand.fbx");
+			CN(pModel);
+			pModel->SetPosition(point(3.5f, 0.0f, 0.0f));
+			pModel->SetScale(0.05f);
+			pModel->RotateXByDeg(-90.0f);
+			pModel->RotateYByDeg(45.0f);
+
+			modelColor = pModel->GetChildMesh(0)->GetDiffuseColor();
+			pModel->SetMaterialSpecularColor(modelColor, true);
+			pModel->SetMaterialShininess(4.0f, true);
+
+			auto pDreamGamepadApp = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CN(pDreamGamepadApp);
+			pDreamGamepadApp->SetCamera(m_pDreamOS->GetCamera());
+
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Irradiance Map Test");
+	pNewTest->SetTestDescription("Test cube map based irradiance map shader");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

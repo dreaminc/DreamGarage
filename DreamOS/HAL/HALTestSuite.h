@@ -67,6 +67,7 @@ public:
 	RESULT AddTestFlatContextNesting();
 
 	RESULT AddTestCubeMap();
+	RESULT AddTestIrradianceMap();
 
 	RESULT TestNestedOBB();
 	RESULT AddTestRotation();

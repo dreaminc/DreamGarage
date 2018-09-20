@@ -573,6 +573,29 @@ RESULT DimObj::ClearChildren() {
 	return R_PASS;
 }
 
+std::shared_ptr<DimObj> DimObj::GetChildObject(int index) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<DimObj> pDimObj = nullptr;
+
+	auto childrenVector = GetChildren();
+
+	CB(childrenVector.size() > index);
+
+	{
+		std::shared_ptr<VirtualObj> pVirtualObj = childrenVector[index];
+
+		pDimObj = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		CN(pDimObj);
+	}
+
+	return pDimObj;
+
+Error:
+	pDimObj = nullptr;
+	return nullptr;
+}
+
 // Explicit for VirtualObj
 template <>
 std::shared_ptr<VirtualObj> DimObj::GetFirstChild<VirtualObj>() {

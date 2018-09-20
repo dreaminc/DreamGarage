@@ -219,10 +219,10 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 
 	///*
 	// Left face
-	m_pVertices[TL = vertCount++] = vertex(point(halfWidth, -halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
-	m_pVertices[TR = vertCount++] = vertex(point(halfWidth, halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
-	m_pVertices[BL = vertCount++] = vertex(point(halfWidth, -halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
-	m_pVertices[BR = vertCount++] = vertex(point(halfWidth, halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
+	m_pVertices[BR = vertCount++] = vertex(point(-halfWidth, -halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
+	m_pVertices[TR = vertCount++] = vertex(point(-halfWidth, halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
+	m_pVertices[BL = vertCount++] = vertex(point(-halfWidth, -halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
+	m_pVertices[TL = vertCount++] = vertex(point(-halfWidth, halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
 
 	if (fTriangleBased) {
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
@@ -242,10 +242,10 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 
 	///*
 	// Right face
-	m_pVertices[TR = vertCount++] = vertex(point(-halfWidth, -halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
-	m_pVertices[TL = vertCount++] = vertex(point(-halfWidth, halfHeight, halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// B
-	m_pVertices[BR = vertCount++] = vertex(point(-halfWidth, -halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
-	m_pVertices[BL = vertCount++] = vertex(point(-halfWidth, halfHeight, -halfLength), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
+	m_pVertices[BL = vertCount++] = vertex(point(halfWidth, -halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
+	m_pVertices[TL = vertCount++] = vertex(point(halfWidth, halfHeight, halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// B
+	m_pVertices[BR = vertCount++] = vertex(point(halfWidth, -halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
+	m_pVertices[TR = vertCount++] = vertex(point(halfWidth, halfHeight, -halfLength), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
 
 	if (fTriangleBased) {
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
@@ -315,7 +315,7 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 		}
 	}
 
-	//	Error:
+Error:
 	return r;
 }
 

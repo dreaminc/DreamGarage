@@ -38,6 +38,8 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformEyePosition), std::string("u_vec4Eye")));
+
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasBumpTexture")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
 
@@ -53,6 +55,9 @@ RESULT OGLProgramStandard::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformCubemapEnvironment), std::string("u_cubemapEnvironment")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasCubemapEnvironment), std::string("u_hasCubemapEnvironment")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformCubemapIrradiance), std::string("u_cubemapIrradiance")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasCubemapIrradiance), std::string("u_hasCubemapIrradiance")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformRiverAnimation), std::string("u_fRiverAnimation")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformAREnabled), std::string("u_fAREnabled")));
@@ -105,6 +110,7 @@ RESULT OGLProgramStandard::OGLInitialize(version versionOGL) {
 	CRM(AddSharedShaderFilename(L"core440.shader"), "Failed to add global shared shader code");
 	CRM(AddSharedShaderFilename(L"materialCommon.shader"), "Failed to add shared vertex shader code");
 	CRM(AddSharedShaderFilename(L"lightingCommon.shader"), "Failed to add shared vertex shader code");
+	CRM(AddSharedShaderFilename(L"brdfCommon.shader"), "Failed to add shared vertex shader code");
 
 	// Vertex
 	CRM(MakeVertexShader(L"standard.vert"), "Failed to create vertex shader");
@@ -145,7 +151,8 @@ RESULT OGLProgramStandard::SetupConnections() {
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_environment_cubemap", &m_pOGLInputFramebufferEnvironmentCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_irradiance_cubemap", &m_pOGLInputFramebufferIrradianceCubemap, DCONNECTION_FLAGS::PASSIVE));
 
 	// Reflection Map
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
@@ -204,13 +211,13 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// Environment map
-	if (m_pOGLInputFramebufferCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
+	if (m_pOGLInputFramebufferEnvironmentCubemap != nullptr && m_pUniformCubemapEnvironment != nullptr) {
 		if (m_pUniformHasCubemapEnvironment != nullptr) {
 			m_pUniformHasCubemapEnvironment->SetUniform(true);
 
 			m_pParentImp->glActiveTexture(GL_TEXTURE5);
-			m_pParentImp->BindTexture(m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
-										m_pOGLInputFramebufferCubemap->GetColorAttachment()->GetOGLCubemapIndex());
+			m_pParentImp->BindTexture(m_pOGLInputFramebufferEnvironmentCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
+										m_pOGLInputFramebufferEnvironmentCubemap->GetColorAttachment()->GetOGLCubemapIndex());
 
 			//m_pUniformCubemapEnvironment->SetUniform(5);
 		}
@@ -230,6 +237,25 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	else {
 		if (m_pUniformHasCubemapEnvironment != nullptr)
 			m_pUniformHasCubemapEnvironment->SetUniform(false);
+	}
+
+	// Irradiance Map
+	if (m_pOGLInputFramebufferIrradianceCubemap != nullptr && m_pUniformCubemapIrradiance != nullptr) {
+		if (m_pOGLInputFramebufferIrradianceCubemap != nullptr) {
+			if(m_pUniformHasCubemapIrradiance != nullptr)
+				m_pUniformHasCubemapIrradiance->SetUniform(true);
+
+			m_pParentImp->glActiveTexture(GL_TEXTURE6);
+
+			m_pParentImp->BindTexture(m_pOGLInputFramebufferIrradianceCubemap->GetColorAttachment()->GetOGLCubemapTarget(),
+				m_pOGLInputFramebufferIrradianceCubemap->GetColorAttachment()->GetOGLCubemapIndex());
+
+			//m_pUniformTextureCubemap->SetUniform(0);
+		}
+		else {
+			if (m_pUniformHasCubemapIrradiance != nullptr)
+				m_pUniformHasCubemapIrradiance->SetUniform(false);
+		}
 	}
 
 	// 3D Object / skybox
@@ -294,6 +320,13 @@ RESULT OGLProgramStandard::SetObjectUniforms(DimObj *pDimObj) {
 
 RESULT OGLProgramStandard::SetCameraUniforms(camera *pCamera) {
 
+	if (m_pUniformTime != nullptr) {
+		auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+		m_deltaTime = (float)deltaTime;
+		m_deltaTime *= 0.5f;
+		m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&m_deltaTime));
+	}
+
 	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
 	//auto matP = pCamera->GetProjectionMatrix();
@@ -304,14 +337,21 @@ RESULT OGLProgramStandard::SetCameraUniforms(camera *pCamera) {
 	//m_pUniformModelViewMatrix
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
+	if (m_pUniformEyePosition != nullptr) {
+		m_pUniformEyePosition->SetUniform(m_pCamera->GetPosition(true));
+	}
+
 	return R_PASS;
 }
 
 RESULT OGLProgramStandard::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-	auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
-	m_deltaTime = (float)deltaTime;
-	m_deltaTime *= 0.5f;
-	m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&m_deltaTime));
+	
+	if (m_pUniformTime != nullptr) {
+		auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+		m_deltaTime = (float)deltaTime;
+		m_deltaTime *= 0.5f;
+		m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&m_deltaTime));
+	}
 
 	//auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
@@ -322,6 +362,10 @@ RESULT OGLProgramStandard::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TY
 	//m_pUniformProjectionMatrix->SetUniform(matP);
 	//m_pUniformModelViewMatrix->SetUniform(matM)
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+	if (m_pUniformEyePosition != nullptr) {
+		m_pUniformEyePosition->SetUniform(pStereoCamera->GetEyePosition(eye));
+	}
 
 	return R_PASS;
 }

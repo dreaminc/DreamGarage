@@ -12,6 +12,7 @@
 #include "OGLProgramToon.h"
 #include "OGLProgramReflection.h"
 #include "OGLProgramRefraction.h"
+#include "OGLProgramEnvironment.h"
 #include "OGLProgramWater.h"
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureShadow.h"
@@ -21,6 +22,8 @@
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramStandard.h"
 #include "OGLProgramScreenQuad.h"
+#include "OGLProgramIrradianceMap.h"
+#include "OGLProgramCubemapConvolution.h"
 #include "OGLProgramScreenFade.h"
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
@@ -28,6 +31,10 @@
 #include "OGLProgramUIStage.h"
 #include "OGLProgramDebugOverlay.h"
 #include "OGLProgramVisualizeNormals.h"
+
+// Deferred 
+#include "OGLProgramGBuffer.h"
+#include "OGLProgramSSAO.h"
 
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
@@ -46,12 +53,17 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "toon", OGLPROGRAM_TOON },
 	{ "reflection", OGLPROGRAM_REFLECTION },
 	{ "refraction", OGLPROGRAM_REFRACTION },
+	{ "environment", OGLPROGRAM_ENVIRONMENT },
 	{ "water", OGLPROGRAM_WATER },
 	{ "custom", OGLPROGRAM_CUSTOM },
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "standard", OGLPROGRAM_STANDARD },
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
+	{ "irrandiance_map_lighting", OGLPROGRAM_IRRADIANCE_MAP },
+	{ "cubemap_convolution", OGLPROGRAM_CUBEMAP_CONVOLUTION },
+	{ "gbuffer", OGLPROGRAM_GBUFFER },
+	{ "ssao", OGLPROGRAM_SSAO },
 	{ "screenfade", OGLPROGRAM_SCREEN_FADE },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
@@ -212,6 +224,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 				"Failed to initialize OGL refraction Program");
 		} break;
 
+		case OGLPROGRAM_ENVIRONMENT: {
+			pOGLProgram = new OGLProgramEnvironment(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL environment Program");
+		} break;
+
 		case OGLPROGRAM_WATER: {
 			pOGLProgram = new OGLProgramWater(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
@@ -231,6 +250,36 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(versionOGL), 
 				"Failed to initialize OGL screen quad texture Program");
+		} break;
+
+		case OGLPROGRAM_IRRADIANCE_MAP: {
+			pOGLProgram = new OGLProgramIrradianceMap(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		case OGLPROGRAM_CUBEMAP_CONVOLUTION: {
+			pOGLProgram = new OGLProgramCubemapConvolution(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		// Deferred
+
+		case OGLPROGRAM_GBUFFER: {
+			pOGLProgram = new OGLProgramGBuffer(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
+		} break;
+
+		case OGLPROGRAM_SSAO: {
+			pOGLProgram = new OGLProgramSSAO(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(versionOGL),
+				"Failed to initialize OGL irradiance map Program");
 		} break;
 
 		case OGLPROGRAM_SCREEN_FADE: {

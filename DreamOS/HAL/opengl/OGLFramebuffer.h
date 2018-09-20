@@ -10,6 +10,8 @@
 #include "OpenGLCommon.h"
 #include "Primitives/Framebuffer.h"
 
+#include <map>
+
 class OpenGLImp;
 class OGLTexture;
 class OGLAttachment;
@@ -45,9 +47,14 @@ public:
 	
 	RESULT InitializeOGLDrawBuffers(int numDrawBuffers);
 
-	RESULT MakeDepthAttachment();
+	//RESULT AddColorAttachment(int index);
+	//RESULT ClearColorAttachments();
+	//OGLAttachment* GetColorAttachment(int index);
+
 	RESULT MakeColorAttachment();
 	RESULT DeleteColorAttachment();
+
+	RESULT MakeDepthAttachment();
 	RESULT DeleteDepthAttachment();
 
 	OGLAttachment* GetDepthAttachment() { return m_pOGLDepthAttachment; }
@@ -76,7 +83,9 @@ private:
 	GLuint m_framebufferIndex;
 
 	OGLAttachment* m_pOGLDepthAttachment = nullptr;
+
 	OGLAttachment* m_pOGLColorAttachment = nullptr;
+	//std::map<int, OGLAttachment*> m_oglColorAttachments;
 	
 	// TODO: Stencil attachments 
 

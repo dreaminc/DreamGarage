@@ -127,6 +127,12 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CN(pScatteringSkyboxProgram);
 		CR(pScatteringSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
 		// Reflection 
 
 		m_pReflectionProgramNodeMirror = pHAL->MakeProgramNode("reflection");
@@ -161,7 +167,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("minimal_texture");
+		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("environment");
 		CN(m_pRenderEnvironmentProgramNodeMirror);
 		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
@@ -172,6 +178,8 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		// NOTE: Add this in if you want to have reflective objects
 		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -264,6 +272,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CN(pScatteringSkyboxProgram);
 		CR(pScatteringSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = pHAL->MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
 		// Reflection 
 		
 		m_pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
@@ -309,7 +323,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("environment");
 		CN(m_pRenderEnvironmentProgramNode);
 		//CR(m_pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(m_pRenderEnvironmentProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
@@ -321,6 +335,8 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
 		// NOTE: Add this in if you want to have reflective objects
 		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -1566,14 +1582,18 @@ Error:
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 
-//Error:
+	if (GetSandboxConfiguration().f3rdPersonCamera) {
+		if (kbEvent->KeyCode == 65 && kbEvent->KeyState == 0) {
+			m_pDreamUserApp->ToggleUserModel();
+		}
+	}
+
+Error:
 	return r;
 }
 
 RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	RESULT r = R_PASS;
-
-	CR(r);
 
 Error:
 	return r;

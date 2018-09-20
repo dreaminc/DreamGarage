@@ -63,6 +63,29 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<mesh> model::GetChildMesh(int index) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<mesh> pMesh = nullptr;
+
+	auto childrenVector = GetChildren();
+
+	CB(childrenVector.size() > index);
+
+	{
+		std::shared_ptr<VirtualObj> pVirtualObj = childrenVector[index];
+
+		pMesh = std::dynamic_pointer_cast<mesh>(pVirtualObj);
+		CN(pMesh);
+	}
+
+	return pMesh;
+
+Error:
+	pMesh = nullptr;
+	return nullptr;
+}
+
 std::shared_ptr<mesh> model::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 

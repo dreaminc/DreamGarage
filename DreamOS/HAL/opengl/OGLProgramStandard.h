@@ -47,7 +47,8 @@ private:
 	ObjectStore *m_pSceneGraph = nullptr;
 
 	cubemap *m_pCubemap = nullptr;
-	OGLFramebuffer* m_pOGLInputFramebufferCubemap = nullptr;
+	OGLFramebuffer* m_pOGLInputFramebufferEnvironmentCubemap = nullptr;
+	OGLFramebuffer* m_pOGLInputFramebufferIrradianceCubemap = nullptr;
 
 	bool m_fAREnabled = false;
 
@@ -67,6 +68,8 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
+	OGLUniformVector *m_pUniformEyePosition = nullptr;
+
 	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;
 
@@ -82,6 +85,9 @@ private:
 
 	OGLUniformBool *m_pUniformHasCubemapEnvironment = nullptr;
 	OGLUniformSamplerCube *m_pUniformCubemapEnvironment = nullptr;
+
+	OGLUniformBool *m_pUniformHasCubemapIrradiance = nullptr;
+	OGLUniformSamplerCube *m_pUniformCubemapIrradiance = nullptr;
 
 	OGLUniformBool *m_pUniformRiverAnimation = nullptr;
 	OGLUniformBool *m_pUniformAREnabled = nullptr;

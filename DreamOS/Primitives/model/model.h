@@ -28,6 +28,8 @@ public:
 	std::shared_ptr<mesh> MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 	std::shared_ptr<mesh> AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
+	std::shared_ptr<mesh> GetChildMesh(int index);
+
 	/*
 public:
 	virtual RESULT Allocate() override;

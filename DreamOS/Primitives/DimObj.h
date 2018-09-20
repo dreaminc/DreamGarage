@@ -154,6 +154,8 @@ public:
 	RESULT RemoveLastChild();
 	RESULT ClearChildren();
 
+	std::shared_ptr<DimObj> GetChildObject(int index);
+
 	// Explicit instantiations in source 
 	template <class objType> 
 	std::shared_ptr<objType> GetFirstChild() {

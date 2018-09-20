@@ -94,6 +94,7 @@ RESULT hand::LoadHandModel() {
 	float palmRadius = 0.01f;
 	point ptModel = point(0.0f, 0.0f, 0.08f);
 	float scaleModel = 0.01f;
+	color modelColor;
 
 #ifndef _DEBUG
 
@@ -127,8 +128,9 @@ RESULT hand::LoadHandModel() {
 	m_pModel->SetVisible(m_fTracked && m_modelState == ModelState::HAND);
 
 	// TODO: this is bad
-	//m_pModel->SetMaterialDiffuseColor(m_pModel->GetDiffuseColor(), true);
-	m_pModel->SetMaterialShininess(2.0f, true);
+	modelColor = ((model*)(m_pModel.get()))->GetChildMesh(0)->GetDiffuseColor();
+	((model*)(m_pModel.get()))->SetMaterialSpecularColor(modelColor, true);
+	((model*)(m_pModel.get()))->SetMaterialShininess(4.0f, true);
 
 #else
 

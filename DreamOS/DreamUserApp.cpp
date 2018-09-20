@@ -276,6 +276,31 @@ unsigned int DreamUserApp::GetHandleLimit() {
 	return -1;
 }
 
+RESULT DreamUserApp::ToggleUserModel() {
+	RESULT r = R_PASS;
+
+	CB(GetDOS()->GetSandboxConfiguration().f3rdPersonCamera);
+
+	if (m_pUserModel != nullptr) {
+		bool fUserModelVisible = m_pUserModel->IsVisible();
+
+		m_pUserModel->SetVisible(!fUserModelVisible);
+		m_pUserModel->GetMouth()->SetVisible(!fUserModelVisible);
+
+		// Don't show the hands
+		if (m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT) != nullptr) {
+			CR(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false));
+		}
+
+		if (m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT) != nullptr) {
+			CR(m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT)->SetVisible(false));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamUserApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
@@ -331,9 +356,10 @@ RESULT DreamUserApp::Update(void *pContext) {
 			// Local mouth scale
 			float mouthScale = GetDOS()->GetDreamSoundSystem()->GetRunTimeCaptureAverage();
 			mouthScale *= 10.0f;
-
 			util::Clamp<float>(mouthScale, 0.0f, 1.0f);
+
 			m_pUserModel->UpdateMouth(mouthScale);
+			m_pUserModel->UpdateMouthPose();
 		}
 	}
 

@@ -218,7 +218,12 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	m_pRightGap->SetOrientation(quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));	
 	m_pRightGap->SetMaterialDiffuseColor(m_backgroundColor);
 
-	m_pUserLabelComposite->SetVisible(true);
+	if (GetDOS()->GetSandboxConfiguration().f3rdPersonCamera) {
+		m_pUserLabelComposite->SetVisible(false);
+	}
+	else {
+		m_pUserLabelComposite->SetVisible(true);
+	}
 
 Error:
 	return r;
