@@ -76,8 +76,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
-	sandboxconfig.fHMDMirror = false;
-	sandboxconfig.f3rdPersonCamera = true;
+	sandboxconfig.fHMDMirror = true;
+	sandboxconfig.f3rdPersonCamera = false;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
@@ -1582,14 +1582,18 @@ Error:
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 
-//Error:
+	if (GetSandboxConfiguration().f3rdPersonCamera) {
+		if (kbEvent->KeyCode == 65 && kbEvent->KeyState == 0) {
+			m_pDreamUserApp->ToggleUserModel();
+		}
+	}
+
+Error:
 	return r;
 }
 
 RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	RESULT r = R_PASS;
-
-	CR(r);
 
 Error:
 	return r;

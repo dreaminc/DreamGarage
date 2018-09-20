@@ -26,8 +26,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 
 	auto pDreamOS = GetDOS();
 
-	m_lightIntensity = 1.0f;
-	m_directionalIntensity = 0.1f;
+	m_lightIntensity = 0.7f;
+	m_directionalIntensity = m_lightIntensity;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 	HMD *pHMD = nullptr;
@@ -49,7 +49,7 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	vector vAmbientDirection = vector(1.0f, 0.25f, -0.1f);
 
 	m_pDirectionalSunLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vSunDirection);
-	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vAmbientDirection);
+	m_pDirectionalAmbientLight = pDreamOS->AddLight(LIGHT_DIRECTIONAL, 0.1f * m_directionalIntensity, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vAmbientDirection);
 
 	//m_pDirectionalSunLight->EnableShadows();
 	

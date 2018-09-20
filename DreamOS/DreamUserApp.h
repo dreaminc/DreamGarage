@@ -173,6 +173,7 @@ public:
 
 //protected:
 public:
+	RESULT ToggleUserModel();
 
 	RESULT UpdateHand(HAND_TYPE type);
 	RESULT UpdateOverlayTexture(HAND_TYPE type);

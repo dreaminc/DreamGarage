@@ -106,6 +106,7 @@ RESULT user::SetDreamOS(DreamOS *pDreamOS) {
 RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	RESULT r = R_PASS;
 
+	color modelColor;
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
 #ifndef _DEBUG
@@ -115,7 +116,10 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 	m_pHead->SetScale(m_headScale);
 	m_pHead->SetOrientationOffset(vHeadOffset);
-	m_pHead->SetMaterialShininess(2.0f, true);
+
+	modelColor = m_pHead->GetChildMesh(0)->GetDiffuseColor();
+	m_pHead->SetMaterialSpecularColor(modelColor, true);
+	m_pHead->SetMaterialShininess(4.0f, true);
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
 

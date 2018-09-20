@@ -16,4 +16,4 @@
 
 // avatars
 #define NUM_AVATARS 12
-#define HEAD_SCALE 0.01f
+#define HEAD_SCALE 0.0085f

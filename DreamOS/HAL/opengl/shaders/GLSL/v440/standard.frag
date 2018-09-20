@@ -118,7 +118,7 @@ void main(void) {
 		colorDiffuse *= texture(u_textureDiffuse, uvCoord);
 
 		// TODO: this is a bandage
-		colorSpecular *= texture(u_textureDiffuse, uvCoord);
+		colorSpecular = colorDiffuse;
 		colorAmbient *= texture(u_textureDiffuse, uvCoord);
 	}
 	
