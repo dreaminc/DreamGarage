@@ -629,7 +629,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -658,7 +658,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
@@ -1063,11 +1063,14 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		if (GetHMD() != nullptr) {
 			auto pLeftHand = GetHMD()->GetHand(HAND_TYPE::HAND_LEFT);
 			pLeftHand->PendCreateHandModel(avatarID);
-			pLeftHand->SetModelState(hand::ModelState::HAND);
+			//pLeftHand->SetModelState(hand::ModelState::HAND);
 
 			auto pRightHand = GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT);
 			pRightHand->PendCreateHandModel(avatarID);
-			pRightHand->SetModelState(hand::ModelState::HAND);
+			//pRightHand->SetModelState(hand::ModelState::HAND);
+
+			m_pDreamUserApp->SetEventApp(nullptr);
+			m_pDreamUserApp->SetHasOpenApp(false);
 		}
 	}
 

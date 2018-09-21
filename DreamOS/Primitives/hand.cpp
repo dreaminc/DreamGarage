@@ -100,7 +100,7 @@ RESULT hand::LoadHandModel() {
 	std::wstring wstrAssetPath;
 
 	// don't create hands twice
-	CBR(m_pModel, R_SKIPPED);
+	CBR(m_pModel == nullptr, R_SKIPPED);
 
 #ifndef _DEBUG
 
