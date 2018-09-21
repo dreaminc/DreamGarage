@@ -263,7 +263,7 @@ RESULT DreamOS::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	CR(OnDreamPeerConnectionClosed(pDreamPeerApp));
 
 	// Delete the dream peer
-//	CR(RemovePeer(pDreamPeerApp));
+	CR(RemovePeer(pDreamPeerApp));
 
 Error:
 	return r;
