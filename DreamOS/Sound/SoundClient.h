@@ -92,6 +92,7 @@ public:
 	virtual RESULT PlaySoundFile(SoundFile *pSoundFile);
 
 	virtual RESULT PushAudioPacket(const AudioPacket &pendingAudioPacket);
+	virtual RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel);
 
 	virtual std::wstring GetDeviceIDFromDeviceID(std::wstring wstrDeviceOutGUID) { return L"default"; }
 

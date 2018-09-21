@@ -71,6 +71,7 @@ public:
 		command_line->AppendSwitchWithValue(L"disable-features", L"TouchpadAndWheelScrollLatching");
 
 		command_line->AppendSwitch(L"mute-audio");
+		command_line->AppendSwitch(L"enable-widevine-cdm");
 
 		return;
 	}

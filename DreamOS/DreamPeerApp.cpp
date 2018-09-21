@@ -541,7 +541,10 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 	CN(m_pUserModel);
 	CR(m_pUserModel->SetVisible(fVisible));
-	CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
+	
+	if (m_pUserModel->GetMouth() != nullptr) {
+		CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
+	}
 	
 	if (m_pUIObjectComposite != nullptr) {
 		m_pUIObjectComposite->SetVisible(fVisible, false);
@@ -620,6 +623,8 @@ Error:
 RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
+	/*
+	// Audio is now being played by the flat mono channels up in DreamGarage
 	int16_t *pAudioDataBuffer = (int16_t*)(pAudioDataMessage->GetAudioMessageBuffer());
 	CN(pAudioDataBuffer);
 
@@ -640,6 +645,7 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 			CR(m_pSpatialSoundObject->PushMonoAudioBuffer((int)numFrames, pInt16Soundbuffer));
 		}
 	}
+	*/
 
 	// Mouth Position
 	//*
@@ -648,17 +654,16 @@ RESULT DreamPeerApp::HandleUserAudioDataMessage(AudioDataMessage *pAudioDataMess
 		CN(pAudioBuffer);
 
 		size_t numSamples = pAudioDataMessage->GetNumChannels() * pAudioDataMessage->GetNumFrames();
-		float averageAccumulator = 0.0f;
+		long averageAccumulator = 0.0f;
 
 		for (int i = 0; i < numSamples; ++i) {
-			//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
 			int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
-			float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+			//float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
 
-			averageAccumulator += std::abs(scaledValue);
+			averageAccumulator += std::abs(value);
 		}
 
-		float mouthScale = averageAccumulator / numSamples;
+		float mouthScale = ((float)((float)averageAccumulator / (float)numSamples)) / ((float)(std::numeric_limits<int16_t>::max()));
 		mouthScale *= 10.0f;
 
 		util::Clamp<float>(mouthScale, 0.0f, 1.0f);

@@ -813,11 +813,11 @@ RESULT DreamBrowser::AudioProcess() {
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
 
+		int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+
 		//if (m_pRenderSoundBuffer != nullptr ) {
 		//if (m_pRenderSoundBuffer != nullptr && diffVal > 9) {
-		if (m_pRenderSoundBuffer) {
-			
-			int audioBufferSampleLength10ms = m_pRenderSoundBuffer->GetSamplingRate() / 100;
+		if (m_pRenderSoundBuffer != nullptr && m_pRenderSoundBuffer->NumPendingFrames() >= audioBufferSampleLength10ms) {
 
 			m_pRenderSoundBuffer->LockBuffer();
 
@@ -847,7 +847,7 @@ RESULT DreamBrowser::AudioProcess() {
 		}
 
 		// Sleep the thread for 10 ms
-		Sleep(10);
+		Sleep(1);
 		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
 	}
@@ -863,17 +863,23 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
 	// TODO: Either put this back in or move it to a different layer
-	//if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
 
-	if (m_pRenderSoundBuffer != nullptr) {
-		CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+		if (m_pRenderSoundBuffer != nullptr) {
+
+			m_pRenderSoundBuffer->LockBuffer();
+
+			{
+				CR(m_pRenderSoundBuffer->PushAudioPacket(pendingAudioPacket, true));
+			}
+
+			m_pRenderSoundBuffer->UnlockBuffer();
+		}
 	}
 
-	/*
-	if (m_fStreaming) {
-		CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
-	}
-	//*/
+	//if (m_fStreaming) {
+	//	CR(GetDOS()->GetCloudController()->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
+	//}
 
 Error:
 	return r;

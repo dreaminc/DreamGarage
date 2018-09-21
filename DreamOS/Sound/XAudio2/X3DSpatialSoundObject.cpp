@@ -156,6 +156,7 @@ RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *
 	m_fLoop = false;
 
 	float *pFloatAudioBuffer = nullptr;
+	float runTimeAverage = 0.0f;
 
 	CN(pSoundBuffer);
 
@@ -165,7 +166,10 @@ RESULT X3DSpatialSoundObject::PushMonoAudioBuffer(int numFrames, const int16_t *
 	// Convert to float
 	for (int i = 0; i < numFrames; i++) {
 		pFloatAudioBuffer[i] = ((float)pSoundBuffer[i]) / std::numeric_limits<int16_t>::max();
+		runTimeAverage += std::abs(pFloatAudioBuffer[i]);
 	}
+
+	runTimeAverage /= numFrames;
 
 	// TODO: Might need to add a mechanism to flush the queued buffers if we're too delayed
 	// likely should do this where we are detecting delay from the network or source

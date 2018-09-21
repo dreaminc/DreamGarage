@@ -169,12 +169,16 @@ Error:
 }
 
 RESULT user::SetMouthPosition(point ptPosition) {
-	m_pMouthComposite->SetPosition(ptPosition);
+	if (m_pMouthComposite != nullptr)
+		m_pMouthComposite->SetPosition(ptPosition);
+
 	return R_PASS;
 }
 
 RESULT user::SetMouthOrientation(quaternion qOrientation) {
-	m_pMouthComposite->SetOrientation(qOrientation);
+	if(m_pMouthComposite != nullptr)
+		m_pMouthComposite->SetOrientation(qOrientation);
+
 	return R_PASS;
 }
 
