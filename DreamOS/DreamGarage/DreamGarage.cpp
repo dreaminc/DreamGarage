@@ -609,7 +609,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -638,7 +638,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-//#endif
+#endif
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
@@ -1378,18 +1378,13 @@ RESULT DreamGarage::OnLogout() {
 	RESULT r = R_PASS;
 
 	UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	//PeerConnectionController *pUserController = GetPeerConn
 
 	// Show login form, given this is not the first launch.
 	std::string strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
 
 	CNM(pUserController, "User controller was nullptr");
 
-	// disabled for testing
-	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
-
-	// Don't clear last login on logout
-	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
+	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
 
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));

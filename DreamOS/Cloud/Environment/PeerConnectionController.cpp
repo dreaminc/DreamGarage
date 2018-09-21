@@ -633,7 +633,7 @@ RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, We
 	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
-	//CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	switch (webRTCIceConnectionState) {
 		case WebRTCIceConnection::state::CONNECTED: {
@@ -725,7 +725,7 @@ RESULT PeerConnectionController::OnAudioData(const std::string &strAudioTrackLab
 	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
-	CNRM(pPeerConnection, R_SKIPPED, "Peer connection %d not found", peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		CR(m_pPeerConnectionControllerObserver->OnAudioData(strAudioTrackLabel, pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
