@@ -88,7 +88,7 @@ public:
 
 	// Poll for the current frame of the browser.
 	// This function can be called by any thread.
-	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
+	virtual RESULT PollFrame() = 0;
 
 	virtual RESULT CloseBrowser() = 0;
 

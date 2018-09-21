@@ -58,7 +58,7 @@ public:
 	~CEFBrowserController();
 
 	// WebBrowserController
-	RESULT PollFrame();
+	virtual RESULT PollFrame() override;
 	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;		// TODO: This should be reviewed 
 	virtual RESULT PollPendingAudioPackets(int &numAudioPacketsProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;

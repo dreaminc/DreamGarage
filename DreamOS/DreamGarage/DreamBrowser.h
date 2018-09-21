@@ -187,6 +187,7 @@ public:
 	RESULT SetCurrentAssetID(long assetID);
 
 	virtual RESULT CloseSource() override;
+	virtual RESULT SendFirstFrame() override;
 
 	RESULT PendUpdateObjectTextures();
 	bool ShouldUpdateObjectTextures();
@@ -247,6 +248,8 @@ private:
 	bool m_fShowControlView = false;
 
 	bool m_fShouldBeginStream = false;
+	bool m_fSendFrame = false;
+	int m_sentFrames = 0;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset;
 

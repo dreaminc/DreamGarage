@@ -27,6 +27,7 @@ public:
 	virtual RESULT SetPath(std::string strPath) = 0;
 	virtual long GetCurrentAssetID() = 0;
 
+	virtual RESULT SendFirstFrame() = 0;
 	virtual RESULT CloseSource() = 0;
 	
 	virtual int GetWidth() = 0;

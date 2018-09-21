@@ -871,6 +871,15 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 	return r;
 }
 
+RESULT DreamUserControlArea::StartSharing() {
+	RESULT r = R_PASS;
+
+	CR(m_pActiveSource->SendFirstFrame());
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::ShutdownSource() {
 	RESULT r = R_PASS;
 

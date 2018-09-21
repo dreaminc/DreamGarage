@@ -612,6 +612,17 @@ RESULT DreamBrowser::Update(void *pContext) {
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
 	
+	// Really strange, we need to send 4 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
+	if (m_fSendFrame && m_sentFrames < 4) {
+		DOSLOG(INFO, "POLL FRAME");
+		CR(m_pWebBrowserController->PollFrame());
+		m_sentFrames++;
+	}
+	if (m_fSendFrame && m_sentFrames == 4) {	// reset
+		m_fSendFrame = false;
+		m_sentFrames = 0;
+	}
+
 	if (m_fScroll) {
 		CR(m_pWebBrowserController->SendMouseWheel(m_mouseEvent, (int)m_pxXScroll, (int)m_pxYScroll));
 		m_fScroll = false;
@@ -663,6 +674,16 @@ RESULT DreamBrowser::CloseSource() {
 	CR(m_pWebBrowserController->CloseBrowser());
 	CR(m_pWebBrowserManager->RemoveBrowser(m_pWebBrowserController));
 	
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SendFirstFrame() {
+	RESULT r = R_PASS;
+	
+	// This'll send an OnPaint which will refresh the frame and broadcast it
+	m_fSendFrame = true;
+
 Error:
 	return r;
 }
@@ -746,12 +767,12 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	}
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-
+	DOSLOG(INFO, "Updated browser texture");
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
 	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	
+
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
 Error:
