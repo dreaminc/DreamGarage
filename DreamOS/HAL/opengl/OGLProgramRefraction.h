@@ -59,6 +59,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformReflectionMatrix = nullptr;
 
 	OGLUniformVector *m_pUniformClippingPlane = nullptr;
+	OGLUniformFloat *m_pUniformClippingOffset = nullptr;
 
 	OGLUniformBool *m_pUniformHasTextureBump = nullptr;
 	OGLUniformSampler2D *m_pUniformTextureBump = nullptr;

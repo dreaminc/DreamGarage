@@ -200,8 +200,10 @@ void main(void) {
 	vec2 vTextureRefraction = vec2(0.5f, 0.5f) + 0.5f * vDeviceRefraction;
 
 	// Displace Normals for refraction and reflection 
-	vTextureRefraction += g_normalDisplacementFactor * TBNNormal.xy;
-	vTextureReflection += g_normalDisplacementFactor * TBNNormal.xy;
+	// Reduced the displacement for refraction by 50% to reduce refraction artifacts
+	// until we have a better solution
+	vTextureRefraction += 0.5f * g_normalDisplacementFactor * TBNNormal.xy;
+	vTextureReflection += 0.5f * g_normalDisplacementFactor * TBNNormal.xy;
 
 	vec4 colorDiffuse = material.m_colorDiffuse; 
 	//vec4 colorDiffuse = vec4(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f); 

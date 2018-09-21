@@ -40,7 +40,8 @@ RESULT OGLProgramReflection::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingPlane), std::string("u_vec4ClippingPlane")));
-	
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingOffset), std::string("u_clippingOffset")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasBumpTexture")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
@@ -195,6 +196,9 @@ RESULT OGLProgramReflection::ProcessNode(long frameID) {
 	//glEnable(GL_BLEND);
 	
 	//glFrontFace(GL_CW);
+
+	if (m_pUniformClippingOffset != nullptr)
+		m_pUniformClippingOffset->SetUniform(-0.2f);
 
 	SetLights(pLights);
 
