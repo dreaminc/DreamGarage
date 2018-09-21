@@ -767,7 +767,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	}
 
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-	DOSLOG(INFO, "Updated browser texture");
+	
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
