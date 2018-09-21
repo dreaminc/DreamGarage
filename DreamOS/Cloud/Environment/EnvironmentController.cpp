@@ -891,6 +891,18 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
+		else if (strType == "request") {
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod ,jsonPayload);
+			if (strMethod == "disconnect") {
+				auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+				pUserController->Logout();
+				//DisconnectFromEnvironmentSocket();
+				// TODO: Handle error 
+			}
+		}
+		else {
+			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
+		}
 
 	}
 	else {
