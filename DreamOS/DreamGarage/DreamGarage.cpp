@@ -463,7 +463,12 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
 			//pDreamPeer->GetUserModel()->GetMouth()->SetVisible(false);
-			userModelPair.first->GetUserLabelComposite()->SetVisible(false);
+			/*
+			if (userModelPair.first != nullptr) {
+				auto pLabelComposite = userModelPair.first->GetUserLabelComposite();
+				if (userModelPair.first->GetUserLabelComposite() != n->SetVisible(false);
+			}
+			//*/
 			//userModelPair.first = nullptr;
 			userModelPair.second->SetVisible(false);
 			userModelPair.second->GetMouth()->SetVisible(false);
