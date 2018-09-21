@@ -182,6 +182,7 @@ RESULT UserController::Logout() {
 	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist.");
 	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
 	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+
 	CR(SetIsLoggedIn(false));
 
 Error:

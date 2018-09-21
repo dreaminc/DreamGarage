@@ -479,7 +479,13 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
 			//pDreamPeer->GetUserModel()->GetMouth()->SetVisible(false);
-			userModelPair.first = nullptr;
+			/*
+			if (userModelPair.first != nullptr) {
+				auto pLabelComposite = userModelPair.first->GetUserLabelComposite();
+				if (userModelPair.first->GetUserLabelComposite() != n->SetVisible(false);
+			}
+			//*/
+			//userModelPair.first = nullptr;
 			userModelPair.second->SetVisible(false);
 			userModelPair.second->GetMouth()->SetVisible(false);
 			return R_PASS;
@@ -487,6 +493,11 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	}
 
 	return R_NOT_FOUND;
+}
+
+RESULT DreamGarage::PendClearPeers() {
+	m_fClearPeers = true;
+	return R_PASS;
 }
 
 user* DreamGarage::FindUserModelInPool(DreamPeerApp *pDreamPeer) {
@@ -926,6 +937,11 @@ RESULT DreamGarage::Update(void) {
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
 		CR(CheckDreamPeerAppStates());
 		g_lastPeerStateCheckTime = timeNow;
+	}
+
+	if (m_fClearPeers) {
+		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
+		//CR(ClearPeers());
 	}
 
 Error:
@@ -1384,18 +1400,14 @@ RESULT DreamGarage::OnLogout() {
 
 	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
 
-	// Don't clear last login on logout
-	//CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_LAST_LOGIN), "clearing last login failed");
-
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
-	CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 
-	// TODO: clear out DreamPeerApp and user assets
+//	CR(PendClearPeers());
 
 	m_fSeated = false;
 

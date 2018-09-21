@@ -183,6 +183,9 @@ RESULT EnvironmentController::DisconnectFromEnvironmentSocket() {
 	CR(m_pEnvironmentWebsocket->Stop());
 	m_pEnvironmentWebsocket = nullptr;
 
+	// should this be here?
+	CR(m_pPeerConnectionController->CloseAllPeerConnections());
+
 Error:
 	return r;
 }
