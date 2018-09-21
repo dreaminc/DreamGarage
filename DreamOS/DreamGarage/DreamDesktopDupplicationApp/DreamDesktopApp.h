@@ -67,6 +67,7 @@ public:
 	virtual std::string GetContentType() override;
 
 	virtual RESULT CloseSource() override;
+	virtual RESULT SendFirstFrame() override;
 
 	// InteractionObjectEvent
 	//virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

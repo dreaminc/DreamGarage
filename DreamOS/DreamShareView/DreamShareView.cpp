@@ -166,12 +166,7 @@ RESULT DreamShareView::ShowCastingTexture() {
 RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) {
 	RESULT r = R_PASS;
 
-	//if (pNewCastTexture == nullptr) {
-	//	CR(ShowLoadingTexture());
-	//}
-	//else { // if (!m_fReceivingStream) {
 	m_pCastTexture = pNewCastTexture;
-	//}
 
 //Error:
 	return r;
@@ -326,10 +321,6 @@ RESULT DreamShareView::BeginStream() {
 
 	//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
 	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
-	
-	// This is probably redundant!!!
-	//CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
-
 	SetStreamingState(true);
 
 Error:
@@ -495,10 +486,8 @@ RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	RESULT r = R_PASS;
 
 	int castBufferSize = m_castpxWidth * m_castpxHeight * 4;
-
 	CBM(m_pendingFrame.fPending, "No frame pending");
 	CNM(m_pendingFrame.pDataBuffer, "No data buffer");
-
 	//DEBUG_LINEOUT("inframe %d x %d", m_pendingFrame.pxWidth, m_pendingFrame.pxHeight);
 
 	// Update texture dimensions if needed

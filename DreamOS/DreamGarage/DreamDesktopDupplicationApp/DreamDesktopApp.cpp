@@ -503,6 +503,10 @@ Error:
 	return r;
 }
 
+RESULT DreamDesktopApp::SendFirstFrame() {
+	return R_NOT_IMPLEMENTED;
+}
+
 bool DreamDesktopApp::IsVisible() {
 	return m_pDesktopQuad->IsVisible();
 }

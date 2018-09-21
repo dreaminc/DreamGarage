@@ -153,6 +153,8 @@ public:
 	RESULT CloseActiveAsset();
 	RESULT OnReceiveAsset();
 
+	RESULT StartSharing();
+
 // Animations
 public:
 	float GetAnimationDuration();

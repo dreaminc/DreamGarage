@@ -87,7 +87,7 @@ RESULT DreamControlBar::SetTitleText(const std::string& strTitle) {
 // ControlBarObserver
 RESULT DreamControlBar::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::BACK));
 Error:
 	return R_PASS;
@@ -95,7 +95,7 @@ Error:
 
 RESULT DreamControlBar::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::FORWARD));
 Error:
 	return R_PASS;
@@ -103,7 +103,7 @@ Error:
 
 RESULT DreamControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_fIsMinimized) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MAXIMIZE));
@@ -121,7 +121,7 @@ Error:
 
 RESULT DreamControlBar::HandleOpenPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::OPEN));
 	
 	// This call triggers a move to menu, hiding the control bar, so the button needs to be forcefully released
@@ -134,7 +134,7 @@ Error:
 
 RESULT DreamControlBar::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::CLOSE));
 Error:
 	return R_PASS;
@@ -142,7 +142,7 @@ Error:
 
 RESULT DreamControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_fIsSharing) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::STOP));
@@ -161,7 +161,7 @@ Error:
 
 RESULT DreamControlBar::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::URL));
 Error:
 	return R_PASS;
@@ -169,7 +169,7 @@ Error:
 
 RESULT DreamControlBar::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CB(m_pParentApp->CanPressButton(pButtonContext));
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::KEYBOARD));
 Error:
 	return R_PASS;
