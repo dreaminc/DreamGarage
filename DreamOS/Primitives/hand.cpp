@@ -96,10 +96,14 @@ RESULT hand::LoadHandModel() {
 	float scaleModel = 0.01f;
 	color modelColor;
 
-#ifndef _DEBUG
-
 	PathManager *pPathManager = PathManager::instance();
 	std::wstring wstrAssetPath;
+
+	// don't create hands twice
+	CBR(m_pModel, R_SKIPPED);
+
+#ifndef _DEBUG
+
 	pPathManager->GetValuePath(PATH_ASSET, wstrAssetPath);
 
 	if (m_handType == HAND_TYPE::HAND_LEFT) {

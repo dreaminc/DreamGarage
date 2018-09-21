@@ -472,6 +472,14 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CR(m_pKeyboardHandle->Show());
 					CR(m_pKeyboardHandle->ShowTitleView());
 				}
+
+				else if (strScope == "TeamScope.Switch") {
+					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+					CR(pUserController->SwitchTeam(strPath));
+					m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
+				}
+
 				else if (strScope == "SystemScope.SignOut") {
 					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 

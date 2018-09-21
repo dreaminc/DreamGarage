@@ -189,6 +189,24 @@ Error:
 	return r;
 }
 
+RESULT UserController::SwitchTeam(std::string strTeamID) {
+	RESULT r = R_PASS;
+
+	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist.");
+	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
+	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+
+	m_loginState.fHasEnvironmentId = false;
+	m_fSwitchingTeams = true;
+
+	// get new environmentID
+	CR(GetTeam(m_strAccessToken,strTeamID));;
+
+Error:
+	return r;
+}
+
 long UserController::GetUserDefaultEnvironmentID() {
 	return m_defaultEnvironmentId;
 //	return m_user.GetDefaultEnvironmentID();
@@ -653,12 +671,12 @@ Error:
 	return;
 }
 
-RESULT UserController::GetTeam(std::string& strAccessToken) {
+RESULT UserController::GetTeam(std::string& strAccessToken, std::string strTeamID) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
 
-	std::string strURI = GetMethodURI(UserMethod::TEAMS);
+	std::string strURI = GetMethodURI(UserMethod::TEAMS) + strTeamID;
 
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
@@ -864,12 +882,16 @@ RESULT UserController::UpdateLoginState() {
 			m_user.SetDefaultEnvironmentID(m_defaultEnvironmentId);
 			m_user.SetToken(m_strAccessToken);
 
-			if (!IsLoggedIn()) {
+			auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+			CN(pEnvironmentController);
 
-				auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-				CN(pEnvironmentController);
+			if (!IsLoggedIn()) {
 				CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
 				SetIsLoggedIn(true);
+			}
+			else if (m_fSwitchingTeams) {
+				CR(pEnvironmentController->ConnectToEnvironmentSocket(m_user, m_defaultEnvironmentId));
+				m_fSwitchingTeams = false;
 			}
 		}
 	}
