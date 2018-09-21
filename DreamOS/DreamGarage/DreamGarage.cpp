@@ -85,14 +85,14 @@ RESULT DreamGarage::ConfigureSandbox() {
 	//sandboxconfig.f3rdPersonCamera = true;
 	//sandboxconfig.fUseGamepad = true;
 
-//#ifdef _DEBUG
-//	sandboxconfig.fUseHMD = true;
-//	sandboxconfig.fMouseLook = true;
-//	sandboxconfig.fUseGamepad = true;
-//	sandboxconfig.fInitSound = true;
-//	sandboxconfig.fHMDMirror = false;
-//	sandboxconfig.f3rdPersonCamera = true;
-//#endif
+#ifdef _DEBUG
+	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fMouseLook = true;
+	sandboxconfig.fUseGamepad = true;
+	sandboxconfig.fInitSound = true;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
+#endif
 
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -664,7 +664,6 @@ RESULT DreamGarage::DidFinishLoading() {
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
-		CR(m_pUserController->RequestDreamVersion());
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
 		//*
