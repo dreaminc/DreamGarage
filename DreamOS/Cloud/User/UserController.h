@@ -111,6 +111,9 @@ public:
 	RESULT Logout();
 	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
+	RESULT SwitchTeam();
+	RESULT RequestSwitchTeam(std::string strTeamID);
+
 	long GetUserDefaultEnvironmentID();
 	RESULT SetUserDefaultEnvironmentID(long environmentId);
 	RESULT SetAccessToken(std::string strAccessToken);
@@ -134,7 +137,7 @@ public:
 	RESULT SetSettings(std::string& strAccessToken, float height, float depth, float scale);
 	void OnSetApiSettings(std::string&& strResponse);
 
-	RESULT GetTeam(std::string& strAccessToken);
+	RESULT GetTeam(std::string& strAccessToken, std::string strTeamID = "");
 	void OnGetTeam(std::string&& strResponse);
 
 	RESULT RequestUserProfile(std::string& strAccessToken);
@@ -166,6 +169,7 @@ public:
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+		virtual RESULT OnSwitchTeams() = 0;
 
 		// api methods
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
@@ -178,6 +182,10 @@ public:
 
 private:
 	bool m_fLoggedIn = false;
+
+	bool m_fSwitchingTeams = false;
+	std::string m_strPendingTeamID = "";
+
 	std::string	m_strToken;
 	std::string m_strPeerScreenName;
 	long m_avatarModelId = -1;

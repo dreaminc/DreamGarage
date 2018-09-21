@@ -117,6 +117,7 @@ public:
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
+	virtual RESULT OnSwitchTeams() override;
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;

@@ -513,6 +513,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnSwitchTeams() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnSwitchTeams());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) {
 	RESULT r = R_PASS;
 
