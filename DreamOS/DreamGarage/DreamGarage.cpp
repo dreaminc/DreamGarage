@@ -1061,8 +1061,13 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 		avatarID = m_pUserController->GetUser().GetAvatarID();
 
 		if (GetHMD() != nullptr) {
-			GetHMD()->GetHand(HAND_TYPE::HAND_LEFT)->PendCreateHandModel(avatarID);
-			GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT)->PendCreateHandModel(avatarID);
+			auto pLeftHand = GetHMD()->GetHand(HAND_TYPE::HAND_LEFT);
+			pLeftHand->PendCreateHandModel(avatarID);
+			pLeftHand->SetModelState(hand::ModelState::HAND);
+
+			auto pRightHand = GetHMD()->GetHand(HAND_TYPE::HAND_RIGHT);
+			pRightHand->PendCreateHandModel(avatarID);
+			pRightHand->SetModelState(hand::ModelState::HAND);
 		}
 	}
 
@@ -1414,6 +1419,34 @@ RESULT DreamGarage::OnLogout() {
 //	CR(PendClearPeers());
 
 	m_fSeated = false;
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnSwitchTeams() {
+	RESULT r = R_PASS;
+
+	m_fSeated = false;
+
+	auto fnOnFadeOutCallback = [&](void *pContext) {
+
+		UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		CNM(pUserController, "User controller was nullptr");
+
+		CRM(pUserController->SwitchTeam(), "switch team failed");
+
+	Error:
+		return r;
+	};
+
+	CN(m_pDreamEnvironmentApp);
+	CR(m_pDreamEnvironmentApp->FadeOut(fnOnFadeOutCallback));
+
+	// TODO: is this necessary
+	// TODO: stop streaming?
+	//CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
+
 
 Error:
 	return r;

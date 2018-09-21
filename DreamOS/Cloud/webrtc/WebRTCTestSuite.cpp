@@ -529,6 +529,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnSwitchTeams() override {
+			DEBUG_LINEOUT("OnSwitchTeams");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
 			DEBUG_LINEOUT("OnFormURL");
 

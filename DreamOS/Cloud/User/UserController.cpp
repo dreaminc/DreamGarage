@@ -189,7 +189,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::SwitchTeam(std::string strTeamID) {
+RESULT UserController::SwitchTeam() {
 	RESULT r = R_PASS;
 
 	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
@@ -201,7 +201,21 @@ RESULT UserController::SwitchTeam(std::string strTeamID) {
 	m_fSwitchingTeams = true;
 
 	// get new environmentID
-	CR(GetTeam(m_strAccessToken,strTeamID));;
+	CRM(GetTeam(m_strAccessToken, m_strPendingTeamID), "Failed to switch to new team");
+
+	m_strPendingTeamID = "";
+
+Error:
+	return r;
+}
+
+RESULT UserController::RequestSwitchTeam(std::string strTeamID) {
+
+	RESULT r = R_PASS;
+
+	m_strPendingTeamID = strTeamID;
+
+	CR(m_pUserControllerObserver->OnSwitchTeams());
 
 Error:
 	return r;

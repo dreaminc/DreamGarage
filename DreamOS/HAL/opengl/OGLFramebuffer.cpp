@@ -334,7 +334,7 @@ RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth, bool fBind)
 
 	glViewport(0, 0, m_width, m_height);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	GLbitfield glClearBitfield = ((fColor) ? GL_COLOR_BUFFER_BIT : 0) + ((fDepth) ? GL_DEPTH_BUFFER_BIT : 0);

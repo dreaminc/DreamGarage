@@ -476,7 +476,8 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 				else if (strScope == "TeamScope.Switch") {
 					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
-					CR(pUserController->SwitchTeam(strPath));
+					//CR(pUserController->SwitchTeam(strPath));
+					CR(pUserController->RequestSwitchTeam(strPath));
 					m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 				}
 
