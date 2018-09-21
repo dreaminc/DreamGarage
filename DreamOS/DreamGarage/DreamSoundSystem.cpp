@@ -116,7 +116,7 @@ RESULT DreamSoundSystem::InitializeModule(void *pContext) {
 
 		CR(ClearSpatialSoundObjects());
 
-		//*
+		/*
 		{
 			// This is BULL
 			m_pTestSpatialSoundObject = AddSpatialSoundObject(point(0.0f, 0.0f, 2.0f), vector(), vector());
@@ -240,6 +240,29 @@ Error:
 	}
 
 	return nullptr;
+}
+
+RESULT DreamSoundSystem::PlayAudioPacket(const AudioPacket &pendingAudioPacket) {
+	RESULT r = R_PASS;
+
+	CN(m_pXAudio2AudioClient);
+
+	CRM(m_pXAudio2AudioClient->PushAudioPacket(pendingAudioPacket), "Failed to play audio packet");
+
+Error:
+	return r;
+}
+
+RESULT DreamSoundSystem::PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel) {
+	RESULT r = R_PASS;
+
+	CN(m_pXAudio2AudioClient);
+
+	// TODO: Would be way cooler to allow DSS to create it's own channels, own them, and pass audio to them
+	CRM(m_pXAudio2AudioClient->PlayAudioPacketSigned16Bit(pendingAudioPacket, strAudioTrackLabel, channel), "Failed to play audio packet");
+
+Error:
+	return r;
 }
 
 RESULT DreamSoundSystem::PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile) {

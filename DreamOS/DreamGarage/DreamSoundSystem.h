@@ -54,6 +54,8 @@ public:
 	std::shared_ptr<SpatialSoundObject> AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection);
 	std::shared_ptr<SoundFile> LoadSoundFile(const std::wstring &wstrFilename, SoundFile::type soundFileType);
 	RESULT PlaySoundFile(std::shared_ptr<SoundFile> pSoundFile);
+	RESULT PlayAudioPacket(const AudioPacket &pendingAudioPacket);
+	RESULT PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel);
 
 	float GetRunTimeCaptureAverage();
 

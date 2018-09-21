@@ -14,6 +14,8 @@
 class quad;
 class texture;
 class AudioPacket;
+class SpatialSoundObject;
+class AudioDataMessage;
 
 class DreamShareView :
 	public DreamApp<DreamShareView>,
@@ -64,6 +66,9 @@ public:
 	RESULT SetupPendingVideoFrame(uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	RESULT UpdateFromPendingVideoFrame();
 
+	// Audio
+	RESULT HandleChromeAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
+
 	// Environment
 	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
 
@@ -112,6 +117,8 @@ private:
 	DreamShareViewMessage::type m_currentAckType;
 
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
+
+	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 
 private:
 //	std::shared_ptr<UIView> 

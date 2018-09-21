@@ -259,6 +259,10 @@ RESULT SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket) {
 	return R_NOT_HANDLED;
 }
 
+RESULT SoundClient::PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel) {
+	return R_NOT_HANDLED;
+}
+
 // Spatial Sound Objects
 std::shared_ptr<SpatialSoundObject> SoundClient::AddSpatialSoundObject(point ptPosition, vector vEmitterDirection, vector vListenerDirection) {
 	RESULT r = R_PASS;

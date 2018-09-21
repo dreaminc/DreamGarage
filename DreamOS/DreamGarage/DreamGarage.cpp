@@ -48,6 +48,8 @@ light *g_pLight = nullptr;
 #include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
 
+#include "Sound/AudioPacket.h"
+
 // TODO: Should this go into the DreamOS side?
 /*
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
@@ -662,10 +664,9 @@ RESULT DreamGarage::DidFinishLoading() {
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
-
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
-//*
+		//*
 #else
 		CR(AuthenticateFromStoredCredentials());
 #endif
@@ -1217,11 +1218,32 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 	AudioDataMessage audioDataMessage(senderUserID, recieverUserID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
 
 	if (strAudioTrackLabel == kUserAudioLabel) {
+		int channel = (int)pPeerConnection->GetPeerSeatPosition();
+		channel += 1;
+		
+		//
+		//// TODO: Move this all into DreamSoundSystem or lower
+		//int16_t *pInt16Soundbuffer = new int16_t[frames];
+		//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+		//
+		
+		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
+		
+		// Sets the mouth position
 		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
 	}
 	else if (strAudioTrackLabel == kChromeAudioLabel) {
-		// TODO: 
-		//HANDLE that shit
+
+		int channel = 0;
+
+		//CR(m_pDreamShareView->HandleChromeAudioDataMessage(pPeerConnection, &audioDataMessage));
+		
+		//int16_t *pInt16Soundbuffer = new int16_t[frames];
+		//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+		
+		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
 	}
 
 Error:

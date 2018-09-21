@@ -7,6 +7,8 @@
 #include "DreamControlView/DreamControlView.h"
 
 #include "Sound/AudioPacket.h"
+#include "DreamGarage/AudioDataMessage.h"
+#include "Sound/SpatialSoundObject.h"
 
 DreamShareView::DreamShareView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamShareView>(pDreamOS, pContext)
@@ -40,7 +42,7 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	float castHeight = std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 	vector vNormal = vector(0.0f, 0.0f, 1.0f).Normal();
 
-	point ptPosition = point(0.0f, castWidth*m_borderHeight / 2.0f -castWidth * m_bottomBarHeight / 2.0f, 0.0f);
+	point ptPosition = point(0.0f, castWidth * m_borderHeight / 2.0f -castWidth * m_bottomBarHeight / 2.0f, 0.0f);
 
 	m_pCastQuad = GetComposite()->AddQuad(castWidth, castHeight, 1, 1, nullptr, vNormal);
 	CN(m_pCastQuad);
@@ -72,6 +74,10 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 
 	GetComposite()->SetMaterialShininess(0.0f, true);
 	GetComposite()->SetMaterialSpecularColor(color(0.0f, 0.0f, 0.0f, 1.0f), true);
+
+	// Spatial Audio Object
+	m_pSpatialBrowserObject = GetDOS()->AddSpatialSoundObject(point(0.0f, 0.0f, 0.0f), vector(), vector());
+	CN(m_pSpatialBrowserObject);
 
 Error:
 	return r;
@@ -268,7 +274,7 @@ RESULT DreamShareView::StopSending() {
 
 	m_pDreamUserHandle->SendStopSharing();
 
-	//m_pCastTexture = m_pLoadingTexture;
+	m_pCastTexture = m_pLoadingTexture;
 	ShowLoadingTexture();
 	Hide();
 
@@ -385,15 +391,14 @@ Error:
 RESULT DreamShareView::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 
-	CBR(m_fStreaming, R_SKIPPED);
+	// TODO: this
+	//CBR(m_fStreaming, R_SKIPPED);
 
 	{
-
 		auto pCloudController = GetDOS()->GetCloudController();
 
 		CN(pCloudController);
 		CR(pCloudController->BroadcastAudioPacket(kChromeAudioLabel, pendingAudioPacket));
-
 	}
 
 Error:
@@ -459,6 +464,33 @@ Error:
 	return r;
 }
 
+RESULT DreamShareView::HandleChromeAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
+	RESULT r = R_PASS;
+
+	// TODO: Handle channels?
+	size_t numFrames = pAudioDataMessage->GetNumFrames();
+	size_t channels = pAudioDataMessage->GetNumChannels();
+
+	int16_t *pAudioDataBuffer = (int16_t*)(pAudioDataMessage->GetAudioMessageBuffer());
+	CN(pAudioDataBuffer);
+
+	// Play
+	if (m_pSpatialBrowserObject != nullptr) {
+
+		// Not sure if we need to allocate new memory here or not
+
+		int16_t *pInt16Soundbuffer = new int16_t[numFrames];
+		memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * numFrames);
+
+		if (pInt16Soundbuffer != nullptr) {
+			CR(m_pSpatialBrowserObject->PushMonoAudioBuffer((int)numFrames, pInt16Soundbuffer));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamShareView::UpdateFromPendingVideoFrame() {
 	RESULT r = R_PASS;
 
@@ -518,5 +550,10 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	GetComposite()->SetOrientation(qOrientation);
 	GetComposite()->SetScale(scale);
 
+	if (m_pSpatialBrowserObject != nullptr) {
+		m_pSpatialBrowserObject->SetPosition(ptPosition);
+	}
+
+Error:
 	return r;
 }

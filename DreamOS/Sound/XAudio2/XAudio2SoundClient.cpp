@@ -46,6 +46,12 @@ RESULT XAudio2SoundClient::AudioRenderProcess() {
 	CR((RESULT)m_pXAudio2SourceVoiceStereoFloat32->Start(0));
 	CR((RESULT)m_pXAudio2SourceVoiceStereoSignedInt16->Start(0));
 
+	for(int i = 0; i < m_numMonoChannels; i++) {
+		if (m_xaudio2MonoSignedInt16Sources[i] != nullptr) {
+			CR((RESULT)m_xaudio2MonoSignedInt16Sources[i]->Start(0));
+		}
+	}
+
 Error:
 
 	DEBUG_LINEOUT("XAudio2SoundClient: AudioRenderProcess End (expected)");
@@ -110,8 +116,6 @@ RESULT XAudio2SoundClient::Initialize() {
 	sourceFormat.wFormatTag = WAVE_FORMAT_PCM;
 	sourceFormat.wBitsPerSample = 16;
 	sourceFormat.nChannels = 2;
-	//sourceFormat.nSamplesPerSec = 44100;
-	//sourceFormat.nSamplesPerSec = 51200;
 	sourceFormat.nSamplesPerSec = 48000;
 	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
 	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
@@ -120,6 +124,26 @@ RESULT XAudio2SoundClient::Initialize() {
 	CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
 	CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
 	m_pXAudio2SourceVoiceStereoSignedInt16 = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
+	//*/
+
+	///*
+	// Mono channels
+	// Move this to member etc
+	// Spatial audio is more restrictive (mono)
+	//WAVEFORMATEX sourceFormat;
+	sourceFormat.wFormatTag = WAVE_FORMAT_PCM;
+	sourceFormat.wBitsPerSample = 16;
+	sourceFormat.nChannels = 1;
+	sourceFormat.nSamplesPerSec = 48000;
+	sourceFormat.nBlockAlign = (sourceFormat.wBitsPerSample >> 3) * sourceFormat.nChannels;
+	sourceFormat.nAvgBytesPerSec = sourceFormat.nBlockAlign * sourceFormat.nSamplesPerSec;
+	sourceFormat.cbSize = 0;
+
+	for (int i = 0; i < m_numMonoChannels; i++) {
+		CRM((RESULT)m_pXAudio2->CreateSourceVoice(&pXAudio2SourceVoice, (WAVEFORMATEX*)&sourceFormat), "Failed to create source voice");
+		CNM(pXAudio2SourceVoice, "Failed to allocate source voice");
+		m_xaudio2MonoSignedInt16Sources[i] = std::shared_ptr<IXAudio2SourceVoice>(pXAudio2SourceVoice);
+	}
 	//*/
 
 	// Spatial Audio
@@ -235,6 +259,49 @@ RESULT XAudio2SoundClient::PushAudioPacket(const AudioPacket &pendingAudioPacket
 		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
 
 		CRM((RESULT)m_pXAudio2SourceVoiceStereoSignedInt16->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
+
+		// Measure time diff
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		auto diffVal = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count();
+		lastUpdateTime = timeNow;
+	}
+
+Error:
+	return r;
+}
+
+RESULT XAudio2SoundClient::PlayAudioPacketSigned16Bit(const AudioPacket &pendingAudioPacket, std::string strAudioTrackLabel, int channel) {
+	RESULT r = R_PASS;
+
+	CN(m_xaudio2MonoSignedInt16Sources[channel]);
+
+	{
+		//size_t pAudioBuffer_n = pendingAudioPacket.GetByteSize();
+		//int16_t *pAudioBuffer = (int16_t*)pendingAudioPacket.GetDataBuffer();
+
+		uint8_t* pAudioBuffer = nullptr;
+		size_t pAudioBuffer_n = 0;
+
+		CR(pendingAudioPacket.GetDataBufferCopy(pAudioBuffer, pAudioBuffer_n));
+
+		XAUDIO2_BUFFER xAudio2SoundBuffer = { 0 };
+		BYTE *pByteAudioBuffer = reinterpret_cast<BYTE*>(pAudioBuffer);
+
+		CN(pByteAudioBuffer);
+
+		xAudio2SoundBuffer.AudioBytes = (UINT32)pAudioBuffer_n;  //size of the audio buffer in bytes
+		xAudio2SoundBuffer.pAudioData = pByteAudioBuffer;  //buffer containing audio data
+		xAudio2SoundBuffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
+
+														  //XAUDIO2_VOICE_STATE voiceState;
+														  //m_pXAudio2SourceVoiceStereoSignedInt16->GetState(&voiceState, NULL);
+
+														  //m_pXAudio2SourceVoiceStereoSignedInt16->FlushSourceBuffers();
+
+		DEBUG_LINEOUT("%d frames", pendingAudioPacket.GetNumFrames());
+
+		CRM((RESULT)m_xaudio2MonoSignedInt16Sources[channel]->SubmitSourceBuffer(&xAudio2SoundBuffer), "Failed to submit source buffer");
 
 		// Measure time diff
 		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
