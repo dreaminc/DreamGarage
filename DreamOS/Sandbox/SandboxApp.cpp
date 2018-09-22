@@ -538,24 +538,29 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));
+
+	// Disable these in production
+	CR(m_pCommandLineManager->DisableParameter("www.ip"));
+	CR(m_pCommandLineManager->DisableParameter("api.ip"));
+	CR(m_pCommandLineManager->DisableParameter("ws.ip"));
 #else
 	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	#ifdef USE_LOCALHOST
+		CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
+	#else
+		CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	#endif
 #endif
 
-#ifdef USE_LOCALHOST
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
-#endif
-
-	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
-
-	CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
-	CR(m_pCommandLineManager->RegisterParameter("password", "p", "Nightmare479!"));
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
-	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
-	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
+	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
+	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
+
+	//CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
+	//CR(m_pCommandLineManager->RegisterParameter("username", "u", "defaulttestuser@dreamos.com"));
+	//CR(m_pCommandLineManager->RegisterParameter("password", "p", "Nightmare479!"));
 
 	// This can attempt to connect to a given environment
 

@@ -33,8 +33,11 @@ public:
 
 		bool m_fValueSet;
 		std::string m_strParamValue;
+		bool m_fEnabled;
 	};
 
+	RESULT EnableParameter(std::string strParamName);
+	RESULT DisableParameter(std::string strParamName);
 	RESULT RegisterParameter(std::string strParamName, std::string strParamTag, std::string strDefaultValue);
 	RESULT SetParameterValue(std::string strParamName, std::string strParamValue);
 	std::string GetParameterValue(std::string strParamName);
