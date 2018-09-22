@@ -431,7 +431,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
 	// should check if website
 	for (auto &pSubMenuNode : m_pScrollView->GetScrollViewNodes()) {
-		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
+		if (pSelected->GetKey() == pSubMenuNode->GetKey()) {
 			const std::string& strScope = pSubMenuNode->GetScope();
 			const std::string& strPath = pSubMenuNode->GetPath();
 			const std::string& strTitle = pSubMenuNode->GetTitle();

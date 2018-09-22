@@ -256,6 +256,7 @@ private:
 	// CEF can call LoadRequest once a URL is loaded
 	bool m_fCanLoadRequest = false;
 	bool m_fUpdateObjectTextures = false;
+	bool m_fUpdateControlBarInfo = false;
 
 	long m_assetID = -1;
 

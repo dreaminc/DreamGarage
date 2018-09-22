@@ -175,6 +175,11 @@ const std::string& MenuNode::GetThumbnailURL() {
 	return m_strThumbnailURL;
 }
 
+std::string MenuNode::GetKey() {
+	m_strKey = m_strPath + m_strScope;
+	return m_strKey;
+}
+
 const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
 }

@@ -137,3 +137,12 @@ RESULT UIMenuItem::SetName(std::string strName) {
 	m_pLabel->SetText(strName);
 	return R_PASS;
 }
+
+std::string& UIMenuItem::GetKey() {
+	return m_strKey;
+}
+
+RESULT UIMenuItem::SetKey(std::string strKey) {
+	m_strKey = strKey;
+	return R_PASS;
+}

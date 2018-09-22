@@ -56,6 +56,7 @@ public:
 	const std::string& GetNextPageToken();
 	const std::string& GetIconURL();
 	const std::string& GetThumbnailURL();
+	std::string GetKey();
 	texture* GetThumbnailTexture();
 
 	std::shared_ptr<UIButton> GetAssociatedButton();
@@ -70,13 +71,14 @@ public:
 
 private:
 	MenuNode::type m_nodeType;
-	std::string m_strPath;
-	std::string m_strScope;
+	std::string m_strPath = "";
+	std::string m_strScope = "";
 	std::string m_strTitle;
 	std::string m_strMIMEType;
 	std::string m_strIconURL;
 	std::string m_strThumbnailURL;
 	std::string m_strNextPageToken;
+	std::string m_strKey = "";
 
 	texture* m_pThumbnailTexture = nullptr;
 	std::shared_ptr<UIButton> m_pUIButton = nullptr;
