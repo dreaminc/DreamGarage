@@ -312,7 +312,7 @@ RESULT DreamShareView::BeginStream() {
 	RESULT r = R_PASS;
 
 	m_pCastQuad->SetVisible(true);
-	m_pCastQuad->SetDiffuseTexture(m_pCastTexture);
+	m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
 	m_pCastBackgroundQuad->SetVisible(true);
 
 	if (m_fReceivingStream) {
