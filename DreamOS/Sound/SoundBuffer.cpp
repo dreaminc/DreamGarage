@@ -62,11 +62,54 @@ const char* SoundBuffer::TypeString(sound::type bufferType) {
 	return "invalid";
 }
 
+RESULT SoundBuffer::PushMonoAudioPacket(const AudioPacket &audioPacket, bool fClobber) {
+	RESULT r = R_PASS;
+
+	if (fClobber) {
+		LockBuffer();
+
+		{
+			ResetBuffer(0, 0);
+		}
+
+		UnlockBuffer();
+	}
+
+	// Just run mono to all of the channels 
+	for (int i = 0; i < m_channels; i++) {
+		switch (audioPacket.GetSoundType()) {
+			case sound::type::UNSIGNED_8_BIT: {
+				CR(PushDataToChannel(i, (uint8_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			} break;
+
+			case sound::type::SIGNED_16_BIT: {
+				CR(PushDataToChannel(i, (int16_t*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			} break;
+
+			case sound::type::FLOATING_POINT_32_BIT: {
+				CR(PushDataToChannel(i, (float*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			} break;
+
+			case sound::type::FLOATING_POINT_64_BIT: {
+				CR(PushDataToChannel(i, (double*)(audioPacket.GetDataBuffer()), audioPacket.GetNumFrames()));
+			} break;
+		}
+	}
+
+Error:
+	return r;
+}
+
 // The aptly named clobber param will clear the current contents of the buffer
 RESULT SoundBuffer::PushAudioPacket(const AudioPacket &audioPacket, bool fClobber) {
 	RESULT r = R_PASS;
 
-	CBM((audioPacket.GetNumChannels() == m_channels), "Channel mismatch");
+	if (audioPacket.GetNumChannels() == 1) {
+		return PushMonoAudioPacket(audioPacket, fClobber);
+	}
+
+	// TODO: handle mono to stereo
+	CBM((audioPacket.GetNumChannels() == m_channels), "channel mismatch");
 
 	if (fClobber) {
 		LockBuffer();

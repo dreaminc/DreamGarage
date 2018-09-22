@@ -320,10 +320,10 @@ public:
 
 	long GetPeerSeatPosition() {
 		if (m_userID == m_offerUserID) {
-			return m_offerPosition;
+			return m_answerPosition;
 		}
 		else if (m_userID == m_answerUserID) {
-			return m_answerPosition;
+			return m_offerPosition;
 		}
 
 		return -1;
