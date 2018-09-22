@@ -615,6 +615,7 @@ RESULT DreamOS::Start() {
 	CR(m_pSandbox->RunAppLoop());
 
 Error:
+	DreamLogger::instance()->Flush();
 	return r;
 }
 

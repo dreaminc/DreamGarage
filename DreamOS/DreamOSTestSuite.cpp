@@ -53,6 +53,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamLogger());
+
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestEnvironmentSeating());
@@ -70,8 +72,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamUIBar());
 
 	CR(AddTestCredentialStorage());
-
-	CR(AddTestDreamLogger());
 
 	CR(AddTestMeta());
 	
@@ -835,14 +835,19 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 		CN(m_pDreamOS);
 
-		CR(SetupPipeline());
+		CR(SetupPipeline("blinnphong"));
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		DOSLOG(INFO, "AddTestDreamLogger DOSLOG (EHM) Test");
-		DreamLogger::instance()->Log(DreamLogger::Level::INFO, "AddTestDreamLogger DreamLogger instance Test");
-		m_pDreamOS->Log(DreamLogger::Level::INFO, "AddTestDreamLogger log test via m_pDOS");
+		sphere *pSphere;
+		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+
+		DOSLOG(INFO, "AddTestDreamLogger DOSLOG (EHM) Test with %s string", "TESTING STRING");
+
+		DreamLogger::instance()->Log(DreamLogger::Level::INFO, "AddTestDreamLogger DreamLogger instance Test: %s", "TESTING STRING");
+
+		m_pDreamOS->Log(DreamLogger::Level::INFO, "AddTestDreamLogger log test via m_pDOS: %s", "TESTING STRING");
 
 	Error:
 		return R_PASS;
@@ -865,7 +870,7 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 // 			printf("*** %d called from %016I64X\n", i, (unsigned __int64)callers[
 
 		// We want to force a "crash here" so we can get the track in the log
-		CBM(0, "Crashing logging test to see what happens");
+		CBM(0, "Crashing logging test to see what happens: %s", "TESTING STRING");
 
 	Error:
 		return r;
