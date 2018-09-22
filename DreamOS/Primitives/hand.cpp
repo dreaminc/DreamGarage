@@ -99,8 +99,11 @@ RESULT hand::LoadHandModel() {
 	PathManager *pPathManager = PathManager::instance();
 	std::wstring wstrAssetPath;
 
-	// don't create hands twice
-	CBR(m_pModel == nullptr, R_SKIPPED);
+	// replace hands
+	if (m_pModel != nullptr) {
+		RemoveChild(m_pModel);
+		m_pModel = nullptr;
+	}
 
 #ifndef _DEBUG
 

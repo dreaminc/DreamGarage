@@ -304,6 +304,10 @@ RESULT DreamTabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pC
 	return R_PASS;
 }
 
+std::vector<std::shared_ptr<DreamContentSource>> DreamTabView::GetAllSources() {
+	return m_sources;
+}
+
 RESULT DreamTabView::FlagShutdownAllSources() {
 	RESULT r = R_PASS;
 

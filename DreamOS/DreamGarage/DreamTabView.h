@@ -64,6 +64,7 @@ public:
 
 	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
+	std::vector<std::shared_ptr<DreamContentSource>> GetAllSources();
 	// Called on logout, closes all tabs
 	RESULT FlagShutdownAllSources();
 	// Execute shutdown of sources during Update
