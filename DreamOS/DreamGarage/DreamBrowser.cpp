@@ -642,7 +642,7 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	int pxHeight = m_browserHeight;
 	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 
-	CN(pWebBrowserManager);
+	CNR(pWebBrowserManager, R_SKIPPED);
 	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
 	m_pWebBrowserManager = pWebBrowserManager;
 
@@ -674,6 +674,8 @@ RESULT DreamBrowser::SetCurrentAssetID(long assetID) {
 RESULT DreamBrowser::CloseSource() {
 	RESULT r = R_PASS;
 
+	CNR(m_pWebBrowserController, R_SKIPPED);
+	CNR(m_pWebBrowserManager, R_SKIPPED);
 	CR(m_pWebBrowserController->CloseBrowser());
 	CR(m_pWebBrowserManager->RemoveBrowser(m_pWebBrowserController));
 	

@@ -494,8 +494,12 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 			}
 			//*/
 			//userModelPair.first = nullptr;
-			userModelPair.second->SetVisible(false);
-			userModelPair.second->GetMouth()->SetVisible(false);
+			if (userModelPair.second != nullptr) {
+				userModelPair.second->SetVisible(false);
+				if (userModelPair.second->GetMouth() != nullptr) {
+					userModelPair.second->GetMouth()->SetVisible(false);
+				}
+			}
 			return R_PASS;
 		}
 	}
@@ -947,7 +951,7 @@ RESULT DreamGarage::Update(void) {
 	}
 
 	if (m_fClearHands) {
-		CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
+		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 		//CR(ClearPeers());
 	}
 

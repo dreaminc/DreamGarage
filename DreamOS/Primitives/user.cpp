@@ -169,17 +169,25 @@ Error:
 }
 
 RESULT user::SetMouthPosition(point ptPosition) {
-	if (m_pMouthComposite != nullptr)
-		m_pMouthComposite->SetPosition(ptPosition);
+	RESULT r = R_PASS;
 
-	return R_PASS;
+	CNR(m_pMouthComposite, R_SKIPPED)
+
+	m_pMouthComposite->SetPosition(ptPosition);
+
+Error:
+	return r;
 }
 
 RESULT user::SetMouthOrientation(quaternion qOrientation) {
-	if(m_pMouthComposite != nullptr)
-		m_pMouthComposite->SetOrientation(qOrientation);
+	RESULT r = R_PASS;
 
-	return R_PASS;
+	CNR(m_pMouthComposite, R_SKIPPED)
+
+	m_pMouthComposite->SetOrientation(qOrientation);
+
+Error:
+	return r;
 }
 
 RESULT user::UpdateMouthPose() {

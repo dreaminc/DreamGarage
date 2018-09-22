@@ -185,6 +185,7 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	RESULT r = R_PASS;
 
+#ifndef _DEBUG
 	m_strURL = strURL;
 	if (m_pDreamBrowserForm == nullptr) {
 		m_fInitBrowser = true;
@@ -193,6 +194,7 @@ RESULT DreamFormApp::UpdateWithNewForm(std::string strURL) {
 	else {
 		m_fUpdateFormURL = true;
 	}
+#endif
 
 	return r;
 }

@@ -938,9 +938,11 @@ std::shared_ptr<CEFBrowserManager> DreamUserApp::GetBrowserManager() {
 	RESULT r = R_PASS;
 
 	if (m_pWebBrowserManager == nullptr) {
+#ifndef _DEBUG
 		m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 		CN(m_pWebBrowserManager);
 		CR(m_pWebBrowserManager->Initialize());
+#endif
 	}
 
 Error:
