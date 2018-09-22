@@ -744,6 +744,10 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return R_NOT_IMPLEMENTED;
 		}
 
+		virtual RESULT OnSwitchTeams() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
 		virtual RESULT OnLogout() override {
 			return R_NOT_IMPLEMENTED;
 		}
@@ -1225,6 +1229,10 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		}
 
 		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnSwitchTeams() override {
 			return R_NOT_IMPLEMENTED;
 		}
 

@@ -34,11 +34,13 @@
 		CRM(dreamTestApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
 		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
-	//Success:
+	Success:
+		DreamLogger::instance()->Flush();
 		return (int)(r);
 
 	Error:
 		DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
+		DreamLogger::instance()->Flush();
 		DEBUG_SYSTEM_PAUSE();
 
 		return (int)(r);
@@ -51,12 +53,14 @@
 		CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
 		CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
 
-	//Success:
+	Success:
 		DEBUG_LINEOUT("DREAM OS Exiting");
+		DreamLogger::instance()->Flush();
 		return (int)(r);
 
 	Error:
 		DEBUG_LINEOUT("DREAM Test App exiting with Error 0x%x result", r);
+		DreamLogger::instance()->Flush();
 		system("pause");
 
 		return (int)(r);
