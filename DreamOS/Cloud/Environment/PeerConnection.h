@@ -40,21 +40,21 @@ public:
 	}
 
 	RESULT Print() {
-		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
+		DOSLOG(INFO, "User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
 		
-		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
-		DEBUG_LINEOUT("%d Offer Candidates:", static_cast<int>(m_offerICECandidates.size()));
+		DOSLOG(INFO, "SDP Offer: %s", m_strSDPOffer.c_str());
+		DOSLOG(INFO, "%d Offer Candidates:", static_cast<int>(m_offerICECandidates.size()));
 		for (auto &iceCandidate : m_offerICECandidates) {
 			iceCandidate.Print();
 		}
-		DEBUG_LINEOUT(" ");
+		DOSLOG(INFO, " ");
 
-		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
-		DEBUG_LINEOUT("%d Answer Candidates:", static_cast<int>(m_answerICECandidates.size()));
+		DOSLOG(INFO, "SDP Answer: %s", m_strSDPAnswer.c_str());
+		DOSLOG(INFO, "%d Answer Candidates:", static_cast<int>(m_answerICECandidates.size()));
 		for (auto &iceCandidate : m_answerICECandidates) {
 			iceCandidate.Print();
 		}
-		DEBUG_LINEOUT(" ");
+		DOSLOG(INFO, " ");
 
 		return R_PASS;
 	}

@@ -895,7 +895,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod ,jsonPayload);
 			if (strMethod == "disconnect") {
 				auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-				pUserController->Logout();
+				pUserController->PendLogout();
 				//DisconnectFromEnvironmentSocket();
 				// TODO: Handle error 
 			}

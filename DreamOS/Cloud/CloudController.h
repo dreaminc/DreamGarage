@@ -99,6 +99,7 @@ public:
 
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+		virtual RESULT OnPendLogout() = 0;
 		virtual RESULT OnSwitchTeams() = 0;
 
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) = 0;
@@ -209,6 +210,7 @@ public:
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
+	virtual RESULT OnPendLogout() override;
 	virtual RESULT OnSwitchTeams() override;
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;

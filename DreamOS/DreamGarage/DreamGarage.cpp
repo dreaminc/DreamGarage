@@ -85,6 +85,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	//sandboxconfig.f3rdPersonCamera = true;
 	//sandboxconfig.fUseGamepad = true;
 
+	/*
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fMouseLook = true;
@@ -93,6 +94,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = true;
 #endif
+//*/
 
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -501,8 +503,8 @@ RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pD
 	return R_NOT_FOUND;
 }
 
-RESULT DreamGarage::PendClearPeers() {
-	m_fClearPeers = true;
+RESULT DreamGarage::PendClearHands() {
+	m_fClearHands = true;
 	return R_PASS;
 }
 
@@ -944,9 +946,16 @@ RESULT DreamGarage::Update(void) {
 		g_lastPeerStateCheckTime = timeNow;
 	}
 
-	if (m_fClearPeers) {
-		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
+	if (m_fClearHands) {
+		CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
 		//CR(ClearPeers());
+	}
+
+	if (m_fPendLogout) {
+		if (m_pUserController != nullptr) {
+			CR(m_pUserController->Logout());
+		}
+		m_fPendLogout = false;
 	}
 
 Error:
@@ -1447,11 +1456,19 @@ RESULT DreamGarage::OnLogout() {
 
 	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
 
-//	CR(PendClearPeers());
+	CR(PendClearHands());
 
 	m_fSeated = false;
 
 Error:
+	return r;
+}
+
+RESULT DreamGarage::OnPendLogout() {
+	RESULT r = R_PASS;
+
+	m_fPendLogout = true;
+
 	return r;
 }
 

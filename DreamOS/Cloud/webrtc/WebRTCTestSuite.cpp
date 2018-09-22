@@ -529,6 +529,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnPendLogout() override {
+			DEBUG_LINEOUT("OnPendLogout");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnSwitchTeams() override {
 			DEBUG_LINEOUT("OnSwitchTeams");
 
