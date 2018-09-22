@@ -1438,7 +1438,7 @@ RESULT DreamGarage::OnLogout() {
 
 	CNM(pUserController, "User controller was nullptr");
 
-	CRM(m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN), "clearing refresh token failed");
+	m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN);
 
 	CR(pUserController->GetFormURL(strFormType));
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
@@ -1465,6 +1465,8 @@ RESULT DreamGarage::OnSwitchTeams() {
 		UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		CNM(pUserController, "User controller was nullptr");
 
+		CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
+
 		CRM(pUserController->SwitchTeam(), "switch team failed");
 
 	Error:
@@ -1474,9 +1476,6 @@ RESULT DreamGarage::OnSwitchTeams() {
 	CN(m_pDreamEnvironmentApp);
 	CR(m_pDreamEnvironmentApp->FadeOut(fnOnFadeOutCallback));
 
-	// TODO: is this necessary
-	// TODO: stop streaming?
-	//CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 
 Error:
