@@ -1234,16 +1234,22 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
 	}
 	else if (strAudioTrackLabel == kChromeAudioLabel) {
-
-		int channel = 0;
-
-		//CR(m_pDreamShareView->HandleChromeAudioDataMessage(pPeerConnection, &audioDataMessage));
 		
-		//int16_t *pInt16Soundbuffer = new int16_t[frames];
-		//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+		// Only stream when it's the user that's currently sharing
+		PeerConnection *pStreamingPeerConnection = m_pDreamShareView->GetStreamingPeerConnection();
 		
-		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
-		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
+		if (pStreamingPeerConnection != nullptr && pStreamingPeerConnection->GetPeerUserID() == pPeerConnection->GetPeerUserID()) {
+
+			int channel = 0;
+
+			//CR(m_pDreamShareView->HandleChromeAudioDataMessage(pPeerConnection, &audioDataMessage));
+
+			//int16_t *pInt16Soundbuffer = new int16_t[frames];
+			//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
+
+			AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
+			CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
+		}
 	}
 
 Error:

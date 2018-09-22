@@ -200,6 +200,8 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	//if (m_pDreamUserHandle != nullptr)
 	//	m_pDreamUserHandle->SendPreserveSharingState(false);
 
+	m_pStreamerPeerConnection = pPeerConnection;
+
 	//ShowCastingTexture();
 	m_pCastQuad->SetVisible(true);
 	m_pCastBackgroundQuad->SetVisible(true);
@@ -238,18 +240,22 @@ Error:
 
 RESULT DreamShareView::PendReceiving() {
 	RESULT r = R_PASS;
+
 	//ShowCastingTexture();
 	m_pCastQuad->SetDiffuseTexture(m_pVideoCastTexture.get());
 	m_fReceivingStream = true;
 	//CR(SetVisible(true));
 
-//Error:
+Error:
 	return r;
 }
 
 RESULT DreamShareView::StopReceiving() {
 	RESULT r = R_PASS;
+
+	m_pStreamerPeerConnection = nullptr;
 	m_fReceivingStream = false;
+
 	//CR(GetComposite()->SetVisible(false));
 	CR(Hide());
 
@@ -377,6 +383,10 @@ RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int h
 	}
 Error:
 	return r;
+}
+
+PeerConnection *DreamShareView::GetStreamingPeerConnection() {
+	return m_pStreamerPeerConnection;
 }
 
 RESULT DreamShareView::BroadcastAudioPacket(const AudioPacket &pendingAudioPacket) {

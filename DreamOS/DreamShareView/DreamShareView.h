@@ -60,6 +60,8 @@ public:
 
 	RESULT BroadcastAudioPacket(const AudioPacket &pendingAudioPacket);
 
+	PeerConnection *GetStreamingPeerConnection();
+
 	// Video Stream Subscriber
 	RESULT BroadcastVideoFrame(const void *pBuffer, int width, int height);
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override;
@@ -119,6 +121,7 @@ private:
 	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
+	PeerConnection *m_pStreamerPeerConnection = nullptr;
 
 private:
 //	std::shared_ptr<UIView> 
