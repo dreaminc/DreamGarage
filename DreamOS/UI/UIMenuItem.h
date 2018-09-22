@@ -78,10 +78,13 @@ public:
 	std::string& GetName();
 	RESULT SetName(std::string strName);
 
+	std::string& GetKey();
+	RESULT SetKey(std::string strKey);
 
 private:
 	std::shared_ptr<text> m_pLabel = nullptr;
 	std::string m_strName;
+	std::string m_strKey;
 
 private:
 	std::shared_ptr<composite> m_pParentContext = nullptr;

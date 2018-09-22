@@ -185,6 +185,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				if (pMenuItem != nullptr && maxItemIndex + i <= arrayMaxIndex) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[maxItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[maxItemIndex + i]->GetTitle());
+					pMenuItem->SetKey(m_pScrollViewNodes[maxItemIndex + i]->GetKey());
 					m_pScrollViewNodes[maxItemIndex + i]->SetAssociatedButton(pButton);
 					
 					PositionMenuButton(maxItemIndex + i, pButton);
@@ -242,6 +243,7 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 			if (pMenuItem != nullptr) {
 				pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[m_itemIndex + i]->GetThumbnailTexture());
 				pMenuItem->SetName(m_pScrollViewNodes[m_itemIndex + i]->GetTitle());
+				pMenuItem->SetKey(m_pScrollViewNodes[m_itemIndex + i]->GetKey());
 			}
 
 			pButton->SetVisible(true);

@@ -310,7 +310,7 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 		
 		CR(m_pWebBrowserController->IsInputFocused());
 
-		//CR(PendUpdateObjectTextures());
+		m_fUpdateControlBarInfo = true;
 	}
 
 Error:
@@ -329,7 +329,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pObserver != nullptr) {
-		//CR(PendUpdateObjectTextures());
+		m_fUpdateControlBarInfo = true;
 	}
 
 Error:
@@ -598,10 +598,14 @@ RESULT DreamBrowser::Update(void *pContext) {
 	}
 
 	if (ShouldUpdateObjectTextures()) {
+		CR(UpdateObjectTextures());
+	}
+
+	if (m_fUpdateControlBarInfo) {
 		if (m_pWebBrowserController != nullptr) {
 			CR(UpdateNavigationFlags());
 		}
-		CR(UpdateObjectTextures());
+		m_fUpdateControlBarInfo = false;
 	}
 
 	if (m_pDreamUserHandle == nullptr) {
