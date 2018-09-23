@@ -348,7 +348,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 #ifndef _DEBUG
 	// CEF will create the Directory(s) if necessary
 	std::wstring wstrAppDataPath;
-	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_ROAMING);
+	PathManager::instance()->GetDreamPath(wstrAppDataPath, DREAM_PATH_TYPE::DREAM_PATH_LOCAL);
 	wstrAppDataPath = wstrAppDataPath + L"CEFCache\\";
 
 	CefString(&cefSettings.cache_path) = wstrAppDataPath;

@@ -180,7 +180,7 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
-	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
+	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 
 	virtual std::shared_ptr<texture> GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;

@@ -836,7 +836,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {	
 		
-		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
+		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset);
 		pBrowser->RegisterObserver(this);
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 

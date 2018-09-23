@@ -635,7 +635,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
+RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	int pxWidth = m_browserWidth;
@@ -646,7 +646,28 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
 	m_pWebBrowserManager = pWebBrowserManager;
 
-	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
+	if (pEnvironmentAsset != nullptr) {
+		m_assetID = pEnvironmentAsset->GetAssetID();
+
+		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
+
+		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
+			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
+		}
+
+		m_strContentType = pEnvironmentAsset->GetContentType();
+
+		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
+
+		if (!requestHeaders.empty()) {
+			m_headermap[strEnvironmentAssetURL] = requestHeaders;
+		}
+
+		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
+	}
+
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, pEnvironmentAsset->GetURL());
 	m_pWebBrowserManager->UpdateJobProcesses();
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
@@ -1056,56 +1077,9 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 }
 
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
-	if (pEnvironmentAsset != nullptr) {
-		m_assetID = pEnvironmentAsset->GetAssetID();
-		WebRequest webRequest;
-
-		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
-		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
-
-		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
-			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
-		}
-
-		m_strContentType = pEnvironmentAsset->GetContentType();
-
-		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
-		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
-		CR(webRequest.SetURL(wstrAssetURL));
-		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-		//*
-		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		CN(pUserControllerProxy);
-
-		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
-		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
-		/*
-		for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
-
-			std::string strKey = itr->first;
-			std::wstring wstrKey = util::StringToWideString(strKey);
-			std::string strValue = itr->second;
-			std::wstring wstrValue = util::StringToWideString(strValue);
-			
-			wstrRequestHeaders.insert(std::pair<std::wstring, std::wstring>(wstrKey, wstrValue));
-		}
-		webRequest.SetRequestHeaders(wstrRequestHeaders);
-		*/
-
-		if (!requestHeaders.empty()) {
-			m_headermap[strEnvironmentAssetURL] = requestHeaders;
-		}	
-		//*/
-		
-		LoadRequest(webRequest);
-		//SetURI(strEnvironmentAssetURL);
-		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
-	}
-
-Error:
+//Error:
 	return r;
 }
 
