@@ -24,6 +24,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
 	sandboxconfig.fInitSound = true;
 	sandboxconfig.fHMDMirror = true;
+	sandboxconfig.fHideWindow = true;
 	sandboxconfig.f3rdPersonCamera = false;
 
 	SetSandboxConfiguration(sandboxconfig);
