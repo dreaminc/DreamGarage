@@ -163,7 +163,7 @@ RESULT Websocket::ProcessingThread() {
 
 	m_fRunning = true;
 
-	while (m_fRunning) {
+	//while (m_fRunning) {
 		// TODO: Are we ok w/ Exceptions?
 		try  {
 			m_websocketClient.set_access_channels(websocketpp::log::alevel::all);
@@ -234,7 +234,7 @@ RESULT Websocket::ProcessingThread() {
 			e;
 			DEBUG_LINEOUT("Websocket Exception: %s", e.what());
 		}
-	}
+	//}
 
 	DEBUG_LINEOUT("Websocket Thread Exit");
 
@@ -287,9 +287,9 @@ RESULT Websocket::Stop() {
 
 	m_pWebsocketConnection.reset();
 	
-	//if (m_thread.joinable()) {
-	//	m_thread.join();
-	//}
+	if (m_thread.joinable()) {
+		m_thread.join();
+	}
 
 Error:
 	return r;
