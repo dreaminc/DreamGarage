@@ -395,6 +395,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 	request->GetHeaderMap(requestHeaders);
 	std::multimap<std::string, std::string> checkForRequestHeaders;
 	std::string strURL = cefstrRequestURL;
+	DOSLOG(INFO, "OnBeforeResourceLoad: %s", strURL);
 	
 	// replacing with full headers list from server instead
 	/*
@@ -442,6 +443,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 			CefString cefstrValue = util::StringToWideString(strValue);
 
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
+			DOSLOG(INFO, "inserting header %s", strKey);
 		}
 		request->SetHeaderMap(requestHeaders);
 	}
