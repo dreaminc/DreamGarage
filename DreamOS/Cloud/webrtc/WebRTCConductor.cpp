@@ -485,7 +485,7 @@ RESULT WebRTCConductor::CloseAllPeerConnections() {
 	}
 
 	// Clear peer connections vector
-	CR(ClearPeerConnections());
+	//CR(ClearPeerConnections());
 
 Error:
 	return r;

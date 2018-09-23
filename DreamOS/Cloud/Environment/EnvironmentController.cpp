@@ -572,6 +572,17 @@ RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	return R_PASS;
 }
 
+bool EnvironmentController::HasPeerConnections() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+
+	return m_pPeerConnectionController->HasPeerConnections();
+
+Error:
+	return false;
+}
+
 long EnvironmentController::GetUserID() {
 	if (m_pEnvironmentControllerObserver != nullptr) {
 		return m_pEnvironmentControllerObserver->GetUserID();

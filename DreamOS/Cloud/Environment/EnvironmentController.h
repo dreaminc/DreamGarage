@@ -138,6 +138,7 @@ public:
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
+	bool HasPeerConnections();
 
 	// EnvironmentControllerProxy
 	// TODO: Note - Register Controller Observer pattern needs to be fixed here

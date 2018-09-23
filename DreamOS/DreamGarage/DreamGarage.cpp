@@ -79,8 +79,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
 
-	sandboxconfig.fHideWindow = true;
-	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.fHideWindow = false;
+	sandboxconfig.fHMDMirror = true;
 	sandboxconfig.f3rdPersonCamera = false;
 
 	//sandboxconfig.fHideWindow = false;
@@ -968,6 +968,19 @@ RESULT DreamGarage::Update(void) {
 		m_fPendLogout = false;
 	}
 
+	if (m_fPendSwitchTeams) {
+
+		EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		if(pEnvironmentController != nullptr && m_pUserController != nullptr) {
+			if (!pEnvironmentController->HasPeerConnections()) {
+				CR(m_pUserController->SwitchTeam());
+			}
+		}
+
+
+		m_fPendSwitchTeams = false;
+	}
+
 Error:
 	return r;
 }
@@ -1492,12 +1505,13 @@ RESULT DreamGarage::OnSwitchTeams() {
 
 	auto fnOnFadeOutCallback = [&](void *pContext) {
 
-		UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-		CNM(pUserController, "User controller was nullptr");
+		//UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		//CNM(pUserController, "User controller was nullptr");
 
 		CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
-		CRM(pUserController->SwitchTeam(), "switch team failed");
+		//CRM(pUserController->SwitchTeam(), "switch team failed");
+		CR(PendSwitchTeams());
 
 	Error:
 		return r;
@@ -1508,6 +1522,19 @@ RESULT DreamGarage::OnSwitchTeams() {
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::PendSwitchTeams() {
+	RESULT r = R_PASS;
+
+	EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
+	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+
+	m_fPendSwitchTeams = true;
 
 Error:
 	return r;
