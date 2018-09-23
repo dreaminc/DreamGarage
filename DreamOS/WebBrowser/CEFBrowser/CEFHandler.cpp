@@ -437,9 +437,9 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 		for (std::multimap<std::string, std::string>::iterator itr = checkForRequestHeaders.begin(); itr != checkForRequestHeaders.end(); ++itr) {
 
 			std::string strKey = itr->first;
-			CefString cefstrKey = strKey;
+			CefString cefstrKey = util::StringToWideString(strKey);
 			std::string strValue = itr->second;
-			CefString cefstrValue = strValue;
+			CefString cefstrValue = util::StringToWideString(strValue);
 
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
 		}
