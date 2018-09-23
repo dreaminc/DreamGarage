@@ -154,6 +154,7 @@ public:
 	RESULT OnReceiveAsset();
 
 	RESULT StartSharing();
+	RESULT ForceStopSharing();
 
 // Animations
 public:
