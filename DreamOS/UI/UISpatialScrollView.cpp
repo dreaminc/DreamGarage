@@ -218,6 +218,8 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 				if (pMenuItem != nullptr && minItemIndex + i >= 0) {
 					pMenuItem->GetSurface()->SetDiffuseTexture(m_pScrollViewNodes[minItemIndex + i]->GetThumbnailTexture());
 					pMenuItem->SetName(m_pScrollViewNodes[minItemIndex + i]->GetTitle());
+					pMenuItem->SetKey(m_pScrollViewNodes[minItemIndex + i]->GetKey());
+
 					m_pScrollViewNodes[minItemIndex + i]->SetAssociatedButton(pButton);
 
 					PositionMenuButton(minItemIndex + i, pButton);

@@ -158,10 +158,12 @@ private:
 	std::shared_ptr<UIButton> m_pRightScrollButton = nullptr;
 	ScrollState m_menuState;
 
+	std::vector<std::shared_ptr<UIButton>> m_pPendingButtons;
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<std::shared_ptr<MenuNode>> m_pScrollViewNodes;
 	std::deque<std::shared_ptr<UIButton>> m_pButtonDeque;
 
+	bool m_fPendingButton = false;
 	bool m_fScrollButtonVisible = false;
 
 	std::queue<DimObj*> m_pendingObjectRemovalQueue;

@@ -1056,13 +1056,11 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 }
 
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	if (pEnvironmentAsset != nullptr) {
 		m_assetID = pEnvironmentAsset->GetAssetID();
-		WebRequest webRequest;
 
-		//std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
 		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
 
@@ -1072,36 +1070,12 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		m_strContentType = pEnvironmentAsset->GetContentType();
 
-		//std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
-		std::wstring wstrAssetURL = util::StringToWideString(strEnvironmentAssetURL);
-		CR(webRequest.SetURL(wstrAssetURL));
-		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
-		//*
-		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		CN(pUserControllerProxy);
-
-		std::multimap<std::wstring, std::wstring> wstrRequestHeaders;
 		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
-		/*
-		for (std::multimap<std::string, std::string>::iterator itr = requestHeaders.begin(); itr != requestHeaders.end(); ++itr) {
-
-			std::string strKey = itr->first;
-			std::wstring wstrKey = util::StringToWideString(strKey);
-			std::string strValue = itr->second;
-			std::wstring wstrValue = util::StringToWideString(strValue);
-			
-			wstrRequestHeaders.insert(std::pair<std::wstring, std::wstring>(wstrKey, wstrValue));
-		}
-		webRequest.SetRequestHeaders(wstrRequestHeaders);
-		*/
 
 		if (!requestHeaders.empty()) {
 			m_headermap[strEnvironmentAssetURL] = requestHeaders;
-		}	
-		//*/
-		
-		LoadRequest(webRequest);
-		//SetURI(strEnvironmentAssetURL);
+		}
+
 		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
 	}
 

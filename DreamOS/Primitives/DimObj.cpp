@@ -509,7 +509,7 @@ RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
 	{
 		auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
 
-		CBR((it != m_pObjects->end()), R_NOT_FOUND);
+		CBR((it != m_pObjects->end()), R_SKIPPED);
 
 		m_pObjects->erase(it);
 	}
