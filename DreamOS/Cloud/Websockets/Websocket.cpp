@@ -39,9 +39,9 @@ Websocket::Websocket(const std::string& strURI) :
 }
 
 Websocket::~Websocket() {
-	if (m_fRunning) {
-		Stop();
-	}
+	//if (m_fRunning) {
+	//	Stop();
+	//}
 }
 
 RESULT Websocket::SetToken(const std::string& strToken) {
@@ -50,6 +50,7 @@ RESULT Websocket::SetToken(const std::string& strToken) {
 }
 
 // Should not actually be in a thread like this
+/*
 RESULT Websocket::ProcessingThread() {
 	RESULT r = R_PASS;
 
@@ -57,78 +58,7 @@ RESULT Websocket::ProcessingThread() {
 
 	//while (m_fRunning) {
 		// TODO: Are we ok w/ Exceptions?
-		try  {
-			m_websocketClient.set_access_channels(websocketpp::log::alevel::all);
-			m_websocketClient.clear_access_channels(websocketpp::log::alevel::all);
-
-			m_websocketClient.init_asio();
-
-			// Set message handler 
-			m_websocketClient.set_message_handler(
-				std::bind(m_fnOnWebsocketMessageCallback, &m_websocketClient, ::_1, ::_2)
-			);
-			
-			/*
-			m_websocketClient.set_socket_init_handler(
-				[](websocketpp::connection_hdl, asio::ssl::stream<asio::ip::tcp::socket> &ssl_stream)
-				{
-					SSL_set_tlsext_host_name(ssl_stream.native_handle(), "ws.develop.dreamos.com");
-				}
-			);
-			//*/
-
-#ifndef USE_LOCALHOST
-			m_websocketClient.set_tls_init_handler([] (websocketpp::connection_hdl) ->context_ptr {
-				context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
-
-				try {
-					ctx->set_options(asio::ssl::context::default_workarounds |
-						asio::ssl::context::no_sslv2 |
-						asio::ssl::context::no_sslv3 |
-						asio::ssl::context::single_dh_use);
-
-					// client verification for a server trust is not yet supported.
-
-					//ctx->set_verify_mode(asio::ssl::verify_peer);
-					//ctx->set_verify_callback(bind(&verify_certificate, hostname, ::_1, ::_2));
-					
-					//ctx->load_verify_file("ca-cert.pem");
-				}
-				catch (std::exception& e) {
-					(void)e;
-					DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
-					DEBUG_LINEOUT("%s", e.what());
-					//ACBM(0, "%s", e.what());
-				}
-				return ctx;
-			});
-#endif
-
-			// Handlers
-			m_websocketClient.set_open_handler(std::bind(m_fnOnWebsocketConnectionOpenCallback, ::_1));
-			m_websocketClient.set_close_handler(std::bind(m_fnOnWebsocketConnectionCloseCallback, ::_1));
-			m_websocketClient.set_fail_handler(std::bind(m_fnOnWebsocketConnectionFailCallback, ::_1));
-
-			websocketpp::lib::error_code websocketError;
-			m_pWebsocketConnection = m_websocketClient.get_connection(m_strURI, websocketError);
-
-			if (websocketError) {
-				DOSLOG(INFO, "websocketError %v", websocketError.message().c_str());
-			}
-
-			CBM((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());
-
-			if (m_strToken.size() > 0) {
-				m_pWebsocketConnection->append_header("Authorization", m_strToken);
-			}
-
-			m_websocketClient.connect(m_pWebsocketConnection);
-			m_websocketClient.run();
-		}
-		catch (websocketpp::exception const & e) {
-			e;
-			DEBUG_LINEOUT("Websocket Exception: %s", e.what());
-		}
+		
 	//}
 
 	DEBUG_LINEOUT("Websocket Thread Exit");
@@ -136,13 +66,95 @@ RESULT Websocket::ProcessingThread() {
 Error:
 	return r;
 }
+*/
 
 RESULT Websocket::Start() {
+	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("Websocket::Start");	
 
-	m_thread = std::thread(&Websocket::ProcessingThread, this);
+	try {
+		m_websocketClient.set_access_channels(websocketpp::log::alevel::all);
+		m_websocketClient.clear_access_channels(websocketpp::log::alevel::all);
+
+		m_websocketClient.init_asio();
+		m_websocketClient.start_perpetual();
+
+		// Set message handler 
+		m_websocketClient.set_message_handler(
+			std::bind(m_fnOnWebsocketMessageCallback, &m_websocketClient, ::_1, ::_2)
+		);
+
+		/*
+		m_websocketClient.set_socket_init_handler(
+		[](websocketpp::connection_hdl, asio::ssl::stream<asio::ip::tcp::socket> &ssl_stream)
+		{
+		SSL_set_tlsext_host_name(ssl_stream.native_handle(), "ws.develop.dreamos.com");
+		}
+		);
+		//*/
+
+#ifndef USE_LOCALHOST
+		m_websocketClient.set_tls_init_handler([](websocketpp::connection_hdl) ->context_ptr {
+			context_ptr ctx = websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::sslv23);
+
+			try {
+				ctx->set_options(asio::ssl::context::default_workarounds |
+					asio::ssl::context::no_sslv2 |
+					asio::ssl::context::no_sslv3 |
+					asio::ssl::context::single_dh_use);
+
+				// client verification for a server trust is not yet supported.
+
+				//ctx->set_verify_mode(asio::ssl::verify_peer);
+				//ctx->set_verify_callback(bind(&verify_certificate, hostname, ::_1, ::_2));
+
+				//ctx->load_verify_file("ca-cert.pem");
+			}
+			catch (std::exception& e) {
+				(void)e;
+				DOSLOG(INFO, "set_tls_init_handler exception %v", e.what());
+				DEBUG_LINEOUT("%s", e.what());
+				//ACBM(0, "%s", e.what());
+			}
+			return ctx;
+		});
+#endif
+
+		// Handlers
+		m_websocketClient.set_open_handler(std::bind(m_fnOnWebsocketConnectionOpenCallback, ::_1));
+		m_websocketClient.set_close_handler(std::bind(m_fnOnWebsocketConnectionCloseCallback, ::_1));
+		m_websocketClient.set_fail_handler(std::bind(m_fnOnWebsocketConnectionFailCallback, ::_1));
+
+		websocketpp::lib::error_code websocketError;
+		m_pWebsocketConnection = m_websocketClient.get_connection(m_strURI, websocketError);
+
+		if (websocketError) {
+			DOSLOG(INFO, "websocketError %v", websocketError.message().c_str());
+		}
+
+		CBM((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());
+
+		if (m_strToken.size() > 0) {
+			m_pWebsocketConnection->append_header("Authorization", m_strToken);
+		}
+
+		//m_websocketClient.run();
+		m_pWebsockThread.reset(new websocketpp::lib::thread(&WebsocketClient::run, &m_websocketClient));
+		
+		m_websocketClient.connect(m_pWebsocketConnection);
+
+		m_fRunning = true;
+	}
+	catch (websocketpp::exception const & e) {
+		e;
+		DEBUG_LINEOUT("Websocket Exception: %s", e.what());
+	}
 	
-	return R_PASS;
+	
+
+Error:
+	return r;
 }
 
 RESULT Websocket::Stop() {
@@ -156,23 +168,32 @@ RESULT Websocket::Stop() {
 	// Close the connection
 
 	// TODO: Move to shut down
-	//m_websocketClient.stop_perpetual();
+	m_websocketClient.stop_perpetual();
 	websocketpp::lib::error_code websocketError;
 
 	CNRM(m_pWebsocketConnection, R_SKIPPED, "Websocket connection already null");
-	
+
 	m_websocketClient.close(
 		m_pWebsocketConnection->get_handle(), 
-		websocketpp::close::status::normal, 
+		websocketpp::close::status::going_away,
 		"disconnect", 
 		websocketError
 	);
 
-	m_pWebsocketConnection.reset();
-	
-	if (m_thread.joinable()) {
-		m_thread.join();
+	if (websocketError) {
+		DEBUG_LINEOUT("Error closing connection: %s", websocketError.message().c_str());
 	}
+	else {
+		if (m_pWebsockThread->joinable()) {
+			m_pWebsockThread->join();
+		}
+	}
+
+	m_pWebsockThread = nullptr;
+
+	m_pWebsocketConnection = nullptr;
+
+	m_websocketClient.reset();
 
 Error:
 	return r;

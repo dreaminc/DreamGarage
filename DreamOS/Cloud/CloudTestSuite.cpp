@@ -117,7 +117,7 @@ Error:
 RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 200.0f;
+	double sTestTime = 1000.0f;
 
 	// non-asynchronous methods could be set up for tests that login immediately like this
 	struct TestContext :
@@ -189,17 +189,14 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 
 			DEBUG_LINEOUT("OnGetToken");
 
+			curEnvID = 0;			
+			int envID = environmentIDs[curEnvID];
+
 			CB(fSuccess);
+			
+			CRM(pUserController->SetUserDefaultEnvironmentID(envID), "Failed to set environment id %d", envID);
 
-			//curEnvID++;
-			//if (curEnvID >= environmentIDs_n)
-			//	curEnvID = 0;
-			//
-			//int envID = environmentIDs[curEnvID];
-			//
-			//CRM(pUserController->SetUserDefaultEnvironmentID(envID), "Failed to set environment id %d", envID);
-
-			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set environment id %d", environmentId);
+			//CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set environment id %d", environmentId);
 
 			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
 
@@ -337,7 +334,7 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
 			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 5000) {
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1500) {
 
 				lastUpdateTime = timeNow;
 
@@ -346,9 +343,15 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 					UserController *pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 					auto currentUser = pUserController->GetUser();
 
-					// TODO: increment 
+					// Increment through teams
+					pTestContext->curEnvID += 1;
+					if (pTestContext->curEnvID >= pTestContext->environmentIDs_n)
+						pTestContext->curEnvID = 0;
 
 					int envID = pTestContext->environmentIDs[pTestContext->curEnvID];
+
+					// blech
+					pUserController->SetUserDefaultEnvironmentID(envID);
 
 					// First off disconnect 
 					DEBUG_LINEOUT("Disconnecting from environment socket");

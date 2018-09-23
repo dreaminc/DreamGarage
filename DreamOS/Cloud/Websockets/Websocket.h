@@ -85,7 +85,7 @@ public:
 	}
 
 private:
-	RESULT ProcessingThread();
+	websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_pWebsockThread;
 	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
 	void OnOpen(websocketpp::connection_hdl hWebsocketConnection);
@@ -93,7 +93,7 @@ private:
 	void OnFail(websocketpp::connection_hdl hWebsocketConnection);
 
 private:
-	std::thread	m_thread;
+	//std::thread	m_thread;
 	bool m_fRunning;
 	bool m_fConnectionOpen;
 
