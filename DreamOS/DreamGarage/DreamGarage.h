@@ -119,6 +119,7 @@ public:
 	virtual RESULT OnLogout() override;
 	virtual RESULT OnPendLogout() override;
 	virtual RESULT OnSwitchTeams() override;
+	RESULT PendSwitchTeams();
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 	virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override;
@@ -174,6 +175,7 @@ private:
 	long m_pendingAssetReceiveUserID = -1;
 
 	bool m_fPendLogout = false;
+	bool m_fPendSwitchTeams = false;
 
 	// TODO: should these be here
 	bool m_fFirstLogin = true;

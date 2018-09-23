@@ -188,6 +188,7 @@ private:
 	bool m_fLoggedIn = false;
 
 	bool m_fSwitchingTeams = false;
+
 	std::string m_strPendingTeamID = "";
 
 	std::string	m_strToken;

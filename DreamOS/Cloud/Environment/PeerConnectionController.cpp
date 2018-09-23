@@ -159,6 +159,10 @@ PeerConnection *PeerConnectionController::GetPeerConnectionByID(long peerConnect
 	return nullptr;
 }
 
+bool PeerConnectionController::HasPeerConnections() {
+	return m_peerConnections.size() > 0;
+}
+
 bool PeerConnectionController::IsUserIDConnected(long peerUserID) {
 	// TODO: Fix this so it works with user IDs
 	//PeerConnection *pPeerConnection = GetPeerConnectionByAnswerUserID(peerUserID);
@@ -229,7 +233,7 @@ RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConne
 RESULT PeerConnectionController::CloseAllPeerConnections() {
 	RESULT r = R_PASS;
 
-	CR(ClearPeerConnections());
+	//CR(ClearPeerConnections());
 
 	CN(m_pWebRTCImp);
 	m_pWebRTCImp->CloseAllPeerConnections();

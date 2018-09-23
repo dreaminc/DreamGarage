@@ -95,6 +95,8 @@ public:
 	bool FindPeerConnectionByID(long peerConnectionID);
 	PeerConnection *GetPeerConnectionByID(long peerConnectionID);
 
+	bool HasPeerConnections();
+
 	bool IsUserIDConnected(long peerUserID);
 
 	RESULT HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload);

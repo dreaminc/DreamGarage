@@ -203,11 +203,10 @@ Error:
 RESULT UserController::SwitchTeam() {
 	RESULT r = R_PASS;
 
+	/*
 	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNRM(pEnvironmentController, R_SKIPPED, "Environment controller does not exist.");
-	CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
-	CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
-
+	//*/
 	m_loginState.fHasEnvironmentId = false;
 	m_fSwitchingTeams = true;
 

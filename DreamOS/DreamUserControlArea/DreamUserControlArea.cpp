@@ -907,7 +907,7 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 
 	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-	/*
+	//*
 	CNR(m_pActiveSource, R_SKIPPED);
 	if (m_pActiveSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
@@ -923,8 +923,8 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	}
 	//*/
 
-	GetDOS()->OnStopSending();
-	GetDOS()->OnStopReceiving();
+	//GetDOS()->OnStopSending();
+	//GetDOS()->OnStopReceiving();
 
 	m_pDreamTabView->FlagShutdownAllSources();
 	CloseActiveAsset();
