@@ -78,10 +78,10 @@ RESULT user::RemoveMouth() {
 	RESULT r = R_PASS;
 
 	CNR(m_pDreamOS, R_SKIPPED);
-	CNR(m_pMouth, R_SKIPPED);
+	CNR(m_pMouthComposite, R_SKIPPED);
 
-	m_pDreamOS->RemoveObjectFromUIGraph(m_pMouth.get());
-	m_pMouth = nullptr;
+	m_pDreamOS->RemoveObjectFromUIGraph(m_pMouthComposite.get());
+	m_pMouthComposite = nullptr;
 
 Error:
 	return r;
@@ -108,11 +108,6 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 
 RESULT user::SetDreamOS(DreamOS *pDreamOS) {
 	m_pDreamOS = pDreamOS;
-
-	if (m_pDreamOS != nullptr) {
-		m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get());
-	}
-
 	return R_PASS;
 }
 
@@ -138,6 +133,7 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	m_pHead->SetMaterialShininess(4.0f, true);
 
 	m_pMouth->GetFirstChild<mesh>()->SetDiffuseTexture(m_mouthStates[0].get());
+	m_pDreamOS->AddObjectToUIGraph(m_pMouthComposite.get());
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
