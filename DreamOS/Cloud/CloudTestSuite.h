@@ -41,6 +41,8 @@ public:
 	RESULT AddTestMenuAPI();
 	RESULT AddTestMultiConnectTest();
 
+	RESULT AddTestSwitchingEnvironmentSockets();
+
 	//TODO: remove when tests don't need pipelines
 	RESULT SetupPipeline();
 
@@ -79,6 +81,7 @@ public:
 
 private:
 	CloudController *GetCloudController();
+	RESULT SetupSkyboxPipeline(std::string strRenderShaderName);
 
 private:
 	DreamOS *m_pDreamOS = nullptr;
