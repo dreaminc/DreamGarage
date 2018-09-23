@@ -74,6 +74,19 @@ std::shared_ptr<model> user::GetMouth() {
 	return m_pMouth;
 }
 
+RESULT user::RemoveMouth() {
+	RESULT r = R_PASS;
+
+	CNR(m_pDreamOS, R_SKIPPED);
+	CNR(m_pMouth, R_SKIPPED);
+
+	m_pDreamOS->RemoveObjectFromUIGraph(m_pMouth.get());
+	m_pMouth = nullptr;
+
+Error:
+	return r;
+}
+
 std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
 	if (type == HAND_TYPE::HAND_LEFT) {
 		return m_pLeftHand;
@@ -110,7 +123,10 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
 #ifndef _DEBUG
-	CBM(m_pHead == nullptr, "avatar model already set");
+	if (m_pHead != nullptr) {
+		m_pHead = nullptr;
+	}
+
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
 

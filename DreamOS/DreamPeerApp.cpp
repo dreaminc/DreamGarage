@@ -60,10 +60,12 @@ Error:
 RESULT DreamPeerApp::Shutdown(void *pContext) {
 	RESULT r = R_PASS;
 
+	m_pUserModel->RemoveMouth();
 	m_pUserModel = nullptr;
 
 	GetDOS()->RemoveObjectFromUIGraph(m_pUIObjectComposite.get());
 	m_pUIObjectComposite = nullptr;
+
 
 Error:
 	return r;
