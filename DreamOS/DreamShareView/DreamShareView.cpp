@@ -261,6 +261,10 @@ RESULT DreamShareView::StopReceiving() {
 
 	ShowLoadingTexture();
 
+	if (GetDOS()->IsRegisteredVideoStreamSubscriber(this)) {
+		CR(GetDOS()->UnregisterVideoStreamSubscriber(this));
+	}
+
 	//CR(	BroadcastDreamBrowserMessage(DreamShareViewMessage::type::ACK, 
 	//								 DreamShareViewMessage::type::REPORT_STREAMING_STOP));
 
