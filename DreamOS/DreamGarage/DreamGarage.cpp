@@ -1102,9 +1102,11 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 			pRightHand->PendCreateHandModel(avatarID);
 			//pRightHand->SetModelState(hand::ModelState::HAND);
 
-			m_pDreamUserApp->SetEventApp(nullptr);
-			m_pDreamUserApp->SetHasOpenApp(false);
+			CR(m_pDreamUserApp->SetEventApp(nullptr));
+			CR(m_pDreamUserApp->SetHasOpenApp(false));
 		}
+
+		CR(m_pDreamUserApp->HideMessageQuad());
 	}
 
 Error:
@@ -1508,10 +1510,14 @@ RESULT DreamGarage::OnSwitchTeams() {
 		//UserController *pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 		//CNM(pUserController, "User controller was nullptr");
 
+		// questionable what kind of resets the flags need
+
 		CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
 		//CRM(pUserController->SwitchTeam(), "switch team failed");
 		CR(PendSwitchTeams());
+
+		CR(m_pDreamShareView->Hide());
 
 	Error:
 		return r;
