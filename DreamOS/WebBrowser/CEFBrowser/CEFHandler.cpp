@@ -443,7 +443,7 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 			CefString cefstrValue = util::StringToWideString(strValue);
 
 			requestHeaders.insert(std::pair<std::wstring, std::wstring>(cefstrKey, cefstrValue));
-			DOSLOG(INFO, "inserting header %s", cefstrKey);
+			DOSLOG(INFO, "inserting header %s", strKey);
 		}
 		request->SetHeaderMap(requestHeaders);
 	}
