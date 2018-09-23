@@ -140,7 +140,7 @@ RESULT Websocket::Start() {
 		}
 
 		//m_websocketClient.run();
-		m_pWebsockThread.reset(new websocketpp::lib::thread(&WebsocketClient::run, &m_websocketClient));
+		m_pWebsockThread = websocketpp::lib::make_shared<websocketpp::lib::thread>(&WebsocketClient::run, &m_websocketClient);
 		
 		m_websocketClient.connect(m_pWebsocketConnection);
 
@@ -183,11 +183,8 @@ RESULT Websocket::Stop() {
 	if (websocketError) {
 		DEBUG_LINEOUT("Error closing connection: %s", websocketError.message().c_str());
 	}
-	else {
-		if (m_pWebsockThread->joinable()) {
-			m_pWebsockThread->join();
-		}
-	}
+
+	m_pWebsockThread->join();
 
 	m_pWebsockThread = nullptr;
 
