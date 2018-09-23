@@ -79,8 +79,8 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fInitCloud = true;
 	sandboxconfig.fInitSound = true;
 
-	sandboxconfig.fHideWindow = false;
-	sandboxconfig.fHMDMirror = true;
+	sandboxconfig.fHideWindow = true;
+	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
 
 	//sandboxconfig.fHideWindow = false;
