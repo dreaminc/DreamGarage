@@ -156,11 +156,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environ
 	strURI += "/";
 
 	DOSLOG(INFO, "Connecting to environment socket URL: %s", strURI.c_str());
-
-	// TODO: Not hard coded!
-	if (m_pEnvironmentWebsocket == nullptr) {
-		CR(InitializeWebsocket(strURI));
-	}
+	CR(InitializeWebsocket(strURI));
 
 	s_user = user;
 	m_pEnvironmentWebsocket->SetToken(user.GetToken());

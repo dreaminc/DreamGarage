@@ -5,6 +5,8 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "Cloud/CloudControllerFactory.h"
+
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
@@ -27,6 +29,56 @@ std::map<int, std::string> k_refreshTokens = {
 	{ 9, "HPfaNfjFrAhlbqS9DuZD5dCrAzI215ETDTRzFMVXrtoYrI2A9XBS3VEKOjGlDSVE" }
 };
 
+RESULT CloudTestSuite::SetupSkyboxPipeline(std::string strRenderShaderName) {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	{
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode(strRenderShaderName);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		//Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToAllInputs(pRenderProgramNode->Output("output_framebuffer")));
+	}
+
+
+	CR(pHAL->ReleaseCurrentContext());
+
+	//g_pRenderProg = (OGLProgram*)(pRenderScreenQuad);
+
+Error:
+	return r;
+}
+
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -39,6 +91,8 @@ CloudTestSuite::~CloudTestSuite() {
 
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestSwitchingEnvironmentSockets());
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
 	CR(AddTestMultiConnectTest());
@@ -60,13 +114,297 @@ Error:
 }
 
 
+RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 200.0f;
+
+	// non-asynchronous methods could be set up for tests that login immediately like this
+	struct TestContext :
+		public CloudController::UserObserver,
+		public CloudController::PeerConnectionObserver
+	{
+		UserController *pUserController = nullptr;
+		CloudController *pCloudController = nullptr;
+
+		int testUserNum = 0;
+
+		int environmentIDs[2] = { 168, 170 };
+		int environmentIDs_n = 2;
+		int curEnvID = 0;
+
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnSetSettings() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnLogin() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnPendLogout() override {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSwitchTeams() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile");
+
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+
+			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+
+		Error:
+			return r;
+		};
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnGetToken");
+
+			CB(fSuccess);
+
+			//curEnvID++;
+			//if (curEnvID >= environmentIDs_n)
+			//	curEnvID = 0;
+			//
+			//int envID = environmentIDs[curEnvID];
+			//
+			//CRM(pUserController->SetUserDefaultEnvironmentID(envID), "Failed to set environment id %d", envID);
+
+			CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set environment id %d", environmentId);
+
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
+
+		Error:
+			return r;
+		};
+
+		// PeerConnectionObserver
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnNewPeerConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnNewSocketConnection(int seatPosition) {
+			DEVENV_LINEOUT("OnNewSocketConnection");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+			DEVENV_LINEOUT("OnPeerConnectionClosed");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) {
+			DEVENV_LINEOUT("OnDataMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+			DEVENV_LINEOUT("OnDataStringMessage");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioData(const std::string &strAudioTrackLabel, PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+			DEBUG_LINEOUT("OnAudioData: %s", strAudioTrackLabel.c_str());
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnDataChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) {
+			DEVENV_LINEOUT("OnAudioChannel");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight) override {
+			DEVENV_LINEOUT("OnVideoFrame");
+
+			return R_NOT_HANDLED;
+		}
+
+	} *pTestContext = new TestContext();
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		std::string strTestValue;
+
+		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CR(SetupSkyboxPipeline("blinnphong"));
+
+		{
+
+			// Objects 
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+			auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			CN(pSphere);
+
+			//*/
+
+			// Command Line Manager
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+			CN(pCommandLineManager);
+
+			strTestValue = pCommandLineManager->GetParameterValue("testval");
+			int testUserNumber = atoi(strTestValue.c_str());
+
+			// Cloud Controller
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
+			CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
+
+			CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+			CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
+
+			// Log in 
+			
+			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
+
+			pTestContext->testUserNum = testUserNumber;
+
+			// m_tokens stores the refresh token of users test0-9,
+			// so use -t 0 to login as test0@dreamos.com
+			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
+			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+
+			CloudController *pCloudController = pTestContext->pCloudController;
+			CN(pCloudController);
+
+			// Every 20 ms
+
+			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 5000) {
+
+				lastUpdateTime = timeNow;
+
+				if (pCloudController != nullptr) {
+					EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+					UserController *pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+					auto currentUser = pUserController->GetUser();
+
+					// TODO: increment 
+
+					int envID = pTestContext->environmentIDs[pTestContext->curEnvID];
+
+					// First off disconnect 
+					DEBUG_LINEOUT("Disconnecting from environment socket");
+					CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+
+					//// Reconnect 
+					CR(pEnvironmentController->ConnectToEnvironmentSocket(currentUser, envID));
+				}
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Reset Code 
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Test Switching Environment Sockets");
+	pNewTest->SetTestDescription("Test switching between environment sockets");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
 RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 200.0f;
 
 	// non-asynchronous methods could be set up for tests that login immediately like this
-	struct TestContext : public CloudController::UserObserver {
+	struct TestContext : 
+		public CloudController::UserObserver 
+	{
 		UserController *pUserController = nullptr;
 
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override { 
