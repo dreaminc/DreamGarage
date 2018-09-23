@@ -206,6 +206,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnPendLogout() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	virtual RESULT OnSwitchTeams() override {
 		return R_NOT_IMPLEMENTED;
 	}

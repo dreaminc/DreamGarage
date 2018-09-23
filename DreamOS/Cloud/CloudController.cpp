@@ -513,6 +513,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnPendLogout() {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnPendLogout());
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnSwitchTeams() {
 	RESULT r = R_PASS;
 

@@ -189,6 +189,17 @@ Error:
 	return r;
 }
 
+RESULT UserController::PendLogout() {
+	RESULT r = R_PASS;
+
+	if (m_pUserControllerObserver != nullptr) {
+		CR(m_pUserControllerObserver->OnPendLogout());
+	}
+
+Error:
+	return r;
+}
+
 RESULT UserController::SwitchTeam() {
 	RESULT r = R_PASS;
 

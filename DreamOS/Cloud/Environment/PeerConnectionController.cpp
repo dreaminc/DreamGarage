@@ -179,12 +179,12 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 	PeerConnection *pPeerConnection = nullptr;
 
 	if ((pPeerConnection = GetPeerConnectionByID(peerConnectionID)) != nullptr) {
-		DEBUG_LINEOUT("Peer Connection %d already exists", peerConnectionID);
+		DOSLOG(INFO, "Peer Connection %d already exists", peerConnectionID);
 		return pPeerConnection;
 	}
 
 	if ((pPeerConnection = GetPeerConnectionByAnswerUserID(peerUserID)) != nullptr) {
-		DEBUG_LINEOUT("Peer conncetion to peer %d already exists", peerUserID);
+		DOSLOG(INFO, "Peer conncetion to peer %d already exists", peerUserID);
 		return pPeerConnection;
 	}
 
@@ -197,6 +197,17 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 	return pPeerConnection;
 }
 */
+
+RESULT PeerConnectionController::ClosePeerConnection(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+
+	m_pWebRTCImp->CloseWebRTCPeerConnection(pPeerConnection);
+
+Error:
+	return r;
+}
 
 RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConnection) {
 
@@ -218,8 +229,11 @@ RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConne
 RESULT PeerConnectionController::CloseAllPeerConnections() {
 	RESULT r = R_PASS;
 
+	CR(ClearPeerConnections());
+
 	CN(m_pWebRTCImp);
 	m_pWebRTCImp->CloseAllPeerConnections();
+
 
 Error:
 	return r;
@@ -229,10 +243,9 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 	PeerConnection *pPeerConnection = new PeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 	PeerConnection *pPeerConnectionTemp = nullptr;
 
-
 	if ((pPeerConnectionTemp = GetPeerConnectionByID(pPeerConnection->GetPeerConnectionID())) != nullptr) {
 		DOSLOG(INFO, "[PeerConnectionController] creating a peer already found by connection");
-		DEBUG_LINEOUT("Peer Connection %d already exists", pPeerConnection->GetPeerConnectionID());
+		DOSLOG(INFO, "Peer Connection %d already exists", pPeerConnection->GetPeerConnectionID());
 
 		delete pPeerConnection;
 		pPeerConnection = nullptr;
@@ -242,7 +255,7 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 
 	m_peerConnections.push_back(pPeerConnection);
 
-	//Error:
+Error:
 	return pPeerConnection;
 }
 
@@ -252,7 +265,7 @@ RESULT PeerConnectionController::OnNewPeerConnection(long userID, long peerUserI
 	long position = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
 	
 	DOSLOG(INFO, "[PeerConnectionController] OnNewPeerConnection %v: myUserID: %v peerUserID: %v, position: %v", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
-	DEBUG_LINEOUT("%s: myUserID: %d peerUserID: %d, position: %d", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
+	DOSLOG(INFO, "%s: myUserID: %d peerUserID: %d, position: %d", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		//CR(m_pPeerConnectionControllerObserver->OnNewPeerConnection(position - 1));
@@ -326,7 +339,15 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 	CBM((userID != -1), "User does not seem to be signed in");
 
-	if (strMethod == "create_offer") {
+	if (strMethod == "disconnect") {
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+
+		DOSLOG(INFO, "[PeerConnectionController] disconnect peer connection %v offeror: %v answerer(self): %v", peerConnectionID, offerUserID, answerUserId);
+
+		CRM(ClosePeerConnection(pPeerConnection), "Failed to close peer connection");
+
+	}
+	else if (strMethod == "create_offer") {
 		if (userID != offerUserID) {
 			DOSLOG(ERR, "[PeerConnectionController] requested offer for wrong user. payload=%v", jsonPayload);
 			return R_FAIL;
@@ -545,7 +566,7 @@ RESULT PeerConnectionController::OnWebRTCConnectionClosed(long peerConnectionID)
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
-	DEBUG_LINEOUT("Peer Connection %d Closed", peerConnectionID);
+	DOSLOG(INFO, "Peer Connection %d Closed", peerConnectionID);
 
 	CR(OnPeerConnectionClosed(pPeerConnection));
 

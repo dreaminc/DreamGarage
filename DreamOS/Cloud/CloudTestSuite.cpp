@@ -84,6 +84,10 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		virtual RESULT OnLogout() override { 
 			return R_NOT_IMPLEMENTED; 
 		}
+
+		virtual RESULT OnPendLogout() override {
+			return R_NOT_HANDLED;
+		}
 		
 		virtual RESULT OnSwitchTeams() override {
 			return R_NOT_IMPLEMENTED;

@@ -41,9 +41,9 @@ WebRTCTestSuite::~WebRTCTestSuite() {
 RESULT WebRTCTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestWebRTCAudio());
-
 	CR(AddTestWebRTCMultiPeer());
+
+	CR(AddTestWebRTCAudio());
 
 	CR(AddTestChromeMultiBrowser());
 
@@ -118,9 +118,14 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	double sTestTime = 2000.0f;
 	int nRepeats = 1;
 
-	struct TestContext : public CloudController::PeerConnectionObserver {
-
+	struct TestContext : 
+		public CloudController::PeerConnectionObserver, 
+		public CloudController::UserObserver
+	{
 		CloudController *pCloudController = nullptr;
+		UserController *pUserController = nullptr;
+		bool fExitTest = false;
+
 		int testUserNum = 0;
 
 		// PeerConnectionObserver
@@ -178,15 +183,103 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			return R_NOT_HANDLED;
 		}
 
+		// CloudController::UserObserver
+		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+			DEBUG_LINEOUT("OnGetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSetSettings() override {
+			DEBUG_LINEOUT("OnSetSettings");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogin() override {
+			DEBUG_LINEOUT("OnLogin");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnLogout() override {
+			DEBUG_LINEOUT("OnLogout");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnPendLogout() override {
+			DEBUG_LINEOUT("OnPendLogout");
+
+			fExitTest = true;
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSwitchTeams() override {
+			DEBUG_LINEOUT("OnSwitchTeams");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			DEBUG_LINEOUT("OnFormURL");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnAccessToken");
+
+			CBM(fSuccess, "Request of access token failed");
+
+			CRM(pUserController->RequestUserProfile(strAccessToken), "Failed to request user profile");
+
+			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
+
+			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+
+		Error:
+			return r;
+		};
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
+			RESULT r = R_PASS;
+
+			DEBUG_LINEOUT("OnGetToken");
+
+			CB(fSuccess);
+
+			//CRM(pUserController->SetUserDefaultEnvironmentID(environmentId), "Failed to set default environment id");
+
+			// Using environment 170 for testing
+			CRM(pUserController->SetUserDefaultEnvironmentID(168), "Failed to set default environment id");
+
+			CRM(pUserController->UpdateLoginState(), "Failed to update login status");
+
+		Error:
+			return r;
+		};
+
 	} *pTestContext = new TestContext();
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		std::string strTestValue;
+
 		DOSLOG(INFO, "[WebRTCTestingSuite] Multipeer Test Initializing ... ");
 
-		CR(SetupSkyboxPipeline("standard"));
+		CR(SetupSkyboxPipeline("blinnphong"));
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -203,29 +296,28 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
 
+		strTestValue = pCommandLineManager->GetParameterValue("testval");
+		int testUserNumber = atoi(strTestValue.c_str());
+
 		// Cloud Controller
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 		pTestContext->pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, nullptr);
 		CNM(pTestContext->pCloudController, "Cloud Controller failed to initialize");
 
 		CRM(pTestContext->pCloudController->RegisterPeerConnectionObserver(pTestContext), "Failed to register Peer Connection Observer");
+		CRM(pTestContext->pCloudController->RegisterUserObserver(pTestContext), "Failed to register user observer");
 
 		// Log in 
 		{
-			// TODO: This way to start the cloud controller thread is not great
-			std::string strUsername = "test";
-			strUsername += pCommandLineManager->GetParameterValue("testval");
-			strUsername += "@dreamos.com";
+			pTestContext->pUserController = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+			CNM(pTestContext->pUserController, "Failed to acquire User Controller Proxy");
 
-			pTestContext->testUserNum = std::stoi(pCommandLineManager->GetParameterValue("testval"));
+			pTestContext->testUserNum = testUserNumber;
 
-			long environmentID = 170;
-			std::string strPassword = "nightmare";
-
-			CR(pCommandLineManager->SetParameterValue("username", strUsername));
-			CR(pCommandLineManager->SetParameterValue("password", strPassword));
-
-			CRM(pTestContext->pCloudController->Start(strUsername, strPassword, environmentID), "Failed to log in");
+			// m_tokens stores the refresh token of users test0-9,
+			// so use -t 0 to login as test0@dreamos.com
+			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
+			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 	Error:
@@ -288,6 +380,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 					pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
 				}
 			}
+		}
+
+		// TODO: Should have a way to kill the test that's not an error code
+		if (pTestContext->fExitTest) {
+			return R_FAIL;
 		}
 
 	Error:
@@ -529,6 +626,12 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnPendLogout() override {
+			DEBUG_LINEOUT("OnPendLogout");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnSwitchTeams() override {
 			DEBUG_LINEOUT("OnSwitchTeams");
 
@@ -624,7 +727,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
 
 		// Browser
-		if (testUserNumber == 2) {
+		if (testUserNumber == 10) {
 			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
 			CN(pTestContext->m_pWebBrowserManager);
 			CR(pTestContext->m_pWebBrowserManager->Initialize());

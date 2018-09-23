@@ -117,6 +117,7 @@ public:
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;
+	virtual RESULT OnPendLogout() override;
 	virtual RESULT OnSwitchTeams() override;
 
 	virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override;
@@ -157,7 +158,7 @@ private:
 	RESULT AllocateAndAssignUserModelFromPool(DreamPeerApp *pDreamPeer);
 	user* FindUserModelInPool(DreamPeerApp *pDreamPeer);
 	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeerApp> pDreamPeer);
-	RESULT PendClearPeers();
+	RESULT PendClearHands();
 
 	std::array<std::pair<DreamPeerApp*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeerApp*, user*>(nullptr, nullptr) };
 
@@ -172,10 +173,12 @@ private:
 
 	long m_pendingAssetReceiveUserID = -1;
 
+	bool m_fPendLogout = false;
+
 	// TODO: should these be here
 	bool m_fFirstLogin = true;
 	bool m_fHasCredentials = false;
-	bool m_fClearPeers = false;
+	bool m_fClearHands = false;
 
 	std::string m_strRefreshToken;
 	std::string m_strAccessToken;

@@ -108,7 +108,10 @@ public:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
+
 	RESULT Logout();
+	RESULT PendLogout();
+
 	RESULT LoginWithOTK(std::string& strOTK, long& environmentID);
 
 	RESULT SwitchTeam();
@@ -169,6 +172,7 @@ public:
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;
+		virtual RESULT OnPendLogout() = 0;
 		virtual RESULT OnSwitchTeams() = 0;
 
 		// api methods

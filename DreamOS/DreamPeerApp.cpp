@@ -541,8 +541,8 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 	CN(m_pUserModel);
 	CR(m_pUserModel->SetVisible(fVisible));
-	
-	if (m_pUserModel->GetMouth() != nullptr) {
+
+	if (m_pUserModel != nullptr && m_pUserModel->GetMouth() != nullptr) {
 		CR(m_pUserModel->GetMouth()->SetVisible(fVisible));
 	}
 	

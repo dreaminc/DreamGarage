@@ -70,6 +70,7 @@ public:
 	RESULT Initialize();
 	RESULT InitializeNewPeerConnection(long peerConnectionID, long userID, long peerUserID, bool fCreateOffer, bool fAddDataChannel);
 	RESULT CloseAllPeerConnections();
+	RESULT CloseWebRTCPeerConnection(PeerConnection *pPeerConnection);
 
 	RESULT Shutdown();
 

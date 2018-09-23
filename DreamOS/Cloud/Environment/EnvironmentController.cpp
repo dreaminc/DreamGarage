@@ -179,12 +179,17 @@ Error:
 RESULT EnvironmentController::DisconnectFromEnvironmentSocket() {
 	RESULT r = R_PASS;
 
+	// close all peers
+
+	// Close all peer connections
+	CR(m_pPeerConnectionController->CloseAllPeerConnections());
+	
+	DOSLOG(INFO, "Disconnecting from Environment Socket");
+
 	CNR(m_pEnvironmentWebsocket, R_SKIPPED);
+
 	CR(m_pEnvironmentWebsocket->Stop());
 	m_pEnvironmentWebsocket = nullptr;
-
-	// should this be here?
-	CR(m_pPeerConnectionController->CloseAllPeerConnections());
 
 Error:
 	return r;
@@ -890,6 +895,21 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage RESPONSE %v, %v", strMethod ,jsonPayload);
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
+		}
+		else if (strType == "request") {
+			DOSLOG(INFO, "[EnvironmentController] HandleSocketMessage REQUEST %v, %v", strMethod, jsonPayload);
+
+			if (strMethod == "disconnect") {
+				// This is now done in DreamGarage since server will close the socket automatically 
+				//RESULT r = DisconnectFromEnvironmentSocket();
+				
+				auto pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+				pUserController->PendLogout();
+				
+			}
+		}
+		else {
+			DOSLOG(ERR, "[EnvironmentController] websocket msg type unknown");
 		}
 
 	}

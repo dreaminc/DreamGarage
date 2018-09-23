@@ -752,6 +752,10 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return R_NOT_IMPLEMENTED;
 		}
 
+		virtual RESULT OnPendLogout() override {
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnDreamVersion(version dreamVersion) override {
 			DEBUG_LINEOUT("OnDreamVersion");
 
@@ -1230,6 +1234,10 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		virtual RESULT OnLogout() override {
 			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnPendLogout() override {
+			return R_NOT_HANDLED;
 		}
 
 		virtual RESULT OnSwitchTeams() override {
