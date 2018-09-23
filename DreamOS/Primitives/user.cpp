@@ -123,7 +123,10 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 	vector vHeadOffset = vector(0.0f, (float)(M_PI), 0.0f);
 
 #ifndef _DEBUG
-	CBM(m_pHead == nullptr, "avatar model already set");
+	if (m_pHead != nullptr) {
+		m_pHead = nullptr;
+	}
+
 	m_avatarModelId = avatarModelID;
 	CR(LoadHeadModelFromID());
 
