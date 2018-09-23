@@ -74,6 +74,19 @@ std::shared_ptr<model> user::GetMouth() {
 	return m_pMouth;
 }
 
+RESULT user::RemoveMouth() {
+	RESULT r = R_PASS;
+
+	CNR(m_pDreamOS, R_SKIPPED);
+	CNR(m_pMouth, R_SKIPPED);
+
+	m_pDreamOS->RemoveObjectFromUIGraph(m_pMouth.get());
+	m_pMouth = nullptr;
+
+Error:
+	return r;
+}
+
 std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
 	if (type == HAND_TYPE::HAND_LEFT) {
 		return m_pLeftHand;

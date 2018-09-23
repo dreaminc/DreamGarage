@@ -924,7 +924,7 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	//*/
 
 	//GetDOS()->OnStopSending();
-	//GetDOS()->OnStopReceiving();
+	GetDOS()->OnStopReceiving();
 
 	m_pDreamTabView->FlagShutdownAllSources();
 	CloseActiveAsset();

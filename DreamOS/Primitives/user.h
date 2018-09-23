@@ -33,6 +33,7 @@ public:
 	RESULT Initialize();
 	std::shared_ptr<composite> GetHead();
 	std::shared_ptr<model> GetMouth();
+	RESULT RemoveMouth();
 	std::shared_ptr<hand> GetHand(HAND_TYPE type);
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
