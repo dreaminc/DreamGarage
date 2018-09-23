@@ -836,14 +836,16 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 	if (pBrowser != nullptr) {	
 		
-		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset);
+		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+
+		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
 		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
 		m_strURL = "";
 
-		pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
 		// TODO: desktop setup

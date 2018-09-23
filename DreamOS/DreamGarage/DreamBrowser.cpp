@@ -635,7 +635,7 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL) {
 	RESULT r = R_PASS;
 
 	int pxWidth = m_browserWidth;
@@ -646,28 +646,7 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CNM(m_pWebBrowserManager == nullptr, "Manager already created");
 	m_pWebBrowserManager = pWebBrowserManager;
 
-	if (pEnvironmentAsset != nullptr) {
-		m_assetID = pEnvironmentAsset->GetAssetID();
-
-		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
-		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
-
-		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
-			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
-		}
-
-		m_strContentType = pEnvironmentAsset->GetContentType();
-
-		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
-
-		if (!requestHeaders.empty()) {
-			m_headermap[strEnvironmentAssetURL] = requestHeaders;
-		}
-
-		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
-	}
-
-	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, pEnvironmentAsset->GetURL());
+	m_pWebBrowserController = m_pWebBrowserManager->CreateNewBrowser(pxWidth, pxHeight, strURL);
 	m_pWebBrowserManager->UpdateJobProcesses();
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
@@ -1079,7 +1058,28 @@ RESULT DreamBrowser::PendEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnv
 RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;	
 
-//Error:
+	if (pEnvironmentAsset != nullptr) {
+		m_assetID = pEnvironmentAsset->GetAssetID();
+
+		std::string strEnvironmentAssetURL = pEnvironmentAsset->GetURL();
+		ResourceHandlerType resourceHandlerType = pEnvironmentAsset->GetResourceHandlerType();
+
+		if (resourceHandlerType == ResourceHandlerType::DREAM) {	// Keeping it flexible, it's very possible there's only default and dream
+			m_dreamResourceHandlerLinks[strEnvironmentAssetURL] = resourceHandlerType;
+		}
+
+		m_strContentType = pEnvironmentAsset->GetContentType();
+
+		std::multimap<std::string, std::string> requestHeaders = pEnvironmentAsset->GetHeaders();
+
+		if (!requestHeaders.empty()) {
+			m_headermap[strEnvironmentAssetURL] = requestHeaders;
+		}
+
+		m_currentEnvironmentAssetID = pEnvironmentAsset->GetAssetID();
+	}
+
+Error:
 	return r;
 }
 
