@@ -460,6 +460,19 @@ Error:
 	return r;
 }
 
+RESULT WebRTCConductor::CloseWebRTCPeerConnection(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
+	CN(pWebRTCPeerConnection);
+
+	// Get proxy from WebRTCPeerConnection
+	return pWebRTCPeerConnection->CloseWebRTCPeerConnection();
+
+Error:
+	return r;
+}
+
 RESULT WebRTCConductor::CloseAllPeerConnections() {
 	RESULT r = R_PASS;
 

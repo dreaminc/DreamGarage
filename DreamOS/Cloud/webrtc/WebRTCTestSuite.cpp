@@ -124,6 +124,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 	{
 		CloudController *pCloudController = nullptr;
 		UserController *pUserController = nullptr;
+		bool fExitTest = false;
 
 		int testUserNum = 0;
 
@@ -209,6 +210,8 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 		virtual RESULT OnPendLogout() override {
 			DEBUG_LINEOUT("OnPendLogout");
+
+			fExitTest = true;
 
 			return R_NOT_HANDLED;
 		}
@@ -377,6 +380,11 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 					pCloudController->BroadcastAudioPacket(kUserAudioLabel, pendingAudioPacket);
 				}
 			}
+		}
+
+		// TODO: Should have a way to kill the test that's not an error code
+		if (pTestContext->fExitTest) {
+			return R_FAIL;
 		}
 
 	Error:

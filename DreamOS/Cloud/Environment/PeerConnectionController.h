@@ -78,6 +78,7 @@ public:
 
 	//PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);	// DEADBEEF: ?
 	PeerConnection* CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
+	RESULT ClosePeerConnection(PeerConnection *pPeerConnection);
 	RESULT DeletePeerConnection(PeerConnection *pPeerConnection);
 	RESULT CloseAllPeerConnections();
 	

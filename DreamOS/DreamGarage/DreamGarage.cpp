@@ -959,6 +959,7 @@ RESULT DreamGarage::Update(void) {
 		if (m_pUserController != nullptr) {
 			CR(m_pUserController->Logout());
 		}
+
 		m_fPendLogout = false;
 	}
 
@@ -1473,6 +1474,9 @@ RESULT DreamGarage::OnPendLogout() {
 
 	m_fPendLogout = true;
 
+	CRM(Exit(r), "Failed to exit Dream");
+
+Error:
 	return r;
 }
 

@@ -267,21 +267,29 @@ RESULT Websocket::Stop() {
 
 	DEBUG_LINEOUT("Websocket::Stop");
 
+	// TODO: This is causing some kind of error on exit still
+	m_fRunning = false;
+
 	// Close the connection
+
+	// TODO: Move to shut down
 	m_websocketClient.stop_perpetual();
 	websocketpp::lib::error_code websocketError;
 
 	CNRM(m_pWebsocketConnection, R_SKIPPED, "Websocket connection already null");
-	m_websocketClient.close(m_pWebsocketConnection->get_handle(), websocketpp::close::status::going_away, "", websocketError);
 	
+	m_websocketClient.close(
+		m_pWebsocketConnection->get_handle(), 
+		websocketpp::close::status::normal, 
+		"disconnect", 
+		websocketError
+	);
+
 	m_pWebsocketConnection.reset();
 	
-	// TODO: This is causing some kind of error on exit still
-	m_fRunning = false;
-
-	if (m_thread.joinable()) {
-		m_thread.join();
-	}
+	//if (m_thread.joinable()) {
+	//	m_thread.join();
+	//}
 
 Error:
 	return r;

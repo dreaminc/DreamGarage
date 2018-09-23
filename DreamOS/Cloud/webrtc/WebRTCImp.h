@@ -70,6 +70,7 @@ public:
 
 	RESULT Shutdown();
 	RESULT CloseAllPeerConnections();
+	RESULT CloseWebRTCPeerConnection(PeerConnection *pPeerConnection);
 
 	// CloudImp Interface
 	RESULT Initialize();
