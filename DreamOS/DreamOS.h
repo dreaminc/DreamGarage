@@ -520,7 +520,7 @@ private:
 public:
 
 	virtual bool IsSharing();
-	virtual std::shared_ptr<texture> GetSharedContentTexture();
+	virtual texture* GetSharedContentTexture();
 	virtual RESULT SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture);
 	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 	virtual RESULT BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket);

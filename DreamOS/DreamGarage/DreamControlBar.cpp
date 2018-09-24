@@ -210,7 +210,7 @@ RESULT DreamControlBar::UpdateControlBarButtonsWithType(std::string strContentTy
 	CR(m_pUIControlBar->UpdateButtonsWithType(m_barType));
 
 	if (m_pParentApp != nullptr) {
-		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
+		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture());
 		fIsSharing = (fIsSharing && GetDOS()->IsSharing());
 
 		CR(SetSharingFlag(fIsSharing));

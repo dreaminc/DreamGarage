@@ -616,9 +616,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
 	
-	// Really strange, we need to send 4 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
+	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
 	if (m_fSendFrame && m_fFirstFrameIsReady) {
-		for (m_sentFrames = 0; m_sentFrames < 4; m_sentFrames++) {
+		for (m_sentFrames = 0; m_sentFrames < 8; m_sentFrames++) {
 			CR(m_pWebBrowserController->PollFrame());
 		}
 		m_fSendFrame = false;
@@ -776,8 +776,8 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
-	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 
@@ -890,7 +890,7 @@ RESULT DreamBrowser::OnAudioPacket(const AudioPacket &pendingAudioPacket) {
 
 	// TODO: Handle this (if streaming we broadcast into webrtc
 	// TODO: Either put this back in or move it to a different layer
-	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture) {
+	if (m_pObserver != nullptr && GetDOS()->GetSharedContentTexture() == m_pBrowserTexture.get()) {
 
 		if (m_pRenderSoundBuffer != nullptr) {
 

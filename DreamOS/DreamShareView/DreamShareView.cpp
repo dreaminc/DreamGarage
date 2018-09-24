@@ -172,8 +172,9 @@ RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTextur
 	return r;
 }
 
-std::shared_ptr<texture> DreamShareView::GetCastingTexture() {
-	return m_pCastTexture;
+texture* DreamShareView::GetCastingTexture() {
+//	return m_pCastTexture;
+	return m_pCastQuad->GetTextureDiffuse();
 }
 
 RESULT DreamShareView::Show() {

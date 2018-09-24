@@ -373,8 +373,8 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
-	CNR(GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture().get(), R_SKIPPED);
+	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);
 
 Error:

@@ -39,7 +39,7 @@ public:
 	RESULT ShowLoadingTexture();
 	RESULT ShowCastingTexture();
 	RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture);
-	std::shared_ptr<texture> GetCastingTexture();
+	texture* GetCastingTexture();
 	RESULT Show();
 	RESULT Hide();
 
