@@ -249,6 +249,7 @@ private:
 
 	bool m_fShouldBeginStream = false;
 	bool m_fSendFrame = false;
+	bool m_fFirstFrameIsReady = false;
 	int m_sentFrames = 0;
 
 	std::shared_ptr<EnvironmentAsset> m_pPendingEnvironmentAsset;

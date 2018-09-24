@@ -395,7 +395,6 @@ CefRequestHandler::ReturnValue CEFHandler::OnBeforeResourceLoad(CefRefPtr<CefBro
 	request->GetHeaderMap(requestHeaders);
 	std::multimap<std::string, std::string> checkForRequestHeaders;
 	std::string strURL = cefstrRequestURL;
-	DOSLOG(INFO, "OnBeforeResourceLoad: %s", strURL);
 	
 	// replacing with full headers list from server instead
 	/*

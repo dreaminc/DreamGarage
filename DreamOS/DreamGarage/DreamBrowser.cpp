@@ -617,11 +617,10 @@ RESULT DreamBrowser::Update(void *pContext) {
 	}
 	
 	// Really strange, we need to send 4 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
-	if (m_fSendFrame && m_sentFrames < 4) {
-		CR(m_pWebBrowserController->PollFrame());
-		m_sentFrames++;
-	}
-	if (m_fSendFrame && m_sentFrames >= 4) {	// reset
+	if (m_fSendFrame && m_fFirstFrameIsReady) {
+		for (m_sentFrames = 0; m_sentFrames < 4; m_sentFrames++) {
+			CR(m_pWebBrowserController->PollFrame());
+		}
 		m_fSendFrame = false;
 		m_sentFrames = 0;
 	}
@@ -758,6 +757,8 @@ Error:
 // TODO: Turn off CEF when we're not using it
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
+
+	m_fFirstFrameIsReady = true;
 
 	if (m_pBrowserTexture == nullptr) {
 		DOSLOG(INFO, "browser texture not initialized");
