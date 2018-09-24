@@ -176,6 +176,7 @@ private:
 
 	bool m_fPendLogout = false;
 	bool m_fPendSwitchTeams = false;
+	bool m_fPendExit = false;
 
 	// TODO: should these be here
 	bool m_fFirstLogin = true;
