@@ -961,8 +961,12 @@ RESULT DreamGarage::Update(void) {
 	}
 
 	if (m_fPendLogout) {
-		if (m_pUserController != nullptr) {
-			CR(m_pUserController->Logout());
+
+		EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		if(pEnvironmentController != nullptr && m_pUserController != nullptr) {
+			if (!pEnvironmentController->HasPeerConnections()) {
+				CR(m_pUserController->Logout());
+			}
 		}
 
 		m_fPendLogout = false;
@@ -977,8 +981,18 @@ RESULT DreamGarage::Update(void) {
 			}
 		}
 
-
 		m_fPendSwitchTeams = false;
+	}
+
+	if (m_fPendExit) {
+		EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		if(pEnvironmentController != nullptr && m_pUserController != nullptr) {
+			if (!pEnvironmentController->HasPeerConnections()) {
+				CR(DreamOS::Exit(r));
+			}
+		}
+
+		m_fPendExit = false;
 	}
 
 Error:
@@ -1475,6 +1489,8 @@ RESULT DreamGarage::OnLogout() {
 	m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN);
 
 	CR(pUserController->GetFormURL(strFormType));
+
+	CR(m_pDreamShareView->Hide());
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
@@ -1710,7 +1726,11 @@ RESULT DreamGarage::Exit(RESULT r) {
 
 	auto fnOnFadeOutCallback = [&](void *pContext) {
 
-		CRM(DreamOS::Exit(r), "Exit dream failed");
+		EnvironmentController *pEnvironmentController = dynamic_cast<EnvironmentController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+		CBRM(pEnvironmentController->IsEnvironmentSocketConnected(), R_SKIPPED, "Environment socket is not connected.");
+		CR(pEnvironmentController->DisconnectFromEnvironmentSocket());
+		//CRM(DreamOS::Exit(r), "Exit dream failed");
+		m_fPendExit = true;
 
 	Error:
 		return r;
