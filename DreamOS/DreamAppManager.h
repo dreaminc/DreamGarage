@@ -110,7 +110,8 @@ public:
 	RESULT SetMinFrameRate(double minFrameRate);
 	bool FindDreamAppWithName(std::string strDreamAppName);
 
-private:
+//private:
+public:
 	std::vector<DreamAppBase*> GetDreamApp(std::string strDreamAppName);
 
 protected:
