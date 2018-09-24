@@ -1376,9 +1376,11 @@ bool DreamOS::IsSharing() {
 	return m_pDreamShareView->IsStreaming();
 }
 
-std::shared_ptr<texture> DreamOS::GetSharedContentTexture() {
-	if(m_pDreamShareView != nullptr) 
+texture* DreamOS::GetSharedContentTexture() {
+
+	if (m_pDreamShareView != nullptr) {
 		return m_pDreamShareView->GetCastingTexture();
+	}
 	
 	return nullptr;
 }
