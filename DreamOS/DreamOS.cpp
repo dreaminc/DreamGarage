@@ -574,6 +574,19 @@ Error:
 	return r;
 }
 
+bool DreamOS::HasPeerApps() {
+	RESULT r = R_PASS;
+
+	CN(m_pSandbox);
+	CN(m_pSandbox->m_pDreamAppManager);
+
+
+	return m_pSandbox->m_pDreamAppManager->GetDreamApp("DreamPeerApp").size() > 0;
+
+Error:
+	return false;
+}
+
 DreamPeerApp::state DreamOS::GetPeerState(long peerUserID) {
 	std::shared_ptr<DreamPeerApp> pDreamPeer = nullptr;
 
