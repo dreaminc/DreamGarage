@@ -80,6 +80,36 @@ RESULT UISpatialScrollView::Update() {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<VirtualObj>> pChildren;
+	
+	if (m_fPendingButton) {
+		CR(m_pMenuButtonsContainer->ClearChildren());
+		m_pButtonDeque.clear();
+
+		int i = 0;
+		for (auto& pButton : m_pPendingButtons) {
+
+			CN(pButton);
+
+			//if (i < m_maxElements) {
+			CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+			pButton->SetVisible(true);
+			//}
+
+			//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
+			//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
+			m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
+
+			PositionMenuButton(i, pButton);
+			m_pMenuButtonsContainer->AddObject(pButton);
+			m_pButtonDeque.push_back(pButton);
+			m_itemIndex = -1;	// Is this a hack? In theory it should just be reset to 0, but this let's me also use it as a "first time" flag.
+
+			i++;
+		}
+		OnRotationDelta(0);
+		m_fPendingButton = false;
+	}
+
 	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
 
 	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
@@ -234,11 +264,11 @@ RESULT UISpatialScrollView::OnRotationDelta(int delta) {
 		minItemIndex += delta;	
 	}
 
-	else if (m_pScrollViewNodes.size() <= m_pButtonDeque.size()) {	// delta == 0 which means we're just populating new data
+	else if (!m_pButtonDeque.empty()) {	// delta == 0 which means we're just populating new data
 		if (m_itemIndex == -1) {	// catching first time flag
 			m_itemIndex = 0;
 		}
-		for (int i = 0; i < m_pScrollViewNodes.size(); i++) {	// MenuItem portion
+		for (int i = 0; i < m_pButtonDeque.size(); i++) {	// MenuItem portion
 			std::shared_ptr<UIButton> pButton = m_pButtonDeque[i];
 			UIMenuItem* pMenuItem = dynamic_cast<UIMenuItem*>(pButton.get());
 			CN(pMenuItem);
@@ -445,30 +475,8 @@ RESULT UISpatialScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButt
 		}
 	}
 
-	CR(m_pMenuButtonsContainer->ClearChildren());
-	m_pButtonDeque.clear();
-
-	int i = 0;
-	for (auto& pButton : pButtons) {
-
-		CN(pButton);
-
-		//if (i < m_maxElements) {
-		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-		pButton->SetVisible(true);
-		//}
-
-		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurface().get());
-		//m_pDreamOS->AddObjectToUIClippingGraph(pButton->GetSurfaceComposite().get());
-		m_pDreamOS->AddObjectToUIClippingGraph(pButton.get());
-
-		PositionMenuButton(i, pButton);
-		m_pMenuButtonsContainer->AddObject(pButton);
-		m_pButtonDeque.push_back(pButton);
-		m_itemIndex = -1;	// Is this a hack? In theory it should just be reset to 0, but this let's me also use it as a "first time" flag.
-
-		i++;
-	}
+	m_fPendingButton = true;
+	m_pPendingButtons = pButtons;
 
 Error:
 	return r;
@@ -480,9 +488,11 @@ RESULT UISpatialScrollView::AddScrollViewNode(std::shared_ptr<MenuNode> pMenuNod
 	CN(pMenuNode);
 
 	m_pScrollViewNodes.push_back(pMenuNode);
+	/*
 	if (m_pScrollViewNodes.size() <= m_pButtonDeque.size()) {	// still populating current menu items
 		OnRotationDelta(0);
 	}
+	*/
 	
 Error:
 	return r;
