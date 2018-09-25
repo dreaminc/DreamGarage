@@ -83,6 +83,9 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
 
+	sandboxconfig.fHideWindow = false;
+	sandboxconfig.fHMDMirror = true;
+
 	//sandboxconfig.fHideWindow = false;
 	//sandboxconfig.fHMDMirror = false;
 	//sandboxconfig.f3rdPersonCamera = true;
@@ -642,7 +645,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 	
 	// DEBUG:
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 
@@ -671,7 +674,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			return m_pUserController->GetAccessToken(strDebugRefreshToken);
 		}
 	}
-#endif
+//#endif
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
