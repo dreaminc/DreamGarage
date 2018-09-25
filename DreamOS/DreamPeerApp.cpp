@@ -37,12 +37,15 @@ RESULT DreamPeerApp::InitializeApp(void *pContext) {
 	SetAppName("DreamPeerApp");
 	SetAppDescription("A Dream User App");
 
+
 	m_pUIObjectComposite = GetComposite()->MakeComposite();
 	m_pUIObjectComposite->SetPosition(GetComposite()->GetPosition(true));
 	GetDOS()->AddObjectToUIGraph(m_pUIObjectComposite.get());
 
 	m_pUserLabelComposite = m_pUIObjectComposite->MakeComposite();
 	m_pUserLabelComposite = m_pUIObjectComposite->AddComposite();
+
+	DOSLOG(INFO, "DreamPeerApp object composites created");
 
 Error:
 	return r;
@@ -152,6 +155,8 @@ RESULT DreamPeerApp::InitializeUserNameText() {
 	CR(m_pUserLabelComposite->AddObject(m_pTextUserName));
 	m_pTextUserName->SetMaterialDiffuseColor(m_hiddenColor);
 
+	DOSLOG(INFO, "DreamPeerApp text object created");
+
 Error:
 	return r;
 }
@@ -228,6 +233,8 @@ RESULT DreamPeerApp::InitializeUserNameLabel() {
 	else {
 		m_pUserLabelComposite->SetVisible(true);
 	}
+
+	DOSLOG(INFO, "DreamPeerApp username label created");
 
 Error:
 	return r;
@@ -447,6 +454,7 @@ RESULT DreamPeerApp::SetPeerConnection(PeerConnection *pPeerConnection) {
 	m_avatarModelId = pUserController->GetPeerAvatarModelID(m_peerUserID);
 	m_strProfilePhotoURL = pUserController->GetPeerProfilePhotoURL(m_peerUserID);
 
+	DOSLOG(INFO, "SetPeerConnection: %s %d", m_strScreenName, m_avatarModelId);
 
 Error:
 	return r;
