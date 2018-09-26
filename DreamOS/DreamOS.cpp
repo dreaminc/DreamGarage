@@ -492,10 +492,11 @@ std::shared_ptr<DreamPeerApp> DreamOS::CreateNewPeer(PeerConnection *pPeerConnec
 	pDreamPeerApp = LaunchDreamApp<DreamPeerApp>(this, true);
 	CNM(pDreamPeerApp, "Failed to create dream peer app");
 
-	pDreamPeerApp->SetPeerConnection(pPeerConnection);
+	CR(pDreamPeerApp->SetPeerConnection(pPeerConnection));
 
 	// Set map
 	m_dreamPeerApps[peerUserID] = pDreamPeerApp;
+	DOSLOG(INFO, "DreamPeerApp added to connections");
 
 	return pDreamPeerApp;
 

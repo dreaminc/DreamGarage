@@ -67,12 +67,16 @@ public:
 	}
 };
 
-WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) :
+WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, 
+										   long peerConnectionID, 
+										   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
+										   WebRTCConductor *pParentWebRTCConductor) :
 	m_pParentObserver(pParentObserver),
 	m_peerConnectionID(peerConnectionID),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_pWebRTCPeerConnectionInterface(nullptr),
-	m_WebRTCPeerID(-1)
+	m_WebRTCPeerID(-1),
+	m_pParentWebRTCConductor(pParentWebRTCConductor)
 {
 	if (pWebRTCPeerConnectionFactory != nullptr) {
 		pWebRTCPeerConnectionFactory->AddRef();
@@ -110,7 +114,7 @@ RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));			// ensure peer connection uninitialized
 
-																		//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
+	//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
 	CBM((CreatePeerConnection(DTLS_ON)), "Error CreatePeerConnection failed");
 	CN(m_pWebRTCPeerConnectionInterface.get());
 
@@ -140,7 +144,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	// Chrome Audio Source
+	//// Chrome Audio Source
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
 	// Chrome Video
@@ -148,7 +152,6 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
-	//CR(AddAudioStream(pMediaStreamInterface, kChromeAudioLabel));
 
 	// Add user stream to peer connection interface
 	//if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
@@ -385,7 +388,7 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 	webrtc::DataChannelInit dataChannelInit;
 
 	// Set max transmit time to 3 frames
-	dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
+	//dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
 	dataChannelInit.reliable = false;
 	dataChannelInit.ordered = false;
 
@@ -393,6 +396,8 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 
 	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kUserDataLabel, &dataChannelInit);
 	CN(m_pDataChannelInterface);
+
+	m_pDataChannelInterface->AddRef();
 	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
 	m_WebRTCLocalActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
@@ -1078,12 +1083,15 @@ Error:
 	return;
 }
 
+#include "p2p/client/basicportallocator.h"
+
 RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
-	rtcConfiguration.dscp();
-
+	rtcConfiguration.enable_dtls_srtp = dtls;
+	//rtcConfiguration.ice_connection_receiving_timeout = 1000;
+	
 	// Not really working?
 	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
 
@@ -1092,28 +1100,66 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
 	TwilioNTSInformation twilioNTSInformation = m_pParentObserver->GetTwilioNTSInformation();
 
+	std::unique_ptr<cricket::BasicPortAllocator> pPortAllocator = nullptr;
+
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
-	for (auto &strICEServerURI : twilioNTSInformation.m_ICEServerURIs) {
-		iceServer.uri = strICEServerURI;
-		iceServer.username = twilioNTSInformation.GetUsername();
-		iceServer.password = twilioNTSInformation.GetPassword();
+	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
+		
+		iceServer.uri = twilioNTSInformation.m_ICEServerURIs[i];
+		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
+		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
+
+		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
+
 		rtcConfiguration.servers.push_back(iceServer);
 	}
 
+	//iceServer.uri = "turn:w1.xirsys.com:80?transport=tcp";
+	//iceServer.username = "e1fa02b0-c151-11e8-8acc-4963be209ae3";
+	//iceServer.password = "e1fa0332-c151-11e8-80e4-3b6f3523fb32";
+	//rtcConfiguration.servers.push_back(iceServer);
+
+	//// Testing
+	//{
+	//	webrtc::PeerConnectionInterface::IceServer testGoogleSTUNServer;
+	//	testGoogleSTUNServer.uri = "stun:stun.l.google.com:19302";
+	//	rtcConfiguration.servers.push_back(testGoogleSTUNServer);
+	//}
+
 	if (dtls) {
 		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
-		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		//pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(
+			new rtc::RTCCertificateGenerator(m_pParentWebRTCConductor->m_signalingThread.get(), 
+											 m_pParentWebRTCConductor->m_workerThread.get())
+		);
 		//}
 
-		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
+		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
 
-		rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+		webrtcConstraints.SetAllowDtlsSctpDataChannels();
+		//rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+
 		//rtcConfiguration.enable_rtp_data_channel = true;
 
-		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
+		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(
+			rtcConfiguration,
+			&webrtcConstraints,
+			nullptr,
+			std::move(pCertificateGenerator),
+			this
+		);
+
+		//webrtc::PeerConnectionDependencies peerConnectionDependencies;
+		//peerConnectionDependencies.observer = this;
+		//peerConnectionDependencies.cert_generator = nullptr;
+		//peerConnectionDependencies.tls_cert_verifier = nullptr;
+		//peerConnectionDependencies.allocator = nullptr;
+		//
+		//m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, peerConnectionDependencies);
 	}
 	else {
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
@@ -1134,7 +1180,7 @@ RESULT WebRTCPeerConnection::CreateOffer() {
 	CN(m_pWebRTCPeerConnectionInterface);
 
 	m_fOffer = true;
-	m_pWebRTCPeerConnectionInterface->CreateOffer(this, NULL);
+	m_pWebRTCPeerConnectionInterface->CreateOffer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 
 Error:
 	return r;
@@ -1161,7 +1207,7 @@ RESULT WebRTCPeerConnection::CreateSDPOfferAnswer(std::string strSDPOffer) {
 	//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
 	//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
 	if (strSDPType == "offer") {
-		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, NULL);
+		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 	}
 
 	// Saves the candidates

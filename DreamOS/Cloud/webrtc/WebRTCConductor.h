@@ -75,6 +75,7 @@ public:
 	RESULT Shutdown();
 
 	friend class WebRTCImp;
+	friend class WebRTCPeerConnection;
 
 public:
 	// WebRTCPeerConnectionObserver Interface
@@ -155,15 +156,17 @@ private:
 
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 
+
+	// Audio Device Module
+	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
+	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
+
+protected:
 	// Worker and Network Threads
 	// TODO: Might need to close these down on exit
 	std::unique_ptr<rtc::Thread> m_networkThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_workerThread = nullptr;
 	std::unique_ptr<rtc::Thread> m_signalingThread = nullptr;
-
-	// Audio Device Module
-	rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceModule = nullptr;
-	//rtc::scoped_refptr<webrtc::AudioDeviceModule> m_pAudioDeviceDummyModule = nullptr;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

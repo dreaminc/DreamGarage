@@ -116,7 +116,9 @@ User WebRTCImp::GetUser() {
 }
 
 TwilioNTSInformation WebRTCImp::GetTwilioNTSInformation() {
-	return m_twilioNTSInformation;
+	auto pUserController = dynamic_cast<UserController*>(GetParentCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+	
+	return pUserController->GetTwilioNTSInformation();
 }
 
 RESULT WebRTCImp::SetUser(User currentUser) {
@@ -124,6 +126,7 @@ RESULT WebRTCImp::SetUser(User currentUser) {
 	return R_PASS;
 }
 
+// TODO: remove this path
 RESULT WebRTCImp::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
 	m_twilioNTSInformation = twilioNTSInformation;
 	return R_PASS;

@@ -829,18 +829,25 @@ void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	m_twilioNTSInformation = TwilioNTSInformation(
 		jsonData["/date_created"_json_pointer].get<std::string>(),
 		jsonData["/date_updated"_json_pointer].get<std::string>(),
-		jsonData["/ttl"_json_pointer].get<int>(),
-		jsonData["/username"_json_pointer].get<std::string>(),
-		jsonData["/password"_json_pointer].get<std::string>()
+		jsonData["/ttl"_json_pointer].get<int>()
 	);
 
 	// Ice Server URIs
 	for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
-		std::string strSDPCandidate = jsonICEServer["url"].get<std::string>();
-		m_twilioNTSInformation.AddICEServerURI(strSDPCandidate);
+		std::string strICEServerURI = jsonICEServer["url"].get<std::string>();
+
+		std::string strICEServerUsername;
+		if(jsonData["/username"_json_pointer].is_null() != true)
+			strICEServerUsername = jsonData["/username"_json_pointer].get<std::string>();
+
+		std::string strICEServerPassword;
+		if (jsonData["/password"_json_pointer].is_null() != true)
+			strICEServerPassword = jsonData["/username"_json_pointer].get<std::string>();
+
+		m_twilioNTSInformation.AddICEServerURI(strICEServerURI, strICEServerUsername, strICEServerPassword);
 	}
 
-	DEBUG_LINEOUT("Twilio NTS Information Loaded");
+	DOSLOG(INFO, "Twilio NTS Information Loaded");
 	m_twilioNTSInformation.Print();
 
 	m_loginState.fHasTwilioInformation = true;
@@ -1007,15 +1014,22 @@ RESULT UserController::LoadTwilioNTSInformation() {
 		m_twilioNTSInformation = TwilioNTSInformation(
 			jsonResponse["/data/date_created"_json_pointer].get<std::string>(),
 			jsonResponse["/data/date_updated"_json_pointer].get<std::string>(),
-			jsonResponse["/data/ttl"_json_pointer].get<int>(),
-			jsonResponse["/data/username"_json_pointer].get<std::string>(),
-			jsonResponse["/data/password"_json_pointer].get<std::string>()
+			jsonResponse["/data/ttl"_json_pointer].get<int>()
 		);
 
 		// Ice Server URIs
 		for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
-			std::string strSDPCandidate = jsonICEServer["url"].get<std::string>();
-			m_twilioNTSInformation.AddICEServerURI(strSDPCandidate);
+			std::string strICEServerURI = jsonICEServer["url"].get<std::string>();
+			
+			std::string strICEServerUsername;
+			if (jsonResponse["/username"_json_pointer].is_null() != true)
+				strICEServerUsername = jsonResponse["/username"_json_pointer].get<std::string>();
+
+			std::string strICEServerPassword;
+			if (jsonResponse["/password"_json_pointer].is_null() != true)
+				strICEServerPassword = jsonResponse["/username"_json_pointer].get<std::string>();
+
+			m_twilioNTSInformation.AddICEServerURI(strICEServerURI, strICEServerUsername, strICEServerPassword);
 		}
 
 		DEBUG_LINEOUT("Twilio NTS Information Loaded");

@@ -84,6 +84,9 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.f3rdPersonCamera = false;
 
 	//sandboxconfig.fHideWindow = false;
+	//sandboxconfig.fHMDMirror = true;
+
+	//sandboxconfig.fHideWindow = false;
 	//sandboxconfig.fHMDMirror = false;
 	//sandboxconfig.f3rdPersonCamera = true;
 	//sandboxconfig.fUseGamepad = true;
@@ -926,9 +929,9 @@ RESULT DreamGarage::Update(void) {
 
 	// Head update
 	// TODO: this should go up into DreamOS or even sandbox
-	///*
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
+	///*
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
 		SendHeadPosition();
 		g_lastHeadUpdateTime = timeNow;
@@ -947,13 +950,13 @@ RESULT DreamGarage::Update(void) {
 		SendMouthSize();
 		g_lastMouthUpdateTime = timeNow;
 	}
-	//*/
 
 	// Periodically check peer app states
 	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastPeerStateCheckTime).count() > CHECK_PEER_APP_STATE_INTERVAL_MS) {
 		CR(CheckDreamPeerAppStates());
 		g_lastPeerStateCheckTime = timeNow;
 	}
+	//*/
 
 	if (m_fClearHands) {
 		//CRM(m_pDreamUserApp->ClearHands(), "failed to clear hands");
