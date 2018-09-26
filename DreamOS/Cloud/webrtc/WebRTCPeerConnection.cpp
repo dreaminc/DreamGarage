@@ -1090,7 +1090,6 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
 	rtcConfiguration.enable_dtls_srtp = dtls;
-	rtcConfiguration.ice_candidate_pool_size = 4;
 	
 	// Not really working?
 	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
@@ -1099,7 +1098,6 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	webrtc::FakeConstraints webrtcConstraints;
 	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
 	TwilioNTSInformation twilioNTSInformation = m_pParentObserver->GetTwilioNTSInformation();
-
 
 	std::unique_ptr<cricket::BasicPortAllocator> pPortAllocator = nullptr;
 
