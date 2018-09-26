@@ -74,7 +74,7 @@ public:
 		// happens at the same time, and cleared at the same time
 		m_ICEServerURIs.push_back(strICEServerURI);
 		m_ICEServerUsernames.push_back(strUsername);
-		m_ICEServerPasswords.push_back(strUsername);
+		m_ICEServerPasswords.push_back(strPassword);
 
 	Error:
 		return r;
