@@ -931,7 +931,7 @@ RESULT DreamGarage::Update(void) {
 	// TODO: this should go up into DreamOS or even sandbox
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
-	/*
+	///*
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
 		SendHeadPosition();
 		g_lastHeadUpdateTime = timeNow;

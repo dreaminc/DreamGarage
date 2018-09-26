@@ -144,11 +144,11 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	////// Chrome Audio Source
-	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	//// Chrome Audio Source
+	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
-	//// Chrome Video
-	//CR(AddVideoStream());
+	// Chrome Video
+	CR(AddVideoStream());
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
@@ -1090,6 +1090,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
 	rtcConfiguration.enable_dtls_srtp = dtls;
+	//rtcConfiguration.ice_connection_receiving_timeout = 1000;
 	
 	// Not really working?
 	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
