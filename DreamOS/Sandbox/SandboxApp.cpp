@@ -551,7 +551,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	#else
 		CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
 	#endif
-//#endif
+#endif
 
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
