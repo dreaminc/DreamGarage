@@ -140,15 +140,14 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	//// Chrome Audio Source
-	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
-	
-	// Chrome Video
-	CR(AddVideoStream());
+	////// Chrome Audio Source
+	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	//
+	//// Chrome Video
+	//CR(AddVideoStream());
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
-	//CR(AddAudioStream(pMediaStreamInterface, kChromeAudioLabel));
 
 	// Add user stream to peer connection interface
 	//if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
@@ -165,9 +164,9 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// Data Channel
 	// This is not in the media streaming interface
-	if (fAddDataChannel) {
-		CR(AddDataChannel());
-	}
+	//if (fAddDataChannel) {
+	//	CR(AddDataChannel());
+	//}
 
 Error:
 	return r;

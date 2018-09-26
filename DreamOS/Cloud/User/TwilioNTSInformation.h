@@ -78,14 +78,14 @@ public:
 	}
 
 	RESULT Print() {
-		DEBUG_LINEOUT("Twilio NTS Information TTL: %d", m_TTL);
-		DEBUG_LINEOUT("Created: %s Updated %s", std::ctime(&m_timeCreated), std::ctime(&m_timeUpdated));
-		DEBUG_LINEOUT("Username: %s", m_strUsername.c_str());
-		DEBUG_LINEOUT("Password: %s", m_strPassword.c_str());
+		DOSLOG(INFO, "Twilio NTS Information TTL: %d", m_TTL);
+		DOSLOG(INFO, "Created: %s Updated %s", std::ctime(&m_timeCreated), std::ctime(&m_timeUpdated));
+		DOSLOG(INFO, "Username: %s", m_strUsername.c_str());
+		DOSLOG(INFO, "Password: %s", m_strPassword.c_str());
 
 		int i = 0;
 		for (auto &strICEServerURI : m_ICEServerURIs) {
-			DEBUG_LINEOUT("%d: %s", i++, strICEServerURI.c_str());
+			DOSLOG(INFO, "%d: %s", i++, strICEServerURI.c_str());
 		}
 
 		return R_PASS;
