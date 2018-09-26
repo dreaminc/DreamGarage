@@ -827,16 +827,22 @@ void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	CB(statusCode == 200);
 
 	m_twilioNTSInformation = TwilioNTSInformation(
-		jsonData["/date_created"_json_pointer].get<std::string>(),
-		jsonData["/date_updated"_json_pointer].get<std::string>(),
-		jsonData["/ttl"_json_pointer].get<int>()
+		//jsonData["/date_created"_json_pointer].get<std::string>(),
+		//jsonData["/date_updated"_json_pointer].get<std::string>(),
+		//jsonData["/ttl"_json_pointer].get<int>()
 	);
 
 	// Ice Server URIs
 	for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
 		std::string strICEServerURI = jsonICEServer["url"].get<std::string>();
-		std::string strICEServerUsername = jsonICEServer["username"].get<std::string>();
-		std::string strICEServerPassword = jsonICEServer["password"].get<std::string>();
+
+		std::string strICEServerUsername;
+		if(jsonICEServer["username"].is_null() != true)
+			strICEServerUsername = jsonICEServer["username"].get<std::string>();
+
+		std::string strICEServerPassword;
+		if (jsonICEServer["password"].is_null() != true)
+			strICEServerPassword = jsonICEServer["password"].get<std::string>();
 
 		m_twilioNTSInformation.AddICEServerURI(strICEServerURI, strICEServerUsername, strICEServerPassword);
 	}
@@ -1006,9 +1012,9 @@ RESULT UserController::LoadTwilioNTSInformation() {
 		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
 
 		m_twilioNTSInformation = TwilioNTSInformation(
-			jsonResponse["/data/date_created"_json_pointer].get<std::string>(),
-			jsonResponse["/data/date_updated"_json_pointer].get<std::string>(),
-			jsonResponse["/data/ttl"_json_pointer].get<int>()
+			//jsonResponse["/data/date_created"_json_pointer].get<std::string>(),
+			//jsonResponse["/data/date_updated"_json_pointer].get<std::string>(),
+			//jsonResponse["/data/ttl"_json_pointer].get<int>()
 		);
 
 		// Ice Server URIs
