@@ -110,7 +110,7 @@ RESULT WebRTCPeerConnection::InitializePeerConnection(bool fAddDataChannel) {
 	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));			// ensure peer connection uninitialized
 
-																		//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
+	//CBM((CreatePeerConnection(DTLS_OFF)), "Error CreatePeerConnection failed");
 	CBM((CreatePeerConnection(DTLS_ON)), "Error CreatePeerConnection failed");
 	CN(m_pWebRTCPeerConnectionInterface.get());
 
@@ -140,7 +140,7 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	// Chrome Audio Source
+	//// Chrome Audio Source
 	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
 	// Chrome Video
@@ -385,7 +385,7 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 	webrtc::DataChannelInit dataChannelInit;
 
 	// Set max transmit time to 3 frames
-	dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
+	//dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
 	dataChannelInit.reliable = false;
 	dataChannelInit.ordered = false;
 
@@ -393,6 +393,8 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 
 	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kUserDataLabel, &dataChannelInit);
 	CN(m_pDataChannelInterface);
+
+	m_pDataChannelInterface->AddRef();
 	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
 	m_WebRTCLocalActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
@@ -1082,7 +1084,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
-	rtcConfiguration.dscp();
+	rtcConfiguration.enable_dtls_srtp = dtls;
 
 	// Not really working?
 	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
@@ -1102,18 +1104,27 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 		rtcConfiguration.servers.push_back(iceServer);
 	}
 
+	//// Testing
+	//{
+	//	webrtc::PeerConnectionInterface::IceServer testGoogleSTUNServer;
+	//	testGoogleSTUNServer.uri = "stun:stun.l.google.com:19302";
+	//	rtcConfiguration.servers.push_back(testGoogleSTUNServer);
+	//}
+
 	if (dtls) {
 		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
 		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
 		//}
 
-		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
+		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
 
-		rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+		webrtcConstraints.SetAllowDtlsSctpDataChannels();
+		//rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+
 		//rtcConfiguration.enable_rtp_data_channel = true;
 
-		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
+		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, nullptr, nullptr, nullptr, this);
 	}
 	else {
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
@@ -1134,7 +1145,7 @@ RESULT WebRTCPeerConnection::CreateOffer() {
 	CN(m_pWebRTCPeerConnectionInterface);
 
 	m_fOffer = true;
-	m_pWebRTCPeerConnectionInterface->CreateOffer(this, NULL);
+	m_pWebRTCPeerConnectionInterface->CreateOffer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 
 Error:
 	return r;
@@ -1161,7 +1172,7 @@ RESULT WebRTCPeerConnection::CreateSDPOfferAnswer(std::string strSDPOffer) {
 	//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
 	//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
 	if (strSDPType == "offer") {
-		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, NULL);
+		m_pWebRTCPeerConnectionInterface->CreateAnswer(this, webrtc::PeerConnectionInterface::RTCOfferAnswerOptions());
 	}
 
 	// Saves the candidates
