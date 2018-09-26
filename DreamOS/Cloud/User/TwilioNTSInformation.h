@@ -86,8 +86,8 @@ public:
 		
 		for (int i = 0; i < m_ICEServerURIs.size(); i++) {
 			DOSLOG(INFO, "%d: %s", i, m_ICEServerURIs[i].c_str());
-			DOSLOG(INFO, "%d: Username: %s", i, m_ICEServerUsernames[i].c_str());
-			DOSLOG(INFO, "%d: Password: %s", i, m_ICEServerPasswords[i].c_str());
+			//DOSLOG(INFO, "%d: Username: %s", i, m_ICEServerUsernames[i].c_str());
+			//DOSLOG(INFO, "%d: Password: %s", i, m_ICEServerPasswords[i].c_str());
 		}
 
 		return R_PASS;
