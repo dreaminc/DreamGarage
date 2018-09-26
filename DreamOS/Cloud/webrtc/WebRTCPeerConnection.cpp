@@ -144,11 +144,11 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	//// Chrome Audio Source
-	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	////// Chrome Audio Source
+	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
 	
-	// Chrome Video
-	CR(AddVideoStream());
+	//// Chrome Video
+	//CR(AddVideoStream());
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
