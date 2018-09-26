@@ -82,7 +82,11 @@ public:
 	friend class WebRTCConductor;
 
 public:
-	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory);
+	WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, 
+						 long peerConnectionID, 
+						 rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
+						 WebRTCConductor *pParentWebRTCConductor
+						 );
 	~WebRTCPeerConnection();
 
 	// TODO: Generalize this when we add renegotiation 
@@ -224,6 +228,8 @@ private:
 
 	bool m_fOffer;	// TODO: this needs to be generalized
 	bool m_fSDPSet;	// TODO: temp
+
+	WebRTCConductor *m_pParentWebRTCConductor = nullptr;
 
 	std::string m_strLocalSessionDescriptionProtocol;
 	std::string m_strLocalSessionDescriptionType;

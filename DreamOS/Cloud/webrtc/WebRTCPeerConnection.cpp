@@ -67,12 +67,16 @@ public:
 	}
 };
 
-WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) :
+WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, 
+										   long peerConnectionID, 
+										   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
+										   WebRTCConductor *pParentWebRTCConductor) :
 	m_pParentObserver(pParentObserver),
 	m_peerConnectionID(peerConnectionID),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_pWebRTCPeerConnectionInterface(nullptr),
-	m_WebRTCPeerID(-1)
+	m_WebRTCPeerID(-1),
+	m_pParentWebRTCConductor(pParentWebRTCConductor)
 {
 	if (pWebRTCPeerConnectionFactory != nullptr) {
 		pWebRTCPeerConnectionFactory->AddRef();
@@ -1119,7 +1123,10 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	if (dtls) {
 		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
 		//pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
-		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new rtc::RTCCertificateGenerator(nullptr, nullptr));
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(
+			new rtc::RTCCertificateGenerator(m_pParentWebRTCConductor->m_signalingThread.get(), 
+											 m_pParentWebRTCConductor->m_workerThread.get())
+		);
 		//}
 
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");

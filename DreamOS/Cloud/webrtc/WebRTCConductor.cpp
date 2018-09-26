@@ -73,7 +73,8 @@ rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::AddNewPeerConnection(l
 			new rtc::RefCountedObject<WebRTCPeerConnection>(
 				this, 
 				peerConnectionID, 
-				m_pWebRTCPeerConnectionFactory) 
+				m_pWebRTCPeerConnectionFactory,
+				this)	// TODO: there is a more eloquent way to do this
 			);
 	
 	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
