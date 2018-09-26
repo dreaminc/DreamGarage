@@ -1079,6 +1079,8 @@ Error:
 	return;
 }
 
+#include "p2p/client/basicportallocator.h"
+
 RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
@@ -1093,6 +1095,9 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
 	TwilioNTSInformation twilioNTSInformation = m_pParentObserver->GetTwilioNTSInformation();
 
+
+	std::unique_ptr<cricket::BasicPortAllocator> pPortAllocator = nullptr;
+
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
@@ -1100,6 +1105,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 		iceServer.uri = strICEServerURI;
 		iceServer.username = twilioNTSInformation.GetUsername();
 		iceServer.password = twilioNTSInformation.GetPassword();
+		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
 		rtcConfiguration.servers.push_back(iceServer);
 	}
 
@@ -1112,7 +1118,8 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	if (dtls) {
 		//if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
-		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		//pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new rtc::RTCCertificateGenerator(nullptr, nullptr));
 		//}
 
 		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
@@ -1123,7 +1130,21 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 		//rtcConfiguration.enable_rtp_data_channel = true;
 
-		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, nullptr, nullptr, nullptr, this);
+		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(
+			rtcConfiguration,
+			&webrtcConstraints,
+			nullptr,
+			std::move(pCertificateGenerator),
+			this
+		);
+
+		//webrtc::PeerConnectionDependencies peerConnectionDependencies;
+		//peerConnectionDependencies.observer = this;
+		//peerConnectionDependencies.cert_generator = nullptr;
+		//peerConnectionDependencies.tls_cert_verifier = nullptr;
+		//peerConnectionDependencies.allocator = nullptr;
+		//
+		//m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, peerConnectionDependencies);
 	}
 	else {
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
