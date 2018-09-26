@@ -144,11 +144,11 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 	// User audio stream
 	CR(AddLocalAudioSource(kUserAudioLabel, kUserStreamLabel));
 	
-	////// Chrome Audio Source
-	//CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
-	//
-	//// Chrome Video
-	//CR(AddVideoStream());
+	//// Chrome Audio Source
+	CR(AddLocalAudioSource(kChromeAudioLabel, kChromeStreamLabel));
+	
+	// Chrome Video
+	CR(AddVideoStream());
 
 	
 	//CR(AddLocalAudioSource(pMediaStreamInterface, kChromeAudioLabel));
@@ -168,9 +168,9 @@ RESULT WebRTCPeerConnection::AddStreams(bool fAddDataChannel) {
 
 	// Data Channel
 	// This is not in the media streaming interface
-	//if (fAddDataChannel) {
-	//	CR(AddDataChannel());
-	//}
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;
@@ -1105,13 +1105,20 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
-	for (auto &strICEServerURI : twilioNTSInformation.m_ICEServerURIs) {
-		iceServer.uri = strICEServerURI;
-		iceServer.username = twilioNTSInformation.GetUsername();
-		iceServer.password = twilioNTSInformation.GetPassword();
+	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
+		iceServer.uri = twilioNTSInformation.m_ICEServerURIs[i];
+		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
+		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];
+
 		//iceServer.tls_cert_policy = webrtc::PeerConnectionInterface::kTlsCertPolicyInsecureNoCheck;
+
 		rtcConfiguration.servers.push_back(iceServer);
 	}
+
+	//iceServer.uri = "turn:w1.xirsys.com:80?transport=tcp";
+	//iceServer.username = "e1fa02b0-c151-11e8-8acc-4963be209ae3";
+	//iceServer.password = "e1fa0332-c151-11e8-80e4-3b6f3523fb32";
+	//rtcConfiguration.servers.push_back(iceServer);
 
 	//// Testing
 	//{
