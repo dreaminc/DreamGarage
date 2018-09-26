@@ -1090,7 +1090,8 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
 	rtcConfiguration.enable_dtls_srtp = dtls;
-
+	rtcConfiguration.ice_candidate_pool_size = 4;
+	
 	// Not really working?
 	//rtcConfiguration.sdp_semantics = webrtc::SdpSemantics::kUnifiedPlan;
 
@@ -1106,6 +1107,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
 	for (int i = 0; i < twilioNTSInformation.m_ICEServerURIs.size(); i++) {
+		
 		iceServer.uri = twilioNTSInformation.m_ICEServerURIs[i];
 		iceServer.username = twilioNTSInformation.m_ICEServerUsernames[i];
 		iceServer.password = twilioNTSInformation.m_ICEServerPasswords[i];

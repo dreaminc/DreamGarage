@@ -1020,8 +1020,14 @@ RESULT UserController::LoadTwilioNTSInformation() {
 		// Ice Server URIs
 		for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
 			std::string strICEServerURI = jsonICEServer["url"].get<std::string>();
-			std::string strICEServerUsername = jsonICEServer["username"].get<std::string>();
-			std::string strICEServerPassword = jsonICEServer["password"].get<std::string>();
+			
+			std::string strICEServerUsername;
+			if (jsonICEServer["username"].is_null() != true)
+				strICEServerUsername = jsonICEServer["username"].get<std::string>();
+
+			std::string strICEServerPassword;
+			if (jsonICEServer["password"].is_null() != true)
+				strICEServerPassword = jsonICEServer["password"].get<std::string>();
 
 			m_twilioNTSInformation.AddICEServerURI(strICEServerURI, strICEServerUsername, strICEServerPassword);
 		}
