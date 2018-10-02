@@ -46,6 +46,7 @@ class font;
 class texture;
 class CollisionManifold;
 class FlatContext;
+class SoundFile;
 
 class UIKeyboardHandle : public DreamAppHandle {
 public:
@@ -118,6 +119,7 @@ public:
 	RESULT SetVisible(bool fVisible);
 
 private:
+	RESULT PressKey(UIKey *pKey, ControllerType type);
 	RESULT ReleaseKey(UIKey *pKey);
 	UIKey* CollisionPointToKey(point ptCollision);
 
@@ -185,6 +187,12 @@ public:
 	RESULT UpdateComposite(float depth); // update position/orientation
 
 	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
+
+private:
+	std::shared_ptr<SoundFile> m_pDefaultPress = nullptr;
+	std::shared_ptr<SoundFile> m_pDeletePress = nullptr;
+	std::shared_ptr<SoundFile> m_pReturnPress = nullptr;
+	std::shared_ptr<SoundFile> m_pSpacePress = nullptr;
 
 private:
 	// layout variables
