@@ -497,7 +497,6 @@ RESULT UIKeyboard::Update(void *pContext) {
 			if (ptCollision.y() < m_keyTypeThreshold) {
 				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
 				CR(PressKey(key, controllerType));
-				//CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(controllerType, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 				key->m_state = KeyState::KEY_DOWN;
 			}
 			else key->m_state = KeyState::KEY_UP;
