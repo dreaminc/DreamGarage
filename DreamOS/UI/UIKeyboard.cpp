@@ -128,10 +128,23 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pUnshiftTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-unshift-background.png");
 	m_pDefaultIconTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
 
-	m_pDefaultPress = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-standard.wav", SoundFile::type::WAVE));
-	m_pDeletePress = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-delete.wav", SoundFile::type::WAVE));
-	m_pReturnPress = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-return.wav", SoundFile::type::WAVE));
-	m_pSpacePress = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-spacebar.wav", SoundFile::type::WAVE));
+	m_pDefaultPressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-standard.wav", SoundFile::type::WAVE));
+	CN(m_pDefaultPressSound);
+
+	m_pDeletePressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-delete.wav", SoundFile::type::WAVE));
+	CN(m_pDeletePressSound);
+
+	m_pReturnPressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-return.wav", SoundFile::type::WAVE));
+	CN(m_pReturnPressSound);
+
+	m_pSpacePressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-spacebar.wav", SoundFile::type::WAVE));
+	CN(m_pSpacePressSound);
+
+	m_keyPressSounds = {
+		{SVK_BACK, m_pDeletePressSound},
+		{SVK_RETURN, m_pReturnPressSound},
+		{0x20, m_pSpacePressSound} // 0x20 is space bar
+	};
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
@@ -674,31 +687,14 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 RESULT UIKeyboard::PressKey(UIKey *pKey, ControllerType type) {
 	RESULT r = R_PASS;
 
-	unsigned int letter = pKey->m_letter;
-
-	switch (pKey->m_letter) {
-
-	case SVK_BACK: {
-		CR(GetDOS()->PlaySoundFile(m_pDeletePress));
-	} break;
-
-	case SVK_RETURN: {
-		CR(GetDOS()->PlaySoundFile(m_pReturnPress));
-	} break;
-
-	case 0x20: { // space
-		CR(GetDOS()->PlaySoundFile(m_pSpacePress));
-	} break;
-
-	default: {
-		CR(GetDOS()->PlaySoundFile(m_pDefaultPress));
-	} break;
-
-	};
-
+	if (m_keyPressSounds.count(pKey->m_letter) > 0) {
+		CR(GetDOS()->PlaySoundFile(m_keyPressSounds[pKey->m_letter]));
+	}
+	else {
+		CR(GetDOS()->PlaySoundFile(m_pDefaultPressSound));
+	}
 
 	CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(type, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-
 
 Error:
 	return r;

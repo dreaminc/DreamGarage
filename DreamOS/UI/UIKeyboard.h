@@ -189,10 +189,12 @@ public:
 	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
 
 private:
-	std::shared_ptr<SoundFile> m_pDefaultPress = nullptr;
-	std::shared_ptr<SoundFile> m_pDeletePress = nullptr;
-	std::shared_ptr<SoundFile> m_pReturnPress = nullptr;
-	std::shared_ptr<SoundFile> m_pSpacePress = nullptr;
+	std::shared_ptr<SoundFile> m_pDefaultPressSound = nullptr;
+	std::shared_ptr<SoundFile> m_pDeletePressSound = nullptr;
+	std::shared_ptr<SoundFile> m_pReturnPressSound = nullptr;
+	std::shared_ptr<SoundFile> m_pSpacePressSound = nullptr;
+
+	std::map<unsigned int, std::shared_ptr<SoundFile>> m_keyPressSounds;
 
 private:
 	// layout variables
