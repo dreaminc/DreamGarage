@@ -203,6 +203,9 @@ RESULT XAudio2SoundClient::PlaySoundFile(SoundFile *pSoundFile) {
 	
 	CN(m_pXAudio2SourceVoiceStereoFloat32);
 
+	// TODO: Temporary workaround to play this sound now and flush the rest of the queue
+	CRM((RESULT)m_pXAudio2SourceVoiceStereoFloat32->FlushSourceBuffers(), "Failed to flush buffer");
+
 	{
 		float *pFloatAudioBuffer = nullptr;
 		size_t pFloatAudioBuffer_n = 0;

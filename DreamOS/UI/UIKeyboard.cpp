@@ -13,6 +13,8 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "Sound/SoundFile.h"
+
 RESULT UIKeyboardHandle::Show() {
 	RESULT r = R_PASS;
 	CB(GetAppState());
@@ -125,6 +127,24 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pSymbolsTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-symbol-background.png");
 	m_pUnshiftTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"Keycaps\\key-unshift-background.png");
 	m_pDefaultIconTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
+
+	m_pDefaultPressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-standard.wav", SoundFile::type::WAVE));
+	CN(m_pDefaultPressSound);
+
+	m_pDeletePressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-delete.wav", SoundFile::type::WAVE));
+	CN(m_pDeletePressSound);
+
+	m_pReturnPressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-return.wav", SoundFile::type::WAVE));
+	CN(m_pReturnPressSound);
+
+	m_pSpacePressSound = std::shared_ptr<SoundFile>(SoundFile::LoadSoundFile(L"sound-keyboard-spacebar.wav", SoundFile::type::WAVE));
+	CN(m_pSpacePressSound);
+
+	m_keyPressSounds = {
+		{SVK_BACK, m_pDeletePressSound},
+		{SVK_RETURN, m_pReturnPressSound},
+		{0x20, m_pSpacePressSound} // 0x20 is space bar
+	};
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
@@ -489,7 +509,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		case KeyState::KEY_MAYBE_DOWN: {
 			if (ptCollision.y() < m_keyTypeThreshold) {
 				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
-				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(controllerType, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+				CR(PressKey(key, controllerType));
 				key->m_state = KeyState::KEY_DOWN;
 			}
 			else key->m_state = KeyState::KEY_UP;
@@ -662,6 +682,22 @@ bool UIKeyboard::IsKeyboardVisible() {
 
 RESULT UIKeyboard::SetVisible(bool fVisible) {
 	return GetComposite()->SetVisible(fVisible, false);
+}
+
+RESULT UIKeyboard::PressKey(UIKey *pKey, ControllerType type) {
+	RESULT r = R_PASS;
+
+	if (m_keyPressSounds.count(pKey->m_letter) > 0) {
+		CR(GetDOS()->PlaySoundFile(m_keyPressSounds[pKey->m_letter]));
+	}
+	else {
+		CR(GetDOS()->PlaySoundFile(m_pDefaultPressSound));
+	}
+
+	CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(type, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+
+Error:
+	return r;
 }
 
 RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {	
