@@ -20,6 +20,7 @@ RESULT OVRPlatform::InitializePlatform() {
 	
 #ifdef OCULUS_PRODUCTION_BUILD
 	// Fails/succeeds asynchronously - will send a message to handle in Update()
+	DOSLOG(INFO, "Requesting Oculus entitlement check");
 	ovr_Entitlement_GetIsViewerEntitled();
 #endif
 
