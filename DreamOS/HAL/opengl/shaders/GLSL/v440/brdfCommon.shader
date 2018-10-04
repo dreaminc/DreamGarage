@@ -9,7 +9,7 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
 	return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec4 ambientIBL(samplerCube irradianceMap, mat4 mat4Model, vec4 eyePosition, vec4 vertWorldSpace, vec4 vNormal, bool fGrayscale = false) {
+vec4 ambientIBL(samplerCube irradianceMap, mat4 mat4Model, vec4 eyePosition, vec4 vertWorldSpace, vec4 vNormal, bool fGrayscale) {
 	
 	vec4 vWorldViewDirection = normalize(vertWorldSpace - eyePosition);
 	vec4 vWorldNormal = normalize(mat4Model * vec4(vNormal.xyz, 0.0f));
