@@ -73,6 +73,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool f
 	// Initializes Oculus Platform
 	m_pOVRPlatform = new OVRPlatform();
 	CN(m_pOVRPlatform);
+
+	DOSLOG(INFO, "Initializing Oculus platform");
 	CRM(m_pOVRPlatform->InitializePlatform(), "Failed to initialize Oculus Platform");
 	
 	// Initializes LibOVR, and the Rift
