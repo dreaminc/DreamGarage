@@ -397,11 +397,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		auto pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
-		if (GetHMD() != nullptr) {
-			if (GetHMD()->GetDeviceType() == HMDDeviceType::META) {
-				m_pUIProgramNode->SetIsAugmented(true);
-				pEnvironmentNode->SetIsAugmented(true);
-			}
+		HMD* pHMD = GetHMD();
+		if (pHMD != nullptr) {
+			bool fARHMD = pHMD->IsARHMD();
+
+			m_pUIProgramNode->SetIsAugmented(fARHMD);
+			pEnvironmentNode->SetIsAugmented(fARHMD);
 		}
 
 		/*

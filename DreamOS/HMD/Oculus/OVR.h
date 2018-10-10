@@ -64,6 +64,7 @@ public:
 
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) override;
 	virtual HMDDeviceType GetDeviceType() override;
+	virtual bool IsARHMD() override;
 	virtual std::string GetDeviceTypeString() override;
 
 	virtual RESULT RecenterHMD() override;
