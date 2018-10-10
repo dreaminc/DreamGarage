@@ -75,6 +75,12 @@ vector camera::GetLookVector() {
 	return vLook.Normal();
 }
 
+// used for positioning in some DreamApps
+vector camera::GetLookVectorXZ() {
+	vector vLook = GetLookVector();
+	return vector(vLook.x(), 0.0f, vLook.z()).Normal();
+}
+
 ProjectionMatrix camera::GetProjectionMatrix() {
 	return ProjectionMatrix(m_ProjectionType,
 		static_cast<projection_precision>(m_viewport.Width()),
