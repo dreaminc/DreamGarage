@@ -789,7 +789,7 @@ Error:
 RESULT DreamOS::InitializeDreamUser() {
 	RESULT r = R_PASS;
 
-	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this);
+	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CNM(m_pDreamUserApp, "Failed to launch dream user app");
 
 	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
