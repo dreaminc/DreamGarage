@@ -38,17 +38,16 @@ RESULT DreamFormApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamFormApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	if (m_pUserApp == nullptr) {
-		UID userAppUID = GetDOS()->GetUniqueAppUID("DreamUserApp");
-		m_pUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(userAppUID, this));
-		CNR(m_pUserApp, R_SKIPPED);
+	if (m_pDreamUserApp == nullptr) {
+		m_pDreamUserApp = GetDOS()->GetUserApp();
+		CNR(m_pDreamUserApp, R_SKIPPED);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
 
 		m_pFormView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
-		m_pFormView->InitializeWithUserApp(m_pUserApp);
+		m_pFormView->InitializeWithUserApp(m_pDreamUserApp);
 
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
@@ -62,13 +61,13 @@ RESULT DreamFormApp::Update(void *pContext) {
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, -0.1f));
 
-		float viewAngleRad = m_pUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
+		float viewAngleRad = m_pDreamUserApp->GetViewAngle() * (float)(M_PI) / 180.0f;
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 		GetComposite()->SetOrientation(qViewQuadOrientation);
 
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pFormView->GetComposite()));
 
-		m_pUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
+		m_pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	}
 
 	// there's fancier code around this in DreamUserControlArea, 
@@ -81,7 +80,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CN(m_pDreamBrowserForm);
 		CR(m_pDreamBrowserForm->RegisterObserver(this));
 
-		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pUserApp->GetBrowserManager(), m_strURL));
+		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), m_strURL));
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
 	}
@@ -110,8 +109,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 	}
 
 	if (m_fSetAsActive) {
-		m_pUserApp->SetHasOpenApp(true);
-		m_pUserApp->SetEventApp(m_pFormView.get());
+		m_pDreamUserApp->SetHasOpenApp(true);
+		m_pDreamUserApp->SetEventApp(m_pFormView.get());
 		m_fSetAsActive = false;
 	}
 
@@ -224,13 +223,13 @@ RESULT DreamFormApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSourc
 
 	bool fMaskPasswordEnabled = false;
 
-	UIKeyboard* pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	UIKeyboard* pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 	CN(pKeyboard);
 
 	CN(pDOMNode);
 
 	if (pDOMNode->GetType() == DOMNode::type::ELEMENT && pDOMNode->IsEditable()) {
-		m_pUserApp->SetEventApp(m_pFormView.get());
+		m_pDreamUserApp->SetEventApp(m_pFormView.get());
 		fMaskPasswordEnabled = pDOMNode->IsPassword();
 
 		CR(pKeyboard->ShowBrowserButtons());
@@ -250,9 +249,9 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 	RESULT r = R_PASS;
 
 	if (fIsFocused) {
-		m_pUserApp->SetEventApp(m_pFormView.get());
+		m_pDreamUserApp->SetEventApp(m_pFormView.get());
 
-		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 		CN(pKeyboard);
 
 		CR(pKeyboard->ShowBrowserButtons());
@@ -270,7 +269,7 @@ Error:
 RESULT DreamFormApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
-	m_pUserApp->SetPreviousApp(nullptr);
+	m_pDreamUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 
@@ -281,7 +280,7 @@ Error:
 RESULT DreamFormApp::HandleDreamFormCancel() {
 	RESULT r = R_PASS;
 
-	CR(m_pUserApp->SetHasOpenApp(false));
+	CR(m_pDreamUserApp->SetHasOpenApp(false));
 	CR(Hide());
 
 Error:
@@ -291,7 +290,7 @@ Error:
 RESULT DreamFormApp::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 	
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
 
@@ -302,7 +301,7 @@ Error:
 RESULT DreamFormApp::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
 	
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pUserApp->GetKeyboard());
+	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
 
@@ -318,7 +317,7 @@ RESULT DreamFormApp::SetAsActive() {
 RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	DreamUserObserver *pEventApp = m_pUserApp->m_pEventApp;
+	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	switch (pEvent->m_eventType) {
@@ -329,12 +328,12 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 			pCloudController->IsUserLoggedIn() && 
 			pCloudController->IsEnvironmentConnected()) {
 
-			if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			if (m_pDreamUserApp->GetKeyboard()->IsVisible()) {
 				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 				CR(m_pFormView->HandleKeyboardDown());
 			}
 			else {
-				CR(m_pUserApp->SetHasOpenApp(false));
+				CR(m_pDreamUserApp->SetHasOpenApp(false));
 				CR(Hide());
 			}
 		}
@@ -342,7 +341,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 			if (m_pFormView != nullptr && !m_pFormView->GetViewQuad()->IsVisible()) {
 				Show();
 			}
-			m_pUserApp->ResetAppComposite();
+			m_pDreamUserApp->ResetAppComposite();
 		}
 		
 	} break;
@@ -422,7 +421,7 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
-		if (m_pUserApp->GetKeyboard()->IsVisible()) {
+		if (m_pDreamUserApp->GetKeyboard()->IsVisible()) {
 			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
@@ -455,8 +454,8 @@ RESULT DreamFormApp::Show() {
 	}
 	else {
 		CR(m_pFormView->Show());
-		CR(m_pUserApp->SetEventApp(m_pFormView.get()));
-		CR(m_pUserApp->SetHasOpenApp(true));	// For login/logout
+		CR(m_pDreamUserApp->SetEventApp(m_pFormView.get()));
+		CR(m_pDreamUserApp->SetHasOpenApp(true));	// For login/logout
 		m_fFormVisible = true;
 		m_fPendShowFormView = false;
 	}
@@ -474,7 +473,7 @@ RESULT DreamFormApp::Hide() {
 	CR(m_pFormView->Hide());
 	m_fFormVisible = false;
 	CR(m_pFormView->HandleKeyboardDown());
-	CR(m_pUserApp->SetEventApp(nullptr));
+	CR(m_pDreamUserApp->SetEventApp(nullptr));
 
 //	m_pDreamBrowserForm->Shutdown();
 	m_pDreamBrowserForm->CloseSource();

@@ -85,19 +85,10 @@ RESULT DreamEnvironmentApp::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamEnvironmentApp::Update(void *pContext) {
 	RESULT r = R_PASS;
 
+	// re-enable for dynamic sun position
 	//for (auto pProgram : m_skyboxPrograms) {
 	//	pProgram->SetSunDirection(m_vSunDirection);
 	//}
-
-	if(m_pUserApp == nullptr) {
-		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-
-		CB(userUIDs.size() == 1);
-		auto userUID = userUIDs[0];
-
-		m_pUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(userUID, this));
-		CN(m_pUserApp);
-	}
 
 Error:
 	return r;
@@ -181,8 +172,12 @@ RESULT DreamEnvironmentApp::HideEnvironment(void *pContext) {
 		m_pFadeProgram->FadeIn();
 
 		// Assuming we want to show welcome back quad here
-		m_pUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::SIGN_IN);
-		m_pUserApp->ShowMessageQuad();
+		
+		std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+		if (pDreamUserApp != nullptr) {
+			pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::SIGN_IN);
+			pDreamUserApp->ShowMessageQuad();
+		}
 
 		return R_PASS;
 	};
@@ -201,7 +196,8 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 	auto fnOnFadeOut = [&](void *pContext) {
 		if (m_pCurrentEnvironmentModel != nullptr) {
 			m_pCurrentEnvironmentModel->SetVisible(true);
-			m_pUserApp->HideMessageQuad();
+
+			GetDOS()->GetUserApp()->HideMessageQuad();
 		}
 
 		m_pFadeProgram->FadeIn();

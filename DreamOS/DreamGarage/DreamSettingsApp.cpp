@@ -73,7 +73,7 @@ RESULT DreamSettingsApp::Notify(SenseControllerEvent *pEvent) {
 
 	//TODO: unregister/register instead of this flag?
 	CBR(m_fFormVisible, R_SKIPPED);
-	CNR(m_pUserApp, R_SKIPPED);
+	CNR(m_pDreamUserApp, R_SKIPPED);
 
 Error:
 	return r;
@@ -82,7 +82,7 @@ Error:
 RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	DreamUserObserver *pEventApp = m_pUserApp->m_pEventApp;
+	DreamUserObserver *pEventApp = m_pDreamUserApp->m_pEventApp;
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
 
 	if (pEvent->m_eventType == INTERACTION_EVENT_MENU) {
@@ -91,7 +91,7 @@ RESULT DreamSettingsApp::Notify(InteractionObjectEvent *pEvent) {
 			pCloudController->IsUserLoggedIn() &&
 			pCloudController->IsEnvironmentConnected()) {
 
-			if (m_pUserApp->GetKeyboard()->IsVisible()) {
+			if (m_pDreamUserApp->GetKeyboard()->IsVisible()) {
 				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 				CR(m_pFormView->HandleKeyboardDown());
 			}
@@ -113,7 +113,7 @@ RESULT DreamSettingsApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
 	//CR(DreamFormApp::HandleDreamFormSuccess());
-	m_pUserApp->SetPreviousApp(nullptr);
+	m_pDreamUserApp->SetPreviousApp(nullptr);
 	CR(Hide());
 	CR(GetDOS()->SendDOSMessage(m_strSuccess));
 

@@ -80,12 +80,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
 
 	if (m_pDreamUserApp == nullptr) {
-		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-
-		CBR(userUIDs.size() == 1, R_SKIPPED);
-		m_userUID = userUIDs[0];
-		m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pDreamUserApp);
+		m_pDreamUserApp = GetDOS()->GetUserApp();
 	}
 		
 	UIMallet* pLMallet;
@@ -189,7 +184,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithUserApp(DreamUserApp *pParent) {
+RESULT DreamControlView::InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
@@ -285,12 +280,7 @@ RESULT DreamControlView::ShowView() {
 		RESULT r = R_PASS;
 		
 		if (m_pDreamUserApp == nullptr) {
-			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-			CB(userUIDs.size() == 1);
-			m_userUID = userUIDs[0];
-
-			//Capture user app
-			m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
+			m_pDreamUserApp = GetDOS()->GetUserApp();
 			CN(m_pDreamUserApp);
 		}
 		m_pDreamUserApp->SetEventApp(this);
