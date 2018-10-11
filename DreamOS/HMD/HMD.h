@@ -142,6 +142,7 @@ public:
 	SenseController* GetSenseController();
 	virtual composite *GetSenseControllerObject(ControllerType controllerType) = 0;
 	virtual HMDDeviceType GetDeviceType() = 0;
+	virtual bool IsARHMD() = 0;
 
 	// string is used instead of HMDDeviceType for server commands like settings
 	virtual std::string GetDeviceTypeString() = 0;

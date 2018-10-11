@@ -11,6 +11,7 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 	m_pHead->SetVisible(false);
 	m_headOffset = point(0.0f, MALLET_RADIUS * sin(MALLET_ANGLE), -MALLET_RADIUS * cos(MALLET_RADIUS));
 
+	// TODO: move to hmd setting mallet offsets
 	auto pHMD = pDreamOS->GetHMD();
 	if (pHMD != nullptr) {
 		if (pHMD->GetDeviceType() == HMDDeviceType::META) {

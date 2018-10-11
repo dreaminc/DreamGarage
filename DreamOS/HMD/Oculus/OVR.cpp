@@ -198,6 +198,10 @@ HMDDeviceType OVRHMD::GetDeviceType() {
 	return HMDDeviceType::OCULUS;
 }
 
+bool OVRHMD::IsARHMD() {
+	return false;
+}
+
 std::string OVRHMD::GetDeviceTypeString() {
 	return "HMDType.OculusRift";
 }
