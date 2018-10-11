@@ -776,7 +776,7 @@ RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
 
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
-	vector vLookXZ = GetCameraLookXZ();
+	vector vLookXZ = pCamera->GetLookVectorXZ();
 	point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
 
 	m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);

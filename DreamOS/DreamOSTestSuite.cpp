@@ -190,10 +190,9 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	EnvironmentProgram* pEnvironmentNode;
 	pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
-	if (m_pDreamOS->GetHMD() != nullptr) {
-		if (m_pDreamOS->GetHMD()->GetDeviceType() == HMDDeviceType::META) {
-			pEnvironmentNode->SetIsAugmented(true);
-		}
+	HMD* pHMD = m_pDreamOS->GetHMD();
+	if (pHMD != nullptr) {
+		pEnvironmentNode->SetIsAugmented(pHMD->IsARHMD());
 	}
 
 	// Reference Geometry Shader Program

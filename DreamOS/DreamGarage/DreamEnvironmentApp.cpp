@@ -59,10 +59,8 @@ RESULT DreamEnvironmentApp::InitializeApp(void *pContext) {
 	
 	pHMD = pDreamOS->GetHMD();
 
-	if (pHMD != nullptr) {
-		if (pHMD->GetDeviceType() == HMDDeviceType::META) {
-			fShowModels = false;
-		}
+	if (pHMD != nullptr && pHMD->IsARHMD()) {
+		fShowModels = false;
 	}
 
 #ifdef _DEBUG
