@@ -789,8 +789,8 @@ Error:
 RESULT DreamOS::InitializeDreamUser() {
 	RESULT r = R_PASS;
 
-	m_pDreamUser = LaunchDreamApp<DreamUserApp>(this);
-	CNM(m_pDreamUser, "Failed to launch dream user app");
+	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this);
+	CNM(m_pDreamUserApp, "Failed to launch dream user app");
 
 	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
 	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
@@ -1003,6 +1003,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 
 quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+std::shared_ptr<DreamUserApp> DreamOS::GetUserApp() {
+	return m_pDreamUserApp;
 }
 
 RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {

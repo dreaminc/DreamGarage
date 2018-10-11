@@ -94,14 +94,6 @@ RESULT DreamShareView::Update(void *pContext) {
 		CRM(UpdateFromPendingVideoFrame(), "Failed to update pending frame");
 	}
 
-	if (m_pDreamUserHandle == nullptr) {
-		auto pDreamOS = GetDOS();
-		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
-		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
-		CBR(userAppIDs.size() == 1, R_OBJECT_NOT_FOUND);
-		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
-	}
-
 Error:
 	return r;
 }
@@ -198,9 +190,6 @@ Error:
 RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	//if (m_pDreamUserHandle != nullptr)
-	//	m_pDreamUserHandle->SendPreserveSharingState(false);
-
 	m_pStreamerPeerConnection = pPeerConnection;
 
 	//ShowCastingTexture();
@@ -278,8 +267,6 @@ RESULT DreamShareView::StopSending() {
 
 	CR(SetStreamingState(false));
 
-	m_pDreamUserHandle->SendStopSharing();
-
 	//m_pCastTexture = m_pLoadingTexture;
 	ShowLoadingTexture();
 	Hide();
@@ -344,8 +331,9 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 
 	m_fStreaming = fStreaming;
 
-	CNR(m_pDreamUserHandle, R_SKIPPED);
-	m_pDreamUserHandle->SendStreamingState(fStreaming);
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
+	pDreamUserApp->SetStreamingState(fStreaming);
 
 Error:
 	return r;
