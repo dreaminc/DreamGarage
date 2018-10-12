@@ -339,8 +339,6 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	UIKeyboardHandle *pKeyboardHandle = nullptr;
-
 	if (m_pObserver != nullptr) {
 		CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
 	}

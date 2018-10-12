@@ -29,7 +29,6 @@ class UIMallet;
 class DimRay;
 class VirtualObj;
 class UIKeyboard;
-class UIKeyboardHandle;
 class DimObj;
 class user;
 
@@ -103,8 +102,6 @@ public:
 
 	RESULT HandleKBEnterEvent();
 	RESULT HandleUserObserverEvent(UserObserverEventType type);
-	UIKeyboardHandle *GetKeyboard();
-	RESULT ReleaseKeyboard();
 
 	RESULT GetStreamingState(bool& fStreaming);
 	RESULT SetStreamingState(bool fStreaming);
@@ -206,8 +203,6 @@ private:
 	// current app that should receive events from the user
 	DreamUserObserver* m_pEventApp = nullptr;
 	DreamUserObserver* m_pPreviousApp = nullptr;
-
-	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	// reflection of the member 
 	bool m_fStreaming = false;

@@ -624,7 +624,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	RESULT r = R_PASS;
 
 	std::string strFormType;
-	//CR(InitializeKeyboard());
+
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);

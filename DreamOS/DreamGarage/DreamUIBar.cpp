@@ -285,19 +285,19 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
 	CNR(pDreamUserApp, R_SKIPPED);
+	CNR(pKeyboardApp, R_SKIPPED);
 
 	switch (type) {
 		case UserObserverEventType::BACK: {
-		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
+
 			CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
-			if (m_pKeyboardHandle != nullptr) {
+			if (pKeyboardApp->IsVisible()) {
 
-				CR(m_pKeyboardHandle->Hide());
-				CR(pDreamUserApp->ReleaseKeyboard());
-				m_pKeyboardHandle = nullptr;
+				CR(pKeyboardApp->Hide());
 
-				PopPath();
+				CR(PopPath());
 			}
 
 			else if (!m_pathStack.empty()) {
@@ -317,10 +317,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 		} break;
 
 		case UserObserverEventType::DISMISS: {
-			if (m_pKeyboardHandle != nullptr) {
-				m_pKeyboardHandle->Hide();
-				pDreamUserApp->ReleaseKeyboard();
-				m_pKeyboardHandle = nullptr;
+			if (pKeyboardApp != nullptr) {
+				pKeyboardApp->Hide();
+				pKeyboardApp = nullptr;
 			} 
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
@@ -329,10 +328,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 		} break;
 
 		case UserObserverEventType::KB_ENTER: {
-			if (m_pKeyboardHandle != nullptr) {
-				m_pKeyboardHandle->Hide();
-				pDreamUserApp->ReleaseKeyboard();
-				m_pKeyboardHandle = nullptr;
+			if (pKeyboardApp != nullptr) {
+				pKeyboardApp->Hide();
+				pKeyboardApp = nullptr;
 			} 
 
 			pDreamUserApp->PreserveSharingState(true);
@@ -462,10 +460,10 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					}
 				}
 				else if (strTitle == "Website") {
-					m_pKeyboardHandle = pDreamUserApp->GetKeyboard();
-					CN(m_pKeyboardHandle);
-					CR(m_pKeyboardHandle->Show());
-					CR(m_pKeyboardHandle->ShowTitleView());
+					std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+					CN(pKeyboardApp);
+					CR(pKeyboardApp->Show());
+					CR(pKeyboardApp->ShowTitleView());
 				}
 
 				else if (strScope == "TeamScope.Switch") {
@@ -574,6 +572,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Processing Title icon
 	if (m_pPendingIconTextureBuffer != nullptr) {
 
+		std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+
 		CN(m_pPendingIconTextureBuffer);
 		uint8_t* pBuffer = &(m_pPendingIconTextureBuffer->operator[](0));
 		size_t pBuffer_n = m_pPendingIconTextureBuffer->size();
@@ -581,8 +581,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 		m_pPendingIconTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
 		CN(m_pPendingIconTexture);
 
-		if (m_pKeyboardHandle != nullptr) {
-			m_pKeyboardHandle->UpdateTitleView(m_pPendingIconTexture, "Website");
+		if (pKeyboardApp != nullptr && pKeyboardApp->IsVisible()) {
+			pKeyboardApp->UpdateTitleView(m_pPendingIconTexture, "Website");
 		}
 		else {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);

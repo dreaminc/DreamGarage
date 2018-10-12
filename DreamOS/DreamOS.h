@@ -556,6 +556,7 @@ protected:
 	std::shared_ptr<DreamSoundSystem> m_pDreamSoundSystem = nullptr;
 
 public:
+	std::shared_ptr<UIKeyboard> GetKeyboardApp();
 	std::shared_ptr<DreamUserApp> GetUserApp();
 
 private:

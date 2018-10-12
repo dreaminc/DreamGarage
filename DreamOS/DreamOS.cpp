@@ -150,6 +150,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	}
 
 	CR(InitializeDreamUserApp());
+	CR(InitializeKeyboard());
 
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
 
@@ -1005,6 +1006,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 
 quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+std::shared_ptr<UIKeyboard> DreamOS::GetKeyboardApp() {
+	return m_pKeyboard;
 }
 
 std::shared_ptr<DreamUserApp> DreamOS::GetUserApp() {

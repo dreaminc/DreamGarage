@@ -50,8 +50,6 @@ public:
 	RESULT AddTestDreamBrowser();
 	RESULT AddTestDreamOS();
 	RESULT AddTestDreamDesktop();
-
-	// Capturing Apps
 	RESULT AddTestCaptureApp();
 
 	// Casting

@@ -15,79 +15,6 @@
 
 #include "Sound/SoundFile.h"
 
-RESULT UIKeyboardHandle::Show() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowKeyboard());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::Hide() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HideKeyboard());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendUpdateComposite(float depth) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateComposite(depth));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateComposite(depth, ptOrigin, qOrigin));
-Error:
-	return r;
-}
-
-bool UIKeyboardHandle::IsVisible() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return IsKeyboardVisible();
-Error:
-	//TODO: could be a problem because nullptr is equal to false
-	return nullptr;
-}
-
-RESULT UIKeyboardHandle::ShowTitleView() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowKeyboardTitleView());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateKeyboardTitleView(pIconTexture,strTitle));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::PopulateTextBox(std::string strText) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PopulateKeyboardTextBox(strText));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendPasswordFlag(bool fIsPassword) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetPasswordFlag(fIsPassword));
-Error:
-	return r;
-}
-
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -188,8 +115,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
-
-	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	// position keyboard composite
 	//float kbOffset = -(-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
@@ -409,7 +334,9 @@ RESULT UIKeyboard::Update(void *pContext) {
 	CN(pDreamUserApp);
 
 	// skip keyboard interaction if not visible
-	CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
+	//CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
+	CBR(GetComposite()->IsVisible(), R_SKIPPED);
+
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
@@ -423,6 +350,8 @@ RESULT UIKeyboard::Update(void *pContext) {
 	CNR(pLMallet, R_SKIPPED);
 	UIMallet* pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);
+
+	CBR(m_pSurface, R_SKIPPED);
 
 	//  Note: this predictive collision functionality is duplicated in control view
 	for (auto &mallet : { pLMallet, pRMallet })
@@ -543,16 +472,12 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
-DreamAppHandle* UIKeyboard::GetAppHandle() {
-	return (UIKeyboardHandle*)(this);
-}
-
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	UIKeyboard *pUIKeyboard = new UIKeyboard(pDreamOS, pContext);
 	return pUIKeyboard;
 }
 
-RESULT UIKeyboard::ShowKeyboard() {
+RESULT UIKeyboard::Show() {
 	RESULT r = R_PASS;
 
 
@@ -568,7 +493,6 @@ RESULT UIKeyboard::ShowKeyboard() {
 		m_pHeaderContainer->SetVisible(false);
 		//m_pTitleIcon->SetVisible(false);
 		//m_pTitleText->SetVisible(false);
-		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
 		return r;
@@ -583,7 +507,6 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
-		CR(SetAnimatingState(UIKeyboard::state::VISIBLE));
 
 		pDreamUserApp = GetDOS()->GetUserApp();
 		CNR(pDreamUserApp, R_SKIPPED);
@@ -618,7 +541,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::HideKeyboard() {
+RESULT UIKeyboard::Hide() {
 
 	RESULT r = R_PASS;
 
@@ -633,7 +556,6 @@ RESULT UIKeyboard::HideKeyboard() {
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
-		CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	Error:
 		return r;
@@ -659,17 +581,7 @@ RESULT UIKeyboard::HideKeyboard() {
 }
 
 bool UIKeyboard::IsVisible() {
-	if (m_keyboardState != UIKeyboard::state::HIDDEN) {
-		return true;
-	}
-
-	else {
-		return false;
-	}
-}
-
-bool UIKeyboard::IsKeyboardVisible() {
-	return IsVisible();
+	return GetComposite()->IsVisible();
 }
 
 RESULT UIKeyboard::SetVisible(bool fVisible) {
@@ -759,11 +671,6 @@ RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 
 RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
-}
-
-RESULT UIKeyboard::SetAnimatingState(UIKeyboard::state keyboardState) {
-	m_keyboardState = keyboardState;
-	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
@@ -859,7 +766,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
+RESULT UIKeyboard::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 	m_pHeaderContainer->SetVisible(true);
 	//m_pTitleIcon->SetVisible(true);
@@ -874,7 +781,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::ShowKeyboardTitleView() {
+RESULT UIKeyboard::ShowTitleView() {
 	RESULT r = R_PASS;
 	CR(m_pHeaderContainer->SetVisible(true));
 	//CR(m_pTitleIcon->SetVisible(true));

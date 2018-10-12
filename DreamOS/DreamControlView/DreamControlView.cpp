@@ -139,14 +139,13 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	switch (type) {
 	case (UserObserverEventType::BACK): {
 
-		if (m_pKeyboardHandle != nullptr) {
+		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 
 			if (m_fIsShareURL) {
 				CR(ShowView());
 
-				if (m_pKeyboardHandle != nullptr) {
-					CR(HideKeyboard());
-				}
+				CR(GetDOS()->GetKeyboardApp()->Hide());
+
 				m_fIsShareURL = false;
 			}
 
@@ -172,7 +171,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	case (UserObserverEventType::KB_ENTER): {	
 		if (m_fIsShareURL) {
 			pDreamUserApp->PreserveSharingState(true);
-			if (m_pKeyboardHandle != nullptr) {
+			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 				CR(HideKeyboard());
 			}
 
@@ -365,7 +364,7 @@ Error:
 RESULT DreamControlView::Dismiss() {
 	RESULT r = R_PASS;
 
-	if (m_pKeyboardHandle != nullptr) {
+	if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 		CR(HideKeyboard());
 	}
 
@@ -436,15 +435,7 @@ Error:
 }
 
 bool DreamControlView::IsVisible() {
-
-	//the keyboard handle is available while the keyboard is visible
-	bool fKeyboardVisible = m_pKeyboardHandle != nullptr;
-
-	//TODO: replace with GetComposite()->IsVisible() if possible
-	bool fViewVisible = m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
-	
-	// this function is closer to IsAppBeingUsed
-	return fKeyboardVisible || fViewVisible;
+	return m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
 }
 
 bool DreamControlView::IsAnimating() {
@@ -478,10 +469,10 @@ RESULT DreamControlView::ShowKeyboard() {
 	RESULT r = R_PASS;
 
 	//maintain the keyboard handle until the keyboard is hidden
-	m_pKeyboardHandle = GetDOS()->GetUserApp()->GetKeyboard();
-	CNM(m_pKeyboardHandle, "keyboard handle not available");
+	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+	CNM(pKeyboardApp, "keyboard not available");
 
-	CR(m_pKeyboardHandle->Show());
+	CR(pKeyboardApp->Show());
 
 Error:
 	return r;
@@ -490,16 +481,9 @@ Error:
 RESULT DreamControlView::HideKeyboard() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-	CNR(m_pKeyboardHandle, R_OBJECT_NOT_FOUND);
-
-	CR(m_pKeyboardHandle->Hide());
-	CR(pDreamUserApp->ReleaseKeyboard());
+	CR(GetDOS()->GetKeyboardApp()->Hide());
 
 Error:
-	m_pKeyboardHandle = nullptr;
-	
 	return r;
 }
 
@@ -531,12 +515,13 @@ RESULT DreamControlView::HandleKeyboardUp() {
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
 	point ptTypingOffset;
 
+	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
 	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pKeyboardApp, R_SKIPPED);
 	CNR(pDreamUserApp, R_SKIPPED);
 
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
-	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
 
 	float viewHeight;
 	viewHeight = m_pViewQuad->GetHeight();
@@ -554,9 +539,7 @@ RESULT DreamControlView::HandleKeyboardUp() {
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
-	if (m_pKeyboardHandle == nullptr) {
-		CR(ShowKeyboard());
-	}
+	CR(ShowKeyboard());
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),

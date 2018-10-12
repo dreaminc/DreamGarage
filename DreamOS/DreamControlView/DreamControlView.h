@@ -132,11 +132,6 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
-
-	UID m_browserUID;
-	UID m_userUID;	
-
 	bool m_fMouseDown[2];
 	bool m_fMouseDrag = false;
 	point m_ptClick;

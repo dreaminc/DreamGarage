@@ -48,32 +48,8 @@ class CollisionManifold;
 class FlatContext;
 class SoundFile;
 
-class UIKeyboardHandle : public DreamAppHandle {
-public:
-	RESULT Show();
-	RESULT Hide();
-	RESULT SendUpdateComposite(float depth);
-	RESULT SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
-	bool IsVisible();
-	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
-	RESULT ShowTitleView();
-	RESULT PopulateTextBox(std::string strText);
-	RESULT SendPasswordFlag(bool fIsPassword);
-
-private:
-	virtual RESULT ShowKeyboard() = 0;
-	virtual RESULT HideKeyboard() = 0;
-	virtual RESULT UpdateComposite(float depth) = 0;
-	virtual RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) = 0;
-	virtual bool IsKeyboardVisible() = 0;
-	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
-	virtual RESULT ShowKeyboardTitleView() = 0;
-	virtual RESULT PopulateKeyboardTextBox(std::string strText) = 0;
-	virtual RESULT SetPasswordFlag(bool fIsPassword) = 0;
-};
 
 class UIKeyboard : public DreamApp<UIKeyboard>,
-	public UIKeyboardHandle,
 	public SenseKeyboard,
 	public ControlBarObserver {
 	friend class DreamAppManager;
@@ -81,12 +57,6 @@ class UIKeyboard : public DreamApp<UIKeyboard>,
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
-
-	enum class state {	// For tracking if keyboard is animating or not
-		HIDDEN,
-		ANIMATING,
-		VISIBLE
-	};
 
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
@@ -103,17 +73,13 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual DreamAppHandle* GetAppHandle() override;
-
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 	//Animation
 public:
-	virtual RESULT ShowKeyboard() override;
-	virtual RESULT HideKeyboard() override;
-
-	virtual bool IsKeyboardVisible() override;
+	virtual RESULT Show();
+	virtual RESULT Hide();
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
@@ -177,16 +143,15 @@ private:
 	RESULT UpdateKeyboardLayout(LayoutType kbType);
 
 public:
-	RESULT SetAnimatingState(UIKeyboard::state keyboardState);
 	RESULT UpdateTextBox(int chkey);
-	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
-	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
-	virtual RESULT ShowKeyboardTitleView() override;
+	RESULT PopulateKeyboardTextBox(std::string strText);
+	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
+	RESULT ShowTitleView();
 	RESULT ShowBrowserButtons();
-	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
+	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
 	RESULT UpdateComposite(float depth); // update position/orientation
 
-	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
+	RESULT SetPasswordFlag(bool fIsPassword);
 
 private:
 	std::shared_ptr<SoundFile> m_pDefaultPressSound = nullptr;
@@ -231,8 +196,6 @@ private:
 	std::shared_ptr<composite> m_pHeaderContainer;
 
 	std::map<LayoutType, text*> m_layoutAtlas;
-
-	UIKeyboard::state m_keyboardState;
 
 	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
