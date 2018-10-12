@@ -50,6 +50,7 @@ public:
 	RESULT AddTestDreamBrowser();
 	RESULT AddTestDreamOS();
 	RESULT AddTestDreamDesktop();
+	RESULT AddTestCaptureApp();
 
 	// Casting
 	RESULT AddTestDreamShareView();
