@@ -48,6 +48,9 @@ public:
 	std::shared_ptr<UIControlBar> MakeUIControlBar(BarType barType);
 	std::shared_ptr<UIControlBar> AddUIControlBar(BarType barType);
 
+	std::shared_ptr<UIControlBar> MakeUIControlBar();
+	std::shared_ptr<UIControlBar> AddUIControlBar();
+
 	std::shared_ptr<UISpatialScrollView> MakeUISpatialScrollView();
 	std::shared_ptr<UISpatialScrollView> AddUISpatialScrollView();
 

@@ -152,6 +152,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
+	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
+
+	return pControlBar;
+}
+
+std::shared_ptr<UIControlBar> UIView::AddUIControlBar() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar();
+	CR(AddObject(pControlBar));
+	return pControlBar;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UISpatialScrollView> UIView::MakeUISpatialScrollView() {
 	std::shared_ptr<UISpatialScrollView> pScrollView(new UISpatialScrollView(m_pHALImp, m_pDreamOS));
 

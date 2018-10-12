@@ -16,20 +16,6 @@ class DreamUserControlArea;
 //All relative to parent app
 #define URL_WIDTH 0.5484
 
-enum class ControlEventType {
-	OPEN,
-	CLOSE,
-	SHARE,
-	STOP,
-	BACK,
-	FORWARD,
-	MAXIMIZE,
-	MINIMIZE,
-	URL,
-	KEYBOARD,
-	INVALID
-};
-
 class DreamControlBar : public DreamApp<DreamControlBar>, public ControlBarObserver {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea; // could be temporary, needs to access composite

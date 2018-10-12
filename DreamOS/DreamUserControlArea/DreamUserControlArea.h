@@ -106,7 +106,7 @@ public:
 
 // DreamControlBar
 public:
-	RESULT HandleControlBarEvent(ControlEventType type);
+	RESULT HandleControlBarEvent(ControlBarButtonType type);
 
 	bool CanPressButton(UIButton *pButtonContext);
 

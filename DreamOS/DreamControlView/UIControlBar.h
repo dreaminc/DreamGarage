@@ -25,6 +25,30 @@ enum class BarType {
 	INVALID
 };
 
+enum class ControlBarButtonType {
+	OPEN,
+	CLOSE,
+	SHARE,
+	STOP,
+	BACK,
+	FORWARD,
+	MAXIMIZE,
+	MINIMIZE,
+	URL,
+	KEYBOARD,
+
+	CANT_BACK,
+	CANT_FORWARD,
+
+	TAB,
+	CANT_TAB,
+	BACKTAB,
+	CANT_BACKTAB,
+	DONE,
+
+	INVALID
+};
+
 // Default Observer
 class ControlBarObserver {
 public:
@@ -43,17 +67,22 @@ public:
 
 class UIControlBar : public UIView {
 public:
+	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
 	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS, BarType barType);
 	~UIControlBar();
 
 	RESULT Initialize();
+	RESULT InitializeGeneral();
 
 	//TODO: currently different control bar layouts are not used
 	RESULT UpdateButtonsWithType(BarType type);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
+	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback);
+
 	float GetSpacingOffset();
 
+	std::shared_ptr<UIButton> GetButton(ControlBarButtonType type);
 	// Getters used for registering event behavior
 	std::shared_ptr<UIButton> GetBackButton();
 	std::shared_ptr<UIButton> GetForwardButton();
@@ -79,6 +108,7 @@ public:
 	RESULT BackTabPressed(UIButton* pButtonContext, void* pContext);
 	RESULT DonePressed(UIButton* pButtonContext, void* pContext);
 
+	texture* GetTexture(ControlBarButtonType type);
 	// Getters used for swapping the hide/show texture on the hide button
 	texture *GetHideTexture();
 	texture *GetShowTexture();
@@ -121,7 +151,6 @@ public:
 	const wchar_t *k_wszURL = L"control-view-url.png";
 	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
 
-	//TODO: need new files
 	const wchar_t *k_wszTab = L"key-tab-next.png";
 	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
 	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
@@ -129,6 +158,8 @@ public:
 	const wchar_t *k_wszDone = L"key-done.png";
 
 private:
+	std::map<ControlBarButtonType, std::shared_ptr<UIButton>> m_buttons;
+
 	std::shared_ptr<UIButton> m_pBackButton = nullptr;
 	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
 	std::shared_ptr<UIButton> m_pToggleButton = nullptr;
@@ -142,6 +173,8 @@ private:
 
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
 	std::shared_ptr<text> m_pURLText = nullptr;
+
+	std::map<ControlBarButtonType, texture*> m_buttonTextures;
 
 	texture *m_pBackTexture = nullptr;
 	texture *m_pForwardTexture = nullptr;

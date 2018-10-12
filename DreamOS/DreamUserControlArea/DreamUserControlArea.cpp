@@ -262,25 +262,25 @@ RESULT DreamUserControlArea::Hide() {
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
+RESULT DreamUserControlArea::HandleControlBarEvent(ControlBarButtonType type) {
 	RESULT r = R_PASS;
 
 	switch (type) {
 
-	case ControlEventType::BACK: {
+	case ControlBarButtonType::BACK: {
 		// Send back event to active browser
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		CNR(pBrowser, R_SKIPPED);
 		CR(pBrowser->HandleBackEvent());
 	} break;
 
-	case ControlEventType::FORWARD: {
+	case ControlBarButtonType::FORWARD: {
 		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
 		CNR(pBrowser, R_SKIPPED);
 		CR(pBrowser->HandleForwardEvent());
 	} break;
 
-	case ControlEventType::OPEN: {
+	case ControlBarButtonType::OPEN: {
 		// pull up menu to select new piece of content
 		// send hide events to control bar, control view, and tab bar
 		CR(Hide());
@@ -288,7 +288,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 	} break;
 
-	case ControlEventType::CLOSE: {
+	case ControlBarButtonType::CLOSE: {
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 		CNR(m_pActiveSource, R_SKIPPED);	// double tapping close? 
@@ -297,13 +297,13 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 
 	} break;
 
-	case ControlEventType::MAXIMIZE: {
+	case ControlBarButtonType::MAXIMIZE: {
 		//CR(Show());
 		m_pControlView->Show();
 		m_pDreamTabView->Show();
 	} break;
 
-	case ControlEventType::MINIMIZE: {
+	case ControlBarButtonType::MINIMIZE: {
 		//TODO: change this with animations, control bar needs to still be visible here
 		//CR(Hide());
 		m_pControlView->Hide();
@@ -312,7 +312,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		//m_pControlBar->Hide();
 	} break;
 
-	case ControlEventType::SHARE: {
+	case ControlBarButtonType::SHARE: {
 		// send share event with active browser
 		ForceStopSharing();
 
@@ -322,14 +322,14 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
-	case ControlEventType::STOP: {
+	case ControlBarButtonType::STOP: {
 		// send stop sharing event 
 		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	} break;
 
-	case ControlEventType::URL: {
+	case ControlBarButtonType::URL: {
 		// dismiss everything(?) and pull up the keyboard
 		Hide();
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
@@ -346,7 +346,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		//*/
 	} break;
 
-	case ControlEventType::KEYBOARD: {
+	case ControlBarButtonType::KEYBOARD: {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
 		//float yValue = (BROWSER_WIDTH) + (BROWSER_HEIGHT * SPACING_SIZE);
 		//HandleNodeFocusChanged(true, m_pActiveSource.get());

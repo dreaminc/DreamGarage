@@ -88,7 +88,7 @@ RESULT DreamControlBar::SetTitleText(const std::string& strTitle) {
 RESULT DreamControlBar::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::BACK));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::BACK));
 Error:
 	return R_PASS;
 }
@@ -96,7 +96,7 @@ Error:
 RESULT DreamControlBar::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::FORWARD));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::FORWARD));
 Error:
 	return R_PASS;
 }
@@ -106,11 +106,11 @@ RESULT DreamControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_fIsMinimized) {
-		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MAXIMIZE));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
 		CR(ClearMinimizedState());
 	}
 	else {
-		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::MINIMIZE));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MINIMIZE));
 		m_fIsMinimized = true;
 		m_pUIControlBar->GetToggleButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShowTexture());
 	}
@@ -122,7 +122,7 @@ Error:
 RESULT DreamControlBar::HandleOpenPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::OPEN));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::OPEN));
 	
 	// This call triggers a move to menu, hiding the control bar, so the button needs to be forcefully released
 	CR(GetDOS()->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
@@ -135,7 +135,7 @@ Error:
 RESULT DreamControlBar::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::CLOSE));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::CLOSE));
 Error:
 	return R_PASS;
 }
@@ -145,12 +145,12 @@ RESULT DreamControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_fIsSharing) {
-		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::STOP));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::STOP));
 		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetShareTexture());
 		m_fIsSharing = false;
 	}
 	else {
-		CR(m_pParentApp->HandleControlBarEvent(ControlEventType::SHARE));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::SHARE));
 		m_pUIControlBar->GetShareButton()->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetStopTexture());
 		m_fIsSharing = true;
 	}
@@ -162,7 +162,7 @@ Error:
 RESULT DreamControlBar::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::URL));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::URL));
 Error:
 	return R_PASS;
 }
@@ -170,7 +170,7 @@ Error:
 RESULT DreamControlBar::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlEventType::KEYBOARD));
+	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::KEYBOARD));
 Error:
 	return R_PASS;
 }

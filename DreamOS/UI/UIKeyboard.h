@@ -61,6 +61,7 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
+	RESULT InitializeControlBar();
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
