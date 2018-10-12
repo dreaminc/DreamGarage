@@ -343,8 +343,8 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 				CR(m_pFormView->HandleKeyboardDown());
 			}
 			else {
-				CR(pDreamUserApp->SetHasOpenApp(false));
 				CR(Hide());
+				CR(pDreamUserApp->SetHasOpenApp(false));
 			}
 		}
 		else {
