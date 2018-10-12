@@ -188,13 +188,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 	auto pCameraNode = GetDOS()->GetCameraNode();
 	CN(pCameraNode);
 
-	if (m_pKeyboardHandle == nullptr) {
-		auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
-		if (keyUIDs.size() == 1) {
-			m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
-		}
-	}
-	
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = std::shared_ptr<DimRay>(GetDOS()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f));
 		CN(m_pOrientationRay);
@@ -744,14 +737,6 @@ RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
 	m_pEventApp->HandleEvent(type);
 Error:
 	return r;
-}
-
-UIKeyboardHandle *DreamUserApp::GetKeyboard() {
-	return m_pKeyboardHandle;
-}
-
-RESULT DreamUserApp::ReleaseKeyboard() {
-	return R_PASS;
 }
 
 RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {

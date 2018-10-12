@@ -223,12 +223,12 @@ RESULT DreamFormApp::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSourc
 	RESULT r = R_PASS;
 
 	bool fMaskPasswordEnabled = false;
-	UIKeyboard* pKeyboard = nullptr;
+	std::shared_ptr<UIKeyboard> pKeyboard = nullptr;
 
 	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 
-	pKeyboard = dynamic_cast<UIKeyboard*>(pDreamUserApp->GetKeyboard());
+	pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 
 	CN(pDOMNode);
@@ -256,7 +256,7 @@ RESULT DreamFormApp::HandleIsInputFocused(bool fIsFocused, DreamContentSource *p
 	if (fIsFocused) {
 		GetDOS()->GetUserApp()->SetEventApp(m_pFormView.get());
 
-		auto pKeyboard = dynamic_cast<UIKeyboard*>(GetDOS()->GetUserApp()->GetKeyboard());
+		auto pKeyboard = GetDOS()->GetKeyboardApp();
 		CN(pKeyboard);
 
 		CR(pKeyboard->ShowBrowserButtons());
@@ -295,7 +295,7 @@ Error:
 RESULT DreamFormApp::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
 	
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(GetDOS()->GetUserApp()->GetKeyboard());
+	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
 
@@ -306,7 +306,7 @@ Error:
 RESULT DreamFormApp::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
 	
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(GetDOS()->GetUserApp()->GetKeyboard());
+	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
 
@@ -338,7 +338,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 			pCloudController->IsUserLoggedIn() && 
 			pCloudController->IsEnvironmentConnected()) {
 
-			if (pDreamUserApp->GetKeyboard()->IsVisible()) {
+			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 				CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 				CR(m_pFormView->HandleKeyboardDown());
 			}
@@ -431,7 +431,7 @@ RESULT DreamFormApp::Notify(UIEvent *pUIEvent) {
 
 	switch (pUIEvent->m_eventType) {
 	case UI_SELECT_BEGIN: {
-		if (GetDOS()->GetUserApp()->GetKeyboard()->IsVisible()) {
+		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 			CR(m_pDreamBrowserForm->HandleUnfocusEvent());
 			CR(m_pFormView->HandleKeyboardDown());
 		}
