@@ -66,7 +66,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 		CN(m_pControlView);
-		m_pControlView->InitializeWithUserApp(m_pDreamUserApp.get());
+		m_pControlView->InitializeWithUserApp(m_pDreamUserApp);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);

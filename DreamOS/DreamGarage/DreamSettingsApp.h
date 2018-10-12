@@ -5,7 +5,6 @@
 
 #include "DreamGarage/DreamFormApp.h"
 
-class DreamUserHandle;
 class DreamControlView;
 
 class DreamSettingsApp : public DreamFormApp, 

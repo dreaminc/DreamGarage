@@ -592,14 +592,12 @@ RESULT DreamGarage::DidFinishLoading() {
 	//CR(InitializeKeyboard());
 	// what used to be in this function is now in DreamUserControlArea::InitializeApp
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
-	auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
-	CN(pDreamUserApp);
-	m_pDreamUserApp = pDreamUserApp.get();
+	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false).get();
 	CN(m_pDreamUserControlArea);
 
-	m_pDreamUserControlArea->SetDreamUserApp(pDreamUserApp);
+	m_pDreamUserControlArea->SetDreamUserApp(GetUserApp());
 	m_pDreamUserControlArea->SetUIProgramNode(m_pUIProgramNode);
 
 	if (m_pDreamEnvironmentApp != nullptr) {

@@ -28,7 +28,6 @@
 class quad;
 class texture;
 class DreamUserControlArea;
-class DreamUserHandle;
 class AudioPacket;
 class EnvironmentAsset;
 
@@ -109,7 +108,6 @@ private:
 	std::shared_ptr<quad> m_pDesktopQuad = nullptr;
 	std::shared_ptr<texture> m_pDesktopTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
-	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	int m_pxDesktopWidth = DESKTOP_PXWIDTH;
 	int m_pxDesktopHeight = DESKTOP_PXHEIGHT;

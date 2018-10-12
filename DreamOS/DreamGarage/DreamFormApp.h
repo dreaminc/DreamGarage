@@ -83,7 +83,6 @@ public:
 protected:
 	std::shared_ptr<DreamBrowser> m_pDreamBrowserForm = nullptr;
 	std::shared_ptr<DreamControlView> m_pFormView = nullptr;
-	DreamUserApp* m_pUserApp = nullptr;
 
 //private:
 protected:

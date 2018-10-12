@@ -255,9 +255,6 @@ private:
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
 
-	DreamUserHandle *m_pUserHandle = nullptr;
-	UID m_userAppUID;
-
 	DreamUserControlArea *m_pParentApp = nullptr;
 };
 
