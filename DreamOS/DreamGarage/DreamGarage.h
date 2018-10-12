@@ -208,7 +208,6 @@ private:
 
 	DreamEnvironmentApp* m_pDreamEnvironmentApp = nullptr;
 	DreamUserControlArea* m_pDreamUserControlArea = nullptr;
-	DreamUserApp* m_pDreamUserApp = nullptr;
 	DreamUIBar* m_pDreamUIBar = nullptr;
 	DreamContentView* m_pDreamContentView = nullptr;
 	DreamBrowser* m_pDreamBrowser = nullptr;

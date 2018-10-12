@@ -4,9 +4,6 @@
 #include "DreamGarage/DreamFormApp.h"
 #include "Sandbox/CredentialManager.h"
 
-
-
-class DreamUserHandle;
 class DreamControlView;
 
 typedef enum CredentialType {

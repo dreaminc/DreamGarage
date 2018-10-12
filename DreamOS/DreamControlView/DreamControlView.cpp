@@ -79,21 +79,15 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;	
 
-	if (m_pDreamUserApp == nullptr) {
-		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-
-		CBR(userUIDs.size() == 1, R_SKIPPED);
-		m_userUID = userUIDs[0];
-		m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pDreamUserApp);
-	}
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 		
 	UIMallet* pLMallet;
-	pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+	pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
 
 	UIMallet* pRMallet;
-	pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
+	pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);	
 
 	// skip mallet update while keyboard is active
@@ -139,6 +133,9 @@ Error:
 RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
+		
 	switch (type) {
 	case (UserObserverEventType::BACK): {
 
@@ -162,7 +159,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 			bool fStreaming = false;
 
 			CR(Hide());
-			m_pDreamUserApp->SetHasOpenApp(false);
+			pDreamUserApp->SetHasOpenApp(false);
 		}
 
 
@@ -174,7 +171,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 	case (UserObserverEventType::KB_ENTER): {	
 		if (m_fIsShareURL) {
-			m_pDreamUserApp->PreserveSharingState(true);
+			pDreamUserApp->PreserveSharingState(true);
 			if (m_pKeyboardHandle != nullptr) {
 				CR(HideKeyboard());
 			}
@@ -189,19 +186,19 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithUserApp(DreamUserApp *pParent) {
+RESULT DreamControlView::InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent) {
 	RESULT r = R_PASS;
 
 	auto pDreamOS = GetDOS();
 
-	m_pDreamUserApp = pParent;
-	CNR(m_pDreamUserApp, R_SKIPPED);
+	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 
 	float width;
-	width = m_pDreamUserApp->GetBaseWidth();
+	width = pDreamUserApp->GetBaseWidth();
 
 	float height;
-	height = m_pDreamUserApp->GetBaseHeight();
+	height = pDreamUserApp->GetBaseHeight();
 	
 	m_pUISurface = m_pView->AddUISurface();
 	m_pUISurface->InitializeSurfaceQuad(width, height);
@@ -284,23 +281,17 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		if (m_pDreamUserApp == nullptr) {
-			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-			CB(userUIDs.size() == 1);
-			m_userUID = userUIDs[0];
+		std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+		CNR(pDreamUserApp, R_SKIPPED);
 
-			//Capture user app
-			m_pDreamUserApp = dynamic_cast<DreamUserApp*>(GetDOS()->CaptureApp(m_userUID, this));
-			CN(m_pDreamUserApp);
-		}
-		m_pDreamUserApp->SetEventApp(this);
+		pDreamUserApp->SetEventApp(this);
 
 		UIMallet* pLMallet;
-		pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
+		pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 		CNR(pLMallet, R_SKIPPED);
 
 		UIMallet* pRMallet;
-		pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
+		pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 		CNR(pRMallet, R_SKIPPED);
 
 		pLMallet->SetDirty();
@@ -338,10 +329,11 @@ RESULT DreamControlView::ResetAppComposite() {
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
 
-	CN(m_pDreamUserApp);
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 
-	CR(m_pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
-	CR(m_pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
+	CR(pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
+	CR(pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
 
 	GetComposite()->SetPosition(ptAppBasisPosition);
 	GetComposite()->SetOrientation(qAppBasisOrientation);
@@ -361,7 +353,7 @@ RESULT DreamControlView::Show() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 1.0f),
-		m_pDreamUserApp->GetAnimationDuration(),
+		GetDOS()->GetUserApp()->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
@@ -378,7 +370,6 @@ RESULT DreamControlView::Dismiss() {
 	}
 
 	CR(Hide());
-	CN(m_pDreamUserApp);	
 
 Error:
 	return r;
@@ -430,7 +421,7 @@ RESULT DreamControlView::Hide() {
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 0.0f),
-		m_pDreamUserApp->GetAnimationDuration(),
+		GetDOS()->GetUserApp()->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags(),
 		nullptr,
@@ -486,10 +477,8 @@ RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
 RESULT DreamControlView::ShowKeyboard() {
 	RESULT r = R_PASS;
 
-	CNM(m_pDreamUserApp, "user app not found");
-
 	//maintain the keyboard handle until the keyboard is hidden
-	m_pKeyboardHandle = m_pDreamUserApp->GetKeyboard();
+	m_pKeyboardHandle = GetDOS()->GetUserApp()->GetKeyboard();
 	CNM(m_pKeyboardHandle, "keyboard handle not available");
 
 	CR(m_pKeyboardHandle->Show());
@@ -501,11 +490,12 @@ Error:
 RESULT DreamControlView::HideKeyboard() {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 	CNR(m_pKeyboardHandle, R_OBJECT_NOT_FOUND);
-	CNR(m_pDreamUserApp, R_OBJECT_NOT_FOUND);
 
 	CR(m_pKeyboardHandle->Hide());
-	CR(m_pDreamUserApp->ReleaseKeyboard());
+	CR(pDreamUserApp->ReleaseKeyboard());
 
 Error:
 	m_pKeyboardHandle = nullptr;
@@ -541,6 +531,9 @@ RESULT DreamControlView::HandleKeyboardUp() {
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
 	point ptTypingOffset;
 
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
+
 	CBR(IsVisible(), R_SKIPPED);
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);
@@ -554,7 +547,7 @@ RESULT DreamControlView::HandleKeyboardUp() {
 
 	// 58 degrees is the old typing angle (straight up), move the y offset down to accomodate
 	// tilting the screen up
-	verticalAngle = (90.0f - m_pDreamUserApp->GetViewAngle()) * M_PI / 180.0;
+	verticalAngle = (90.0f - pDreamUserApp->GetViewAngle()) * M_PI / 180.0;
 	textBoxYOffset *= 1.0f - sin(verticalAngle - TYPING_ANGLE); 
 
 	ptTypingOffset = point(0.0f, 0.0f, -m_pViewBackground->GetHeight() * 0.5f);	// so that it'll appear past the keyboard quad

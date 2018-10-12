@@ -175,6 +175,7 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	// Set up the pipeline
 	HALImp *pHAL = m_pDreamOS->GetHALImp();
 	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
+	HMD* pHMD = m_pDreamOS->GetHMD();
 
 	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
@@ -190,7 +191,6 @@ RESULT DreamOSTestSuite::SetupDreamAppPipeline() {
 	EnvironmentProgram* pEnvironmentNode;
 	pEnvironmentNode = dynamic_cast<EnvironmentProgram*>(pRenderProgramNode);
 
-	HMD* pHMD = m_pDreamOS->GetHMD();
 	if (pHMD != nullptr) {
 		pEnvironmentNode->SetIsAugmented(pHMD->IsARHMD());
 	}

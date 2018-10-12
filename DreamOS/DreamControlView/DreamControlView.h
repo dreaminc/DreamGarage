@@ -57,7 +57,7 @@ protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeWithUserApp(DreamUserApp *pParent);
+	RESULT InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent);
 	
 // DreamAppHandle
 public:
@@ -132,7 +132,6 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	DreamUserApp *m_pDreamUserApp = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	UID m_browserUID;
