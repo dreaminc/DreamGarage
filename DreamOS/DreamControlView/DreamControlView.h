@@ -132,7 +132,6 @@ private:
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
 
-	std::shared_ptr<DreamUserApp> m_pDreamUserApp = nullptr;
 	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	UID m_browserUID;

@@ -325,7 +325,7 @@ public:
 public:
 	// Keyboard
 	RESULT InitializeKeyboard();
-	RESULT InitializeDreamUser();
+	RESULT InitializeDreamUserApp();
 	RESULT InitializeCloudController();
 
 	// Physics

@@ -594,8 +594,6 @@ RESULT DreamGarage::DidFinishLoading() {
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, GetSandboxConfiguration().f3rdPersonCamera);
 	//auto pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 
-	CR(InitializeDreamUser());
-
 	m_pDreamUserControlArea = LaunchDreamApp<DreamUserControlArea>(this, false).get();
 	CN(m_pDreamUserControlArea);
 

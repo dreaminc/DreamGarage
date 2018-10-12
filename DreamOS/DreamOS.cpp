@@ -149,6 +149,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
 	}
 
+	CR(InitializeDreamUserApp());
+
 	CRM(DidFinishLoading(), "Failed to run DidFinishLoading");
 
 	// Register the update callback
@@ -786,7 +788,7 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::InitializeDreamUser() {
+RESULT DreamOS::InitializeDreamUserApp() {
 	RESULT r = R_PASS;
 
 	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
