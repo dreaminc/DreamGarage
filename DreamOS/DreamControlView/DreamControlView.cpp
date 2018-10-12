@@ -435,12 +435,7 @@ Error:
 }
 
 bool DreamControlView::IsVisible() {
-
-	//TODO: replace with GetComposite()->IsVisible() if possible
-	bool fViewVisible = m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
-	
-	// this function is closer to IsAppBeingUsed
-	return GetDOS()->GetKeyboardApp()->IsVisible() || fViewVisible;
+	return m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
 }
 
 bool DreamControlView::IsAnimating() {
