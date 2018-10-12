@@ -338,6 +338,10 @@ HMDDeviceType OpenVRDevice::GetDeviceType() {
 	return m_deviceType;
 }
 
+bool OpenVRDevice::IsARHMD() {
+	return m_deviceType == HMDDeviceType::META;
+}
+
 std::string OpenVRDevice::GetDeviceTypeString() {
 	std::string strDeviceType;
 

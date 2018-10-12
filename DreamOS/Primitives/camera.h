@@ -59,6 +59,8 @@ public:
 	vector GetLookVector();
 	vector GetUpVector();
 
+	vector GetLookVectorXZ();
+
 	ProjectionMatrix GetProjectionMatrix();
 	ViewMatrix GetViewMatrix();
 	matrix<camera_precision, 4, 4> GetProjectionViewMatrix();

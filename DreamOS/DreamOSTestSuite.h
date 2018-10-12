@@ -51,9 +51,6 @@ public:
 	RESULT AddTestDreamOS();
 	RESULT AddTestDreamDesktop();
 
-	// Capturing Apps
-	RESULT AddTestCaptureApp();
-
 	// Casting
 	RESULT AddTestDreamShareView();
 	RESULT AddTestBasicBrowserCast();

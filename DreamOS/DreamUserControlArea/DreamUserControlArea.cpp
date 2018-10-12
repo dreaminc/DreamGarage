@@ -54,8 +54,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	quaternion qOrigin;
 
 	if (m_pDreamUserApp != nullptr && m_pDreamUIBar == nullptr) {
-		auto pKeyboard = GetDOS()->LaunchDreamApp<UIKeyboard>(this, false);
-		CN(pKeyboard);
 
 		m_pDreamUIBar = GetDOS()->LaunchDreamApp<DreamUIBar>(this, false);
 		CN(m_pDreamUIBar);
@@ -66,7 +64,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 		CN(m_pControlView);
-		m_pControlView->InitializeWithUserApp(m_pDreamUserApp.get());
+		m_pControlView->InitializeWithUserApp(m_pDreamUserApp);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
@@ -108,8 +106,9 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float totalCenter = (m_pControlView->GetBackgroundWidth() + m_pDreamUserApp->GetSpacingSize() + m_pDreamTabView->GetBorderWidth()) / 2.0f;
 		//m_centerOffset = currentCenter - totalCenter;
 		
-		pKeyboard->InitializeWithParent(this);
-		GetComposite()->AddObject(std::shared_ptr<composite>(pKeyboard->GetComposite()));
+		GetDOS()->GetKeyboardApp()->InitializeWithParent(this);
+		// TODO: bad
+		GetComposite()->AddObject(std::shared_ptr<composite>(GetDOS()->GetKeyboardApp()->GetComposite()));
 	}
 
 	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
@@ -340,10 +339,7 @@ RESULT DreamUserControlArea::HandleControlBarEvent(ControlEventType type) {
 		CR(pDreamOS->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
 		CR(pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(pButtonContext->GetInteractionObject()));
 
-		if (m_pKeyboardHandle == nullptr) {
-			CR(ShowKeyboard());
-			CR(m_pKeyboardHandle->ShowTitleView());
-		}
+		CR(GetDOS()->GetKeyboardApp()->Show());
 
 		CR(HideView());
 		m_fIsShareURL = true;
@@ -379,7 +375,6 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 	//CBR(!pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get()), R_SKIPPED);
 
 	//only allow button presses while keyboard isn't active
-	//CBR(m_pKeyboardHandle == nullptr, R_SKIPPED);	
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(dirtyIndex != -1, R_SKIPPED);
 
@@ -542,7 +537,7 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamCont
 
 	bool fMaskPasswordEnabled = false;
 
-	UIKeyboard* pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	std::shared_ptr<UIKeyboard> pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 
 	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
@@ -577,7 +572,7 @@ RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentS
 
 	if (fIsFocused) {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+		auto pKeyboard = GetDOS()->GetKeyboardApp();
 		CN(pKeyboard);
 		CR(pKeyboard->ShowBrowserButtons());
 		CR(m_pControlView->HandleKeyboardUp());
@@ -603,7 +598,7 @@ RESULT DreamUserControlArea::HandleDreamFormSuccess() {
 
 RESULT DreamUserControlArea::HandleCanTabNext(bool fCanNext) {
 	RESULT r = R_PASS;
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabNextTexture(fCanNext));
 Error:
@@ -612,7 +607,7 @@ Error:
 
 RESULT DreamUserControlArea::HandleCanTabPrevious(bool fCanPrevious) {
 	RESULT r = R_PASS;
-	auto pKeyboard = dynamic_cast<UIKeyboard*>(m_pDreamUserApp->GetKeyboard());
+	auto pKeyboard = GetDOS()->GetKeyboardApp();
 	CN(pKeyboard);
 	CR(pKeyboard->UpdateTabPreviousTexture(fCanPrevious));
 Error:

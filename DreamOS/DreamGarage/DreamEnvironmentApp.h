@@ -77,8 +77,6 @@ private:
 	light *m_pDirectionalSunLight = nullptr;
 	light *m_pDirectionalAmbientLight = nullptr;
 
-	DreamUserApp* m_pUserApp = nullptr;
-
 	// shader programs
 	std::vector<SkyboxScatterProgram*> m_skyboxPrograms;
 	OGLProgramScreenFade *m_pFadeProgram = nullptr;

@@ -339,8 +339,6 @@ Error:
 RESULT DreamBrowser::OnNodeFocusChanged(DOMNode *pDOMNode) {
 	RESULT r = R_PASS;
 
-	UIKeyboardHandle *pKeyboardHandle = nullptr;
-
 	if (m_pObserver != nullptr) {
 		CR(m_pObserver->HandleNodeFocusChanged(pDOMNode, this));
 	}
@@ -606,14 +604,6 @@ RESULT DreamBrowser::Update(void *pContext) {
 			CR(UpdateNavigationFlags());
 		}
 		m_fUpdateControlBarInfo = false;
-	}
-
-	if (m_pDreamUserHandle == nullptr) {
-		auto pDreamOS = GetDOS();
-		CNR(pDreamOS, R_OBJECT_NOT_FOUND);
-		auto userAppIDs = pDreamOS->GetAppUID("DreamUserApp");
-		CBR(userAppIDs.size() == 1, R_SKIPPED);
-		m_pDreamUserHandle = dynamic_cast<DreamUserApp*>(pDreamOS->CaptureApp(userAppIDs[0], this));
 	}
 	
 	// Really strange, we need to send 8 frames for the share to go through? As in OnVideoFrame isn't called on the receiver side until the 4th one is sent
