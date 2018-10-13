@@ -210,6 +210,27 @@ Error:
 	return r;
 }
 
+RESULT UIControlBar::InitializeText() {
+	RESULT r = R_PASS;
+
+	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+
+	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
+		"",
+		m_urlWidth - m_itemSpacing,
+		m_itemSide - (2.0f*m_itemSpacing),
+		textFlags));
+
+	m_pURLText->RotateXByDeg(90.0f);
+	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+	GetButton(ControlBarButtonType::URL)->AddObject(m_pURLText);
+
+Error:
+	return r;
+}
+
 RESULT UIControlBar::BackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CN(m_pObserver);

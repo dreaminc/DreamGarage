@@ -73,6 +73,7 @@ public:
 
 	RESULT Initialize();
 	RESULT InitializeGeneral();
+	RESULT InitializeText();
 
 	//TODO: currently different control bar layouts are not used
 	RESULT UpdateButtonsWithType(BarType type);

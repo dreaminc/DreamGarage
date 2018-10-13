@@ -73,22 +73,7 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2)));
 
 	// create text for title
-	{
-		auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-		pFont->SetLineHeight(buttonWidth - (2.0f*spacingSize));
-
-		auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-		m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
-			"",
-			0.84375 - spacingSize,
-			buttonWidth - (2.0f*spacingSize),
-			textFlags));
-
-		m_pURLText->RotateXByDeg(90.0f);
-		m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-
-		CR(GetButton(ControlBarButtonType::URL)->AddObject(m_pURLText));
-	}
+	CR(InitializeText());
 
 Error:
 	return r;
@@ -198,12 +183,12 @@ RESULT UIContentControlBar::HandleShareTogglePressed(UIButton *pButtonContext, v
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_fIsSharing) {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::SHARE));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::STOP));
 		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::SHARE));
 		m_fIsSharing = false;
 	}
 	else {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::STOP));
+		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::SHARE));
 		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::STOP));
 		m_fIsSharing = true;
 	}
@@ -232,7 +217,7 @@ RESULT UIContentControlBar::UpdateControlBarButtonsWithType(std::string strConte
 	RESULT r = R_PASS;
 
 	m_barType = ControlBarTypeFromString(strContentType);
-	CR(UpdateButtonsWithType(m_barType));
+	//CR(UpdateButtonsWithType(m_barType));
 
 	if (m_pParentApp != nullptr) {
 		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pDreamOS->GetSharedContentTexture());

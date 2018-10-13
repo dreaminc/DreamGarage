@@ -442,13 +442,11 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	m_pActiveSource = pNewContent;
 	if (m_pUIControlBar != nullptr) {
 		m_pUIControlBar->SetTitleText(m_pActiveSource->GetTitle());
-		//m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+		m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 
-	//bool fIsSharing = (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture());
-	//m_pControlBar->SetSharingFlag(fIsSharing);
 
 	auto pView = m_pControlView->GetViewQuad();
 	SetIsAnimating(true);
@@ -874,7 +872,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 	CR(Show());
 
-	//m_pUIControlBar->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
+	m_pUIControlBar->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
 
 Error:
 	return r;
@@ -992,7 +990,8 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		// replace with top of tab bar
 		if (m_pActiveSource != nullptr) {
 			m_pUIControlBar->SetTitleText(m_pActiveSource->GetTitle());
-//			m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+			m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+
 			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 			CR(ShowControlView());
 		}
