@@ -59,7 +59,6 @@ private:
 
 	bool m_fUpdateTitle = false;
 	std::string m_strUpdateTitle = "";
-	BarType m_barType = BarType::DEFAULT;
 
 	double m_buttonWidth = ITEM_SIZE;
 	double m_buttonHeight = ITEM_SIZE;

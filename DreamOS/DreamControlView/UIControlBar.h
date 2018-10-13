@@ -17,14 +17,6 @@ class text;
 
 #define ITEM_ACTUATION_DEPTH 0.02f
 
-enum class BarType {
-	DEFAULT,
-	BROWSER,
-	DESKTOP,
-	KEYBOARD,
-	INVALID
-};
-
 enum class ControlBarButtonType {
 	OPEN,
 	CLOSE,
@@ -49,90 +41,28 @@ enum class ControlBarButtonType {
 	INVALID
 };
 
-// Default Observer
-class ControlBarObserver {
-public:
-	virtual RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) = 0;
-	virtual RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) = 0;
-	virtual RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) = 0;
-};
-
 class UIControlBar : public UIView {
 public:
 	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
-	UIControlBar(HALImp *pHALImp, DreamOS *pDreamOS, BarType barType);
 	~UIControlBar();
 
 	RESULT Initialize();
-	RESULT InitializeGeneral();
 	RESULT InitializeText();
 
-	//TODO: currently different control bar layouts are not used
-	RESULT UpdateButtonsWithType(BarType type);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback);
 
-	float GetSpacingOffset();
-
 	std::shared_ptr<UIButton> GetButton(ControlBarButtonType type);
-	// Getters used for registering event behavior
-	std::shared_ptr<UIButton> GetBackButton();
-	std::shared_ptr<UIButton> GetForwardButton();
-	std::shared_ptr<UIButton> GetToggleButton();
-	std::shared_ptr<UIButton> GetShareButton();
-	std::shared_ptr<UIButton> GetStopButton();
-	std::shared_ptr<UIButton> GetURLButton();
-	std::shared_ptr<UIButton> GetKeyboardButton();
-	std::shared_ptr<UIButton> GetTabButton();
-	std::shared_ptr<UIButton> GetBackTabButton();
-	std::shared_ptr<UIButton> GetDoneButton();
-
-	// Wrappers for executing the observer methods
-	RESULT BackPressed(UIButton* pButtonContext, void* pContext);
-	RESULT ForwardPressed(UIButton* pButtonContext, void* pContext);
-	RESULT TogglePressed(UIButton* pButtonContext, void* pContext);
-	RESULT OpenPressed(UIButton* pButtonContext, void* pContext);
-	RESULT ClosePressed(UIButton* pButtonContext, void* pContext);
-	RESULT SharePressed(UIButton* pButtonContext, void* pContext);
-	RESULT URLPressed(UIButton* pButtonContext, void* pContext);
-	RESULT KeyboardPressed(UIButton* pButtonContext, void* pContext);
-	RESULT TabPressed(UIButton* pButtonContext, void* pContext);
-	RESULT BackTabPressed(UIButton* pButtonContext, void* pContext);
-	RESULT DonePressed(UIButton* pButtonContext, void* pContext);
 
 	texture* GetTexture(ControlBarButtonType type);
-	// Getters used for swapping the hide/show texture on the hide button
-	texture *GetHideTexture();
-	texture *GetShowTexture();
-	texture *GetShareTexture();
-	texture *GetStopTexture();
-
-	texture *GetTabTexture();
-	texture *GetCantTabTexture();
-	texture *GetBackTabTexture();
-	texture *GetCantBackTabTexture();
 
 	// for non-default implementations, call these before initialize
-	RESULT SetTotalWidth(float totalWidth);
 	RESULT SetItemSide(float itemSide);
-	RESULT SetURLWidth(float urlWidth);
 	RESULT SetItemSpacing(float itemSpacing);
+	RESULT SetURLWidth(float urlWidth);
 
 	std::shared_ptr<text> GetURLText();
-
-	RESULT RegisterObserver(ControlBarObserver *pObserver);
-	RESULT UnregisterObserver(ControlBarObserver *pObserver);
-
-	static BarType ControlBarTypeFromString(const std::string& strContentType);
 
 // common behavior
 public:
@@ -202,10 +132,6 @@ private:
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;
 	float m_urlWidth = m_totalWidth * URL_WIDTH_2;
 	float m_actuationDepth = ITEM_ACTUATION_DEPTH;
-
-	BarType m_barType = BarType::DEFAULT;
-
-	ControlBarObserver *m_pObserver = nullptr;
 };
 
 #endif UI_CONTROL_BAR_H_

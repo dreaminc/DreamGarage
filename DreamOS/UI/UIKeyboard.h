@@ -50,8 +50,7 @@ class SoundFile;
 
 
 class UIKeyboard : public DreamApp<UIKeyboard>,
-	public SenseKeyboard,
-	public ControlBarObserver {
+	public SenseKeyboard {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
@@ -116,19 +115,10 @@ public:
 	RESULT SetKeyReleaseThreshold(float threshold);
 	RESULT SetSurfaceOffset(point ptOffset);
 
-	//ControlBarObserver
 public:
-	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext);
 
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);

@@ -854,7 +854,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
-		//m_pControlBar->SetTitleText(pBrowser->GetTitle());
+		m_pUIControlBar->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
 		m_strURL = "";

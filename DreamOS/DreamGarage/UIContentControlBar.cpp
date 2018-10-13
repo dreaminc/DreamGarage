@@ -45,17 +45,16 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 
 	//GetDOS()->AddObjectToUIGraph(GetComposite());
 
-	SetTotalWidth(width);
 	SetItemSide(m_buttonWidth * width);
-	SetURLWidth(m_urlWidth * width);
 	SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
+	SetURLWidth(m_urlWidth * width);
 
 	SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2 * spacingSize + buttonWidth / 2.0f);
 	RotateXByDeg(-90.0f);
 
 	SetVisible(true);
 
-	CR(InitializeGeneral());
+	CR(UIControlBar::Initialize());
 
 	CR(AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2)));
@@ -216,16 +215,17 @@ Error:
 RESULT UIContentControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
 	RESULT r = R_PASS;
 
-	m_barType = ControlBarTypeFromString(strContentType);
-	//CR(UpdateButtonsWithType(m_barType));
+	// TODO: if source is desktop, switch around buttons
+	// doing things like settings visibility was removed from this function in UIControlBar
 
 	if (m_pParentApp != nullptr) {
 		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pDreamOS->GetSharedContentTexture());
 		fIsSharing = (fIsSharing && m_pDreamOS->IsSharing());
 
 		CR(SetSharingFlag(fIsSharing));
-		if (m_barType == BarType::BROWSER) {
-			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
+
+		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pParentApp->GetActiveSource().get());
+		if (pBrowser != nullptr) {
 			CR(pBrowser->UpdateNavigationFlags());
 		}
 	}

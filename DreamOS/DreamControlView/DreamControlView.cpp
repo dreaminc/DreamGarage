@@ -249,16 +249,6 @@ RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTex
 	return R_PASS;
 }
 
-RESULT DreamControlView::SetContentType(std::string strContentType) {
-
-
-	m_currentControlBarType = UIControlBar::ControlBarTypeFromString(strContentType);
-
-	//TODO: don't need to do this until different types of control bars are defined
-
-	return R_PASS;
-}
-
 DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamControlView *pDreamControlView = new DreamControlView(pDreamOS, pContext);
 	return pDreamControlView;

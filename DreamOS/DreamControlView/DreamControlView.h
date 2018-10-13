@@ -62,7 +62,6 @@ public:
 // DreamAppHandle
 public:
 	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
-	RESULT SetContentType(std::string strContentType);
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
@@ -158,8 +157,6 @@ private:
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
 	std::string m_strText;
-
-	BarType m_currentControlBarType;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

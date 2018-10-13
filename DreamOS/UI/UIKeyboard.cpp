@@ -311,7 +311,6 @@ RESULT UIKeyboard::InitializeControlBar() {
 	float right = m_surfaceWidth / 2.0f - marginError / 2.0f;
 	float doneOffset = right - barButtonWidth/2.0f;
 
-	m_pUIControlBar->SetTotalWidth(m_surfaceWidth);
 	m_pUIControlBar->SetItemSide(itemSide);
 	m_pUIControlBar->SetItemSpacing(marginError);
 
@@ -319,9 +318,7 @@ RESULT UIKeyboard::InitializeControlBar() {
 	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
 
 	//pLayout->SetVisible(false);
-	//CR(m_pUIControlBar->Initialize());
-	//CR(m_pUIControlBar->UpdateButtonsWithType(BarType::KEYBOARD));
-	CR(m_pUIControlBar->InitializeGeneral());
+	CR(m_pUIControlBar->Initialize());
 
 	CR(m_pUIControlBar->AddButton(ControlBarButtonType::TAB, tabOffset, barButtonWidth, 
 		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2)));

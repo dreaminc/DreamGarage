@@ -137,22 +137,6 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIControlBar> UIView::MakeUIControlBar(BarType barType) {
-	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS, barType));
-
-	return pControlBar;
-}
-
-std::shared_ptr<UIControlBar> UIView::AddUIControlBar(BarType barType) {
-	RESULT r = R_PASS;
-
-	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar(barType);
-	CR(AddObject(pControlBar));
-	return pControlBar;
-Error:
-	return nullptr;
-}
-
 std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
 	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
 
