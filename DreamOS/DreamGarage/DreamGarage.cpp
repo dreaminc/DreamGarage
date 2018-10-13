@@ -43,7 +43,7 @@ light *g_pLight = nullptr;
 #include "Cloud/Environment/PeerConnection.h"
 
 #include "DreamGarageMessage.h"
-#include "UpdateHeadMessage.h"
+#include "UpdateHeadMessage.h" 
 #include "UpdateHandMessage.h"
 #include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
@@ -83,8 +83,11 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
 
-	//sandboxconfig.fHideWindow = false;
-	//sandboxconfig.fHMDMirror = true;
+	// Enable HMD mirror for non-production builds 
+#ifndef PRODUCTION_BUILD
+	sandboxconfig.fHideWindow = false;
+	sandboxconfig.fHMDMirror = true;
+#endif
 
 	//sandboxconfig.fHideWindow = false;
 	//sandboxconfig.fHMDMirror = false;
@@ -106,7 +109,39 @@ RESULT DreamGarage::ConfigureSandbox() {
 
 	SetSandboxConfiguration(sandboxconfig);
 
-	//Error:
+	// Set up API routes
+	// Set up command line manager
+	auto pCommandLineManager = CommandLineManager::instance();
+	CN(pCommandLineManager);
+
+	// previous AWS server
+	// CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+	// CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+
+	// TODO: Since DreamOS project doesn't get PRODUCTION pre-processors and the OCULUS_PRODUCTION_BUILD one is supposed to be temporary
+	//		 This will need to be reworked at that time as well.
+#ifdef PRODUCTION_BUILD	
+	CR(pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
+	CR(pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
+	CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));
+
+	// Disable these in production
+	CR(pCommandLineManager->DisableParameter("www.ip"));
+	CR(pCommandLineManager->DisableParameter("api.ip"));
+	CR(pCommandLineManager->DisableParameter("ws.ip"));
+#else
+	CR(pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
+	CR(pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
+
+	#ifdef USE_LOCALHOST
+		CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
+	#else
+		CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	#endif
+
+#endif
+
+Error:
 	return r;
 }
 
@@ -678,7 +713,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	
 	// Initial step of login flow:
 	if(IsConnectedToInternet()) {
-#if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+#if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(STAGING_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
 		//*
 #else

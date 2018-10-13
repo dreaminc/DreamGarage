@@ -123,7 +123,8 @@ public:
 	const quaternion& operator+(const quaternion& arg) const;
 
 	quaternion& operator-=(const quaternion& rhs);
-	const quaternion& operator-(const quaternion& arg) const;
+	//const quaternion& operator-(const quaternion& arg) const;
+	quaternion operator-(const quaternion& arg) const;
 
 	bool operator==(const quaternion& rhs);
 	bool operator!=(const quaternion& rhs);

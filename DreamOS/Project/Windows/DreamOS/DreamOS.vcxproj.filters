@@ -978,7 +978,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point2D.cpp">
       <Filter>Primitives</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -995,6 +995,9 @@
       <Filter>HAL\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironment.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLSphere.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2157,7 +2160,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\point2D.h">
       <Filter>Primitives</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLCameraViewportDisplay.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>

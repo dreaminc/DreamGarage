@@ -99,7 +99,7 @@ RESULT CloudTestSuite::AddTests() {
 
 	// Requires login
 
-	CR(AddTestDownloadFile());	
+	CR(AddTestDownloadFile());	 
 
 	CR(AddTestConnectLogin());
 	

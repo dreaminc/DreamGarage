@@ -40,7 +40,7 @@ RESULT CEFExtension::Initialize() {
 		//	"  };"
 		//	"})();";
 
-#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+#if defined(PRODUCTION_BUILD) || defined(STAGING_BUILD)
 		char pszDreamPath[MAX_PATH];
 		size_t pszDreamPath_n = 0;
 
