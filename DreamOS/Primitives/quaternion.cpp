@@ -440,8 +440,14 @@ quaternion& quaternion::operator-=(const quaternion& rhs) {
 	return *this;
 }
 
-const quaternion& quaternion::operator-(const quaternion& arg) const {
-	return quaternion(*this).operator-=(arg);
+//const quaternion& quaternion::operator-(const quaternion& arg) const {
+//	return quaternion(*this).operator-=(arg);
+//}
+
+quaternion quaternion::operator-(const quaternion& arg) const {
+	quaternion retQ(*this); 
+	retQ.operator-=(arg);
+	return retQ;
 }
 
 bool quaternion::operator==(const quaternion& rhs) {

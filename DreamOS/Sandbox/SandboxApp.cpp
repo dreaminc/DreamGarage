@@ -527,31 +527,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Set up command line manager
 	m_pCommandLineManager = CommandLineManager::instance();
 	CN(m_pCommandLineManager);
-	
-	// previous AWS server
-	// CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
-	// CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
-
-	// TODO: Since DreamOS project doesn't get PRODUCTION pre-processors and the OCULUS_PRODUCTION_BUILD one is supposed to be temporary
-	//		 This will need to be reworked at that time as well.
-#ifdef OCULUS_PRODUCTION_BUILD	
-	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));
-
-	// Disable these in production
-	CR(m_pCommandLineManager->DisableParameter("www.ip"));
-	CR(m_pCommandLineManager->DisableParameter("api.ip"));
-	CR(m_pCommandLineManager->DisableParameter("ws.ip"));
-#else
-	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
-	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
-	#ifdef USE_LOCALHOST
-		CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://localhost:8000"));
-	#else
-		CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
-	#endif
-#endif
 
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));

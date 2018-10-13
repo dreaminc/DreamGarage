@@ -50,7 +50,7 @@ public:
 	RESULT SendMouthSize();
 
 	virtual bool UseInstallPath() override {
-#if defined(PRODUCTION_BUILD) || defined(DEV_PRODUCTION_BUILD)
+#if defined(PRODUCTION_BUILD) || defined(STAGING_BUILD)
 		return true;
 #else
 		return false;
@@ -58,11 +58,14 @@ public:
 	}
 
 	virtual std::wstring GetDreamFolderPath() {
-#ifdef PRODUCTION_BUILD
 		return std::wstring(L"\\Dream\\");
-#else DEV_PRODUCTION_BUILD
-		return std::wstring(L"\\DreamDev\\");
-#endif
+
+		// TODO: Understand the implications of this, we no longer have a DreamDev build now
+//#ifdef PRODUCTION_BUILD
+//		return std::wstring(L"\\Dream\\");
+//#else STAGING_BUILD
+//		return std::wstring(L"\\DreamDev\\");
+//#endif
 	}
 
 	// TODO: this is just a debug test temp
