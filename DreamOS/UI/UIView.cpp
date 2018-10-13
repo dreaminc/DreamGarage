@@ -6,6 +6,7 @@
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
 #include "DreamControlView/UIControlBar.h"
+#include "DreamGarage/UIContentControlBar.h"
 
 #include "DreamOS.h"
 
@@ -162,6 +163,22 @@ std::shared_ptr<UIControlBar> UIView::AddUIControlBar() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar();
+	CR(AddObject(pControlBar));
+	return pControlBar;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIContentControlBar> UIView::MakeUIContentControlBar() {
+	std::shared_ptr<UIContentControlBar> pControlBar(new UIContentControlBar(m_pHALImp, m_pDreamOS));
+
+	return pControlBar;
+}
+
+std::shared_ptr<UIContentControlBar> UIView::AddUIContentControlBar() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIContentControlBar> pControlBar = MakeUIContentControlBar();
 	CR(AddObject(pControlBar));
 	return pControlBar;
 Error:

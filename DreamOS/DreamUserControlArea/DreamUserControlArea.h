@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 #include "DreamApp.h"
-#include "DreamGarage/DreamControlBar.h"
+#include "DreamGarage/UIContentControlBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "Primitives/Subscriber.h"
 
@@ -185,8 +185,12 @@ private:
 	// App used for opening content
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 
+	// UI in control area
+	std::shared_ptr<UIView> m_pView = nullptr;
+	std::shared_ptr<UIContentControlBar> m_pUIControlBar = nullptr;
+
+	// TODO: move to UI
 	// Apps in control area
-	std::shared_ptr<DreamControlBar> m_pControlBar;
 	std::shared_ptr<DreamControlView> m_pControlView;
 	std::shared_ptr<DreamTabView> m_pDreamTabView;
 

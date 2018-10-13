@@ -16,6 +16,7 @@ class UISpatialScrollView;
 class UIFlatScrollView;
 class UIMenuItem;
 class UIControlBar;
+class UIContentControlBar;
 class UISurface;
 class DreamOS;
 enum class BarType;
@@ -50,6 +51,9 @@ public:
 
 	std::shared_ptr<UIControlBar> MakeUIControlBar();
 	std::shared_ptr<UIControlBar> AddUIControlBar();
+
+	std::shared_ptr<UIContentControlBar> MakeUIContentControlBar();
+	std::shared_ptr<UIContentControlBar> AddUIContentControlBar();
 
 	std::shared_ptr<UISpatialScrollView> MakeUISpatialScrollView();
 	std::shared_ptr<UISpatialScrollView> AddUISpatialScrollView();

@@ -382,18 +382,21 @@ RESULT UIControlBar::UpdateButtonsWithType(BarType type) {
 RESULT UIControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
+	auto pBackButton = GetButton(ControlBarButtonType::BACK);
+	auto pForwardButton = GetButton(ControlBarButtonType::FORWARD);
+
 	if (fCanGoBack) {
-		m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackTexture);
+		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::BACK));
 	}
 	else {
-		m_pBackButton->GetSurface()->SetDiffuseTexture(m_pBackDisabledTexture);
+		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_BACK));
 	}
 
 	if (fCanGoForward) {
-		m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardTexture);
+		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::FORWARD));
 	}
 	else {
-		m_pForwardButton->GetSurface()->SetDiffuseTexture(m_pForwardDisabledTexture);
+		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_FORWARD));
 	}
 
 	return r;
@@ -436,8 +439,10 @@ RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) 
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 
 	//TODO: this only works if these textures are used for no other purpose
-	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pBackDisabledTexture &&
-		pButtonContext->GetSurface()->GetTextureDiffuse() != m_pForwardDisabledTexture, R_SKIPPED);
+	//CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pBackDisabledTexture &&
+	//	pButtonContext->GetSurface()->GetTextureDiffuse() != m_pForwardDisabledTexture, R_SKIPPED);
+	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_BACK] &&
+		pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_FORWARD], R_SKIPPED);
 
 //	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_pCantBackTabTexture &&
 //		pButtonContext->GetSurface()->GetTextureDiffuse() != m_pCantTabTexture, R_SKIPPED);

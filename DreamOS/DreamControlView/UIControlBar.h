@@ -157,6 +157,9 @@ public:
 	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
 	const wchar_t *k_wszDone = L"key-done.png";
 
+protected:
+	std::shared_ptr<text> m_pURLText = nullptr;
+
 private:
 	std::map<ControlBarButtonType, std::shared_ptr<UIButton>> m_buttons;
 
@@ -172,7 +175,6 @@ private:
 	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
 
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
-	std::shared_ptr<text> m_pURLText = nullptr;
 
 	std::map<ControlBarButtonType, texture*> m_buttonTextures;
 
