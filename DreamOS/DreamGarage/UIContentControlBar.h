@@ -25,6 +25,7 @@ public:
 	// DreamApp
 public:
 	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT InitializeText();
 	RESULT Update();
 
 	// ControlBarObserver
@@ -38,12 +39,15 @@ public:
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext);
 	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext);
 
-	// Also updates the button texture
+	// Update functions specific to this type of control bar
 	RESULT SetSharingFlag(bool fIsSharing);
 	RESULT SetTitleText(const std::string& strTitle);
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
+	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 	RESULT ClearMinimizedState();
+
+	std::shared_ptr<text> GetURLText();
 
 // Animations
 public:
@@ -57,6 +61,7 @@ private:
 	bool m_fIsMinimized = false;
 	bool m_fIsSharing = false;
 
+	std::shared_ptr<text> m_pURLText = nullptr;
 	bool m_fUpdateTitle = false;
 	std::string m_strUpdateTitle = "";
 

@@ -47,9 +47,6 @@ public:
 	~UIControlBar();
 
 	RESULT Initialize();
-	RESULT InitializeText();
-
-	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback);
 
@@ -60,9 +57,6 @@ public:
 	// for non-default implementations, call these before initialize
 	RESULT SetItemSide(float itemSide);
 	RESULT SetItemSpacing(float itemSpacing);
-	RESULT SetURLWidth(float urlWidth);
-
-	std::shared_ptr<text> GetURLText();
 
 // common behavior
 public:
@@ -88,45 +82,12 @@ public:
 	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
 	const wchar_t *k_wszDone = L"key-done.png";
 
-protected:
-	std::shared_ptr<text> m_pURLText = nullptr;
-
 private:
 	std::map<ControlBarButtonType, std::shared_ptr<UIButton>> m_buttons;
 
-	std::shared_ptr<UIButton> m_pBackButton = nullptr;
-	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
-	std::shared_ptr<UIButton> m_pToggleButton = nullptr;
-	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
-	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
-	std::shared_ptr<UIButton> m_pShareToggleButton = nullptr;
-	std::shared_ptr<UIButton> m_pKeyboardButton = nullptr;
-	std::shared_ptr<UIButton> m_pTabButton = nullptr;
-	std::shared_ptr<UIButton> m_pBackTabButton = nullptr;
-	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
-
-	std::shared_ptr<UIButton> m_pURLButton = nullptr;
-
 	std::map<ControlBarButtonType, texture*> m_buttonTextures;
 
-	texture *m_pBackTexture = nullptr;
-	texture *m_pForwardTexture = nullptr;
-	texture *m_pBackDisabledTexture = nullptr;
-	texture *m_pForwardDisabledTexture = nullptr;
-	texture *m_pKeyboardTexture = nullptr;
-	texture *m_pShowTexture = nullptr;
-	texture *m_pHideTexture = nullptr;
-	texture *m_pOpenTexture = nullptr;
-	texture *m_pCloseTexture = nullptr;
-	texture *m_pShareTexture = nullptr;
-	texture *m_pStopSharingTexture = nullptr;
-	texture *m_pURLTexture = nullptr;
-	texture *m_pTabTexture = nullptr;
-	texture *m_pCantTabTexture = nullptr;
-	texture *m_pBackTabTexture = nullptr;
-	texture *m_pCantBackTabTexture = nullptr;
-	texture *m_pDoneTexture = nullptr;
-
+protected:
 	float m_totalWidth = TOTAL_WIDTH;
 	float m_itemSide = m_totalWidth * ITEM_SIDE;
 	float m_itemSpacing = m_totalWidth * ITEM_SPACING;

@@ -45,58 +45,10 @@ Error:
 	return r;
 }
 
-RESULT UIControlBar::InitializeText() {
-	RESULT r = R_PASS;
-
-	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
-
-	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
-	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
-		"",
-		m_urlWidth - m_itemSpacing,
-		m_itemSide - (2.0f*m_itemSpacing),
-		textFlags));
-
-	m_pURLText->RotateXByDeg(90.0f);
-	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-	GetButton(ControlBarButtonType::URL)->AddObject(m_pURLText);
-
-Error:
-	return r;
-}
-
-RESULT UIControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
-	RESULT r = R_PASS;
-
-	auto pBackButton = GetButton(ControlBarButtonType::BACK);
-	auto pForwardButton = GetButton(ControlBarButtonType::FORWARD);
-
-	CN(pBackButton);
-	CN(pForwardButton);
-
-	if (fCanGoBack) {
-		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::BACK));
-	}
-	else {
-		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_BACK));
-	}
-
-	if (fCanGoForward) {
-		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::FORWARD));
-	}
-	else {
-		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_FORWARD));
-	}
-
-Error:
-	return r;
-}
 
 RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback) {
 	RESULT r = R_PASS;
 	
-	// TODO: texture, width from type
 	std::shared_ptr<UIButton> pButton = AddUIButton(width, m_itemSide);
 
 	pButton->SetPosition(point(offset, 0.0f, 0.0f));
@@ -104,14 +56,17 @@ RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float wi
 	CBR(type != ControlBarButtonType::INVALID, R_SKIPPED);
 	CR(pButton->GetSurface()->SetDiffuseTexture(m_buttonTextures[type]));
 
-	CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+	// if there isn't a trigger callback provided, 
+	// the button doesn't need to be interactable at all
+	if (fnCallback != nullptr) {
+		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 
-	if (type != ControlBarButtonType::URL) {
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
 	}
 	
+	// Assumption: a control bar's buttons have unique types
 	m_buttons[type] = pButton;
 
 Error:
@@ -194,13 +149,4 @@ RESULT UIControlBar::SetItemSide(float itemSide) {
 RESULT UIControlBar::SetItemSpacing(float itemSpacing) {
 	m_itemSpacing = itemSpacing;
 	return R_PASS;
-}
-
-RESULT UIControlBar::SetURLWidth(float urlWidth) {
-	m_urlWidth = urlWidth;
-	return R_PASS;
-}
-
-std::shared_ptr<text> UIControlBar::GetURLText() {
-	return m_pURLText;
 }

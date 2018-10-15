@@ -47,7 +47,7 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 
 	SetItemSide(m_buttonWidth * width);
 	SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
-	SetURLWidth(m_urlWidth * width);
+	m_urlWidth *= width;
 
 	SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2 * spacingSize + buttonWidth / 2.0f);
 	RotateXByDeg(-90.0f);
@@ -62,8 +62,13 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
-		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
+
+// Re-enable for selectability of the URL button
+//	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
+//		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
+
+	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr));
+
 	CR(AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
@@ -77,6 +82,28 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 Error:
 	return r;
 }
+
+RESULT UIContentControlBar::InitializeText() {
+	RESULT r = R_PASS;
+
+	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+
+	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
+	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
+		"",
+		m_urlWidth - m_itemSpacing,
+		m_itemSide - (2.0f*m_itemSpacing),
+		textFlags));
+
+	m_pURLText->RotateXByDeg(90.0f);
+	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
+	GetButton(ControlBarButtonType::URL)->AddObject(m_pURLText);
+
+Error:
+	return r;
+}
+
 
 RESULT UIContentControlBar::Update() {
 
@@ -234,6 +261,33 @@ Error:
 	return r;
 }
 
+RESULT UIContentControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+
+	auto pBackButton = GetButton(ControlBarButtonType::BACK);
+	auto pForwardButton = GetButton(ControlBarButtonType::FORWARD);
+
+	CN(pBackButton);
+	CN(pForwardButton);
+
+	if (fCanGoBack) {
+		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::BACK));
+	}
+	else {
+		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_BACK));
+	}
+
+	if (fCanGoForward) {
+		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::FORWARD));
+	}
+	else {
+		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_FORWARD));
+	}
+
+Error:
+	return r;
+}
+
 RESULT UIContentControlBar::ClearMinimizedState() {
 	RESULT r = R_PASS;
 
@@ -246,6 +300,10 @@ RESULT UIContentControlBar::ClearMinimizedState() {
 
 Error:
 	return r;
+}
+
+std::shared_ptr<text> UIContentControlBar::GetURLText() {
+	return m_pURLText;
 }
 
 RESULT UIContentControlBar::Show() {
