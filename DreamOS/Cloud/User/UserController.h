@@ -55,6 +55,7 @@ public:
 		GET_ACCESS_TOKEN,
 		SETTINGS,
 		TEAMS,
+		CHECK_API_CONNECTION,
 		INVALID
 	};
 
@@ -152,6 +153,9 @@ public:
 	RESULT RequestDreamVersion();
 	void OnDreamVersion(std::string&& strResponse);
 
+	RESULT CheckAPIConnection();
+	void OnAPIConnectionCheck(std::string&& strResponse);
+
 // basic http error handling
 private:
 	RESULT GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode);
@@ -180,6 +184,7 @@ public:
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) = 0;
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) = 0;
 		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) = 0;
 	};
 
 	RESULT RegisterUserControllerObserver(UserControllerObserver* pUserControllerObserver);

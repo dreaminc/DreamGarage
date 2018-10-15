@@ -458,6 +458,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnAPIConnectionCheck(bool fIsConnected) {
+	RESULT r = R_PASS;
+
+	if (m_pUserObserver != nullptr) {
+		CR(m_pUserObserver->OnAPIConnectionCheck(fIsConnected));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnDreamVersion(version dreamVersion) {
 	RESULT r = R_PASS;
 

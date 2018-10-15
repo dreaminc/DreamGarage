@@ -133,6 +133,10 @@ void HTTPController::CURLMultihandleThreadProcess() {
 
 							std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
 							if (pHTTPRequestHandler != nullptr) {
+								// Check for Timeout
+								if (pCURLMsg->data.result == CURLE_COULDNT_RESOLVE_HOST) {
+
+								}
 								CR(pHTTPRequestHandler->OnHTTPRequestComplete());
 							}
 
@@ -301,7 +305,7 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnHTTPResponseCallback) {
+RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnHTTPResponseCallback, long timeout) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<HTTPRequestHandler>	pHTTPRequestHandler = nullptr;
@@ -309,6 +313,8 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 
 	CURL* pCURL = curl_easy_init();
 	CN(pCURL);
+
+	curl_easy_setopt(pCURL, CURLOPT_CONNECTTIMEOUT, timeout);
 
 	pHTTPRequestHandler = std::make_shared<HTTPRequestHandler>(new HTTPRequest(pCURL, strURI, strHeaders),
 															   nullptr,
@@ -328,6 +334,7 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler.get());
 
 	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
+	m_CURLMultiHandleCount++;
 
 Error:
 	return r;

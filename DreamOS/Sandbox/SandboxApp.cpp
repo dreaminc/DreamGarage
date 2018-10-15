@@ -103,11 +103,11 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 		case SENSE_MOUSE_MOVE: {
 			// For object intersection testing
 			//SenseMouse::PrintEvent(mEvent);
-			
+
 			if (m_fMouseIntersectObjects) {
 				// Create ray
-				// TODO: This will only work for non-HMD camera 
-				
+				// TODO: This will only work for non-HMD camera
+
 				ray rayCamera = m_pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
@@ -150,7 +150,7 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 
 RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	RESULT r = R_PASS;
-	int mouseX = 0; 
+	int mouseX = 0;
 	int mouseY = 0;
 	int pxWidth = 0;
 	int pxHeight = 0;
@@ -158,9 +158,9 @@ RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	// Get mouse position
 	CR(m_pSenseMouse->GetMousePosition(mouseX, mouseY));
 	CR(GetSandboxWindowSize(pxWidth, pxHeight));
-	
+
 	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
-		
+
 		CN(m_pCamera);
 		rCast = m_pCamera->GetRay(mouseX, mouseY, t);
 
@@ -194,12 +194,12 @@ RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
 
 	for (auto &pObject : gEvent->m_collisionGroup) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->SetVertexColor(color(COLOR_RED));
 		}
 	}
-	
+
 
 //Error:
 	return r;
@@ -220,7 +220,7 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	//CR(RegisterSubscriber(SVK_UP, pCamera));
 	//CR(RegisterSubscriber(SVK_DOWN, pCamera));
 	//CR(RegisterSubscriber(SVK_RIGHT, pCamera));
-	
+
 	//CR(RegisterSubscriber(SVK_SPACE, pCamera));
 
 	/*
@@ -261,7 +261,7 @@ Error:
 // temp
 #include "HAL/opengl/OGLHand.h"
 
-// TODO: shouldn't be this way ultimately 
+// TODO: shouldn't be this way ultimately
 RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
@@ -319,7 +319,7 @@ hand *SandboxApp::GetHand(HAND_TYPE handType) {
 	if (m_pSenseLeapMotion != nullptr) {
 		return m_pSenseLeapMotion->GetHand(handType);
 	}
-	
+
 	return nullptr;
 }
 
@@ -334,11 +334,11 @@ RESULT SandboxApp::SetSandboxRunning(bool fRunning) {
 }
 
 inline PathManager* SandboxApp::GetPathManager() {
-	return m_pPathManager; 
+	return m_pPathManager;
 }
 
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
-	return m_pOpenGLRenderingContext; 
+	return m_pOpenGLRenderingContext;
 }
 
 bool SandboxApp::IsShuttingDown() {
@@ -408,7 +408,7 @@ RESULT SandboxApp::RunAppLoop() {
 	// Launch main message loop
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
-	
+
 #ifdef OCULUS_PRODUCTION_BUILD
 	// TODO: This is a hack until async model loading can happen
 	// Literally only doing it to pass oculus tests
@@ -421,8 +421,8 @@ RESULT SandboxApp::RunAppLoop() {
 	// TODO: This should be moved to the sandbox
 	while (IsSandboxRunning()) {
 		CR(HandleMessages());	// Handle windows messages
-		
-		if (!IsSandboxRunning()) 
+
+		if (!IsSandboxRunning())
 			break;
 
 #ifdef CEF_ENABLED
@@ -451,7 +451,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
-		// be parallel 
+		// be parallel
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
@@ -459,7 +459,7 @@ RESULT SandboxApp::RunAppLoop() {
 			CRM(m_pHMD->UpdateHMD(), "UpdateHMD failed in Sandbox");
 		}
 
-		// Update Scene 
+		// Update Scene
 		//CR(m_pSceneGraph->UpdateScene());
 
 		// TODO: Do these need to be wired up this way?
@@ -554,7 +554,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 #else
 	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
 #endif
-	
+
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
@@ -564,7 +564,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
-	
+
 	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
 
@@ -742,12 +742,12 @@ RESULT SandboxApp::InitializeHMD() {
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
 		m_pHMD = HMDFactory::MakeHMD(
-			HMD_ANY_AVAILABLE, 
-			this, 
-			m_pHALImp, 
-			pxWidth, 
-			pxHeight, 
-			GetSandboxConfiguration().fHMDMirror	// disable / enable mirror 
+			HMD_ANY_AVAILABLE,
+			this,
+			m_pHALImp,
+			pxWidth,
+			pxHeight,
+			GetSandboxConfiguration().fHMDMirror	// disable / enable mirror
 		);
 
 		if (m_pHMD != nullptr) {
@@ -940,8 +940,8 @@ Error:
 
 RESULT SandboxApp::RemoveObjectFromUIGraph(VirtualObj *pObject) {
 	return m_pUISceneGraph->RemoveObject(pObject);
-}	   
-	   
+}
+
 RESULT SandboxApp::RemoveObjectFromUIClippingGraph(VirtualObj *pObject) {
 	return m_pUIClippingSceneGraph->RemoveObject(pObject);
 }
@@ -988,7 +988,7 @@ RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
 
 	// removes all animations
-	CR(m_pInteractionEngine->RemoveAllObjects()); 
+	CR(m_pInteractionEngine->RemoveAllObjects());
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
@@ -1040,7 +1040,7 @@ Error:
 
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
-	
+
 	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
 
 Error:
@@ -1118,12 +1118,12 @@ Error:
 }
 
 DimRay* SandboxApp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
-	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 }
 
 DimRay* SandboxApp::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
 	RESULT r = R_PASS;
-	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional);
 	CN(pRay);
 
 	CR(AddObject(pRay));
@@ -1673,7 +1673,7 @@ composite* SandboxApp::AddComposite() {
 	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
-	
+
 	//Success:
 	return pComposite;
 
@@ -1820,7 +1820,7 @@ Error:
 
 RESULT SandboxApp::RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
 	RESULT r = R_PASS;
-	
+
 	CNM(m_pSenseGamepad, "Gamepad not initialized");
 	CR(m_pSenseGamepad->RegisterSubscriber(gamePadEvent, pGamepadSubscriber));
 

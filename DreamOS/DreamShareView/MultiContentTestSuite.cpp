@@ -762,6 +762,12 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return R_NOT_HANDLED;
 		}
 
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
 			RESULT r = R_PASS;
 
@@ -1258,6 +1264,12 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		virtual RESULT OnDreamVersion(version dreamVersion) override {
 			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
 
 			return R_NOT_HANDLED;
 		}

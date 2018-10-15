@@ -93,6 +93,10 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 
 		case UserMethod::TEAMS: {
 			strURI = strAPIURL + "/teams/";
+		} break;
+			
+		case UserMethod::CHECK_API_CONNECTION: {
+			strURI = strAPIURL + "/health/ping/";
 		}
 	}
 
@@ -311,6 +315,47 @@ void UserController::OnDreamVersion(std::string&& strResponse) {
 	if (m_pUserControllerObserver != nullptr) {
 		version dreamVersion = version(strDreamVersion);
 		CR(m_pUserControllerObserver->OnDreamVersion(dreamVersion));
+	}
+
+Error:
+	return;
+}
+
+RESULT UserController::CheckAPIConnection() {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+	nlohmann::json jsonResponse;
+	std::string strResponse;
+	std::string strVersion;
+	std::string strURI = GetMethodURI(UserMethod::CHECK_API_CONNECTION);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), 2L));
+
+Error:
+	return r;
+}
+
+void UserController::OnAPIConnectionCheck(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	nlohmann::json jsonForm;
+	int statusCode;
+
+	//TODO: these function are void instead of RESULT
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	if (m_pUserControllerObserver != nullptr) {
+		if (statusCode == 200) {
+			CR(m_pUserControllerObserver->OnAPIConnectionCheck(true));
+		}
+		else {
+			CR(m_pUserControllerObserver->OnAPIConnectionCheck(false));
+		}
 	}
 
 Error:

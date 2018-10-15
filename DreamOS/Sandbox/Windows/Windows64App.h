@@ -57,8 +57,6 @@ public:	// Sandbox Interface
 	virtual RESULT GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) override;
 	virtual RESULT RemoveKeyValue(std::wstring wstrKey, CredentialManager::type credType) override;
 
-	virtual bool IsConnectedToInternet() override;
-
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
 	RESULT InitializeOpenGLRenderingContext();
