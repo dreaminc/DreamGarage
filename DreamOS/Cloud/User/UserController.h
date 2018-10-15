@@ -155,6 +155,7 @@ public:
 
 	RESULT CheckAPIConnection();
 	void OnAPIConnectionCheck(std::string&& strResponse);
+	void OnAPIConnectionCheckTimeout();
 
 // basic http error handling
 private:

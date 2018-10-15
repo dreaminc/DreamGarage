@@ -333,7 +333,7 @@ RESULT UserController::CheckAPIConnection() {
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
 
-	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), 2L));
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), std::bind(&UserController::OnAPIConnectionCheckTimeout, this), 2L));
 
 Error:
 	return r;
@@ -359,6 +359,13 @@ void UserController::OnAPIConnectionCheck(std::string&& strResponse) {
 	}
 
 Error:
+	return;
+}
+
+void UserController::OnAPIConnectionCheckTimeout() {
+	DOSLOG(INFO, "Request to API Endpoint timed out");
+	m_pUserControllerObserver->OnAPIConnectionCheck(false);
+
 	return;
 }
 

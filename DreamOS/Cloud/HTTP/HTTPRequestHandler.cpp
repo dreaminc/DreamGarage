@@ -3,10 +3,11 @@
 #include "HTTPRequest.h"
 #include "HTTPResponse.h"
 
-HTTPRequestHandler::HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
+HTTPRequestHandler::HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback, HTTPTimeoutCallback fnTimeoutCallback) :
 	m_pHTTPRequest(pHTTPRequest),
 	m_pHTTPResponse(pHTTPResponse),
-	m_fnResponseCallback(fnResponseCallback)
+	m_fnResponseCallback(fnResponseCallback),
+	m_fnTimeoutCallback(fnTimeoutCallback)
 {
 	// empty
 }
@@ -48,6 +49,16 @@ CURL* HTTPRequestHandler::GetCURLHandle() {
 
 RESULT HTTPRequestHandler::OnHTTPRequestComplete() {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT HTTPRequestHandler::OnHTTPRequestTimeout() {
+	RESULT r = R_PASS;
+
+	if (m_fnTimeoutCallback != nullptr) {
+		m_fnTimeoutCallback();
+	}
+
+	return r;
 }
 
 RESULT HTTPRequestHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
