@@ -190,6 +190,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 		return R_NOT_IMPLEMENTED;
 	}
@@ -500,7 +504,7 @@ public:
 	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
 	RESULT RemoveCredential(std::wstring wstrKey, CredentialManager::type credType);
 
-	bool IsConnectedToInternet();
+	bool IsSandboxInternetConnectionValid();
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

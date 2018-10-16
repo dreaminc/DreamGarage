@@ -117,6 +117,7 @@ public:
 
 	// User Observer
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
 
 	virtual RESULT OnLogin() override;
 	virtual RESULT OnLogout() override;

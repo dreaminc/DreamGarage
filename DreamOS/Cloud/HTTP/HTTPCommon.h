@@ -12,7 +12,8 @@
 #include <vector>
 #include <memory>
 
-typedef std::function<void(std::string&&)> HTTPResponseCallback;
+typedef std::function<RESULT(std::string&&)> HTTPResponseCallback;
+typedef std::function<RESULT()> HTTPTimeoutCallback;
 typedef std::function<RESULT(std::shared_ptr<std::vector<uint8_t>>, void*)> HTTPResponseFileCallback;
 
 #endif // ! HTTP_COMMON_H_

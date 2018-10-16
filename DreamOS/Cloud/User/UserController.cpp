@@ -93,7 +93,11 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 
 		case UserMethod::TEAMS: {
 			strURI = strAPIURL + "/teams/";
-		}
+		} break;
+			
+		case UserMethod::CHECK_API_CONNECTION: {
+			strURI = strAPIURL + "/health/ping/";
+		} break;
 	}
 
 	return strURI;
@@ -289,7 +293,7 @@ Error:
 	return r;
 }
 
-void UserController::OnDreamVersion(std::string&& strResponse) {
+RESULT UserController::OnDreamVersion(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	std::string strDreamVersion;
@@ -314,7 +318,62 @@ void UserController::OnDreamVersion(std::string&& strResponse) {
 	}
 
 Error:
-	return;
+	return r;
+}
+
+RESULT UserController::CheckAPIConnection() {
+	RESULT r = R_PASS;
+
+	HTTPResponse httpResponse;
+	nlohmann::json jsonResponse;
+	std::string strResponse;
+	std::string strVersion;
+	std::string strURI = GetMethodURI(UserMethod::CHECK_API_CONNECTION);
+
+	HTTPController *pHTTPController = HTTPController::instance();
+	auto headers = HTTPController::ContentAcceptJson();
+
+	// This is a specific AGET call where the caller needs to specify a timeout handler and a timeout durations
+	// In the future there should be a generic timeout handler / duration
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), std::bind(&UserController::OnAPIConnectionCheckTimeout, this), 2L));
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnAPIConnectionCheck(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
+	nlohmann::json jsonData;
+	nlohmann::json jsonForm;
+	int statusCode;
+
+	//TODO: these function are void instead of RESULT
+	CR(GetResponseData(jsonData, jsonResponse, statusCode));
+	if (m_pUserControllerObserver != nullptr) {
+		if (statusCode == 200) {
+			CR(m_pUserControllerObserver->OnAPIConnectionCheck(true));
+		}
+		else {
+			CR(m_pUserControllerObserver->OnAPIConnectionCheck(false));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT UserController::OnAPIConnectionCheckTimeout() {
+	RESULT r = R_PASS;
+	DOSLOG(INFO, "Request to API Endpoint timed out");
+
+	if (m_pUserControllerObserver != nullptr) {
+		CR(m_pUserControllerObserver->OnAPIConnectionCheck(false));
+	}
+
+Error:
+	return r;
 }
 
 RESULT UserController::LoginFromCommandline() {
@@ -523,7 +582,7 @@ Error:
 	return r;
 }
 
-void UserController::OnFormURL(std::string&& strResponse) {
+RESULT UserController::OnFormURL(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	//std::string strHttpResponse = strHttpResponse.substr(0, strResponse.find('\r'));
@@ -550,7 +609,7 @@ void UserController::OnFormURL(std::string&& strResponse) {
 		jsonForm["/url"_json_pointer].get<std::string>()));
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetAccessToken(std::string& strRefreshToken) {
@@ -573,7 +632,7 @@ Error:
 	return r;
 }
 
-void UserController::OnAccessToken(std::string&& strResponse) {
+RESULT UserController::OnAccessToken(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -604,7 +663,7 @@ void UserController::OnAccessToken(std::string&& strResponse) {
 	}
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetSettings(std::string& strAccessToken) {
@@ -624,7 +683,7 @@ Error:
 	return r;
 }
 
-void UserController::OnGetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -653,7 +712,7 @@ void UserController::OnGetApiSettings(std::string&& strResponse) {
 	CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::SetSettings(std::string& strAccessToken, float height, float depth, float scale) {
@@ -679,7 +738,7 @@ Error:
 	return r;
 }
 
-void UserController::OnSetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnSetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -692,7 +751,7 @@ void UserController::OnSetApiSettings(std::string&& strResponse) {
 	CR(m_pUserControllerObserver->OnSetSettings());
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetTeam(std::string& strAccessToken, std::string strTeamID) {
@@ -712,7 +771,7 @@ Error:
 	return r;
 }
 
-void UserController::OnGetTeam(std::string&& strResponse) {
+RESULT UserController::OnGetTeam(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -750,7 +809,7 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 	}
 	
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::RequestUserProfile(std::string& strAccessToken) {
@@ -770,7 +829,7 @@ Error:
 	return r;
 }
 
-void UserController::OnUserProfile(std::string&& strResponse) {
+RESULT UserController::OnUserProfile(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -796,7 +855,7 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 	CR(UpdateLoginState());
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::RequestTwilioNTSInformation(std::string& strAccessToken) {
@@ -816,7 +875,7 @@ Error:
 	return r;
 }
 
-void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
+RESULT UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -854,7 +913,7 @@ void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	UpdateLoginState();
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {

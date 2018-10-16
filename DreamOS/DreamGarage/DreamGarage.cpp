@@ -22,7 +22,7 @@ light *g_pLight = nullptr;
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
 #include "DreamUserApp.h"
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "DreamGarage/DreamGamepadCameraApp.h"
 
 #include "HAL/opengl/OGLObj.h"
@@ -43,7 +43,7 @@ light *g_pLight = nullptr;
 #include "Cloud/Environment/PeerConnection.h"
 
 #include "DreamGarageMessage.h"
-#include "UpdateHeadMessage.h" 
+#include "UpdateHeadMessage.h"
 #include "UpdateHandMessage.h"
 #include "UpdateMouthMessage.h"
 #include "AudioDataMessage.h"
@@ -90,7 +90,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHMDMirror = false;
 	sandboxconfig.f3rdPersonCamera = false;
 
-	// Enable HMD mirror for non-production builds 
+	// Enable HMD mirror for non-production builds
 #ifndef PRODUCTION_BUILD
 	sandboxconfig.fHideWindow = false;
 	sandboxconfig.fHMDMirror = true;
@@ -129,7 +129,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 
 	// TODO: Since DreamOS project doesn't get PRODUCTION pre-processors and the OCULUS_PRODUCTION_BUILD one is supposed to be temporary
 	//		 This will need to be reworked at that time as well.
-#ifdef PRODUCTION_BUILD	
+#ifdef PRODUCTION_BUILD
 	CR(pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.dreamos.com:443"));
 	CR(pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.dreamos.com:443"));
 	CR(pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.dreamos.com:443"));
@@ -200,7 +200,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
-		// Reflection 
+		// Reflection
 
 		m_pReflectionProgramNodeMirror = pHAL->MakeProgramNode("reflection");
 		CN(m_pReflectionProgramNodeMirror);
@@ -223,7 +223,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 		ProgramNode* pWaterProgramNode = pHAL->MakeProgramNode("water");
 		CN(pWaterProgramNode);
-		// Still need scene graph for lights 
+		// Still need scene graph for lights
 		// TODO: make lights a different node
 		CR(pWaterProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
@@ -274,7 +274,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
-		
+
 		// Connect output as pass-thru to internal blend program
 		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
@@ -345,8 +345,8 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 
-		// Reflection 
-		
+		// Reflection
+
 		m_pReflectionProgramNode = pHAL->MakeProgramNode("reflection");
 		CN(m_pReflectionProgramNode);
 		//CR(m_pReflectionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
@@ -361,7 +361,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Refraction
 
-		
+
 		m_pRefractionProgramNode = pHAL->MakeProgramNode("refraction");
 		CN(m_pRefractionProgramNode);
 		//CR(pRefractionProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
@@ -378,7 +378,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		ProgramNode* pWaterProgramNode = pHAL->MakeProgramNode("water");
 		CN(pWaterProgramNode);
-		// Still need scene graph for lights 
+		// Still need scene graph for lights
 		// TODO: make lights a different node
 		//CR(pWaterProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pWaterProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
@@ -672,7 +672,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	if (GetSandboxConfiguration().fUseGamepad) {
 		m_pDreamGamepadCameraApp = LaunchDreamApp<DreamGamepadCameraApp>(this, false).get();
 		CN(m_pDreamGamepadCameraApp);
-		
+
 		if (m_pAuxCamera != nullptr) {
 			CR(m_pDreamGamepadCameraApp->SetCamera(m_pAuxCamera));
 		}
@@ -694,7 +694,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	// which is in SandboxApp::Initialize while fInitCloud is true
 	m_pUserController = dynamic_cast<UserController*>(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 	CN(m_pUserController);
-	
+
 	// DEBUG:
 #ifdef _DEBUG
 	{
@@ -718,7 +718,7 @@ RESULT DreamGarage::DidFinishLoading() {
 
 		std::string strTestUserNumber = pCommandLineManager->GetParameterValue("rtoken");
 		if ((strTestUserNumber.compare("") == 0) == false) {
-			
+
 			int testUserNumber = stoi(strTestUserNumber);
 
 			std::string strDebugRefreshToken = testRefreshTokens[testUserNumber];
@@ -726,9 +726,39 @@ RESULT DreamGarage::DidFinishLoading() {
 		}
 	}
 #endif
-	
+
 	// Initial step of login flow:
-	if(IsConnectedToInternet()) {
+	CRM(m_pUserController->CheckAPIConnection(), "Checking connection to API");
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
+	RESULT r = R_PASS;
+
+	std::string strFormType;
+
+	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update...
+		if (m_pDreamUserApp != nullptr) {
+		//	CR(m_pDreamUserApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED));
+			m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::UPDATE_REQUIRED);
+			m_pDreamUserApp->ShowMessageQuad();
+			m_pDreamEnvironmentApp->FadeIn();
+		}
+	}
+	else {
+		CR(AuthenticateFromStoredCredentials());
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::OnAPIConnectionCheck(bool fIsConnected) {
+	RESULT r = R_PASS;
+
+	if (fIsConnected) {
 #if defined(PRODUCTION_BUILD) || defined(OCULUS_PRODUCTION_BUILD) || defined(STAGING_BUILD)
 		CR(m_pUserController->RequestDreamVersion());
 		//*
@@ -741,27 +771,6 @@ RESULT DreamGarage::DidFinishLoading() {
 		m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INTERNET_REQUIRED);
 		m_pDreamUserApp->ShowMessageQuad();
 		m_pDreamEnvironmentApp->FadeIn();
-	}
-
-Error:
-	return r;
-}
-
-RESULT DreamGarage::OnDreamVersion(version dreamVersion) {
-	RESULT r = R_PASS;
-
-	std::string strFormType;
-
-	if (m_versionDreamClient < dreamVersion) {	// If the server version isn't GREATER than current, we don't make them update... 
-		if (m_pDreamUserApp != nullptr) {
-		//	CR(m_pDreamUserApp->FadeInWithMessageQuad(DreamEnvironmentApp::StartupMessage::UPDATE_REQUIRED));
-			m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::UPDATE_REQUIRED);
-			m_pDreamUserApp->ShowMessageQuad();
-			m_pDreamEnvironmentApp->FadeIn();
-		}
-	}
-	else {
-		CR(AuthenticateFromStoredCredentials());
 	}
 
 Error:
@@ -796,9 +805,9 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 
 		CR(m_pUserController->GetFormURL(strFormType));
 
-		if (m_pDreamEnvironmentApp != nullptr) {	
+		if (m_pDreamEnvironmentApp != nullptr) {
 			// fade into lobby (with no environment showing)
-			CR(m_pDreamEnvironmentApp->FadeIn()); 
+			CR(m_pDreamEnvironmentApp->FadeIn());
 		}
 	}
 
@@ -1152,7 +1161,7 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
-		
+
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 		//*/
 
@@ -1322,24 +1331,24 @@ RESULT DreamGarage::OnAudioData(const std::string &strAudioTrackLabel, PeerConne
 	if (strAudioTrackLabel == kUserAudioLabel) {
 		int channel = (int)pPeerConnection->GetPeerSeatPosition();
 		channel += 1;
-		
+
 		//
 		//// TODO: Move this all into DreamSoundSystem or lower
 		//int16_t *pInt16Soundbuffer = new int16_t[frames];
 		//memcpy((void*)pInt16Soundbuffer, pAudioDataBuffer, sizeof(int16_t) * frames);
 		//
-		
+
 		AudioPacket pendingPacket((int)frames, (int)channels, (int)bitsPerSample, (int)samplingRate, (uint8_t*)pAudioDataBuffer);
 		CR(m_pDreamSoundSystem->PlayAudioPacketSigned16Bit(pendingPacket, strAudioTrackLabel, channel));
-		
+
 		// Sets the mouth position
 		CR(HandleUserAudioDataMessage(pPeerConnection, &audioDataMessage));
 	}
 	else if (strAudioTrackLabel == kChromeAudioLabel) {
-		
+
 		// Only stream when it's the user that's currently sharing
 		PeerConnection *pStreamingPeerConnection = m_pDreamShareView->GetStreamingPeerConnection();
-		
+
 		if (pStreamingPeerConnection != nullptr && pStreamingPeerConnection->GetPeerUserID() == pPeerConnection->GetPeerUserID()) {
 
 			int channel = 0;
@@ -1516,7 +1525,7 @@ RESULT DreamGarage::OnLogin() {
 	// TODO: with seating pass, the cave will look better
 
 	// the fade in now happens in OnNewSocketConnection
-	// TODO: would definitely prefer UserController to respond to OnNewSocketConection so that 
+	// TODO: would definitely prefer UserController to respond to OnNewSocketConection so that
 	// it is a part of UpdateLoginState and the environment can fade in here
 
 	//m_pDreamEnvironmentApp->SetCurrentEnvironment(CAVE);
@@ -1525,7 +1534,7 @@ RESULT DreamGarage::OnLogin() {
 
 	// TODO: uncomment when everything else works
 	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
-	
+
 //Error:
 	return r;
 }
@@ -1681,7 +1690,7 @@ RESULT DreamGarage::OnShareAsset() {
 
 	CN(m_pDreamUserControlArea);
 	CN(m_pDreamShareView);
-	
+
 	CR(m_pDreamShareView->ShowCastingTexture());
 	CR(m_pDreamShareView->BeginStream());
 	CR(m_pDreamShareView->Show());
@@ -1769,9 +1778,9 @@ Error:
 RESULT DreamGarage::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
 	CN(m_pDreamUserControlArea);
-	
+
 	m_pDreamUserControlArea->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
-	
+
 Error:
 	return r;
 }

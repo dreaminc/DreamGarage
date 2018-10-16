@@ -94,6 +94,8 @@ public:
 	class UserObserver {
 	public:
 		virtual RESULT OnDreamVersion(version dreamVersion) = 0;
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) = 0;
+
 		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
 		virtual RESULT OnSetSettings() = 0;
 
@@ -205,6 +207,7 @@ public:
 
 	// UserControllerObserver
 	virtual RESULT OnDreamVersion(version dreamVersion) override;
+	virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override;
 	virtual RESULT OnGetSettings(float height, float depth, float scale) override;
 	virtual RESULT OnSetSettings() override;
 

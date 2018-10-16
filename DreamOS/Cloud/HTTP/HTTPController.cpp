@@ -119,28 +119,32 @@ void HTTPController::CURLMultihandleThreadProcess() {
 			case 0: 
 			default: {
 				// Timeout or readable/writable sockets
-				int lastCURLMultiHandleCount = m_CURLMultiHandleCount;
 				curlMC = curl_multi_perform(m_pCURLMultiHandle, &m_CURLMultiHandleCount);
-				if (lastCURLMultiHandleCount != m_CURLMultiHandleCount) {
-					int numCURLMessagesInQueue = 0;
-					struct CURLMsg *pCURLMsg = nullptr;
-					
-					while((pCURLMsg = curl_multi_info_read(m_pCURLMultiHandle, &numCURLMessagesInQueue)) != nullptr) {
-						if (pCURLMsg->msg == CURLMSG_DONE) {
-							CURL *pCURL = pCURLMsg->easy_handle;
-							
-							//transfers--;
+			
+				int numCURLMessagesInQueue = 0;
+				struct CURLMsg *pCURLMsg = nullptr;
+				
+				while((pCURLMsg = curl_multi_info_read(m_pCURLMultiHandle, &numCURLMessagesInQueue)) != nullptr) {
+					if (pCURLMsg->msg == CURLMSG_DONE) {
+						CURL *pCURL = pCURLMsg->easy_handle;
+						
+						//transfers--;
 
-							std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
-							if (pHTTPRequestHandler != nullptr) {
+						std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
+						if (pHTTPRequestHandler != nullptr) {
+							// Check for Timeout
+							if (pCURLMsg->data.result == CURLE_COULDNT_RESOLVE_HOST || pCURLMsg->data.result == CURLE_COULDNT_CONNECT) {
+								CR(pHTTPRequestHandler->OnHTTPRequestTimeout());
+							}
+							else {
 								CR(pHTTPRequestHandler->OnHTTPRequestComplete());
 							}
-
-							curlMC = curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
-							CBM((curlMC == CURLM_OK), "curl_multi_remove_handle");
-
-							curl_easy_cleanup(pCURL);
 						}
+
+						curlMC = curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
+						CBM((curlMC == CURLM_OK), "curl_multi_remove_handle");
+
+						curl_easy_cleanup(pCURL);
 					}
 				}
 
@@ -333,13 +337,53 @@ Error:
 	return r;
 }
 
+RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnHTTPResponseCallback, HTTPTimeoutCallback fnHTTPTimeoutCallback, long timeout) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<HTTPRequestHandler>	pHTTPRequestHandler = nullptr;
+	struct curl_slist *pCURLList = nullptr;
+
+	CURL* pCURL = curl_easy_init();
+	CN(pCURL);
+
+	pHTTPRequestHandler = std::make_shared<HTTPRequestHandler>(new HTTPRequest(pCURL, strURI, strHeaders),
+																nullptr,
+																fnHTTPResponseCallback,
+																fnHTTPTimeoutCallback);
+	CN(pHTTPRequestHandler);
+	CR(AddPendingHTTPRequestHandler(pHTTPRequestHandler));
+
+	// Set to zero to switch to the default built - in connection timeout - 300 seconds.
+	curl_easy_setopt(pCURL, CURLOPT_CONNECTTIMEOUT, timeout);
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+
+	for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders())
+		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
+
+	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler.get());
+
+	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
+
+Error:
+	return r;
+}
+
 RESULT HTTPController::GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse) {
 	RESULT r = R_PASS;
 
 	std::promise<std::string> httpPromise;
 	std::future<std::string> httpFuture = httpPromise.get_future();
 
-	CR(AGET(strURI, strHeaders, [&](std::string&& in) {httpPromise.set_value(in); }));
+	CR(AGET(strURI, strHeaders, 
+		[&](std::string&& in) -> RESULT {
+			httpPromise.set_value(in); 
+			return R_PASS; 
+		}
+	));
 
 	{
 		// Future Timeout
@@ -432,8 +476,9 @@ RESULT HTTPController::POST(const std::string& strURI, const std::vector<std::st
 	std::future<std::string> httpFuture = httpPromise.get_future();
 
 	CR(APOST(strURI, strHeaders, strBody, 
-		[&](std::string&& strFutureResponse) { 
+		[&](std::string&& strFutureResponse) -> RESULT { 
 			httpPromise.set_value(strFutureResponse); 
+			return R_PASS;
 		}
 	));
 

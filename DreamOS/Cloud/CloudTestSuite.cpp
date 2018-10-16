@@ -166,6 +166,12 @@ RESULT CloudTestSuite::AddTestSwitchingEnvironmentSockets() {
 
 			return R_NOT_HANDLED;
 		}
+		
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
+
+			return R_NOT_HANDLED;
+		}
 
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
 			RESULT r = R_PASS;
@@ -443,7 +449,13 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 
 			return R_NOT_HANDLED;
 		}
-		
+	
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
+
+			return R_NOT_HANDLED;
+		}
+
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override { 
 			RESULT r = R_PASS;
 
