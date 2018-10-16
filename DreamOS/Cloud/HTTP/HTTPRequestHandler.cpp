@@ -55,9 +55,10 @@ RESULT HTTPRequestHandler::OnHTTPRequestTimeout() {
 	RESULT r = R_PASS;
 
 	if (m_fnTimeoutCallback != nullptr) {
-		m_fnTimeoutCallback();
+		CR(m_fnTimeoutCallback());
 	}
 
+Error:
 	return r;
 }
 

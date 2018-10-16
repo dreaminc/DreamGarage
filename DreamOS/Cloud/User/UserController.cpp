@@ -364,13 +364,16 @@ Error:
 	return;
 }
 
-void UserController::OnAPIConnectionCheckTimeout() {
+RESULT UserController::OnAPIConnectionCheckTimeout() {
 	RESULT r = R_PASS;
+	DOSLOG(INFO, "Request to API Endpoint timed out");
 
-	CRM(m_pUserControllerObserver->OnAPIConnectionCheck(false), "Request to API Endpoint timed out");
+	if (m_pUserControllerObserver != nullptr) {
+		CR(m_pUserControllerObserver->OnAPIConnectionCheck(false));
+	}
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::LoginFromCommandline() {
