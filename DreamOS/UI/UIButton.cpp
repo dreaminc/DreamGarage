@@ -1,26 +1,12 @@
 #include "UIButton.h"
 #include "DreamOS.h"
 
-UIButton::UIButton(HALImp *pHALImp, DreamOS *pDreamOS, float width, float height) :
-UIView(pHALImp, pDreamOS, width, height)
-{
-	RESULT r = R_PASS;
-
-	CR(Initialize());
-
-	Validate();
-	return;
-Error:
-	Invalidate();
-	return;
-}
-
 UIButton::UIButton(HALImp *pHALImp, 
 	DreamOS *pDreamOS, 
-	std::shared_ptr<texture> pEnabledTexture,
-	std::shared_ptr<texture> pDisabledTexture,
 	float width, 
-	float height) :
+	float height,
+	std::shared_ptr<texture> pEnabledTexture,
+	std::shared_ptr<texture> pDisabledTexture) :
 
 	UIView(pHALImp, pDreamOS, width, height),
 	m_pEnabledTexture(pEnabledTexture),
@@ -115,12 +101,6 @@ point UIButton::GetContactPoint() {
 	return m_ptContact;
 }
 
-RESULT UIButton::SetTextures(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
-	m_pEnabledTexture = pEnabledTexture;
-	m_pDisabledTexture = pDisabledTexture;
-	return R_PASS;
-}
-
 RESULT UIButton::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
@@ -137,7 +117,7 @@ RESULT UIButton::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 
-	CBR(m_fInteractable, R_SKIPPED);
+	CBR(m_fEnabled, R_SKIPPED);
 
 	pSurface = pButtonContext->GetSurface();
 
@@ -178,12 +158,12 @@ Error:
 	return r;
 }
 
-RESULT UIButton::SetInteractability(bool fInteractable) {
+RESULT UIButton::SetEnabledFlag(bool fInteractable) {
 	RESULT r = R_PASS;
 
 	CR(SwitchToTexture(fInteractable));
 
-	m_fInteractable = fInteractable;
+	m_fEnabled = fInteractable;
 
 Error:
 	return r;

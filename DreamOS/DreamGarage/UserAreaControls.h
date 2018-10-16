@@ -3,8 +3,6 @@
 
 #include "RESULT/EHM.h"
 
-#include "DreamApp.h"
-
 #include "UI/UIView.h"
 
 #include "DreamGarage/UICommon.h"

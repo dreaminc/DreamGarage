@@ -1,9 +1,6 @@
 #include "UserAreaControls.h"
 #include "DreamOS.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/DreamControlView.h"
-#include "DreamGarage/DreamTabView.h"
-#include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 
 #include "UI/UIButton.h"
@@ -210,7 +207,7 @@ RESULT UserAreaControls::HandleShowTogglePressed(UIButton* pButtonContext, void*
 	RESULT r = R_PASS;
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	if (!m_pMinimizeButton->IsToggled()) {
+	if (!pButtonContext->IsToggled()) {
 	//	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
 		m_pParentApp->Maximize();
 	}
@@ -219,7 +216,7 @@ RESULT UserAreaControls::HandleShowTogglePressed(UIButton* pButtonContext, void*
 		m_pParentApp->Minimize();
 	}
 
-	CR(m_pMinimizeButton->Toggle());
+	CR(pButtonContext->Toggle());
 
 Error:
 	return R_PASS;
@@ -267,7 +264,7 @@ RESULT UserAreaControls::HandleShareTogglePressed(UIButton *pButtonContext, void
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
-	if (m_pShareButton->IsToggled()) {
+	if (pButtonContext->IsToggled()) {
 		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	}
 	else {
@@ -276,7 +273,7 @@ RESULT UserAreaControls::HandleShareTogglePressed(UIButton *pButtonContext, void
 		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	}
 
-	CR(m_pShareButton->Toggle());
+	CR(pButtonContext->Toggle());
 
 Error:
 	return r;
@@ -336,8 +333,8 @@ Error:
 RESULT UserAreaControls::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
-	CR(m_pBackButton->SetInteractability(fCanGoBack));
-	CR(m_pForwardButton->SetInteractability(fCanGoForward));
+	CR(m_pBackButton->SetEnabledFlag(fCanGoBack));
+	CR(m_pForwardButton->SetEnabledFlag(fCanGoForward));
 
 Error:
 	return r;

@@ -12,13 +12,12 @@ class DreamOS;
 
 class UIButton : public UIView, public Subscriber<UIEvent> {
 public:
-	UIButton(HALImp *pHALImp, DreamOS *pDreamOS, float width = DEFAULT_WIDTH, float height = DEFAULT_HEIGHT);
-	UIButton(HALImp *pHALImp, 
-		DreamOS *pDreamOS, 
-		std::shared_ptr<texture> pEnabledTexture,
-		std::shared_ptr<texture> pDisabledTexture,
-		float width = DEFAULT_WIDTH, 
-		float height = DEFAULT_HEIGHT);
+	UIButton(HALImp *pHALImp,
+		DreamOS *pDreamOS,
+		float width = DEFAULT_WIDTH,
+		float height = DEFAULT_HEIGHT,
+		std::shared_ptr<texture> pEnabledTexture = nullptr,
+		std::shared_ptr<texture> pDisabledTexture = nullptr);
 
 	~UIButton();
 
@@ -34,15 +33,12 @@ public:
 	VirtualObj *GetInteractionObject();
 	point GetContactPoint();
 
-	// TODO: is this necessary
-	RESULT SetTextures(std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
-
 public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 	// temp hopefully
 	RESULT RegisterTouchStart();
 
-	RESULT SetInteractability(bool fInteractable);
+	RESULT SetEnabledFlag(bool fEnabled);
 	RESULT Toggle();
 	bool IsToggled();
 
@@ -63,7 +59,7 @@ protected:
 	point m_ptContact;
 
 	// whether the button is enabled influences the interaction events
-	bool m_fInteractable = true;
+	bool m_fEnabled = true;
 
 	std::shared_ptr<texture> m_pEnabledTexture = nullptr;
 	std::shared_ptr<texture> m_pDisabledTexture = nullptr;

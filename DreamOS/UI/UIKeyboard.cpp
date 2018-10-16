@@ -348,8 +348,6 @@ RESULT UIKeyboard::InitializeKeyboardControls() {
 	m_pPreviousButton->SetVisible(true);
 	m_pDoneButton->SetVisible(true);
 
-	//CR(m_pDoneButton->SetTextures(pDone, nullptr));
-
 Error:
 	return r;
 }
@@ -1051,7 +1049,7 @@ RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
 	CN(m_pNextButton);
-	CR(m_pNextButton->SetInteractability(fCanTabNext));
+	CR(m_pNextButton->SetEnabledFlag(fCanTabNext));
 
 Error:
 	return r;
@@ -1060,7 +1058,7 @@ RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
 	RESULT r = R_PASS;
 
 	CN(m_pPreviousButton);
-	CR(m_pPreviousButton->SetInteractability(fCanTabPrevious));
+	CR(m_pPreviousButton->SetEnabledFlag(fCanTabPrevious));
 
 Error:
 	return r;

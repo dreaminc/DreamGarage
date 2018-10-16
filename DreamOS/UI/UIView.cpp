@@ -105,7 +105,7 @@ Error:
 }
 
 std::shared_ptr<UIButton> UIView::MakeUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
-	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, pEnabledTexture, pDisabledTexture, width, height));
+	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, width, height, pEnabledTexture, pDisabledTexture));
 
 	return pButton;
 }
