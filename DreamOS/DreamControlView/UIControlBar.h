@@ -48,7 +48,7 @@ public:
 
 	RESULT Initialize();
 
-	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback);
+	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
 
 	std::shared_ptr<UIButton> GetButton(ControlBarButtonType type);
 

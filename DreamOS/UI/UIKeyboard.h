@@ -152,6 +152,14 @@ private:
 
 	std::map<unsigned int, std::shared_ptr<SoundFile>> m_keyPressSounds;
 
+	// control bar textures
+private:
+	const wchar_t *k_wszTab = L"key-tab-next.png";
+	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
+	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
+	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
+	const wchar_t *k_wszDone = L"key-done.png";
+
 private:
 	// layout variables
 	float m_surfaceWidth = SURFACE_WIDTH;

@@ -317,14 +317,30 @@ RESULT UIKeyboard::InitializeControlBar() {
 	m_pUIControlBar->RotateXByDeg(-90.0f);
 	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
 
+	auto pTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszTab));
+	auto pCantTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab));
+	auto pBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab));
+	auto pCantBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab));
+
+	//TODO: use when controlbar is deprecated
+	auto pDone = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszDone));
+
+	CN(pTab);
+	CN(pCantTab);
+	CN(pBackTab);
+	CN(pCantBackTab);
+	CN(pDone)
+
 	//pLayout->SetVisible(false);
 	CR(m_pUIControlBar->Initialize());
 
 	CR(m_pUIControlBar->AddButton(ControlBarButtonType::TAB, tabOffset, barButtonWidth, 
-		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2)));
+		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2),
+		pTab, pCantTab));
 
 	CR(m_pUIControlBar->AddButton(ControlBarButtonType::BACKTAB, backTabOffset, barButtonWidth, 
-		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2)));
+		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
+		pBackTab, pCantBackTab));
 
 	CR(m_pUIControlBar->AddButton(ControlBarButtonType::DONE, doneOffset, barButtonWidth, 
 		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2)));
@@ -1034,13 +1050,16 @@ RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
 	m_fCanTabNext = fCanTabNext;
-	auto pButton = m_pUIControlBar->GetButton(ControlBarButtonType::TAB);
+	std::shared_ptr<UIButton> pButton = m_pUIControlBar->GetButton(ControlBarButtonType::TAB);
+	CR(pButton->SetInteractability(fCanTabNext));
+	/*
 	if (fCanTabNext) {
 		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::TAB)));
 	}
 	else {
 		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::CANT_TAB)));
 	}
+	//*/
 
 Error:
 	return r;
@@ -1050,12 +1069,15 @@ RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
 
 	m_fCanTabPrevious = fCanTabPrevious;
 	auto pButton = m_pUIControlBar->GetButton(ControlBarButtonType::BACKTAB);
+	CR(pButton->SetInteractability(fCanTabPrevious));
+	/*
 	if (fCanTabPrevious) {
 		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::BACKTAB)));
 	}
 	else {
 		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::CANT_BACKTAB)));
 	}
+	//*/
 
 Error:
 	return r;

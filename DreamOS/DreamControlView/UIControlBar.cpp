@@ -46,15 +46,23 @@ Error:
 }
 
 
-RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback) {
+RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
 	RESULT r = R_PASS;
 	
-	std::shared_ptr<UIButton> pButton = AddUIButton(width, m_itemSide);
+	std::shared_ptr<UIButton> pButton = nullptr;
+
+	CBR(type != ControlBarButtonType::INVALID, R_SKIPPED);
+
+	if (pEnabledTexture == nullptr || pDisabledTexture == nullptr) {
+		pButton = AddUIButton(width, m_itemSide);
+		CR(pButton->GetSurface()->SetDiffuseTexture(m_buttonTextures[type]));
+	}
+	else {
+		pButton = AddUIButton(pEnabledTexture, pDisabledTexture, width, m_itemSide);
+	}
 
 	pButton->SetPosition(point(offset, 0.0f, 0.0f));
 
-	CBR(type != ControlBarButtonType::INVALID, R_SKIPPED);
-	CR(pButton->GetSurface()->SetDiffuseTexture(m_buttonTextures[type]));
 
 	// if there isn't a trigger callback provided, 
 	// the button doesn't need to be interactable at all
