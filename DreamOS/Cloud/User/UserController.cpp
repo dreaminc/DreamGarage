@@ -293,7 +293,7 @@ Error:
 	return r;
 }
 
-void UserController::OnDreamVersion(std::string&& strResponse) {
+RESULT UserController::OnDreamVersion(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	std::string strDreamVersion;
@@ -318,7 +318,7 @@ void UserController::OnDreamVersion(std::string&& strResponse) {
 	}
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::CheckAPIConnection() {
@@ -341,7 +341,7 @@ Error:
 	return r;
 }
 
-void UserController::OnAPIConnectionCheck(std::string&& strResponse) {
+RESULT UserController::OnAPIConnectionCheck(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -361,7 +361,7 @@ void UserController::OnAPIConnectionCheck(std::string&& strResponse) {
 	}
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::OnAPIConnectionCheckTimeout() {
@@ -582,7 +582,7 @@ Error:
 	return r;
 }
 
-void UserController::OnFormURL(std::string&& strResponse) {
+RESULT UserController::OnFormURL(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	//std::string strHttpResponse = strHttpResponse.substr(0, strResponse.find('\r'));
@@ -609,7 +609,7 @@ void UserController::OnFormURL(std::string&& strResponse) {
 		jsonForm["/url"_json_pointer].get<std::string>()));
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetAccessToken(std::string& strRefreshToken) {
@@ -632,7 +632,7 @@ Error:
 	return r;
 }
 
-void UserController::OnAccessToken(std::string&& strResponse) {
+RESULT UserController::OnAccessToken(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -663,7 +663,7 @@ void UserController::OnAccessToken(std::string&& strResponse) {
 	}
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetSettings(std::string& strAccessToken) {
@@ -683,7 +683,7 @@ Error:
 	return r;
 }
 
-void UserController::OnGetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -712,7 +712,7 @@ void UserController::OnGetApiSettings(std::string&& strResponse) {
 	CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::SetSettings(std::string& strAccessToken, float height, float depth, float scale) {
@@ -738,7 +738,7 @@ Error:
 	return r;
 }
 
-void UserController::OnSetApiSettings(std::string&& strResponse) {
+RESULT UserController::OnSetApiSettings(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -751,7 +751,7 @@ void UserController::OnSetApiSettings(std::string&& strResponse) {
 	CR(m_pUserControllerObserver->OnSetSettings());
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetTeam(std::string& strAccessToken, std::string strTeamID) {
@@ -771,7 +771,7 @@ Error:
 	return r;
 }
 
-void UserController::OnGetTeam(std::string&& strResponse) {
+RESULT UserController::OnGetTeam(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -809,7 +809,7 @@ void UserController::OnGetTeam(std::string&& strResponse) {
 	}
 	
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::RequestUserProfile(std::string& strAccessToken) {
@@ -829,7 +829,7 @@ Error:
 	return r;
 }
 
-void UserController::OnUserProfile(std::string&& strResponse) {
+RESULT UserController::OnUserProfile(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -855,7 +855,7 @@ void UserController::OnUserProfile(std::string&& strResponse) {
 	CR(UpdateLoginState());
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::RequestTwilioNTSInformation(std::string& strAccessToken) {
@@ -875,7 +875,7 @@ Error:
 	return r;
 }
 
-void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
+RESULT UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
@@ -913,7 +913,7 @@ void UserController::OnTwilioNTSInformation(std::string&& strResponse) {
 	UpdateLoginState();
 
 Error:
-	return;
+	return r;
 }
 
 RESULT UserController::GetResponseData(nlohmann::json& jsonData, nlohmann::json jsonResponse, int& statusCode) {

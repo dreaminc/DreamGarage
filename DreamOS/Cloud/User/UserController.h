@@ -130,31 +130,31 @@ public:
 public:
 //	RESULT GetForm(std::string& strFormKey, std::string& strURL);
 	RESULT GetFormURL(std::string& strFormKey);
-	void OnFormURL(std::string&& strResponse);
+	RESULT OnFormURL(std::string&& strResponse);
 
 	RESULT GetAccessToken(std::string& strRefreshToken);
-	void OnAccessToken(std::string&& strResponse);
+	RESULT OnAccessToken(std::string&& strResponse);
 
 	RESULT GetSettings(std::string& strAccessToken);
-	void OnGetApiSettings(std::string&& strResponse);
+	RESULT OnGetApiSettings(std::string&& strResponse);
 
 	RESULT SetSettings(std::string& strAccessToken, float height, float depth, float scale);
-	void OnSetApiSettings(std::string&& strResponse);
+	RESULT OnSetApiSettings(std::string&& strResponse);
 
 	RESULT GetTeam(std::string& strAccessToken, std::string strTeamID = "");
-	void OnGetTeam(std::string&& strResponse);
+	RESULT OnGetTeam(std::string&& strResponse);
 
 	RESULT RequestUserProfile(std::string& strAccessToken);
-	void OnUserProfile(std::string&& strResponse);
+	RESULT OnUserProfile(std::string&& strResponse);
 
 	RESULT RequestTwilioNTSInformation(std::string& strAccessToken);
-	void OnTwilioNTSInformation(std::string&& strResponse);
+	RESULT OnTwilioNTSInformation(std::string&& strResponse);
 
 	RESULT RequestDreamVersion();
-	void OnDreamVersion(std::string&& strResponse);
+	RESULT OnDreamVersion(std::string&& strResponse);
 
 	RESULT CheckAPIConnection();
-	void OnAPIConnectionCheck(std::string&& strResponse);
+	RESULT OnAPIConnectionCheck(std::string&& strResponse);
 	RESULT OnAPIConnectionCheckTimeout();
 
 // basic http error handling

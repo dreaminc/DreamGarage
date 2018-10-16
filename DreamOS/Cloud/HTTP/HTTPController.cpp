@@ -378,7 +378,12 @@ RESULT HTTPController::GET(const std::string& strURI, const std::vector<std::str
 	std::promise<std::string> httpPromise;
 	std::future<std::string> httpFuture = httpPromise.get_future();
 
-	CR(AGET(strURI, strHeaders, [&](std::string&& in) {httpPromise.set_value(in); }));
+	CR(AGET(strURI, strHeaders, 
+		[&](std::string&& in) -> RESULT {
+			httpPromise.set_value(in); 
+			return R_PASS; 
+		}
+	));
 
 	{
 		// Future Timeout
@@ -471,8 +476,9 @@ RESULT HTTPController::POST(const std::string& strURI, const std::vector<std::st
 	std::future<std::string> httpFuture = httpPromise.get_future();
 
 	CR(APOST(strURI, strHeaders, strBody, 
-		[&](std::string&& strFutureResponse) { 
+		[&](std::string&& strFutureResponse) -> RESULT { 
 			httpPromise.set_value(strFutureResponse); 
+			return R_PASS;
 		}
 	));
 
