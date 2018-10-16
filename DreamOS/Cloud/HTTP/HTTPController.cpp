@@ -119,32 +119,32 @@ void HTTPController::CURLMultihandleThreadProcess() {
 			case 0: 
 			default: {
 				// Timeout or readable/writable sockets
-				int lastCURLMultiHandleCount = m_CURLMultiHandleCount;
 				curlMC = curl_multi_perform(m_pCURLMultiHandle, &m_CURLMultiHandleCount);
-				if (lastCURLMultiHandleCount != m_CURLMultiHandleCount) {
-					int numCURLMessagesInQueue = 0;
-					struct CURLMsg *pCURLMsg = nullptr;
-					
-					while((pCURLMsg = curl_multi_info_read(m_pCURLMultiHandle, &numCURLMessagesInQueue)) != nullptr) {
-						if (pCURLMsg->msg == CURLMSG_DONE) {
-							CURL *pCURL = pCURLMsg->easy_handle;
-							
-							//transfers--;
+			
+				int numCURLMessagesInQueue = 0;
+				struct CURLMsg *pCURLMsg = nullptr;
+				
+				while((pCURLMsg = curl_multi_info_read(m_pCURLMultiHandle, &numCURLMessagesInQueue)) != nullptr) {
+					if (pCURLMsg->msg == CURLMSG_DONE) {
+						CURL *pCURL = pCURLMsg->easy_handle;
+						
+						//transfers--;
 
-							std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
-							if (pHTTPRequestHandler != nullptr) {
-								// Check for Timeout
-								if (pCURLMsg->data.result == CURLE_COULDNT_RESOLVE_HOST || pCURLMsg->data.result == CURLE_COULDNT_CONNECT) {
-									CR(pHTTPRequestHandler->OnHTTPRequestTimeout());
-								}
+						std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
+						if (pHTTPRequestHandler != nullptr) {
+							// Check for Timeout
+							if (pCURLMsg->data.result == CURLE_COULDNT_RESOLVE_HOST || pCURLMsg->data.result == CURLE_COULDNT_CONNECT) {
+								CR(pHTTPRequestHandler->OnHTTPRequestTimeout());
+							}
+							else {
 								CR(pHTTPRequestHandler->OnHTTPRequestComplete());
 							}
-
-							curlMC = curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
-							CBM((curlMC == CURLM_OK), "curl_multi_remove_handle");
-
-							curl_easy_cleanup(pCURL);
 						}
+
+						curlMC = curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
+						CBM((curlMC == CURLM_OK), "curl_multi_remove_handle");
+
+						curl_easy_cleanup(pCURL);
 					}
 				}
 
@@ -332,7 +332,6 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler.get());
 
 	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
-	m_CURLMultiHandleCount++;
 
 Error:
 	return r;
@@ -354,6 +353,7 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 	CN(pHTTPRequestHandler);
 	CR(AddPendingHTTPRequestHandler(pHTTPRequestHandler));
 
+	// Set to zero to switch to the default built - in connection timeout - 300 seconds.
 	curl_easy_setopt(pCURL, CURLOPT_CONNECTTIMEOUT, timeout);
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
 
@@ -367,7 +367,6 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler.get());
 
 	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
-	m_CURLMultiHandleCount++;
 
 Error:
 	return r;

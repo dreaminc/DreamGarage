@@ -97,7 +97,7 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 			
 		case UserMethod::CHECK_API_CONNECTION: {
 			strURI = strAPIURL + "/health/ping/";
-		}
+		} break;
 	}
 
 	return strURI;
@@ -333,6 +333,8 @@ RESULT UserController::CheckAPIConnection() {
 	HTTPController *pHTTPController = HTTPController::instance();
 	auto headers = HTTPController::ContentAcceptJson();
 
+	// This is a specific AGET call where the caller needs to specify a timeout handler and a timeout durations
+	// In the future there should be a generic timeout handler / duration
 	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), std::bind(&UserController::OnAPIConnectionCheckTimeout, this), 2L));
 
 Error:
@@ -363,9 +365,11 @@ Error:
 }
 
 void UserController::OnAPIConnectionCheckTimeout() {
-	DOSLOG(INFO, "Request to API Endpoint timed out");
-	m_pUserControllerObserver->OnAPIConnectionCheck(false);
+	RESULT r = R_PASS;
 
+	CRM(m_pUserControllerObserver->OnAPIConnectionCheck(false), "Request to API Endpoint timed out");
+
+Error:
 	return;
 }
 

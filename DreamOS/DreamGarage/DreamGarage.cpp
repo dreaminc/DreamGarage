@@ -680,7 +680,7 @@ RESULT DreamGarage::DidFinishLoading() {
 	CN(m_pUserController);
 
 	// DEBUG:
-#ifndef _DEBUG
+#ifdef _DEBUG
 	{
 		m_fHasCredentials = true;
 

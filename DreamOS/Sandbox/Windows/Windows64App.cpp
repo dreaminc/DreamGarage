@@ -18,6 +18,7 @@
 #include "Win64CredentialManager.h"
 
 #include <string>
+#include <netlistmgr.h>
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -205,6 +206,28 @@ RESULT Windows64App::RemoveKeyValue(std::wstring wstrKey, CredentialManager::typ
 
 Error:
 	return r;
+}
+
+bool Windows64App::IsSandboxInternetConnectionValid() {
+	INetworkListManager* pNetworkListManager = nullptr;
+	if (SUCCEEDED(CoCreateInstance(CLSID_NetworkListManager, NULL, CLSCTX_ALL, IID_INetworkListManager, (LPVOID*)&pNetworkListManager))) {
+		// Creating the object was successful.	
+		VARIANT_BOOL fIsConnected = 0;	// 0 == false, -1 == true;
+		pNetworkListManager->get_IsConnectedToInternet(&fIsConnected);
+		// The function call succeeded.	
+		if (fIsConnected == VARIANT_TRUE) {
+			CoUninitialize();
+			return true;
+		}
+		else {
+			CoUninitialize();
+			return false;
+		}
+	}
+	// Uninitialize COM.	
+	// (This should be called on application shutdown.)	
+	CoUninitialize();
+	return false;
 }
 
 /*
