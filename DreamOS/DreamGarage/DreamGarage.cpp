@@ -50,6 +50,10 @@ light *g_pLight = nullptr;
 
 #include "Sound/AudioPacket.h"
 
+#define _USE_3RD_PARTY_CAMERA
+#define _USE_3RD_PARTY_CAMERA_HD
+//#define _USE_3RD_PARTY_CAMERA_UHD
+
 // TODO: Should this go into the DreamOS side?
 /*
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
@@ -89,10 +93,12 @@ RESULT DreamGarage::ConfigureSandbox() {
 	sandboxconfig.fHMDMirror = true;
 #endif
 
-	//sandboxconfig.fHideWindow = false;
-	//sandboxconfig.fHMDMirror = false;
-	//sandboxconfig.f3rdPersonCamera = true;
-	//sandboxconfig.fUseGamepad = true;
+#ifdef _USE_3RD_PARTY_CAMERA
+	sandboxconfig.fHideWindow = false;
+	sandboxconfig.fHMDMirror = false;
+	sandboxconfig.f3rdPersonCamera = true;
+	sandboxconfig.fUseGamepad = true;
+#endif
 
 /*
 #ifdef _DEBUG
@@ -166,7 +172,15 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 	// Aux
 
 	//m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 6.0f), viewport(2560, 1386, 60));
+	
+#if defined(_USE_3RD_PARTY_CAMERA_UHD)
 	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(3840, 2107, 60));
+#elif defined(_USE_3RD_PARTY_CAMERA_HD)
+	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1920, 1080, 60));
+#else 
+	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+#endif
+
 	CN(m_pAuxCamera);
 	CB(m_pAuxCamera->incRefCount());
 
