@@ -121,6 +121,27 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIButton> UIView::AddButton(ControlBarButtonType type, float offset, float width, float height, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = MakeUIButton(pEnabledTexture, pDisabledTexture, width, height);
+
+	pButton->SetPosition(point(offset, 0.0f, 0.0f));
+
+	// if there isn't a trigger callback provided, 
+	// the button doesn't need to be interactable at all
+	if (fnCallback != nullptr) {
+		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		CR(pButton->RegisterTouchStart());
+		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
+	}
+	
+	return pButton;
+Error:
+	return nullptr;
+}
+
+
 std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS));
 

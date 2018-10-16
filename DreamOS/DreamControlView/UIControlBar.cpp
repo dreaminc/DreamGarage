@@ -18,23 +18,6 @@ UIControlBar::~UIControlBar() {
 RESULT UIControlBar::Initialize() {
 	RESULT r = R_PASS;
 
-	m_buttonTextures[ControlBarButtonType::BACK] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack);
-	m_buttonTextures[ControlBarButtonType::FORWARD] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward);
-	m_buttonTextures[ControlBarButtonType::CANT_BACK] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled);
-	m_buttonTextures[ControlBarButtonType::CANT_FORWARD] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled);
-	m_buttonTextures[ControlBarButtonType::MINIMIZE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide);
-	m_buttonTextures[ControlBarButtonType::MAXIMIZE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow);
-	m_buttonTextures[ControlBarButtonType::OPEN] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen);
-	m_buttonTextures[ControlBarButtonType::CLOSE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose);
-	m_buttonTextures[ControlBarButtonType::URL] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL);
-	m_buttonTextures[ControlBarButtonType::KEYBOARD] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard);
-	m_buttonTextures[ControlBarButtonType::SHARE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare);
-	m_buttonTextures[ControlBarButtonType::STOP] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing);
-
-	for (auto pTexturePair : m_buttonTextures) {
-		CN(pTexturePair.second);
-	}
-
 Error:
 	return r;
 }
@@ -66,78 +49,7 @@ std::shared_ptr<UIButton> UIControlBar::AddButton(ControlBarButtonType type, flo
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
 	}
 	
-	// Assumption: a control bar's buttons have unique types
-	m_buttons[type] = pButton;
-
 	return pButton;
-Error:
-	return nullptr;
-}
-
-RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
-	RESULT r = R_PASS;
-
-	//TODO: very similar to the code in DreamUIBar::HandleTouchStart
-	std::shared_ptr<quad> pSurface = nullptr;
-	vector vSurface;
-	vector vRotation;
-	quaternion qSurface;
-	quaternion qRotation;
-	CBR(IsVisible(), R_SKIPPED);
-	CNR(pButtonContext, R_SKIPPED);
-	CBR(pButtonContext->IsVisible(), R_SKIPPED);
-
-	//TODO: this only works if these textures are used for no other purpose
-	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_BACK] &&
-		pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_FORWARD], R_SKIPPED);
-
-	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_TAB] &&
-		pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_BACKTAB], R_SKIPPED);
-
-	pSurface = pButtonContext->GetSurface();
-
-	//vector for captured object movement
-	qSurface = pButtonContext->GetOrientation() * (pSurface->GetOrientation());
-	qSurface.Reverse();
-	vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
-
-	//vector for captured object collisions
-	qRotation = pSurface->GetOrientation(true);
-	qRotation.Reverse();
-	vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
-
-	InteractionEngineProxy* pInteractionProxy;
-	pInteractionProxy = m_pDreamOS->GetInteractionEngineProxy();
-	pInteractionProxy->ResetObjects(pButtonContext->GetInteractionObject());
-	pInteractionProxy->ReleaseObjects(pButtonContext->GetInteractionObject());
-
-	pInteractionProxy->CaptureObject(
-		pButtonContext,
-		pButtonContext->GetInteractionObject(), 
-		pButtonContext->GetContactPoint(), 
-		vRotation,
-		vSurface,
-		m_actuationDepth);
-Error:
-	return r;
-}
-
-std::shared_ptr<UIButton> UIControlBar::GetButton(ControlBarButtonType type) {
-	RESULT r = R_PASS;
-
-	CB(m_buttons.count(type) > 0);
-	return m_buttons[type];
-
-Error:
-	return nullptr;
-}
-
-texture* UIControlBar::GetTexture(ControlBarButtonType type) {
-	RESULT r = R_PASS;
-
-	CB(m_buttonTextures.count(type) > 0);
-	return m_buttonTextures[type];
-
 Error:
 	return nullptr;
 }

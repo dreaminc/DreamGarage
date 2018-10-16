@@ -52,8 +52,6 @@ public:
 
 	std::shared_ptr<UIButton> GetButton(ControlBarButtonType type);
 
-	texture* GetTexture(ControlBarButtonType type);
-
 	// for non-default implementations, call these before initialize
 	RESULT SetItemSide(float itemSide);
 	RESULT SetItemSpacing(float itemSpacing);

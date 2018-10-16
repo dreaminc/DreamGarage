@@ -43,6 +43,8 @@ public:
 	std::shared_ptr<UIButton> MakeUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture>, float width, float height);
 	std::shared_ptr<UIButton> AddUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture>, float width, float height);
 
+	std::shared_ptr<UIButton> AddButton(ControlBarButtonType type, float offset, float width, float height, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
+
 	std::shared_ptr<UIMenuItem> MakeUIMenuItem();
 	std::shared_ptr<UIMenuItem> AddUIMenuItem();
 

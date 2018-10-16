@@ -45,8 +45,6 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 
 	//GetDOS()->AddObjectToUIGraph(GetComposite());
 
-	SetItemSide(m_buttonWidth * width);
-	SetItemSpacing(m_pParentApp->GetSpacingSize() * width);
 	m_urlWidth *= width;
 
 	SetPosition(0.0f, 0.0f, m_pParentApp->GetBaseHeight() / 2.0f + 2 * spacingSize + buttonWidth / 2.0f);
@@ -54,27 +52,66 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 
 	SetVisible(true);
 
+	// this can be local, because all values are saved to specific buttons
+	std::vector<std::shared_ptr<texture>> controlTextures;
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBack));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackDisabled));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForward));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszForwardDisabled));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszClose));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszURL));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOpen));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow));
+
+	// TODO: desktop logic
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard));
+
+	for (auto pTexture : controlTextures) {
+		CN(pTexture);
+	}
+
 	CR(UIControlBar::Initialize());
 
-	CN(AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CN(AddButton(ControlBarButtonType::FORWARD, forwardOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CN(AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2)));
+	m_pBackButton = AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth,
+		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[0], controlTextures[1]);
+
+	m_pForwardButton = AddButton(ControlBarButtonType::FORWARD, forwardOffset, buttonWidth, 
+		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[2], controlTextures[3]);
+
+	m_pCloseButton = AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth,
+		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[4]);
 
 // Re-enable for selectability of the URL button
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
 //		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
 
-	CN(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr));
+	m_pURLButton = AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr, controlTextures[5]);
 
-	CN(AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CN(AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CN(AddButton(ControlBarButtonType::MINIMIZE, hideOffset, buttonWidth, 
-		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2)));
+	m_pOpenButton = AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
+		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[6]);
+
+	m_pShareButton = AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
+		std::bind(&UIContentControlBar::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[7], controlTextures[8]);
+
+	m_pMinimizeButton = AddButton(ControlBarButtonType::MINIMIZE, hideOffset, buttonWidth, 
+		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[9], controlTextures[10]);
+
+	CN(m_pBackButton);
+	CN(m_pForwardButton);
+	CN(m_pCloseButton);
+	CN(m_pURLButton);
+	CN(m_pOpenButton);
+	CN(m_pShareButton);
+	CN(m_pMinimizeButton);
 
 	// create text for title
 	CR(InitializeText());
@@ -98,7 +135,7 @@ RESULT UIContentControlBar::InitializeText() {
 
 	m_pURLText->RotateXByDeg(90.0f);
 	m_pURLText->SetPosition(point(0.0f, 0.0f, 0.001f));
-	GetButton(ControlBarButtonType::URL)->AddObject(m_pURLText);
+	m_pURLButton->AddObject(m_pURLText);
 
 Error:
 	return r;
@@ -119,17 +156,8 @@ RESULT UIContentControlBar::Update() {
 
 RESULT UIContentControlBar::SetSharingFlag(bool fIsSharing) {
 	RESULT r = R_PASS;
-	m_fIsSharing = fIsSharing;
 	
-	std::shared_ptr<UIButton> pButton = GetButton(ControlBarButtonType::SHARE);
-	CN(pButton);
-
-	if (m_fIsSharing) {
-		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::STOP));
-	}
-	else {
-		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::SHARE));
-	}
+	m_pShareButton->SwitchToTexture(fIsSharing);
 
 Error:
 	return r;
@@ -163,18 +191,16 @@ Error:
 
 RESULT UIContentControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
-	if (m_fIsMinimized) {
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	if (!m_pMinimizeButton->IsToggled()) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
-		CR(ClearMinimizedState());
 	}
 	else {
 		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MINIMIZE));
-		m_fIsMinimized = true;
-
-		GetButton(ControlBarButtonType::MINIMIZE)->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::MAXIMIZE));
 	}
+
+	CR(m_pMinimizeButton->Toggle());
 
 Error:
 	return R_PASS;
@@ -204,23 +230,19 @@ Error:
 RESULT UIContentControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 	
-	std::shared_ptr<UIButton> pButton = GetButton(ControlBarButtonType::SHARE);
-
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
-	if (m_fIsSharing) {
+	if (m_pShareButton->IsToggled()) {
 		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::STOP));
-		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::SHARE));
-		m_fIsSharing = false;
 	}
 	else {
 		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::SHARE));
-		pButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::STOP));
-		m_fIsSharing = true;
 	}
 
+	m_pShareButton->Toggle();
+
 Error:
-	return R_PASS;
+	return r;
 }
 
 RESULT UIContentControlBar::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
@@ -264,39 +286,8 @@ Error:
 RESULT UIContentControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
-	auto pBackButton = GetButton(ControlBarButtonType::BACK);
-	auto pForwardButton = GetButton(ControlBarButtonType::FORWARD);
-
-	CN(pBackButton);
-	CN(pForwardButton);
-
-	if (fCanGoBack) {
-		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::BACK));
-	}
-	else {
-		pBackButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_BACK));
-	}
-
-	if (fCanGoForward) {
-		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::FORWARD));
-	}
-	else {
-		pForwardButton->GetSurface()->SetDiffuseTexture(GetTexture(ControlBarButtonType::CANT_FORWARD));
-	}
-
-Error:
-	return r;
-}
-
-RESULT UIContentControlBar::ClearMinimizedState() {
-	RESULT r = R_PASS;
-
-	auto pButton = GetButton(ControlBarButtonType::MINIMIZE);
-	auto pTexture = GetTexture(ControlBarButtonType::MINIMIZE);
-	CN(pButton);
-	CN(pTexture);
-	pButton->GetSurface()->SetDiffuseTexture(pTexture);
-	m_fIsMinimized = false;
+	CR(m_pBackButton->SetInteractability(fCanGoBack));
+	CR(m_pForwardButton->SetInteractability(fCanGoForward));
 
 Error:
 	return r;
@@ -310,7 +301,8 @@ RESULT UIContentControlBar::Show() {
 	RESULT r = R_PASS;
 
 	SetVisible(true, false);	
-	CR(ClearMinimizedState());
+
+	m_pMinimizeButton->SwitchToTexture(true);
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		this,

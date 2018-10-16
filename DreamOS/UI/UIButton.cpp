@@ -189,18 +189,7 @@ Error:
 RESULT UIButton::SetInteractability(bool fInteractable) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pSurface = GetSurface();
-
-	CN(pSurface);
-	CN(m_pEnabledTexture);
-	CN(m_pDisabledTexture);
-
-	if (fInteractable) {
-		CR(pSurface->SetDiffuseTexture(m_pEnabledTexture.get()));
-	}
-	else {
-		CR(pSurface->SetDiffuseTexture(m_pDisabledTexture.get()));
-	}
+	CR(SwitchToTexture(fInteractable));
 
 	m_fInteractable = fInteractable;
 
@@ -211,18 +200,7 @@ Error:
 RESULT UIButton::Toggle() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pSurface = GetSurface();
-
-	CN(pSurface);
-	CN(m_pEnabledTexture);
-	CN(m_pDisabledTexture);
-
-	if (pSurface->GetTextureDiffuse() == m_pEnabledTexture.get()) {
-		CR(pSurface->SetDiffuseTexture(m_pDisabledTexture.get()));
-	}
-	else if (pSurface->GetTextureDiffuse() == m_pDisabledTexture.get()) {
-		CR(pSurface->SetDiffuseTexture(m_pEnabledTexture.get()));
-	}
+	CR(SwitchToTexture(!IsToggled()));
 
 Error:
 	return r;
@@ -237,6 +215,26 @@ bool UIButton::IsToggled() {
 	CN(m_pEnabledTexture);
 
 	return pSurface->GetTextureDiffuse() == m_pEnabledTexture.get();
+
+Error:
+	return r;
+}
+
+RESULT UIButton::SwitchToTexture(bool fIsEnabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pSurface = GetSurface();
+
+	CN(pSurface);
+	CN(m_pEnabledTexture);
+	CN(m_pDisabledTexture);
+
+	if (fIsEnabledTexture) {
+		CR(pSurface->SetDiffuseTexture(m_pEnabledTexture.get()));
+	}
+	else {
+		CR(pSurface->SetDiffuseTexture(m_pDisabledTexture.get()));
+	}
 
 Error:
 	return r;

@@ -46,6 +46,8 @@ public:
 	RESULT Toggle();
 	bool IsToggled();
 
+	RESULT SwitchToTexture(bool fIsEnabledTexture);
+
 protected:
 	// objects (TODO: could be in subclass)
 

@@ -16,7 +16,7 @@ class DreamUserControlArea;
 //All relative to parent app
 #define URL_WIDTH 0.5484
 
-class UIContentControlBar : public UIControlBar {
+class UIContentControlBar : public UIView {
 
 public:
 	UIContentControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
@@ -45,8 +45,6 @@ public:
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
-	RESULT ClearMinimizedState();
-
 	std::shared_ptr<text> GetURLText();
 
 // Animations
@@ -55,11 +53,22 @@ public:
 	RESULT Hide();
 
 private:
+	const wchar_t *k_wszBack = L"control-view-back.png";
+	const wchar_t *k_wszBackDisabled = L"browser-control-back-disabled.png";
+	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszForwardDisabled = L"browser-control-forward-disabled.png";
+	const wchar_t *k_wszOpen = L"control-view-open.png";
+	const wchar_t *k_wszClose = L"control-view-close.png";
+	const wchar_t *k_wszShare = L"control-view-share.png";
+	const wchar_t *k_wszStopSharing = L"control-view-stop-sharing.png";
+	const wchar_t *k_wszHide = L"control-view-minimize.png";
+	const wchar_t *k_wszShow = L"control-view-maximize.png";
+	const wchar_t *k_wszURL = L"control-view-url.png";
+	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
+
+private:
 
 	DreamUserControlArea* m_pParentApp = nullptr;
-
-	bool m_fIsMinimized = false;
-	bool m_fIsSharing = false;
 
 	std::shared_ptr<text> m_pURLText = nullptr;
 	bool m_fUpdateTitle = false;
@@ -69,6 +78,14 @@ private:
 	double m_buttonHeight = ITEM_SIZE;
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = ITEM_SIZE;
+
+	std::shared_ptr<UIButton> m_pBackButton = nullptr;
+	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
+	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+	std::shared_ptr<UIButton> m_pURLButton = nullptr;
+	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
+	std::shared_ptr<UIButton> m_pShareButton = nullptr;
+	std::shared_ptr<UIButton> m_pMinimizeButton = nullptr;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_
