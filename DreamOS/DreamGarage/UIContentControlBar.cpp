@@ -11,7 +11,7 @@
 #include "Primitives/font.h"
 
 UIContentControlBar::UIContentControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
-	UIControlBar(pHALImp,pDreamOS)
+	UIView(pHALImp,pDreamOS)
 {
 	RESULT r = R_PASS;
 }
@@ -29,7 +29,12 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 	// ui positioning	
 	float width = m_pParentApp->GetBaseWidth();
 	float buttonWidth = m_buttonWidth * width;
+	float buttonHeight = buttonWidth;
 	float spacingSize = m_pParentApp->GetSpacingSize() * width;
+
+	m_buttonWidth = buttonWidth;
+	m_buttonHeight = buttonHeight;
+	m_spacingSize = spacingSize;
 
 	// button positioning
 	float start = -width / 2.0f - spacingSize/2.0f;
@@ -73,17 +78,15 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 		CN(pTexture);
 	}
 
-	CR(UIControlBar::Initialize());
-
-	m_pBackButton = AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth,
+	m_pBackButton = AddButton(backOffset, buttonWidth, buttonHeight,
 		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[0], controlTextures[1]);
 
-	m_pForwardButton = AddButton(ControlBarButtonType::FORWARD, forwardOffset, buttonWidth, 
+	m_pForwardButton = AddButton(forwardOffset, buttonWidth, buttonHeight,
 		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[2], controlTextures[3]);
 
-	m_pCloseButton = AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth,
+	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
 		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[4]);
 
@@ -91,17 +94,17 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
 //		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
 
-	m_pURLButton = AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr, controlTextures[5]);
+	m_pURLButton = AddButton(urlOffset, m_urlWidth, buttonHeight, nullptr, controlTextures[5]);
 
-	m_pOpenButton = AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
+	m_pOpenButton = AddButton(openOffset, buttonWidth, buttonHeight, 
 		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[6]);
 
-	m_pShareButton = AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
+	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
 		std::bind(&UIContentControlBar::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[7], controlTextures[8]);
 
-	m_pMinimizeButton = AddButton(ControlBarButtonType::MINIMIZE, hideOffset, buttonWidth, 
+	m_pMinimizeButton = AddButton(hideOffset, buttonWidth, buttonHeight,
 		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[9], controlTextures[10]);
 
@@ -124,13 +127,13 @@ RESULT UIContentControlBar::InitializeText() {
 	RESULT r = R_PASS;
 
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pFont->SetLineHeight(m_itemSide - (2.0f*m_itemSpacing));
+	pFont->SetLineHeight(m_buttonHeight - (2.0f*m_spacingSize));
 
 	auto textFlags = text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD;
 	m_pURLText = std::shared_ptr<text>(m_pDreamOS->MakeText(pFont,
 		"",
-		m_urlWidth - m_itemSpacing,
-		m_itemSide - (2.0f*m_itemSpacing),
+		m_urlWidth - m_spacingSize,
+		m_buttonHeight - (2.0f*m_spacingSize),
 		textFlags));
 
 	m_pURLText->RotateXByDeg(90.0f);

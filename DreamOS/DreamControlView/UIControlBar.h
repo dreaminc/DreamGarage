@@ -61,18 +61,6 @@ public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 
 public:
-	const wchar_t *k_wszBack = L"control-view-back.png";
-	const wchar_t *k_wszBackDisabled = L"browser-control-back-disabled.png";
-	const wchar_t *k_wszForward = L"control-view-forward.png";
-	const wchar_t *k_wszForwardDisabled = L"browser-control-forward-disabled.png";
-	const wchar_t *k_wszOpen = L"control-view-open.png";
-	const wchar_t *k_wszClose = L"control-view-close.png";
-	const wchar_t *k_wszShare = L"control-view-share.png";
-	const wchar_t *k_wszStopSharing = L"control-view-stop-sharing.png";
-	const wchar_t *k_wszHide = L"control-view-minimize.png";
-	const wchar_t *k_wszShow = L"control-view-maximize.png";
-	const wchar_t *k_wszURL = L"control-view-url.png";
-	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
 
 private:
 	std::map<ControlBarButtonType, std::shared_ptr<UIButton>> m_buttons;

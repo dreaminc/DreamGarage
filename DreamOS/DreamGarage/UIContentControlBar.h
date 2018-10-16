@@ -76,6 +76,7 @@ private:
 
 	double m_buttonWidth = ITEM_SIZE;
 	double m_buttonHeight = ITEM_SIZE;
+	double m_spacingSize;
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = ITEM_SIZE;
 
