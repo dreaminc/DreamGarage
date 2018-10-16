@@ -60,9 +60,7 @@ RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float wi
 	// the button doesn't need to be interactable at all
 	if (fnCallback != nullptr) {
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-
-		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-			std::bind(&UIControlBar::HandleTouchStart, this, std::placeholders::_1, std::placeholders::_2)));
+		CR(pButton->RegisterTouchStart());
 		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
 	}
 	

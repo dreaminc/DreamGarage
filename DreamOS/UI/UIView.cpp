@@ -105,6 +105,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIButton> UIView::MakeUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, pEnabledTexture, pDisabledTexture, width, height));
+
+	return pButton;
+}
+
+std::shared_ptr<UIButton> UIView::AddUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = MakeUIButton(pEnabledTexture, pDisabledTexture, width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS));
 
