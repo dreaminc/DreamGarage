@@ -398,8 +398,9 @@ RESULT DreamUserApp::Update(void *pContext) {
 		CN(m_pUserModel);
 
 		CR(m_pUserModel->SetDreamOS(GetDOS()));
-		CR(m_pUserModel->UpdateAvatarModelWithID(1));
+		CR(m_pUserModel->UpdateAvatarModelWithID(12));
 		CR(m_pUserModel->SetVisible(true));
+
 		if (m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT) != nullptr) {
 			CR(m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT)->SetVisible(false));
 		}

@@ -50,9 +50,12 @@ light *g_pLight = nullptr;
 
 #include "Sound/AudioPacket.h"
 
+/* Comment this out to enable 3rd party camera
 #define _USE_3RD_PARTY_CAMERA
-#define _USE_3RD_PARTY_CAMERA_HD
+//#define _USE_3RD_PARTY_CAMERA_HD
 //#define _USE_3RD_PARTY_CAMERA_UHD
+#define _USE_3RD_PARTY_CAMERA_HALF_UHD
+//*/
 
 // TODO: Should this go into the DreamOS side?
 /*
@@ -169,14 +172,13 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 	CR(pHAL->MakeCurrentContext());
 
-	// Aux
-
-	//m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 6.0f), viewport(2560, 1386, 60));
-	
+	// Aux Camera
 #if defined(_USE_3RD_PARTY_CAMERA_UHD)
 	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(3840, 2107, 60));
 #elif defined(_USE_3RD_PARTY_CAMERA_HD)
 	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1920, 1080, 60));
+#elif defined(_USE_3RD_PARTY_CAMERA_HALF_UHD)
+	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 6.0f), viewport(2560, 1386, 60));
 #else 
 	m_pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
 #endif
