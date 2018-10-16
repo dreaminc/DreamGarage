@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 #include "DreamApp.h"
-#include "DreamGarage/UIContentControlBar.h"
+#include "DreamGarage/UserAreaControls.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "Primitives/Subscriber.h"
 
@@ -106,9 +106,10 @@ public:
 
 // DreamControlBar
 public:
-	RESULT HandleControlBarEvent(ControlBarButtonType type);
-
 	bool CanPressButton(UIButton *pButtonContext);
+	RESULT Open();
+	RESULT Minimize();
+	RESULT Maximize();
 
 // DreamTabView
 public:
@@ -187,7 +188,7 @@ private:
 
 	// UI in control area
 	std::shared_ptr<UIView> m_pView = nullptr;
-	std::shared_ptr<UIContentControlBar> m_pUIControlBar = nullptr;
+	std::shared_ptr<UserAreaControls> m_pUserControls = nullptr;
 
 	// TODO: move to UI
 	// Apps in control area

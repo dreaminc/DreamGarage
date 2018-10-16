@@ -49,9 +49,6 @@
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp">
       <Filter>DreamControlView</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp">
-      <Filter>DreamControlView</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp">
       <Filter>DreamShareView</Filter>
     </ClCompile>
@@ -73,7 +70,7 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamSoundSystem.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\UIContentControlBar.cpp">
+    <ClCompile Include="..\..\..\DreamGarage\UserAreaControls.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
   </ItemGroup>
@@ -121,9 +118,6 @@
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h">
       <Filter>DreamControlView</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h">
-      <Filter>DreamControlView</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamShareView\DreamShareView.h">
       <Filter>DreamShareView</Filter>
     </ClInclude>
@@ -151,7 +145,7 @@
     <ClInclude Include="..\..\..\DreamGarage\UICommon.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\UIContentControlBar.h">
+    <ClInclude Include="..\..\..\DreamGarage\UserAreaControls.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>

@@ -772,12 +772,11 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
-    <ClCompile Include="..\..\..\DreamControlView\UIControlBar.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamClientMain.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\UIContentControlBar.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\UserAreaControls.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamFormApp.cpp" />
@@ -793,13 +792,12 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
-    <ClInclude Include="..\..\..\DreamControlView\UIControlBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamClientMain.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
-    <ClInclude Include="..\..\..\DreamGarage\UIContentControlBar.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UserAreaControls.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamEnvironmentApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamFormApp.h" />

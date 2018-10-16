@@ -6,21 +6,21 @@
 #include "DreamApp.h"
 
 #include "UI/UIView.h"
-#include "DreamControlView/UIControlBar.h"
 
 #include "DreamGarage/UICommon.h"
 
 //#include "DreamUserControlArea/DreamUserControlArea.h"
 class DreamUserControlArea;
+class text;
 
 //All relative to parent app
 #define URL_WIDTH 0.5484
 
-class UIContentControlBar : public UIView {
+class UserAreaControls : public UIView {
 
 public:
-	UIContentControlBar(HALImp *pHALImp, DreamOS *pDreamOS);
-	~UIContentControlBar();
+	UserAreaControls(HALImp *pHALImp, DreamOS *pDreamOS);
+	~UserAreaControls();
 
 	// DreamApp
 public:

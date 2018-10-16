@@ -9,7 +9,6 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "WebBrowser/WebBrowserController.h"
 #include "DreamUserApp.h"
-#include "UIControlBar.h"
 
 #include "DreamGarage/UICommon.h"
 
@@ -124,7 +123,6 @@ private:
 	texture* m_pBackgroundTexture = nullptr;
 
 	texture* m_pLoadingScreenTexture = nullptr;
-	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
 

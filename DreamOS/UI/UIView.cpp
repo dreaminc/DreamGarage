@@ -5,8 +5,7 @@
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
-#include "DreamControlView/UIControlBar.h"
-#include "DreamGarage/UIContentControlBar.h"
+#include "DreamGarage/UserAreaControls.h"
 
 #include "DreamOS.h"
 
@@ -174,32 +173,16 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIControlBar> UIView::MakeUIControlBar() {
-	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS));
+std::shared_ptr<UserAreaControls> UIView::MakeUIContentControlBar() {
+	std::shared_ptr<UserAreaControls> pControlBar(new UserAreaControls(m_pHALImp, m_pDreamOS));
 
 	return pControlBar;
 }
 
-std::shared_ptr<UIControlBar> UIView::AddUIControlBar() {
+std::shared_ptr<UserAreaControls> UIView::AddUIContentControlBar() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar();
-	CR(AddObject(pControlBar));
-	return pControlBar;
-Error:
-	return nullptr;
-}
-
-std::shared_ptr<UIContentControlBar> UIView::MakeUIContentControlBar() {
-	std::shared_ptr<UIContentControlBar> pControlBar(new UIContentControlBar(m_pHALImp, m_pDreamOS));
-
-	return pControlBar;
-}
-
-std::shared_ptr<UIContentControlBar> UIView::AddUIContentControlBar() {
-	RESULT r = R_PASS;
-
-	std::shared_ptr<UIContentControlBar> pControlBar = MakeUIContentControlBar();
+	std::shared_ptr<UserAreaControls> pControlBar = MakeUIContentControlBar();
 	CR(AddObject(pControlBar));
 	return pControlBar;
 Error:

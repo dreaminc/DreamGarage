@@ -8,7 +8,6 @@
 
 #include "UI/UIMallet.h"
 //#include "UI/UIView.h"
-//#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
 #include "UI/UISurface.h"
 

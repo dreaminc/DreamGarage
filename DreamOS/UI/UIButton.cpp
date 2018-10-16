@@ -137,14 +137,6 @@ RESULT UIButton::HandleTouchStart(UIButton* pButtonContext, void* pContext) {
 	CNR(pButtonContext, R_SKIPPED);
 	CBR(pButtonContext->IsVisible(), R_SKIPPED);
 
-	//TODO: this only works if these textures are used for no other purpose
-	/*
-	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_BACK] &&
-		pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_FORWARD], R_SKIPPED);
-
-	CBR(pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_TAB] &&
-		pButtonContext->GetSurface()->GetTextureDiffuse() != m_buttonTextures[ControlBarButtonType::CANT_BACKTAB], R_SKIPPED);
-		//*/
 	CBR(m_fInteractable, R_SKIPPED);
 
 	pSurface = pButtonContext->GetSurface();

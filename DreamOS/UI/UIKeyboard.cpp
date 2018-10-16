@@ -175,16 +175,16 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 
 		auto pView = m_pSurfaceContainer->AddUIView(GetDOS());
-		m_pUIControlBar = pView->AddUIControlBar();
+		m_pKeyboardControls = pView->AddUIView();
 
 		//m_pUIControlBar->RegisterObserver(this);
-		m_pUIControlBar->SetVisible(false, false);
+		m_pKeyboardControls->SetVisible(false, false);
 	}
 
 	CR(InitializeQuadsWithLayout(pLayout));
 	m_pLayout = pLayout;
 
-	CR(InitializeControlBar());
+	CR(InitializeKeyboardControls());
 
 	m_currentLayout = LayoutType::QWERTY;
 
@@ -294,7 +294,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::InitializeControlBar() {
+RESULT UIKeyboard::InitializeKeyboardControls() {
 	RESULT r = R_PASS;
 
 	// sizing specific to keyboard
@@ -311,11 +311,8 @@ RESULT UIKeyboard::InitializeControlBar() {
 	float right = m_surfaceWidth / 2.0f - marginError / 2.0f;
 	float doneOffset = right - barButtonWidth/2.0f;
 
-	m_pUIControlBar->SetItemSide(itemSide);
-	m_pUIControlBar->SetItemSpacing(marginError);
-
-	m_pUIControlBar->RotateXByDeg(-90.0f);
-	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
+	m_pKeyboardControls->RotateXByDeg(-90.0f);
+	m_pKeyboardControls->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
 
 	auto pTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszTab));
 	auto pCantTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab));
@@ -331,24 +328,25 @@ RESULT UIKeyboard::InitializeControlBar() {
 	CN(pCantBackTab);
 	CN(pDone)
 
-	//pLayout->SetVisible(false);
-	CR(m_pUIControlBar->Initialize());
-
-	m_pNextButton = m_pUIControlBar->AddButton(ControlBarButtonType::TAB, tabOffset, barButtonWidth, 
+	m_pNextButton = m_pKeyboardControls->AddButton(tabOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2),
 		pTab, pCantTab);
 
-	m_pPreviousButton = m_pUIControlBar->AddButton(ControlBarButtonType::BACKTAB, backTabOffset, barButtonWidth, 
+	m_pPreviousButton = m_pKeyboardControls->AddButton(backTabOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
 		pBackTab, pCantBackTab);
 
-	m_pDoneButton = m_pUIControlBar->AddButton(ControlBarButtonType::DONE, doneOffset, barButtonWidth, 
+	m_pDoneButton = m_pKeyboardControls->AddButton(doneOffset, barButtonWidth, itemSide,
 		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2),
 		pDone);
 
 	CN(m_pNextButton);
 	CN(m_pPreviousButton);
 	CN(m_pDoneButton);
+
+	m_pNextButton->SetVisible(true);
+	m_pPreviousButton->SetVisible(true);
+	m_pDoneButton->SetVisible(true);
 
 	//CR(m_pDoneButton->SetTextures(pDone, nullptr));
 
@@ -597,7 +595,7 @@ RESULT UIKeyboard::Hide() {
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false, false);
-		m_pUIControlBar->SetVisible(false, false);
+		m_pKeyboardControls->SetVisible(false, false);
 		// full press of key that clears whole string
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 0));
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
@@ -840,7 +838,7 @@ Error:
 RESULT UIKeyboard::ShowBrowserButtons() {
 	RESULT r = R_PASS;
 
-	CR(m_pUIControlBar->SetVisible(true, false));
+	CR(m_pKeyboardControls->SetVisible(true, false));
 
 Error:
 	return r;
@@ -1047,10 +1045,6 @@ RESULT UIKeyboard::HandleBackTabPressed(UIButton* pButtonContext, void* pContext
 
 Error:
 	return r;
-}
-
-std::shared_ptr<UIControlBar> UIKeyboard::GetControlBar() {
-	return m_pUIControlBar;
 }
 
 RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {

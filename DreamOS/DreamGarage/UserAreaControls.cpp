@@ -1,6 +1,9 @@
-#include "UIContentControlBar.h"
+#include "UserAreaControls.h"
 #include "DreamOS.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "DreamControlView/DreamControlView.h"
+#include "DreamGarage/DreamTabView.h"
+#include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 
 #include "UI/UIButton.h"
@@ -10,18 +13,18 @@
 
 #include "Primitives/font.h"
 
-UIContentControlBar::UIContentControlBar(HALImp *pHALImp, DreamOS *pDreamOS) :
+UserAreaControls::UserAreaControls(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIView(pHALImp,pDreamOS)
 {
 	RESULT r = R_PASS;
 }
 
-UIContentControlBar::~UIContentControlBar() {
+UserAreaControls::~UserAreaControls() {
 	// empty
 }
 
 // DreamApp
-RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
+RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	RESULT r = R_PASS;
 
 	m_pParentApp = pParent;
@@ -79,15 +82,15 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 	}
 
 	m_pBackButton = AddButton(backOffset, buttonWidth, buttonHeight,
-		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[0], controlTextures[1]);
 
 	m_pForwardButton = AddButton(forwardOffset, buttonWidth, buttonHeight,
-		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[2], controlTextures[3]);
 
 	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
-		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[4]);
 
 // Re-enable for selectability of the URL button
@@ -97,15 +100,15 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 	m_pURLButton = AddButton(urlOffset, m_urlWidth, buttonHeight, nullptr, controlTextures[5]);
 
 	m_pOpenButton = AddButton(openOffset, buttonWidth, buttonHeight, 
-		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[6]);
 
 	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
-		std::bind(&UIContentControlBar::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[7], controlTextures[8]);
 
 	m_pMinimizeButton = AddButton(hideOffset, buttonWidth, buttonHeight,
-		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&UserAreaControls::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[9], controlTextures[10]);
 
 	CN(m_pBackButton);
@@ -123,7 +126,7 @@ Error:
 	return r;
 }
 
-RESULT UIContentControlBar::InitializeText() {
+RESULT UserAreaControls::InitializeText() {
 	RESULT r = R_PASS;
 
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -145,7 +148,7 @@ Error:
 }
 
 
-RESULT UIContentControlBar::Update() {
+RESULT UserAreaControls::Update() {
 
 	if (m_fUpdateTitle) {
 
@@ -157,7 +160,7 @@ RESULT UIContentControlBar::Update() {
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::SetSharingFlag(bool fIsSharing) {
+RESULT UserAreaControls::SetSharingFlag(bool fIsSharing) {
 	RESULT r = R_PASS;
 	
 	m_pShareButton->SwitchToTexture(fIsSharing);
@@ -166,7 +169,7 @@ Error:
 	return r;
 }
 
-RESULT UIContentControlBar::SetTitleText(const std::string& strTitle) {
+RESULT UserAreaControls::SetTitleText(const std::string& strTitle) {
 	RESULT r = R_PASS;
 
 	m_fUpdateTitle = true;
@@ -176,31 +179,44 @@ RESULT UIContentControlBar::SetTitleText(const std::string& strTitle) {
 }
 
 // ControlBarObserver
-RESULT UIContentControlBar::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
+	//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::BACK));
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pParentApp->GetActiveSource());
+	CNR(pBrowser, R_SKIPPED);
+
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::BACK));
+	CR(pBrowser->HandleBackEvent());
+
 Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleForwardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
+
+	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pParentApp->GetActiveSource());
+	CNR(pBrowser, R_SKIPPED);
+
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::FORWARD));
+	//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::FORWARD));
+	CR(pBrowser->HandleForwardEvent());
+
 Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	if (!m_pMinimizeButton->IsToggled()) {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
+	//	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
+		m_pParentApp->Maximize();
 	}
 	else {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MINIMIZE));
+		//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MINIMIZE));
+		m_pParentApp->Minimize();
 	}
 
 	CR(m_pMinimizeButton->Toggle());
@@ -209,10 +225,10 @@ Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleOpenPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleOpenPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::OPEN));
+	CR(m_pParentApp->Open());
 	
 	// This call triggers a move to menu, hiding the control bar, so the button needs to be forcefully released
 	CR(m_pDreamOS->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
@@ -222,49 +238,80 @@ Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleClosePressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
+
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	auto pActiveSource = m_pParentApp->GetActiveSource();
+
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CN(pActiveSource);
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::CLOSE));
+
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CNR(pActiveSource, R_SKIPPED);	// double tapping close? 
+	CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+
 Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) {
+RESULT UserAreaControls::HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) {
 	RESULT r = R_PASS;
 	
+	auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+	auto pActiveSource = m_pParentApp->GetActiveSource();
+
+	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+	CN(pActiveSource);
+
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 
 	if (m_pShareButton->IsToggled()) {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::STOP));
+		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	}
 	else {
-		CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::SHARE));
+		CR(m_pParentApp->ForceStopSharing());
+		CR(m_pDreamOS->SetSharedContentTexture(pActiveSource->GetSourceTexture()));
+		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 	}
 
-	m_pShareButton->Toggle();
+	CR(m_pShareButton->Toggle());
 
 Error:
 	return r;
 }
 
-RESULT UIContentControlBar::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+
+	// TODO: this button's event is currently unused
+	/*
 	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::URL));
+		Hide();
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+		m_pControlView->ShowKeyboard();
+		m_pControlView->m_fIsShareURL = true;
+		//*/
 Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
+RESULT UserAreaControls::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	// TODO: this button is currently unused
+	/*
 	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::KEYBOARD));
+
+		m_pDreamUserApp->SetEventApp(m_pControlView.get());
+	//*/
 Error:
 	return R_PASS;
 }
 
-RESULT UIContentControlBar::UpdateControlBarButtonsWithType(std::string strContentType) {
+RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentType) {
 	RESULT r = R_PASS;
 
 	// TODO: if source is desktop, switch around buttons
@@ -286,7 +333,7 @@ Error:
 	return r;
 }
 
-RESULT UIContentControlBar::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
+RESULT UserAreaControls::UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
 	CR(m_pBackButton->SetInteractability(fCanGoBack));
@@ -296,11 +343,11 @@ Error:
 	return r;
 }
 
-std::shared_ptr<text> UIContentControlBar::GetURLText() {
+std::shared_ptr<text> UserAreaControls::GetURLText() {
 	return m_pURLText;
 }
 
-RESULT UIContentControlBar::Show() {
+RESULT UserAreaControls::Show() {
 	RESULT r = R_PASS;
 
 	SetVisible(true, false);	
@@ -319,7 +366,7 @@ Error:
 	return r;
 }
 
-RESULT UIContentControlBar::Hide() {
+RESULT UserAreaControls::Hide() {
 	RESULT r = R_PASS;
 
 	auto fnEndCallback = [&](void *pContext) {

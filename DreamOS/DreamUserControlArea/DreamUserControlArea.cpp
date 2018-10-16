@@ -60,11 +60,11 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);
-		m_pUIControlBar = m_pView->AddUIContentControlBar();
-		CN(m_pUIControlBar);
+		m_pUserControls = m_pView->AddUIContentControlBar();
+		CN(m_pUserControls);
 
-		m_pUIControlBar->Initialize(this);
-		GetDOS()->AddObjectToUIGraph(m_pUIControlBar.get());
+		m_pUserControls->Initialize(this);
+		GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
 
 		/*
 		m_pUIControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
@@ -99,12 +99,12 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->SetPosition(ptOrigin);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
-		GetComposite()->AddObject(m_pUIControlBar);
+		GetComposite()->AddObject(m_pUserControls);
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 		//GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
 
-		m_pUIControlBar->Hide();
+		m_pUserControls->Hide();
 		m_pDreamTabView->GetComposite()->SetVisible(false);
 		m_pControlView->GetComposite()->SetVisible(false);
 
@@ -121,7 +121,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->AddObject(std::shared_ptr<composite>(GetDOS()->GetKeyboardApp()->GetComposite()));
 	}
 
-	m_pUIControlBar->Update();
+	m_pUserControls->Update();
 
 	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
 		CR(m_pDreamUIBar->ResetAppComposite());
@@ -256,7 +256,7 @@ RESULT DreamUserControlArea::Show() {
 	//m_pDreamTabView->GetComposite()->SetVisible(true);
 	m_pDreamTabView->Show();
 	//m_pControlBar->GetComposite()->SetVisible(true);
-	m_pUIControlBar->Show();
+	m_pUserControls->Show();
 
 	return r;
 }
@@ -269,101 +269,37 @@ RESULT DreamUserControlArea::Hide() {
 	//m_pDreamTabView->GetComposite()->SetVisible(false);
 	m_pDreamTabView->Hide();
 	//m_pControlBar->GetComposite()->SetVisible(false);
-	m_pUIControlBar->Hide();
+	m_pUserControls->Hide();
 
 	return r;
 }
 
-RESULT DreamUserControlArea::HandleControlBarEvent(ControlBarButtonType type) {
+RESULT DreamUserControlArea::Open() {
 	RESULT r = R_PASS;
 
-	switch (type) {
+	CR(Hide());
+	CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
+	CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
 
-	case ControlBarButtonType::BACK: {
-		// Send back event to active browser
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-		CNR(pBrowser, R_SKIPPED);
-		CR(pBrowser->HandleBackEvent());
-	} break;
+Error:
+	return r;
+}
 
-	case ControlBarButtonType::FORWARD: {
-		auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-		CNR(pBrowser, R_SKIPPED);
-		CR(pBrowser->HandleForwardEvent());
-	} break;
+RESULT DreamUserControlArea::Minimize() {
+	RESULT r = R_PASS;
 
-	case ControlBarButtonType::OPEN: {
-		// pull up menu to select new piece of content
-		// send hide events to control bar, control view, and tab bar
-		CR(Hide());
-		CR(m_pDreamUIBar->ShowMenuLevel(MenuLevel::OPEN));
-		CR(m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get()));
-	} break;
+	CR(m_pControlView->Hide());
+	CR(m_pDreamTabView->Hide());
 
-	case ControlBarButtonType::CLOSE: {
-		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-		CNR(m_pActiveSource, R_SKIPPED);	// double tapping close? 
-//		long assetID = m_pActiveBrowser->Get
-		CRM(m_pEnvironmentControllerProxy->RequestCloseAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
+Error:
+	return r;
+}
 
-	} break;
+RESULT DreamUserControlArea::Maximize() {
+	RESULT r = R_PASS;
 
-	case ControlBarButtonType::MAXIMIZE: {
-		//CR(Show());
-		m_pControlView->Show();
-		m_pDreamTabView->Show();
-	} break;
-
-	case ControlBarButtonType::MINIMIZE: {
-		//TODO: change this with animations, control bar needs to still be visible here
-		//CR(Hide());
-		m_pControlView->Hide();
-		m_pDreamTabView->Hide();
-		//m_pControlBar->GetComposite()->SetVisible(true);
-		//m_pControlBar->Hide();
-	} break;
-
-	case ControlBarButtonType::SHARE: {
-		// send share event with active browser
-		ForceStopSharing();
-
-		GetDOS()->SetSharedContentTexture(m_pActiveSource->GetSourceTexture());
-		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-		CRM(m_pEnvironmentControllerProxy->RequestShareAsset(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-	} break;
-
-	case ControlBarButtonType::STOP: {
-		// send stop sharing event 
-		auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-		CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-		CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
-	} break;
-
-	case ControlBarButtonType::URL: {
-		// dismiss everything(?) and pull up the keyboard
-		Hide();
-		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		m_pControlView->ShowKeyboard();
-		m_pControlView->m_fIsShareURL = true;
-		/*
-		CR(pDreamOS->GetInteractionEngineProxy()->ResetObjects(pButtonContext->GetInteractionObject()));
-		CR(pDreamOS->GetInteractionEngineProxy()->ReleaseObjects(pButtonContext->GetInteractionObject()));
-
-		CR(GetDOS()->GetKeyboardApp()->Show());
-
-		CR(HideView());
-		m_fIsShareURL = true;
-		//*/
-	} break;
-
-	case ControlBarButtonType::KEYBOARD: {
-		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		//float yValue = (BROWSER_WIDTH) + (BROWSER_HEIGHT * SPACING_SIZE);
-		//HandleNodeFocusChanged(true, m_pActiveSource.get());
-	}
-	}
+	CR(m_pControlView->Show());
+	CR(m_pDreamTabView->Show());
 
 Error:
 	return r;
@@ -440,9 +376,9 @@ RESULT DreamUserControlArea::SetActiveSource(std::shared_ptr<DreamContentSource>
 	RESULT r = R_PASS;
 
 	m_pActiveSource = pNewContent;
-	if (m_pUIControlBar != nullptr) {
-		m_pUIControlBar->SetTitleText(m_pActiveSource->GetTitle());
-		m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+	if (m_pUserControls != nullptr) {
+		m_pUserControls->SetTitleText(m_pActiveSource->GetTitle());
+		m_pUserControls->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 	}
 
 	//m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
@@ -504,7 +440,7 @@ RESULT DreamUserControlArea::UpdateContentSourceTexture(std::shared_ptr<texture>
 RESULT DreamUserControlArea::UpdateControlBarText(std::string& strTitle) {
 	RESULT r = R_PASS;
 
-	CR(m_pUIControlBar->SetTitleText(strTitle));
+	CR(m_pUserControls->SetTitleText(strTitle));
 
 Error:
 	return r;
@@ -513,7 +449,7 @@ Error:
 RESULT DreamUserControlArea::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) {
 	RESULT r = R_PASS;
 
-	CR(m_pUIControlBar->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
+	CR(m_pUserControls->UpdateNavigationButtons(fCanGoBack, fCanGoForward));
 	
 Error:
 	return r;
@@ -559,7 +495,7 @@ RESULT DreamUserControlArea::HandleNodeFocusChanged(DOMNode *pDOMNode, DreamCont
 
 		CR(pKeyboard->ShowBrowserButtons());
 		CR(m_pControlView->HandleKeyboardUp());
-		CR(m_pUIControlBar->Hide());
+		CR(m_pUserControls->Hide());
 		CR(m_pDreamTabView->Hide());
 
 		std::string strTextField = pDOMNode->GetValue();
@@ -586,7 +522,7 @@ RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentS
 		CN(pKeyboard);
 		CR(pKeyboard->ShowBrowserButtons());
 		CR(m_pControlView->HandleKeyboardUp());
-		CR(m_pUIControlBar->Hide());
+		CR(m_pUserControls->Hide());
 		CR(m_pDreamTabView->Hide());
 		m_fKeyboardUp = true;
 	}
@@ -732,9 +668,9 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pDreamDesktop = GetDOS()->LaunchDreamApp<DreamDesktopApp>(this);
 			m_pActiveSource = m_pDreamDesktop;
 			m_pDreamDesktop->InitializeWithParent(this);
-			m_pUIControlBar->SetTitleText(m_pDreamDesktop->GetTitle());
+			m_pUserControls->SetTitleText(m_pDreamDesktop->GetTitle());
 			// new desktop can't be the current content
-			m_pUIControlBar->SetSharingFlag(false);
+			m_pUserControls->SetSharingFlag(false);
 		}
 	}
 
@@ -802,7 +738,7 @@ RESULT DreamUserControlArea::HideWebsiteTyping() {
 	//	CR(m_pDreamUserApp->GetKeyboard()->Hide());
 		m_fKeyboardUp = false;
 		CR(m_pControlView->HandleKeyboardDown());
-		m_pUIControlBar->Show();
+		m_pUserControls->Show();
 		m_pDreamTabView->Show();
 		auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 		CNR(pBrowser, R_SKIPPED);
@@ -854,7 +790,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
-		m_pUIControlBar->SetTitleText(pBrowser->GetTitle());
+		m_pUserControls->SetTitleText(pBrowser->GetTitle());
 
 		// TODO: may not be enough once browser typing is re-enabled
 		m_strURL = "";
@@ -872,7 +808,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 	CR(Show());
 
-	m_pUIControlBar->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
+	m_pUserControls->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
 
 Error:
 	return r;
@@ -882,7 +818,7 @@ RESULT DreamUserControlArea::OnReceiveAsset() {
 	RESULT r = R_PASS;
 	
 	// new browser can't be the current content
-	m_pUIControlBar->SetSharingFlag(false);
+	m_pUserControls->SetSharingFlag(false);
 
 	return r;
 }
@@ -989,8 +925,8 @@ RESULT DreamUserControlArea::CloseActiveAsset() {
 		//m_pControlView->GetViewQuad()->SetVisible(false);
 		// replace with top of tab bar
 		if (m_pActiveSource != nullptr) {
-			m_pUIControlBar->SetTitleText(m_pActiveSource->GetTitle());
-			m_pUIControlBar->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
+			m_pUserControls->SetTitleText(m_pActiveSource->GetTitle());
+			m_pUserControls->UpdateControlBarButtonsWithType(m_pActiveSource->GetContentType());
 
 			m_pControlView->SetViewQuadTexture(m_pActiveSource->GetSourceTexture());
 			CR(ShowControlView());
@@ -1098,7 +1034,7 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 
 		}
 		
-		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pUIControlBar->IsVisible())) {	// Pressing Menu while we have content open or minimized content
+		else if (m_fHasOpenApp && (m_pControlView->IsVisible() || m_pUserControls->IsVisible())) {	// Pressing Menu while we have content open or minimized content
 			ResetAppComposite();
 			Hide();
 			m_pDreamUIBar->ShowMenuLevel(MenuLevel::ROOT);

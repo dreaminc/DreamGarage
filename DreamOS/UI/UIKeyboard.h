@@ -11,7 +11,6 @@
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/UIControlBar.h"
 
 #include <vector>
 #include <string>
@@ -60,7 +59,7 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
-	RESULT InitializeControlBar();
+	RESULT InitializeKeyboardControls();
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
@@ -123,9 +122,8 @@ public:
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
 
-	std::shared_ptr<UIControlBar> GetControlBar();
 private:
-	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
+	std::shared_ptr<UIView> m_pKeyboardControls = nullptr;
 
 private:
 	RESULT UpdateViewQuad();
