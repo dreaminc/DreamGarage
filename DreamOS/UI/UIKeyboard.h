@@ -11,7 +11,6 @@
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/UIControlBar.h"
 
 #include <vector>
 #include <string>
@@ -50,8 +49,7 @@ class SoundFile;
 
 
 class UIKeyboard : public DreamApp<UIKeyboard>,
-	public SenseKeyboard,
-	public ControlBarObserver {
+	public SenseKeyboard {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
@@ -61,6 +59,7 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
+	RESULT InitializeKeyboardControls();
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
@@ -115,28 +114,16 @@ public:
 	RESULT SetKeyReleaseThreshold(float threshold);
 	RESULT SetSurfaceOffset(point ptOffset);
 
-	//ControlBarObserver
 public:
-	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext);
 
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
 
-	std::shared_ptr<UIControlBar> GetControlBar();
 private:
-	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
-	bool m_fCanTabNext = true;
-	bool m_fCanTabPrevious = true;
+	std::shared_ptr<UIView> m_pKeyboardControls = nullptr;
 
 private:
 	RESULT UpdateViewQuad();
@@ -160,6 +147,19 @@ private:
 	std::shared_ptr<SoundFile> m_pSpacePressSound = nullptr;
 
 	std::map<unsigned int, std::shared_ptr<SoundFile>> m_keyPressSounds;
+
+	// control bar textures
+private:
+	const wchar_t *k_wszTab = L"key-tab-next.png";
+	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
+	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
+	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
+	const wchar_t *k_wszDone = L"key-done.png";
+
+private:
+	std::shared_ptr<UIButton> m_pNextButton = nullptr;
+	std::shared_ptr<UIButton> m_pPreviousButton = nullptr;
+	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
 
 private:
 	// layout variables

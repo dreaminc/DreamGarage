@@ -8,7 +8,6 @@
 
 #include "UI/UIMallet.h"
 //#include "UI/UIView.h"
-//#include "UI/UIControlBar.h"
 #include "UI/UIButton.h"
 #include "UI/UISurface.h"
 
@@ -246,16 +245,6 @@ RESULT DreamControlView::Shutdown(void *pContext) {
 
 RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
 	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
-	return R_PASS;
-}
-
-RESULT DreamControlView::SetContentType(std::string strContentType) {
-
-
-	m_currentControlBarType = UIControlBar::ControlBarTypeFromString(strContentType);
-
-	//TODO: don't need to do this until different types of control bars are defined
-
 	return R_PASS;
 }
 
