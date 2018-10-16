@@ -334,16 +334,23 @@ RESULT UIKeyboard::InitializeControlBar() {
 	//pLayout->SetVisible(false);
 	CR(m_pUIControlBar->Initialize());
 
-	CR(m_pUIControlBar->AddButton(ControlBarButtonType::TAB, tabOffset, barButtonWidth, 
+	m_pNextButton = m_pUIControlBar->AddButton(ControlBarButtonType::TAB, tabOffset, barButtonWidth, 
 		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2),
-		pTab, pCantTab));
+		pTab, pCantTab);
 
-	CR(m_pUIControlBar->AddButton(ControlBarButtonType::BACKTAB, backTabOffset, barButtonWidth, 
+	m_pPreviousButton = m_pUIControlBar->AddButton(ControlBarButtonType::BACKTAB, backTabOffset, barButtonWidth, 
 		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
-		pBackTab, pCantBackTab));
+		pBackTab, pCantBackTab);
 
-	CR(m_pUIControlBar->AddButton(ControlBarButtonType::DONE, doneOffset, barButtonWidth, 
-		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2)));
+	m_pDoneButton = m_pUIControlBar->AddButton(ControlBarButtonType::DONE, doneOffset, barButtonWidth, 
+		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2),
+		pDone);
+
+	CN(m_pNextButton);
+	CN(m_pPreviousButton);
+	CN(m_pDoneButton);
+
+	//CR(m_pDoneButton->SetTextures(pDone, nullptr));
 
 Error:
 	return r;
@@ -1049,17 +1056,8 @@ std::shared_ptr<UIControlBar> UIKeyboard::GetControlBar() {
 RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
-	m_fCanTabNext = fCanTabNext;
-	std::shared_ptr<UIButton> pButton = m_pUIControlBar->GetButton(ControlBarButtonType::TAB);
-	CR(pButton->SetInteractability(fCanTabNext));
-	/*
-	if (fCanTabNext) {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::TAB)));
-	}
-	else {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::CANT_TAB)));
-	}
-	//*/
+	CN(m_pNextButton);
+	CR(m_pNextButton->SetInteractability(fCanTabNext));
 
 Error:
 	return r;
@@ -1067,17 +1065,8 @@ Error:
 RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
 	RESULT r = R_PASS;
 
-	m_fCanTabPrevious = fCanTabPrevious;
-	auto pButton = m_pUIControlBar->GetButton(ControlBarButtonType::BACKTAB);
-	CR(pButton->SetInteractability(fCanTabPrevious));
-	/*
-	if (fCanTabPrevious) {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::BACKTAB)));
-	}
-	else {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTexture(ControlBarButtonType::CANT_BACKTAB)));
-	}
-	//*/
+	CN(m_pPreviousButton);
+	CR(m_pPreviousButton->SetInteractability(fCanTabPrevious));
 
 Error:
 	return r;

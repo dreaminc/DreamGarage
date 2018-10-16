@@ -34,6 +34,9 @@ public:
 	VirtualObj *GetInteractionObject();
 	point GetContactPoint();
 
+	// TODO: is this necessary
+	RESULT SetTextures(std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
+
 public:
 	RESULT HandleTouchStart(UIButton* pButtonContext, void* pContext);
 	// temp hopefully

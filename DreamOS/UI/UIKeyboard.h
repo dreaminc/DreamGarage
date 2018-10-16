@@ -126,8 +126,6 @@ public:
 	std::shared_ptr<UIControlBar> GetControlBar();
 private:
 	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
-	bool m_fCanTabNext = true;
-	bool m_fCanTabPrevious = true;
 
 private:
 	RESULT UpdateViewQuad();
@@ -159,6 +157,11 @@ private:
 	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
 	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
 	const wchar_t *k_wszDone = L"key-done.png";
+
+private:
+	std::shared_ptr<UIButton> m_pNextButton = nullptr;
+	std::shared_ptr<UIButton> m_pPreviousButton = nullptr;
+	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
 
 private:
 	// layout variables

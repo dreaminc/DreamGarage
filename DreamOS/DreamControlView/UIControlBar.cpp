@@ -31,12 +31,6 @@ RESULT UIControlBar::Initialize() {
 	m_buttonTextures[ControlBarButtonType::SHARE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShare);
 	m_buttonTextures[ControlBarButtonType::STOP] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSharing);
 
-	m_buttonTextures[ControlBarButtonType::TAB] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszTab);
-	m_buttonTextures[ControlBarButtonType::CANT_TAB] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab);
-	m_buttonTextures[ControlBarButtonType::BACKTAB] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab);
-	m_buttonTextures[ControlBarButtonType::CANT_BACKTAB] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab);
-	m_buttonTextures[ControlBarButtonType::DONE] = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszDone);
-
 	for (auto pTexturePair : m_buttonTextures) {
 		CN(pTexturePair.second);
 	}
@@ -46,14 +40,14 @@ Error:
 }
 
 
-RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
+std::shared_ptr<UIButton> UIControlBar::AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
 	RESULT r = R_PASS;
 	
 	std::shared_ptr<UIButton> pButton = nullptr;
 
 	CBR(type != ControlBarButtonType::INVALID, R_SKIPPED);
 
-	if (pEnabledTexture == nullptr || pDisabledTexture == nullptr) {
+	if (pEnabledTexture == nullptr) {
 		pButton = AddUIButton(width, m_itemSide);
 		CR(pButton->GetSurface()->SetDiffuseTexture(m_buttonTextures[type]));
 	}
@@ -75,8 +69,9 @@ RESULT UIControlBar::AddButton(ControlBarButtonType type, float offset, float wi
 	// Assumption: a control bar's buttons have unique types
 	m_buttons[type] = pButton;
 
+	return pButton;
 Error:
-	return r;
+	return nullptr;
 }
 
 RESULT UIControlBar::HandleTouchStart(UIButton* pButtonContext, void* pContext) {

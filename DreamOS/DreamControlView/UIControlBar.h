@@ -48,7 +48,7 @@ public:
 
 	RESULT Initialize();
 
-	RESULT AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
+	std::shared_ptr<UIButton> AddButton(ControlBarButtonType type, float offset, float width, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture = nullptr, std::shared_ptr<texture> pDisabledTexture = nullptr);
 
 	std::shared_ptr<UIButton> GetButton(ControlBarButtonType type);
 
@@ -75,12 +75,6 @@ public:
 	const wchar_t *k_wszShow = L"control-view-maximize.png";
 	const wchar_t *k_wszURL = L"control-view-url.png";
 	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
-
-	const wchar_t *k_wszTab = L"key-tab-next.png";
-	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
-	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
-	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
-	const wchar_t *k_wszDone = L"key-done.png";
 
 private:
 	std::map<ControlBarButtonType, std::shared_ptr<UIButton>> m_buttons;

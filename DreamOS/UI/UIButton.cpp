@@ -54,6 +54,10 @@ RESULT UIButton::Initialize() {
 	CN(m_pSurface);
 	CR(InitializeOBB());
 
+	if (m_pEnabledTexture != nullptr) {
+		CR(m_pSurface->SetDiffuseTexture(m_pEnabledTexture.get()));
+	}
+
 Error:
 	return r;
 }
@@ -109,6 +113,12 @@ VirtualObj *UIButton::GetInteractionObject() {
 
 point UIButton::GetContactPoint() {
 	return m_ptContact;
+}
+
+RESULT UIButton::SetTextures(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
+	m_pEnabledTexture = pEnabledTexture;
+	m_pDisabledTexture = pDisabledTexture;
+	return R_PASS;
 }
 
 RESULT UIButton::HandleTouchStart(UIButton* pButtonContext, void* pContext) {

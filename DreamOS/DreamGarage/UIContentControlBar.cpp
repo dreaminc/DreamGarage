@@ -56,24 +56,24 @@ RESULT UIContentControlBar::Initialize(DreamUserControlArea *pParent) {
 
 	CR(UIControlBar::Initialize());
 
-	CR(AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::BACK, backOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CR(AddButton(ControlBarButtonType::FORWARD, forwardOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::FORWARD, forwardOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CR(AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::CLOSE, closeOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2)));
 
 // Re-enable for selectability of the URL button
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
 //		std::bind(&UIContentControlBar::HandleURLPressed, this, std::placeholders::_1, std::placeholders::_2)));
 
-	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr));
+	CN(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth, nullptr));
 
-	CR(AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::OPEN, openOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CR(AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::SHARE, shareOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2)));
-	CR(AddButton(ControlBarButtonType::MINIMIZE, hideOffset, buttonWidth, 
+	CN(AddButton(ControlBarButtonType::MINIMIZE, hideOffset, buttonWidth, 
 		std::bind(&UIContentControlBar::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2)));
 
 	// create text for title
