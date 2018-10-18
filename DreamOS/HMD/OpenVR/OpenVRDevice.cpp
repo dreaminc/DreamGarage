@@ -75,6 +75,9 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, 
 	m_pHALImp = halimp;
 
 	m_pIVRHMD = vr::VR_Init(&ivrResult, vr::VRApplication_Scene);
+
+	vr::VRCompositor()->SetTrackingSpace(vr::TrackingUniverseSeated);
+
 	CNM(m_pIVRHMD, "Failed to initialize and allocate IVR HMD");
 	CIVRM(ivrResult, "Unable to initialize IVR runtime");
 
@@ -89,6 +92,7 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, 
 
 	// Eye Widths
 	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
+	//m_pIVRHMD->Set
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 	
@@ -121,6 +125,7 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		m_pControllerMeshLeftTexture = pTexture;
 		if (m_pLeftController == nullptr) {
 			m_pLeftController = m_pParentSandbox->MakeComposite();
+			m_pLeftController->AddObject(m_pControllerMeshLeft);
 		}
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
@@ -128,6 +133,7 @@ RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr
 		m_pControllerMeshRightTexture = pTexture;
 		if (m_pRightController == nullptr) {
 			m_pRightController = m_pParentSandbox->MakeComposite();
+			m_pRightController->AddObject(m_pControllerMeshRight);
 		}
 	}
 	/*
@@ -459,7 +465,8 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
 		CBR(m_pLeftController != nullptr, R_SKIPPED);
-		cState.type = CONTROLLER_LEFT;
+		//cState.type = CONTROLLER_LEFT;
+		cState.type = CONTROLLER_RIGHT;
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		CBR(m_pRightController != nullptr, R_SKIPPED);
@@ -481,7 +488,7 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 			uint64_t flag = (uint64_t)1 << 33;
 			cState.fMenu = (state.ulButtonPressed & flag) != 0;
 			cState.fClosed = (state.ulButtonPressed & flag) != 0;
-			cState.triggerRange = 0.0f;
+			cState.triggerRange = 0.0f;LeftHand
 			cState.ptTouchpad = point(0.0f, 0.0f, 0.0f);
 		} break;
 		//*/
@@ -504,6 +511,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 	if(m_pIVRHMD->PollNextEvent(&vrEvent, sizeof(vr::VREvent_t))) {
 		HandleVREvent(vrEvent);
 	}
+
+	vr::VRControllerState_t leftState;
+	vr::VRControllerState_t rightState;
+	int trackedControllers = 0;
+	bool fLeft = false;
+	bool fRight = false;
+	bool fMenu = false;
 
 	// Process SteamVR controller state
 	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
@@ -539,12 +553,34 @@ RESULT OpenVRDevice::UpdateHMD() {
 				if (currentFrame != m_vrFrameCount) {
 					m_vrFrameCount = currentFrame;
 
-					UpdateSenseController(controllerRole, state);
+//					UpdateSenseController(controllerRole, state);
+					trackedControllers++;
+					if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+						leftState = state;
+						fLeft = true;
+						fMenu = fMenu || (leftState.ulButtonPressed & (1 << 1)) != 0;
+					}
+					else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+						rightState = state;
+						fRight = true;
+						fMenu = fMenu || (rightState.ulButtonPressed & (1 << 1)) != 0;
+					}
 				}
 			}
 
 			//m_rbShowTrackedDevice[unDevice] = state.ulButtonPressed == 0;
 			// TODO: do stuff
+		}
+	}
+
+	if (fLeft || fRight) {
+		if (fLeft) {
+			leftState.ulButtonPressed |= (fMenu << 1);
+			//UpdateSenseController(vr::TrackedControllerRole_LeftHand, leftState);
+		}
+		if (fRight) {
+			rightState.ulButtonPressed |= (fMenu << 1);
+			UpdateSenseController(vr::TrackedControllerRole_RightHand, rightState);
 		}
 	}
 

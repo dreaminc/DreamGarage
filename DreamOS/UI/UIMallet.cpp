@@ -7,8 +7,6 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 {
 	// default
 	m_radius = 0.015f;
-	m_pHead = m_pDreamOS->AddSphere(m_radius, 20.0f, 20.0f);
-	m_pHead->SetVisible(false);
 	m_headOffset = point(0.0f, MALLET_RADIUS * sin(MALLET_ANGLE), -MALLET_RADIUS * cos(MALLET_RADIUS));
 
 	// TODO: move to hmd setting mallet offsets
@@ -18,7 +16,14 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 			m_radius = 0.015f;
 			m_headOffset = point(0.0f, 0.0f, 0.0f);
 		}
+		else if (pHMD->GetDeviceType() == HMDDeviceType::VIVE) {
+			m_radius = 0.015f;
+			m_headOffset = point(0.0f, MALLET_RADIUS * sin(MALLET_ANGLE), -MALLET_RADIUS * cos(MALLET_RADIUS));
+		}
 	}
+
+	m_pHead = m_pDreamOS->AddSphere(m_radius, 20.0f, 20.0f);
+	m_pHead->SetVisible(false);
 }
 
 UIMallet::~UIMallet() {}
