@@ -4,8 +4,7 @@
 #include "Primitives/point.h"
 #include "Primitives/dirty.h"
 
-#define MALLET_ANGLE (203.0f * (float)(M_PI) / 180.0f)
-#define MALLET_RADIUS 0.2f
+#define MALLET_RADIUS 0.015f
 
 class DreamOS;
 class sphere;
@@ -25,6 +24,8 @@ public:
 
 private:
 	float m_radius;
+	float m_distance;
+	float m_angle;
 	sphere *m_pHead;
 	point m_headOffset;
 	DreamOS *m_pDreamOS;

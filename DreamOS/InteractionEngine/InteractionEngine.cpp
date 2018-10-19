@@ -854,7 +854,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	//TODO:  Expand this to accommodate for left controller
-	if(pEvent->state.type == CONTROLLER_RIGHT) {
+//	if(pEvent->state.type == CONTROLLER_RIGHT) {
 		switch (pEvent->type) {
 			case SENSE_CONTROLLER_TRIGGER_UP: {
 				for(auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
@@ -902,7 +902,7 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 				}
 			} break;
 		}
-	}
+//	}
 
 Error:
 	return r;

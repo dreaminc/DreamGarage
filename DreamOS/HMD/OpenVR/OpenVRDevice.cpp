@@ -465,8 +465,8 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
 		CBR(m_pLeftController != nullptr, R_SKIPPED);
-		//cState.type = CONTROLLER_LEFT;
-		cState.type = CONTROLLER_RIGHT;
+		cState.type = CONTROLLER_LEFT;
+		//cState.type = CONTROLLER_RIGHT;
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		CBR(m_pRightController != nullptr, R_SKIPPED);
@@ -512,12 +512,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 		HandleVREvent(vrEvent);
 	}
 
-	vr::VRControllerState_t leftState;
-	vr::VRControllerState_t rightState;
-	int trackedControllers = 0;
-	bool fLeft = false;
-	bool fRight = false;
-	bool fMenu = false;
+	uint32_t currentFrame = 0;
 
 	// Process SteamVR controller state
 	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
@@ -548,23 +543,11 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		if (m_pIVRHMD->GetControllerState(unDevice, &state, sizeof(vr::VRControllerState_t))) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
-				uint32_t currentFrame = state.unPacketNum;
+				currentFrame = state.unPacketNum;
 
 				if (currentFrame != m_vrFrameCount) {
-					m_vrFrameCount = currentFrame;
 
-//					UpdateSenseController(controllerRole, state);
-					trackedControllers++;
-					if (controllerRole == vr::TrackedControllerRole_LeftHand) {
-						leftState = state;
-						fLeft = true;
-						fMenu = fMenu || (leftState.ulButtonPressed & (1 << 1)) != 0;
-					}
-					else if (controllerRole == vr::TrackedControllerRole_RightHand) {
-						rightState = state;
-						fRight = true;
-						fMenu = fMenu || (rightState.ulButtonPressed & (1 << 1)) != 0;
-					}
+					UpdateSenseController(controllerRole, state);
 				}
 			}
 
@@ -573,15 +556,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 		}
 	}
 
-	if (fLeft || fRight) {
-		if (fLeft) {
-			leftState.ulButtonPressed |= (fMenu << 1);
-			//UpdateSenseController(vr::TrackedControllerRole_LeftHand, leftState);
-		}
-		if (fRight) {
-			rightState.ulButtonPressed |= (fMenu << 1);
-			UpdateSenseController(vr::TrackedControllerRole_RightHand, rightState);
-		}
+	if (currentFrame != 0) {
+		m_vrFrameCount = currentFrame;
 	}
 
 
