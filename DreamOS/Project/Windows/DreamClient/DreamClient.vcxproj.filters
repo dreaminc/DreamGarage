@@ -162,13 +162,13 @@
     <None Include="PropertySheet.props">
       <Filter>NuGet</Filter>
     </None>
-    <None Include="..\DreamOS\DreamClient.development.nuspec">
-      <Filter>NuGet</Filter>
-    </None>
     <None Include="..\DreamOS\DreamClient.production.nuspec">
       <Filter>NuGet</Filter>
     </None>
     <None Include="..\DreamOS\DreamClient.oculus.nuspec">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="..\DreamOS\DreamClient.staging.nuspec">
       <Filter>NuGet</Filter>
     </None>
   </ItemGroup>
