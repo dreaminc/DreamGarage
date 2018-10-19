@@ -436,8 +436,10 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	//0x0400 - Left stick press
 	//0x100000 - Left menu
 
-	// B and Y spawn the menu event
-	cState.fMenu = ((inputState.Buttons & 1<<1) != 0);
+	// A, B, X, Y, and Left menu (hamburger) spawn the menu event
+	cState.fMenu = ((inputState.Buttons & 1) != 0);
+	cState.fMenu = ((inputState.Buttons & 1<<1) != 0) || cState.fMenu;
+	cState.fMenu = ((inputState.Buttons & 1<<8) != 0) || cState.fMenu;
 	cState.fMenu = ((inputState.Buttons & 1<<9) != 0) || cState.fMenu;
 	cState.fMenu = (inputState.Buttons & 1<<20) != 0 || cState.fMenu;
 

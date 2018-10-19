@@ -1532,7 +1532,9 @@ RESULT DreamGarage::OnLogout() {
 
 	CRM(m_pDreamUserControlArea->ShutdownAllSources(), "failed to shutdown source");
 
-	CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+	if (m_pDreamUserApp->GetBrowserManager() != nullptr) {
+		CRM(m_pDreamUserApp->GetBrowserManager()->DeleteCookies(), "deleting cookies failed");
+	}
 
 	CR(PendClearHands());
 
