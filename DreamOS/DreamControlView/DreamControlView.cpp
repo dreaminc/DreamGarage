@@ -460,6 +460,7 @@ RESULT DreamControlView::ShowKeyboard() {
 	//maintain the keyboard handle until the keyboard is hidden
 	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
 	CNM(pKeyboardApp, "keyboard not available");
+	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
 
 	CR(pKeyboardApp->Show());
 

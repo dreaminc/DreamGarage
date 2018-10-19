@@ -16,7 +16,7 @@ public:
 	~UIMallet();
 
 public:
-	Initialize();
+	RESULT Initialize();
 
 	RESULT Show();
 	RESULT Hide();

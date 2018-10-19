@@ -25,8 +25,8 @@ RESULT UIMallet::Initialize() {
 
 			} break;
 			case HMDDeviceType::VIVE: {
-				m_distance = 0.16f;
-				m_angle = -20.0f * (float)(M_PI) / 180.0f;
+				m_distance = 0.2f;
+				m_angle = -60.0f * (float)(M_PI) / 180.0f;
 			} break;
 			case HMDDeviceType::META: {
 				m_distance = 0.0f;
