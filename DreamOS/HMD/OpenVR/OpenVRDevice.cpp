@@ -512,7 +512,12 @@ RESULT OpenVRDevice::UpdateHMD() {
 		HandleVREvent(vrEvent);
 	}
 
-	uint32_t currentFrame = 0;
+	vr::VRControllerState_t leftState;
+	vr::VRControllerState_t rightState;
+	bool fLeft = false;
+	bool fRight = false;
+	bool fMenu = false;
+	uint32_t currentFrame;
 
 	// Process SteamVR controller state
 	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
@@ -546,8 +551,21 @@ RESULT OpenVRDevice::UpdateHMD() {
 				currentFrame = state.unPacketNum;
 
 				if (currentFrame != m_vrFrameCount) {
+//					m_vrFrameCount = currentFrame;
 
-					UpdateSenseController(controllerRole, state);
+					//UpdateSenseController(controllerRole, state);
+
+					// unify button states for menu press
+					if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+						leftState = state;
+						fLeft = true;
+						fMenu = fMenu || (leftState.ulButtonPressed & (1 << 1)) != 0;
+					}
+					else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+						rightState = state;
+						fRight = true;
+						fMenu = fMenu || (rightState.ulButtonPressed & (1 << 1)) != 0;
+					}
 				}
 			}
 
@@ -556,7 +574,17 @@ RESULT OpenVRDevice::UpdateHMD() {
 		}
 	}
 
-	if (currentFrame != 0) {
+	if (fLeft || fRight) {
+		if (fLeft) {
+			leftState.ulButtonPressed |= (fMenu << 1);
+			UpdateSenseController(vr::TrackedControllerRole_LeftHand, leftState);
+		}
+		if (fRight) {
+			rightState.ulButtonPressed |= (fMenu << 1);
+			UpdateSenseController(vr::TrackedControllerRole_RightHand, rightState);
+		}
+
+		// update the frame count if either controller had an update
 		m_vrFrameCount = currentFrame;
 	}
 

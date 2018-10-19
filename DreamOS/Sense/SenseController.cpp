@@ -62,7 +62,10 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 		eventType = SENSE_CONTROLLER_MENU_UP;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	currentState->fMenu = controllerState.fMenu;
+
+	m_controllerStates[CONTROLLER_LEFT].fMenu = controllerState.fMenu;
+	m_controllerStates[CONTROLLER_RIGHT].fMenu = controllerState.fMenu;
+	//currentState->fMenu = controllerState.fMenu;
 
 	//TODO:
 	currentState->fClosed = controllerState.fClosed;

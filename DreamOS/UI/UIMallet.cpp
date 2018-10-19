@@ -14,7 +14,7 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 		switch (pHMD->GetDeviceType()) {
 			case HMDDeviceType::OCULUS: {
 				m_distance = 0.2f;
-				m_angle = 203.0f * (float)(M_PI) / 180.0f;
+				m_angle = -23.0f * (float)(M_PI) / 180.0f;
 
 			} break;
 			case HMDDeviceType::VIVE: {
