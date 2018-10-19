@@ -92,7 +92,6 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, 
 
 	// Eye Widths
 	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
-	//m_pIVRHMD->Set
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 	
@@ -466,7 +465,6 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
 		CBR(m_pLeftController != nullptr, R_SKIPPED);
 		cState.type = CONTROLLER_LEFT;
-		//cState.type = CONTROLLER_RIGHT;
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
 		CBR(m_pRightController != nullptr, R_SKIPPED);
@@ -488,7 +486,7 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 			uint64_t flag = (uint64_t)1 << 33;
 			cState.fMenu = (state.ulButtonPressed & flag) != 0;
 			cState.fClosed = (state.ulButtonPressed & flag) != 0;
-			cState.triggerRange = 0.0f;LeftHand
+			cState.triggerRange = 0.0f;
 			cState.ptTouchpad = point(0.0f, 0.0f, 0.0f);
 		} break;
 		//*/

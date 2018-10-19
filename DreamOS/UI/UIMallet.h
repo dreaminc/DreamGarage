@@ -16,6 +16,8 @@ public:
 	~UIMallet();
 
 public:
+	Initialize();
+
 	RESULT Show();
 	RESULT Hide();
 	sphere* GetMalletHead();

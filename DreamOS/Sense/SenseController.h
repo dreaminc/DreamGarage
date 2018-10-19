@@ -71,7 +71,7 @@ public:
 
 public:
 	ControllerState GetControllerState(ControllerType type);
-	virtual RESULT SetControllerState(ControllerState controllerState);
+	RESULT SetControllerState(ControllerState controllerState);
 
 private:
 	std::map<ControllerType, ControllerState> m_controllerStates;
