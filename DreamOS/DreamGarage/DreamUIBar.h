@@ -12,8 +12,9 @@
 
 #include "Primitives/Subscriber.h"
 
-#include "DreamUserApp.h"
 #include "UI/UISpatialScrollView.h"
+
+#include "DreamUserApp.h"
 
 #include <functional>
 #include <stack>
@@ -192,9 +193,6 @@ private:
 	UID m_keyboardUID;
 	UID m_browserUID;
 	UID m_userUID;
-
-	DreamUserHandle *m_pUserHandle = nullptr;
-	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	DreamUserControlArea *m_pParentApp = nullptr;
 	std::shared_ptr<volume> m_pVolume = nullptr;

@@ -118,8 +118,6 @@ private:
 	DreamShareViewMessage::type m_currentMessageType;
 	DreamShareViewMessage::type m_currentAckType;
 
-	DreamUserHandle* m_pDreamUserHandle = nullptr;
-
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
 

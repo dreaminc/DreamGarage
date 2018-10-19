@@ -9,7 +9,6 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "WebBrowser/WebBrowserController.h"
 #include "DreamUserApp.h"
-#include "UIControlBar.h"
 
 #include "DreamGarage/UICommon.h"
 
@@ -57,12 +56,11 @@ protected:
 	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	RESULT InitializeWithUserApp(DreamUserApp *pParent);
+	RESULT InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent);
 	
 // DreamAppHandle
 public:
 	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
-	RESULT SetContentType(std::string strContentType);
 
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
@@ -125,18 +123,11 @@ private:
 	texture* m_pBackgroundTexture = nullptr;
 
 	texture* m_pLoadingScreenTexture = nullptr;
-	std::shared_ptr<UIControlBar> m_pControlBar = nullptr;
 
 	std::string m_strURL = "";
 
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
-
-	DreamUserApp *m_pDreamUserApp = nullptr;
-	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
-
-	UID m_browserUID;
-	UID m_userUID;	
 
 	bool m_fMouseDown[2];
 	bool m_fMouseDrag = false;
@@ -164,8 +155,6 @@ private:
 	point m_ptVisiblePosition;	
 	quaternion m_qViewQuadOrientation;
 	std::string m_strText;
-
-	BarType m_currentControlBarType;
 };
 
 #endif // ! DREAM_CONTROL_VIEW_H_

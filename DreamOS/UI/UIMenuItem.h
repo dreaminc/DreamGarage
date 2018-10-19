@@ -67,7 +67,6 @@ public:
 
 	RESULT Initialize();
 
-	std::shared_ptr<composite> GetContext();
 	std::shared_ptr<quad> GetQuad();
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);

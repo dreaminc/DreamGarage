@@ -1,0 +1,90 @@
+#ifndef DREAM_CONTROL_BAR_H_
+#define DREAM_CONTROL_BAR_H_
+
+#include "RESULT/EHM.h"
+
+#include "UI/UIView.h"
+
+#include "DreamGarage/UICommon.h"
+
+//#include "DreamUserControlArea/DreamUserControlArea.h"
+class DreamUserControlArea;
+class text;
+
+//All relative to parent app
+#define URL_WIDTH 0.5484
+
+class UserAreaControls : public UIView {
+
+public:
+	UserAreaControls(HALImp *pHALImp, DreamOS *pDreamOS);
+	~UserAreaControls();
+
+	// DreamApp
+public:
+	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT InitializeText();
+	RESULT Update();
+
+	// ControlBarObserver
+public:
+	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext);
+	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext);
+
+	// Update functions specific to this type of control bar
+	RESULT SetSharingFlag(bool fIsSharing);
+	RESULT SetTitleText(const std::string& strTitle);
+	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
+	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
+
+	std::shared_ptr<text> GetURLText();
+
+// Animations
+public:
+	RESULT Show();
+	RESULT Hide();
+
+private:
+	const wchar_t *k_wszBack = L"control-view-back.png";
+	const wchar_t *k_wszBackDisabled = L"browser-control-back-disabled.png";
+	const wchar_t *k_wszForward = L"control-view-forward.png";
+	const wchar_t *k_wszForwardDisabled = L"browser-control-forward-disabled.png";
+	const wchar_t *k_wszOpen = L"control-view-open.png";
+	const wchar_t *k_wszClose = L"control-view-close.png";
+	const wchar_t *k_wszShare = L"control-view-share.png";
+	const wchar_t *k_wszStopSharing = L"control-view-stop-sharing.png";
+	const wchar_t *k_wszHide = L"control-view-minimize.png";
+	const wchar_t *k_wszShow = L"control-view-maximize.png";
+	const wchar_t *k_wszURL = L"control-view-url.png";
+	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
+
+private:
+
+	DreamUserControlArea* m_pParentApp = nullptr;
+
+	std::shared_ptr<text> m_pURLText = nullptr;
+	bool m_fUpdateTitle = false;
+	std::string m_strUpdateTitle = "";
+
+	double m_buttonWidth = ITEM_SIZE;
+	double m_buttonHeight = ITEM_SIZE;
+	double m_spacingSize;
+	double m_urlWidth = URL_WIDTH;
+	double m_urlHeight = ITEM_SIZE;
+
+	std::shared_ptr<UIButton> m_pBackButton = nullptr;
+	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
+	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+	std::shared_ptr<UIButton> m_pURLButton = nullptr;
+	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
+	std::shared_ptr<UIButton> m_pShareButton = nullptr;
+	std::shared_ptr<UIButton> m_pMinimizeButton = nullptr;
+};
+
+#endif // ! DREAM_CONTROL_BAR_H_

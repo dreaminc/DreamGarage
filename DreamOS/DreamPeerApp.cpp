@@ -339,7 +339,7 @@ RESULT DreamPeerApp::ShowUserNameField() {
 	};	
 
 	m_pUserLabelComposite->SetVisible(true);
-	m_pUIObjectComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetCameraLookXZ()));
+	m_pUIObjectComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), GetDOS()->GetCamera()->GetLookVectorXZ()));
 	//* quaternion::MakeQuaternionWithEuler(vector((90 * (float)M_PI) / 180, 0.0f, 0.0f)));
 	/*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(

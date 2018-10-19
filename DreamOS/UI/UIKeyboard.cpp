@@ -15,79 +15,6 @@
 
 #include "Sound/SoundFile.h"
 
-RESULT UIKeyboardHandle::Show() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowKeyboard());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::Hide() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HideKeyboard());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendUpdateComposite(float depth) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateComposite(depth));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateComposite(depth, ptOrigin, qOrigin));
-Error:
-	return r;
-}
-
-bool UIKeyboardHandle::IsVisible() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return IsKeyboardVisible();
-Error:
-	//TODO: could be a problem because nullptr is equal to false
-	return nullptr;
-}
-
-RESULT UIKeyboardHandle::ShowTitleView() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ShowKeyboardTitleView());
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(UpdateKeyboardTitleView(pIconTexture,strTitle));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::PopulateTextBox(std::string strText) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PopulateKeyboardTextBox(strText));
-Error:
-	return r;
-}
-
-RESULT UIKeyboardHandle::SendPasswordFlag(bool fIsPassword) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetPasswordFlag(fIsPassword));
-Error:
-	return r;
-}
-
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -189,8 +116,6 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
-	CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
-
 	// position keyboard composite
 	//float kbOffset = -(-m_surfaceHeight + pParent->GetTotalHeight() + marginError) / 2.0f;
 	float kbOffset = 0.0f;
@@ -250,15 +175,16 @@ RESULT UIKeyboard::InitializeWithParent(DreamUserControlArea *pParent) {
 
 
 		auto pView = m_pSurfaceContainer->AddUIView(GetDOS());
-		m_pUIControlBar = pView->AddUIControlBar(BarType::KEYBOARD);
+		m_pKeyboardControls = pView->AddUIView();
 
-
-		m_pUIControlBar->RegisterObserver(this);
-		m_pUIControlBar->SetVisible(false, false);
+		//m_pUIControlBar->RegisterObserver(this);
+		m_pKeyboardControls->SetVisible(false, false);
 	}
 
-	InitializeQuadsWithLayout(pLayout);
+	CR(InitializeQuadsWithLayout(pLayout));
 	m_pLayout = pLayout;
+
+	CR(InitializeKeyboardControls());
 
 	m_currentLayout = LayoutType::QWERTY;
 
@@ -363,22 +289,64 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 		colIndex = 0;
 		rowIndex++;
 	}
-	//TODO: make these numbers visible to keyboard
-	float width = m_pParentApp->GetBaseWidth();
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::InitializeKeyboardControls() {
+	RESULT r = R_PASS;
+
+	// sizing specific to keyboard
+	float keyDimension = m_surfaceWidth / (float)m_pLayout->GetKeys()[0].size();
 	float marginError = keyDimension * (1 - m_keyScale);
 	float buttonWidth = keyDimension;
+	float itemSide = keyDimension * m_keyScale;
+	float barButtonWidth = 2.0f * itemSide + marginError;
 
-	m_pUIControlBar->SetTotalWidth(m_surfaceWidth);
-	//m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
-	m_pUIControlBar->SetItemSide(keyDimension * m_keyScale);
-	m_pUIControlBar->SetItemSpacing(marginError);
+	float left = -m_surfaceWidth / 2.0f + marginError / 2.0f;
+	float backTabOffset = left + barButtonWidth/2.0f;
+	float tabOffset = backTabOffset + barButtonWidth + marginError;
 
-	//pLayout->SetVisible(false);
-	CR(m_pUIControlBar->Initialize());
-	CR(m_pUIControlBar->UpdateButtonsWithType(BarType::KEYBOARD));
+	float right = m_surfaceWidth / 2.0f - marginError / 2.0f;
+	float doneOffset = right - barButtonWidth/2.0f;
 
-	m_pUIControlBar->RotateXByDeg(-90.0f);
-	m_pUIControlBar->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
+	m_pKeyboardControls->RotateXByDeg(-90.0f);
+	m_pKeyboardControls->SetPosition(point(0.0f, 0.0f, -(m_surfaceHeight + buttonWidth) / 2.0f));
+
+	auto pTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszTab));
+	auto pCantTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantTab));
+	auto pBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszBackTab));
+	auto pCantBackTab = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszCantBackTab));
+
+	//TODO: use when controlbar is deprecated
+	auto pDone = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszDone));
+
+	CN(pTab);
+	CN(pCantTab);
+	CN(pBackTab);
+	CN(pCantBackTab);
+	CN(pDone)
+
+	m_pNextButton = m_pKeyboardControls->AddButton(tabOffset, barButtonWidth, itemSide,
+		std::bind(&UIKeyboard::HandleTabPressed, this, std::placeholders::_1, std::placeholders::_2),
+		pTab, pCantTab);
+
+	m_pPreviousButton = m_pKeyboardControls->AddButton(backTabOffset, barButtonWidth, itemSide,
+		std::bind(&UIKeyboard::HandleBackTabPressed, this, std::placeholders::_1, std::placeholders::_2),
+		pBackTab, pCantBackTab);
+
+	m_pDoneButton = m_pKeyboardControls->AddButton(doneOffset, barButtonWidth, itemSide,
+		std::bind(&UIKeyboard::HandleDonePressed, this, std::placeholders::_1, std::placeholders::_2),
+		pDone);
+
+	CN(m_pNextButton);
+	CN(m_pPreviousButton);
+	CN(m_pDoneButton);
+
+	m_pNextButton->SetVisible(true);
+	m_pPreviousButton->SetVisible(true);
+	m_pDoneButton->SetVisible(true);
 
 Error:
 	return r;
@@ -405,18 +373,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	std::vector<UIKey*> activeKeysToRemove;
 
-	// skip keyboard interaction if not visible
-	CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
-	if (m_pUserHandle == nullptr) {
-		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-		CB(userUIDs.size() == 1);
-		m_userAppUID = userUIDs[0];
+	std::shared_ptr<DreamUserApp> pDreamUserApp = pDOS->GetUserApp();
+	CN(pDreamUserApp);
 
-		//Capture user app
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
-		CN(m_pUserHandle);
-	}
-	//CBR(m_pUserHandle != nullptr && m_pUserHandle->GetAppState(), R_SKIPPED);
+	// skip keyboard interaction if not visible
+	//CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
+	CBR(GetComposite()->IsVisible(), R_SKIPPED);
+
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
@@ -424,10 +387,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	// Update Keys if the app is active
 	int i = 0;
-	UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+
+
+	UIMallet* pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CNR(pLMallet, R_SKIPPED);
-	UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	UIMallet* pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CNR(pRMallet, R_SKIPPED);
+
+	CBR(m_pSurface, R_SKIPPED);
 
 	//  Note: this predictive collision functionality is duplicated in control view
 	for (auto &mallet : { pLMallet, pRMallet })
@@ -548,16 +515,12 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 	return R_PASS;
 }
 
-DreamAppHandle* UIKeyboard::GetAppHandle() {
-	return (UIKeyboardHandle*)(this);
-}
-
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	UIKeyboard *pUIKeyboard = new UIKeyboard(pDreamOS, pContext);
 	return pUIKeyboard;
 }
 
-RESULT UIKeyboard::ShowKeyboard() {
+RESULT UIKeyboard::Show() {
 	RESULT r = R_PASS;
 
 
@@ -573,7 +536,6 @@ RESULT UIKeyboard::ShowKeyboard() {
 		m_pHeaderContainer->SetVisible(false);
 		//m_pTitleIcon->SetVisible(false);
 		//m_pTitleText->SetVisible(false);
-		CR(SetAnimatingState(UIKeyboard::state::ANIMATING));
 
 	Error:
 		return r;
@@ -581,24 +543,20 @@ RESULT UIKeyboard::ShowKeyboard() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		CR(UpdateKeyState((SenseVirtualKey)(0), 1));	// To refresh textbox
 		CR(UpdateKeyState((SenseVirtualKey)(0), 0));
-		CR(SetAnimatingState(UIKeyboard::state::VISIBLE));
 
-		if (m_pUserHandle == nullptr) {
-			auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
-			CB(userUIDs.size() == 1);
-			m_userAppUID = userUIDs[0];
+		pDreamUserApp = GetDOS()->GetUserApp();
+		CNR(pDreamUserApp, R_SKIPPED);
 
-			//Capture user app
-			m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userAppUID, this));
-			CN(m_pUserHandle);
-		}
-		UIMallet* pLMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+		UIMallet* pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 		CNR(pLMallet, R_SKIPPED);
-		UIMallet* pRMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+		UIMallet* pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 		CNR(pRMallet, R_SKIPPED);
 
 		pLMallet->SetDirty();
@@ -626,7 +584,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::HideKeyboard() {
+RESULT UIKeyboard::Hide() {
 
 	RESULT r = R_PASS;
 
@@ -635,13 +593,12 @@ RESULT UIKeyboard::HideKeyboard() {
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false, false);
-		m_pUIControlBar->SetVisible(false, false);
+		m_pKeyboardControls->SetVisible(false, false);
 		// full press of key that clears whole string
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 0));
 		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
 
 		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
-		CR(SetAnimatingState(UIKeyboard::state::HIDDEN));
 
 	Error:
 		return r;
@@ -667,17 +624,7 @@ RESULT UIKeyboard::HideKeyboard() {
 }
 
 bool UIKeyboard::IsVisible() {
-	if (m_keyboardState != UIKeyboard::state::HIDDEN) {
-		return true;
-	}
-
-	else {
-		return false;
-	}
-}
-
-bool UIKeyboard::IsKeyboardVisible() {
-	return IsVisible();
+	return GetComposite()->IsVisible();
 }
 
 RESULT UIKeyboard::SetVisible(bool fVisible) {
@@ -769,11 +716,6 @@ RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT UIKeyboard::SetAnimatingState(UIKeyboard::state keyboardState) {
-	m_keyboardState = keyboardState;
-	return R_PASS;
-}
-
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	RESULT r = R_PASS;
 
@@ -808,13 +750,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 
 	else if (chkey == SVK_RETURN) {
 		m_pTextBoxText->SetText("");
-		//TODO: it is possible that when the menu button is pressed again, 
-		// the user is at the root menu by coincidence.  may need to notify
-		// DreamUIBar in some way in the future
 
-		//HideKeyboard();
-		//m_pUserHandle->SendKBEnterEvent();
-		m_pUserHandle->SendUserObserverEvent(UserObserverEventType::KB_ENTER);
+		std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+		CN(pDreamUserApp);
+		pDreamUserApp->HandleUserObserverEvent(UserObserverEventType::KB_ENTER);
 	}
 
 	else if (chkey == 0x01) {
@@ -870,7 +809,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) {
+RESULT UIKeyboard::UpdateTitleView(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 	m_pHeaderContainer->SetVisible(true);
 	//m_pTitleIcon->SetVisible(true);
@@ -885,7 +824,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::ShowKeyboardTitleView() {
+RESULT UIKeyboard::ShowTitleView() {
 	RESULT r = R_PASS;
 	CR(m_pHeaderContainer->SetVisible(true));
 	//CR(m_pTitleIcon->SetVisible(true));
@@ -897,7 +836,7 @@ Error:
 RESULT UIKeyboard::ShowBrowserButtons() {
 	RESULT r = R_PASS;
 
-	CR(m_pUIControlBar->SetVisible(true, false));
+	CR(m_pKeyboardControls->SetVisible(true, false));
 
 Error:
 	return r;
@@ -918,9 +857,11 @@ RESULT UIKeyboard::UpdateComposite(float depth) {
 
 	point ptOrigin;
 	quaternion qOrigin;
-	CN(m_pUserHandle);
-	CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-	CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
+
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CN(pDreamUserApp);
+	CR(pDreamUserApp->GetAppBasisPosition(ptOrigin));
+	CR(pDreamUserApp->GetAppBasisOrientation(qOrigin));
 
 	GetComposite()->SetPosition(ptOrigin + ptkbOffset);
 	GetComposite()->SetOrientation(qOrigin);
@@ -1104,21 +1045,11 @@ Error:
 	return r;
 }
 
-std::shared_ptr<UIControlBar> UIKeyboard::GetControlBar() {
-	return m_pUIControlBar;
-}
-
 RESULT UIKeyboard::UpdateTabNextTexture(bool fCanTabNext) {
 	RESULT r = R_PASS;
 
-	m_fCanTabNext = fCanTabNext;
-	auto pButton = m_pUIControlBar->GetTabButton();
-	if (fCanTabNext) {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetTabTexture()));
-	}
-	else {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetCantTabTexture()));
-	}
+	CN(m_pNextButton);
+	CR(m_pNextButton->SetEnabledFlag(fCanTabNext));
 
 Error:
 	return r;
@@ -1126,14 +1057,8 @@ Error:
 RESULT UIKeyboard::UpdateTabPreviousTexture(bool fCanTabPrevious) {
 	RESULT r = R_PASS;
 
-	m_fCanTabPrevious = fCanTabPrevious;
-	auto pButton = m_pUIControlBar->GetBackTabButton();
-	if (fCanTabPrevious) {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetBackTabTexture()));
-	}
-	else {
-		CR(pButton->GetSurface()->SetDiffuseTexture(m_pUIControlBar->GetCantBackTabTexture()));
-	}
+	CN(m_pPreviousButton);
+	CR(m_pPreviousButton->SetEnabledFlag(fCanTabPrevious));
 
 Error:
 	return r;

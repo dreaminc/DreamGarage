@@ -29,7 +29,6 @@ class UIMallet;
 class DimRay;
 class VirtualObj;
 class UIKeyboard;
-class UIKeyboardHandle;
 class DimObj;
 class user;
 
@@ -67,56 +66,7 @@ public:
 	virtual texture* GetOverlayTexture(HAND_TYPE type);
 };
 
-class DreamUserHandle : public DreamAppHandle {
-public:
-	//TODO: this is unsafe, since the mallets can be used later, 
-	// this function could return a handle to a mallet
-	UIMallet *RequestMallet(HAND_TYPE type);
-	RESULT RequestHapticImpulse(VirtualObj *pEventObj);
-
-	RESULT RequestAppBasisPosition(point& ptOrigin);
-	RESULT RequestAppBasisOrientation(quaternion& qOrigin);
-
-	RESULT SendSetPreviousApp(DreamUserObserver* pObserver);
-
-	RESULT SendKBEnterEvent();
-	RESULT SendUserObserverEvent(UserObserverEventType type);
-	UIKeyboardHandle *RequestKeyboard();
-	RESULT SendReleaseKeyboard();
-
-	RESULT RequestStreamingState(bool& fStreaming);
-	RESULT SendStreamingState(bool fStreaming);
-	RESULT SendPreserveSharingState(bool fIsSharing);
-
-	RESULT SendStopSharing();
-
-	RESULT RequestResetAppComposite();
-
-private:
-	virtual UIMallet *GetMallet(HAND_TYPE type) = 0;
-	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) = 0;
-
-	virtual RESULT GetAppBasisPosition(point& ptOrigin) = 0;
-	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) = 0;
-
-	virtual RESULT SetPreviousApp(DreamUserObserver* pObserver) = 0;
-
-	virtual RESULT HandleKBEnterEvent() = 0;
-	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) = 0;
-	virtual UIKeyboardHandle *GetKeyboard() = 0;
-	virtual RESULT ReleaseKeyboard() = 0;
-
-	virtual RESULT GetStreamingState(bool& fStreaming) = 0;
-	virtual RESULT SetStreamingState(bool fStreaming) = 0;
-	virtual RESULT PreserveSharingState(bool fIsSharing) = 0;
-
-	virtual RESULT StopSharing() = 0;
-
-	virtual RESULT ResetAppComposite() = 0;
-
-};
-
-class DreamUserApp : public DreamApp<DreamUserApp>, public DreamUserHandle, public Subscriber<InteractionObjectEvent> {
+class DreamUserApp : public DreamApp<DreamUserApp>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
@@ -132,39 +82,32 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual DreamAppHandle *GetAppHandle() override;
-	virtual unsigned int GetHandleLimit() override;
-
 protected:
 	static DreamUserApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
-	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+	virtual RESULT Notify(InteractionObjectEvent *mEvent);
 
 	RESULT SetHand(hand* pHand);
 	RESULT ClearHands();
 
-	virtual UIMallet *GetMallet(HAND_TYPE type) override;
+	UIMallet *GetMallet(HAND_TYPE type);
 	hand *GetHand(HAND_TYPE type);
-	virtual RESULT CreateHapticImpulse(VirtualObj *pEventObj) override;
+	RESULT CreateHapticImpulse(VirtualObj *pEventObj);
 
-	virtual RESULT GetAppBasisPosition(point& ptOrigin) override;
-	virtual RESULT GetAppBasisOrientation(quaternion& qOrigin) override;
+	RESULT GetAppBasisPosition(point& ptOrigin);
+	RESULT GetAppBasisOrientation(quaternion& qOrigin) ;
 
-	virtual RESULT SetPreviousApp(DreamUserObserver* pObserver) override;
+	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
 
-	virtual RESULT HandleKBEnterEvent() override;
-	virtual RESULT HandleUserObserverEvent(UserObserverEventType type) override;
-	virtual UIKeyboardHandle *GetKeyboard() override;
-	virtual RESULT ReleaseKeyboard() override;
+	RESULT HandleKBEnterEvent();
+	RESULT HandleUserObserverEvent(UserObserverEventType type);
 
-	virtual RESULT GetStreamingState(bool& fStreaming) override;
-	virtual RESULT SetStreamingState(bool fStreaming) override;
-	virtual RESULT PreserveSharingState(bool fIsSharing) override;
+	RESULT GetStreamingState(bool& fStreaming);
+	RESULT SetStreamingState(bool fStreaming);
+	RESULT PreserveSharingState(bool fIsSharing);
 
-	virtual RESULT StopSharing() override;
-
-	virtual RESULT ResetAppComposite() override;
+	RESULT ResetAppComposite();
 	RESULT SetAppCompositeOrientation(quaternion qOrientation);
 	RESULT SetAppCompositePosition(point ptPosition);
 
@@ -260,8 +203,6 @@ private:
 	// current app that should receive events from the user
 	DreamUserObserver* m_pEventApp = nullptr;
 	DreamUserObserver* m_pPreviousApp = nullptr;
-
-	UIKeyboardHandle *m_pKeyboardHandle = nullptr;
 
 	// reflection of the member 
 	bool m_fStreaming = false;

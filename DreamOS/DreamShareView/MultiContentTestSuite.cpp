@@ -1201,7 +1201,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
 			RESULT r = R_PASS;
 
-			pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();
+			pUserControlArea->GetDOS()->GetKeyboardApp()->Show();
 			m_height = height;
 			m_depth = depth;
 			m_scale = scale;
@@ -1478,7 +1478,7 @@ RESULT MultiContentTestSuite::AddTestAllUIObjects() {
 			pDreamUIBar->ResetAppComposite();
 			pTestContext->pUserControlArea->ResetAppComposite();
 
-			pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show();		
+			pTestContext->pUserControlArea->GetDOS()->GetKeyboardApp()->Show();		
 		}
 	Error:
 		return r;

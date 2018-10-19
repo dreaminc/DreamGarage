@@ -853,55 +853,52 @@ Error:
 RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	//TODO:  Expand this to accommodate for left controller
-	if(pEvent->state.type == CONTROLLER_RIGHT) {
-		switch (pEvent->type) {
-			case SENSE_CONTROLLER_TRIGGER_UP: {
-				for(auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
+	switch (pEvent->type) {
+		case SENSE_CONTROLLER_TRIGGER_UP: {
+			for(auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
 
-					InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
-					InteractionObjectEvent interactionEvent(type, pObject);
+				InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
+				InteractionObjectEvent interactionEvent(type, pObject);
 
-					CR(NotifySubscribers(pObject, type, &interactionEvent));
-				}
-			} break;
+				CR(NotifySubscribers(pObject, type, &interactionEvent));
+			}
+		} break;
 
-			case SENSE_CONTROLLER_TRIGGER_DOWN: {
-				for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
+		case SENSE_CONTROLLER_TRIGGER_DOWN: {
+			for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
 
-					InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
-					InteractionObjectEvent interactionEvent(type, pObject);
+				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
+				InteractionObjectEvent interactionEvent(type, pObject);
 
-					CR(NotifySubscribers(pObject, type, &interactionEvent));
-				}
-			} break;
+				CR(NotifySubscribers(pObject, type, &interactionEvent));
+			}
+		} break;
 
-			case SENSE_CONTROLLER_MENU_UP: {
-				InteractionEventType type = INTERACTION_EVENT_MENU;
-				InteractionObjectEvent interactionEvent(type);
+		case SENSE_CONTROLLER_MENU_UP: {
+			InteractionEventType type = INTERACTION_EVENT_MENU;
+			InteractionObjectEvent interactionEvent(type);
+
+			CR(NotifySubscribers(type, &interactionEvent));
+		} break;
+
+		case SENSE_CONTROLLER_PAD_MOVE: {
+			// Keeps decimal in accumulator, moves value into touchY
+			m_interactionPadAccumulator += pEvent->state.ptTouchpad.y();
+			double touchY = m_interactionPadAccumulator;
+			m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
+
+			for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+				VirtualObj *pObject = pActiveObject->GetObject();
+
+				InteractionEventType type = INTERACTION_EVENT_WHEEL;
+				InteractionObjectEvent interactionEvent(type, pObject);
+				interactionEvent.SetValue((int)(touchY));
 
 				CR(NotifySubscribers(type, &interactionEvent));
-			} break;
-
-			case SENSE_CONTROLLER_PAD_MOVE: {
-				// Keeps decimal in accumulator, moves value into touchY
-				m_interactionPadAccumulator += pEvent->state.ptTouchpad.y();
-				double touchY = m_interactionPadAccumulator;
-				m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
-
-				for (auto &pActiveObject : m_activeObjectQueues[ActiveObject::type::INTERSECT].FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
-					VirtualObj *pObject = pActiveObject->GetObject();
-
-					InteractionEventType type = INTERACTION_EVENT_WHEEL;
-					InteractionObjectEvent interactionEvent(type, pObject);
-					interactionEvent.SetValue((int)(touchY));
-
-					CR(NotifySubscribers(type, &interactionEvent));
-				}
-			} break;
-		}
+			}
+		} break;
 	}
 
 Error:

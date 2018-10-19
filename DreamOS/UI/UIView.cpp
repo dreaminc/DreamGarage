@@ -5,7 +5,7 @@
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
-#include "DreamControlView/UIControlBar.h"
+#include "DreamGarage/UserAreaControls.h"
 
 #include "DreamOS.h"
 
@@ -104,6 +104,43 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIButton> UIView::MakeUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	std::shared_ptr<UIButton> pButton(new UIButton(m_pHALImp, m_pDreamOS, width, height, pEnabledTexture, pDisabledTexture));
+
+	return pButton;
+}
+
+std::shared_ptr<UIButton> UIView::AddUIButton(std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture, float width, float height) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = MakeUIButton(pEnabledTexture, pDisabledTexture, width, height);
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIButton> UIView::AddButton(float offset, float width, float height, std::function<RESULT(UIButton*, void*)> fnCallback, std::shared_ptr<texture> pEnabledTexture, std::shared_ptr<texture> pDisabledTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIButton> pButton = AddUIButton(pEnabledTexture, pDisabledTexture, width, height);
+
+	pButton->SetPosition(point(offset, 0.0f, 0.0f));
+
+	// if there isn't a trigger callback provided, 
+	// the button doesn't need to be interactable at all
+	if (fnCallback != nullptr) {
+		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
+		CR(pButton->RegisterTouchStart());
+		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER, fnCallback));
+	}
+	
+	return pButton;
+Error:
+	return nullptr;
+}
+
+
 std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
 	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp, m_pDreamOS));
 
@@ -136,16 +173,16 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIControlBar> UIView::MakeUIControlBar(BarType barType) {
-	std::shared_ptr<UIControlBar> pControlBar(new UIControlBar(m_pHALImp, m_pDreamOS, barType));
+std::shared_ptr<UserAreaControls> UIView::MakeUIContentControlBar() {
+	std::shared_ptr<UserAreaControls> pControlBar(new UserAreaControls(m_pHALImp, m_pDreamOS));
 
 	return pControlBar;
 }
 
-std::shared_ptr<UIControlBar> UIView::AddUIControlBar(BarType barType) {
+std::shared_ptr<UserAreaControls> UIView::AddUIContentControlBar() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIControlBar> pControlBar = MakeUIControlBar(barType);
+	std::shared_ptr<UserAreaControls> pControlBar = MakeUIContentControlBar();
 	CR(AddObject(pControlBar));
 	return pControlBar;
 Error:

@@ -16,120 +16,6 @@ texture *DreamUserObserver::GetOverlayTexture(HAND_TYPE type) {
 	return nullptr;
 }
 
-UIMallet *DreamUserHandle::RequestMallet(HAND_TYPE type) {
-	RESULT r = R_PASS;
-
-	CB(GetAppState());
-
-	return GetMallet(type);
-Error:
-	return nullptr;
-}
-
-RESULT DreamUserHandle::RequestHapticImpulse(VirtualObj *pEventObj) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(CreateHapticImpulse(pEventObj));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::RequestAppBasisPosition(point& ptOrigin) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(GetAppBasisPosition(ptOrigin));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::RequestAppBasisOrientation(quaternion& qOrigin) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(GetAppBasisOrientation(qOrigin));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendSetPreviousApp(DreamUserObserver* pObserver) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetPreviousApp(pObserver));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendStopSharing() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(StopSharing());
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendKBEnterEvent() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HandleKBEnterEvent());
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendUserObserverEvent(UserObserverEventType type) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(HandleUserObserverEvent(type));
-Error:
-	return r;
-}
-
-UIKeyboardHandle* DreamUserHandle::RequestKeyboard() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	return GetKeyboard();
-Error:
-	return nullptr;
-}
-
-RESULT DreamUserHandle::SendReleaseKeyboard() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ReleaseKeyboard());
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::RequestStreamingState(bool& fStreaming) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(GetStreamingState(fStreaming));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendStreamingState(bool fStreaming) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(SetStreamingState(fStreaming));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::SendPreserveSharingState(bool fIsSharing) {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(PreserveSharingState(fIsSharing));
-Error:
-	return r;
-}
-
-RESULT DreamUserHandle::RequestResetAppComposite() {
-	RESULT r = R_PASS;
-	CB(GetAppState());
-	CR(ResetAppComposite());
-Error:
-	return r;
-}
-
 DreamUserApp::DreamUserApp(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUserApp>(pDreamOS, pContext)
 {
@@ -268,14 +154,6 @@ Error:
 	return r;
 }
 
-DreamAppHandle* DreamUserApp::GetAppHandle() {
-	return (DreamUserHandle*)(this);
-}
-
-unsigned int DreamUserApp::GetHandleLimit() {
-	return -1;
-}
-
 RESULT DreamUserApp::ToggleUserModel() {
 	RESULT r = R_PASS;
 
@@ -310,13 +188,6 @@ RESULT DreamUserApp::Update(void *pContext) {
 	auto pCameraNode = GetDOS()->GetCameraNode();
 	CN(pCameraNode);
 
-	if (m_pKeyboardHandle == nullptr) {
-		auto keyUIDs = GetDOS()->GetAppUID("UIKeyboard");
-		if (keyUIDs.size() == 1) {
-			m_pKeyboardHandle = dynamic_cast<UIKeyboardHandle*>(GetDOS()->CaptureApp(keyUIDs[0], this));
-		}
-	}
-	
 	if (m_pOrientationRay == nullptr) {
 		m_pOrientationRay = std::shared_ptr<DimRay>(GetDOS()->AddRay(point(0.0f, 0.0f, 0.0f), vector::kVector(-1.0f), 1.0f));
 		CN(m_pOrientationRay);
@@ -607,7 +478,7 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			if (m_pRightHand != nullptr) {
 				m_pRightHand->SetOverlayVisible(false);
 			}
-			if (m_pEventApp == nullptr && !m_fStreaming) {
+			if (m_pEventApp == nullptr) {
 				if (m_pLeftHand != nullptr) {
 					m_pLeftHand->SetModelState(hand::ModelState::HAND);
 				}
@@ -635,12 +506,6 @@ RESULT DreamUserApp::GetAppBasisPosition(point& ptOrigin) {
 RESULT DreamUserApp::GetAppBasisOrientation(quaternion& qOrigin) {
 	qOrigin = m_pAppBasis->GetOrientation();
 	return R_PASS;
-}
-
-RESULT DreamUserApp::StopSharing() {
-	RESULT r = R_PASS;
-
-	return r;
 }
 
 RESULT DreamUserApp::SetPreviousApp(DreamUserObserver* pObserver) {
@@ -777,7 +642,7 @@ RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
 
 	composite *pComposite = GetComposite();
 	auto pCamera = pComposite->GetCamera();
-	vector vLookXZ = GetCameraLookXZ();
+	vector vLookXZ = pCamera->GetLookVectorXZ();
 	point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
 
 	m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
@@ -873,14 +738,6 @@ RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
 	m_pEventApp->HandleEvent(type);
 Error:
 	return r;
-}
-
-UIKeyboardHandle *DreamUserApp::GetKeyboard() {
-	return m_pKeyboardHandle;
-}
-
-RESULT DreamUserApp::ReleaseKeyboard() {
-	return R_PASS;
 }
 
 RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {

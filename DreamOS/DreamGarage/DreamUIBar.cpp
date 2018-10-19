@@ -210,25 +210,12 @@ RESULT DreamUIBar::ResetAppComposite() {
 	point ptOrigin;
 	quaternion qOrigin;
 	vector vCameraToMenu;
-	if(m_pUserHandle == nullptr) {
-		auto userUIDs = GetDOS()->GetAppUID("DreamUserApp");
 
-		CB(userUIDs.size() == 1);
-		m_userUID = userUIDs[0];
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pUserHandle)
-	}
-
-	if (m_pUserHandle != nullptr) {
-		CR(m_pUserHandle->RequestAppBasisPosition(ptOrigin));
-		CR(m_pUserHandle->RequestAppBasisOrientation(qOrigin));
-	}
-	//*/
-	if (m_pParentApp != nullptr) {
-		//ptOrigin = m_pParentApp->GetComposite()->GetOrigin(true);
-		//qOrigin = m_pParentApp->GetComposite()->GetOrientation(true);
-	}
+	CR(pDreamUserApp->GetAppBasisPosition(ptOrigin));
+	CR(pDreamUserApp->GetAppBasisOrientation(qOrigin));
 	
 	GetComposite()->SetPosition(ptOrigin);
 	GetComposite()->SetOrientation(qOrigin);
@@ -297,16 +284,20 @@ Error:
 RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+	CNR(pDreamUserApp, R_SKIPPED);
+	CNR(pKeyboardApp, R_SKIPPED);
+
 	switch (type) {
 		case UserObserverEventType::BACK: {
-		//	CBR(m_menuState != MenuState::ANIMATING, R_SKIPPED);
-			CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
-			if (m_pKeyboardHandle != nullptr) {
-				CR(m_pKeyboardHandle->Hide());
-				CR(m_pUserHandle->SendReleaseKeyboard());
-				m_pKeyboardHandle = nullptr;
 
-				PopPath();
+			CBR(!m_fWaitingForMenuResponse, R_SKIPPED);
+			if (pKeyboardApp->IsVisible()) {
+
+				CR(pKeyboardApp->Hide());
+
+				CR(PopPath());
 			}
 
 			else if (!m_pathStack.empty()) {
@@ -326,10 +317,9 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 		} break;
 
 		case UserObserverEventType::DISMISS: {
-			if (m_pKeyboardHandle != nullptr) {
-				m_pKeyboardHandle->Hide();
-				m_pUserHandle->SendReleaseKeyboard();
-				m_pKeyboardHandle = nullptr;
+			if (pKeyboardApp != nullptr) {
+				pKeyboardApp->Hide();
+				pKeyboardApp = nullptr;
 			} 
 			CR(HideApp());
 			m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
@@ -338,12 +328,12 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 		} break;
 
 		case UserObserverEventType::KB_ENTER: {
-			if (m_pKeyboardHandle != nullptr) {
-				m_pKeyboardHandle->Hide();
-				m_pUserHandle->SendReleaseKeyboard();
-				m_pKeyboardHandle = nullptr;
+			if (pKeyboardApp != nullptr) {
+				pKeyboardApp->Hide();
+				pKeyboardApp = nullptr;
 			} 
-			m_pUserHandle->SendPreserveSharingState(true);
+
+			pDreamUserApp->PreserveSharingState(true);
 			
 			if (m_pParentApp != nullptr) {
 				CR(m_pParentApp->CreateBrowserSource(m_pMenuNode->GetScope()));
@@ -397,7 +387,9 @@ Error:
 
 RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	//	auto pSelected = GetCurrentItem();
+
+	std::shared_ptr<DreamUserApp> pDreamUserApp = nullptr;
+
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected;
@@ -415,20 +407,21 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 
 	CBR(m_menuState == MenuState::NONE, R_PASS);
 
-	CNR(m_pUserHandle, R_SKIPPED);
+	pDreamUserApp = GetDOS()->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 	
 	UIMallet* pLeftMallet;
-	pLeftMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_LEFT);
+	pLeftMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 	CN(pLeftMallet);
 
 	UIMallet* pRightMallet;
-	pRightMallet = m_pUserHandle->RequestMallet(HAND_TYPE::HAND_RIGHT);
+	pRightMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
 	CN(pRightMallet);
 
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
 
-	m_pUserHandle->RequestHapticImpulse(pSelected->GetInteractionObject());
+	pDreamUserApp->CreateHapticImpulse(pSelected->GetInteractionObject());
 	// should check if website
 	for (auto &pSubMenuNode : m_pScrollView->GetScrollViewNodes()) {
 		if (pSelected->GetKey() == pSubMenuNode->GetKey()) {
@@ -467,10 +460,10 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					}
 				}
 				else if (strTitle == "Website") {
-					m_pKeyboardHandle = m_pUserHandle->RequestKeyboard();
-					CN(m_pKeyboardHandle);
-					CR(m_pKeyboardHandle->Show());
-					CR(m_pKeyboardHandle->ShowTitleView());
+					std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+					CN(pKeyboardApp);
+					CR(pKeyboardApp->Show());
+					CR(pKeyboardApp->ShowTitleView());
 				}
 
 				else if (strScope == "TeamScope.Switch") {
@@ -494,7 +487,7 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 					CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 					CR(pEnvironmentControllerProxy->RequestForm(strPath));
-					m_pUserHandle->SendSetPreviousApp(this);
+					pDreamUserApp->SetPreviousApp(this);
 				}
 				m_pMenuNode = pSubMenuNode;
 				ClearMenuWaitingFlag();
@@ -546,17 +539,6 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 	DreamOS *pDreamOS = GetDOS();
 
-	// Makes sense for UIBar to always have a user run with it for now
-	if(m_pUserHandle == nullptr) {
-		auto userUIDs = pDreamOS->GetAppUID("DreamUserApp");
-
-		CB(userUIDs.size() == 1);
-		m_userUID = userUIDs[0];
-
-		m_pUserHandle = dynamic_cast<DreamUserHandle*>(GetDOS()->CaptureApp(m_userUID, this));
-		CN(m_pUserHandle)
-	}
-
 	if (m_pCloudController == nullptr) {
 		m_pCloudController = pDreamOS->GetCloudController();
 		if (m_pCloudController != nullptr) {
@@ -590,6 +572,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 	// Processing Title icon
 	if (m_pPendingIconTextureBuffer != nullptr) {
 
+		std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+
 		CN(m_pPendingIconTextureBuffer);
 		uint8_t* pBuffer = &(m_pPendingIconTextureBuffer->operator[](0));
 		size_t pBuffer_n = m_pPendingIconTextureBuffer->size();
@@ -597,8 +581,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 		m_pPendingIconTexture = GetDOS()->MakeTextureFromFileBuffer(texture::type::TEXTURE_2D, pBuffer, pBuffer_n);
 		CN(m_pPendingIconTexture);
 
-		if (m_pKeyboardHandle != nullptr) {
-			m_pKeyboardHandle->UpdateTitleView(m_pPendingIconTexture, "Website");
+		if (pKeyboardApp != nullptr && pKeyboardApp->IsVisible()) {
+			pKeyboardApp->UpdateTitleView(m_pPendingIconTexture, "Website");
 		}
 		else {
 			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pPendingIconTexture);

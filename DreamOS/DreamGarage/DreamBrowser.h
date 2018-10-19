@@ -42,7 +42,6 @@ class texture;
 class EnvironmentAsset;
 class WebBrowserManager;
 class DOMNode;
-class DreamUserHandle;
 class DreamUserControlArea;
 class AudioPacket;
 class SoundBuffer;
@@ -209,7 +208,6 @@ private:
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
-	DreamUserHandle* m_pDreamUserHandle = nullptr;
 
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
 

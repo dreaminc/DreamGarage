@@ -11,7 +11,6 @@
 #include "UI/UIMallet.h"
 #include "DreamUserApp.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/UIControlBar.h"
 
 #include <vector>
 #include <string>
@@ -48,49 +47,19 @@ class CollisionManifold;
 class FlatContext;
 class SoundFile;
 
-class UIKeyboardHandle : public DreamAppHandle {
-public:
-	RESULT Show();
-	RESULT Hide();
-	RESULT SendUpdateComposite(float depth);
-	RESULT SendUpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
-	bool IsVisible();
-	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
-	RESULT ShowTitleView();
-	RESULT PopulateTextBox(std::string strText);
-	RESULT SendPasswordFlag(bool fIsPassword);
-
-private:
-	virtual RESULT ShowKeyboard() = 0;
-	virtual RESULT HideKeyboard() = 0;
-	virtual RESULT UpdateComposite(float depth) = 0;
-	virtual RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) = 0;
-	virtual bool IsKeyboardVisible() = 0;
-	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) = 0;
-	virtual RESULT ShowKeyboardTitleView() = 0;
-	virtual RESULT PopulateKeyboardTextBox(std::string strText) = 0;
-	virtual RESULT SetPasswordFlag(bool fIsPassword) = 0;
-};
 
 class UIKeyboard : public DreamApp<UIKeyboard>,
-	public UIKeyboardHandle,
-	public SenseKeyboard,
-	public ControlBarObserver {
+	public SenseKeyboard {
 	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 
 public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class state {	// For tracking if keyboard is animating or not
-		HIDDEN,
-		ANIMATING,
-		VISIBLE
-	};
-
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeLayoutTexture(LayoutType type);
+	RESULT InitializeKeyboardControls();
 
 public:
 	RESULT InitializeWithParent(DreamUserControlArea *pParent);
@@ -103,17 +72,13 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	virtual DreamAppHandle* GetAppHandle() override;
-
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 	//Animation
 public:
-	virtual RESULT ShowKeyboard() override;
-	virtual RESULT HideKeyboard() override;
-
-	virtual bool IsKeyboardVisible() override;
+	virtual RESULT Show();
+	virtual RESULT Hide();
 
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
@@ -149,44 +114,31 @@ public:
 	RESULT SetKeyReleaseThreshold(float threshold);
 	RESULT SetSurfaceOffset(point ptOffset);
 
-	//ControlBarObserver
 public:
-	RESULT HandleBackPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleForwardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShowTogglePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleOpenPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) override { return R_NOT_IMPLEMENTED; };
-	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext) override;
-	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext) override;
+	RESULT HandleTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleBackTabPressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleDonePressed(UIButton* pButtonContext, void* pContext);
 
 	RESULT UpdateTabNextTexture(bool fCanTabNext);
 	RESULT UpdateTabPreviousTexture(bool fCanTabPrevious);
 
-	std::shared_ptr<UIControlBar> GetControlBar();
 private:
-	std::shared_ptr<UIControlBar> m_pUIControlBar = nullptr;
-	bool m_fCanTabNext = true;
-	bool m_fCanTabPrevious = true;
+	std::shared_ptr<UIView> m_pKeyboardControls = nullptr;
 
 private:
 	RESULT UpdateViewQuad();
 	RESULT UpdateKeyboardLayout(LayoutType kbType);
 
 public:
-	RESULT SetAnimatingState(UIKeyboard::state keyboardState);
 	RESULT UpdateTextBox(int chkey);
-	virtual RESULT PopulateKeyboardTextBox(std::string strText) override;
-	virtual RESULT UpdateKeyboardTitleView(texture *pIconTexture, std::string strTitle) override;
-	virtual RESULT ShowKeyboardTitleView() override;
+	RESULT PopulateKeyboardTextBox(std::string strText);
+	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);
+	RESULT ShowTitleView();
 	RESULT ShowBrowserButtons();
-	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin) override;
+	RESULT UpdateComposite(float depth, point ptOrigin, quaternion qOrigin);
 	RESULT UpdateComposite(float depth); // update position/orientation
 
-	virtual RESULT SetPasswordFlag(bool fIsPassword) override;
+	RESULT SetPasswordFlag(bool fIsPassword);
 
 private:
 	std::shared_ptr<SoundFile> m_pDefaultPressSound = nullptr;
@@ -195,6 +147,19 @@ private:
 	std::shared_ptr<SoundFile> m_pSpacePressSound = nullptr;
 
 	std::map<unsigned int, std::shared_ptr<SoundFile>> m_keyPressSounds;
+
+	// control bar textures
+private:
+	const wchar_t *k_wszTab = L"key-tab-next.png";
+	const wchar_t *k_wszCantTab = L"key-tab-next-disabled.png";
+	const wchar_t *k_wszBackTab = L"key-tab-previous.png";
+	const wchar_t *k_wszCantBackTab = L"key-tab-previous-disabled.png";
+	const wchar_t *k_wszDone = L"key-done.png";
+
+private:
+	std::shared_ptr<UIButton> m_pNextButton = nullptr;
+	std::shared_ptr<UIButton> m_pPreviousButton = nullptr;
+	std::shared_ptr<UIButton> m_pDoneButton = nullptr;
 
 private:
 	// layout variables
@@ -232,8 +197,6 @@ private:
 
 	std::map<LayoutType, text*> m_layoutAtlas;
 
-	UIKeyboard::state m_keyboardState;
-
 	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
 	std::list<UIKey*> m_activeKeys;
@@ -254,9 +217,6 @@ private:
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
-
-	DreamUserHandle *m_pUserHandle = nullptr;
-	UID m_userAppUID;
 
 	DreamUserControlArea *m_pParentApp = nullptr;
 };
