@@ -36,8 +36,8 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 	}
 	currentState->triggerRange = controllerState.triggerRange;
 
-
-	if (currentState->ptTouchpad != controllerState.ptTouchpad) {
+	// the idea here is to only avoid constantly sending PAD_MOVE events when there is no scrolling happening
+	if (currentState->ptTouchpad != controllerState.ptTouchpad || vector(controllerState.ptTouchpad).magnitudeSquared() != 0.0f) {
 		eventType = SENSE_CONTROLLER_PAD_MOVE;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}

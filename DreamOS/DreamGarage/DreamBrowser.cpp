@@ -707,11 +707,13 @@ Error:
 RESULT DreamBrowser::UpdateNavigationFlags() {
 	RESULT r = R_PASS;
 
-	bool fCanGoBack = m_pWebBrowserController->CanGoBack();
-	bool fCanGoForward = m_pWebBrowserController->CanGoForward();
+	if (m_pWebBrowserController != nullptr) {
+		bool fCanGoBack = m_pWebBrowserController->CanGoBack();
+		bool fCanGoForward = m_pWebBrowserController->CanGoForward();
 
-	if (m_pObserver != nullptr) {
-		CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+		if (m_pObserver != nullptr) {
+			CR(m_pObserver->UpdateControlBarNavigation(fCanGoBack, fCanGoForward));
+		}
 	}
 
 Error:
