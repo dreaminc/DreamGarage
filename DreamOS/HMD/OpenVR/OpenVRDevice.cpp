@@ -422,6 +422,8 @@ RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 		} break;
 
 		// TODO: Lots more events to ultimately map...
+		// TODO: this is probably where button presses should be detected:
+		// vr::VREvent_ButtonPress / vr::VREvent_ButtonUnpress
 	}
 
 //Error:
@@ -474,10 +476,26 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 	switch (m_deviceType) {
 		case HMDDeviceType::VIVE: {
 			cState.triggerRange = state.rAxis[1].x;
-			cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
 
-			cState.fMenu = (state.ulButtonPressed & (1 << 1)) != 0;
-			cState.fGrip = (state.ulButtonPressed & (1 << 2)) != 0;
+			if ((state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Axis0)) != 0) {
+				// force d-pad style
+				float x = state.rAxis[0].x;
+				float y = state.rAxis[0].y;
+
+				if (abs(x) >= abs(y)) {
+					if (x >= 0) cState.ptTouchpad = point(1.0f, 0.0f, 0.0f);
+					else cState.ptTouchpad = point(-1.0f, 0.0f, 0.0f);
+				}
+				else {
+					if (y >= 0) cState.ptTouchpad = point(0.0f, 1.0f, 0.0f);
+					else cState.ptTouchpad = point(0.0f, -1.0f, 0.0f);
+				}
+
+				//cState.ptTouchpad = vector(state.rAxis[0].x, state.rAxis[0].y, 0.0f).Normal();
+			}
+
+			cState.fMenu = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) != 0;
+			cState.fGrip = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) != 0;
 
 		} break;
 			/*
