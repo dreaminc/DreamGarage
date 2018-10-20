@@ -335,7 +335,7 @@ RESULT UserController::CheckAPIConnection() {
 
 	// This is a specific AGET call where the caller needs to specify a timeout handler and a timeout durations
 	// In the future there should be a generic timeout handler / duration
-	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), std::bind(&UserController::OnAPIConnectionCheckTimeout, this), 2L));
+	CB(pHTTPController->AGET(strURI, headers, std::bind(&UserController::OnAPIConnectionCheck, this, std::placeholders::_1), std::bind(&UserController::OnAPIConnectionCheckTimeout, this), 4L));
 
 Error:
 	return r;
