@@ -12,7 +12,7 @@
 #include "DreamControlView/DreamControlView.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamTabView.h"
+#include "DreamGarage/UITabView.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamSettingsApp.h"
 #include "DreamGarage/DreamLoginApp.h"
