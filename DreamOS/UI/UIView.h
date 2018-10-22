@@ -17,6 +17,7 @@ class UIFlatScrollView;
 class UIMenuItem;
 class UserAreaControls;
 class UISurface;
+class UITabView;
 class DreamOS;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
@@ -51,6 +52,9 @@ public:
 
 	std::shared_ptr<UserAreaControls> MakeUIContentControlBar();
 	std::shared_ptr<UserAreaControls> AddUIContentControlBar();
+
+	std::shared_ptr<UITabView> MakeUITabView();
+	std::shared_ptr<UITabView> AddUITabView();
 
 	std::shared_ptr<UISpatialScrollView> MakeUISpatialScrollView();
 	std::shared_ptr<UISpatialScrollView> AddUISpatialScrollView();
