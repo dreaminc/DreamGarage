@@ -14,7 +14,7 @@
 class DreamUserApp;
 class DreamControlView;
 class DreamUIBar;
-class DreamTabView;
+class UITabView;
 class DreamContentSource;
 class DreamDesktopApp;
 
@@ -192,13 +192,13 @@ private:
 
 	// TODO: move to UI
 	// Apps in control area
-	std::shared_ptr<DreamControlView> m_pControlView;
-	std::shared_ptr<DreamTabView> m_pDreamTabView;
+	std::shared_ptr<DreamControlView> m_pControlView = nullptr;
+	std::shared_ptr<UITabView> m_pDreamTabView = nullptr;
 
 	//TODO: potentially a class Browser and Desktop extend that implements
 	// the control view events, ContactAtPoint, ScrollByDiff, etc.
 	// ControlViewObserver?
-	std::shared_ptr<DreamContentSource> m_pActiveSource;
+	std::shared_ptr<DreamContentSource> m_pActiveSource = nullptr;
 
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;

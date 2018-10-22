@@ -5,7 +5,7 @@
 #include "DreamUserApp.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamTabView.h"
+#include "DreamGarage/UITabView.h"
 #include "DreamControlView/DreamControlView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
@@ -60,17 +60,16 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);
+
 		m_pUserControls = m_pView->AddUIContentControlBar();
 		CN(m_pUserControls);
-
 		m_pUserControls->Initialize(this);
 		GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
 
-		/*
-		m_pUIControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
-		CN(m_pUIControlBar);
-		m_pUIControlBar->InitializeWithParent(this);
-		//*/
+		m_pDreamTabView = m_pView->AddUITabView();
+		CN(m_pDreamTabView);
+		m_pDreamTabView->Initialize(this);
+		GetDOS()->AddObjectToUIGraph(m_pDreamTabView.get());
 
 		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
 		CN(m_pControlView);
@@ -79,10 +78,6 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
-
-		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
-		CN(m_pDreamTabView);
-		m_pDreamTabView->InitializeWithParent(this);
 
 		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
 		m_pDreamUIBar->InitializeWithParent(this);
@@ -100,12 +95,12 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		//DreamUserControlArea is a friend of these classes to add the composite
 		GetComposite()->AddObject(m_pUserControls);
+		GetComposite()->AddObject(m_pDreamTabView);
 		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
-		GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
 		//GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
 
 		m_pUserControls->Hide();
-		m_pDreamTabView->GetComposite()->SetVisible(false);
+		m_pDreamTabView->SetVisible(false);
 		m_pControlView->GetComposite()->SetVisible(false);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
@@ -122,6 +117,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 	}
 
 	m_pUserControls->Update();
+	m_pDreamTabView->Update();
 
 	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
 		CR(m_pDreamUIBar->ResetAppComposite());
@@ -172,7 +168,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float tabViewWidth = m_pDreamTabView->GetBorderWidth();
 		float tabViewHeight = m_pDreamTabView->GetBorderHeight();
 
-		point ptDreamTabView = m_pDreamTabView->GetComposite()->GetPosition();
+		point ptDreamTabView = m_pDreamTabView->GetPosition();
 
 		bool fWidth = ( ptSphereOrigin.x() > ptDreamTabView.x() - tabViewWidth / 2.0f  &&
 						ptSphereOrigin.x() < ptDreamTabView.x() + tabViewWidth / 2.0f);
@@ -231,7 +227,7 @@ float DreamUserControlArea::GetViewAngle() {
 }
 
 point DreamUserControlArea::GetCenter() {
-	return point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z());
+	return point(0.0f, 0.0f, m_pDreamTabView->GetPosition().z());
 }
 
 float DreamUserControlArea::GetCenterOffset() {

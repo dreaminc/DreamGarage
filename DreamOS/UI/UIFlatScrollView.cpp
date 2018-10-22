@@ -3,7 +3,7 @@
 #include "DreamOS.h"
 
 #include "DreamUserControlArea/DreamContentSource.h"
-#include "DreamGarage/DreamTabView.h"
+#include "DreamGarage/UITabView.h"
 
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"

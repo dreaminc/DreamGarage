@@ -40,9 +40,6 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamEnvironmentApp.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
@@ -73,6 +70,9 @@
     <ClCompile Include="..\..\..\DreamGarage\UserAreaControls.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\UITabView.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
@@ -98,9 +98,6 @@
       <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
@@ -146,6 +143,9 @@
       <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\UserAreaControls.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UITabView.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
