@@ -5,7 +5,7 @@
 
 #include "DreamGarage/DreamFormApp.h"
 
-class DreamControlView;
+class UIControlView;
 
 class DreamSettingsApp : public DreamFormApp, 
 						public Subscriber<SenseControllerEvent>

@@ -6,7 +6,7 @@
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/UITabView.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
@@ -64,16 +64,18 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pUserControls = m_pView->AddUIContentControlBar();
 		CN(m_pUserControls);
 		m_pUserControls->Initialize(this);
-		GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
+		//GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
 
 		m_pDreamTabView = m_pView->AddUITabView();
 		CN(m_pDreamTabView);
 		m_pDreamTabView->Initialize(this);
-		GetDOS()->AddObjectToUIGraph(m_pDreamTabView.get());
+		//GetDOS()->AddObjectToUIGraph(m_pDreamTabView.get());
 
-		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
+		m_pControlView = m_pView->AddUIControlView();
 		CN(m_pControlView);
-		m_pControlView->InitializeWithUserApp(m_pDreamUserApp);
+		m_pControlView->Initialize();
+		//GetDOS()->AddObjectToUIGraph(m_pControlView.get());
+
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
 		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
@@ -94,14 +96,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->SetPosition(ptOrigin);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
-		GetComposite()->AddObject(m_pUserControls);
-		GetComposite()->AddObject(m_pDreamTabView);
-		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
-		//GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
+		//GetComposite()->AddObject(m_pUserControls);
+		//GetComposite()->AddObject(m_pDreamTabView);
+		//GetComposite()->AddObject(m_pControlView);
 
 		m_pUserControls->Hide();
 		m_pDreamTabView->SetVisible(false);
-		m_pControlView->GetComposite()->SetVisible(false);
+		m_pControlView->SetVisible(false);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
@@ -114,10 +115,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetDOS()->GetKeyboardApp()->InitializeWithParent(this);
 		// TODO: bad
 		GetComposite()->AddObject(std::shared_ptr<composite>(GetDOS()->GetKeyboardApp()->GetComposite()));
+
+		GetDOS()->AddObjectToUIGraph(GetComposite());
 	}
 
-	m_pUserControls->Update();
-	m_pDreamTabView->Update();
+	CR(m_pUserControls->Update());
+	CR(m_pDreamTabView->Update());
+	CR(m_pControlView->Update());
 
 	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
 		CR(m_pDreamUIBar->ResetAppComposite());
