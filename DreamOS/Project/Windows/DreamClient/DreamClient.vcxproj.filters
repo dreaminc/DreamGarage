@@ -162,7 +162,7 @@
     <None Include="..\DreamOS\DreamClient.oculus.nuspec">
       <Filter>NuGet</Filter>
     </None>
-    <None Include="..\DreamOS\DreamClient.staging.nuspec">
+    <None Include="..\DreamOS\DreamClient.development.nuspec">
       <Filter>NuGet</Filter>
     </None>
   </ItemGroup>
