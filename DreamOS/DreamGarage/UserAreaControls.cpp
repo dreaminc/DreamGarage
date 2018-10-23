@@ -282,15 +282,6 @@ Error:
 RESULT UserAreaControls::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-
-	// TODO: this button's event is currently unused
-	/*
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::URL));
-		Hide();
-		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-		m_pControlView->ShowKeyboard();
-		m_pControlView->m_fIsShareURL = true;
-		//*/
 Error:
 	return R_PASS;
 }

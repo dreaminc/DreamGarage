@@ -133,8 +133,6 @@ private:
 	bool m_fMouseDrag = false;
 	point m_ptClick;
 
-	// true while the keyboard is shown for sharing a new URL
-	bool m_fIsShareURL = false;
 	bool m_fIsMinimized = false;
 
 	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 

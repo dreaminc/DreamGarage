@@ -98,8 +98,6 @@ RESULT DreamControlView::Update(void *pContext) {
 	//*/
 	CBR(!IsAnimating(), R_SKIPPED);
 	CBR(IsVisible(), R_SKIPPED);
-	// if a url is being shared through the keyboard don't update the control view surface
-	CBR(!m_fIsShareURL, R_SKIPPED);
 
 	for (int i = 0; i < 2; i++) {
 		UIMallet *pMallet;
@@ -140,17 +138,7 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 
 		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 
-			if (m_fIsShareURL) {
-				CR(ShowView());
-
-				CR(GetDOS()->GetKeyboardApp()->Hide());
-
-				m_fIsShareURL = false;
-			}
-
-			else {
-				CR(HandleKeyboardDown());
-			}
+			CR(HandleKeyboardDown());
 		}
 
 		else if (IsVisible()) {
@@ -161,21 +149,6 @@ RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
 		}
 
 
-	} break;
-
-	case (UserObserverEventType::DISMISS): {
-		CR(Dismiss());
-	} break;
-
-	case (UserObserverEventType::KB_ENTER): {	
-		if (m_fIsShareURL) {
-			pDreamUserApp->PreserveSharingState(true);
-			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
-				CR(HideKeyboard());
-			}
-
-			m_fIsShareURL = false;
-		}
 	} break;
 
 	} 
