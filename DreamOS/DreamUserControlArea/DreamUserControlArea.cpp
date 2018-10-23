@@ -510,7 +510,6 @@ RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentS
 	RESULT r = R_PASS;
 
 	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
-	CBR(!m_pControlView->m_fIsShareURL, R_SKIPPED);
 
 	if (fIsFocused) {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
@@ -1065,11 +1064,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			bool fIsSpecialKey = (chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE);	// These are keys not actually on our keyboard that we send manually
 			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 			if (!fIsSpecialKey) {
-				if (chkey == SVK_RETURN && fKeyDown) {
-					if (m_pControlView->m_fIsShareURL) {
-						CR(SetActiveBrowserURI());
-					}
-				}
 				CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 			}
 			else if (fKeyDown) {
