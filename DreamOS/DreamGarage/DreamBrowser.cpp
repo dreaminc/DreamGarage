@@ -1,5 +1,5 @@
 #include "DreamBrowser.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamOS.h"

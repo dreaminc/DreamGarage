@@ -13,7 +13,7 @@
 #include "UI/UISpatialScrollView.h"
 #include "UI/UIMallet.h"
 
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamBrowser.h"
 

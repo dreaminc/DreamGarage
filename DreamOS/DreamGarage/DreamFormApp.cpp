@@ -1,5 +1,5 @@
 #include "DreamFormApp.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "WebBrowser/DOMNode.h"
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
@@ -47,16 +47,16 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
 
 
-		m_pFormView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
-		m_pFormView->InitializeWithUserApp(pDreamUserApp);
+		m_pFormView = GetComposite()->AddUIView(GetDOS())->AddUIControlView();
+		m_pFormView->Initialize();
 
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pFormView->RegisterSubscriber(UI_SCROLL, this);
 
 		//m_pFormView->Hide();
-		m_pFormView->GetComposite()->SetVisible(false);
+		m_pFormView->SetVisible(false);
 		GetComposite()->SetVisible(false, false);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
@@ -66,10 +66,10 @@ RESULT DreamFormApp::Update(void *pContext) {
 		quaternion qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(viewAngleRad, 0.0f, 0.0f);
 		GetComposite()->SetOrientation(qViewQuadOrientation);
 
-		GetComposite()->AddObject(std::shared_ptr<composite>(m_pFormView->GetComposite()));
-
 		pDreamUserApp->GetComposite()->AddObject(std::shared_ptr<composite>(GetComposite()));
 	}
+
+	CR(m_pFormView->Update());
 
 	// there's fancier code around this in DreamUserControlArea, 
 	// but we assume that there is only one piece of content here

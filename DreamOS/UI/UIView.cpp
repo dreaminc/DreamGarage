@@ -9,6 +9,7 @@
 // TODO: move these files to DreamOS(?)
 #include "DreamGarage/UserAreaControls.h"
 #include "DreamGarage/UITabView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "DreamOS.h"
 
@@ -236,6 +237,22 @@ std::shared_ptr<UIFlatScrollView> UIView::AddUIFlatScrollView() {
 	std::shared_ptr<UIFlatScrollView> pScrollView = MakeUIFlatScrollView();
 	CR(AddObject(pScrollView));
 	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIControlView> UIView::MakeUIControlView() {
+	std::shared_ptr<UIControlView> pControlView(new UIControlView(m_pHALImp, m_pDreamOS));
+
+	return pControlView;
+}
+
+std::shared_ptr<UIControlView> UIView::AddUIControlView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIControlView> pControlView = MakeUIControlView();
+	CR(AddObject(pControlView));
+	return pControlView;
 Error:
 	return nullptr;
 }

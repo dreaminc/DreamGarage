@@ -4,7 +4,7 @@
 
 #include "DreamUserControlArea/DreamContentSource.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "DreamBrowser.h"
 #include "DreamUserApp.h"

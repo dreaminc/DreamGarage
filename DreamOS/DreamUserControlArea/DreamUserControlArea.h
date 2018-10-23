@@ -12,7 +12,7 @@
 #include <map>
 
 class DreamUserApp;
-class DreamControlView;
+class UIControlView;
 class DreamUIBar;
 class UITabView;
 class DreamContentSource;
@@ -192,7 +192,7 @@ private:
 
 	// TODO: move to UI
 	// Apps in control area
-	std::shared_ptr<DreamControlView> m_pControlView = nullptr;
+	std::shared_ptr<UIControlView> m_pControlView = nullptr;
 	std::shared_ptr<UITabView> m_pDreamTabView = nullptr;
 
 	//TODO: potentially a class Browser and Desktop extend that implements
