@@ -50,10 +50,10 @@ RESULT DreamFormApp::Update(void *pContext) {
 		m_pFormView = GetComposite()->AddUIView(GetDOS())->AddUIControlView();
 		m_pFormView->Initialize();
 
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
-		m_pFormView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pFormView->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pFormView->RegisterSubscriber(UI_SCROLL, this);
 
 		//m_pFormView->Hide();
 		m_pFormView->SetVisible(false);

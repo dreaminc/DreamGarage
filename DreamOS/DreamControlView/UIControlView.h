@@ -13,6 +13,7 @@
 #include "DreamGarage/UICommon.h"
 
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "UI/UISurface.h"
 
 #include "Primitives/Subscriber.h"
 #include <functional>
@@ -34,7 +35,7 @@ class UIMallet;
 class UIButton;
 class texture;
 
-class UIControlView : public UIView, 
+class UIControlView : public UISurface, 
 						 public DreamUserObserver {
 	friend class DreamUserControlArea;
 	friend class DreamSettingsApp;
@@ -81,16 +82,10 @@ private:
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
 
-	RESULT SetURLText(std::string strURL);
-
 // View Context
 public:
-	std::shared_ptr<quad> GetViewQuad();
-	std::shared_ptr<UISurface> GetViewSurface();
-
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
-	point GetLastEvent();
 
 public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
@@ -103,18 +98,12 @@ public:
 
 private:
 	
-	std::shared_ptr<UIView> m_pView = nullptr;
-
-	std::shared_ptr<UISurface> m_pUISurface = nullptr;
-	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 
 	std::shared_ptr<quad> m_pViewBackground = nullptr;
 	texture* m_pBackgroundTexture = nullptr;
 
 	texture* m_pLoadingScreenTexture = nullptr;
-
-	std::string m_strURL = "";
 
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;

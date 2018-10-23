@@ -12,7 +12,7 @@
 #include "UI/UISurface.h"
 
 UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
-	UIView(pHALImp, pDreamOS)
+	UISurface(pHALImp, pDreamOS)
 {
 	//empty
 }
@@ -22,9 +22,6 @@ RESULT UIControlView::Initialize() {
 
 	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
-
-	m_pView = AddUIView();
-	CN(m_pView);
 
 	// Texture needs to be upside down, and flipped on y-axis
 	m_pLoadingScreenTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen);
@@ -67,11 +64,7 @@ RESULT UIControlView::Initialize() {
 	float height;
 	height = pDreamUserApp->GetBaseHeight();
 	
-	m_pUISurface = m_pView->AddUISurface();
-	m_pUISurface->InitializeSurfaceQuad(width, height);
-	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
-	m_pViewQuad = m_pUISurface->GetViewQuad();
-	CN(m_pViewQuad);
+	InitializeSurfaceQuad(width, height);
 
 //	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
 
@@ -84,7 +77,7 @@ RESULT UIControlView::Initialize() {
 
 	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
 
-	m_pViewBackground = m_pView->AddQuad(width * m_borderWidth, width * m_borderHeight);
+	m_pViewBackground = AddQuad(width * m_borderWidth, width * m_borderHeight);
 	CB(m_pViewBackground);
 	m_pBackgroundTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
 	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
@@ -133,7 +126,7 @@ RESULT UIControlView::Update() {
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
 
-		m_pUISurface->UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -372,23 +365,10 @@ bool UIControlView::IsVisible() {
 bool UIControlView::IsAnimating() {
 	auto pProxy = m_pDreamOS->GetInteractionEngineProxy();
 
-	bool fViewAnimating = pProxy->IsAnimating(m_pView.get());
+	bool fViewAnimating = pProxy->IsAnimating(this);
 	bool fQuadAnimating = pProxy->IsAnimating(m_pViewQuad.get());
 
 	return fViewAnimating || fQuadAnimating;
-}
-
-RESULT UIControlView::SetURLText(std::string strURL) {
-	RESULT r = R_PASS;
-
-	std::shared_ptr<text> pURLText;
-
-	//CNR(pURLText, R_SKIPPED);
-	//pURLText->SetDirty();
-	m_strText = strURL;
-
-//Error:
-	return r;
 }
 
 RESULT UIControlView::SetKeyboardAnimationDuration(float animationDuration) {
@@ -425,7 +405,7 @@ RESULT UIControlView::HandleKeyboardDown() {
 	CR(HideKeyboard());
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pView.get(),
+		this,
 		m_ptVisiblePosition,	
 		m_qViewQuadOrientation,
 		vector(1.0f, 1.0f, 1.0f),
@@ -474,7 +454,7 @@ RESULT UIControlView::HandleKeyboardUp() {
 	CR(ShowKeyboard());
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pView.get(),
+		this,
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
 		//vector(m_visibleScale, m_visibleScale, m_visibleScale),
@@ -486,18 +466,6 @@ RESULT UIControlView::HandleKeyboardUp() {
 
 Error:
 	return r;
-}
-
-point UIControlView::GetLastEvent() {
-	return m_pUISurface->GetLastEvent();
-}
-
-std::shared_ptr<quad> UIControlView::GetViewQuad() {
-	return m_pViewQuad;
-}
-
-std::shared_ptr<UISurface> UIControlView::GetViewSurface() {
-	return m_pUISurface;
 }
 
 float UIControlView::GetBackgroundWidth() {

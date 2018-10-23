@@ -76,10 +76,10 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		m_pControlView->Initialize();
 		//GetDOS()->AddObjectToUIGraph(m_pControlView.get());
 
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
+		m_pControlView->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pControlView->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pControlView->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pControlView->RegisterSubscriber(UI_SCROLL, this);
 
 		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
 		m_pDreamUIBar->InitializeWithParent(this);
