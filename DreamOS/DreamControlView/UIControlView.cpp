@@ -246,24 +246,6 @@ Error:
 	return r;
 }
 
-RESULT UIControlView::ResetAppComposite() {
-	RESULT r = R_PASS;
-
-	point ptAppBasisPosition;
-	quaternion qAppBasisOrientation;	
-
-	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-
-	CR(pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
-	CR(pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
-
-	SetPosition(ptAppBasisPosition);
-	SetOrientation(qAppBasisOrientation);
-Error:
-	return r;
-}
-
 RESULT UIControlView::Show() {
 	RESULT r = R_PASS;
 
@@ -285,19 +267,6 @@ Error:
 	return r;
 }
 
-RESULT UIControlView::Dismiss() {
-	RESULT r = R_PASS;
-
-	if (m_pDreamOS->GetKeyboardApp()->IsVisible()) {
-		CR(HideKeyboard());
-	}
-
-	CR(Hide());
-
-Error:
-	return r;
-}
-
 RESULT UIControlView::HideView() {
 	RESULT r = R_PASS;
 
@@ -307,8 +276,6 @@ RESULT UIControlView::HideView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
-	//	SetVisible(false);
-		m_strURL = "";
 		return R_PASS;
 	};
 
@@ -376,33 +343,10 @@ RESULT UIControlView::SetKeyboardAnimationDuration(float animationDuration) {
 	return R_PASS;
 }
 
-RESULT UIControlView::ShowKeyboard() {
-	RESULT r = R_PASS;
-
-	//maintain the keyboard handle until the keyboard is hidden
-	std::shared_ptr<UIKeyboard> pKeyboardApp = m_pDreamOS->GetKeyboardApp();
-	CNM(pKeyboardApp, "keyboard not available");
-	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
-
-	CR(pKeyboardApp->Show());
-
-Error:
-	return r;
-}
-
-RESULT UIControlView::HideKeyboard() {
-	RESULT r = R_PASS;
-
-	CR(m_pDreamOS->GetKeyboardApp()->Hide());
-
-Error:
-	return r;
-}
-
 RESULT UIControlView::HandleKeyboardDown() {
 	RESULT r = R_PASS;
 	
-	CR(HideKeyboard());
+	CR(m_pDreamOS->GetKeyboardApp()->Hide());
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		this,
@@ -451,7 +395,8 @@ RESULT UIControlView::HandleKeyboardUp() {
 
 	ptTypingPosition = ptTypingOffset +point(0.0f, sin(TYPING_ANGLE) * textBoxYOffset, -cos(TYPING_ANGLE) * textBoxYOffset);
 
-	CR(ShowKeyboard());
+	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
+	CR(pKeyboardApp->Show());
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		this,

@@ -44,37 +44,25 @@ class UIControlView : public UISurface,
 public:
 	UIControlView(HALImp *pHALImp, DreamOS *pDreamOS);
 
-// DreamApp
 public:
 	RESULT Initialize();
 	RESULT Update();
 	
-// DreamAppHandle
 public:
-	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
-
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
-
-	RESULT HandleKeyboardUp();
-	virtual RESULT HandleKeyboardDown();
-
-	RESULT ResetAppComposite();
-
-private:
-	RESULT ShowKeyboard();
-	RESULT HideKeyboard();
-
 
 // Animations
 public:
 	RESULT Show();
 	RESULT Hide();
 
+	RESULT HandleKeyboardUp();
+	RESULT HandleKeyboardDown();
+
 private:
 	RESULT ShowView();
 	RESULT HideView();
-	RESULT Dismiss();
 
 	bool IsVisible();
 
@@ -86,6 +74,7 @@ private:
 public:
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
+	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
 
 public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
