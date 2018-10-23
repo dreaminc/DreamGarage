@@ -16,7 +16,7 @@
 class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
-class DreamControlView;
+class UIControlView;
 class DreamDesktopApp;
 class DreamUserControlArea;
 class DreamShareView;
@@ -212,7 +212,7 @@ private:
 	DreamUIBar* m_pDreamUIBar = nullptr;
 	DreamContentView* m_pDreamContentView = nullptr;
 	DreamBrowser* m_pDreamBrowser = nullptr;
-	DreamControlView* m_pDreamControlView = nullptr;
+	UIControlView* m_pDreamControlView = nullptr;
 	DreamDesktopApp* m_pDreamDesktop = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
 };

@@ -34,29 +34,19 @@ class UIMallet;
 class UIButton;
 class texture;
 
-class DreamControlView : public DreamApp<DreamControlView>, 
+class UIControlView : public UIView, 
 						 public DreamUserObserver {
-	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 	friend class DreamSettingsApp;
 	friend class DreamFormApp;
 
 public:
-	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
+	UIControlView(HALImp *pHALImp, DreamOS *pDreamOS);
 
 // DreamApp
 public:
-	virtual RESULT InitializeApp(void *pContext = nullptr) override;
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
-
-	virtual RESULT Update(void *pContext = nullptr) override;
-	virtual RESULT Shutdown(void *pContext = nullptr) override;
-
-protected:
-	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
-
-public:
-	RESULT InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent);
+	RESULT Initialize();
+	RESULT Update();
 	
 // DreamAppHandle
 public:

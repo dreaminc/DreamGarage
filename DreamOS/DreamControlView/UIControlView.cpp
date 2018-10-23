@@ -1,4 +1,4 @@
-#include "DreamControlView.h"
+#include "UIControlView.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamShareView/DreamShareView.h"
@@ -11,25 +11,23 @@
 #include "UI/UIButton.h"
 #include "UI/UISurface.h"
 
-DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
-	DreamApp<DreamControlView>(pDreamOS, pContext)
+UIControlView::UIControlView(HALImp *pHALImp, DreamOS *pDreamOS) :
+	UIView(pHALImp, pDreamOS)
 {
 	//empty
 }
 
-RESULT DreamControlView::InitializeApp(void *pContext) {
+RESULT UIControlView::Initialize() {
 	RESULT r = R_PASS;
-	DreamOS *pDreamOS = GetDOS();
 
-	SetAppName("DreamControlView");
-	GetDOS()->AddObjectToUIGraph(GetComposite());	
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
+	CNR(pDreamUserApp, R_SKIPPED);
 
-	m_pView = GetComposite()->AddUIView(pDreamOS);
+	m_pView = AddUIView();
 	CN(m_pView);
 
-
 	// Texture needs to be upside down, and flipped on y-axis
-	m_pLoadingScreenTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen);
+	m_pLoadingScreenTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen);
 	CN(m_pLoadingScreenTexture);
 
 	m_hiddenScale = 0.2f;
@@ -37,19 +35,19 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_keyboardAnimationDuration = KEYBOARD_ANIMATION_DURATION_SECONDS;	
 
-	if (GetDOS()->GetHMD() != nullptr) {
-		switch (GetDOS()->GetHMD()->GetDeviceType()) {
+	if (m_pDreamOS->GetHMD() != nullptr) {
+		switch (m_pDreamOS->GetHMD()->GetDeviceType()) {
 		case HMDDeviceType::OCULUS: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayLeft);
-			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayRight);
+			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayLeft);
+			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszOculusOverlayRight);
 		} break;
 		case HMDDeviceType::VIVE: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
-			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
+			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
 		} break;
 		case HMDDeviceType::META: {
-			m_pOverlayLeft = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
-			m_pOverlayRight = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
+			m_pOverlayLeft = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayLeft);
+			m_pOverlayRight = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszViveOverlayRight);
 		} break;
 		}
 
@@ -63,22 +61,44 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	m_fMalletDirty[0] = dirty();
 	m_fMalletDirty[1] = dirty();
 
+	float width;
+	width = pDreamUserApp->GetBaseWidth();
+
+	float height;
+	height = pDreamUserApp->GetBaseHeight();
+	
+	m_pUISurface = m_pView->AddUISurface();
+	m_pUISurface->InitializeSurfaceQuad(width, height);
+	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
+	m_pViewQuad = m_pUISurface->GetViewQuad();
+	CN(m_pViewQuad);
+
+//	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
+
+	m_ptVisiblePosition = point(0.0f, 0.0f, 0.0f);
+	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f);
+
+	m_pViewQuad->SetMaterialAmbient(0.75f);
+	m_pViewQuad->FlipUVVertical();
+	CR(m_pViewQuad->SetVisible(false));
+
+	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
+
+	m_pViewBackground = m_pView->AddQuad(width * m_borderWidth, width * m_borderHeight);
+	CB(m_pViewBackground);
+	m_pBackgroundTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
+	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
+
+	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
+
 Error:
 	return r;
 }
 
-RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
-	RESULT r = R_PASS;
-
-
-//Error:
-	return r;
-}
-
-RESULT DreamControlView::Update(void *pContext) {
+RESULT UIControlView::Update() {
 	RESULT r = R_PASS;	
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 		
 	UIMallet* pLMallet;
@@ -127,16 +147,16 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleEvent(UserObserverEventType type) {
+RESULT UIControlView::HandleEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 		
 	switch (type) {
 	case (UserObserverEventType::BACK): {
 
-		if (GetDOS()->GetKeyboardApp()->IsVisible()) {
+		if (m_pDreamOS->GetKeyboardApp()->IsVisible()) {
 
 			CR(HandleKeyboardDown());
 		}
@@ -157,49 +177,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent) {
-	RESULT r = R_PASS;
-
-	auto pDreamOS = GetDOS();
-
-	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-
-	float width;
-	width = pDreamUserApp->GetBaseWidth();
-
-	float height;
-	height = pDreamUserApp->GetBaseHeight();
-	
-	m_pUISurface = m_pView->AddUISurface();
-	m_pUISurface->InitializeSurfaceQuad(width, height);
-	//m_pViewQuad = m_pView->AddQuad(width, height, 1, 1, nullptr);
-	m_pViewQuad = m_pUISurface->GetViewQuad();
-	CN(m_pViewQuad);
-
-//	pDreamOS->AddAndRegisterInteractionObject(m_pViewQuad.get(), ELEMENT_COLLIDE_BEGAN, this);
-
-	m_ptVisiblePosition = point(0.0f, 0.0f, 0.0f);
-	m_qViewQuadOrientation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, 0.0f);
-
-	m_pViewQuad->SetMaterialAmbient(0.75f);
-	m_pViewQuad->FlipUVVertical();
-	CR(m_pViewQuad->SetVisible(false));
-
-	m_pViewQuad->SetDiffuseTexture(m_pLoadingScreenTexture);
-
-	m_pViewBackground = m_pView->AddQuad(width * m_borderWidth, width * m_borderHeight);
-	CB(m_pViewBackground);
-	m_pBackgroundTexture = GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png");
-	m_pViewBackground->SetDiffuseTexture(m_pBackgroundTexture);
-
-	m_pViewBackground->SetPosition(point(0.0f, -0.0005f, 0.0f));
-
-Error:
-	return r;
-}
-
-texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
+texture *UIControlView::GetOverlayTexture(HAND_TYPE type) {
 	texture *pTexture = nullptr;
 
 	if (type == HAND_TYPE::HAND_LEFT) {
@@ -212,25 +190,16 @@ texture *DreamControlView::GetOverlayTexture(HAND_TYPE type) {
 	return pTexture;
 }
 
-RESULT DreamControlView::Shutdown(void *pContext) {
-	return R_PASS;
-}
-
-RESULT DreamControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
+RESULT UIControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
 	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
 	return R_PASS;
 }
 
-DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
-	DreamControlView *pDreamControlView = new DreamControlView(pDreamOS, pContext);
-	return pDreamControlView;
-}
-
-RESULT DreamControlView::ShowView() {
+RESULT UIControlView::ShowView() {
 	RESULT r = R_PASS;
 	/* This screws with animations too much, taking it out for now
-	if (GetDOS()->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get())) {
-		GetDOS()->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
+	if (m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pViewQuad.get())) {
+		m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pViewQuad.get());
 	}
 	//*/
 
@@ -242,7 +211,7 @@ RESULT DreamControlView::ShowView() {
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		
-		std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+		std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 		CNR(pDreamUserApp, R_SKIPPED);
 
 		pDreamUserApp->SetEventApp(this);
@@ -267,7 +236,7 @@ RESULT DreamControlView::ShowView() {
 
 	// This flag is never set anymore?
 	CBR(!m_fIsMinimized, R_SKIPPED);
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
 		m_pViewQuad->GetPosition(),
 		m_pViewQuad->GetOrientation(),
@@ -284,37 +253,37 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::ResetAppComposite() {
+RESULT UIControlView::ResetAppComposite() {
 	RESULT r = R_PASS;
 
 	point ptAppBasisPosition;
 	quaternion qAppBasisOrientation;	
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 
 	CR(pDreamUserApp->GetAppBasisPosition(ptAppBasisPosition));
 	CR(pDreamUserApp->GetAppBasisOrientation(qAppBasisOrientation));
 
-	GetComposite()->SetPosition(ptAppBasisPosition);
-	GetComposite()->SetOrientation(qAppBasisOrientation);
+	SetPosition(ptAppBasisPosition);
+	SetOrientation(qAppBasisOrientation);
 Error:
 	return r;
 }
 
-RESULT DreamControlView::Show() {
+RESULT UIControlView::Show() {
 	RESULT r = R_PASS;
 
 	//CR(ResetAppComposite());
-	GetComposite()->SetVisible(true);
+	SetVisible(true);
 //	m_pViewQuad->SetVisible(true);
 	CR(ShowView());
 
 //	m_pViewBackground->SetVisible(true);
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 1.0f),
-		GetDOS()->GetUserApp()->GetAnimationDuration(),
+		m_pDreamOS->GetUserApp()->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags()
 	));
@@ -323,10 +292,10 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::Dismiss() {
+RESULT UIControlView::Dismiss() {
 	RESULT r = R_PASS;
 
-	if (GetDOS()->GetKeyboardApp()->IsVisible()) {
+	if (m_pDreamOS->GetKeyboardApp()->IsVisible()) {
 		CR(HideKeyboard());
 	}
 
@@ -336,7 +305,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HideView() {
+RESULT UIControlView::HideView() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -345,12 +314,12 @@ RESULT DreamControlView::HideView() {
 
 	auto fnEndCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(false);
-	//	GetComposite()->SetVisible(false);
+	//	SetVisible(false);
 		m_strURL = "";
 		return R_PASS;
 	};
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewQuad.get(),
 		m_pViewQuad->GetPosition(),
 		m_pViewQuad->GetOrientation(),
@@ -367,7 +336,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::Hide() {
+RESULT UIControlView::Hide() {
 	RESULT r = R_PASS;
 
 	auto fnEndCallback = [&](void *pContext) {
@@ -379,10 +348,10 @@ RESULT DreamControlView::Hide() {
 	};
 
 	CR(HideView());
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pViewBackground.get(),
 		color(1.0f, 1.0f, 1.0f, 0.0f),
-		GetDOS()->GetUserApp()->GetAnimationDuration(),
+		m_pDreamOS->GetUserApp()->GetAnimationDuration(),
 		AnimationCurveType::SIGMOID,
 		AnimationFlags::AnimationFlags(),
 		nullptr,
@@ -396,12 +365,12 @@ Error:
 	return r;
 }
 
-bool DreamControlView::IsVisible() {
+bool UIControlView::IsVisible() {
 	return m_pViewQuad != nullptr && m_pViewQuad->IsVisible();
 }
 
-bool DreamControlView::IsAnimating() {
-	auto pProxy = GetDOS()->GetInteractionEngineProxy();
+bool UIControlView::IsAnimating() {
+	auto pProxy = m_pDreamOS->GetInteractionEngineProxy();
 
 	bool fViewAnimating = pProxy->IsAnimating(m_pView.get());
 	bool fQuadAnimating = pProxy->IsAnimating(m_pViewQuad.get());
@@ -409,7 +378,7 @@ bool DreamControlView::IsAnimating() {
 	return fViewAnimating || fQuadAnimating;
 }
 
-RESULT DreamControlView::SetURLText(std::string strURL) {
+RESULT UIControlView::SetURLText(std::string strURL) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<text> pURLText;
@@ -422,16 +391,16 @@ RESULT DreamControlView::SetURLText(std::string strURL) {
 	return r;
 }
 
-RESULT DreamControlView::SetKeyboardAnimationDuration(float animationDuration) {
+RESULT UIControlView::SetKeyboardAnimationDuration(float animationDuration) {
 	m_keyboardAnimationDuration = animationDuration;
 	return R_PASS;
 }
 
-RESULT DreamControlView::ShowKeyboard() {
+RESULT UIControlView::ShowKeyboard() {
 	RESULT r = R_PASS;
 
 	//maintain the keyboard handle until the keyboard is hidden
-	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
+	std::shared_ptr<UIKeyboard> pKeyboardApp = m_pDreamOS->GetKeyboardApp();
 	CNM(pKeyboardApp, "keyboard not available");
 	CBR(!pKeyboardApp->IsVisible(), R_SKIPPED);
 
@@ -441,21 +410,21 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HideKeyboard() {
+RESULT UIControlView::HideKeyboard() {
 	RESULT r = R_PASS;
 
-	CR(GetDOS()->GetKeyboardApp()->Hide());
+	CR(m_pDreamOS->GetKeyboardApp()->Hide());
 
 Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardDown() {
+RESULT UIControlView::HandleKeyboardDown() {
 	RESULT r = R_PASS;
 	
 	CR(HideKeyboard());
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
 		m_ptVisiblePosition,	
 		m_qViewQuadOrientation,
@@ -469,7 +438,7 @@ Error:
 	return r;
 }
 
-RESULT DreamControlView::HandleKeyboardUp() {
+RESULT UIControlView::HandleKeyboardUp() {
 	RESULT r = R_PASS;
 
 	point ptTypingPosition;
@@ -478,8 +447,8 @@ RESULT DreamControlView::HandleKeyboardUp() {
 	// Position the ControlView behind the keyboard with a slight height offset (center should be above keyboard textbox).
 	point ptTypingOffset;
 
-	std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
+	std::shared_ptr<UIKeyboard> pKeyboardApp = m_pDreamOS->GetKeyboardApp();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pKeyboardApp, R_SKIPPED);
 	CNR(pDreamUserApp, R_SKIPPED);
 
@@ -504,7 +473,7 @@ RESULT DreamControlView::HandleKeyboardUp() {
 
 	CR(ShowKeyboard());
 
-	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		m_pView.get(),
 		ptTypingPosition,
 		quaternion::MakeQuaternionWithEuler((float)TYPING_ANGLE, 0.0f, 0.0f),
@@ -519,18 +488,18 @@ Error:
 	return r;
 }
 
-point DreamControlView::GetLastEvent() {
+point UIControlView::GetLastEvent() {
 	return m_pUISurface->GetLastEvent();
 }
 
-std::shared_ptr<quad> DreamControlView::GetViewQuad() {
+std::shared_ptr<quad> UIControlView::GetViewQuad() {
 	return m_pViewQuad;
 }
 
-std::shared_ptr<UISurface> DreamControlView::GetViewSurface() {
+std::shared_ptr<UISurface> UIControlView::GetViewSurface() {
 	return m_pUISurface;
 }
 
-float DreamControlView::GetBackgroundWidth() {
+float UIControlView::GetBackgroundWidth() {
 	return m_pViewBackground->GetWidth();
 }

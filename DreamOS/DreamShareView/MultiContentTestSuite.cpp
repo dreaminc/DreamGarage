@@ -9,7 +9,7 @@
 
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 #include "DreamGarage/Dream2DMouseApp.h"
 #include "DreamGarage/DreamBrowser.h"
 #include "DreamGarage/UITabView.h"
