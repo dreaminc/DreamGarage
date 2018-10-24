@@ -25,6 +25,13 @@ RESULT OpenVRHMDSinkNode::OGLInitialize() {
 	m_pCompositor = vr::VRCompositor();
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
+	m_pOGLInputFramebuffer = new OGLFramebuffer(m_pParentImp, m_pParentImp->GetViewport().Height(), m_pParentImp->GetViewport().Width(), 4);
+	CR(m_pOGLInputFramebuffer->OGLInitialize());
+	CR(m_pOGLInputFramebuffer->Bind());
+
+	CR(m_pOGLInputFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLInputFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture());
+
 Error:
 	return r;
 }
