@@ -233,7 +233,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	CBM((indices.size() == (pRenderModel->unTriangleCount * 3)), "Index count mismatch");
 	
 	//model *pModel = nullptr;
-	mesh *pControllerMesh = m_pParentSandbox->AddMesh(verts, indices);
+	mesh *pControllerMesh = m_pParentSandbox->MakeMesh(verts, indices);
 
 	//TODO: looks a little better, but there is still likely a problem with how the controllers are positioned
 	pControllerMesh->SetScale(vector(0.9f));

@@ -349,6 +349,9 @@ public:
 	//model *AddModel(wchar_t *pszModelName);
 	//model *MakeModel(wchar_t *pszModelName);
 
+	mesh *MakeMesh(const std::vector<vertex>& vertices);
+	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+
 	mesh *AddMesh(const std::vector<vertex>& vertices);
 	mesh *AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 

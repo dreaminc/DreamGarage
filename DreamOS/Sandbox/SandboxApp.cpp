@@ -1509,10 +1509,26 @@ Error:
 }
 */
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
+mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices);
+	CN(pMesh);
+
+	return pMesh;
+
+Error:
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	mesh* pMesh = MakeMesh(vertices);
 	CN(pMesh);
 
 	CR(AddObject(pMesh));
@@ -1528,10 +1544,26 @@ Error:
 	return nullptr;
 }
 
-mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* SandboxApp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	mesh* pMesh = m_pHALImp->MakeMesh(vertices, indices);
+	CN(pMesh);
+
+	return pMesh;
+
+Error:
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	mesh* pMesh = MakeMesh(vertices, indices);
 	CN(pMesh);
 
 	CR(AddObject(pMesh));
