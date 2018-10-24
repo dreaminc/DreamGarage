@@ -680,7 +680,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		m_pActiveSource = pBrowser;
 
 		pBrowser->SetScope(strScope);
-		pBrowser->SetPath(m_strURL);
+		pBrowser->SetPath(strPath);
 
 		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
@@ -697,35 +697,15 @@ RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
 	std::string strTitle = m_strWebsiteTitle;
-	if (m_strURL == "") {
+	std::string strURL = GetDOS()->GetKeyboardApp()->GetText();
+
+	if (strURL == "") {
 		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK));
 		m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 	}
 	else {
-		CR(RequestOpenAsset(strScope, m_strURL, strTitle));
+		CR(RequestOpenAsset(strScope, strURL, strTitle));
 	}
-Error:
-	return r;
-}
-
-RESULT DreamUserControlArea::SetActiveBrowserURI() {
-	RESULT r = R_PASS;
-
-	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
-	std::string strTitle = m_strWebsiteTitle;
-
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-	CNR(pBrowser, R_SKIPPED);
-
-	CR(Show());
-
-	EnvironmentControllerProxy* m_pEnvironmentControllerProxy;
-	m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, m_strURL, strTitle), "Failed to share environment asset");
-
-	m_strURL = "";
-
 Error:
 	return r;
 }
@@ -790,9 +770,6 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
 		m_pUserControls->SetTitleText(pBrowser->GetTitle());
-
-		// TODO: may not be enough once browser typing is re-enabled
-		m_strURL = "";
 
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
@@ -1082,22 +1059,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 					//CR(m_pControlView->HandleKeyboardDown());
 					CR(HideWebsiteTyping());
 				}
-			}
-		}
-		else {
-			//*/
-			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
-				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
-			}
-
-			else if (chkey == SVK_BACK) {
-				if (m_strURL.size() > 0) {
-					m_strURL.pop_back();
-				}
-			}
-			
-			else if (chkey != SVK_CONTROL && chkey != SVK_SHIFT && fKeyDown) { // control and shift keycodes were being added to URLs
-				m_strURL += chkey;
 			}
 		}
 
