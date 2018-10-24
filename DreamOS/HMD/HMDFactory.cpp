@@ -43,7 +43,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 				DOSLOG(INFO, "Failed to create Oculus HMD");
 			}
 
-//#ifndef OCULUS_PRODUCTION_BUILD
+#ifndef OCULUS_PRODUCTION_BUILD
 			// OPENVR Second
 			DOSLOG(INFO, "Attempting to create OpenVR HMD");
 			CB((pHMD == nullptr));
@@ -59,7 +59,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 					pHMD = nullptr;
 				}
 			}
-//#endif
+#endif
 			CBM((false), "Failed to find an available HMD");
 
 		} break;
