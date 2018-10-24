@@ -101,7 +101,6 @@ public:
 	RESULT SetPath(std::string strPath);
 	RESULT RequestOpenAsset(std::string strScope, std::string strPath, std::string strTitle);
 	RESULT CreateBrowserSource(std::string strScope);
-	RESULT SetActiveBrowserURI();
 	RESULT HideWebsiteTyping();
 
 // DreamControlBar
@@ -202,10 +201,6 @@ private:
 
 	//TODO: list of objects that relate to the right bar
 	//std::vector<std::shared_ptr<DreamApp>> m_openApps;
-
-	// string saved from KEY_DOWN interaction events
-	// this is used for opening a URL, key presses are sent directly to the active browser
-	std::string m_strURL;
 
 // logic
 private:

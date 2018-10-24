@@ -733,6 +733,10 @@ Error:
 	return r;
 }
 
+std::string UIKeyboard::GetText() {
+	return m_pTextBoxText->GetText();
+}
+
 RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	RESULT r = R_PASS;
 
@@ -749,11 +753,11 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	}
 
 	else if (chkey == SVK_RETURN) {
-		m_pTextBoxText->SetText("");
-
 		std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
 		CN(pDreamUserApp);
 		pDreamUserApp->HandleUserObserverEvent(UserObserverEventType::KB_ENTER);
+
+		m_pTextBoxText->SetText("");
 	}
 
 	else if (chkey == 0x01) {
