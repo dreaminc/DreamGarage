@@ -32,7 +32,7 @@
 // IVR EHM extension
 
 #define CIVR(ivrr) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){goto Error;}}while(0);
-#define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
+#define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DOSLogErrorMessage("CIVRM", ivrResult, msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
 
 class OpenVRDevice : public HMD {
 	friend class OpenVRHMDSinkNode;

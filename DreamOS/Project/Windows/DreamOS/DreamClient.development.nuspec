@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>DreamStaging</id>
+    <id>DreamDevelopment</id>
     <version>$version$</version>
     <title>DreamDev</title>
     <authors>Dream Garage, Incorporated</authors>
@@ -24,13 +24,13 @@
     <tags>native, dreamos</tags>
   </metadata>
   <files>
-    <file src="x64\Staging\*.exe" target="" />
-    <file src="x64\Staging\*.lib" target="" />
-    <file src="x64\Staging\*.dll" target="" />
-    <file src="x64\Staging\*.bin" target="" />
-    <file src="x64\Staging\*.dat" target="" />
-    <file src="x64\Staging\*.pak" target="" />
-    <file src="x64\Staging\*.js" target="" />
+    <file src="x64\Development\*.exe" target="" />
+    <file src="x64\Development\*.lib" target="" />
+    <file src="x64\Development\*.dll" target="" />
+    <file src="x64\Development\*.bin" target="" />
+    <file src="x64\Development\*.dat" target="" />
+    <file src="x64\Development\*.pak" target="" />
+    <file src="x64\Development\*.js" target="" />
     
     <file src=".\..\..\..\dreampaths.txt" target="\dreampaths.txt" />
     <file src=".\..\..\..\HAL\**" target="\HAL\" />
@@ -41,7 +41,7 @@
     
     <file src=".\..\..\..\distribution\*" target="" />
     
-    <file src="x64\Staging\locales\**" target="\locales\" />
+    <file src="x64\Development\locales\**" target="\locales\" />
     
     <file src="DreamOS.targets" target="\build\net45\DreamOS.targets" />
   </files>
