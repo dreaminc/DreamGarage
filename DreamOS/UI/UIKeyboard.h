@@ -130,6 +130,7 @@ private:
 	RESULT UpdateKeyboardLayout(LayoutType kbType);
 
 public:
+	std::string GetText();
 	RESULT UpdateTextBox(int chkey);
 	RESULT PopulateKeyboardTextBox(std::string strText);
 	RESULT UpdateTitleView(texture *pIconTexture, std::string strTitle);

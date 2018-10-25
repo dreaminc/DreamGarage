@@ -785,7 +785,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DreamControlView\DreamControlView.cpp" />
+    <ClCompile Include="..\..\..\DreamControlView\UIControlView.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\Dream2DMouseApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamClientMain.cpp" />
@@ -799,13 +799,13 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClCompile Include="..\..\..\DreamGarage\DreamLoginApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamSettingsApp.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamSoundSystem.cpp" />
-    <ClCompile Include="..\..\..\DreamGarage\DreamTabView.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\UITabView.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamShareView\DreamShareView.cpp" />
     <ClCompile Include="..\..\..\DreamUserControlArea\DreamUserControlArea.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DreamControlView\DreamControlView.h" />
+    <ClInclude Include="..\..\..\DreamControlView\UIControlView.h" />
     <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\Dream2DMouseApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
@@ -821,7 +821,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <ClInclude Include="..\..\..\DreamGarage\DreamLoginApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamSettingsApp.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamSoundSystem.h" />
-    <ClInclude Include="..\..\..\DreamGarage\DreamTabView.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UITabView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
     <ClInclude Include="..\..\..\DreamGarage\UICommon.h" />
     <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />

@@ -13,6 +13,7 @@
 #include "DreamGarage/UICommon.h"
 
 #include "DreamUserControlArea/DreamUserControlArea.h"
+#include "UI/UISurface.h"
 
 #include "Primitives/Subscriber.h"
 #include <functional>
@@ -34,56 +35,34 @@ class UIMallet;
 class UIButton;
 class texture;
 
-class DreamControlView : public DreamApp<DreamControlView>, 
+class UIControlView : public UISurface, 
 						 public DreamUserObserver {
-	friend class DreamAppManager;
 	friend class DreamUserControlArea;
 	friend class DreamSettingsApp;
 	friend class DreamFormApp;
 
 public:
-	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
-
-// DreamApp
-public:
-	virtual RESULT InitializeApp(void *pContext = nullptr) override;
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
-
-	virtual RESULT Update(void *pContext = nullptr) override;
-	virtual RESULT Shutdown(void *pContext = nullptr) override;
-
-protected:
-	static DreamControlView *SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	UIControlView(HALImp *pHALImp, DreamOS *pDreamOS);
 
 public:
-	RESULT InitializeWithUserApp(std::shared_ptr<DreamUserApp> pParent);
+	RESULT Initialize();
+	RESULT Update();
 	
-// DreamAppHandle
 public:
-	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
-
 	virtual RESULT HandleEvent(UserObserverEventType type) override;
 	virtual texture *GetOverlayTexture(HAND_TYPE type);
-
-	RESULT HandleKeyboardUp();
-	virtual RESULT HandleKeyboardDown();
-
-	RESULT ResetAppComposite();
-
-private:
-	RESULT ShowKeyboard();
-	RESULT HideKeyboard();
-
 
 // Animations
 public:
 	RESULT Show();
 	RESULT Hide();
 
+	RESULT HandleKeyboardUp();
+	RESULT HandleKeyboardDown();
+
 private:
 	RESULT ShowView();
 	RESULT HideView();
-	RESULT Dismiss();
 
 	bool IsVisible();
 
@@ -91,16 +70,11 @@ private:
 	//	to avoid problems with animations and updates
 	bool IsAnimating();
 
-	RESULT SetURLText(std::string strURL);
-
 // View Context
 public:
-	std::shared_ptr<quad> GetViewQuad();
-	std::shared_ptr<UISurface> GetViewSurface();
-
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
-	point GetLastEvent();
+	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
 
 public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
@@ -113,18 +87,12 @@ public:
 
 private:
 	
-	std::shared_ptr<UIView> m_pView = nullptr;
-
-	std::shared_ptr<UISurface> m_pUISurface = nullptr;
-	std::shared_ptr<quad> m_pViewQuad = nullptr;
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 
 	std::shared_ptr<quad> m_pViewBackground = nullptr;
 	texture* m_pBackgroundTexture = nullptr;
 
 	texture* m_pLoadingScreenTexture = nullptr;
-
-	std::string m_strURL = "";
 
 	texture* m_pOverlayLeft;
 	texture* m_pOverlayRight;
@@ -133,8 +101,6 @@ private:
 	bool m_fMouseDrag = false;
 	point m_ptClick;
 
-	// true while the keyboard is shown for sharing a new URL
-	bool m_fIsShareURL = false;
 	bool m_fIsMinimized = false;
 
 	//TODO: the physics in the keyboard surface uses dirty with the mallets to determine whether a hit 

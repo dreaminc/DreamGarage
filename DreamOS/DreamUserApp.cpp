@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 #include "UI/UIKeyboard.h"
 #include "DreamGarage/DreamUIBar.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "UI/UIMallet.h"
 

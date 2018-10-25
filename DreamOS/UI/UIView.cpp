@@ -5,7 +5,11 @@
 #include "UISpatialScrollView.h"
 #include "UIFlatScrollView.h"
 #include "UISurface.h"
+
+// TODO: move these files to DreamOS(?)
 #include "DreamGarage/UserAreaControls.h"
+#include "DreamGarage/UITabView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "DreamOS.h"
 
@@ -189,6 +193,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UITabView> UIView::MakeUITabView() {
+	std::shared_ptr<UITabView> pTabView(new UITabView (m_pHALImp, m_pDreamOS));
+
+	return pTabView;
+}
+
+std::shared_ptr<UITabView> UIView::AddUITabView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UITabView> pTabView = MakeUITabView();
+	CR(AddObject(pTabView));
+	return pTabView;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UISpatialScrollView> UIView::MakeUISpatialScrollView() {
 	std::shared_ptr<UISpatialScrollView> pScrollView(new UISpatialScrollView(m_pHALImp, m_pDreamOS));
 
@@ -217,6 +237,22 @@ std::shared_ptr<UIFlatScrollView> UIView::AddUIFlatScrollView() {
 	std::shared_ptr<UIFlatScrollView> pScrollView = MakeUIFlatScrollView();
 	CR(AddObject(pScrollView));
 	return pScrollView;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIControlView> UIView::MakeUIControlView() {
+	std::shared_ptr<UIControlView> pControlView(new UIControlView(m_pHALImp, m_pDreamOS));
+
+	return pControlView;
+}
+
+std::shared_ptr<UIControlView> UIView::AddUIControlView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIControlView> pControlView = MakeUIControlView();
+	CR(AddObject(pControlView));
+	return pControlView;
 Error:
 	return nullptr;
 }

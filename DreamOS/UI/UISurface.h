@@ -36,6 +36,7 @@ private:
 	float m_dragThresholdSquared;
 	bool m_fMouseDrag = false;
 
+protected:
 	std::shared_ptr<quad> m_pViewQuad = nullptr;
 };
 

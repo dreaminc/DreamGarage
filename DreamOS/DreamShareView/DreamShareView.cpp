@@ -4,7 +4,7 @@
 #include "Primitives/quad.h"
 #include "Primitives/texture.h"
 #include "DreamShareViewMessage.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "Sound/AudioPacket.h"
 #include "DreamGarage/AudioDataMessage.h"

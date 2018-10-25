@@ -21,32 +21,21 @@ class quad;
 #define TAB_WIDTH 0.2640f;
 #define TAB_HEIGHT 0.148387f;
 
-class DreamTabView : public DreamApp<DreamTabView> 
+class UITabView : public UIView
 {
-	friend class DreamAppManager;
-	friend class DreamUserControlArea;
-	friend class MultiContentTestSuite;
 
 public:
-	DreamTabView(DreamOS *pDreamOS, void *pContext = nullptr);
-	~DreamTabView();
+	UITabView(HALImp *pHALImp, DreamOS *pDreamOS);
+	~UITabView();
 
-	// DreamApp Interface
-	virtual RESULT InitializeApp(void *pContext = nullptr);
-	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr);
-	virtual RESULT Update(void *pContext = nullptr);
-	virtual RESULT Shutdown(void *pContext = nullptr);
-
-	RESULT InitializeWithParent(DreamUserControlArea *pParent);
+	RESULT Initialize(DreamUserControlArea *pParent);
+	RESULT Update();
 
 public:
 	float GetBorderWidth();
 	float GetBorderHeight();
 
 	RESULT SetScrollFlag(bool fCanScroll, int index);
-
-protected:
-	static DreamTabView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 public:
 

@@ -4,7 +4,7 @@
 #include "DreamGarage/DreamFormApp.h"
 #include "Sandbox/CredentialManager.h"
 
-class DreamControlView;
+class UIControlView;
 
 typedef enum CredentialType {
 	CREDENTIAL_REFRESH_TOKEN,

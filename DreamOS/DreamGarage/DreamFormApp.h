@@ -6,7 +6,7 @@
 
 #include "DreamGarage/DreamBrowser.h"
 
-class DreamControlView;
+class UIControlView;
 struct UIEvent;
 
 enum class FormType {
@@ -82,7 +82,7 @@ public:
 
 protected:
 	std::shared_ptr<DreamBrowser> m_pDreamBrowserForm = nullptr;
-	std::shared_ptr<DreamControlView> m_pFormView = nullptr;
+	std::shared_ptr<UIControlView> m_pFormView = nullptr;
 
 //private:
 protected:

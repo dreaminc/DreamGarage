@@ -3,7 +3,7 @@
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamControlView/UIControlView.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -1113,7 +1113,7 @@ RESULT UIViewTestSuite::AddTestDreamControlView() {
 			pUIKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pUIKeyboard->SetVisible(true);
 
-			auto pDreamControlView = m_pDreamOS->LaunchDreamApp<DreamControlView>(this, true);
+			//auto pDreamControlView = m_pDreamOS->LaunchDreamApp<UIControlView>(this, true);
 			
 		}
 

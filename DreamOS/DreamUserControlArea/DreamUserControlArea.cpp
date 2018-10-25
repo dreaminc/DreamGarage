@@ -5,8 +5,8 @@
 #include "DreamUserApp.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamGarage/DreamBrowser.h"
-#include "DreamGarage/DreamTabView.h"
-#include "DreamControlView/DreamControlView.h"
+#include "DreamGarage/UITabView.h"
+#include "DreamControlView/UIControlView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
@@ -60,29 +60,26 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 		m_pView = GetComposite()->AddUIView(GetDOS());
 		CN(m_pView);
+
 		m_pUserControls = m_pView->AddUIContentControlBar();
 		CN(m_pUserControls);
-
 		m_pUserControls->Initialize(this);
-		GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
+		//GetDOS()->AddObjectToUIGraph(m_pUserControls.get());
 
-		/*
-		m_pUIControlBar = GetDOS()->LaunchDreamApp<DreamControlBar>(this, false);
-		CN(m_pUIControlBar);
-		m_pUIControlBar->InitializeWithParent(this);
-		//*/
-
-		m_pControlView = GetDOS()->LaunchDreamApp<DreamControlView>(this, false);
-		CN(m_pControlView);
-		m_pControlView->InitializeWithUserApp(m_pDreamUserApp);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_BEGIN, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_MOVED, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SELECT_ENDED, this);
-		m_pControlView->GetViewSurface()->RegisterSubscriber(UI_SCROLL, this);
-
-		m_pDreamTabView = GetDOS()->LaunchDreamApp<DreamTabView>(this, false);
+		m_pDreamTabView = m_pView->AddUITabView();
 		CN(m_pDreamTabView);
-		m_pDreamTabView->InitializeWithParent(this);
+		m_pDreamTabView->Initialize(this);
+		//GetDOS()->AddObjectToUIGraph(m_pDreamTabView.get());
+
+		m_pControlView = m_pView->AddUIControlView();
+		CN(m_pControlView);
+		m_pControlView->Initialize();
+		//GetDOS()->AddObjectToUIGraph(m_pControlView.get());
+
+		m_pControlView->RegisterSubscriber(UI_SELECT_BEGIN, this);
+		m_pControlView->RegisterSubscriber(UI_SELECT_MOVED, this);
+		m_pControlView->RegisterSubscriber(UI_SELECT_ENDED, this);
+		m_pControlView->RegisterSubscriber(UI_SCROLL, this);
 
 		m_pDreamUIBar->SetUIStageProgram(m_pUIStageProgram);
 		m_pDreamUIBar->InitializeWithParent(this);
@@ -99,14 +96,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetComposite()->SetPosition(ptOrigin);
 
 		//DreamUserControlArea is a friend of these classes to add the composite
-		GetComposite()->AddObject(m_pUserControls);
-		GetComposite()->AddObject(std::shared_ptr<composite>(m_pControlView->GetComposite()));
-		GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamTabView->GetComposite()));
-		//GetComposite()->AddObject(std::shared_ptr<composite>(m_pDreamUIBar->GetComposite()));
+		//GetComposite()->AddObject(m_pUserControls);
+		//GetComposite()->AddObject(m_pDreamTabView);
+		//GetComposite()->AddObject(m_pControlView);
 
 		m_pUserControls->Hide();
-		m_pDreamTabView->GetComposite()->SetVisible(false);
-		m_pControlView->GetComposite()->SetVisible(false);
+		m_pDreamTabView->SetVisible(false);
+		m_pControlView->SetVisible(false);
 
 		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
 		CR(GetDOS()->AddAndRegisterInteractionObject(GetComposite(), INTERACTION_EVENT_KEY_DOWN, this));
@@ -119,9 +115,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		GetDOS()->GetKeyboardApp()->InitializeWithParent(this);
 		// TODO: bad
 		GetComposite()->AddObject(std::shared_ptr<composite>(GetDOS()->GetKeyboardApp()->GetComposite()));
+
+		GetDOS()->AddObjectToUIGraph(GetComposite());
 	}
 
-	m_pUserControls->Update();
+	CR(m_pUserControls->Update());
+	CR(m_pDreamTabView->Update());
+	CR(m_pControlView->Update());
 
 	if (m_pDreamUIBar != nullptr && m_fUpdateDreamUIBar) {
 		CR(m_pDreamUIBar->ResetAppComposite());
@@ -172,7 +172,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		float tabViewWidth = m_pDreamTabView->GetBorderWidth();
 		float tabViewHeight = m_pDreamTabView->GetBorderHeight();
 
-		point ptDreamTabView = m_pDreamTabView->GetComposite()->GetPosition();
+		point ptDreamTabView = m_pDreamTabView->GetPosition();
 
 		bool fWidth = ( ptSphereOrigin.x() > ptDreamTabView.x() - tabViewWidth / 2.0f  &&
 						ptSphereOrigin.x() < ptDreamTabView.x() + tabViewWidth / 2.0f);
@@ -231,7 +231,7 @@ float DreamUserControlArea::GetViewAngle() {
 }
 
 point DreamUserControlArea::GetCenter() {
-	return point(0.0f, 0.0f, m_pDreamTabView->GetComposite()->GetPosition().z());
+	return point(0.0f, 0.0f, m_pDreamTabView->GetPosition().z());
 }
 
 float DreamUserControlArea::GetCenterOffset() {
@@ -514,7 +514,6 @@ RESULT DreamUserControlArea::HandleIsInputFocused(bool fIsFocused, DreamContentS
 	RESULT r = R_PASS;
 
 	CBR(pContext == m_pActiveSource.get(), R_SKIPPED);
-	CBR(!m_pControlView->m_fIsShareURL, R_SKIPPED);
 
 	if (fIsFocused) {
 		m_pDreamUserApp->SetEventApp(m_pControlView.get());
@@ -681,7 +680,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 		m_pActiveSource = pBrowser;
 
 		pBrowser->SetScope(strScope);
-		pBrowser->SetPath(m_strURL);
+		pBrowser->SetPath(strPath);
 
 		CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
@@ -698,35 +697,15 @@ RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
 	std::string strTitle = m_strWebsiteTitle;
-	if (m_strURL == "") {
+	std::string strURL = GetDOS()->GetKeyboardApp()->GetText();
+
+	if (strURL == "") {
 		CR(m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK));
 		m_pDreamUserApp->SetEventApp(m_pDreamUIBar.get());
 	}
 	else {
-		CR(RequestOpenAsset(strScope, m_strURL, strTitle));
+		CR(RequestOpenAsset(strScope, strURL, strTitle));
 	}
-Error:
-	return r;
-}
-
-RESULT DreamUserControlArea::SetActiveBrowserURI() {
-	RESULT r = R_PASS;
-
-	std::string strScope = "MenuProviderScope.WebsiteMenuProvider";
-	std::string strTitle = m_strWebsiteTitle;
-
-	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pActiveSource);
-	CNR(pBrowser, R_SKIPPED);
-
-	CR(Show());
-
-	EnvironmentControllerProxy* m_pEnvironmentControllerProxy;
-	m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
-	CRM(m_pEnvironmentControllerProxy->RequestOpenAsset(strScope, m_strURL, strTitle), "Failed to share environment asset");
-
-	m_strURL = "";
-
 Error:
 	return r;
 }
@@ -791,9 +770,6 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		pBrowser->InitializeWithBrowserManager(m_pDreamUserApp->GetBrowserManager(), pEnvironmentAsset->GetURL());
 		pBrowser->RegisterObserver(this);
 		m_pUserControls->SetTitleText(pBrowser->GetTitle());
-
-		// TODO: may not be enough once browser typing is re-enabled
-		m_strURL = "";
 
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
@@ -1069,11 +1045,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 			bool fIsSpecialKey = (chkey == SVK_TAB || chkey == SVK_SHIFTTAB || chkey == SVK_CLOSE);	// These are keys not actually on our keyboard that we send manually
 			auto pBrowser = dynamic_cast<DreamBrowser*>(m_pActiveSource.get());
 			if (!fIsSpecialKey) {
-				if (chkey == SVK_RETURN && fKeyDown) {
-					if (m_pControlView->m_fIsShareURL) {
-						CR(SetActiveBrowserURI());
-					}
-				}
 				CR(m_pActiveSource->OnKeyPress(chkey, fKeyDown));
 			}
 			else if (fKeyDown) {
@@ -1088,22 +1059,6 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 					//CR(m_pControlView->HandleKeyboardDown());
 					CR(HideWebsiteTyping());
 				}
-			}
-		}
-		else {
-			//*/
-			if (chkey == 0x01) {	// dupe filters from UIKeyboard to properly build URL based on what is in Keyboards textbox
-				m_strURL = "";		// could be scraped if we exposed keyboards textbox and pulled it via a keyboard handle
-			}
-
-			else if (chkey == SVK_BACK) {
-				if (m_strURL.size() > 0) {
-					m_strURL.pop_back();
-				}
-			}
-			
-			else if (chkey != SVK_CONTROL && chkey != SVK_SHIFT && fKeyDown) { // control and shift keycodes were being added to URLs
-				m_strURL += chkey;
 			}
 		}
 
