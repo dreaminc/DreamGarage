@@ -58,6 +58,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 		//m_pFormView->Hide();
 		m_pFormView->SetVisible(false);
 		GetComposite()->SetVisible(false, false);
+		GetDOS()->AddObjectToUIGraph(m_pFormView);
 
 		//TODO: values from DreamUserControlArea, can be deleted once there is further settings integration
 		GetComposite()->SetPosition(point(0.0f, -0.2f, -0.1f));
