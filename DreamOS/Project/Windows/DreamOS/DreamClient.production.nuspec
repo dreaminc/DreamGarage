@@ -24,24 +24,26 @@
     <tags>native, dreamos</tags>
   </metadata>
   <files>
-    <file src="x64\Production\*.exe" target="\lib\net45\" />
-    <file src="x64\Production\*.lib" target="\lib\net45\" />
-    <file src="x64\Production\*.dll" target="\lib\net45\" />
-    <file src="x64\Production\*.bin" target="\lib\net45\" />
-    <file src="x64\Production\*.dat" target="\lib\net45\" />
-    <file src="x64\Production\*.pak" target="\lib\net45\" />
-    <file src="x64\Production\*.js" target="\lib\net45\" />
+    <file src="x64\Production\*.exe" target="" />
+    <file src="x64\Production\*.lib" target="" />
+    <file src="x64\Production\*.dll" target="" />
+    <file src="x64\Production\*.bin" target="" />
+    <file src="x64\Production\*.dat" target="" />
+    <file src="x64\Production\*.pak" target="" />
+    <file src="x64\Production\*.js" target="" />
 
-    <file src=".\..\..\..\dreampaths.txt" target="\lib\net45\dreampaths.txt" />
-    <file src=".\..\..\..\HAL\**" target="\lib\net45\HAL\" />
-    <file src=".\..\..\..\Models\**" target="\lib\net45\Models\" />
-    <file src=".\..\..\..\Assets\**" target="\lib\net45\Assets\" />
-    <file src=".\..\..\..\Resources\**" target="\lib\net45\Resources\" />
-    <file src=".\..\..\..\Texture\**" target="\lib\net45\Texture\" />
+    <file src=".\..\..\..\dreampaths.txt" target="\dreampaths.txt" />
+    <file src=".\..\..\..\HAL\**" target="\HAL\" />
+    <file src=".\..\..\..\Models\cube.obj" target="\Models\" />
+    <file src=".\..\..\..\Models\Cave\**" target="\Models\Cave" />
+    <file src=".\..\..\..\Models\OculusTouch\**" target="\Models\OculusTouch" />
+    <file src=".\..\..\..\Assets\**" target="\Assets\" />
+    <file src=".\..\..\..\Resources\**" target="\Resources\" />
+    <file src=".\..\..\..\Texture\**" target="\Texture\" />
 
-    <file src=".\..\..\..\distribution\*" target="\lib\net45\" />
+    <file src=".\..\..\..\distribution\*" target="" />
 
-    <file src="x64\Production\locales\**" target="\lib\net45\locales\" />
+    <file src="x64\Production\locales\**" target="\locales\" />
     
     <file src="DreamOS.targets" target="\build\net45\DreamOS.targets" />
   </files>
