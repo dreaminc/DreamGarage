@@ -1000,6 +1000,15 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLSphere.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\HysteresisObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\HysteresisCylinder.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\HysteresisQuad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2178,6 +2187,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironment.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\HysteresisObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\HysteresisCylinder.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\HysteresisQuad.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -443,6 +443,9 @@
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\Framebuffer.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\HysteresisCylinder.cpp" />
+    <ClCompile Include="..\..\..\Primitives\HysteresisObj.cpp" />
+    <ClCompile Include="..\..\..\Primitives\HysteresisQuad.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\image.cpp" />
     <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp" />
@@ -800,6 +803,9 @@
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
     <ClInclude Include="..\..\..\Primitives\HandType.h" />
+    <ClInclude Include="..\..\..\Primitives\HysteresisCylinder.h" />
+    <ClInclude Include="..\..\..\Primitives\HysteresisObj.h" />
+    <ClInclude Include="..\..\..\Primitives\HysteresisQuad.h" />
     <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h" />
     <ClInclude Include="..\..\..\Primitives\image\image.h" />
     <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h" />
