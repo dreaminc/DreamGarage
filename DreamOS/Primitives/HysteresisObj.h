@@ -32,7 +32,11 @@ public:
 
 	virtual bool Resolve(UIMallet *pMallet) = 0;
 
-private:
+
+protected:
+	float m_offDistance;
+	float m_onDistance;
+
 	HysteresisEventType m_currentState = OFF;
 };
 
