@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DreamDevelopment</id>
+    <version>$version$</version>
+    <title>DreamDev</title>
+    <authors>Dream Garage, Incorporated</authors>
+    <owners>Dream Garage, Incorporated</owners>
+    <description>DreamDev</description>
+    <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>-->
+    <projectUrl>https://www.dreamos.com</projectUrl>
+    <iconUrl>https://github.com/dreaminc/Dream/releases/download/Releases/Dream.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+
+    <!--<dependencies></dependencies>-->
+
+    <releaseNotes>
+      Verson $version$ 
+
+      This is a test of the deplopyment system
+    </releaseNotes>
+    
+    <copyright>Copyright 2017</copyright>
+    <tags>native, dreamos</tags>
+  </metadata>
+  <files>
+    <file src="x64\Development\*.exe" target="" />
+    <file src="x64\Development\*.lib" target="" />
+    <file src="x64\Development\*.dll" target="" />
+    <file src="x64\Development\*.bin" target="" />
+    <file src="x64\Development\*.dat" target="" />
+    <file src="x64\Development\*.pak" target="" />
+    <file src="x64\Development\*.js" target="" />
+    
+    <file src=".\..\..\..\dreampaths.txt" target="\dreampaths.txt" />
+    <file src=".\..\..\..\HAL\**" target="\HAL\" />
+    <file src=".\..\..\..\Models\**" target="\Models\" />
+    <file src=".\..\..\..\Assets\**" target="\Assets\" />
+    <file src=".\..\..\..\Resources\**" target="\Resources\" />
+    <file src=".\..\..\..\Texture\**" target="\Texture\" />
+    
+    <file src=".\..\..\..\distribution\*" target="" />
+    
+    <file src="x64\Development\locales\**" target="\locales\" />
+    
+    <file src="DreamOS.targets" target="\build\net45\DreamOS.targets" />
+  </files>
+</package>

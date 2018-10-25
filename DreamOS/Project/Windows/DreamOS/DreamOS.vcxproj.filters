@@ -2388,10 +2388,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\standard_clipping.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
-      <Filter>HAL</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\mathCommon.shader">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
@@ -2445,6 +2441,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\environment_clipping.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenfade.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
