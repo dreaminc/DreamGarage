@@ -8,6 +8,6 @@ HysteresisQuad::~HysteresisQuad() {
 	// empty
 }
 
-RESULT HysteresisQuad::Update(UIMallet *pMallet) {
-	return R_NOT_IMPLEMENTED;
+bool HysteresisQuad::Resolve(UIMallet *pMallet) {
+	return false;
 }

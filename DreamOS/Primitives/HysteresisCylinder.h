@@ -10,7 +10,7 @@ public:
 	~HysteresisCylinder();
 
 public:
-	virtual RESULT Update(UIMallet *pMallet) override;
+	virtual bool Resolve(UIMallet *pMallet) override;
 };
 
 #endif // ! HYSTERESIS_CYLINDER_H_

@@ -27,7 +27,13 @@ public:
 	~HysteresisObj();
 
 public:
-	virtual RESULT Update(UIMallet *pMallet) = 0;
+	RESULT Update(UIMallet *pMallet);
+	HysteresisEventType GetState(UIMallet *pMallet);
+
+	virtual bool Resolve(UIMallet *pMallet) = 0;
+
+private:
+	HysteresisEventType m_currentState = OFF;
 };
 
 #endif // ! HYSTERESIS_OBJ_H_
