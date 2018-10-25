@@ -39,6 +39,7 @@
 #include "Sense/SenseGamepadController.h"
 
 #include "Primitives/model/ModelFactory.h"
+#include "HMD/HMDFactory.h"
 
 class light; 
 class quad;
@@ -81,6 +82,7 @@ public:
 		unsigned fHMDMirror : 1;
 		unsigned f3rdPersonCamera : 1;
 		unsigned fHideWindow : 1;
+		HMD_TYPE hmdType = HMD_ANY_AVAILABLE;
 	};
 
 private:
