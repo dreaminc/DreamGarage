@@ -742,7 +742,7 @@ RESULT SandboxApp::InitializeHMD() {
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
 		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
 		m_pHMD = HMDFactory::MakeHMD(
-			HMD_ANY_AVAILABLE,
+			m_SandboxConfiguration.hmdType,
 			this,
 			m_pHALImp,
 			pxWidth,
