@@ -10,7 +10,7 @@ public:
 	~HysteresisSphere();
 
 public:
-	virtual bool Resolve(UIMallet *pMallet) override;
+	virtual bool Resolve(VirtualObj *pObj) override;
 };
 
 #endif // ! HYSTERESIS_SPHERE_H_

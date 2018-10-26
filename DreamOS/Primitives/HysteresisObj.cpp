@@ -16,25 +16,25 @@ HysteresisObj::~HysteresisObj() {
 	// empty
 }
 
-RESULT HysteresisObj::Update(UIMallet *pMallet) {
+RESULT HysteresisObj::Update(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
-	HysteresisEventType currentState = GetState(pMallet);
+	HysteresisEventType currentState = GetState(pObj);
 
 	if (currentState != m_currentState) {
 		m_currentState = currentState;
 
-		CR(NotifySubscribers(m_currentState, new HysteresisEvent(m_currentState, pMallet->GetMalletHead())));
+		CR(NotifySubscribers(m_currentState, new HysteresisEvent(m_currentState, pObj)));
 	}
 
 Error:
 	return r;
 }
 
-HysteresisEventType HysteresisObj::GetState(UIMallet *pMallet) {
+HysteresisEventType HysteresisObj::GetState(VirtualObj *pObj) {
 
 	// TODO: only an example, far from actual hysteresis
-	bool fResolved = Resolve(pMallet);
+	bool fResolved = Resolve(pObj);
 	HysteresisEventType eventType;
 	if (fResolved) {
 		eventType = HysteresisEventType::ON;

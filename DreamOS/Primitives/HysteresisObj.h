@@ -27,15 +27,15 @@ public:
 	~HysteresisObj();
 
 public:
-	RESULT Update(UIMallet *pMallet);
-	HysteresisEventType GetState(UIMallet *pMallet);
+	RESULT Update(VirtualObj *pObj);
+	HysteresisEventType GetState(VirtualObj *pObj);
 
-	virtual bool Resolve(UIMallet *pMallet) = 0;
+	virtual bool Resolve(VirtualObj *pObj) = 0;
 
 
 protected:
-	float m_offDistance;
-	float m_onDistance;
+	float m_offThreshold;
+	float m_onThreshold;
 
 	HysteresisEventType m_currentState = OFF;
 };

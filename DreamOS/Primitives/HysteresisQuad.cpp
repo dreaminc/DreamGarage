@@ -10,20 +10,20 @@ HysteresisQuad::~HysteresisQuad() {
 	// empty
 }
 
-bool HysteresisQuad::Resolve(UIMallet *pMallet) {
+bool HysteresisQuad::Resolve(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = GetPosition(true);
-	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+	point ptSphereOrigin = pObj->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation(true))) * (ptSphereOrigin - GetOrigin(true)));
 
 	float distance = ptSphereOrigin.y();
 
 	if (m_currentState == ON) {
-		return distance + pMallet->GetRadius() > m_onDistance;
+		return distance > m_onThreshold;
 	}
 	else {
-		return distance - pMallet->GetRadius() < m_offDistance;
+		return distance < m_offThreshold;
 	}
 
 Error:

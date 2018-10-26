@@ -10,16 +10,16 @@ HysteresisSphere::~HysteresisSphere() {
 	// empty
 }
 
-bool HysteresisSphere::Resolve(UIMallet *pMallet) {
+bool HysteresisSphere::Resolve(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
-	float distance = (pMallet->GetMalletHead()->GetPosition(true) - GetPosition(true)).magnitude();
+	float distance = (pObj->GetPosition(true) - GetPosition(true)).magnitude();
 
 	if (m_currentState == ON) {
-		return distance + pMallet->GetRadius() > m_onDistance;
+		return distance > m_onThreshold;
 	}
 	else {
-		return distance - pMallet->GetRadius() < m_offDistance;
+		return distance < m_offThreshold;
 	}
 	
 Error:

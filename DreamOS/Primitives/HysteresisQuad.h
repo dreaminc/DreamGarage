@@ -10,7 +10,7 @@ public:
 	~HysteresisQuad();
 
 public:
-	virtual bool Resolve(UIMallet *pMallet) override;
+	virtual bool Resolve(VirtualObj *pObj) override;
 };
 
 #endif // ! HYSTERESIS_QUAD_H_
