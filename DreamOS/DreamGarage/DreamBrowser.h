@@ -59,6 +59,7 @@ public:
 
 	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
 	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
+	virtual RESULT HandleLoadEnd() = 0;
 
 	virtual RESULT HandleDreamFormSuccess() = 0;
 	virtual RESULT HandleDreamFormCancel() = 0;

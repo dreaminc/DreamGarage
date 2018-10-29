@@ -533,6 +533,10 @@ Error:
 	return r;
 }
 
+RESULT DreamUserControlArea::HandleLoadEnd() {
+	return R_NOT_IMPLEMENTED;
+}
+
 bool DreamUserControlArea::IsContentVisible() {
 	return true;
 }
@@ -1018,14 +1022,16 @@ RESULT DreamUserControlArea::Notify(InteractionObjectEvent *pSubscriberEvent) {
 		}
 
 		else {	// Pressing back when Menu has a level saved
-			m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
-			if (m_pDreamUIBar->IsEmpty()) {	// Case where pressing back on Top level menu
-				if (m_fHasOpenApp) {
-					Show();
-				}
-				else {
-					m_pDreamUserApp->SetEventApp(nullptr);
-					m_pDreamUserApp->SetHasOpenApp(false);
+			if (m_pDreamUserApp->m_pPreviousApp != m_pDreamUIBar.get()) {
+				m_pDreamUIBar->HandleEvent(UserObserverEventType::BACK);
+				if (m_pDreamUIBar->IsEmpty()) {	// Case where pressing back on Top level menu
+					if (m_fHasOpenApp) {
+						Show();
+					}
+					else {
+						m_pDreamUserApp->SetEventApp(nullptr);
+						m_pDreamUserApp->SetHasOpenApp(false);
+					}
 				}
 			}
 		}
