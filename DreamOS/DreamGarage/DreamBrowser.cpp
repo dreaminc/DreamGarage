@@ -329,6 +329,7 @@ RESULT DreamBrowser::OnLoadEnd(int httpStatusCode, std::string strCurrentURL) {
 	m_strCurrentURL = strCurrentURL;
 
 	if (m_pObserver != nullptr) {
+		CR(m_pObserver->HandleLoadEnd());
 		m_fUpdateControlBarInfo = true;
 	}
 

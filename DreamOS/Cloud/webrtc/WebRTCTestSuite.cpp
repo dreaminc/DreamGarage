@@ -513,7 +513,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
-
+		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
 		// CloudController::PeerConnectionObserver
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 			DEVENV_LINEOUT("OnNewPeerConnection");

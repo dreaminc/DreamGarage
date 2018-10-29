@@ -58,6 +58,7 @@ public:
 
 	RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override;
 	RESULT HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) override;
+	RESULT HandleLoadEnd() override;
 
 	RESULT HandleDreamFormSuccess() override;
 	RESULT HandleDreamFormCancel() override;
@@ -91,6 +92,7 @@ protected:
 
 	bool m_fInitBrowser = false;
 	bool m_fUpdateFormURL = false;
+	bool m_fBrowserFinishedLoading = false;
 
 	bool m_fFormVisible = false;
 	bool m_fPendShowFormView = false;

@@ -126,6 +126,7 @@ public:
 	//TODO: present keyboard from browser::OnNodeFocusChanged
 	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override;
 	virtual RESULT HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) override;
+	virtual RESULT HandleLoadEnd() override;
 	bool IsContentVisible();
 
 	virtual RESULT HandleDreamFormSuccess() override;

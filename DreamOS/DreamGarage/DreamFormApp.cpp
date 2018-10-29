@@ -77,6 +77,7 @@ RESULT DreamFormApp::Update(void *pContext) {
 	if (m_fInitBrowser) {
 		DOSLOG(INFO, "Creating browser app for form: %s", m_strURL);
 		m_fInitBrowser = false;
+		m_fBrowserFinishedLoading = false;
 
 		m_pDreamBrowserForm = GetDOS()->LaunchDreamApp<DreamBrowser>(this);
 		CN(m_pDreamBrowserForm);
@@ -272,6 +273,15 @@ Error:
 	return r;
 }
 
+RESULT DreamFormApp::HandleLoadEnd() {	// This has a chance of breaking if we ever load complex pages as forms (pages that load ads, plugins, etc...) but at the same time it might still work.
+	RESULT r = R_PASS;
+
+	m_fBrowserFinishedLoading = true;
+
+Error:
+	return r;
+}
+
 RESULT DreamFormApp::HandleDreamFormSuccess() {
 	RESULT r = R_PASS;
 
@@ -330,7 +340,7 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	
 	pEventApp = pDreamUserApp->m_pEventApp;
 	CBR(pEventApp == m_pFormView.get(), R_SKIPPED);
-
+	CBR(m_fBrowserFinishedLoading, R_SKIPPED);
 	switch (pEvent->m_eventType) {
 
 	case INTERACTION_EVENT_MENU: {
