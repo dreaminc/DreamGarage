@@ -1728,6 +1728,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 				pTestContext->msLastSent = msTimeNow;
 				int randAction = std::rand() % 10;
 
+				/*
 				if (randAction <= 7) {
 					// select random tab
 					DEBUG_LINEOUT("SELECT");
@@ -1741,7 +1742,6 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					}
 
 				}
-				/*
 				else if (randAction == 9) {
 					DEBUG_LINEOUT("OPEN");
 					int randIndex = std::rand() % pTestContext->strURIs.size();

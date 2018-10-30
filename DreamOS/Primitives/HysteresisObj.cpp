@@ -8,12 +8,29 @@ HysteresisEvent::HysteresisEvent(HysteresisEventType eventType, VirtualObj *even
 	// empty
 }
 
+HysteresisObj::HysteresisObj(float onThreshold, float offThreshold) :
+	m_onThreshold(onThreshold),
+	m_offThreshold(offThreshold) 
+{
+	Initialize();
+}
+
 HysteresisObj::HysteresisObj() {
-	// empty
+	Initialize();
 }
 
 HysteresisObj::~HysteresisObj() {
 	// empty
+}
+
+RESULT HysteresisObj::Initialize() {
+	RESULT r = R_PASS;
+
+	CR(RegisterEvent(HysteresisEventType::OFF));
+	CR(RegisterEvent(HysteresisEventType::ON));
+
+Error:
+	return r;
 }
 
 RESULT HysteresisObj::Update(VirtualObj *pObj) {

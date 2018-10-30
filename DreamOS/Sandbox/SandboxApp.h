@@ -56,6 +56,10 @@ class user;
 class Message;
 class DreamAppMessage;
 
+class HysteresisCylinder;
+class HysteresisQuad;
+class HysteresisSphere;
+
 class UIKeyboardLayout;
 
 class DreamAppManager;
@@ -369,6 +373,10 @@ public:
 
 	user *AddUser();
 	user *MakeUser();
+
+	HysteresisCylinder *MakeHysteresisCylinder(float onThresold, float offThreshold);
+	HysteresisQuad *MakeHysteresisQuad(float onThreshold, float offThreshold);
+	HysteresisSphere *MakeHysteresisSphere(float onThreshold, float offThreshold);
 
 	// Cloud Controller 
 public:

@@ -26,6 +26,10 @@
 
 #include "Primitives/model/ModelFactory.h"
 
+#include "Primitives/HysteresisCylinder.h"
+#include "Primitives/HysteresisQuad.h"
+#include "Primitives/HysteresisSphere.h"
+
 #include <HMD/HMDFactory.h>
 
 SandboxApp::SandboxApp() :
@@ -1611,6 +1615,51 @@ Error:
 	if (pUser != nullptr) {
 		delete pUser;
 		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+HysteresisCylinder *SandboxApp::MakeHysteresisCylinder(float onThreshold, float offThreshold) {
+	RESULT r = R_PASS;
+	HysteresisCylinder *pCylinder = new HysteresisCylinder(onThreshold, offThreshold);
+	CN(pCylinder);
+
+	return pCylinder;
+
+Error:
+	if (pCylinder != nullptr) {
+		delete pCylinder;
+		pCylinder = nullptr;
+	}
+	return nullptr;
+}
+
+HysteresisQuad *SandboxApp::MakeHysteresisQuad(float onThreshold, float offThreshold) {
+	RESULT r = R_PASS;
+	HysteresisQuad *pQuad = new HysteresisQuad(onThreshold, offThreshold);
+	CN(pQuad);
+
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+	return nullptr;
+}
+
+HysteresisSphere *SandboxApp::MakeHysteresisSphere(float onThreshold, float offThreshold) {
+	RESULT r = R_PASS;
+	HysteresisSphere *pSphere = new HysteresisSphere(onThreshold, offThreshold);
+	CN(pSphere);
+
+	return pSphere;
+
+Error:
+	if (pSphere != nullptr) {
+		delete pSphere;
+		pSphere = nullptr;
 	}
 	return nullptr;
 }

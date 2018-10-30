@@ -9,6 +9,8 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "Primitives/HysteresisCylinder.h"
+
 #include "PhysicsEngine/CollisionManifold.h"
 
 #include "HAL/opengl/OGLProgramReflection.h"
@@ -34,6 +36,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMinimalTextureShader());
+
 	CR(AddTestIrradianceMap());
 
 	CR(AddTest3rdPersonCamera());
@@ -43,8 +47,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestCubeMap());
 
 	CR(AddTestWaterShaderCube());
-
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 

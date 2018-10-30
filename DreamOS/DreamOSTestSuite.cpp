@@ -21,10 +21,9 @@
 #include "UI\UIKeyboard.h"
 #include "DreamGarage\DreamUIBar.h"
 #include "DreamGarage\DreamFormApp.h"
-#include "DreamControlView\UIControlView.h"
+//#include "DreamControlView\UIControlView.h"
 #include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamShareView\DreamShareView.h"
-#include "DreamGarage\DreamDesktopDupplicationApp\DreamDesktopApp.h"
 #include "DreamGarage\DreamGamepadCameraApp.h"
 #include "DreamGarage\DreamEnvironmentApp.h"
 

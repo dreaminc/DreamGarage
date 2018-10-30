@@ -6,6 +6,7 @@
 class HysteresisCylinder : public HysteresisObj {
 
 public:
+	HysteresisCylinder(float onThreshold, float offThreshold);
 	HysteresisCylinder();
 	~HysteresisCylinder();
 

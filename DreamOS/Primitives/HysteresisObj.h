@@ -23,11 +23,15 @@ struct HysteresisEvent {
 class HysteresisObj : public VirtualObj, public Publisher<HysteresisEventType, HysteresisEvent> {
 
 public:
+	HysteresisObj(float onThreshold, float offThreshold);
 	HysteresisObj();
 	~HysteresisObj();
 
 public:
+
+	RESULT Initialize();
 	RESULT Update(VirtualObj *pObj);
+
 	HysteresisEventType GetState(VirtualObj *pObj);
 
 	virtual bool Resolve(VirtualObj *pObj) = 0;

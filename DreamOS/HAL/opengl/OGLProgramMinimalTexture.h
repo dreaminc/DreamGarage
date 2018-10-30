@@ -45,7 +45,7 @@ private:
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
 
-	bool m_fPassThru = true;
+	bool m_fPassThru = false;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

@@ -2,6 +2,12 @@
 #include "UI/UIMallet.h"
 #include "sphere.h"
 
+HysteresisSphere::HysteresisSphere(float onThreshold, float offThreshold) : 
+	HysteresisObj(onThreshold,offThreshold)
+{
+
+}
+
 HysteresisSphere::HysteresisSphere() {
 	// empty
 }
@@ -15,11 +21,11 @@ bool HysteresisSphere::Resolve(VirtualObj *pObj) {
 
 	float distance = (pObj->GetPosition(true) - GetPosition(true)).magnitude();
 
-	if (m_currentState == ON) {
+	if (m_currentState == OFF) {
 		return distance > m_onThreshold;
 	}
 	else {
-		return distance < m_offThreshold;
+		return distance > m_offThreshold;
 	}
 	
 Error:

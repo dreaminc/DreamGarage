@@ -6,6 +6,8 @@
 class HysteresisSphere : public HysteresisObj {
 
 public:
+
+	HysteresisSphere(float onThreshold, float offThreshold);
 	HysteresisSphere();
 	~HysteresisSphere();
 

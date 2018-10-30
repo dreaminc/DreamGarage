@@ -47,6 +47,9 @@ public:
 	// OBB - OBB
 	RESULT AddTestOBBOBB();
 
+	// Hysteresis
+	RESULT AddTestHysteresisObj();
+
 	// TODO: OBB - Sphere
 
 	// TODO: OBB - Quad

@@ -35,6 +35,10 @@
 #include "Primitives/skybox.h"
 #include "Primitives/user.h"
 
+#include "Primitives/HysteresisCylinder.h"
+#include "Primitives/HysteresisQuad.h"
+#include "Primitives/HysteresisSphere.h"
+
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
@@ -361,6 +365,10 @@ public:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+
+	HysteresisCylinder *MakeHysteresisCylinder(float onThresold, float offThreshold);
+	HysteresisQuad *MakeHysteresisQuad(float onThreshold, float offThreshold);
+	HysteresisSphere *MakeHysteresisSphere(float onThreshold, float offThreshold);
 
 	template<typename objType, typename... Targs>
 	objType *Add(Targs... Fargs) {
