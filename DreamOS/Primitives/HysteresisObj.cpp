@@ -12,11 +12,29 @@ HysteresisObj::HysteresisObj(float onThreshold, float offThreshold) :
 	m_onThreshold(onThreshold),
 	m_offThreshold(offThreshold) 
 {
-	Initialize();
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 HysteresisObj::HysteresisObj() {
-	Initialize();
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 HysteresisObj::~HysteresisObj() {
@@ -38,10 +56,10 @@ RESULT HysteresisObj::Update(VirtualObj *pObj) {
 
 	HysteresisEventType currentState = GetState(pObj);
 
-	if (currentState != m_currentState) {
-		m_currentState = currentState;
+	if (m_currentStates.count(pObj) == 0 || m_currentStates[pObj] != currentState) {
+		m_currentStates[pObj] = currentState;
 
-		CR(NotifySubscribers(m_currentState, new HysteresisEvent(m_currentState, pObj)));
+		CR(NotifySubscribers(m_currentStates[pObj], new HysteresisEvent(m_currentStates[pObj], pObj)));
 	}
 
 Error:
@@ -50,8 +68,8 @@ Error:
 
 HysteresisEventType HysteresisObj::GetState(VirtualObj *pObj) {
 
-	// TODO: only an example, far from actual hysteresis
 	bool fResolved = Resolve(pObj);
+
 	HysteresisEventType eventType;
 	if (fResolved) {
 		eventType = HysteresisEventType::ON;

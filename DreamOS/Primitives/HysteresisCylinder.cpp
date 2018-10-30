@@ -24,7 +24,7 @@ bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 	ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation(true))) * (ptSphereOrigin - GetOrigin(true)));
 
 	float distance = vector(ptSphereOrigin.x(), 0.0f, ptSphereOrigin.z()).magnitude();
-	if (m_currentState == OFF) {
+	if (m_currentStates.count(pObj) == 0 || m_currentStates[pObj] == OFF) {
 		return distance > m_onThreshold;
 	}
 	else {

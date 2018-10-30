@@ -1976,18 +1976,32 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		HysteresisObj *pObj = nullptr;
 
 		virtual RESULT Notify(HysteresisEvent *pEvent) override {
+			RESULT r = R_PASS;
+
+			// with DreamUserApp as the Subscriber to the Hysteresis objects, this logic is more reasonable
+			UIMallet *pMallet = nullptr;
+			if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead() == pEvent->m_pEventObject) {
+				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT);
+			}
+			else if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead() == pEvent->m_pEventObject) {
+				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT);
+			}
+			CNR(pMallet, R_SKIPPED);
+
 			switch (pEvent->m_eventType) {
 			case ON: {
-				pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
+				pMallet->Show();
+
 			} break;
 
 			case OFF: {
-				pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Hide();
+				pMallet->Hide();
 			} break;
 
 			}
 
-			return R_PASS;
+		Error:
+			return r;
 		}
 
 	};
@@ -2020,6 +2034,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::ON, pTestContext);
 		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::OFF, pTestContext);
 
+		// reference objects, positioned at the boundaries
 		pTestContext->pVolumeOff = m_pDreamOS->AddVolume(0.0125f);
 		pTestContext->pVolumeOn = m_pDreamOS->AddVolume(0.0125f);
 
@@ -2038,6 +2053,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		pTestContext->pVolumeOn->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true) + point(0.0f, -0.1f, -0.5f));
 
 		pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
+		pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
 
 //		pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
 

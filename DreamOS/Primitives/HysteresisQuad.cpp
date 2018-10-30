@@ -25,7 +25,7 @@ bool HysteresisQuad::Resolve(VirtualObj *pObj) {
 
 	float distance = ptSphereOrigin.y();
 
-	if (m_currentState == OFF) {
+	if (m_currentStates.count(pObj) == 0 || m_currentStates[pObj] == OFF) {
 		return distance > m_onThreshold;
 	}
 	else {

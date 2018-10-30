@@ -41,7 +41,7 @@ protected:
 	float m_offThreshold;
 	float m_onThreshold;
 
-	HysteresisEventType m_currentState = OFF;
+	std::map<VirtualObj*, HysteresisEventType> m_currentStates;
 };
 
 #endif // ! HYSTERESIS_OBJ_H_
