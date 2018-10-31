@@ -31,6 +31,7 @@
 #include "InteractionEngine/InteractionEngine.h"
 
 #include "Primitives/viewport.h"
+#include "Primitives/HysteresisObject.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -379,6 +380,8 @@ public:
 	user *MakeUser();
 
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+
+	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
 
 	// Cloud Controller 
 public:

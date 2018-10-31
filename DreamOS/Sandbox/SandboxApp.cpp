@@ -26,6 +26,10 @@
 
 #include "Primitives/model/ModelFactory.h"
 
+#include "Primitives/HysteresisCylinder.h"
+#include "Primitives/HysteresisPlane.h"
+#include "Primitives/HysteresisSphere.h"
+
 #include <HMD/HMDFactory.h>
 
 SandboxApp::SandboxApp() :
@@ -1645,6 +1649,35 @@ Error:
 		pProgramNode = nullptr;
 	}
 
+	return nullptr;
+}
+
+HysteresisObject *SandboxApp::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	RESULT r = R_PASS;
+
+	HysteresisObject *pObject = nullptr;
+
+	switch (objectType) {
+		case (SPHERE): {
+			pObject = new HysteresisSphere(onThreshold, offThreshold);
+		} break;
+		case (CYLINDER): {
+			pObject = new HysteresisCylinder(onThreshold, offThreshold);
+		} break;
+		case (PLANE): {
+			pObject = new HysteresisPlane(onThreshold, offThreshold);
+		} break;
+	}
+
+	CN(pObject);
+
+	return pObject;
+
+Error:
+	if (pObject != nullptr) {
+		delete pObject;
+		pObject = nullptr;
+	}
 	return nullptr;
 }
 
