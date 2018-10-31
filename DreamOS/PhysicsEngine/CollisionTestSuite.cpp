@@ -8,6 +8,7 @@
 #include "PhysicsEngine/CollisionManifold.h"
 
 #include "Primitives/DimPlane.h"
+#include "Primitives/HysteresisCylinder.h"
 
 CollisionTestSuite::CollisionTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -21,6 +22,8 @@ CollisionTestSuite::~CollisionTestSuite() {
 
 RESULT CollisionTestSuite::AddTests() {
 	RESULT r = R_PASS;
+
+	CR(AddTestHysteresisObj());
 
 	CR(AddTestOBBOBB());
 
@@ -1951,6 +1954,131 @@ RESULT CollisionTestSuite::AddTestRayModel() {
 
 	pNewTest->SetTestName("Ray vs Quads in Composite");
 	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion in a composite");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT CollisionTestSuite::AddTestHysteresisObj() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 100.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public Subscriber<HysteresisEvent> {
+
+		DreamOS *pDreamOS = nullptr;
+		volume *pVolumeOff = nullptr;
+		volume *pVolumeOn = nullptr;
+
+		HysteresisObject *pObj = nullptr;
+
+		virtual RESULT Notify(HysteresisEvent *pEvent) override {
+			RESULT r = R_PASS;
+
+			// with DreamUserApp as the Subscriber to the Hysteresis objects, this logic is more reasonable
+			UIMallet *pMallet = nullptr;
+			if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead() == pEvent->m_pEventObject) {
+				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT);
+			}
+			else if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead() == pEvent->m_pEventObject) {
+				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT);
+			}
+			CNR(pMallet, R_SKIPPED);
+
+			switch (pEvent->m_eventType) {
+			case ON: {
+				pMallet->Show();
+
+			} break;
+
+			case OFF: {
+				pMallet->Hide();
+			} break;
+
+			}
+
+		Error:
+			return r;
+		}
+
+	};
+	TestContext *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CR(SetupSkyboxPipeline("minimal"));
+
+		CN(m_pDreamOS);
+		pTestContext->pDreamOS = m_pDreamOS;
+
+		// cylinder
+		pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, CYLINDER);
+
+		// sphere
+		//pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, SPHERE);
+
+		// quad
+		//pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, PLANE);
+		//pTestContext->pObj->RotateXByDeg(-90.0f);
+
+		CN(pTestContext->pObj);
+
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
+		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::ON, pTestContext);
+		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::OFF, pTestContext);
+
+		// reference objects, positioned at the boundaries
+		pTestContext->pVolumeOff = m_pDreamOS->AddVolume(0.0125f);
+		pTestContext->pVolumeOn = m_pDreamOS->AddVolume(0.0125f);
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pObj->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true));
+		pTestContext->pVolumeOff->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true) + point(0.0f, -0.1f, -0.25f));
+		pTestContext->pVolumeOn->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true) + point(0.0f, -0.1f, -0.5f));
+
+	//	pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
+	//	pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
+		pTestContext->pObj->Update();
+
+//		pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Hysteresis Test");
+	pNewTest->SetTestDescription("hysteresis test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

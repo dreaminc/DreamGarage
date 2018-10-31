@@ -31,6 +31,7 @@
 #include "InteractionEngine/InteractionEngine.h"
 
 #include "Primitives/viewport.h"
+#include "Primitives/HysteresisObject.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -369,6 +370,8 @@ public:
 
 	user *AddUser();
 	user *MakeUser();
+
+	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
 
 	// Cloud Controller 
 public:

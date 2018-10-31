@@ -38,6 +38,7 @@ class texture;
 class UIControlView : public UISurface, 
 						 public DreamUserObserver {
 	friend class DreamUserControlArea;
+	friend class MultiContentTestSuite;
 	friend class DreamSettingsApp;
 	friend class DreamFormApp;
 

@@ -1,4 +1,5 @@
 #include "DreamLoginApp.h"
+#include "DreamControlView/UIControlView.h"
 #include <chrono>
 
 DreamLoginApp::DreamLoginApp(DreamOS *pDreamOS, void *pContext) :
