@@ -109,10 +109,10 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 	#define	DOS_LOG_OUTPUT_MAX_SIZE	1024
 	static char szDosLogOutputString[DOS_DEBUGGER_OUTPUT_MAX_SIZE] = { DOS_DEBUGGER_SIGNATURE };
 
-	#define DOSLogLine(level, crt, r) DOSLOG(ERR, "%s:%s:%s(%d):Error: 0x%x\n", crt, __FILE__, __FUNCTION__, __LINE__, r)
+	#define DOSLogLine(level, crt, r) DOSLOG(ERR, "%s:%s:%s(%d):Error: 0x%x\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r)
 #define DOSLogLineMessage(level, crt, r, msg, ...) do {																	\
 		sprintf_s(szDosLogOutputString, msg, ##__VA_ARGS__);															\
-		DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)			\
+		DOSLOG(level, "%s:%s:%s(%d:0x%x):%s\n", crt, __BASE_FILE__, __FUNCTION__, __LINE__, r, szDosLogOutputString)			\
 	} while (0);
 
 	#define DOSLogError(crt, r) DOSLogLine(ERR, crt, r)

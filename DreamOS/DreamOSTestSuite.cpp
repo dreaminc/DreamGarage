@@ -53,9 +53,9 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamLogger());
-
 	CR(AddTestGamepadCamera());
+
+	CR(AddTestDreamLogger());
 
 	CR(AddTestEnvironmentSeating());
 
