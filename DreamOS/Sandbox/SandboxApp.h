@@ -31,6 +31,7 @@
 #include "InteractionEngine/InteractionEngine.h"
 
 #include "Primitives/viewport.h"
+#include "Primitives/HysteresisObject.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -55,10 +56,6 @@ class model;
 class user;
 class Message;
 class DreamAppMessage;
-
-class HysteresisCylinder;
-class HysteresisQuad;
-class HysteresisSphere;
 
 class UIKeyboardLayout;
 
@@ -374,9 +371,7 @@ public:
 	user *AddUser();
 	user *MakeUser();
 
-	HysteresisCylinder *MakeHysteresisCylinder(float onThresold, float offThreshold);
-	HysteresisQuad *MakeHysteresisQuad(float onThreshold, float offThreshold);
-	HysteresisSphere *MakeHysteresisSphere(float onThreshold, float offThreshold);
+	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
 
 	// Cloud Controller 
 public:

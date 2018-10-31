@@ -1,22 +1,22 @@
-#include "HysteresisQuad.h"
+#include "HysteresisPlane.h"
 #include "UI/UIMallet.h"
 #include "sphere.h"
 
-HysteresisQuad::HysteresisQuad(float onThreshold, float offThreshold) : 
-	HysteresisObj(onThreshold,offThreshold)
+HysteresisPlane::HysteresisPlane(float onThreshold, float offThreshold) : 
+	HysteresisObject(onThreshold,offThreshold)
 {
 
 }
 
-HysteresisQuad::HysteresisQuad() {
+HysteresisPlane::HysteresisPlane() {
 	// empty
 }
 
-HysteresisQuad::~HysteresisQuad() {
+HysteresisPlane::~HysteresisPlane() {
 	// empty
 }
 
-bool HysteresisQuad::Resolve(VirtualObj *pObj) {
+inline bool HysteresisPlane::Resolve(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = GetPosition(true);

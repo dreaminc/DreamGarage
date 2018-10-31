@@ -3,7 +3,7 @@
 #include "sphere.h"
 
 HysteresisCylinder::HysteresisCylinder(float onThreshold, float offThreshold) : 
-	HysteresisObj(onThreshold,offThreshold)
+	HysteresisObject(onThreshold,offThreshold)
 {
 
 }
@@ -16,7 +16,7 @@ HysteresisCylinder::~HysteresisCylinder() {
 	// empty
 }
 
-bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
+inline bool HysteresisCylinder::Resolve(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = GetPosition(true);

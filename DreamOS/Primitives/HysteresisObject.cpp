@@ -1,4 +1,4 @@
-#include "HysteresisObj.h"
+#include "HysteresisObject.h"
 #include "sphere.h"
 
 HysteresisEvent::HysteresisEvent(HysteresisEventType eventType, VirtualObj *eventObject) :
@@ -8,7 +8,7 @@ HysteresisEvent::HysteresisEvent(HysteresisEventType eventType, VirtualObj *even
 	// empty
 }
 
-HysteresisObj::HysteresisObj(float onThreshold, float offThreshold) :
+HysteresisObject::HysteresisObject(float onThreshold, float offThreshold) :
 	m_onThreshold(onThreshold),
 	m_offThreshold(offThreshold) 
 {
@@ -24,7 +24,7 @@ Error:
 	return;
 }
 
-HysteresisObj::HysteresisObj() {
+HysteresisObject::HysteresisObject() {
 	RESULT r = R_PASS;
 
 	CR(Initialize());
@@ -37,11 +37,11 @@ Error:
 	return;
 }
 
-HysteresisObj::~HysteresisObj() {
+HysteresisObject::~HysteresisObject() {
 	// empty
 }
 
-RESULT HysteresisObj::Initialize() {
+RESULT HysteresisObject::Initialize() {
 	RESULT r = R_PASS;
 
 	CR(RegisterEvent(HysteresisEventType::OFF));
@@ -51,22 +51,35 @@ Error:
 	return r;
 }
 
-RESULT HysteresisObj::Update(VirtualObj *pObj) {
+RESULT HysteresisObject::Update() {
 	RESULT r = R_PASS;
 
-	HysteresisEventType currentState = GetState(pObj);
+	for (auto pObjIt = m_currentStates.begin(); pObjIt != m_currentStates.end(); ++pObjIt) {
 
-	if (m_currentStates.count(pObj) == 0 || m_currentStates[pObj] != currentState) {
-		m_currentStates[pObj] = currentState;
+		auto pObj = pObjIt->first;
+		HysteresisEventType currentState = GetState(pObj);
 
-		CR(NotifySubscribers(m_currentStates[pObj], new HysteresisEvent(m_currentStates[pObj], pObj)));
+		if (m_currentStates[pObj] != currentState) {
+			m_currentStates[pObj] = currentState;
+
+			CR(NotifySubscribers(m_currentStates[pObj], new HysteresisEvent(m_currentStates[pObj], pObj)));
+		}
 	}
 
 Error:
 	return r;
 }
 
-HysteresisEventType HysteresisObj::GetState(VirtualObj *pObj) {
+RESULT HysteresisObject::RegisterObject(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+
+	m_currentStates[pObj] = OFF;
+
+Error:
+	return r;
+}
+
+HysteresisEventType HysteresisObject::GetState(VirtualObj *pObj) {
 
 	bool fResolved = Resolve(pObj);
 

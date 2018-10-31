@@ -1008,16 +1008,8 @@ quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions,
 	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-HysteresisCylinder *DreamOS::MakeHysteresisCylinder(float onThresold, float offThreshold) {
-	return m_pSandbox->MakeHysteresisCylinder(onThresold, offThreshold);
-}
-
-HysteresisQuad *DreamOS::MakeHysteresisQuad(float onThreshold, float offThreshold) {
-	return m_pSandbox->MakeHysteresisQuad(onThreshold, offThreshold);
-}
-
-HysteresisSphere *DreamOS::MakeHysteresisSphere(float onThreshold, float offThreshold) {
-	return m_pSandbox->MakeHysteresisSphere(onThreshold, offThreshold);
+HysteresisObject *DreamOS::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	return m_pSandbox->MakeHysteresisObject(onThreshold, offThreshold, objectType);
 }
 
 std::shared_ptr<UIKeyboard> DreamOS::GetKeyboardApp() {

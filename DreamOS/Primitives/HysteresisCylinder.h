@@ -1,9 +1,9 @@
 #ifndef HYSTERESIS_CYLINDER_H_
 #define HYSTERESIS_CYLINDER_H_
 
-#include "HysteresisObj.h"
+#include "HysteresisObject.h"
 
-class HysteresisCylinder : public HysteresisObj {
+class HysteresisCylinder : public HysteresisObject {
 
 public:
 	HysteresisCylinder(float onThreshold, float offThreshold);

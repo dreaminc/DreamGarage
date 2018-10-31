@@ -3,7 +3,7 @@
 #include "sphere.h"
 
 HysteresisSphere::HysteresisSphere(float onThreshold, float offThreshold) : 
-	HysteresisObj(onThreshold,offThreshold)
+	HysteresisObject(onThreshold,offThreshold)
 {
 
 }
@@ -16,7 +16,7 @@ HysteresisSphere::~HysteresisSphere() {
 	// empty
 }
 
-bool HysteresisSphere::Resolve(VirtualObj *pObj) {
+inline bool HysteresisSphere::Resolve(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 
 	float distance = (pObj->GetPosition(true) - GetPosition(true)).magnitude();

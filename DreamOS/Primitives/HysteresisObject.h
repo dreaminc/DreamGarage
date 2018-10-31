@@ -1,5 +1,5 @@
-#ifndef HYSTERESIS_OBJ_H_
-#define HYSTERESIS_OBJ_H_
+#ifndef HYSTERESIS_OBJECT_H_
+#define HYSTERESIS_OBJECT_H_
 
 // DREAM OS
 // Hysteresis Base Object
@@ -13,6 +13,12 @@ enum HysteresisEventType {
 	OFF
 };
 
+enum HysteresisObjectType {
+	CYLINDER,
+	SPHERE,
+	PLANE
+};
+
 struct HysteresisEvent {
 	HysteresisEventType m_eventType;
 	VirtualObj *m_pEventObject;
@@ -20,17 +26,19 @@ struct HysteresisEvent {
 	HysteresisEvent(HysteresisEventType eventType, VirtualObj *eventObject);
 };
 
-class HysteresisObj : public VirtualObj, public Publisher<HysteresisEventType, HysteresisEvent> {
+class HysteresisObject : public VirtualObj, public Publisher<HysteresisEventType, HysteresisEvent> {
 
 public:
-	HysteresisObj(float onThreshold, float offThreshold);
-	HysteresisObj();
-	~HysteresisObj();
+	HysteresisObject(float onThreshold, float offThreshold);
+	HysteresisObject();
+	~HysteresisObject();
 
 public:
 
 	RESULT Initialize();
-	RESULT Update(VirtualObj *pObj);
+	RESULT Update();
+
+	RESULT RegisterObject(VirtualObj *pObj);
 
 	HysteresisEventType GetState(VirtualObj *pObj);
 
@@ -38,10 +46,10 @@ public:
 
 
 protected:
-	float m_offThreshold;
-	float m_onThreshold;
+	float m_offThreshold = 0.25f;
+	float m_onThreshold = 0.5f;
 
 	std::map<VirtualObj*, HysteresisEventType> m_currentStates;
 };
 
-#endif // ! HYSTERESIS_OBJ_H_
+#endif // ! HYSTERESIS_OBJECT_H_

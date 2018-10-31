@@ -1973,7 +1973,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		volume *pVolumeOff = nullptr;
 		volume *pVolumeOn = nullptr;
 
-		HysteresisObj *pObj = nullptr;
+		HysteresisObject *pObj = nullptr;
 
 		virtual RESULT Notify(HysteresisEvent *pEvent) override {
 			RESULT r = R_PASS;
@@ -2020,17 +2020,19 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		pTestContext->pDreamOS = m_pDreamOS;
 
 		// cylinder
-		pTestContext->pObj = m_pDreamOS->MakeHysteresisCylinder(0.5f, 0.25f);
+		pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, CYLINDER);
 
 		// sphere
-		//pTestContext->pObj = m_pDreamOS->MakeHysteresisSphere(0.5f, 0.25f);
+		//pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, SPHERE);
 
 		// quad
-		//pTestContext->pObj = m_pDreamOS->MakeHysteresisQuad(0.5f, 0.25f);
+		//pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, PLANE);
 		//pTestContext->pObj->RotateXByDeg(-90.0f);
 
 		CN(pTestContext->pObj);
 
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
 		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::ON, pTestContext);
 		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::OFF, pTestContext);
 
@@ -2052,8 +2054,9 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		pTestContext->pVolumeOff->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true) + point(0.0f, -0.1f, -0.25f));
 		pTestContext->pVolumeOn->SetPosition(pTestContext->pDreamOS->GetCamera()->GetPosition(true) + point(0.0f, -0.1f, -0.5f));
 
-		pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
-		pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
+	//	pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
+	//	pTestContext->pObj->Update(pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
+		pTestContext->pObj->Update();
 
 //		pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
 

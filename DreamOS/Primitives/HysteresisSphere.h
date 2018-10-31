@@ -1,9 +1,9 @@
 #ifndef HYSTERESIS_SPHERE_H_
 #define HYSTERESIS_SPHERE_H_
 
-#include "HysteresisObj.h"
+#include "HysteresisObject.h"
 
-class HysteresisSphere : public HysteresisObj {
+class HysteresisSphere : public HysteresisObject {
 
 public:
 
