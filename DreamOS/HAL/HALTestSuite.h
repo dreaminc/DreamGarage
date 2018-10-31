@@ -51,6 +51,9 @@ public:
 	RESULT AddTestObjectMaterialsColors();
 	RESULT AddTestEnvironmentMapping();
 
+	// Pixel Buffer Object
+	RESULT AddTestPBO();
+
 	// Environments
 	RESULT AddTestStandardShader();
 	RESULT AddTestEnvironments();

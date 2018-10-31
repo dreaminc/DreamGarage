@@ -34,6 +34,10 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMinimalTextureShader());
+
+	CR(AddTestPBO());
+
 	CR(AddTestIrradianceMap());
 
 	CR(AddTest3rdPersonCamera());
@@ -43,8 +47,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestCubeMap());
 
 	CR(AddTestWaterShaderCube());
-
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestBlinnPhongShaderTextureBumpDisplacement());
 
@@ -4869,7 +4871,11 @@ Error:
 	return r;
 }
 
-// TODO: 
+// TODO:
+RESULT HALTestSuite::AddTestPBO() {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT HALTestSuite::AddTestMinimalTextureShader() {
 	RESULT r = R_PASS;
 
