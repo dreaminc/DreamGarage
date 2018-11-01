@@ -425,6 +425,7 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		virtual RESULT HandleDreamFormSetEnvironmentId(int environmentId) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabNext(bool fCanNext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override { return R_NOT_HANDLED; }
+		virtual RESULT HandleLoadEnd() override { return R_NOT_HANDLED; }
 
 	} *pTestContext = new TestContext();
 
