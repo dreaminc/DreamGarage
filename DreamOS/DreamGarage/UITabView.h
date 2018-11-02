@@ -23,7 +23,6 @@ class quad;
 
 class UITabView : public UIView
 {
-	friend class MultiContentTestSuite;
 public:
 	UITabView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UITabView();
