@@ -48,6 +48,7 @@ public:
 	RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
+	virtual RESULT UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
 	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
@@ -56,6 +57,7 @@ public:
 
 public:
 	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) override;
+	virtual RESULT LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) override;
 
 private:
 	GLenum GetOGLPixelFormat();

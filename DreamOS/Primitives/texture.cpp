@@ -197,6 +197,10 @@ Error:
 	return r;
 }
 
+RESULT texture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT texture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	return R_NOT_HANDLED;
 }
@@ -283,6 +287,10 @@ RESULT texture::UpdateDimensions(int width, int height) {
 }
 
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT texture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 	return R_NOT_IMPLEMENTED;
 }
 
