@@ -236,7 +236,9 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	mesh *pControllerMesh = m_pParentSandbox->MakeMesh(verts, indices);
 
 	//TODO: looks a little better, but there is still likely a problem with how the controllers are positioned
-	pControllerMesh->SetScale(vector(0.9f));
+	if (m_deviceType != HMDDeviceType::OCULUS) {
+		pControllerMesh->SetScale(vector(0.9f));
+	}
 	//pModel->SetMaterialAmbient(1.0f);
 	CNM(pControllerMesh, "Open VR Controller Models failed to load");
 
@@ -280,6 +282,9 @@ RESULT OpenVRDevice::InitializeDeviceType() {
 		//m_deviceType = HMDDeviceType::VIVE;
 		//m_strDriver == "meta"
 		m_deviceType = HMDDeviceType::META;
+	}
+	else if (m_strName == "Oculus") {	// running from steam with Oculus headset
+		m_deviceType = HMDDeviceType::OCULUS;
 	}
 	else {
 		m_deviceType = HMDDeviceType::NONE;
@@ -366,8 +371,11 @@ std::string OpenVRDevice::GetDeviceTypeString() {
 }
 
 RESULT OpenVRDevice::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
-	RESULT r = R_PASS;
-
+	return R_NOT_IMPLEMENTED;
+	
+	/*	// Fails with UnsetSettingHasNoDefault, but steam will fall through to system default anyway
+	// Users of the system need to provide a proper default in default.vrsettings in the resources/settings/ directory of either the runtime or the driver_xxx
+	// directory. Otherwise the default will be false, 0, 0.0 or ""
 	vr::EVRSettingsError evrErr;
 	char szDeviceOutStrBuffer[128];
 
@@ -384,6 +392,7 @@ RESULT OpenVRDevice::GetAudioDeviceOutID(std::wstring &wstrAudioDeviceOutGUID) {
 
 Error:
 	return r;
+	//*/
 }
 
 RESULT OpenVRDevice::GetAudioDeviceInGUID(std::wstring &wstrAudioDeviceInGUID) {
@@ -498,6 +507,21 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 			cState.fGrip = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) != 0;
 
 		} break;
+
+		case HMDDeviceType::OCULUS: {
+			cState.triggerRange = state.rAxis[0].x;
+
+			if ((state.ulButtonPressed | vr::ButtonMaskFromId(vr::k_EButton_Axis0)) != 0) {
+				// force d-pad style
+				float x = state.rAxis[0].x;
+				float y = state.rAxis[0].y;
+				cState.ptTouchpad = point(x, y, 0.0f);
+			}
+
+			cState.fMenu = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu)) != 0;
+			cState.fGrip = (state.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_Grip)) != 0;
+		} break;
+
 			/*
 		case HMDDeviceType::META: {
 			cState.fGrip = false;
@@ -654,14 +678,22 @@ RESULT OpenVRDevice::UpdateHMD() {
 					qOrientation *= qRotation;
 					qOrientation.Reverse();
 
+					point ptOffset = point(0.0f, 0.01f, -0.0057f);
+
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerMeshLeft != nullptr) {
 						//m_pControllerMeshLeft->SetPosition(ptControllerPosition);
 						//m_pControllerMeshLeft->SetOrientation(qOrientation);
 						m_pLeftController->SetPosition(ptControllerPosition);
 						m_pLeftController->SetOrientation(qOrientation);
 
-						m_pLeftHand->SetPosition(ptControllerPosition);
-						m_pLeftHand->SetOrientation(qOrientation);
+						if (m_deviceType == HMDDeviceType::OCULUS) {
+							m_pLeftHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pLeftHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+						}
+						else {
+							m_pLeftHand->SetPosition(ptControllerPosition);
+							m_pLeftHand->SetOrientation(qOrientation);
+						}
 						m_pLeftHand->SetLocalOrientation(qOrientation);
 
 						fLeftHandTracked = true;
@@ -673,8 +705,14 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pRightController->SetPosition(ptControllerPosition);
 						m_pRightController->SetOrientation(qOrientation);
 
-						m_pRightHand->SetPosition(ptControllerPosition);
-						m_pRightHand->SetOrientation(qOrientation);
+						if (m_deviceType == HMDDeviceType::OCULUS) {
+							m_pRightHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pRightHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+						}
+						else {
+							m_pRightHand->SetPosition(ptControllerPosition);
+							m_pRightHand->SetOrientation(qOrientation);
+						}
 						m_pRightHand->SetLocalOrientation(qOrientation);
 
 						fRightHandTracked = true;

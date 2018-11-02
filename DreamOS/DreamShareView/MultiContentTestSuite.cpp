@@ -1731,6 +1731,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 				if (randAction <= 7) {
 					// select random tab
 					DEBUG_LINEOUT("SELECT");
+					/*	// broken rn
 					auto tabButtons = pTestContext->pUserControlArea->m_pDreamTabView->m_tabButtons;
 					if (tabButtons.size() > 0) {
 						int randIndex = std::rand() % tabButtons.size();
@@ -1739,6 +1740,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 						pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
 						pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
 					}
+					*/
 
 				}
 				/*
