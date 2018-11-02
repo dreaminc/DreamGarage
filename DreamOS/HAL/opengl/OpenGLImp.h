@@ -152,6 +152,10 @@ public:
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
 	RESULT glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers);
 
+	// PBO
+	void *glMapBuffer(GLenum target, GLenum access);
+	RESULT glUnmapBuffer(GLenum target);
+
 	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
 	RESULT glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers);

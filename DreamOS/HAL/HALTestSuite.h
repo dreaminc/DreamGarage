@@ -52,8 +52,9 @@ public:
 	RESULT AddTestEnvironmentMapping();
 
 	// Pixel Buffer Object
-	RESULT AddTestPBOTextureUpdate();
 	RESULT AddTestTextureUpdate();
+	RESULT AddTestPBOTextureUpload();
+	RESULT AddTestPBOTextureReadback();
 
 	// Environments
 	RESULT AddTestStandardShader();

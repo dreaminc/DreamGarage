@@ -1372,6 +1372,22 @@ Error:
 	return r;
 }
 
+// PBO
+void *OpenGLImp::glMapBuffer(GLenum target, GLenum access) {
+	return m_OpenGLExtensions.glMapBuffer(target, access);
+}
+
+RESULT OpenGLImp::glUnmapBuffer(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUnmapBuffer(target);
+	CRM(CheckGLError(), "glUnmapBuffer failed");
+
+Error:
+	return r;
+}
+
+// Render Buffers
 RESULT OpenGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
 	RESULT r = R_PASS;
 

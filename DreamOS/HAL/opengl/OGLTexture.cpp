@@ -40,6 +40,14 @@ RESULT OGLTexture::Bind() {
 	return m_pParentImp->BindTexture(m_glTextureTarget, m_glTextureIndex);
 }
 
+RESULT OGLTexture::BindPixelUnpackBuffer() {
+	return m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBuferIndex);
+}
+
+RESULT OGLTexture::BindPixelPackBuffer() {
+	return m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBuferIndex);
+}
+
 RESULT OGLTexture::SetTextureParameter(GLenum paramName, GLint paramVal) {
 	RESULT r = R_PASS;
 
@@ -523,7 +531,39 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 	CR(Bind());
 
-	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
+	if (m_glPixelUnpackBuferIndex != 0) {
+		CR(BindPixelUnpackBuffer());
+
+		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
+
+		// Needed?  Only if we want to do two PBOs for unpack?
+		CR(BindPixelUnpackBuffer());
+
+		CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, pBuffer_n, 0, GL_STREAM_DRAW));
+
+		void* pUnpackPBO = m_pParentImp->glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
+		CN(pUnpackPBO);
+		
+		// update the data here
+		//updatePixels(ptr, DATA_SIZE);
+
+		// Update data directly on the mapped buffer
+		memcpy((void*)pUnpackPBO, (void*)pBuffer, pBuffer_n);
+
+		// release pointer to mapping buffer
+		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);  
+		
+
+		// It is good idea to release PBOs with ID 0 after use.
+		// Once bound with 0, all pixel operations behave normal ways.
+		(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
+
+	}
+	else {
+		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
+	}
+
+	CRM(m_pParentImp->CheckGLError(), "UpdateTextureFromBuffer failed");
 
 Error:
 	return r;
@@ -553,4 +593,42 @@ Error:
 
 GLenum OGLTexture::GetOGLPixelFormat() {
 	return GetOpenGLPixelFormat(m_pixelFormat, m_channels);
+}
+
+RESULT OGLTexture::EnableOGLPBOUnpack() {
+	RESULT r = R_PASS;
+
+	// Create pixel unpack buffer objects
+	// glBufferData() with NULL pointer reserves only memory space
+
+	// TODO: Delete on exit
+
+	CR(m_pParentImp->glGenBuffers(1, &m_glPixelUnpackBuferIndex));
+
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBuferIndex));
+	CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, GetTextureSize(), 0, GL_STREAM_DRAW));
+
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
+
+Error:
+	return r;
+}
+
+RESULT OGLTexture::EnableOGLPBOPack() {
+	RESULT r = R_PASS;
+
+	// Create pixel unpack buffer objects
+	// glBufferData() with NULL pointer reserves only memory space
+
+	// TODO: Delete on exit
+
+	CR(m_pParentImp->glGenBuffers(1, &m_glPixelPackBuferIndex));
+
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBuferIndex));
+	CR(m_pParentImp->glBufferData(GL_PIXEL_PACK_BUFFER, GetTextureSize(), 0, GL_STREAM_READ));
+
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, 0));
+
+Error:
+	return r;
 }

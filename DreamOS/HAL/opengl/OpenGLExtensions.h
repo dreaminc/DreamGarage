@@ -332,6 +332,15 @@ public:
 		return m_glDrawBuffers(n, bufs);
 	}
 
+	// PBO
+	inline void* glMapBuffer(GLenum target, GLenum access) {
+		return m_glMapBuffer(target, access);
+	}
+
+	inline bool glUnmapBuffer(GLenum target) {
+		return m_glUnmapBuffer(target);
+	}
+
 	// VBO
 	inline void glGenBuffers(GLsizei n, GLuint *buffers) {
 		return m_glGenBuffers(n, buffers);
@@ -503,6 +512,10 @@ private:
 	PFNGLBLITFRAMEBUFFERPROC m_glBlitFramebuffer;
 
 	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
+
+	// PBO
+	PFNGLMAPBUFFERPROC m_glMapBuffer;
+	PFNGLUNMAPBUFFERPROC m_glUnmapBuffer;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

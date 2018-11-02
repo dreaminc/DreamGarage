@@ -34,9 +34,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestTextureUpdate());
+	CR(AddTestPBOTextureUpload());
 
-	CR(AddTestPBOTextureUpdate());
+	CR(AddTestPBOTextureReadback());
+
+	CR(AddTestTextureUpdate());
 
 	CR(AddTestMinimalTextureShader());
 
@@ -5020,7 +5022,130 @@ Error:
 }
 
 // TODO:
-RESULT HALTestSuite::AddTestPBOTextureUpdate() {
+RESULT HALTestSuite::AddTestPBOTextureUpload() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	struct TestContext {
+		quad *pQuad = nullptr;
+		texture *pTexture = nullptr;\
+			unsigned char *pUpdateBuffer = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode;
+		pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode *pRenderScreenQuad;
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		{
+			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			pTestContext->pQuad = m_pDreamOS->AddQuad(3.0f, 3.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f));
+			CN(pTestContext->pQuad);
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pTestContext->pTexture);
+
+			// Enable PBO unpack
+			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOUnpack());
+
+			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
+			pTestContext->pUpdateBuffer = (unsigned char *)malloc(bufferSize);
+			CN(pTestContext->pUpdateBuffer);
+
+			CR(pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pUpdateBuffer, bufferSize));
+
+			CR(pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture));
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		{
+			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
+
+			// Upload the texture back to the texture
+			CR(pTestContext->pTexture->UpdateTextureFromBuffer(pTestContext->pUpdateBuffer, bufferSize));
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Render To Texture");
+	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT HALTestSuite::AddTestPBOTextureReadback() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 40.0f;

@@ -23,6 +23,9 @@ public:
 	~OGLTexture();
 
 	RESULT Bind();
+	RESULT BindPixelUnpackBuffer();
+	RESULT BindPixelPackBuffer();
+
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
 	// border will be zero more often than the buffer is 
@@ -84,6 +87,15 @@ private:
 	GLint m_glInternalFormat; 
 	GLenum m_glFormat;
 	GLenum m_glPixelDataType;
+
+public:
+	RESULT EnableOGLPBOUnpack();
+	RESULT EnableOGLPBOPack();
+
+private:
+	// TODO: More?
+	GLuint m_glPixelUnpackBuferIndex = 0;
+	GLuint m_glPixelPackBuferIndex = 0;
 };
 
 #endif // !OGL_TEXTURE_H_
