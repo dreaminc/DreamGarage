@@ -40,7 +40,7 @@ class ObjectStore;
 
 class OGLProgram : public ProgramNode {
 public:
-	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram");
+	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	~OGLProgram();
 
 	// ProgramNode Interface

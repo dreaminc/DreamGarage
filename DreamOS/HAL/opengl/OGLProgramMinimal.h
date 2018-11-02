@@ -15,8 +15,8 @@ class stereocamera;
 
 class OGLProgramMinimal : public OGLProgram {
 public:
-	OGLProgramMinimal(OpenGLImp *pParentImp);
-	OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName);
+	OGLProgramMinimal(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 
@@ -41,8 +41,6 @@ protected:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
-
-	bool m_fPassThru = false;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_H_

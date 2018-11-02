@@ -9,8 +9,8 @@
 #include "OGLObj.h"
 #include "OGLTexture.h"
 
-OGLProgramFlat::OGLProgramFlat(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglflat")
+OGLProgramFlat::OGLProgramFlat(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglflat", optFlags)
 {
 	// empty
 }
@@ -41,11 +41,11 @@ RESULT OGLProgramFlat::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<FlatContext>("flatcontext", &m_pFlatContext, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<FlatContext>("flatcontext", &m_pFlatContext, PIPELINE_FLAGS::PASSIVE));
 
 	// Note: This is a special case here, most framebuffer inputs will WANT to be active (another shader)
-	CR(MakeInput<framebuffer>("framebuffer", (framebuffer**)(&m_pOGLFramebuffer), DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<framebuffer>("framebuffer", (framebuffer**)(&m_pOGLFramebuffer), PIPELINE_FLAGS::PASSIVE));
 
 Error:
 	return r;

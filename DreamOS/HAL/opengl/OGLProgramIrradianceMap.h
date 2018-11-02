@@ -15,7 +15,7 @@ class cubemap;
 
 class OGLProgramIrradianceMap : public OGLProgram {
 public:
-	OGLProgramIrradianceMap(OpenGLImp *pParentImp);
+	OGLProgramIrradianceMap(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

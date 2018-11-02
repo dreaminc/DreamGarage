@@ -12,8 +12,8 @@
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
-OGLProgramSkybox::OGLProgramSkybox(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglskybox")
+OGLProgramSkybox::OGLProgramSkybox(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglskybox", optFlags)
 {
 	// empty
 }
@@ -36,7 +36,7 @@ RESULT OGLProgramSkybox::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureCubemap), std::string("u_hasTextureCubemap")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureCubemap), std::string("u_textureCubeMap")));
 
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -127,13 +127,13 @@ RESULT OGLProgramSkybox::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, PIPELINE_FLAGS::PASSIVE));
 
 	// TODO: Input cube map node
 
 	// Outputs
-	if (m_fPassThru == true) {
+	if (IsPassthru() == true) {
 		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	}
@@ -148,7 +148,7 @@ Error:
 RESULT OGLProgramSkybox::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 	}
 
@@ -158,7 +158,7 @@ RESULT OGLProgramSkybox::ProcessNode(long frameID) {
 	//glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr) {
-		if (m_fPassThru) {
+		if (IsPassthru()) {
 			m_pOGLFramebuffer->Bind();
 		}
 		else {

@@ -108,7 +108,7 @@ public:
 
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
-	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) override;
 
 public:
 	virtual RESULT Resize(viewport newViewport) override;

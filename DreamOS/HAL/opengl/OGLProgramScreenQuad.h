@@ -14,7 +14,8 @@ class OGLQuad;
 
 class OGLProgramScreenQuad : public OGLProgram {
 public:
-	OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName = "oglscreenquad");
+	OGLProgramScreenQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName = "oglscreenquad", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

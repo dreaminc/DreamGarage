@@ -9,8 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramDebugOverlay::OGLProgramDebugOverlay(OpenGLImp *pParentImp) :
-	OGLProgramMinimal(pParentImp, "ogldebugoverlay")
+OGLProgramDebugOverlay::OGLProgramDebugOverlay(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgramMinimal(pParentImp, "ogldebugoverlay", optFlags)
 {
 	// empty
 }
@@ -64,8 +64,8 @@ RESULT OGLProgramDebugOverlay::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs

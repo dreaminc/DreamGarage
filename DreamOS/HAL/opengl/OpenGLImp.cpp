@@ -1081,10 +1081,10 @@ SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
 	return pSourceNode;
 }
 
-ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName) {
+ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
 	ProgramNode* pProgramNode = nullptr;
 
-	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL);
+	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL, optFlags);
 
 	return pProgramNode;
 }

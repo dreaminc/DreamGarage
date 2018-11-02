@@ -10,8 +10,8 @@
 
 #include "OGLAttachment.h"
 
-OGLProgramVisualizeNormals::OGLProgramVisualizeNormals(OpenGLImp *pParentImp) :
-	OGLProgramMinimal(pParentImp)
+OGLProgramVisualizeNormals::OGLProgramVisualizeNormals(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty
 }
@@ -37,7 +37,7 @@ RESULT OGLProgramVisualizeNormals::OGLInitialize() {
 
 
 	// Framebuffer Output
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -112,11 +112,11 @@ RESULT OGLProgramVisualizeNormals::SetupConnections() {
 	RESULT r = R_PASS;
 
 	//// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	
 	// Treat framebuffer as pass-thru
-	if (m_fPassThru == true) {
+	if (IsPassthru() == true) {
 		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	}
@@ -145,7 +145,7 @@ RESULT OGLProgramVisualizeNormals::ProcessNode(long frameID) {
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		if (m_fPassThru) {
+		if (IsPassthru()) {
 			m_pOGLFramebuffer->Bind();
 		}
 		else {

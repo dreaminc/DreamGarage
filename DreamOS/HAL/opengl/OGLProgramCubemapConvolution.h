@@ -20,7 +20,7 @@ class cubemap;
 
 class OGLProgramCubemapConvolution : public OGLProgram {
 public:
-	OGLProgramCubemapConvolution(OpenGLImp *pParentImp);
+	OGLProgramCubemapConvolution(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

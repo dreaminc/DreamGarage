@@ -12,7 +12,7 @@
 
 class OGLProgramUIStage : public OGLProgram, public UIStageProgram {
 public:
-	OGLProgramUIStage(OpenGLImp *pParentImp);
+	OGLProgramUIStage(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

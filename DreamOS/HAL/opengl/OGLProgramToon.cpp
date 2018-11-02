@@ -9,8 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramToon::OGLProgramToon(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "ogltoon"),
+OGLProgramToon::OGLProgramToon(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "ogltoon", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {

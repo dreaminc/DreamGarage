@@ -12,7 +12,7 @@ class OGLQuad;
 
 class OGLProgramBlurQuad : public OGLProgram {
 public:
-	OGLProgramBlurQuad(OpenGLImp *pParentImp);
+	OGLProgramBlurQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

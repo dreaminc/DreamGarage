@@ -10,8 +10,8 @@
 #include "OGLAttachment.h"
 #include "OGLCubemap.h"
 
-OGLProgramStandard::OGLProgramStandard(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglenvironment"),
+OGLProgramStandard::OGLProgramStandard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglenvironment", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -69,7 +69,7 @@ RESULT OGLProgramStandard::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	// Framebuffer Output
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -147,19 +147,19 @@ RESULT OGLProgramStandard::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_environment_cubemap", &m_pOGLInputFramebufferEnvironmentCubemap, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_irradiance_cubemap", &m_pOGLInputFramebufferIrradianceCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_environment_cubemap", &m_pOGLInputFramebufferEnvironmentCubemap, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_irradiance_cubemap", &m_pOGLInputFramebufferIrradianceCubemap, PIPELINE_FLAGS::PASSIVE));
 
 	// Reflection Map
 	//CR(MakeInput<OGLFramebuffer>("input_reflection_map", &m_pOGLReflectionFramebuffer));
 
 	// Outputs
 	// Treat framebuffer as pass-thru
-	if (m_fPassThru == true) {
+	if (IsPassthru() == true) {
 		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	}
@@ -186,7 +186,7 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 	}
 
@@ -194,7 +194,7 @@ RESULT OGLProgramStandard::ProcessNode(long frameID) {
 
 	if (m_pOGLFramebuffer != nullptr) {
 		
-		if (m_fPassThru) {
+		if (IsPassthru()) {
 			m_pOGLFramebuffer->Bind();
 		}
 		else {

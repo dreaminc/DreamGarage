@@ -10,8 +10,8 @@
 #include "OGLAttachment.h"
 #include "OGLCubemap.h"
 
-OGLProgramIrradianceMap::OGLProgramIrradianceMap(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglirradiancemap"),
+OGLProgramIrradianceMap::OGLProgramIrradianceMap(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglirradiancemap", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -143,7 +143,7 @@ RESULT OGLProgramIrradianceMap::SetupConnections() {
 	//TODO: CR(MakeInput("lights"));
 
 	// Irradiance Cubemap Input
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, PIPELINE_FLAGS::PASSIVE));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));

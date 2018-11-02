@@ -14,7 +14,7 @@
 
 class OGLProgramMinimalTexture : public OGLProgram {
 public:
-	OGLProgramMinimalTexture(OpenGLImp *pParentImp);
+	OGLProgramMinimalTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -44,8 +44,6 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
-
-	bool m_fPassThru = false;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

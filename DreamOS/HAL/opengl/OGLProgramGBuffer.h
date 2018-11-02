@@ -12,8 +12,8 @@ class stereocamera;
 
 class OGLProgramGBuffer : public OGLProgram {
 public:
-	OGLProgramGBuffer(OpenGLImp *pParentImp);
-	OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName);
+	OGLProgramGBuffer(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

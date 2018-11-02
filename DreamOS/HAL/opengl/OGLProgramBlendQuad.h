@@ -13,7 +13,7 @@ class OGLQuad;
 
 class OGLProgramBlendQuad : public OGLProgram {
 public:
-	OGLProgramBlendQuad(OpenGLImp *pParentImp);
+	OGLProgramBlendQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 

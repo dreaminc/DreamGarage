@@ -9,14 +9,14 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglgbuffer")
+OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglgbuffer", optFlags)
 {
 	// empty
 }
 
-OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
+OGLProgramGBuffer::OGLProgramGBuffer(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }
@@ -126,8 +126,8 @@ RESULT OGLProgramGBuffer::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs

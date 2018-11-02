@@ -13,8 +13,8 @@
 
 class OGLProgramBlinnPhongTextureShadow : public OGLProgram {
 public:
-	OGLProgramBlinnPhongTextureShadow(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp, "oglblinnphongtextureshadow"),
+	OGLProgramBlinnPhongTextureShadow(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+		OGLProgram(pParentImp, "oglblinnphongtextureshadow", optFlags),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{

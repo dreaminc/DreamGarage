@@ -16,7 +16,7 @@ class cubemap;
 
 class OGLProgramSkybox : public OGLProgram {
 public:
-	OGLProgramSkybox(OpenGLImp *pParentImp);
+	OGLProgramSkybox(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -57,8 +57,6 @@ private:
 
 	OGLUniformBool *m_pUniformHasTextureCubemap = nullptr;
 	OGLUniformSamplerCube *m_pUniformTextureCubemap = nullptr;
-
-	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_SKYBOX_H_

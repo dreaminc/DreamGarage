@@ -15,7 +15,7 @@ class stereocamera;
 
 class OGLProgramReflection : public OGLProgram {
 public:
-	OGLProgramReflection(OpenGLImp *pParentImp);
+	OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

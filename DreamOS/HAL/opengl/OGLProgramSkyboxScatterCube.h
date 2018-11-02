@@ -16,7 +16,7 @@ class skybox;
 
 class OGLProgramSkyboxScatterCube : public OGLProgram, public SkyboxScatterProgram {
 public:
-	OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp);
+	OGLProgramSkyboxScatterCube(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	virtual RESULT OGLInitialize() override;
 	virtual RESULT OGLInitialize(version versionOGL) override;

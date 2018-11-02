@@ -8,8 +8,14 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramSSAO::OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
+OGLProgramSSAO::OGLProgramSSAO(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglssao", optFlags)
+{
+	// empty
+}
+
+OGLProgramSSAO::OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }
