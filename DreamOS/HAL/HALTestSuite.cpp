@@ -34,9 +34,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestPBOTextureUpload());
-
 	CR(AddTestPBOTextureReadback());
+	
+	CR(AddTestPBOTextureUpload());
 
 	CR(AddTestTextureUpdate());
 
@@ -5036,8 +5036,8 @@ RESULT HALTestSuite::AddTestPBOTextureUpload() {
 
 	struct TestContext {
 		quad *pQuad = nullptr;
-		texture *pTexture = nullptr;\
-			unsigned char *pUpdateBuffer = nullptr;
+		texture *pTexture = nullptr;
+		unsigned char *pUpdateBuffer = nullptr;
 	} *pTestContext = new TestContext();
 
 	// Initialize Code 
@@ -5160,6 +5160,7 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 	struct TestContext {
 		quad *pQuad = nullptr;
 		texture *pTexture = nullptr;
+		unsigned char *pLoadBuffer = nullptr;
 	} *pTestContext = new TestContext();
 
 	// Initialize Code 
@@ -5208,6 +5209,15 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pTestContext->pTexture);
 
+			// Enable PBO unpack
+			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOUnpack());
+
+			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
+			pTestContext->pLoadBuffer = (unsigned char *)malloc(bufferSize);
+			CN(pTestContext->pLoadBuffer);
+
+			CR(pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pLoadBuffer, bufferSize));
+
 			CR(pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture));
 		}
 
@@ -5227,6 +5237,13 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		{
+			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
+
+			// Upload the texture back to the texture
+			//CR(pTestContext->pTexture->UpdateTextureFromBuffer(pTestContext->pUpdateBuffer, bufferSize));
+		}
 
 	Error:
 		return r;
