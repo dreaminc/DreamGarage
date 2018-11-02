@@ -40,6 +40,7 @@ public:
 
 	RESULT RegisterObject(VirtualObj *pObj);
 
+	HysteresisEventType UpdateState(VirtualObj *pObj);
 	HysteresisEventType GetState(VirtualObj *pObj);
 
 	virtual bool Resolve(VirtualObj *pObj) = 0;
