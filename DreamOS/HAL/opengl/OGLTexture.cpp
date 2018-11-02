@@ -34,6 +34,16 @@ OGLTexture::~OGLTexture() {
 		m_pParentImp->DeleteTextures(1, &m_glTextureIndex);
 		m_glTextureIndex = 0;
 	}
+
+	if (m_glPixelUnpackBuferIndex != 0) {
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBuferIndex);
+		m_glPixelUnpackBuferIndex = 0;
+	}
+
+	if (m_glPixelPackBuferIndex != 0) {
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelPackBuferIndex);
+		m_glPixelPackBuferIndex = 0;
+	}
 }
 
 RESULT OGLTexture::Bind() {
@@ -471,19 +481,6 @@ GLuint OGLTexture::GetOGLTextureIndex() {
 	return m_glTextureIndex;
 }
 
-
-RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
-	RESULT r = R_PASS;
-
-	PIXEL_FORMAT pixelFormat = m_pixelFormat;
-
-	m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer));
-	CN(pBuffer);
-
-Error:
-	return r;
-}
-
 RESULT OGLTexture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 
@@ -519,6 +516,18 @@ RESULT OGLTexture::UpdateDimensions(int pxWidth, int pxHeight) {
 
 	// TODO: Pull deeper settings from texture object
 	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
+
+Error:
+	return r;
+}
+
+RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	PIXEL_FORMAT pixelFormat = m_pixelFormat;
+
+	m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer));
+	CN(pBuffer);
 
 Error:
 	return r;

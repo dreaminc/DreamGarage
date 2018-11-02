@@ -5210,7 +5210,7 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 			CN(pTestContext->pTexture);
 
 			// Enable PBO unpack
-			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOUnpack());
+			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOPack());
 
 			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
 			pTestContext->pLoadBuffer = (unsigned char *)malloc(bufferSize);
