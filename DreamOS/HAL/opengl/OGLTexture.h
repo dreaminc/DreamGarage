@@ -11,6 +11,8 @@
 
 #include "OpenGLCommon.h"
 
+#define NUM_PACK_BUFFERS 2
+
 class OpenGLImp;
 
 class OGLTexture : public texture {
@@ -23,8 +25,8 @@ public:
 	~OGLTexture();
 
 	RESULT Bind();
-	RESULT BindPixelUnpackBuffer();
-	RESULT BindPixelPackBuffer();
+	RESULT BindPixelUnpackBuffer(int index = 0);
+	RESULT BindPixelPackBuffer(int index);
 
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
@@ -95,7 +97,9 @@ public:
 private:
 	// TODO: More?
 	GLuint m_glPixelUnpackBuferIndex = 0;
-	GLuint m_glPixelPackBuferIndex = 0;
+
+	int m_packBufferIndex = 0;
+	GLuint m_glPixelPackBuferIndex[NUM_PACK_BUFFERS] = { 0 };
 };
 
 #endif // !OGL_TEXTURE_H_

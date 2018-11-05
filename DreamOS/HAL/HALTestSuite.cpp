@@ -5209,14 +5209,14 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pTestContext->pTexture);
 
-			// Enable PBO unpack
-			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOPack());
-
 			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
 			pTestContext->pLoadBuffer = (unsigned char *)malloc(bufferSize);
 			CN(pTestContext->pLoadBuffer);
 
-			CR(pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pLoadBuffer, bufferSize));
+			//CR(pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pLoadBuffer, bufferSize));
+
+			// Enable PBO unpack
+			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOPack());
 
 			CR(pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture));
 		}
@@ -5243,6 +5243,8 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 
 			// Upload the texture back to the texture
 			//CR(pTestContext->pTexture->UpdateTextureFromBuffer(pTestContext->pUpdateBuffer, bufferSize));
+
+			pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pLoadBuffer, bufferSize);
 		}
 
 	Error:
