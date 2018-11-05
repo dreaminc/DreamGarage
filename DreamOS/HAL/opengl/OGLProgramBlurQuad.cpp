@@ -8,8 +8,8 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlurQuad::OGLProgramBlurQuad(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblurquad")
+OGLProgramBlurQuad::OGLProgramBlurQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblurquad", optFlags)
 {
 	// empty
 }

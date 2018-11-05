@@ -18,7 +18,7 @@ class stereocamera;
 
 class OGLProgramStandard : public OGLProgram, public EnvironmentProgram {
 public:
-	OGLProgramStandard(OpenGLImp *pParentImp);
+	OGLProgramStandard(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -101,8 +101,6 @@ private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
 
 	float m_deltaTime; 
-
-	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_STANDARD_H_

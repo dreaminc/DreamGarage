@@ -15,8 +15,8 @@
 
 class OGLProgramBlinnPhongShadow : public OGLProgram {
 public:
-	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp, "oglblinnphongshadow"),
+	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
+		OGLProgram(pParentImp, "oglblinnphongshadow", optFlags),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{

@@ -1,7 +1,7 @@
 #include "OGLProgramTextureBitBlit.h"
 
-OGLProgramTextureBitBlit::OGLProgramTextureBitBlit(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "ogltexturebitblit")
+OGLProgramTextureBitBlit::OGLProgramTextureBitBlit(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "ogltexturebitblit", optFlags)
 {
 	// empty
 }
@@ -30,7 +30,7 @@ RESULT OGLProgramTextureBitBlit::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));

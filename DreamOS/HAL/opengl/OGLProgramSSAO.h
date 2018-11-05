@@ -12,7 +12,8 @@ class OGLQuad;
 
 class OGLProgramSSAO : public OGLProgram {
 public:
-	OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName = "oglssao");
+	OGLProgramSSAO(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	OGLProgramSSAO(OpenGLImp *pParentImp, std::string strName = "oglssao", PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

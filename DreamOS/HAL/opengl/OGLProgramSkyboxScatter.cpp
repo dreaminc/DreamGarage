@@ -11,8 +11,8 @@
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
-OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglskyboxscatter")
+OGLProgramSkyboxScatter::OGLProgramSkyboxScatter(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglskyboxscatter", optFlags)
 {
 	// empty
 }
@@ -127,8 +127,8 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 	// Inputs
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs

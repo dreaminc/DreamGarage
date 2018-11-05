@@ -14,7 +14,7 @@ class ObjectStore;
 
 class OGLProgramBlinnPhong : public OGLProgram {
 public:
-	OGLProgramBlinnPhong(OpenGLImp *pParentImp);
+	OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

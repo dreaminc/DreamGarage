@@ -9,14 +9,14 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglminimal")
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglminimal", optFlags)
 {
 	// empty
 }
 
-OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }
@@ -43,7 +43,7 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT24, GL_INT));
 
 	///*
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -72,12 +72,12 @@ RESULT OGLProgramMinimal::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	if (m_fPassThru == true) {
+	if (IsPassthru() == true) {
 		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	}
@@ -106,7 +106,7 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	//glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr) {
-		if (m_fPassThru) {
+		if (IsPassthru()) {
 			m_pOGLFramebuffer->Bind();
 		}
 		else {

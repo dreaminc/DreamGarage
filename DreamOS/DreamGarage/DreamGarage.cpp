@@ -216,7 +216,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CR(m_pReflectionProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
 		ProgramNode* pReflectionSkyboxProgram;
-		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pReflectionSkyboxProgram);
 		CR(pReflectionSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -250,7 +250,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 		// Everything else
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
@@ -263,7 +263,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", m_pRenderEnvironmentProgramNodeMirror->Output("output_framebuffer")));
 
 		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference", PIPELINE_FLAGS::PASSTHRU);
 		CN(pReferenceGeometryProgram);
 		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
@@ -272,13 +272,13 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 		// Skybox
 		ProgramNode* pSkyboxProgram;
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
 		CN(pUIProgramNode);
 		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
@@ -362,7 +362,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(m_pReflectionProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 		ProgramNode* pReflectionSkyboxProgram;
-		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		pReflectionSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pReflectionSkyboxProgram);
 		CR(pReflectionSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
@@ -407,7 +407,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 		CR(m_pRenderEnvironmentProgramNode->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
 
 		// Everything else
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
@@ -429,13 +429,13 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Skybox
 		ProgramNode* pSkyboxProgram;
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox");
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
 		CN(pUIProgramNode);
 		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));

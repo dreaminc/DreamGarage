@@ -18,7 +18,7 @@ class OGLQuad;
 
 class OGLProgramScreenFade : public OGLProgramScreenQuad {
 public:
-	OGLProgramScreenFade(OpenGLImp *pParentImp);
+	OGLProgramScreenFade(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

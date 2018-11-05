@@ -231,6 +231,14 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	WCNM((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
 		"Failed to initialize glFramebufferTexture extension");
 
+	// PBO
+
+	WCNM((m_glMapBuffer = (PFNGLMAPBUFFERPROC)wglGetProcAddress("glMapBuffer")),
+		"Failed to initialize glMapBuffer extension");
+
+	WCNM((m_glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)wglGetProcAddress("glUnmapBuffer")),
+		"Failed to initialize glMapBuffer extension");
+
 	// VBO
 	WCNM((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
 		"Failed to initialzie glGenBuffers extension");

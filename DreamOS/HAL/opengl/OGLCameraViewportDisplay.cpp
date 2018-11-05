@@ -14,7 +14,7 @@ RESULT OGLCameraViewportDisplay::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
 
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLInputFramebuffer));
 

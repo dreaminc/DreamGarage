@@ -11,6 +11,8 @@
 
 #include "OpenGLCommon.h"
 
+#define NUM_PACK_BUFFERS 2
+
 class OpenGLImp;
 
 class OGLTexture : public texture {
@@ -23,6 +25,9 @@ public:
 	~OGLTexture();
 
 	RESULT Bind();
+	RESULT BindPixelUnpackBuffer(int index = 0);
+	RESULT BindPixelPackBuffer(int index);
+
 	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
 	// border will be zero more often than the buffer is 
@@ -48,6 +53,7 @@ public:
 	RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, PIXEL_FORMAT pixelFormat) override;
+	virtual RESULT UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) override;
 	virtual RESULT UpdateDimensions(int width, int height) override;
 
 	GLenum GetOGLTextureTarget() { return m_glTextureTarget; }
@@ -56,6 +62,7 @@ public:
 
 public:
 	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) override;
+	virtual RESULT LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) override;
 
 private:
 	GLenum GetOGLPixelFormat();
@@ -82,6 +89,17 @@ private:
 	GLint m_glInternalFormat; 
 	GLenum m_glFormat;
 	GLenum m_glPixelDataType;
+
+public:
+	RESULT EnableOGLPBOUnpack();
+	RESULT EnableOGLPBOPack();
+
+private:
+	// TODO: More?
+	GLuint m_glPixelUnpackBuferIndex = 0;
+
+	int m_packBufferIndex = 0;
+	GLuint m_glPixelPackBuferIndex[NUM_PACK_BUFFERS] = { 0 };
 };
 
 #endif // !OGL_TEXTURE_H_

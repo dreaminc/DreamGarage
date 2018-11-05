@@ -19,7 +19,7 @@ class stereocamera;
 
 class OGLProgramWater : public OGLProgram {
 public:
-	OGLProgramWater(OpenGLImp *pParentImp);
+	OGLProgramWater(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

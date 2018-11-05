@@ -14,7 +14,7 @@
 
 class OGLProgramBlinnPhongTextureBumpDisplacement : public OGLProgram {
 public:
-	OGLProgramBlinnPhongTextureBumpDisplacement(OpenGLImp *pParentImp);
+	OGLProgramBlinnPhongTextureBumpDisplacement(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;

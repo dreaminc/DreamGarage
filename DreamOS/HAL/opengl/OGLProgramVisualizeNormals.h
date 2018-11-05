@@ -14,7 +14,8 @@ class stereocamera;
 
 class OGLProgramVisualizeNormals : public OGLProgramMinimal {
 public:
-	OGLProgramVisualizeNormals(OpenGLImp *pParentImp);
+	OGLProgramVisualizeNormals(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+
 	virtual RESULT ProcessNode(long frameID) override;
 
 	virtual RESULT OGLInitialize() override;
@@ -31,9 +32,6 @@ protected:
 
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix = nullptr;
 	OGLUniformMatrix4 *m_pUniformViewMatrix = nullptr;
-
-private:
-	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_VISUALIZE_NORMALS_H_

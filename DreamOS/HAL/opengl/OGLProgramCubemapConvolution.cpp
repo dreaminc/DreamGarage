@@ -10,8 +10,8 @@
 #include "OGLAttachment.h"
 #include "OGLCubemap.h"
 
-OGLProgramCubemapConvolution::OGLProgramCubemapConvolution(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglskybox")
+OGLProgramCubemapConvolution::OGLProgramCubemapConvolution(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglskybox", optFlags)
 {
 	// empty
 }
@@ -120,8 +120,8 @@ RESULT OGLProgramCubemapConvolution::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_cubemap", &m_pOGLInputFramebufferCubemap, PIPELINE_FLAGS::PASSIVE));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer_cube", m_pOGLFramebufferCubemap));

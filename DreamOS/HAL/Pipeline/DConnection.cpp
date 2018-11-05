@@ -3,7 +3,7 @@
 #include "DNode.h"
 #include "ProgramNode.h"
 
-DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
+DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
 	m_connType(connType),
 	m_flags(optFlags)
@@ -11,7 +11,7 @@ DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTI
 	// empty
 }
 
-DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
+DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, PIPELINE_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
 	m_connType(connType),
@@ -153,14 +153,14 @@ CONNECTION_TYPE DConnection::GetType() {
 }
 
 bool DConnection::IsActive() {
-	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSIVE) != 0)
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::PASSIVE) != 0)
 		return false;
 	else
 		return true;
 }
 
 bool DConnection::IsPassthru() {
-	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSTHRU) != 0)
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::PASSTHRU) != 0)
 		return true;
 	else
 		return false;

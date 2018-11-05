@@ -17,16 +17,18 @@
 class DNode : public DObject {
 
 public:
-	DNode();
-	DNode(std::string strName);
+	DNode(PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+	DNode(std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	~DNode();
 
 	RESULT ClearInputConnections();
 	RESULT ClearOutputConnections();
 	RESULT ClearConnections();
 
+	bool IsPassthru();
+
 	template <class objType>
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 		RESULT r = R_PASS;
 
 		std::vector<DConnection*> *pDConnections = nullptr;
@@ -50,7 +52,7 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType **ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType **ppDestination, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 		RESULT r = R_PASS;
 
 		std::vector<DConnection*> *pDConnections = nullptr;
@@ -74,18 +76,18 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeInput(std::string strName, objType **ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	RESULT MakeInput(std::string strName, objType **ppDestination, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, ppDestination, optFlags);
 	}
 
 	template <class objType>
-	RESULT MakeOutput(std::string strName, objType *pDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+	RESULT MakeOutput(std::string strName, objType *pDestination, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) {
 		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination, optFlags);
 	}
 
 	template <class objType>
 	RESULT MakeOutputPassthru(std::string strName, objType **ppDestination) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, DCONNECTION_FLAGS::PASSTHRU);
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, PIPELINE_FLAGS::PASSTHRU);
 	}
 
 	template <class objType>
@@ -195,6 +197,9 @@ private:
 
 private:
 	std::string m_strName;
+
+protected:
+	PIPELINE_FLAGS m_flags;
 };
 
 #endif	// ! DNODE_H_

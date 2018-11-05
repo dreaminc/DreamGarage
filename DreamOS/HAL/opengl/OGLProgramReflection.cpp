@@ -11,8 +11,8 @@
 
 #include "Primitives/matrix/ReflectionMatrix.h"
 
-OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglreflection"),
+OGLProgramReflection::OGLProgramReflection(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglreflection", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -145,8 +145,8 @@ RESULT OGLProgramReflection::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs

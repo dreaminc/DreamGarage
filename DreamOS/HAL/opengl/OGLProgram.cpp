@@ -9,8 +9,8 @@
 
 #include "Scene/ObjectStore.h"
 
-OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName) :
-	ProgramNode(strName),
+OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	ProgramNode(strName, optFlags),
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),

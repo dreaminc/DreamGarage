@@ -1723,11 +1723,13 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 
 			std::chrono::steady_clock::duration tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 			float msTimeNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+			
 			if (msTimeNow - pTestContext->msLastSent > pTestContext->msTimeDelay) {
 				pTestContext->msTimeDelay = 500.0f;
 				pTestContext->msLastSent = msTimeNow;
 				int randAction = std::rand() % 10;
 
+				/*
 				if (randAction <= 7) {
 					// select random tab
 					DEBUG_LINEOUT("SELECT");
@@ -1743,7 +1745,6 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 					*/
 
 				}
-				/*
 				else if (randAction == 9) {
 					DEBUG_LINEOUT("OPEN");
 					int randIndex = std::rand() % pTestContext->strURIs.size();

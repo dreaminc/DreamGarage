@@ -9,8 +9,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblinnphong"),
+OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblinnphong", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {

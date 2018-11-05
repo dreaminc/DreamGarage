@@ -34,6 +34,7 @@
 #include "Primitives/DimPlane.h"
 
 #include "Pipeline/Pipeline.h"
+#include "Pipeline/PipelineCommon.h"
 
 class SandboxApp;
 
@@ -97,7 +98,7 @@ public:
 	
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) = 0;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) = 0;
-	virtual ProgramNode* MakeProgramNode(std::string strNodeName) = 0;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) = 0;
 
 public:
 

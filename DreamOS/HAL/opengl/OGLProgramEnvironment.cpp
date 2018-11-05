@@ -4,8 +4,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramEnvironment::OGLProgramEnvironment(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglenvironment")
+OGLProgramEnvironment::OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglenvironment", optFlags)
 {
 	// empty
 }
@@ -32,7 +32,7 @@ RESULT OGLProgramEnvironment::OGLInitialize() {
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
 
 	///*
-	if (m_fPassThru == false) {
+	if (IsPassthru() == false) {
 		int pxWidth = m_pParentImp->GetViewport().Width();
 		int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -106,12 +106,12 @@ RESULT OGLProgramEnvironment::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	if (m_fPassThru == true) {
+	if (IsPassthru() == true) {
 		CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 		CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 	}
@@ -137,7 +137,7 @@ RESULT OGLProgramEnvironment::ProcessNode(long frameID) {
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		if (m_fPassThru) {
+		if (IsPassthru()) {
 			m_pOGLFramebuffer->Bind();
 		}
 		else {

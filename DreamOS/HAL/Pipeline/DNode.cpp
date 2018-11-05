@@ -2,12 +2,15 @@
 
 #include "DConnection.h"
 
-DNode::DNode() {
+DNode::DNode(PIPELINE_FLAGS optFlags) :
+	m_flags(optFlags)
+{
 	// empty
 }
 
-DNode::DNode(std::string strName) :
-	m_strName(strName)
+DNode::DNode(std::string strName, PIPELINE_FLAGS optFlags) :
+	m_strName(strName),
+	m_flags(optFlags)
 {
 	// empty
 }
@@ -40,6 +43,13 @@ RESULT DNode::ClearConnections() {
 
 Error:
 	return r;
+}
+
+bool DNode::IsPassthru() {
+	if (static_cast<int>(m_flags & PIPELINE_FLAGS::PASSTHRU) != 0)
+		return true;
+	else
+		return false;
 }
 
 /*

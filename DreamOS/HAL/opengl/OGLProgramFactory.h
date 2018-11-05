@@ -60,7 +60,7 @@ private:
 	static const std::map<std::string, OGLPROGRAM_TYPE> m_OGLProgramNameType;
 
 public:
-	static ProgramNode* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
+	static ProgramNode* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 	static 	OGLPROGRAM_TYPE OGLProgramTypeFromstring(std::string strProgramName);
 };
 

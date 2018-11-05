@@ -8,8 +8,14 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName) :
-	OGLProgram(pParentImp, strName)
+OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglscreenquad", optFlags)
+{
+	// empty
+}
+
+OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp, std::string strName, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, strName, optFlags)
 {
 	// empty
 }

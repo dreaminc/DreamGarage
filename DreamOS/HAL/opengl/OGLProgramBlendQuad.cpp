@@ -11,8 +11,8 @@
 OGLTexture *g_pColorTexture1 = nullptr;
 OGLTexture *g_pColorTexture2 = nullptr;
 
-OGLProgramBlendQuad::OGLProgramBlendQuad(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblendquad")
+OGLProgramBlendQuad::OGLProgramBlendQuad(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblendquad", optFlags)
 {
 	// empty
 }

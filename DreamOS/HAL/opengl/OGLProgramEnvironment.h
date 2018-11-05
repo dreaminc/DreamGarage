@@ -14,7 +14,7 @@
 
 class OGLProgramEnvironment: public OGLProgram {
 public:
-	OGLProgramEnvironment(OpenGLImp *pParentImp);
+	OGLProgramEnvironment(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	RESULT OGLInitialize();
 	virtual RESULT OGLInitialize(version versionOGL) override;
@@ -44,8 +44,6 @@ private:
 	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
 
 	OGLMaterialBlock *m_pMaterialsBlock = nullptr;
-
-	bool m_fPassThru = true;
 };
 
 #endif // ! OGLPROGRAM_ENVIRONMENT_H_

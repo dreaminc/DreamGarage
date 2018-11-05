@@ -14,7 +14,8 @@ class stereocamera;
 
 class OGLProgramReferenceGeometry : public OGLProgramMinimal {
 public:
-	OGLProgramReferenceGeometry(OpenGLImp *pParentImp);
+	OGLProgramReferenceGeometry(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+
 	virtual RESULT ProcessNode(long frameID) override;
 
 	virtual RESULT OGLInitialize() override;

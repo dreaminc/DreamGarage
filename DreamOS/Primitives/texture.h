@@ -66,6 +66,8 @@ public:
 	RESULT LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n);
 	
 	RESULT CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n);
+	virtual RESULT LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n);
+	virtual RESULT UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n);
 
 	virtual RESULT LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat);
 

@@ -4,8 +4,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhongTexture::OGLProgramBlinnPhongTexture(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblinnpohongtexture"),
+OGLProgramBlinnPhongTexture::OGLProgramBlinnPhongTexture(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglblinnpohongtexture", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {

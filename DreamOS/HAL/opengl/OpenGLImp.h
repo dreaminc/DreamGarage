@@ -108,7 +108,7 @@ public:
 
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
-	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) override;
 
 public:
 	virtual RESULT Resize(viewport newViewport) override;
@@ -151,6 +151,10 @@ public:
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
 	RESULT glDeleteFramebuffers(GLsizei n, const GLuint *framebuffers);
+
+	// PBO
+	void *glMapBuffer(GLenum target, GLenum access);
+	RESULT glUnmapBuffer(GLenum target);
 
 	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);

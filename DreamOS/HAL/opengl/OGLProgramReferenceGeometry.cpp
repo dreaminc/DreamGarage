@@ -8,8 +8,8 @@
 #include "HAL/opengl/OpenGLImp.h"
 #include "HAL/opengl/OGLFramebuffer.h"
 
-OGLProgramReferenceGeometry::OGLProgramReferenceGeometry(OpenGLImp *pParentImp) :
-	OGLProgramMinimal(pParentImp)
+OGLProgramReferenceGeometry::OGLProgramReferenceGeometry(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgramMinimal(pParentImp, optFlags)
 {
 	// empty
 }
@@ -35,8 +35,8 @@ RESULT OGLProgramReferenceGeometry::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
-	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, PIPELINE_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// The render output is passed through

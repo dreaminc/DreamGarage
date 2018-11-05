@@ -13,8 +13,8 @@
 
 #include <chrono>
 
-OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglwater"),
+OGLProgramWater::OGLProgramWater(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags) :
+	OGLProgram(pParentImp, "oglwater", optFlags),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
@@ -142,7 +142,7 @@ RESULT OGLProgramWater::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
-	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, PIPELINE_FLAGS::PASSIVE));
 	//CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
