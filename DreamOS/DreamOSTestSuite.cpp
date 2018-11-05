@@ -53,6 +53,8 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamDesktop());
+
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
@@ -75,8 +77,6 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestMeta());
 	
-	CR(AddTestDreamDesktop());
-
 	CR(AddTestDreamBrowser());		
 
 	CR(AddTestDreamOS());
