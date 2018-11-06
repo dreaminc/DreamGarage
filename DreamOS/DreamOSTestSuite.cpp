@@ -35,6 +35,9 @@
 #include "WebBrowser\WebBrowserController.h"
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
 
+#include "Sandbox/NamedPipeClient.h"
+#include "Sandbox/NamedPipeServer.h"
+
 #include <chrono>
 
 #include <windows.h>
