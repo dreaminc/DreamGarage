@@ -100,6 +100,21 @@ public:
 	RESULT PendCreateHandModel(long avatarModelID);
 	RESULT LoadHandModel();
 
+	// mallet replacement(?)
+public:
+	RESULT Show();
+	RESULT Hide();
+	std::shared_ptr<sphere> GetMalletHead();
+	float GetMalletRadius();
+	point GetMalletOffset();
+	
+private:
+	float m_radius;
+	float m_distance;
+	float m_angle;
+	std::shared_ptr<sphere> m_pHead;
+	point m_headOffset;
+
 protected:
 	//Animations
 	//TODO: generalize

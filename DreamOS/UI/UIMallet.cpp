@@ -73,7 +73,7 @@ Error:
 	return r;
 }
 
-float UIMallet::GetRadius() {
+float UIMallet::GetMalletRadius() {
 	return m_radius;
 }
 
@@ -81,6 +81,6 @@ sphere *UIMallet::GetMalletHead() {
 	return m_pHead;
 }
 
-point UIMallet::GetHeadOffset() {
+point UIMallet::GetMalletOffset() {
 	return m_headOffset;
 }

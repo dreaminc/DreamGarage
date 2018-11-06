@@ -34,7 +34,7 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
-	if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+	if (ptSphereOrigin.y() >= pMallet->GetMalletRadius()) {
 
 		fMalletDirty = false;
 
@@ -66,7 +66,7 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 	float zDistance = ptSphereOrigin.z() - m_ptClick.z();
 	float squaredDistance = xDistance * xDistance + zDistance * zDistance;
 
-	if (ptSphereOrigin.y() < pMallet->GetRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
+	if (ptSphereOrigin.y() < pMallet->GetMalletRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
 		m_fMouseDrag = true;
 		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_MOVED, m_pViewQuad.get(), pMallet->GetMalletHead(), ptSphereOrigin);
 		NotifySubscribers(UI_SELECT_MOVED, pUIEvent);
@@ -74,7 +74,7 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 	}
 
 	// if the sphere is lower than its own radius, there must be an interaction
-	if (ptSphereOrigin.y() < pMallet->GetRadius() && !fMalletDirty) {
+	if (ptSphereOrigin.y() < pMallet->GetMalletRadius() && !fMalletDirty) {
 
 		float quadWidth = m_pViewQuad->GetWidth();
 		float quadHeight = m_pViewQuad->GetHeight();

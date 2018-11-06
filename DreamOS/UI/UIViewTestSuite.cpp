@@ -623,7 +623,7 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -632,7 +632,7 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
 
 			CR(pScrollView->Update());
 		}

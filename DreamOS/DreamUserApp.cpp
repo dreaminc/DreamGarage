@@ -52,8 +52,8 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pRightMallet = new UIMallet(pDreamOS);
 	CN(m_pRightMallet);
 
-	pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-	pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
+	//pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
+	//pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	m_pAppBasis = pDreamOS->MakeComposite();
 
@@ -313,7 +313,7 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (pMallet != nullptr) {
-		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetHeadOffset()));
+		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetMalletOffset()));
 	}
 
 	// Update Mallet Visibility

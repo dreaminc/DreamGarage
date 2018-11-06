@@ -386,7 +386,7 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 			auto& pRightMallet = pCaptureContext->pRightMallet;
 
 			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -395,7 +395,7 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
 
 			pCaptureContext->pFlatContext->RenderToQuad(pCaptureContext->pRenderQuad, 0.0f, 0.0f);
 		}
@@ -625,7 +625,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			auto& pRightMallet = pCaptureContext->pRightMallet;
 
 			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -634,7 +634,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
 		}
 
 	Error:

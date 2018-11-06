@@ -404,11 +404,11 @@ RESULT UIKeyboard::Update(void *pContext) {
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pSurface->GetOrientation(true))) * (ptSphereOrigin - m_pSurface->GetOrigin(true)));
 		ptCollisions[i] = ptSphereOrigin;
 
-		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
+		if (ptSphereOrigin.y() >= mallet->GetMalletRadius()) mallet->CheckAndCleanDirty();
 		//else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
 		
 		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
+		if (ptSphereOrigin.y() < mallet->GetMalletRadius() && !mallet->IsDirty()) {
 
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
 			// if it accounted for the radius, it would be able to return multiple keys
@@ -423,7 +423,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 			point ptPosition = key->m_pQuad->GetPosition();
 
 			// TODO: edge case where there is a new interaction during the key release animation
-			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetRadius(), ptPosition.z()));
+			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetMalletRadius(), ptPosition.z()));
 		}
 
 		i++;
@@ -435,7 +435,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		auto key = keyCollisions[0];
 		point ptPosition = key->m_pQuad->GetPosition();
 		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
-		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLMallet->GetRadius(), ptPosition.z()));
+		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLMallet->GetMalletRadius(), ptPosition.z()));
 	}
 
 

@@ -164,7 +164,7 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 		ptSphereOrigin = (point)(inverse(RotationMatrix(pComposite->GetOrientation(true))) * (ptSphereOrigin - pComposite->GetOrigin(true)));
 
 		// clear flags
-		if (ptSphereOrigin.y() >= pMallet->GetRadius()) {
+		if (ptSphereOrigin.y() >= pMallet->GetMalletRadius()) {
 			m_fCanPressButton[i] = true;
 		}
 

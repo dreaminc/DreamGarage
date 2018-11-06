@@ -99,6 +99,8 @@ public:
 	virtual bool HasCapturedObjects(VirtualObj *pInteractionObject) = 0;
 	virtual bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) = 0;
 	virtual std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject) = 0;
+
+	virtual RESULT SetInteractionDiffThreshold(double thresh) = 0;
 	//virtual point GetInteractionRayOrigin() = 0;
 };
 
@@ -161,7 +163,7 @@ public:
 	RESULT ClearInteractionObjects();
 	VirtualObj *FindInteractionObject(VirtualObj *pInteractionObject);
 
-	RESULT SetInteractionDiffThreshold(double thresh);
+	virtual RESULT SetInteractionDiffThreshold(double thresh) override;
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	// TODO: Register element events etc

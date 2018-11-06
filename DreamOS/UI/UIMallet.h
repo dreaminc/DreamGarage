@@ -21,8 +21,8 @@ public:
 	RESULT Show();
 	RESULT Hide();
 	sphere* GetMalletHead();
-	float GetRadius();
-	point GetHeadOffset();
+	float GetMalletRadius();
+	point GetMalletOffset();
 
 private:
 	float m_radius;

@@ -166,6 +166,8 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	CN(m_pController);
 	m_pController->SetVisible(false);
 
+	m_radius = 0.015f;
+
 	//TODO: several unique positioning variables per device here that aren't used anywhere else
 	switch (pHMD->GetDeviceType()) {
 	case (HMDDeviceType::OCULUS): {
@@ -182,6 +184,9 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 										scale * OVR_OVERLAY_POSITION_Z));
 		m_pOverlayQuad->SetVisible(false);
 		//*/
+
+		m_distance = 0.2f;
+		m_angle = -23.0f * (float)(M_PI) / 180.0f;
 
 	} break;
 	case (HMDDeviceType::VIVE): {
@@ -200,6 +205,9 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		m_pOverlayQuad->SetVisible(false);
 		//*/
 
+		m_distance = 0.2f;
+		m_angle = -60.0f * (float)(M_PI) / 180.0f;
+
 	} break;
 	case (HMDDeviceType::META): {
 		float scale = VIVE_OVERLAY_SCALE;
@@ -213,12 +221,72 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 			scale * VIVE_OVERLAY_POSITION_Z));
 		m_pOverlayQuad->SetVisible(false);
 		//*/
+
+		m_distance = 0.0f;
+		m_angle = 0.0f;
+
 	} break;
 	}
+
+	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
+
+	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
+	m_pHead->SetVisible(true);
+	m_pHead->SetPosition(m_headOffset);
+
+//	float testZ = m_handType == HAND_TYPE::HAND_LEFT ? (float)M_PI_2 : -1.0f * (float)M_PI_2;
+	//m_pHead->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, testZ));
+	//m_pHead->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI_2, 0.0f));
+	//m_pHead->SetVisible(false);
+
+	pDreamOS->AddInteractionObject(m_pHead.get());
 
 
 Error:
 	return r;
+}
+
+RESULT hand::Show() {
+	RESULT r = R_PASS;
+	//TODO: Mallet animation
+	m_pHead->SetVisible(true);
+	
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pHead.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags()));
+
+Error:
+	return r;
+}
+
+RESULT hand::Hide() {
+	RESULT r = R_PASS;
+	m_pHead->SetVisible(false);
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pHead.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags()));
+
+Error:
+	return r;
+}
+
+float hand::GetMalletRadius() {
+	return m_radius;
+}
+
+std::shared_ptr<sphere> hand::GetMalletHead() {
+	return m_pHead;
+}
+
+point hand::GetMalletOffset() {
+	return m_headOffset;
 }
 
 hand::ModelState hand::GetModelState() {
