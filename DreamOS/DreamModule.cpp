@@ -55,3 +55,31 @@ RESULT DreamModuleBase::Print(std::string strOptString) {
 	DEBUG_LINEOUT("%s: %s running %fus pri: %d", strOptString.c_str(), (m_strName.length() > 0) ? m_strName.c_str() : "DreamModule", GetTimeRun(), GetPriority());
 	return R_PASS;
 }
+
+RESULT DreamModuleBase::StartModuleProcess(void *pContext) {
+	RESULT r = R_PASS;
+
+	// TODO: Task manager / poster?
+
+	CBM((m_moduleThread.joinable() == false), "Cannot start a new module thread, one already running");
+
+	m_moduleThread = std::thread(&DreamModuleBase::ModuleProcess, this, pContext);
+
+	CBM((m_moduleThread.joinable()), "Failed to start module thread");
+
+Error:
+	return r;
+}
+
+RESULT DreamModuleBase::KillModuleProcess() {
+	RESULT r = R_PASS;
+
+	CBM((m_moduleThread.joinable()), "Cannot kill module thread, not running");
+
+	m_moduleThread.join();
+
+	CBM((m_moduleThread.joinable() == false), "Failed to kill module thread");
+
+Error:
+	return r;
+}

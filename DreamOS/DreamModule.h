@@ -131,12 +131,23 @@ protected:
 		return m_uid;
 	}
 
+	// Module Thread Process
+	RESULT StartModuleProcess(void *pContext = nullptr);
+	RESULT KillModuleProcess();
+	virtual RESULT ModuleProcess(void *pContext) { return R_NOT_IMPLEMENTED; }
+
+	bool IsModuleProcessRunning() {
+		return m_moduleThread.joinable();
+	}
+
 private:
 	double m_usTimeRun = 0.0;
 	int m_priority = 0;
 
 	bool m_fShutdownFlag = false;
 	std::string m_strShutdownFlagSignalName;
+
+	std::thread	m_moduleThread;
 
 protected:
 	std::string m_strName;

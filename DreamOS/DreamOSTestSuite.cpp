@@ -57,13 +57,13 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamDesktop());
 
+	CR(AddTestModuleManager());
+	
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
 
 	CR(AddTestEnvironmentSeating());
-
-	CR(AddTestModuleManager());
 
 	CR(AddTestCredentialStorage());
 
@@ -996,9 +996,10 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 			RESULT r = R_PASS;
 
 			SetName("DreamSoundSystem");
-			SetModuleDescription("The Dream Sound System Module");
+			SetModuleDescription("The Dream System Module");
 
-			CR(r);
+			// nullptr is optional, but added to the test for completeness
+			CR(StartModuleProcess(nullptr));	
 
 		Error:
 			return r;
@@ -1010,7 +1011,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 		virtual RESULT Update(void *pContext = nullptr) override {
 			RESULT r = R_PASS;
 
-			CR(Print(std::to_string(m_testingValue)));
+			//CR(Print(std::to_string(m_testingValue)));
 
 		Error:
 			return r;
@@ -1025,6 +1026,19 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 			return R_PASS;
 		}
 
+		virtual RESULT ModuleProcess(void *pContext) override { 
+			RESULT r = R_PASS;
+
+			while (true) {
+				DEBUG_LINEOUT("module %d: count %d", m_testingValue, m_count++);
+
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+
+		Error:
+			return r;
+		}
+
 	protected:
 		static DreamTestingModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 			DreamTestingModule *pDreamModule = new DreamTestingModule(pDreamOS, pContext);
@@ -1033,6 +1047,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 
 	private:
 		int m_testingValue = -1;
+		int m_count = 0;
 	};
 
 	// Initialize Code
