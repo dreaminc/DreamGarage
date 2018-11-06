@@ -528,7 +528,7 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 
 	PIXEL_FORMAT pixelFormat = m_pixelFormat;
 
-	if (m_glPixelPackBufferIndex[0] != 0) {
+	if (IsOGLPBOPackEnabled()) {
 		//// Set the target framebuffer to read
 		// glReadBuffer(GL_FRONT);
 
@@ -577,7 +577,7 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 	CR(Bind());
 
-	if (m_glPixelUnpackBufferIndex != 0) {
+	if (IsOGLPBOUnpackEnabled()) {
 		CR(BindPixelUnpackBuffer());
 
 		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
@@ -677,17 +677,10 @@ Error:
 	return r;
 }
 
-bool OGLTexture::IsOGLPBOPackEnabled() {
-	bool fEnabled = false;
-	if (m_glPixelPackBufferIndex[0] != 0) {
-		fEnabled = true;
-	}
-	return fEnabled;
-}
 bool OGLTexture::IsOGLPBOUnpackEnabled() {
-	bool fEnabled = false;
-	if (m_glPixelUnpackBufferIndex != 0) {
-		fEnabled = true;
-	}
-	return fEnabled;
+	return (m_glPixelUnpackBuferIndex != 0);
+}
+
+bool OGLTexture::IsOGLPBOPackEnabled() {
+	return (m_glPixelPackBuferIndex[0] != 0);
 }

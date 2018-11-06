@@ -43,6 +43,7 @@ public:
 
 	// Modules
 	RESULT AddTestModuleManager();
+	RESULT AddTestDreamVCam();
 
 	// Apps
 	RESULT AddTestUIKeyboard();

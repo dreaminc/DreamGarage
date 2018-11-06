@@ -28,6 +28,8 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 #include "DreamGarage\DreamEnvironmentApp.h"
 
+#include "DreamVCam.h"
+
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
@@ -56,6 +58,8 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamDesktop());
+	
+	CR(AddTestDreamVCam());
 
 	CR(AddTestModuleManager());
 	
@@ -971,6 +975,91 @@ Error:
 	return r;
 }
 
+RESULT DreamOSTestSuite::AddTestDreamVCam() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 5000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	struct TestContext {
+		texture *pTexture = nullptr;
+		unsigned char *pBuffer = nullptr;
+		std::shared_ptr<DreamVCam> pDreamVCam = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+
+		// Hook up a texture
+		{
+			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+			CN(pLight);
+
+			sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pSphere);
+
+			// Create the VCam		
+			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCam>(this);
+			CNM(pTestContext->pDreamVCam, "Failed to create dream virtual camera");
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pTestContext->pTexture);
+
+			CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
+		}
+		
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Dream VCam Test");
+	pUITest->SetTestDescription("Testing the dream virtual camera module");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT DreamOSTestSuite::AddTestModuleManager() {
 	RESULT r = R_PASS;
 
@@ -1068,7 +1157,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 		// Create the testing modules
 		for (int i = 0; i < 5; i++) {
 			pDreamTestModules[i] = m_pDreamOS->LaunchDreamModule<DreamTestingModule>(this);
-			CNM(pDreamTestModules[i], "Failed to create dream test app");
+			CNM(pDreamTestModules[i], "Failed to create dream test module");
 			pDreamTestModules[i]->SetTestingValue(i);
 		}
 
