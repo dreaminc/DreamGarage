@@ -932,6 +932,15 @@ RESULT DreamOS::SetGravityAcceleration(double acceleration) {
 	return m_pSandbox->SetGravityAcceleration(acceleration);
 }
 
+// Sandbox Level Objects 
+std::shared_ptr<NamedPipeClient> DreamOS::MakeNamedPipeClient(std::wstring strPipename) {
+	return m_pSandbox->MakeNamedPipeClient(strPipename);
+}
+
+std::shared_ptr<NamedPipeServer> DreamOS::MakeNamedPipeServer(std::wstring strPipename) {
+	return m_pSandbox->MakeNamedPipeServer(strPipename);
+}
+
 RESULT DreamOS::SetGravityState(bool fEnabled) {
 	return m_pSandbox->SetGravityState(fEnabled);
 }

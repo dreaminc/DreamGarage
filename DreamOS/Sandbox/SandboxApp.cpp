@@ -877,7 +877,19 @@ const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
 	return m_pHALImp->GetHALConfiguration();
 }
 
+
+
 // Sandbox Factory Methods
+
+// Sandbox Objects
+std::shared_ptr<NamedPipeClient> SandboxApp::MakeNamedPipeClient(std::wstring strPipename) {
+	return nullptr;
+}
+
+std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring strPipename) {
+	return nullptr;
+}
+
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 

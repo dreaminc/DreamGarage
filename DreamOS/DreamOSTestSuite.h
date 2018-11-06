@@ -41,6 +41,9 @@ public:
 	// Meta UI
 	RESULT AddTestMeta();
 
+	// IPC
+	RESULT AddTestNamedPipes();
+
 	// Modules
 	RESULT AddTestModuleManager();
 	RESULT AddTestDreamVCam();

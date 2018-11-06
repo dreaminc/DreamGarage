@@ -59,6 +59,8 @@ class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
 
+class NamedPipeClient;
+class NamedPipeServer;
 
 class PeerStayAliveMessage;
 class PeerAckMessage;
@@ -336,6 +338,10 @@ public:
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
+
+	// Sandbox level objects
+	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
+	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 
 	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);

@@ -59,6 +59,10 @@ public:	// Sandbox Interface
 
 	virtual bool IsSandboxInternetConnectionValid() override;
 
+	// Sandbox Objects
+	virtual std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename) override;
+	virtual std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename) override;
+
 public:
 	virtual RESULT InitializePathManager(DreamOS *pDOSHandle) override;	
 	RESULT InitializeOpenGLRenderingContext();

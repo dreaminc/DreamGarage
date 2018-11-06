@@ -59,6 +59,8 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestDreamDesktop());
 	
+	CR(AddTestNamedPipes());
+
 	CR(AddTestDreamVCam());
 
 	CR(AddTestModuleManager());
@@ -968,6 +970,97 @@ RESULT DreamOSTestSuite::AddTestDreamLogger() {
 
 	pUITest->SetTestName("Logging Test");
 	pUITest->SetTestDescription("Basic logging test which will spin up a few SPD logs and test out the system");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestNamedPipes() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 5000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	struct TestContext {
+		texture *pTexture = nullptr;
+		unsigned char *pBuffer = nullptr;
+
+		std::shared_ptr<NamedPipeServer> pNamedPipeServer = nullptr;
+		std::shared_ptr<NamedPipeClient> pNamedPipeClient = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		{
+			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+			CN(pLight);
+
+			sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pSphere);
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pTestContext->pTexture);
+
+			// Set up named pipe and server
+			pTestContext->pNamedPipeServer = m_pDreamOS->MakeNamedPipeServer(L"testPipe");
+			CN(pTestContext->pNamedPipeServer);
+			CR(pTestContext->pNamedPipeServer->Start());
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		// TODO: Send msgs from server to client
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Dream VCam Test");
+	pUITest->SetTestDescription("Testing the dream virtual camera module");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
