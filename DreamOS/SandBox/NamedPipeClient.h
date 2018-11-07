@@ -17,8 +17,22 @@ public:
 
 	virtual RESULT Initialize() = 0;
 
+	RESULT Start();
+	RESULT Stop();
+
+	RESULT RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler);
+	RESULT UnregisterMessageHandler();
+
+	virtual RESULT NamedPipeClientProcess() = 0;
+	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) = 0;
+
 protected:
 	std::wstring m_strPipename;
+
+	std::thread m_namedPipeClientProcess;
+	bool m_fRunning = false;
+
+	std::function<RESULT(void*, size_t)> m_fnPipeMessageHandler = nullptr;
 };
 
 #endif // ! DREAM_NAMED_PIPE_CLIENT_H_

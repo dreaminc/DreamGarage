@@ -993,6 +993,31 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 
 		std::shared_ptr<NamedPipeServer> pNamedPipeServer = nullptr;
 		std::shared_ptr<NamedPipeClient> pNamedPipeClient = nullptr;
+
+		RESULT HandleClientPipeMessage(void *pBuffer, size_t pBuffer_n) {
+			RESULT r = R_PASS;
+
+			char *pszMessage = (char *)(pBuffer);
+			CN(pszMessage);
+
+			DEBUG_LINEOUT("HandleClientPipeMessage: %s", pszMessage);
+
+		Error:
+			return r;
+		}
+
+		RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
+			RESULT r = R_PASS;
+
+			char *pszMessage = (char *)(pBuffer);
+			CN(pszMessage);
+
+			DEBUG_LINEOUT("HandleServerPipeMessage: %s", pszMessage);
+
+		Error:
+			return r;
+		}
+
 	} *pTestContext = new TestContext();
 
 	// Initialize Code
@@ -1016,10 +1041,19 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
 			CN(pTestContext->pTexture);
 
-			// Set up named pipe and server
+			// Set up named pipe server
 			pTestContext->pNamedPipeServer = m_pDreamOS->MakeNamedPipeServer(L"testPipe");
 			CN(pTestContext->pNamedPipeServer);
-			CR(pTestContext->pNamedPipeServer->Start());
+			CR(pTestContext->pNamedPipeServer->RegisterMessageHandler(std::bind(&TestContext::HandleServerPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			//CR(pTestContext->pNamedPipeServer->Start());
+
+			// Set up named pipe client
+			pTestContext->pNamedPipeClient = m_pDreamOS->MakeNamedPipeClient(L"testPipe");
+			CN(pTestContext->pNamedPipeClient);
+			CR(pTestContext->pNamedPipeClient->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeClient->Start());
+
+
 		}
 
 
@@ -1039,7 +1073,13 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		// TODO: Send msgs from server to client
+		static int count = 0;
+
+		{
+			std::string strTestMessage = "testing: " + std::to_string(count++);
+
+			CR(pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size()));
+		}
 
 	Error:
 		return r;

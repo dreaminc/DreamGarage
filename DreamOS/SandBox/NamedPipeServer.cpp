@@ -43,3 +43,23 @@ RESULT NamedPipeServer::Stop() {
 Error:
 	return r;
 }
+
+RESULT NamedPipeServer::RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler) {
+	RESULT r = R_PASS;
+
+	CBM((m_fnPipeMessageHandler == nullptr), "Message handler already set");
+	m_fnPipeMessageHandler = fnPipeMessageHandler;
+
+Error:
+	return r;
+}
+
+RESULT NamedPipeServer::UnregisterMessageHandler() {
+	RESULT r = R_PASS;
+
+	CNM(m_fnPipeMessageHandler, "Handler not set");
+	m_fnPipeMessageHandler = nullptr;
+
+Error:
+	return r;
+}

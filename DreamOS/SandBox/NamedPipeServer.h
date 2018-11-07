@@ -20,13 +20,19 @@ public:
 	RESULT Start();
 	RESULT Stop();
 
+	RESULT RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler);
+	RESULT UnregisterMessageHandler();
+
 	virtual RESULT NamedPipeServerProcess() = 0;
+	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) = 0;
 
 protected:
 	std::wstring m_strPipename;
 
 	std::thread m_namedPipeServerProcess;
 	bool m_fRunning = false;
+
+	std::function<RESULT(void*, size_t)> m_fnPipeMessageHandler = nullptr;
 };
 
 #endif // ! DREAM_NAMED_PIPE_SERVER_H_

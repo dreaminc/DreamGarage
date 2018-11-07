@@ -12,7 +12,7 @@
 
 #include <windows.h> 
 
-#define DEFAULT_NAMED_PIPE_BUFFER_SIZE 512
+#define DEFAULT_NAMED_PIPE_SERVER_BUFFER_SIZE 512
 
 class Win64NamedPipeServer : public NamedPipeServer {
 public:
@@ -22,14 +22,11 @@ public:
 	virtual RESULT Initialize() override;
 
 	virtual RESULT NamedPipeServerProcess() override;
-
-private:
-	RESULT HandleRequest(LPTSTR pchRequest, LPTSTR pchReply, LPDWORD pchBytes);
-	std::wstring GetWindowsNamedPipeName();
+	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) override;
 
 private:
 	HANDLE m_handleNamedPipe = INVALID_HANDLE_VALUE;
-	int m_pipeBufferSize = DEFAULT_NAMED_PIPE_BUFFER_SIZE;
+	int m_pipeBufferSize = DEFAULT_NAMED_PIPE_SERVER_BUFFER_SIZE;
 
 	bool m_fConnected = false;
 };
