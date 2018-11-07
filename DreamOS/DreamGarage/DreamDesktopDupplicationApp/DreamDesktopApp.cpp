@@ -155,7 +155,7 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	m_pDesktopTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
 	m_pLoadingScreenTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen));
 
-	/*	// Testing quad
+	//*	// Testing quad
 	auto pComposite = GetDOS()->AddComposite();
 	pComposite->InitializeOBB();
 
@@ -383,7 +383,7 @@ RESULT DreamDesktopApp::HandleWindows64CopyData(unsigned long messageSize, void*
 
 	CNR(pMessageData, R_SKIPPED);
 	
-	//*
+	/*
 	if (!m_fDesktopDuplicationIsRunning) {
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;

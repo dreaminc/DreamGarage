@@ -664,7 +664,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pDreamTabView->AddContent(m_pActiveSource);
 		}
 	}
-	
+
 	if (strScope == m_strDesktopScope) {
 		if (m_pDreamDesktop == nullptr) {
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
