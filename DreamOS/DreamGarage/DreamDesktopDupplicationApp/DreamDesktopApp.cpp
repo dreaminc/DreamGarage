@@ -395,7 +395,7 @@ RESULT DreamDesktopApp::HandleWindows64CopyData(unsigned long messageSize, void*
 	}
 	//*/
 
-	if (dynamic_cast<OGLTexture*>(m_pDesktopTexture.get())->GetOGLTexturePixelUnpackBufferIndex() != 0) {
+	if (dynamic_cast<OGLTexture*>(m_pDesktopTexture.get())->IsOGLPBOUnpackEnabled()) {
 		m_pDesktopTexture->UpdateTextureFromBuffer((unsigned char*)pMessageData, messageSize);
 	}
 	else {

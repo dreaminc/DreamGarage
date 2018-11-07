@@ -345,7 +345,7 @@ RESULT DreamOS::RegisterWindows64Observer(Windows64Observer *pWindows64Observer)
 	RESULT r = R_PASS;
 
 	CNM((pWindows64Observer), "Observer cannot be nullptr");
-	CBM((m_pWindows64Observer == nullptr), "Can't overwrite DOS observer");
+	CBM((m_pWindows64Observer == nullptr), "Can't overwrite Windows64Observer");
 
 	m_pWindows64Observer = pWindows64Observer;
 
@@ -357,7 +357,7 @@ RESULT DreamOS::UnregisterWindows64Observer(Windows64Observer *pWindows64Observe
 	RESULT r = R_PASS;
 
 	CN(pWindows64Observer);
-	CBM((m_pWindows64Observer == pWindows64Observer), "DOS Observer is not set to this object");
+	CBM((m_pWindows64Observer == pWindows64Observer), "Windows64Observer is not set to this object");
 
 	m_pWindows64Observer = nullptr;
 
@@ -367,7 +367,12 @@ Error:
 
 RESULT DreamOS::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
+
+	CNM(m_pWindows64Observer, "Windows64Observer was nullptr");
+
 	m_pWindows64Observer->HandleWindows64CopyData(messageSize, pMessageData, pxHeight, pxWidth);
+
+Error:
 	return r;
 }
 
