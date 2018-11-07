@@ -341,6 +341,36 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::RegisterWindows64Observer(Windows64Observer *pWindows64Observer) {
+	RESULT r = R_PASS;
+
+	CNM((pWindows64Observer), "Observer cannot be nullptr");
+	CBM((m_pWindows64Observer == nullptr), "Can't overwrite DOS observer");
+
+	m_pWindows64Observer = pWindows64Observer;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::UnregisterWindows64Observer(Windows64Observer *pWindows64Observer) {
+	RESULT r = R_PASS;
+
+	CN(pWindows64Observer);
+	CBM((m_pWindows64Observer == pWindows64Observer), "DOS Observer is not set to this object");
+
+	m_pWindows64Observer = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+	RESULT r = R_PASS;
+	m_pWindows64Observer->HandleWindows64CopyData(messageSize, pMessageData, pxHeight, pxWidth);
+	return r;
+}
+
 RESULT DreamOS::OnDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 

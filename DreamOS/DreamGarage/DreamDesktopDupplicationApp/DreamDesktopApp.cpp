@@ -7,6 +7,7 @@
 #include "DDCIPCMessage.h"
 #include <windows.h>
 #include <windowsx.h>
+#include "HAL\opengl\OGLTexture.h"
 
 
 DreamDesktopApp::DreamDesktopApp(DreamOS *pDreamOS, void *pContext) :
@@ -148,9 +149,27 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 	SetAppName("DreamDesktopApp");
 	SetAppDescription("A Shared Desktop View");
 
+	GetDOS()->RegisterWindows64Observer(this);
+
 	// Initialize texture
-	m_pDesktopTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4));
+	m_pDesktopTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
 	m_pLoadingScreenTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, k_wszLoadingScreen));
+
+	//*	// Testing quad
+	auto pComposite = GetDOS()->AddComposite();
+	pComposite->InitializeOBB();
+
+	auto pView = pComposite->AddUIView(GetDOS());
+	pView->InitializeOBB();
+
+	m_pDesktopQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+	m_pDesktopQuad->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pDesktopQuad->FlipUVVertical();
+
+	m_pDesktopQuad->SetDiffuseTexture(m_pDesktopTexture.get());
+	//*/
+
+	CR(dynamic_cast<OGLTexture*>(m_pDesktopTexture.get())->EnableOGLPBOUnpack());
 
 	CR(GetComposite()->SetVisible(true));
 
@@ -192,7 +211,7 @@ RESULT DreamDesktopApp::StartDuplicationProcess() {
 	jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
 	jobCRCI.CpuRate = 1500;	// percent used * 100;
 
-	m_dreamJobHandle = CreateJobObjectW(nullptr, L"DreamJob");
+	m_dreamJobHandle = CreateJobObjectW(nullptr, L"DreamDesktopJob");
 	CNM(m_dreamJobHandle, "Failed to create job object");
 
 	SetInformationJobObject(m_dreamJobHandle, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));
@@ -359,11 +378,12 @@ RESULT DreamDesktopApp::SetParams(point ptPosition, float diagonal, float aspect
 	return R_PASS;
 }
 
-RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
+RESULT DreamDesktopApp::HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
 	RESULT r = R_PASS;
 
 	CNR(pMessageData, R_SKIPPED);
 	
+	/*
 	if (!m_fDesktopDuplicationIsRunning) {
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
@@ -373,8 +393,15 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture.get(), pContentSource);
 		m_fDesktopDuplicationIsRunning = true;
 	}
+	//*/
 
-	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
+	if (dynamic_cast<OGLTexture*>(m_pDesktopTexture.get())->GetOGLTexturePixelUnpackBufferIndex() != 0) {
+		m_pDesktopTexture->UpdateTextureFromBuffer((unsigned char*)pMessageData, messageSize);
+	}
+	else {
+		CR(m_pDesktopTexture->Update((unsigned char*)(pMessageData), pxWidth, pxHeight, PIXEL_FORMAT::BGRA));
+	}
+	
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 	CBR(GetSourceTexture() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);

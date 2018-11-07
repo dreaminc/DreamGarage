@@ -22,7 +22,7 @@ D3D11DesktopDuplicationOutputManager OutMgr;
 HWND pWindowHandle;		// These can go to the .h if we want
 HWND g_pDreamHandle;
 bool g_fStartSending = false;
-float g_msTimeDelay = 1000 / 24.0f; // fps
+float g_msTimeDelay = 1000 / 120.0f; // fps
 
 // These are the errors we expect from general Dxgi API due to a transition
 HRESULT SystemTransitionsExpectedErrors[] = {
@@ -162,8 +162,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	UINT texturepxHeight = 0;
 	// Message loop (attempts to update screen when no other messages to process)
 	MSG msg = { 0 };
-	bool FirstTime = true;
-	bool Occluded = true;
+	bool fFirstTime = true;
+	bool fOccluded = true;
 	DynamicWait DynamicWait;
 	float msLastSent = 0.0f;
 	// Window
@@ -217,8 +217,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	DestroyCursor(Cursor);
 
-	//ShowWindow(pWindowHandle, nCmdShow);
-	//UpdateWindow(pWindowHandle);
+#ifdef _DEBUG
+	ShowWindow(pWindowHandle, nCmdShow);
+	UpdateWindow(pWindowHandle);
+#endif
 
 	while (WM_QUIT != msg.message) {
 		DUPL_RETURN Ret = DUPL_RETURN_SUCCESS;
@@ -229,7 +231,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 			if (msg.message == OCCLUSION_STATUS_MSG) {
 				// Present may not be occluded now so try again
-				Occluded = false;
+				fOccluded = false;
 			}
 			else {
 				// Process window messages
@@ -241,8 +243,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			// Unexpected error occurred so exit the application
 			break;
 		}
-		else if (FirstTime || WaitForSingleObjectEx(ExpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0) {
-			if (!FirstTime) {
+		else if (fFirstTime || WaitForSingleObjectEx(ExpectedErrorEvent, 0, FALSE) == WAIT_OBJECT_0) {
+			if (!fFirstTime) {
 				// Terminate other threads
 				SetEvent(TerminateThreadsEvent);
 				ThreadMgr.WaitForThreadTermination();
@@ -259,7 +261,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 			else {
 				// First time through the loop so nothing to clean up
-				FirstTime = false;
+				fFirstTime = false;
 
 			}
 
@@ -277,7 +279,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			}
 
 			// We start off in occluded state and we should immediate get a occlusion status window message
-			Occluded = true;
+			fOccluded = true;
 		}
 
 		else {
@@ -286,8 +288,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			if (msTimeNow - msLastSent > g_msTimeDelay) {
 				msLastSent = msTimeNow; 
 				// Nothing else to do, so try to present to write out to window if not occluded
-				if (!Occluded) {
-					Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &Occluded, &pBuffer, pxWidth, pxHeight);
+				if (!fOccluded) {
+					Ret = OutMgr.UpdateApplicationWindow(ThreadMgr.GetPointerInfo(), &fOccluded, &pBuffer, pxWidth, pxHeight);
 				}
 
 				//if((pBuffer != nullptr) && (pBuffer[0] != '\0')) {
@@ -314,7 +316,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 						ddcMessage.pxWidth = pxWidth;
 
 						if (pxWidth > 600) {	// arbitrary cutoff, basically hard limit anything > down sampled 1080p (width ~ 500)
-							g_msTimeDelay = 1000 / 2.0f;
+							//g_msTimeDelay = 1000 / 2.0f;
 						}
 
 						COPYDATASTRUCT desktopCDS;

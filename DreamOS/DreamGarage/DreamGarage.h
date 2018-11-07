@@ -110,8 +110,6 @@ public:
 
 	virtual RESULT OnGetForm(std::string& strKey, std::string& strTitle, std::string& strURL) override;
 
-	// Desktop Sharing
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 	virtual RESULT OnShareAsset() override;
 	virtual RESULT OnCloseAsset() override;
 
@@ -213,7 +211,6 @@ private:
 	DreamContentView* m_pDreamContentView = nullptr;
 	DreamBrowser* m_pDreamBrowser = nullptr;
 	UIControlView* m_pDreamControlView = nullptr;
-	DreamDesktopApp* m_pDreamDesktop = nullptr;
 	DreamGamepadCameraApp* m_pDreamGamepadCameraApp = nullptr;
 };
 

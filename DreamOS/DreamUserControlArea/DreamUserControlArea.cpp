@@ -575,16 +575,6 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
-	RESULT r = R_PASS;
-
-	CNR(m_pDreamDesktop, R_SKIPPED);
-	m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
-
-Error:
-	return r;
-}
-
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }

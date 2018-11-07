@@ -479,6 +479,10 @@ GLuint OGLTexture::GetOGLTextureIndex() {
 	return m_glTextureIndex;
 }
 
+GLuint OGLTexture::GetOGLTexturePixelUnpackBufferIndex() {
+	return m_glPixelUnpackBufferIndex;
+}
+
 RESULT OGLTexture::LoadImageFromTexture(int level, PIXEL_FORMAT pixelFormat) {
 	RESULT r = R_PASS;
 

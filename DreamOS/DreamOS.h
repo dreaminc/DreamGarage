@@ -76,6 +76,11 @@ public:
 	virtual RESULT HandleDOSMessage(std::string& strMessage) = 0;
 };
 
+class Windows64Observer {
+public:
+	virtual RESULT HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) = 0;
+};
+
 class DreamOS :
 	public Subscriber<CollisionObjectEvent>,
 	public valid,
@@ -157,8 +162,6 @@ public:
 	virtual RESULT OnVideoFrame(PeerConnection* pPeerConnection, uint8_t *pVideoFrameDataBuffer, int pxWidth, int pxHeight);
 	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
 	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
-
-	virtual RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) = 0;
 
 	// EnvironmentObserver
 	// TODO: This should be encapsulated in it's own object
@@ -243,8 +246,14 @@ public:
 	RESULT UnregisterDOSObserver(DOSObserver *pDOSObserver);
 	RESULT SendDOSMessage(std::string& strMessage);
 
+	// Windows64Observer
+	RESULT RegisterWindows64Observer(Windows64Observer *pWindows64Observer);
+	RESULT UnregisterWindows64Observer(Windows64Observer *pWindows64Observer);
+	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
+
 private:
 	DOSObserver * m_pDOSObserver = nullptr;
+	Windows64Observer *m_pWindows64Observer = nullptr;
 
 public:
 	// Cloud Controller Hooks

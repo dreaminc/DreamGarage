@@ -141,10 +141,6 @@ public:
 	virtual RESULT HandleCanTabNext(bool fCanNext) override;
 	virtual RESULT HandleCanTabPrevious(bool fCanPrevious) override;
 
-// Dream Desktop
-public:
-	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
-
 // DreamGarage compatability (temp?)
 public:
 	RESULT ResetAppComposite();

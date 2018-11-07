@@ -47,15 +47,8 @@ public:
 										void *pContext = nullptr);
 
 	virtual RESULT AddTests() = 0;
-	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
-
+	
 	std::shared_ptr<TestObject> GetCurrentTest();
-
-public:
-	unsigned char* m_pDataBuffer = nullptr;
-	size_t m_pDataBuffer_n = 0;
-	int m_pxWidth = 0;
-	int m_pxHeight = 0;
 
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;

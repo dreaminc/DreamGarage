@@ -48,6 +48,7 @@ public:
 	GLenum GetGLTextureNumberDefine(int value);
 
 	GLuint GetOGLTextureIndex();
+	GLuint GetOGLTexturePixelUnpackBufferIndex();
 
 	RESULT AllocateGLTexture(size_t optOffset = 0);
 	RESULT AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);

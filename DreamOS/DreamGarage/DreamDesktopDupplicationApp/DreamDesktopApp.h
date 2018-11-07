@@ -2,7 +2,7 @@
 #define DREAM_DESKTOP_H_
 
 #include "RESULT/EHM.h"
-
+#include "DreamOS.h"
 // DREAM OS
 // DreamOS/DreamGarage/DesktopDuplicationApp
 // The Desktop duplication app starts and manages
@@ -31,7 +31,8 @@ class DreamUserControlArea;
 class AudioPacket;
 class EnvironmentAsset;
 
-class DreamDesktopApp :
+class DreamDesktopApp : 
+	public Windows64Observer,
 	public DreamApp<DreamDesktopApp>,
 	public DreamContentSource
 {
@@ -83,7 +84,7 @@ public:
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	//RESULT FadeQuadToBlack();
 
-	RESULT OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth);
+	virtual RESULT HandleWindows64CopyData(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) override;
 
 	RESULT InitializeWithParent(DreamUserControlArea *pParentApp);
 
