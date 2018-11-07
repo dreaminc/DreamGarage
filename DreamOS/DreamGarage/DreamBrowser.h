@@ -121,7 +121,7 @@ public:
 	bool m_fTestQuadActive = false;
 
 	// WebBrowserController Observer
-	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
+	virtual RESULT OnPaint(const void *pBuffer, int width, int height) override;
 	virtual RESULT OnAudioPacket(const AudioPacket &pendingAudioPacket) override;
 	virtual RESULT OnAfterCreated() override;
 	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward, std::string strCurrentURL) override;

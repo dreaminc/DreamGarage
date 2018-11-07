@@ -35,7 +35,7 @@ RESULT CEFBrowserManager::Initialize() {
 
 	JOBOBJECT_CPU_RATE_CONTROL_INFORMATION jobCRCI = { 0 };
 	//jobCRCI.ControlFlags = JOB_OBJECT_CPU_RATE_CONTROL_ENABLE | JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP;
-	m_hDreamJob = CreateJobObjectW(nullptr, L"DreamJob");
+	m_hDreamJob = CreateJobObjectW(nullptr, L"DreamCEFJob");
 	CNM(m_hDreamJob, "Failed to create job object");
 
 	SetInformationJobObject(m_hDreamJob, JobObjectExtendedLimitInformation, &jobELI, sizeof(jobELI));

@@ -67,7 +67,7 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
-		CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
 	}
 
 Error:
@@ -83,9 +83,9 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		for (auto& dirtyFrame : m_NewDirtyFrames) {
-			WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
+			//WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
 			
-			CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+			CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
 		
 			rNumFramesProcessed++;
 		}
@@ -343,6 +343,11 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::UseOGLPBOUnpack() {
+	m_fUseOGLPBO = true;
+	return R_PASS;
+}
+
 RESULT CEFBrowserController::CloseBrowser() {
 	RESULT r = R_PASS;
 
@@ -438,21 +443,26 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	RESULT r = R_PASS;
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
-	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
-
-	size_t pBuffer_n = width * height * 4;
-
-	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
-
-	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
-
-	if (fSizeChanged) {
-		m_bufferWidth = width;
-		m_bufferHeight = height;
-		DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
+	if (m_fUseOGLPBO) {
+		m_pWebBrowserControllerObserver->OnPaint(static_cast<const unsigned char*>(pBuffer), width, height);
 	}
+	else {
+		std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
-	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
+		size_t pBuffer_n = width * height * 4;
+
+		m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+
+		bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
+
+		if (fSizeChanged) {
+			m_bufferWidth = width;
+			m_bufferHeight = height;
+			DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
+		}
+
+		m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
+	}
 
 //Error:
 	return r;
