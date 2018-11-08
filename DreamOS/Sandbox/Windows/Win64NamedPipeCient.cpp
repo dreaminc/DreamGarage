@@ -41,14 +41,14 @@ RESULT Win64NamedPipeClient::Initialize() {
 
 	CNM(m_handleNamedPipe, "Failed to create pipe %S", GetWindowsNamedPipeClientName(m_strPipename).c_str());
 
-	//// Set mode of pipe
-	//DWORD dwMode = PIPE_READMODE_BYTE;
-	//bool fSuccess = SetNamedPipeHandleState(m_handleNamedPipe,		// pipe handle 
-	//										&dwMode,				// new pipe mode 
-	//										nullptr,				// don't set maximum bytes 
-	//										nullptr);				// don't set maximum time 
-	//
-	//CBM(fSuccess, "SetNamedPipeHandleState failed. GLE: %d", GetLastError());
+	// Set mode of pipe
+	DWORD dwMode = PIPE_READMODE_BYTE;
+	bool fSuccess = SetNamedPipeHandleState(m_handleNamedPipe,		// pipe handle 
+											&dwMode,				// new pipe mode 
+											nullptr,				// don't set maximum bytes 
+											nullptr);				// don't set maximum time 
+	
+	CBM(fSuccess, "SetNamedPipeHandleState failed. GLE: %d", GetLastError());
 
 Error:
 	return r;

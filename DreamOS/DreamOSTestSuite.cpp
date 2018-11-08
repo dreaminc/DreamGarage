@@ -1052,7 +1052,7 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 
 			/*
 			// This form of IPC isn't designed to be same process
-			// so we add a bit of delay to accomodate for problematic event handling / timing errors
+			// so we add a bit of delay to accommodate for problematic event handling / timing errors
 			// that would normally be fixed with a mutex for cross-thread sync
 			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
 
