@@ -22,7 +22,7 @@ D3D11DesktopDuplicationOutputManager OutMgr;
 HWND pWindowHandle;		// These can go to the .h if we want
 HWND g_pDreamHandle;
 bool g_fStartSending = false;
-float g_msTimeDelay = 1000 / 120.0f; // fps
+float g_msTimeDelay = 1000 / 24.0f; // fps
 
 // These are the errors we expect from general Dxgi API due to a transition
 HRESULT SystemTransitionsExpectedErrors[] = {
