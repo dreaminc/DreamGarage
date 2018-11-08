@@ -4,8 +4,6 @@
 #include "DreamGarage/DreamUIBar.h"
 #include "DreamControlView/UIControlView.h"
 
-#include "UI/UIMallet.h"
-
 #include "Core/Utilities.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
@@ -44,16 +42,6 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	pDreamOS->AddObjectToInteractionGraph(GetComposite());
 
 	CR(pDreamOS->RegisterEventSubscriber(GetComposite(), INTERACTION_EVENT_MENU, this));
-
-	// Initialize mallets
-	m_pLeftMallet = new UIMallet(pDreamOS);
-	CN(m_pLeftMallet);
-
-	m_pRightMallet = new UIMallet(pDreamOS);
-	CN(m_pRightMallet);
-
-	//pDreamOS->AddInteractionObject(m_pLeftMallet->GetMalletHead());
-	//pDreamOS->AddInteractionObject(m_pRightMallet->GetMalletHead());
 
 	m_pAppBasis = pDreamOS->MakeComposite();
 
@@ -115,7 +103,7 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 #endif
 
 	// this is the guess at where the UI could be, only call this here
-	CR(ResetAppComposite());
+	//CR(ResetAppComposite());
 
 Error:
 	return r;
@@ -289,40 +277,22 @@ RESULT DreamUserApp::UpdateHand(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	hand *pHand = nullptr;
-	UIMallet *pMallet = nullptr;
 	bool fRayHandCollision = false;
 	RotationMatrix qOffset; 
 
 	// define variables based on hand type
 	if (type == HAND_TYPE::HAND_LEFT) {
 		pHand = m_pLeftHand;
-		pMallet = m_pLeftMallet;
 		fRayHandCollision = m_fCollisionLeft;
 	}
 	else if (type == HAND_TYPE::HAND_RIGHT) {
 		pHand = m_pRightHand;
-		pMallet = m_pRightMallet;
 		fRayHandCollision = m_fCollisionRight;
 	}
 
 	CNR(pHand, R_SKIPPED);
 
 	CR(pHand->Update());
-
-	// Update Mallet Position
-	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-	if (pMallet != nullptr) {
-		pMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pMallet->GetMalletOffset()));
-	}
-
-	// Update Mallet Visibility
-	if (!pHand->IsTracked() && pMallet->GetMalletHead()->IsVisible()) {
-		pMallet->Hide();
-	} 
-	else if (pHand->IsTracked() && m_pEventApp != nullptr && !pMallet->GetMalletHead()->IsVisible()) {
-		pMallet->Show();
-	}
 
 Error:
 	return r;
@@ -345,11 +315,9 @@ RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
 	if (m_fHasOpenApp) {
 
 		if (m_pLeftHand != nullptr) {
-			m_pLeftMallet->Show();
 			m_pLeftHand->SetModelState(hand::ModelState::CONTROLLER);
 		}
 		if (m_pRightHand != nullptr) {
-			m_pRightMallet->Show();
 			m_pRightHand->SetModelState(hand::ModelState::CONTROLLER);
 		}
 	}
@@ -357,10 +325,8 @@ RESULT DreamUserApp::SetHasOpenApp(bool fHasOpenApp) {
 
 		if (m_pLeftHand != nullptr) {
 			m_pLeftHand->SetModelState(hand::ModelState::HAND);
-			m_pLeftMallet->Hide();
 		}
 		if (m_pRightHand != nullptr) {
-			m_pRightMallet->Hide();
 			m_pRightHand->SetModelState(hand::ModelState::HAND);
 		}
 	}
@@ -579,18 +545,6 @@ Error:
 	return r;
 }
 
-UIMallet *DreamUserApp::GetMallet(HAND_TYPE type) {
-
-	if (type == HAND_TYPE::HAND_LEFT) {
-		return m_pLeftMallet;
-	}
-	else if (type == HAND_TYPE::HAND_RIGHT) {
-		return m_pRightMallet;
-	}
-
-	return nullptr;
-}
-
 hand *DreamUserApp::GetHand(HAND_TYPE type) {
 
 	if (type == HAND_TYPE::HAND_LEFT) {
@@ -608,10 +562,10 @@ RESULT DreamUserApp::CreateHapticImpulse(VirtualObj *pEventObj) {
 
 	CNR(GetDOS()->GetHMD(), R_OBJECT_NOT_FOUND);
 
-	if (pEventObj == m_pLeftMallet->GetMalletHead()) {
+	if (pEventObj == m_pLeftHand->GetMalletHead()) {
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 	}
-	else if (pEventObj == m_pRightMallet->GetMalletHead()) {
+	else if (pEventObj == m_pRightHand->GetMalletHead()) {
 		CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 	}
 
@@ -683,15 +637,18 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		point ptCamera = pCamera->GetPosition();
 
 		//*
-		if (m_pLeftMallet != nullptr && m_pRightMallet != nullptr &&
+		sphere *pLeftMallet = m_pLeftHand->GetMalletHead();
+		sphere *pRightMallet = m_pRightHand->GetMalletHead();
+
+		if (pLeftMallet != nullptr && pRightMallet != nullptr &&
 			m_pLeftHand != nullptr && m_pRightHand != nullptr) {
 
 			vector vPos;
 
-			for (auto& mallet : { m_pLeftMallet, m_pRightMallet }) {	// which hand is closer
+			for (auto& mallet : { pLeftMallet, pRightMallet }) {	// which hand is closer
 
 				RotationMatrix qOffset;
-				auto pHand = mallet == m_pLeftMallet ? m_pLeftHand : m_pRightHand;
+				auto pHand = mallet == pLeftMallet ? m_pLeftHand : m_pRightHand;
 
 				// at least one of two hands should be tracked, since this is 
 				// called as a result of menu press
@@ -700,7 +657,7 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 
 					//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
 
-					point ptHand = mallet->GetMalletHead()->GetPosition(true);
+					point ptHand = mallet->GetPosition(true);
 					vector vHand = ptHand - pCamera->GetOrigin(true);
 					vHand = vector(vHand.x(), 0.0f, vHand.z());
 					//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));

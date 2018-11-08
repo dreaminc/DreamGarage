@@ -8,7 +8,6 @@
 #include "Sense/SenseKeyboard.h"
 
 #include "UI/UIKeyboardLayout.h"
-#include "UI/UIMallet.h"
 #include "DreamUserApp.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 

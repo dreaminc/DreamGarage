@@ -6,7 +6,6 @@
 
 #include "DimObj.h"
 #include "Publisher.h"
-#include "UI/UIMallet.h"
 
 enum HysteresisEventType {
 	ON,

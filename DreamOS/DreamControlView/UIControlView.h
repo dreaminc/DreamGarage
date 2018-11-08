@@ -31,7 +31,6 @@
 class quad; 
 class sphere;
 class UIView;
-class UIMallet;
 class UIButton;
 class texture;
 

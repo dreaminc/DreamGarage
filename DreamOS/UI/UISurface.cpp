@@ -27,14 +27,14 @@ Error:
 	return r;
 }
 
-RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
+RESULT UISurface::UpdateWithHand(hand *pHand, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType) {
 	RESULT r = R_PASS;
 
 	point ptBoxOrigin = m_pViewQuad->GetOrigin(true);
-	point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+	point ptSphereOrigin = pHand->GetMalletHead()->GetOrigin(true);
 	ptSphereOrigin = (point)(inverse(RotationMatrix(m_pViewQuad->GetOrientation(true))) * (ptSphereOrigin - m_pViewQuad->GetOrigin(true)));
 
-	if (ptSphereOrigin.y() >= pMallet->GetMalletRadius()) {
+	if (ptSphereOrigin.y() >= pHand->GetMalletRadius()) {
 
 		fMalletDirty = false;
 
@@ -43,11 +43,11 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 
 			if (m_fMouseDrag) {
 				m_fMouseDrag = false;
-				UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_pViewQuad.get(), pMallet->GetMalletHead(), ptSphereOrigin);
+				UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_pViewQuad.get(), pHand->GetMalletHead(), ptSphereOrigin);
 				NotifySubscribers(UI_SELECT_ENDED, pUIEvent);
 			}
 			else {
-				UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_pViewQuad.get(), pMallet->GetMalletHead(), m_ptLastEvent);
+				UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, m_pViewQuad.get(), pHand->GetMalletHead(), m_ptLastEvent);
 				NotifySubscribers(UI_SELECT_ENDED, pUIEvent);
 			}
 		}
@@ -66,15 +66,15 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 	float zDistance = ptSphereOrigin.z() - m_ptClick.z();
 	float squaredDistance = xDistance * xDistance + zDistance * zDistance;
 
-	if (ptSphereOrigin.y() < pMallet->GetMalletRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
+	if (ptSphereOrigin.y() < pHand->GetMalletRadius() && fMouseDown && squaredDistance > m_dragThresholdSquared) {
 		m_fMouseDrag = true;
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_MOVED, m_pViewQuad.get(), pMallet->GetMalletHead(), ptSphereOrigin);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_MOVED, m_pViewQuad.get(), pHand->GetMalletHead(), ptSphereOrigin);
 		NotifySubscribers(UI_SELECT_MOVED, pUIEvent);
 		m_ptClick = ptSphereOrigin;
 	}
 
 	// if the sphere is lower than its own radius, there must be an interaction
-	if (ptSphereOrigin.y() < pMallet->GetMalletRadius() && !fMalletDirty) {
+	if (ptSphereOrigin.y() < pHand->GetMalletRadius() && !fMalletDirty) {
 
 		float quadWidth = m_pViewQuad->GetWidth();
 		float quadHeight = m_pViewQuad->GetHeight();
@@ -98,7 +98,7 @@ RESULT UISurface::UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &
 			CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_RIGHT, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 		}
 
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_BEGIN, m_pViewQuad.get(), pMallet->GetMalletHead(), ptSphereOrigin);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_BEGIN, m_pViewQuad.get(), pHand->GetMalletHead(), ptSphereOrigin);
 		NotifySubscribers(UI_SELECT_BEGIN, pUIEvent);
 
 		m_ptLastEvent = ptSphereOrigin;

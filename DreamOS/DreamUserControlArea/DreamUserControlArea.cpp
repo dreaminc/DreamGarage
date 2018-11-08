@@ -131,13 +131,13 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	CNR(m_pDreamUserApp, R_SKIPPED);
 	
-	UIMallet* pLMallet;
-	pLMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-	CNR(pLMallet, R_SKIPPED);
+	hand* pLHand;
+	pLHand = m_pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+	CNR(pLHand, R_SKIPPED);
 
-	UIMallet* pRMallet;
-	pRMallet = m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_SKIPPED);	
+	hand* pRHand;
+	pRHand = m_pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+	CNR(pRHand, R_SKIPPED);	
 
 	//m_pDreamUserApp->UpdateCompositeWithHands(-0.16f);
 	//m_pDreamUserApp->GetAppBasisPosition(ptOrigin);
@@ -147,24 +147,24 @@ RESULT DreamUserControlArea::Update(void *pContext) {
 
 	//TODO: change this to a UISurface
 	for (int i = 0; i < 2; i++) {
-		UIMallet *pMallet;
+		hand *pHand;
 		HAND_TYPE type;
 		if (i == 0) {
-			pMallet = pLMallet;
+			pHand = pLHand;
 			type = HAND_TYPE::HAND_LEFT;
 		}
 		else {
-			pMallet = pRMallet;
+			pHand = pRHand;
 			type = HAND_TYPE::HAND_RIGHT;
 		}
 		// Update using mallets, send relevant information to child apps
 		auto pComposite = GetComposite();
 		point ptBoxOrigin = pComposite->GetOrigin(true);
-		point ptSphereOrigin = pMallet->GetMalletHead()->GetOrigin(true);
+		point ptSphereOrigin = pHand->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(pComposite->GetOrientation(true))) * (ptSphereOrigin - pComposite->GetOrigin(true)));
 
 		// clear flags
-		if (ptSphereOrigin.y() >= pMallet->GetMalletRadius()) {
+		if (ptSphereOrigin.y() >= pHand->GetMalletRadius()) {
 			m_fCanPressButton[i] = true;
 		}
 
@@ -312,10 +312,10 @@ bool DreamUserControlArea::CanPressButton(UIButton *pButtonContext) {
 
 	auto pInteractionObj = pButtonContext->GetInteractionObject();
 	int dirtyIndex = -1;
-	if (pInteractionObj == m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
+	if (pInteractionObj == m_pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT)->GetMalletHead()) {
 		dirtyIndex = 0;
 	}
-	else if (pInteractionObj == m_pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
+	else if (pInteractionObj == m_pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT)->GetMalletHead()) {
 		dirtyIndex = 1;
 	}
 

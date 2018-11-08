@@ -96,9 +96,9 @@ public:
 
 	// mallet replacement(?)
 public:
-	RESULT Show();
-	RESULT Hide();
-	std::shared_ptr<sphere> GetMalletHead();
+	RESULT ShowMallet();
+	RESULT HideMallet();
+	sphere* GetMalletHead();
 	float GetMalletRadius();
 	point GetMalletOffset();
 	

@@ -1,5 +1,4 @@
 #include "HysteresisPlane.h"
-#include "UI/UIMallet.h"
 #include "sphere.h"
 
 HysteresisPlane::HysteresisPlane(float onThreshold, float offThreshold) : 

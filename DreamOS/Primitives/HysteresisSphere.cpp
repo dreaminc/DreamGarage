@@ -1,5 +1,4 @@
 #include "HysteresisSphere.h"
-#include "UI/UIMallet.h"
 #include "sphere.h"
 
 HysteresisSphere::HysteresisSphere(float onThreshold, float offThreshold) : 

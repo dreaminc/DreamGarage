@@ -6,8 +6,6 @@
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "UI/UIMallet.h"
-//#include "UI/UIView.h"
 #include "UI/UIButton.h"
 #include "UI/UISurface.h"
 
@@ -94,13 +92,13 @@ RESULT UIControlView::Update() {
 	std::shared_ptr<DreamUserApp> pDreamUserApp = m_pDreamOS->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 		
-	UIMallet* pLMallet;
-	pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-	CNR(pLMallet, R_SKIPPED);
+	hand* pLHand;
+	pLHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+	CNR(pLHand, R_SKIPPED);
 
-	UIMallet* pRMallet;
-	pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_SKIPPED);	
+	hand* pRHand;
+	pRHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+	CNR(pRHand, R_SKIPPED);	
 
 	// skip mallet update while keyboard is active
 	//*
@@ -113,20 +111,20 @@ RESULT UIControlView::Update() {
 	CBR(IsVisible(), R_SKIPPED);
 
 	for (int i = 0; i < 2; i++) {
-		UIMallet *pMallet;
+		hand *pHand;
 		HAND_TYPE type;
 		if (i == 0) {
-			pMallet = pLMallet;
+			pHand = pLHand;
 			type = HAND_TYPE::HAND_LEFT;
 		}
 		else {
-			pMallet = pRMallet;
+			pHand = pRHand;
 			type = HAND_TYPE::HAND_RIGHT;
 		}
 
 		bool fMalletDirty = m_fMalletDirty[i].IsDirty();
 
-		UpdateWithMallet(pMallet, fMalletDirty, m_fMouseDown[i], type);
+		UpdateWithHand(pHand, fMalletDirty, m_fMouseDown[i], type);
 
 		if (fMalletDirty) {
 			m_fMalletDirty[i].SetDirty();
@@ -209,16 +207,16 @@ RESULT UIControlView::ShowView() {
 
 		pDreamUserApp->SetEventApp(this);
 
-		UIMallet* pLMallet;
-		pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-		CNR(pLMallet, R_SKIPPED);
+		hand* pLHand;
+		pLHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+		CNR(pLHand, R_SKIPPED);
 
-		UIMallet* pRMallet;
-		pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
-		CNR(pRMallet, R_SKIPPED);
+		hand* pRHand;
+		pRHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+		CNR(pRHand, R_SKIPPED);
 
-		pLMallet->SetDirty();
-		pRMallet->SetDirty();
+		pLHand->SetDirty();
+		pRHand->SetDirty();
 
 		m_fMouseDown[0] = false;
 		m_fMouseDown[1] = false;

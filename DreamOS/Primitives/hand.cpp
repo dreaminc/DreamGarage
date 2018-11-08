@@ -226,7 +226,7 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
 
 	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
-	m_pHead->SetVisible(true);
+	m_pHead->SetVisible(false);
 	m_pHead->SetPosition(m_headOffset);
 
 //	float testZ = m_handType == HAND_TYPE::HAND_LEFT ? (float)M_PI_2 : -1.0f * (float)M_PI_2;
@@ -241,7 +241,7 @@ Error:
 	return r;
 }
 
-RESULT hand::Show() {
+RESULT hand::ShowMallet() {
 	RESULT r = R_PASS;
 	//TODO: Mallet animation
 	m_pHead->SetVisible(true);
@@ -257,7 +257,7 @@ Error:
 	return r;
 }
 
-RESULT hand::Hide() {
+RESULT hand::HideMallet() {
 	RESULT r = R_PASS;
 	m_pHead->SetVisible(false);
 
@@ -276,8 +276,8 @@ float hand::GetMalletRadius() {
 	return m_radius;
 }
 
-std::shared_ptr<sphere> hand::GetMalletHead() {
-	return m_pHead;
+sphere* hand::GetMalletHead() {
+	return m_pHead.get();
 }
 
 point hand::GetMalletOffset() {
@@ -408,6 +408,9 @@ RESULT hand::OnLostTrack() {
 	
 	if (m_pModel != nullptr) {
 		m_pModel->SetVisible(m_fTracked);
+	}
+	if (m_pHead != nullptr) {
+		m_pHead->SetVisible(m_fTracked);
 	}
 
 	//m_pPalm->SetVisible(m_fTracked);
@@ -545,6 +548,7 @@ RESULT hand::HideController() {
 
 	m_pController->SetVisible(false);
 
+	CR(HideMallet());
 	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 
@@ -583,6 +587,8 @@ RESULT hand::ShowController() {
 	if (m_pOverlayQuad != nullptr) {
 		m_pOverlayQuad->SetVisible(false);
 	}
+
+	CR(ShowMallet());
 
 	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(

@@ -2014,16 +2014,15 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 
 		virtual RESULT Notify(InteractionObjectEvent *pEvent) override {
 
-			UIMallet* pMallet = nullptr;
 			auto pUserApp = pDreamOS->GetUserApp();
 			auto pLeftHand = pUserApp->GetHand(HAND_TYPE::HAND_LEFT);
 			auto pRightHand = pUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
 			auto handType = HAND_TYPE::HAND_LEFT;
 
-			if (pEvent->m_pInteractionObject == pLeftHand->GetMalletHead().get()) {
+			if (pEvent->m_pInteractionObject == pLeftHand->GetMalletHead()) {
 				handType = HAND_TYPE::HAND_LEFT;
 			}
-			else if (pEvent->m_pInteractionObject == pRightHand->GetMalletHead().get()) {
+			else if (pEvent->m_pInteractionObject == pRightHand->GetMalletHead()) {
 				handType = HAND_TYPE::HAND_RIGHT;
 			}
 
@@ -2079,7 +2078,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 			}
 
 			/*/
-			if (pObj->GetState(pHand->GetMalletHead().get()) == HysteresisEventType::ON) {
+			if (pObj->GetState(pHand->GetMalletHead()) == HysteresisEventType::ON) {
 				pPointSphere->SetVisible(true);
 			}
 			else {
