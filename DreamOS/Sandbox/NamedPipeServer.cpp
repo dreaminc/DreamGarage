@@ -7,7 +7,7 @@ NamedPipeServer::NamedPipeServer(std::wstring strPipename) :
 }
 
 NamedPipeServer::~NamedPipeServer() {
-	// empty
+	// 
 }
 
 RESULT NamedPipeServer::Start() {

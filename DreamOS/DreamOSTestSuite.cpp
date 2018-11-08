@@ -992,7 +992,8 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 		unsigned char *pBuffer = nullptr;
 
 		std::shared_ptr<NamedPipeServer> pNamedPipeServer = nullptr;
-		std::shared_ptr<NamedPipeClient> pNamedPipeClient = nullptr;
+		std::shared_ptr<NamedPipeClient> pNamedPipeClient1 = nullptr;
+		std::shared_ptr<NamedPipeClient> pNamedPipeClient2 = nullptr;
 
 		RESULT HandleClientPipeMessage(void *pBuffer, size_t pBuffer_n) {
 			RESULT r = R_PASS;
@@ -1024,6 +1025,8 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		int msBuffer = 50;
+
 		CN(m_pDreamOS);
 
 		CR(SetupPipeline());
@@ -1042,18 +1045,33 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 			CN(pTestContext->pTexture);
 
 			// Set up named pipe server
-			pTestContext->pNamedPipeServer = m_pDreamOS->MakeNamedPipeServer(L"testPipe");
+			pTestContext->pNamedPipeServer = m_pDreamOS->MakeNamedPipeServer(L"dreamvcampipe");
 			CN(pTestContext->pNamedPipeServer);
 			CR(pTestContext->pNamedPipeServer->RegisterMessageHandler(std::bind(&TestContext::HandleServerPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
-			//CR(pTestContext->pNamedPipeServer->Start());
+			CR(pTestContext->pNamedPipeServer->Start());
 
-			// Set up named pipe client
-			pTestContext->pNamedPipeClient = m_pDreamOS->MakeNamedPipeClient(L"testPipe");
-			CN(pTestContext->pNamedPipeClient);
-			CR(pTestContext->pNamedPipeClient->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
-			CR(pTestContext->pNamedPipeClient->Start());
+			/*
+			// This form of IPC isn't designed to be same process
+			// so we add a bit of delay to accomodate for problematic event handling / timing errors
+			// that would normally be fixed with a mutex for cross-thread sync
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
 
+			// Set up named pipe clients
+			pTestContext->pNamedPipeClient1 = m_pDreamOS->MakeNamedPipeClient(L"dreamvcampipe");
+			CN(pTestContext->pNamedPipeClient1);
+			CR(pTestContext->pNamedPipeClient1->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeClient1->Start());
+			
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
 
+			pTestContext->pNamedPipeClient2 = m_pDreamOS->MakeNamedPipeClient(L"dreamvcampipe");
+			CN(pTestContext->pNamedPipeClient2);
+			CR(pTestContext->pNamedPipeClient2->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeClient2->Start());
+
+			// just to be careful
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
+			//*/
 		}
 
 
@@ -1078,7 +1096,7 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 		{
 			std::string strTestMessage = "testing: " + std::to_string(count++);
 
-			CR(pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size()));
+			pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size());
 		}
 
 	Error:

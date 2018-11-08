@@ -2,6 +2,75 @@
 
 #include <strsafe.h>
 
+Win64NamedPipeConnection::Win64NamedPipeConnection(Win64NamedPipeServer *pParentServer, HANDLE handleNamedPipe, LPOVERLAPPED pOverlapped, int connectionID) :
+	m_pParentServer(pParentServer),
+	m_handleNamedPipe(handleNamedPipe),
+	m_pOverlapped(pOverlapped),
+	m_connectionID(connectionID)
+{
+	// empty
+}
+
+Win64NamedPipeConnection::~Win64NamedPipeConnection() {
+	ClosePipe();
+}
+
+RESULT Win64NamedPipeConnection::ConnectPipe() {
+	RESULT r = R_PASS;
+
+	CN(m_handleNamedPipe);
+
+	// Start an overlapped connection for this pipe instance. 
+	m_fConnected = ConnectNamedPipe(m_handleNamedPipe, m_pOverlapped);
+
+	// Overlapped ConnectNamedPipe should return zero. 
+	if (m_fConnected == false) {
+		switch (GetLastError()) {
+			// The overlapped connection in progress. 
+			case ERROR_IO_PENDING: {
+				m_fPendingConnection = true;
+			} break;
+
+			// Client is already connected, so signal an event. 
+			case ERROR_PIPE_CONNECTED: {
+				if (SetEvent(m_pOverlapped->hEvent)) {
+					DEBUG_LINEOUT("Connection %d connected!", m_connectionID);
+					m_fConnected = true;
+				}
+			} break;
+
+			// If an error occurs during the connect operation... 
+			default: {
+				CBM((false), "ConnectNamedPipe failed with %d.\n", GetLastError());
+			} break;
+		}
+	}
+	else {
+		DEBUG_LINEOUT("Connection %d connected!", m_connectionID);
+	}
+
+Error:
+	return r;
+}
+
+RESULT Win64NamedPipeConnection::ClosePipe() {
+	RESULT r = R_PASS;
+
+	// Flush the pipe to allow the client to read the pipe's contents  before disconnecting. 
+	// Then disconnect the pipe, and close the handle to this pipe instance. 
+
+	if (m_handleNamedPipe != INVALID_HANDLE_VALUE && m_handleNamedPipe != nullptr) {
+		FlushFileBuffers(m_handleNamedPipe);
+		DisconnectNamedPipe(m_handleNamedPipe);
+		CloseHandle(m_handleNamedPipe);
+
+		m_handleNamedPipe = INVALID_HANDLE_VALUE;
+	}
+
+Error:
+	return r;
+}
+
 Win64NamedPipeServer::Win64NamedPipeServer(std::wstring wstrPipename) :
 	NamedPipeServer(wstrPipename)
 {
@@ -9,8 +78,18 @@ Win64NamedPipeServer::Win64NamedPipeServer(std::wstring wstrPipename) :
 }
 
 Win64NamedPipeServer::~Win64NamedPipeServer() {
-	// empty
+	Close();
 }
+
+RESULT Win64NamedPipeServer::Close() {
+	RESULT r = R_PASS;
+
+	m_clientConnections.clear();
+
+Error:
+	return r;
+}
+
 
 std::wstring GetWindowsNamedPipeServerName(std::wstring strPipename) {
 	std::wstring wstrWindowsName = L"\\\\.\\pipe\\" + strPipename;
@@ -20,18 +99,99 @@ std::wstring GetWindowsNamedPipeServerName(std::wstring strPipename) {
 RESULT Win64NamedPipeServer::Initialize() {
 	RESULT r = R_PASS;
 
+	/*
 	m_handleNamedPipe = CreateNamedPipe(GetWindowsNamedPipeServerName(m_strPipename).c_str(),		// pipe name 
-										PIPE_ACCESS_DUPLEX,											// read/write access 
-										PIPE_TYPE_BYTE |											// message type pipe 
-										PIPE_READMODE_BYTE |										// message-read mode 
-										PIPE_WAIT,													// blocking mode 
-										PIPE_UNLIMITED_INSTANCES,									// max. instances  
+										PIPE_ACCESS_DUPLEX |												// read/write access 
+										FILE_FLAG_OVERLAPPED,												// overlapped mode 
+										PIPE_TYPE_MESSAGE |													// message-type pipe 
+										PIPE_READMODE_MESSAGE |												// message read mode 
+										PIPE_WAIT,															// blocking mode 
+										PIPE_UNLIMITED_INSTANCES,											// unlimited instances 
 										m_pipeBufferSize,											// output buffer size 
 										m_pipeBufferSize,											// input buffer size 
-										0,															// client time-out 
+										m_msTimeout,															// client time-out 
 										nullptr);													// default security attribute 
-
+	
 	CBM((m_handleNamedPipe != INVALID_HANDLE_VALUE), "Failed to create named pipe: %S Error: %d", GetWindowsNamedPipeServerName(m_strPipename).c_str(), GetLastError());
+	
+	DEBUG_LINEOUT("Created %S pipe", GetWindowsNamedPipeServerName(m_strPipename).c_str());
+	*/
+
+	// Create one event object for the connect operation. 
+	m_hConnectEvent = CreateEvent(
+		nullptr,    // default security attribute
+		true,		// manual reset event 
+		true,		// initial state = signaled 
+		nullptr);   // unnamed event object 
+
+	CNM(m_hConnectEvent, "CreateEvent failed with %d", GetLastError());
+	m_overlapped.hEvent = m_hConnectEvent;
+
+	// This is supposed to fail if there are no pending connections
+	// TODO: Handle this more eloquently 
+	AllocateAndConnectPendingConnectionInstance();
+
+Error:
+	return r;
+}
+
+// CreateAndConnectInstance(LPOVERLAPPED) 
+// This function creates a pipe instance and connects to the client. 
+// It returns TRUE if the connect operation is pending, and FALSE if 
+// the connection has been completed. 
+
+RESULT Win64NamedPipeServer::AllocateAndConnectPendingConnectionInstance() {
+	RESULT r = R_PASS;
+
+	static int connectionID = 0;
+
+	CBM((m_pPendingConnection == nullptr), "Allocated connection already pending");
+
+	DEBUG_LINEOUT("Allocating new connection id: %d", connectionID);
+
+	// Create the pipe
+	HANDLE handlePipe = CreateNamedPipe(
+		//GetWindowsNamedPipeServerName(m_strPipename).c_str(),				// pipe name 
+		L"\\\\.\\pipe\\dreamvcampipe",	// pipe name 
+		PIPE_ACCESS_DUPLEX |												// read/write access 
+		FILE_FLAG_OVERLAPPED,												// overlapped mode 
+		PIPE_TYPE_MESSAGE |													// message-type pipe 
+		PIPE_READMODE_MESSAGE |												// message read mode 
+		PIPE_WAIT,															// blocking mode 
+		PIPE_UNLIMITED_INSTANCES,											// unlimited instances 
+		m_pipeBufferSize,															// output buffer size 
+		m_pipeBufferSize,															// input buffer size 
+		m_msTimeout,															// client time-out 
+		nullptr);															// default security attributes
+
+	CBM((handlePipe != INVALID_HANDLE_VALUE), "CreateNamedPipe failed with %d.\n", GetLastError());
+
+	m_pPendingConnection = new Win64NamedPipeConnection(this, handlePipe, &m_overlapped, connectionID++);
+	CN(m_pPendingConnection);
+	
+	// Connect the pipe
+	CRM(m_pPendingConnection->ConnectPipe(), "Failed to connect pipe");
+
+Error:
+	return r;
+}
+
+
+RESULT Win64NamedPipeServer::AddPendingConnectionInstanceAndAllocateNew() {
+	RESULT r = R_PASS;
+
+	CN(m_pPendingConnection != nullptr);
+
+	m_pPendingConnection->m_fConnected = true;
+	m_pPendingConnection->m_fPendingConnection = false;
+	DEBUG_LINEOUT("Connection %d connected!", m_pPendingConnection->m_connectionID);
+
+	m_clientConnections.push_back(m_pPendingConnection);
+	m_pPendingConnection = nullptr;
+
+	// This is supposed to fail if there are no pending connections
+	// TODO: Handle this more eloquently 
+	AllocateAndConnectPendingConnectionInstance();
 
 Error:
 	return r;
@@ -39,76 +199,73 @@ Error:
 
 RESULT Win64NamedPipeServer::NamedPipeServerProcess() {
 	RESULT r = R_PASS;
-
-	unsigned char* pBuffer = nullptr;
-	size_t pBuffer_n = (size_t)m_pipeBufferSize;
-	DWORD cbBytesRead = 0;
-
+	
+	DWORD dwEventWait;
 	bool fSuccess = false;
 
-	DEBUG_LINEOUT("Pipe server process started");
+	// Call a subroutine to create one instance, and wait for 
+	// the client to connect. 
 
-	// Look for connection - this call appears to be synchronous 
-	m_fConnected = ConnectNamedPipe(m_handleNamedPipe, nullptr); 
+	DEBUG_LINEOUT("Starting server...");
 
-	if (m_fConnected == false) {
-		// Connection occurred between CreateNamedPipe and ConnectNamedPipe
-		// so connection is still valid
-		CBM((GetLastError() == ERROR_PIPE_CONNECTED), "Pipe failed to connect error: %d", GetLastError());
-		m_fConnected = true;
-	}
-	else {
-		DEBUG_LINEOUT("NamedPipeServerProcess: Client connected to pipe");
-	}
+	while (m_fRunning)  {
 
-	pBuffer = new unsigned char[pBuffer_n];
-	CNM(pBuffer, "Failed to allocate pipe buffer");
+		// Wait for a client to connect, or for a read or write 
+		// operation to be completed, which causes a completion 
+		// routine to be queued for execution. 
 
-	DEBUG_LINEOUT("NamedPipeServerProcess: Receiving and processing messages");
+		dwEventWait = WaitForSingleObjectEx(
+			m_hConnectEvent,  // event object to wait for 
+			INFINITE,       // waits indefinitely 
+			true);          // alert-able wait enabled 
 
-	// Loop until done 
-	while (m_fRunning) {
+		switch (dwEventWait) { 
 
-		fSuccess = ReadFile(m_handleNamedPipe,					// handle to pipe 
-							(void*)pBuffer,						// buffer to receive data 
-							(DWORD)pBuffer_n,					// size of buffer 
-							&cbBytesRead,						// number of bytes read 
-							nullptr);							// not overlapped I/O 
+			// The wait conditions are satisfied by a completed connect 
+			// operation. 
+			case 0: {
 
-		// TODO: Handle this better
-		if (GetLastError() == ERROR_BROKEN_PIPE) {
-			DEBUG_LINEOUT("InstanceThread: client disconnected GLE: %d", GetLastError());
-		}
+				// If an operation is pending, get the result of the 
+				// connect operation. 
 
-		CBM((fSuccess), "ReadFile failed, GLE=%d", GetLastError());
-		CBM((cbBytesRead != 0), "Readfile read zero bytes");
+				//if (fPendingIO) {
+				//	fSuccess = GetOverlappedResult(
+				//		m_handleNamedPipe,		// pipe handle 
+				//		&overlappedConnect,				// OVERLAPPED structure 
+				//		&cbRet,					// bytes transferred 
+				//		false);					// does not wait 
+				//
+				//	CBM((fSuccess), "ConnectNamedPipe (%d)\n", GetLastError());
+				//}
 
-		// Process the incoming message.
-		if (m_fnPipeMessageHandler != nullptr) {
-			CRM(m_fnPipeMessageHandler(pBuffer, (size_t)cbBytesRead), "Server pipe message handler failed");
+				// Allocate storage for next instance. 
+				AddPendingConnectionInstanceAndAllocateNew();
+			} break;
+
+			// The wait is satisfied by a completed read or write 
+			// operation. This allows the system to execute the 
+			// completion routine. 
+			case WAIT_IO_COMPLETION: {
+				//
+			} break;
+
+			// An error occurred in the wait function. 
+			default: {
+				CBM((false), "WaitForSingleObjectEx (%d)\n", GetLastError());
+			} break;
 		}
 	}
 
 Error:
 	DEBUG_LINEOUT("Pipe server process ended");
 
-	// Flush the pipe to allow the client to read the pipe's contents 
-	// before disconnecting. Then disconnect the pipe, and close the 
-	// handle to this pipe instance. 
-	if (m_handleNamedPipe != INVALID_HANDLE_VALUE) {
-		FlushFileBuffers(m_handleNamedPipe);
-		DisconnectNamedPipe(m_handleNamedPipe);
-		CloseHandle(m_handleNamedPipe);
-		m_handleNamedPipe = INVALID_HANDLE_VALUE;
-	}
-
-	if (pBuffer != nullptr) {
-		delete[] pBuffer;
-		pBuffer = nullptr;
-	}
+	//if (pBuffer != nullptr) {
+	//	delete[] pBuffer;
+	//	pBuffer = nullptr;
+	//}
 
 	m_fRunning = false;
-	m_fConnected = false;
+	//m_fConnected = false;
 
 	return r;
 }
@@ -121,18 +278,33 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 
 	// Send a message to the pipe client 
 
-	cbToWrite = (DWORD)((pBuffer_n + 1) * sizeof(TCHAR));
+	for (auto &pClientConnection : m_clientConnections) {
+			
+		pClientConnection->m_cbToWrite = (DWORD)((pBuffer_n + 1) * sizeof(TCHAR));
 
-	// Write the reply to the pipe. 
-	bool fSuccess = WriteFile(m_handleNamedPipe,   // pipe handle 
-		pBuffer,             // message 
-		cbToWrite,           // message length 
-		&cbWritten,          // bytes written 
-		nullptr);            // not overlapped 
+		if (pClientConnection->m_fConnected) {
+			bool fSuccess = WriteFile(
+				pClientConnection->m_handleNamedPipe,   // pipe handle 
+				pBuffer,								// message 
+				pClientConnection->m_cbToWrite,         // message length 
+				&pClientConnection->m_cbWritten,        // bytes written 
+				nullptr);								// not overlapped 
 
-	CBM((fSuccess), "WriteFile failed, GLE=%d", GetLastError());
+			if (fSuccess == false) {
+				DWORD err = GetLastError();
 
-	CBM((cbToWrite == cbWritten), "Writefile mismatch bytes written");
+				if (err == ERROR_PIPE_LISTENING) {
+					CBM((false), "WriteFile warning waiting for connection");
+				}
+				else {
+					CBM((false), "WriteFile failed with GLE: %d", (int)err);
+				}
+			}
+			else {
+				CBM((cbToWrite == cbWritten), "Writefile mismatch bytes written");
+			}
+		}
+	}
 
 Error:
 	return r;

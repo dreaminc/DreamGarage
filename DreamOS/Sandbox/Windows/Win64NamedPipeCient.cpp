@@ -18,7 +18,8 @@ std::wstring GetWindowsNamedPipeClientName(std::wstring strPipename) {
 RESULT Win64NamedPipeClient::Initialize() {
 	RESULT r = R_PASS;
 
-	m_handleNamedPipe = CreateFile(GetWindowsNamedPipeClientName(m_strPipename).c_str(),	// pipe name 
+	//m_handleNamedPipe = CreateFile(GetWindowsNamedPipeClientName(m_strPipename).c_str(),	// pipe name 
+	m_handleNamedPipe = CreateFile(L"\\\\.\\pipe\\dreamvcampipe",	// pipe name 
 								   GENERIC_READ |											// read and write access 
 								   GENERIC_WRITE,
 								   0,														// no sharing 
@@ -35,19 +36,19 @@ RESULT Win64NamedPipeClient::Initialize() {
 		CBM((err == ERROR_PIPE_BUSY), "Pipe creation faield with error 0x%x", err);
 
 		// Pipe instances are busy, so wait for 10 seconds 
-		CBM((WaitNamedPipe(m_strPipename.c_str(), 10000)), "Pipe creation timed out");
+		CBM((WaitNamedPipe(GetWindowsNamedPipeClientName(m_strPipename).c_str(), 10000)), "Pipe creation timed out");
 	}
 
 	CNM(m_handleNamedPipe, "Failed to create pipe %S", GetWindowsNamedPipeClientName(m_strPipename).c_str());
 
-	// Set mode of pipe
-	DWORD dwMode = PIPE_READMODE_BYTE;
-	bool fSuccess = SetNamedPipeHandleState(m_handleNamedPipe,		// pipe handle 
-											&dwMode,				// new pipe mode 
-											nullptr,				// don't set maximum bytes 
-											nullptr);				// don't set maximum time 
-	
-	CBM(fSuccess, "SetNamedPipeHandleState failed. GLE: %d", GetLastError());
+	//// Set mode of pipe
+	//DWORD dwMode = PIPE_READMODE_BYTE;
+	//bool fSuccess = SetNamedPipeHandleState(m_handleNamedPipe,		// pipe handle 
+	//										&dwMode,				// new pipe mode 
+	//										nullptr,				// don't set maximum bytes 
+	//										nullptr);				// don't set maximum time 
+	//
+	//CBM(fSuccess, "SetNamedPipeHandleState failed. GLE: %d", GetLastError());
 
 Error:
 	return r;

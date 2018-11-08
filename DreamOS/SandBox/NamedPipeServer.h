@@ -16,7 +16,8 @@ public:
 	~NamedPipeServer();
 
 	virtual RESULT Initialize() = 0;
-	
+	virtual RESULT Close() = 0;
+
 	RESULT Start();
 	RESULT Stop();
 
