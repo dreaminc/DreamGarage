@@ -29,7 +29,7 @@
 #include "Primitives/Multipublisher.h"
 #include "Primitives/CapturedObj.h"
 
-#define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
+#define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.005f
 
 class ObjectStore;
 

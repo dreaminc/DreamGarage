@@ -476,11 +476,9 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 						//	pLeftMallet->GetH
 						//	pLeftMallet->GetMalletHead()->SetScale(1.5f);
 							//pLeftHand->SetScale(1.5f);
-							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.02f);
 						}
 						else {
 							//pLeftHand->SetScale(1.0f);
-							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.03f);
 							//pLeftMallet->GetMalletHead()->SetScale(1.0f);
 						}
 					//	pLeftMallet->

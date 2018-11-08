@@ -6,11 +6,11 @@ RESULT HMD::AttachHand(hand *pHand, HAND_TYPE type) {
 	state.ptPalm = point(0.0f, 0.0f, 0.0f);
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
-		m_pLeftHand->SetHandState(state);
+		//m_pLeftHand->SetHandState(state);
 	}
 	else if (type == HAND_TYPE::HAND_RIGHT) {
 		m_pRightHand = pHand;
-		m_pRightHand->SetHandState(state);
+		//m_pRightHand->SetHandState(state);
 	}
 	else {
 		return R_FAIL;

@@ -540,6 +540,7 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 	}
 
 	// if the second hand is created later on, make sure that the states match
+
 	if (pHand == m_pLeftHand) {
 		pOtherHand = m_pRightHand;
 	}

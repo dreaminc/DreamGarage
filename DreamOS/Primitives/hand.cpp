@@ -36,31 +36,11 @@ Error:
 	return;
 }
 
-RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
-
-	if (!CompareParent(pParent.get()) && pHandState.fOriented)
-		pParent->AddChild(std::shared_ptr<DimObj>(this));
-
-	return R_PASS;
-}
-
-std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
-	return m_pModel;
-}
-
 RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	RESULT r = R_PASS;
 
-
-	// why
-	SetPosition(point(0.0f, 0.0f, -1.0f));
-
 	m_handType = type;
 	
-	m_fOriented = false;
-
-	m_qRotation = GetOrientation();
-
 	m_fTracked = false;
 	//Start all visibility at false
 	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
@@ -145,12 +125,27 @@ RESULT hand::LoadHandModel() {
 	//m_pModel->AddVolume(0.02f);
 	m_pModel = AddModel(L"cube.obj");
 	m_pModel->SetScale(0.02f);
+
+	if (m_handType == HAND_TYPE::HAND_LEFT) {
+		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
+		m_pModel->SetOrientationOffset(vLeftHandOffset);
+	}
+	
+	if (m_handType == HAND_TYPE::HAND_RIGHT) {
+		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
+		m_pModel->SetOrientationOffset(vRightHandOffset);
+	}
+
 #endif
 
 	m_fLoadHandModel = false;
 
 Error:
 	return r;
+}
+
+std::shared_ptr<composite> hand::GetModel() {
+	return m_pModel;
 }
 
 RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
@@ -360,20 +355,6 @@ Error:
 	return r;
 }
 
-RESULT hand::SetVisible(bool fVisible, bool fSetChildren /* = true */) {
-	RESULT r = R_PASS;
-
-	//Ensure hand is not set to visible while not tracked
-	CR(DimObj::SetVisible(fVisible && m_fTracked, fSetChildren));
-	//Ensure phantom volume is not set to visible
-	if (m_pPhantomVolume != nullptr) {
-		m_pPhantomVolume->SetVisible(false);
-	}
-
-Error:
-	return r;
-}
-
 RESULT hand::SetOverlayVisible(bool fVisible) {
 	RESULT r = R_PASS;
 
@@ -413,15 +394,6 @@ std::shared_ptr<volume> hand::GetPhantomVolume() {
 	return m_pPhantomVolume;
 }
 
-RESULT hand::SetOriented(bool fOriented) {
-	m_fOriented = fOriented;
-	return R_PASS;
-}
-
-bool hand::IsOriented() {
-	return m_fOriented;
-}
-
 RESULT hand::SetTracked(bool fTracked) {
 	m_fTracked = fTracked;
 	return R_PASS;
@@ -443,41 +415,30 @@ RESULT hand::OnLostTrack() {
 	return R_PASS;
 }
 
-RESULT hand::SetLocalOrientation(quaternion qRotation) {
-	m_qRotation = qRotation;
-	return R_PASS;
-}
-
-
 RESULT hand::SetHandModel(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	CBR(type == HAND_TYPE::HAND_SKELETON, R_SKIPPED) 
 
-	SetVisible();
+	SetVisible(true, false);
 	m_pModel->SetVisible(true);
 
 Error:
 	return r;
 }
 
-RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
-	m_pModel->SetOrientation(qOrientation);
-	return R_PASS;
-}
-
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	point pt = pHandState.ptPalm;
-	SetPosition(pt);
+	SetPosition(pHandState.ptPalm);
 
 	m_handType = pHandState.handType;
 	SetHandModel(pHandState.handType);
 
 	m_fTracked = pHandState.fTracked;
-	if (!m_fTracked)
+	if (!m_fTracked) {
 		OnLostTrack();
+	}
 
 	if (m_pModel != nullptr) {
 		m_pModel->SetOrientation(pHandState.qOrientation);
@@ -491,21 +452,8 @@ hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
 		GetPosition(true),
-		m_qRotation,
-		m_fOriented,
+		GetOrientation(true),
 		m_fTracked
-	};
-
-	return handState;
-}
-
-hand::HandState hand::GetDebugHandState(HAND_TYPE handType) {
-	hand::HandState handState = {
-		handType,
-		point(1,2,3),
-		quaternion(),
-		false,
-		false
 	};
 
 	return handState;

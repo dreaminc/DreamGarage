@@ -1986,22 +1986,24 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 			RESULT r = R_PASS;
 
 			// with DreamUserApp as the Subscriber to the Hysteresis objects, this logic is more reasonable
-			UIMallet *pMallet = nullptr;
-			if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead() == pEvent->m_pEventObject) {
-				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT);
+			sphere *pSphere = nullptr;
+			if (pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_LEFT) == pEvent->m_pEventObject) {
+				pSphere = pPointSphereLeft;
 			}
-			else if (pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead() == pEvent->m_pEventObject) {
-				pMallet = pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT);
+			else if (pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_RIGHT) == pEvent->m_pEventObject) {
+				pSphere = pPointSphereRight;
 			}
-			CNR(pMallet, R_SKIPPED);
 
+			CNR(pSphere, R_SKIPPED);
 			switch (pEvent->m_eventType) {
 			case ON: {
-				pMallet->Show();
+				//pMallet->Show();
+				pSphere->SetVisible(true);
 			} break;
 
 			case OFF: {
-				pMallet->Hide();
+				//pMallet->Hide();
+				pSphere->SetVisible(false);
 			} break;
 
 			}
@@ -2027,13 +2029,14 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 
 			switch (pEvent->m_eventType) {
 			case ELEMENT_INTERSECT_BEGAN: {
+				/*
 				if (handType == HAND_TYPE::HAND_LEFT) {
 					pPointSphereLeft->SetVisible(true);
 				}
 				else if (handType == HAND_TYPE::HAND_RIGHT) {
 					pPointSphereRight->SetVisible(true);
 				}
-
+				//*/
 			} break;
 			case ELEMENT_INTERSECT_MOVED: {
 
@@ -2046,12 +2049,14 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 
 			} break;
 			case ELEMENT_INTERSECT_ENDED: {
+				/*
 				if (handType == HAND_TYPE::HAND_LEFT) {
 					pPointSphereLeft->SetVisible(false);
 				}
 				else if (handType == HAND_TYPE::HAND_RIGHT) {
 					pPointSphereRight->SetVisible(false);
 				}
+				//*/
 			} break;
 			};
 
@@ -2061,8 +2066,6 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		RESULT UpdatePointer(HAND_TYPE handType) {
 
 			auto pUserApp = pDreamOS->GetUserApp();
-
-			auto pMallet = pUserApp->GetMallet(handType);
 
 			auto pHand = pUserApp->GetHand(handType);
 
@@ -2075,29 +2078,14 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 				pPointSphere = pPointSphereRight;
 			}
 
-			if (pObj->GetState(pMallet->GetMalletHead()) == HysteresisEventType::ON) {
-
-				//pPointSphere->SetVisible(true);
-
-				/*
-
-				RotationMatrix qOffset;
-				qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-
-				point ptPosition = pHand->GetPosition(true);
-				vector vDirection = point(qOffset * pMallet->GetHeadOffset());
-				vDirection.Normalize();
-
-				ray handRay = pHand->GetRay(true);
-
-
-				point ptSphere = (-1.0f * ptPosition.z() / vDirection.z()) * vDirection + ptPosition;
-				pPointSphere->SetPosition(ptSphere);
-				//*/
+			/*/
+			if (pObj->GetState(pHand->GetMalletHead().get()) == HysteresisEventType::ON) {
+				pPointSphere->SetVisible(true);
 			}
 			else {
-				//pPointSphere->SetVisible(false);
+				pPointSphere->SetVisible(false);
 			}
+			//*/
 
 			return R_PASS;
 		};
@@ -2118,7 +2106,7 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		pTestContext->pDreamOS = m_pDreamOS;
 
 		// cylinder
-		pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, CYLINDER);
+		pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.45f, 0.3f, CYLINDER);
 
 		// sphere
 		//pTestContext->pObj = m_pDreamOS->MakeHysteresisObject(0.5f, 0.25f, SPHERE);
@@ -2129,25 +2117,21 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 
 		CN(pTestContext->pObj);
 
-		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->GetMalletHead());
-		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_RIGHT)->GetMalletHead());
-		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::ON, pTestContext);
-		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::OFF, pTestContext);
-
 		// reference objects, positioned at the boundaries
 		pTestContext->pVolumeOff = m_pDreamOS->AddVolume(0.0125f);
 		pTestContext->pVolumeOn = m_pDreamOS->AddVolume(0.0125f);
 
-		pTestContext->pPointQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+		pTestContext->pPointQuad = m_pDreamOS->AddQuad(7.844f, 4.412f);
 		pTestContext->pPointQuad->RotateXByDeg(90.0f);
+		pTestContext->pPointQuad->SetPosition(0.0f, 0.0f, -5.86f);
 
 		pTestContext->pPointSphereLeft = m_pDreamOS->AddSphere(0.025f);
 		pTestContext->pPointSphereLeft->SetMaterialDiffuseColor(COLOR_RED);
 		pTestContext->pPointSphereRight = m_pDreamOS->AddSphere(0.025f);
 		pTestContext->pPointSphereRight->SetMaterialDiffuseColor(COLOR_BLUE);
 
-//		pTestContext->leftRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-//		pTestContext->rightRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+		pTestContext->leftRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+		pTestContext->rightRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
 
 		//m_pDreamOS->AddInteractionObject(m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_LEFT));
 		//m_pDreamOS->AddInteractionObject(m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_RIGHT));
@@ -2165,6 +2149,14 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_LEFT)->SetModelState(hand::ModelState::CONTROLLER);
 		m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_RIGHT)->SetModelState(hand::ModelState::CONTROLLER);
 
+		m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_LEFT)->LoadHandModel();
+		m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_RIGHT)->LoadHandModel();
+
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_LEFT));
+		pTestContext->pObj->RegisterObject(m_pDreamOS->GetUserApp()->GetHand(HAND_TYPE::HAND_RIGHT));
+		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::ON, pTestContext);
+		pTestContext->pObj->RegisterSubscriber(HysteresisEventType::OFF, pTestContext);
+		
 
 	Error:
 		return r;
@@ -2193,7 +2185,20 @@ RESULT CollisionTestSuite::AddTestHysteresisObj() {
 		//*/
 
 		hand *pHand = pTestContext->pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
-		pTestContext->leftRay = pTestContext->pDreamOS->AddRay(pHand->GetOrigin(true), pHand->GetOrientation(true).RotateVector(vector(0.0f, 0.0f, -1.0f)));
+		if (pHand->GetModel() != nullptr) {
+			point ptMallet = pHand->GetMalletHead()->GetPosition(true);
+			ray testRay = ray(ptMallet, vector(ptMallet - pHand->GetPosition(true)).Normal());
+			pTestContext->leftRay->UpdateFromRay(testRay);
+			pTestContext->leftRay->SetRayVertices(0.1f);
+			pTestContext->leftRay->UpdateBuffers();
+		}
+
+		pHand = pTestContext->pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
+		if (pHand->GetModel() != nullptr) {
+			pTestContext->rightRay->UpdateFromRay(pHand->GetMalletHead()->GetRay(true));
+			pTestContext->rightRay->SetRayVertices(0.1f);
+			pTestContext->rightRay->UpdateBuffers();
+		}
 
 //		pTestContext->pDreamOS->GetUserApp()->GetMallet(HAND_TYPE::HAND_LEFT)->Show();
 
