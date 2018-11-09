@@ -97,12 +97,12 @@ std::wstring DreamLoginApp::GetCredentialManagerString(CredentialType type) {
 	wstrCredential += m_wstrClient;
 
 	switch (type) {
+	case CREDENTIAL_REFRESH_TOKEN:
+		wstrCredential += m_wstrRefreshToken;
+		break;
 	case CREDENTIAL_ACCESS_TOKEN: 
 		wstrCredential += m_wstrAccessToken; 
-		break;
-	case CREDENTIAL_REFRESH_TOKEN: 
-		wstrCredential += m_wstrRefreshToken; 
-		break;
+		break;	
 	case CREDENTIAL_LAST_LOGIN: 
 		wstrCredential += m_wstrLastLogin; 
 		break;
@@ -116,7 +116,8 @@ std::wstring DreamLoginApp::GetCredentialManagerString(CredentialType type) {
 
 RESULT DreamLoginApp::GetCredential(CredentialType type, std::string& strCredentialValue) {
 	RESULT r = R_PASS;
-
+	
+	DOSLOG(INFO, "Retrieving Creds %d", type);
 	CR(GetDOS()->GetCredential(GetCredentialManagerString(type), strCredentialValue, GetCredentialManagerType(type)));
 
 Error:
@@ -136,6 +137,7 @@ Error:
 RESULT DreamLoginApp::ClearCredential(CredentialType type) {
 	RESULT r = R_PASS;
 
+	DOSLOG(INFO, "Clearing cred %d", type);
 	CR(GetDOS()->RemoveCredential(GetCredentialManagerString(type), GetCredentialManagerType(type)));
 
 Error:
@@ -146,7 +148,7 @@ bool DreamLoginApp::IsFirstLaunch() {
 
 	RESULT r = R_PASS;
 	std::string strLastLogin;
-
+	DOSLOG(INFO, "Check if first time launching");
 	//TODO: the last login value is not used for anything yet
 	CR(GetCredential(CREDENTIAL_LAST_LOGIN, strLastLogin));
 
@@ -158,6 +160,7 @@ Error:
 bool DreamLoginApp::HasStoredCredentials(std::string& strRefreshToken, std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
+	DOSLOG(INFO, "Have stored credentials");
 	CR(GetCredential(CREDENTIAL_REFRESH_TOKEN, strRefreshToken));
 	//CR(GetCredential(CREDENTIAL_ACCESS_TOKEN, strAccessToken));
 
@@ -178,6 +181,7 @@ RESULT DreamLoginApp::SetLaunchDate() {
 
 	std::string strCurrentTime = std::to_string(std::chrono::duration_cast<std::chrono::seconds>(currentTime.time_since_epoch()).count());
 
+	DOSLOG(INFO, "Setting launch date");
 	CR(SetCredential(CREDENTIAL_LAST_LOGIN, strCurrentTime));
 
 Error:

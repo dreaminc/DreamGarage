@@ -243,7 +243,7 @@ RESULT DreamGarage::SetupMirrorPipeline(Pipeline *pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("environment");
+		m_pRenderEnvironmentProgramNodeMirror = pHAL->MakeProgramNode("environment", PIPELINE_FLAGS::PASSTHRU);
 		CN(m_pRenderEnvironmentProgramNodeMirror);
 		CR(m_pRenderEnvironmentProgramNodeMirror->ConnectToInput("camera", m_pAuxCamera->Output("stereocamera")));
 
@@ -399,7 +399,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 		// Environment shader
 
-		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("environment");
+		m_pRenderEnvironmentProgramNode = pHAL->MakeProgramNode("environment", PIPELINE_FLAGS::PASSTHRU);
 		CN(m_pRenderEnvironmentProgramNode);
 		//CR(m_pRenderEnvironmentProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(m_pRenderEnvironmentProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
@@ -736,6 +736,7 @@ RESULT DreamGarage::DidFinishLoading() {
 #endif
 
 	// Initial step of login flow:
+	DOSLOG(INFO, "Checking API connection (internet access)");
 	CRM(m_pUserController->CheckAPIConnection(), "Checking connection to API");
 
 Error:
@@ -771,11 +772,14 @@ RESULT DreamGarage::OnAPIConnectionCheck(bool fIsConnected) {
 		CR(m_pUserController->RequestDreamVersion());
 		//*
 #else
+		DOSLOG(INFO, "API check ok, authing from stored creds");
 		CR(AuthenticateFromStoredCredentials());
 #endif
 //*/
 	}
 	else {
+		DOSLOG(INFO, "API check failed, showing internet required");
+
 		m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INTERNET_REQUIRED);
 		m_pDreamUserApp->ShowMessageQuad();
 		m_pDreamEnvironmentApp->FadeIn();
@@ -795,16 +799,19 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 	std::string strFormType;
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
+		DOSLOG(INFO, "Not first login and has creds");
 		m_pUserController->GetAccessToken(m_strRefreshToken);
 	}
 	else {
 		// Otherwise, start by showing the login form
 
 		if (!m_fFirstLogin) {
+			DOSLOG(INFO, "Not first login, going to sign-in");
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_IN);
 			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::SIGN_IN));
 		}
 		else {
+			DOSLOG(INFO, "Is first login, going to sign-up");
 			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
 			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME));
 		}
