@@ -7,7 +7,7 @@ Win64CredentialManager::Win64CredentialManager()
 	// empty
 }
 
-
+// https://docs.microsoft.com/en-us/windows/desktop/Debug/system-error-codes error codes
 RESULT Win64CredentialManager::GetKeyValue(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType) {
 	RESULT r = R_PASS;
 
@@ -18,7 +18,10 @@ RESULT Win64CredentialManager::GetKeyValue(std::wstring wstrKey, std::string &st
 	strOut.assign((char*)pcred->CredentialBlob, pcred->CredentialBlobSize);
 		
 Error:
-	CredFree(pcred); // must free memory allocated by CredRead()
+	if (pcred != nullptr) {
+		CredFree(pcred); // must free memory allocated by CredRead()
+		pcred = nullptr;
+	}
 	return r;
 }
 
