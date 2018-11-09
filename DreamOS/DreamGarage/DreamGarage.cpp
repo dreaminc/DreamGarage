@@ -1656,7 +1656,7 @@ RESULT DreamGarage::OnFormURL(std::string& strKey, std::string& strTitle, std::s
 	// the behavior of sign in, sign up, and teams create should be executed the same
 	// way with regards to the functions that they use
 	// TODO: potentially, the teams form will do other stuff later
-	else if (type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
+	else if (type == FormType::SIGN_UP_WELCOME || type == FormType::SIGN_IN || type == FormType::SIGN_UP || type == FormType::TEAMS_MISSING) {
 	//	m_pDreamLoginApp->GetComposite()->SetVisible(true, false);
 		CR(m_pDreamLoginApp->UpdateWithNewForm(strURL));
 		//CR(m_pDreamLoginApp->Show());
@@ -1787,9 +1787,11 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	else {
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
 		CR(m_pDreamGeneralForm->Show());
+		CR(GetUserApp()->ResetAppComposite());
 
 		// Used for special case with disabling button presses on welcome form
 		CR(m_pDreamGeneralForm->SetFormType(DreamFormApp::TypeFromString(strKey)));
+
 	}
 
 Error:
