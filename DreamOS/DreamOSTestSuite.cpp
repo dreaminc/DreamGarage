@@ -467,33 +467,22 @@ RESULT DreamOSTestSuite::AddTestMeta() {
 			if (event->type == SENSE_CONTROLLER_META_CLOSED) {
 				//hardcoded values taken from DreamUIBar
 				if (m_pUserApp != nullptr) {
-					auto pLeftMallet = m_pUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-					auto pRightMallet = m_pUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
 					auto pLeftHand = m_pUserApp->GetHand(HAND_TYPE::HAND_LEFT);
 					auto pRightHand = m_pUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
 					if (event->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT && pLeftHand != nullptr) {
 						if (event->state.fClosed == false) {
-						//	pLeftMallet->GetH
-						//	pLeftMallet->GetMalletHead()->SetScale(1.5f);
-							//pLeftHand->SetScale(1.5f);
-							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.02f);
+							pLeftHand->SetScale(1.5f);
 						}
 						else {
-							//pLeftHand->SetScale(1.0f);
-							pLeftHand->GetModel(HAND_TYPE::HAND_LEFT)->SetScale(0.03f);
-							//pLeftMallet->GetMalletHead()->SetScale(1.0f);
+							pLeftHand->SetScale(1.0f);
 						}
-					//	pLeftMallet->
 					}
 					if (event->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT && pRightHand != nullptr) {
 						if (event->state.fClosed == false) {
-						//	pLeftMallet->GetH
-						//	pLeftMallet->GetMalletHead()->SetScale(1.5f);
 							pRightHand->SetScale(1.0f);
 						}
 						else {
 							pRightHand->SetScale(1.5f);
-							//pLeftMallet->GetMalletHead()->SetScale(1.0f);
 						}
 
 					}

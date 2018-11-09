@@ -6,7 +6,6 @@
 
 #include "DimObj.h"
 #include "Publisher.h"
-#include "UI/UIMallet.h"
 
 enum HysteresisEventType {
 	ON,
@@ -40,6 +39,7 @@ public:
 
 	RESULT RegisterObject(VirtualObj *pObj);
 
+	HysteresisEventType UpdateState(VirtualObj *pObj);
 	HysteresisEventType GetState(VirtualObj *pObj);
 
 	virtual bool Resolve(VirtualObj *pObj) = 0;

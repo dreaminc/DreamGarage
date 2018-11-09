@@ -530,7 +530,6 @@
     <ClCompile Include="..\..\..\UI\UIKey.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboard.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp" />
-    <ClCompile Include="..\..\..\UI\UIMallet.cpp" />
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp" />
     <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp" />
     <ClCompile Include="..\..\..\UI\UISurface.cpp" />
@@ -918,7 +917,6 @@
     <ClInclude Include="..\..\..\UI\UIKey.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboard.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h" />
-    <ClInclude Include="..\..\..\UI\UIMallet.h" />
     <ClInclude Include="..\..\..\UI\UIMenuItem.h" />
     <ClInclude Include="..\..\..\UI\UIScrollView.h" />
     <ClInclude Include="..\..\..\UI\UISpatialScrollView.h" />

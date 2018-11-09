@@ -120,9 +120,6 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight, bool f
 	CN(m_pSenseController);
 	CR(m_pSenseController->Initialize());
 
-	qLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
-	qRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
-
 #ifdef _USE_TEST_APP
 	// In testing we just use spheres to speed up on testing
 	// TODO: Add this to config instead
@@ -388,8 +385,6 @@ RESULT OVRHMD::UpdateHMD() {
 
 			if (trackingState.HandStatusFlags[i] != 3) {
 				hand->SetTracked(false);
-				//hand->SetVisible(false);
-				//pModel->SetVisible(false);
 				continue;
 			}
 
@@ -399,15 +394,13 @@ RESULT OVRHMD::UpdateHMD() {
 			pModel->SetPosition(ptControllerPosition + offset);
 
 			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
+
 			// Act like this doesn't exist
 			qOrientation.Reverse();
 			qOrientation *= qRotation;
 			qOrientation.Reverse();
 
-			quaternion base = i == 0 ? qLeftRotation : qRightRotation;
 			hand->SetOrientation(qOrientation);
-			//hand->SetOrientation(qOrientation * base);
-			hand->SetLocalOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
 			
 			HAND_TYPE hType = i == 0 ? HAND_TYPE::HAND_LEFT : HAND_TYPE::HAND_RIGHT;

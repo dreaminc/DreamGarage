@@ -562,11 +562,11 @@ RESULT DreamPeerApp::SetVisible(bool fVisible) {
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_LEFT);
 	CN(pHand);
-	pHand->SetVisible(fVisible);
+	pHand->SetVisible(fVisible, false);
 
 	pHand = m_pUserModel->GetHand(HAND_TYPE::HAND_RIGHT);
 	CN(pHand);
-	pHand->SetVisible(fVisible);
+	pHand->SetVisible(fVisible, false);
 
 Error:
 	return r;

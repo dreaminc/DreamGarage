@@ -48,7 +48,6 @@ public:
 		point ptPalm;
 		quaternion qOrientation;
 
-		bool fOriented;
 		bool fTracked;
 
 		RESULT PrintState() {
@@ -70,35 +69,45 @@ public:
 	RESULT Initialize(HAND_TYPE type, long avatarModelID = -1);
 	RESULT InitializeWithContext(DreamOS *pDreamOS);
 
+	RESULT Update(); 
+
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	virtual RESULT OnLostTrack();
 	RESULT SetHandState(const hand::HandState& pHandState);
 
-	RESULT SetOriented(bool fOriented);
-	bool IsOriented();
 	RESULT SetTracked(bool fTracked);
 	bool IsTracked();
-	RESULT SetLocalOrientation(quaternion qRotation);
 
 	virtual hand::HandState GetHandState();
-	static hand::HandState GetDebugHandState(HAND_TYPE handType);
-	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
 	virtual RESULT SetHandModel(HAND_TYPE type);
-	RESULT SetHandModelOrientation(quaternion qOrientation);
-
-	std::shared_ptr<composite> GetModel(HAND_TYPE handType);
 
 	RESULT SetModelState(ModelState modelState);
 	ModelState GetModelState();
+
+	RESULT PendCreateHandModel(long avatarModelID);
+	RESULT LoadHandModel();
+	std::shared_ptr<composite> GetModel();
+
+	// Overlay - deprecated currently
 	RESULT SetOverlayVisible(bool fVisible);
 	bool IsOverlayVisible();
 	RESULT SetOverlayTexture(texture *pOverlayTexture);
 	std::shared_ptr<volume> GetPhantomVolume();
-	RESULT Update(); // TODO: app?
-	RESULT SetVisible(bool fVisible = true, bool fSetChildren = true);
 
-	RESULT PendCreateHandModel(long avatarModelID);
-	RESULT LoadHandModel();
+	// mallet replacement(?)
+public:
+	RESULT ShowMallet();
+	RESULT HideMallet();
+	sphere* GetMalletHead();
+	float GetMalletRadius();
+	point GetMalletOffset();
+	
+private:
+	float m_radius;
+	float m_distance;
+	float m_angle;
+	std::shared_ptr<sphere> m_pHead;
+	point m_headOffset;
 
 protected:
 	//Animations
@@ -121,12 +130,8 @@ protected:
 
 	HAND_TYPE m_handType;
 
-	std::shared_ptr<composite> m_pModel = nullptr;;
+	std::shared_ptr<composite> m_pModel = nullptr;
 	std::shared_ptr<sphere> m_pPalm = nullptr;
-
-	bool m_fOriented;
-
-	quaternion m_qRotation;
 
 	// this is a state of the hand to represent whether the hand is tracked or not.
 	// For example when using a leap motion, a hand is not tracked when it goes out of the sensor.

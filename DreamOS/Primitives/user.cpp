@@ -97,15 +97,6 @@ std::shared_ptr<hand> user::GetHand(HAND_TYPE type) {
 	return nullptr;
 }
 
-RESULT user::Activate(user::CONTROLLER_TYPE type) {
-
-	SetVisible(true);
-	m_pLeftHand->SetVisible(false);
-	m_pRightHand->SetVisible(false);
-
-	return R_PASS;
-}
-
 RESULT user::SetDreamOS(DreamOS *pDreamOS) {
 	m_pDreamOS = pDreamOS;
 	return R_PASS;
@@ -137,10 +128,10 @@ RESULT user::UpdateAvatarModelWithID(long avatarModelID) {
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pLeftHand = AddHand(HAND_TYPE::HAND_LEFT, m_avatarModelId);
-	m_pLeftHand->SetVisible(true);
+	m_pLeftHand->SetVisible(true, false);
 
 	m_pRightHand = AddHand(HAND_TYPE::HAND_RIGHT, m_avatarModelId);
-	m_pRightHand->SetVisible(true);
+	m_pRightHand->SetVisible(true, false);
 
 #endif
 
@@ -246,7 +237,7 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	pHand->SetPosition(ptHand);
 	pHand->SetOrientation(qHandOrientation);
 	pHand->SetTracked(pHandState.fTracked);
-	pHand->SetVisible(pHand->IsTracked());
+	pHand->SetVisible(pHand->IsTracked(), false);
 
 Error:
 	return r;

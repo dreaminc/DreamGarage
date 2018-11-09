@@ -21,7 +21,6 @@
 #include <queue>
 
 class DreamUserControlArea;
-class UIMallet;
 class UIView;
 
 class CloudController;

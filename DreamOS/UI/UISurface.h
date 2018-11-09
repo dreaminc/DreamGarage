@@ -6,7 +6,7 @@
 #include "Sense/SenseController.h"
 
 class DreamOS;
-class UIMallet;
+class hand;
 class quad;
 
 #define SCROLL_CONSTANT 10.0f;
@@ -19,7 +19,7 @@ public:
 	RESULT InitializeSurfaceQuad(float width, float height);
 
 public:
-	RESULT UpdateWithMallet(UIMallet *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType);
+	RESULT UpdateWithHand(hand *pMallet, bool &fMalletDirty, bool &fMouseDown, HAND_TYPE handType);
 
 	std::shared_ptr<quad> GetViewQuad();
 	point GetLastEvent();

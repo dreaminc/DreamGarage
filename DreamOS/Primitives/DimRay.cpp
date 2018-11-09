@@ -57,6 +57,8 @@ Error:
 RESULT DimRay::SetRayVertices(float rayVisualLength) {
 	RESULT r = R_PASS;
 
+	Allocate();
+
 	// line segment vertices
 	vertex vBegin = vertex(m_ptOrigin);
 	point ptEnd = m_ptOrigin + point(rayVisualLength * m_vDirection);

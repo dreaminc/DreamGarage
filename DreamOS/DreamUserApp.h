@@ -25,7 +25,6 @@ class volume;
 class quad; 
 class texture;
 class hand;
-class UIMallet;
 class DimRay;
 class VirtualObj;
 class UIKeyboard;
@@ -91,7 +90,6 @@ public:
 	RESULT SetHand(hand* pHand);
 	RESULT ClearHands();
 
-	UIMallet *GetMallet(HAND_TYPE type);
 	hand *GetHand(HAND_TYPE type);
 	RESULT CreateHapticImpulse(VirtualObj *pEventObj);
 
@@ -192,9 +190,6 @@ private:
 	std::shared_ptr<user> m_pUserModel = nullptr;
 	hand* m_pLeftHand = nullptr;
 	hand* m_pRightHand = nullptr;
-
-	UIMallet* m_pLeftMallet = nullptr;
-	UIMallet* m_pRightMallet = nullptr;
 
 	// apps position themselves with this when they are presented
 	VirtualObj *m_pAppBasis = nullptr;
