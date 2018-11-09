@@ -444,7 +444,20 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	if (m_fUseOGLPBO) {
-		m_pWebBrowserControllerObserver->OnPaint(static_cast<const unsigned char*>(pBuffer), width, height);
+		bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
+
+		if (fSizeChanged) {
+			m_bufferWidth = width;
+			m_bufferHeight = height;
+			DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
+		}
+
+		size_t pBuffer_n = width * height * 4;
+		m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
+		if (m_pWebBrowserControllerObserver != nullptr) {
+			m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], width, height);
+		}
+		m_vectorBuffer.clear();
 	}
 	else {
 		std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);

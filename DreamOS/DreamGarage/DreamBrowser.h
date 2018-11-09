@@ -282,7 +282,9 @@ private:
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
 	std::thread	m_browserAudioProcessingThread;
 
-	
+	RESULT RenderProcess();
+
+	std::thread m_browserRenderProcessingThread;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
