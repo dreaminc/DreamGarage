@@ -19,6 +19,7 @@ public:
 	Win64NamedPipeClient(std::wstring strPipename);
 	~Win64NamedPipeClient();
 
+	virtual RESULT Close() override;
 	virtual RESULT Initialize() override;
 
 	virtual RESULT NamedPipeClientProcess() override;

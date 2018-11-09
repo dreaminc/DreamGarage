@@ -32,13 +32,13 @@ RESULT NamedPipeClient::Stop() {
 
 	// End thread
 
-	CBM((m_namedPipeClientProcess.joinable()), "Cannot kill named pipe process, not running");
+	m_fRunning = false;
 
-	m_namedPipeClientProcess.join();
+	if (m_namedPipeClientProcess.joinable()) {
+		m_namedPipeClientProcess.join();
+	}
 
 	CBM((m_namedPipeClientProcess.joinable() == false), "Failed to named pipe process");
-
-	m_fRunning = false;
 
 Error:
 	return r;

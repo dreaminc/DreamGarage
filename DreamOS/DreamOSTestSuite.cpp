@@ -1050,13 +1050,14 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 			CR(pTestContext->pNamedPipeServer->RegisterMessageHandler(std::bind(&TestContext::HandleServerPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
 			CR(pTestContext->pNamedPipeServer->Start());
 
-			/*
+			///*
 			// This form of IPC isn't designed to be same process
 			// so we add a bit of delay to accommodate for problematic event handling / timing errors
 			// that would normally be fixed with a mutex for cross-thread sync
 			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
 
 			// Set up named pipe clients
+			/*
 			pTestContext->pNamedPipeClient1 = m_pDreamOS->MakeNamedPipeClient(L"dreamvcampipe");
 			CN(pTestContext->pNamedPipeClient1);
 			CR(pTestContext->pNamedPipeClient1->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
@@ -1093,10 +1094,26 @@ RESULT DreamOSTestSuite::AddTestNamedPipes() {
 
 		static int count = 0;
 
-		{
-			std::string strTestMessage = "testing: " + std::to_string(count++);
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+		static std::chrono::system_clock::time_point lastUpdateTimeResetClient = std::chrono::system_clock::now();
 
-			pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size());
+		{
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+			// This sort of emulates 24 FPS or so
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1000) {
+				std::string strTestMessage = "testing: " + std::to_string(count++);
+				pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size());
+				lastUpdateTime = timeNow;
+			}
+
+			// Will disconnect client 2 after 5 seconds
+			if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - lastUpdateTimeResetClient).count() > 5) {
+				if (pTestContext->pNamedPipeClient2 != nullptr) {
+					pTestContext->pNamedPipeClient2 = nullptr;
+				}
+				lastUpdateTimeResetClient = timeNow;
+			}
 		}
 
 	Error:

@@ -23,6 +23,7 @@ public:
 	RESULT RegisterMessageHandler(std::function<RESULT(void*, size_t)> fnPipeMessageHandler);
 	RESULT UnregisterMessageHandler();
 
+	virtual RESULT Close() = 0;
 	virtual RESULT NamedPipeClientProcess() = 0;
 	virtual RESULT SendMessage(void *pBuffer, size_t pBuffer_n) = 0;
 

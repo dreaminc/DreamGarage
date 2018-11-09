@@ -273,9 +273,6 @@ Error:
 RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
-	DWORD cbToWrite = 0;
-	DWORD cbWritten = 0;
-
 	// Send a message to the pipe client 
 
 	for (auto &pClientConnection : m_clientConnections) {
@@ -296,12 +293,16 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 				if (err == ERROR_PIPE_LISTENING) {
 					CBM((false), "WriteFile warning waiting for connection");
 				}
+				else if (err == ERROR_NO_DATA) {
+					pClientConnection->m_fConnected = false;
+					DEBUG_LINEOUT("Client connection %d closed", pClientConnection->m_connectionID);
+				}
 				else {
 					CBM((false), "WriteFile failed with GLE: %d", (int)err);
 				}
 			}
 			else {
-				CBM((cbToWrite == cbWritten), "Writefile mismatch bytes written");
+				CBM((pClientConnection->m_cbToWrite == pClientConnection->m_cbWritten), "Writefile mismatch bytes written");
 			}
 		}
 	}

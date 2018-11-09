@@ -7,12 +7,31 @@ Win64NamedPipeClient::Win64NamedPipeClient(std::wstring wstrPipename) :
 }
 
 Win64NamedPipeClient::~Win64NamedPipeClient() {
-	// empty
+	Close();
 }
 
 std::wstring GetWindowsNamedPipeClientName(std::wstring strPipename) {
 	std::wstring wstrWindowsName = L"\\\\.\\pipe\\" + strPipename;
 	return wstrWindowsName;
+}
+
+RESULT Win64NamedPipeClient::Close() {
+	RESULT r = R_PASS;
+
+	CBM(CancelSynchronousIo(m_namedPipeClientProcess.native_handle()), "failed to cancel sync io");
+	CBM(TerminateThread(m_namedPipeClientProcess.native_handle(), 0), "failed to terminate thread");
+
+	if (m_handleNamedPipe != INVALID_HANDLE_VALUE) {
+		FlushFileBuffers(m_handleNamedPipe);
+		DisconnectNamedPipe(m_handleNamedPipe);
+		CloseHandle(m_handleNamedPipe);
+		m_handleNamedPipe = INVALID_HANDLE_VALUE;
+	}
+
+	CR(Stop());
+
+Error:
+	return r;
 }
 
 RESULT Win64NamedPipeClient::Initialize() {
@@ -21,11 +40,11 @@ RESULT Win64NamedPipeClient::Initialize() {
 	//m_handleNamedPipe = CreateFile(GetWindowsNamedPipeClientName(m_strPipename).c_str(),	// pipe name 
 	m_handleNamedPipe = CreateFile(L"\\\\.\\pipe\\dreamvcampipe",	// pipe name 
 								   GENERIC_READ |											// read and write access 
-								   GENERIC_WRITE,
+								   GENERIC_WRITE ,
 								   0,														// no sharing 
 								   nullptr,													// default security attributes
-								   OPEN_EXISTING,											// opens existing pipe 
-								   0,														// default attributes 
+								   OPEN_EXISTING ,											// opens existing pipe 
+								   0,									// default attributes 
 								   nullptr);												// no template file 
 
 	// Break if the pipe handle is valid. 
@@ -76,21 +95,22 @@ RESULT Win64NamedPipeClient::NamedPipeClientProcess() {
 			(void*)pBuffer,										// buffer to receive data 
 			(DWORD)pBuffer_n,									// size of buffer 
 			&cbBytesRead,										// number of bytes read 
-			nullptr);											// not overlapped I/O 
+			nullptr);										// not overlapped I/O 
 
 		// TODO: Handle this better
 		if (GetLastError() == ERROR_BROKEN_PIPE) {
 			DEBUG_LINEOUT("InstanceThread: client disconnected GLE: %d", GetLastError());
 		}
 
-		CBM((fSuccess), "ReadFile failed, GLE=%d", GetLastError());
-		CBM((cbBytesRead != 0), "Readfile read zero bytes");
-
-		// Process the incoming message.
-		if (m_fnPipeMessageHandler != nullptr) {
-			CRM(m_fnPipeMessageHandler(pBuffer, (size_t)cbBytesRead), "Server pipe message handler failed");
+		if (fSuccess && cbBytesRead != 0) {
+			// Process the incoming message.
+			if (m_fnPipeMessageHandler != nullptr) {
+				CRM(m_fnPipeMessageHandler(pBuffer, (size_t)cbBytesRead), "Server pipe message handler failed");
+			}
 		}
-
+		else {
+			// TODO:
+		}
 	};
 
 Error:
