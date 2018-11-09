@@ -331,10 +331,6 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 
 	m_fStreaming = fStreaming;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-	pDreamUserApp->SetStreamingState(fStreaming);
-
 Error:
 	return r;
 }

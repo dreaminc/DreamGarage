@@ -682,35 +682,12 @@ Error:
 
 }
 
-RESULT DreamUserApp::HandleKBEnterEvent() {
-	RESULT r = R_PASS;
-	CNR(m_pEventApp, R_SKIPPED);
-	m_pEventApp->HandleEvent(UserObserverEventType::KB_ENTER);
-Error:
-	return r;
-}
-
 RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 	CNR(m_pEventApp, R_SKIPPED);
 	m_pEventApp->HandleEvent(type);
 Error:
 	return r;
-}
-
-RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
-	fStreaming = m_fStreaming;
-	return R_PASS;
-}
-
-RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
-	m_fStreaming = fStreaming;
-	return R_PASS;
-}
-
-RESULT DreamUserApp::PreserveSharingState(bool fIsSharing) {
-	m_fIsSharing = fIsSharing;
-	return R_PASS;
 }
 
 RESULT DreamUserApp::ResetAppComposite() {

@@ -98,14 +98,11 @@ public:
 
 	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
 
-	RESULT HandleKBEnterEvent();
 	RESULT HandleUserObserverEvent(UserObserverEventType type);
 
-	RESULT GetStreamingState(bool& fStreaming);
-	RESULT SetStreamingState(bool fStreaming);
-	RESULT PreserveSharingState(bool fIsSharing);
-
 	RESULT ResetAppComposite();
+	
+	// used to set seating position created in DreamGarage and DreamEnvironmentApp
 	RESULT SetAppCompositeOrientation(quaternion qOrientation);
 	RESULT SetAppCompositePosition(point ptPosition);
 
@@ -150,8 +147,6 @@ public:
 
 	RESULT ShowMessageQuad();
 	RESULT HideMessageQuad();
-
-	RESULT FadeInWithMessageQuad(StartupMessage startupMessage);
 
 private:
 	std::wstring k_wstrUpdateRequired = L"LaunchQuad/launch-update-required.png"; 
