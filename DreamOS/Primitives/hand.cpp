@@ -592,7 +592,9 @@ RESULT hand::ShowController() {
 		m_pOverlayQuad->SetVisible(false);
 	}
 
-	CR(ShowMallet());
+	if (m_fTracked) {
+		CR(ShowMallet());
+	}
 
 	/*
 	auto pMesh = m_pController->GetFirstChild<mesh>().get();
