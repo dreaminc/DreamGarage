@@ -152,6 +152,9 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::SIGN_UP) {
 		strType = "FormKey.UsersSignUp";
 	}
+	else if (type == FormType::SIGN_UP_WELCOME) {
+		strType = "FormKey.UsersSignUpWelcome";
+	}
 	else if (type == FormType::SETTINGS) {
 		strType = "FormKey.UsersSettings";
 	}
@@ -171,6 +174,9 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	}
 	else if (strType == "FormKey.UsersSignUp") {
 		type = FormType::SIGN_UP;
+	}
+	else if (strType == "FormKey.UsersSignUpWelcome") {
+		type = FormType::SIGN_UP_WELCOME;
 	}
 	else if (strType == "FormKey.UsersSettings") {
 		type = FormType::SETTINGS;
@@ -330,6 +336,11 @@ RESULT DreamFormApp::SetAsActive() {
 	return R_PASS;
 }
 
+RESULT DreamFormApp::SetFormType(FormType type) {
+	m_formType = type;
+	return R_PASS;
+}
+
 RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
@@ -347,7 +358,8 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr && 
 			pCloudController->IsUserLoggedIn() && 
-			pCloudController->IsEnvironmentConnected()) {
+			pCloudController->IsEnvironmentConnected() &&
+			!m_formType == FormType::SIGN_UP_WELCOME) {
 
 			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 				CR(m_pDreamBrowserForm->HandleUnfocusEvent());

@@ -812,7 +812,8 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 		}
 		else {
 			DOSLOG(INFO, "Is first login, going to sign-up");
-			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+			//strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP);
+			strFormType = DreamFormApp::StringFromType(FormType::SIGN_UP_WELCOME);
 			CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::WELCOME));
 		}
 
@@ -1786,6 +1787,9 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	else {
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
 		CR(m_pDreamGeneralForm->Show());
+
+		// Used for special case with disabling button presses on welcome form
+		CR(m_pDreamGeneralForm->SetFormType(DreamFormApp::TypeFromString(strKey)));
 	}
 
 Error:
