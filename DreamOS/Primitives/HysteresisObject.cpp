@@ -57,7 +57,7 @@ RESULT HysteresisObject::Update() {
 	for (auto pObjIt = m_currentStates.begin(); pObjIt != m_currentStates.end(); ++pObjIt) {
 
 		auto pObj = pObjIt->first;
-		HysteresisEventType currentState = GetState(pObj);
+		HysteresisEventType currentState = UpdateState(pObj);
 
 		if (m_currentStates[pObj] != currentState) {
 			m_currentStates[pObj] = currentState;
@@ -79,7 +79,7 @@ Error:
 	return r;
 }
 
-HysteresisEventType HysteresisObject::GetState(VirtualObj *pObj) {
+HysteresisEventType HysteresisObject::UpdateState(VirtualObj *pObj) {
 
 	bool fResolved = Resolve(pObj);
 
@@ -92,5 +92,14 @@ HysteresisEventType HysteresisObject::GetState(VirtualObj *pObj) {
 	}
 
 	return eventType;	
+}
+
+HysteresisEventType HysteresisObject::GetState(VirtualObj *pObj) {
+
+	if (m_currentStates.count(pObj) > 0) {
+		return m_currentStates[pObj];
+	}
+
+	return OFF;
 }
 

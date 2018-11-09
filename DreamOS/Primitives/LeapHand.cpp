@@ -247,8 +247,6 @@ RESULT LeapHand::SetFromLeapHand(const Leap::Hand hand) {
 	qRotation.SetQuaternion(vx, vy, vz);
 	qRotation.Reverse();
 
-	m_qRotation = qRotation;
-
 	Leap::Matrix handTransform;
 	handTransform.origin = hand.palmPosition();
 	handTransform = handTransform.rigidInverse();
@@ -282,8 +280,6 @@ RESULT LeapHand::SetFromLeapHand(const Leap::Hand hand) {
 	HAND_TYPE modelType = (m_fSkeleton) ? HAND_TYPE::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
-	m_pModel->SetOrientation(m_qRotation);
-	
 //Error:
 	return r;
 }

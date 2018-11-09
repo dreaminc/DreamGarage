@@ -38,8 +38,6 @@ public:
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	
-	RESULT Activate(user::ControllerType type = user::ControllerType::CONTROLLER_INVALID);
-
 	RESULT SetDreamOS(DreamOS *pDreamOS);
 	RESULT UpdateAvatarModelWithID(long avatarModelID);
 

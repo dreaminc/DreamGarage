@@ -278,9 +278,6 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
-	pLeftHand->SetOriented(true);
-	pRightHand->SetOriented(true);
-
 	// TODO: broken for now
 //	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 //	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
@@ -295,9 +292,6 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 	if (m_pHMD != nullptr) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
-
-		pLeftHand->SetOriented(false);
-		pRightHand->SetOriented(false);
 
 		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));

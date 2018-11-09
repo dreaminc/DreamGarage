@@ -628,9 +628,6 @@
     <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMallet.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\TextEntryString.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -1721,9 +1718,6 @@
       <Filter>HAL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMallet.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\TextEntryString.h">
