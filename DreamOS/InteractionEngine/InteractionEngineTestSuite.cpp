@@ -177,8 +177,6 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 	int nRepeats = 1;
 
 	struct CaptureContext : public Subscriber<InteractionObjectEvent> {
-		UIMallet *pLeftMallet = nullptr;
-		UIMallet *pRightMallet = nullptr;
 		std::shared_ptr<composite> pComposite = nullptr;
 		std::shared_ptr<FlatContext> pFlatContext = nullptr;
 		quad *pRenderQuad = nullptr;
@@ -272,16 +270,6 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 			CN(pCaptureContext);
 			CN(m_pDreamOS);
 			
-			pCaptureContext->pLeftMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pLeftMallet->Show();
-			//pCaptureContext->pLeftMallet->GetMalletHead()->InitializeOBB();
-			pCaptureContext->pRightMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pRightMallet->Show();
-			//pCaptureContext->pRightMallet->GetMalletHead()->InitializeOBB();
-
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pLeftMallet->GetMalletHead());
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pRightMallet->GetMalletHead());
-
 			//auto pComposite = m_pDreamOS->MakeComposite();
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->SetVisible(true);
@@ -382,11 +370,8 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 			CN(pHand);
 
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
-			auto& pLeftMallet = pCaptureContext->pLeftMallet;
-			auto& pRightMallet = pCaptureContext->pRightMallet;
 
-			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -394,8 +379,7 @@ RESULT InteractionEngineTestSuite::AddTestFlatCollisions() {
 			qOffset = RotationMatrix();
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			pCaptureContext->pFlatContext->RenderToQuad(pCaptureContext->pRenderQuad, 0.0f, 0.0f);
 		}
@@ -434,8 +418,6 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 	int nRepeats = 1;
 
 	struct CaptureContext : public Subscriber<InteractionObjectEvent> {
-		UIMallet *pLeftMallet = nullptr;
-		UIMallet *pRightMallet = nullptr;
 		DreamOS *m_pDreamOS = nullptr;
 
 		RESULT Notify(InteractionObjectEvent *mEvent) {
@@ -560,16 +542,6 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			CN(pCaptureContext);
 			CN(m_pDreamOS);
 			
-			pCaptureContext->pLeftMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pLeftMallet->Show();
-			//pCaptureContext->pLeftMallet->GetMalletHead()->InitializeOBB();
-			pCaptureContext->pRightMallet = new UIMallet(m_pDreamOS);
-			pCaptureContext->pRightMallet->Show();
-			//pCaptureContext->pRightMallet->GetMalletHead()->InitializeOBB();
-
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pLeftMallet->GetMalletHead());
-			m_pDreamOS->AddInteractionObject(pCaptureContext->pRightMallet->GetMalletHead());
-
 			auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
 			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
 			pQuad->RotateXByDeg(90.0f);
@@ -621,11 +593,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 			
-			auto& pLeftMallet = pCaptureContext->pLeftMallet;
-			auto& pRightMallet = pCaptureContext->pRightMallet;
-
-			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -633,8 +601,7 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			qOffset = RotationMatrix();
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 		}
 
 	Error:

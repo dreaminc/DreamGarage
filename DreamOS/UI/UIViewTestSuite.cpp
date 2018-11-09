@@ -8,7 +8,6 @@
 #include "UIView.h"
 #include "UIButton.h"
 #include "UISpatialScrollView.h"
-#include "UIMallet.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -552,8 +551,6 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 		std::shared_ptr<UIView> pView = nullptr;
 		std::shared_ptr<UISpatialScrollView> pScrollView = nullptr;
 		std::vector<std::shared_ptr<UIButton>> pButtons = {};
-		UIMallet* pLeftMallet = nullptr;
-		UIMallet* pRightMallet = nullptr;
 	};
 	TestContext *pContext = new TestContext();
 
@@ -566,8 +563,6 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 		auto& pView = pTestContext->pView;
 		auto& pScrollView = pTestContext->pScrollView;
 		auto& pButtons = pTestContext->pButtons;
-		auto& pLeftMallet = pTestContext->pLeftMallet;
-		auto& pRightMallet = pTestContext->pRightMallet;
 
 		int numButtons = 8;
 
@@ -594,15 +589,6 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 		pScrollView->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
 		pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, -(float)(M_PI_2), 0.0f));
 
-		pLeftMallet = new UIMallet(m_pDreamOS);
-		pRightMallet = new UIMallet(m_pDreamOS);
-
-		pLeftMallet->Show();
-		pRightMallet->Show();
-
-		m_pDreamOS->AddInteractionObject(pLeftMallet->GetMalletHead());
-		m_pDreamOS->AddInteractionObject(pRightMallet->GetMalletHead());
-
 	Error:
 		return r;
 	};
@@ -615,15 +601,12 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 
 		{
 			auto pScrollView = pTestContext->pScrollView;
-			auto& pLeftMallet = pTestContext->pLeftMallet;
-			auto& pRightMallet = pTestContext->pRightMallet;
 
 			hand *pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_LEFT);
 			CN(pHand);
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pLeftMallet)
-				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			pHand = m_pDreamOS->GetHand(HAND_TYPE::HAND_RIGHT);
 			CN(pHand);
@@ -631,8 +614,7 @@ RESULT UIViewTestSuite::AddTestUISpatialScrollView() {
 			qOffset = RotationMatrix();
 			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-			if (pRightMallet)
-				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetMalletOffset()));
+			pHand->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pHand->GetMalletOffset()));
 
 			CR(pScrollView->Update());
 		}
@@ -767,8 +749,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		bool fDecreaseMalletAngle = false;
 		DreamOS *pDreamOS;	
 		float malletAngle = 180.0f;
-		UIMallet *pKLeftMallet = nullptr;
-		UIMallet *pKRightMallet = nullptr;
 		virtual RESULT Notify(SenseControllerEvent *event) override {
 			RESULT r = R_PASS;
 			SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
@@ -838,10 +818,6 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 
 			pTestContext->pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 			pTestContext->pKeyboard->Show();
-//			pTestContext->pKLeftMallet = pTestContext->pKeyboard->GetLeftMallet();
-//			pTestContext->pKRightMallet = pTestContext->pKeyboard->GetRightMallet();
-			//m_pDreamOS->AddInteractionObject(pTestContext->pKLeftMallet->GetMalletHead());
-			//m_pDreamOS->AddInteractionObject(pTestContext->pKRightMallet->GetMalletHead());
 			//*
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);

@@ -25,7 +25,6 @@ class volume;
 class quad; 
 class texture;
 class hand;
-class UIMallet;
 class DimRay;
 class VirtualObj;
 class UIKeyboard;

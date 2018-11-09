@@ -348,6 +348,7 @@ RESULT hand::Update() {
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
+		m_pHead->SetVisible(m_fTracked);
 	} break;
 	}
 
@@ -396,6 +397,11 @@ std::shared_ptr<volume> hand::GetPhantomVolume() {
 
 RESULT hand::SetTracked(bool fTracked) {
 	m_fTracked = fTracked;
+
+	if (!m_fTracked) {
+		OnLostTrack();
+	}
+
 	return R_PASS;
 }
 
@@ -579,8 +585,6 @@ RESULT hand::ShowController() {
 
 	m_pController->SetVisible(m_fTracked);
 
-	auto pMesh = m_pController->GetFirstChild<mesh>().get();
-	CNR(pMesh, R_SKIPPED);
 
 
 	// TODO: re-enable if overlays come back
@@ -591,6 +595,8 @@ RESULT hand::ShowController() {
 	CR(ShowMallet());
 
 	/*
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 
