@@ -86,6 +86,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(GetDOS()->GetUserApp()->GetBrowserManager(), m_strURL));
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
+
+		//Show();
 	}
 	if (m_fUpdateFormURL) {
 		m_fUpdateFormURL = false;

@@ -1112,6 +1112,7 @@ RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	if (m_pDreamUserControlArea != nullptr) {
 		m_pDreamUserControlArea->ResetAppComposite();
 	}
+	m_pDreamUserApp->ResetAppComposite();
 
 Error:
 	return r;
@@ -1175,9 +1176,20 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		long avatarID;
 
+		auto fnOnFadeInCallback = [&](void *pContext) {
+			
+			if (m_fFirstLogin) {
+				m_pDreamGeneralForm->Show();
+				m_pDreamUserApp->ResetAppComposite();
+			}
+			
+			return R_PASS;
+		};
+
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 
+		//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr, fnOnFadeInCallback));
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 		//*/
 
@@ -1510,7 +1522,15 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	auto pCloudController = GetCloudController();
 	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
-		m_pDreamUserControlArea->OnDreamFormSuccess();
+		if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
+			m_pDreamUserControlArea->OnDreamFormSuccess();
+		}
+		else if (strMessage == "DreamEnvironmentApp.OnFadeIn") {
+			if (m_fFirstLogin) {
+				m_pDreamGeneralForm->Show();
+				m_pDreamUserApp->ResetAppComposite();
+			}
+		}
 	}
 	else {
 		// once login has succeeded, save the launch date
@@ -1786,7 +1806,7 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	}
 	else {
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
-		CR(m_pDreamGeneralForm->Show());
+		//CR(m_pDreamGeneralForm->Show());
 		CR(GetUserApp()->ResetAppComposite());
 
 		// Used for special case with disabling button presses on welcome form
