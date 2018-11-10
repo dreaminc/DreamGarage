@@ -15,7 +15,9 @@ class SpatialSoundObject;
 class SoundFile;
 class HMD;
 class texture;
+class NamedPipeServer;
 //class SoundBuffer;
+
 
 class DreamVCam : public DreamModule<DreamVCam> {
 	friend class DreamModuleManager;
@@ -34,11 +36,17 @@ public:
 	RESULT SetSourceTexture(texture *pTexture);
 	RESULT UnsetSourceTexture();
 
+	RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n);
+
 protected:
 	static DreamVCam* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
 	texture * m_pSourceTexture = nullptr;
+
+	unsigned char *m_pLoadBuffer = nullptr;
+	size_t m_pLoadBuffer_n = 0;
 };
 
 #endif // ! DREAM_VCAM_SYSTEM_H_

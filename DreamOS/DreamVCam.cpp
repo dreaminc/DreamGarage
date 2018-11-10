@@ -8,6 +8,8 @@
 // but VCam will fail right now outside of OGL anyways
 #include "HAL/opengl/OGLTexture.h"
 
+#include "Sandbox/NamedPipeServer.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {
@@ -25,9 +27,37 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	SetModuleDescription("The Dream Virtual Camera Module");
 
 	// Pass in a context if needed in future
-	CRM(StartModuleProcess(), "Failed to start module process");
+	//CRM(StartModuleProcess(), "Failed to start module process");
 
-	// TODO: 
+	// Set up named pipe server
+	m_pNamedPipeServer = GetDOS()->MakeNamedPipeServer(L"dreamvcampipe");
+	CN(m_pNamedPipeServer);
+
+	CRM(m_pNamedPipeServer->RegisterMessageHandler(std::bind(&DreamVCam::HandleServerPipeMessage, this, std::placeholders::_1, std::placeholders::_2)), 
+		"Failed to register message handler");
+
+	CRM(m_pNamedPipeServer->Start(), "Failed to start server");
+
+	// TODO: Parameterize this eventually
+	int width = 1280;
+	int height = 720;
+	int channels = 4;
+	
+	m_pLoadBuffer_n = width * height * channels * sizeof(unsigned char);
+	m_pLoadBuffer = (unsigned char*) malloc(m_pLoadBuffer_n);
+	CNM(m_pLoadBuffer, "Failed to allocate DreamCam buffer");
+
+Error:
+	return r;
+}
+
+RESULT DreamVCam::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	char *pszMessage = (char *)(pBuffer);
+	CN(pszMessage);
+
+	DEBUG_LINEOUT("HandleServerPipeMessage: %s", pszMessage);
 
 Error:
 	return r;
@@ -36,7 +66,32 @@ Error:
 RESULT DreamVCam::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	// TODO: 
+	static int count = 0;
+
+	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+	// TODO: Some more logic around texture / buffer sizes etc 
+	if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1000) {
+			size_t bufferSize = m_pSourceTexture->GetTextureSize();
+
+			if (bufferSize == m_pLoadBuffer_n) {
+				// TODO: We currently don't support multi-sample, so need to make sure
+				// to render one sample (expose with flag)
+				m_pSourceTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize);
+
+				m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n);
+
+				lastUpdateTime = timeNow;
+			}
+			else {
+				DEBUG_LINEOUT("Mismatch in buffer size for source texture and virtual camera");
+			}
+		}
+	}
 
 Error:
 	return r;
@@ -70,13 +125,24 @@ RESULT DreamVCam::ModuleProcess(void *pContext) {
 	RESULT r = R_PASS;
 
 	int stayAliveCount = 0;
+	
+	// TODO: Cross thread OGL calls don't seem to work - need to investigate
 
 	while (true) {
-		DEBUG_LINEOUT("vcam: stayalive - %d", (5 * stayAliveCount++));
+		DEBUG_LINEOUT("vcam: stayalive - %d", (1 * stayAliveCount++));
 
-		// TODO: 
+		// TODO: Some more logic around texture / buffer sizes etc 
+		if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
-		std::this_thread::sleep_for(std::chrono::seconds(5));
+			CBM((bufferSize == m_pLoadBuffer_n), "Mismatch in buffer size for source texture and virtual camera");
+
+			CRM(m_pSourceTexture->LoadBufferFromTexture(m_pLoadBuffer, bufferSize), "Failed to load buffer from texture");
+
+			CRM(m_pNamedPipeServer->SendMessage((void*)(m_pLoadBuffer), m_pLoadBuffer_n), "Failed to send vcam buffer");
+		}
+
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 
 Error:

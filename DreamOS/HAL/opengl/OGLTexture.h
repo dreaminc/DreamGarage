@@ -94,6 +94,9 @@ public:
 	RESULT EnableOGLPBOUnpack();
 	RESULT EnableOGLPBOPack();
 
+	RESULT DeallocateOGLPBOPack();
+	RESULT DeallocateOGLPBOUnpack();
+
 	bool IsOGLPBOUnpackEnabled();
 	bool IsOGLPBOPackEnabled();
 

@@ -274,15 +274,19 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	// Send a message to the pipe client 
+	unsigned char *pTempBuffer = (unsigned char *)malloc(pBuffer_n);
+	CN(pTempBuffer);
+
+	memcpy(pTempBuffer, pBuffer, pBuffer_n);
 
 	for (auto &pClientConnection : m_clientConnections) {
 			
-		pClientConnection->m_cbToWrite = (DWORD)((pBuffer_n + 1) * sizeof(TCHAR));
+		pClientConnection->m_cbToWrite = (DWORD)((pBuffer_n));
 
 		if (pClientConnection->m_fConnected) {
 			bool fSuccess = WriteFile(
 				pClientConnection->m_handleNamedPipe,   // pipe handle 
-				pBuffer,								// message 
+				pTempBuffer,							// message 
 				pClientConnection->m_cbToWrite,         // message length 
 				&pClientConnection->m_cbWritten,        // bytes written 
 				nullptr);								// not overlapped 
@@ -308,5 +312,10 @@ RESULT Win64NamedPipeServer::SendMessage(void *pBuffer, size_t pBuffer_n) {
 	}
 
 Error:
+	if (pTempBuffer != nullptr) {
+		delete pTempBuffer;
+		pTempBuffer = nullptr;
+	}
+
 	return r;
 }

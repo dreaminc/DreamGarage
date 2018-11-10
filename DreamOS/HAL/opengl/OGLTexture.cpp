@@ -28,6 +28,8 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 }
 
 OGLTexture::~OGLTexture() {
+	RESULT r = R_PASS;
+
 	texture::~texture();
 
 	if (m_glTextureIndex != 0) {
@@ -35,17 +37,11 @@ OGLTexture::~OGLTexture() {
 		m_glTextureIndex = 0;
 	}
 
-	if (m_glPixelUnpackBufferIndex != 0) {
-		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBufferIndex);
-		m_glPixelUnpackBufferIndex = 0;
-	}
+	CR(DeallocateOGLPBOPack());
+	CR(DeallocateOGLPBOUnpack());
 
-	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
-		if (m_glPixelPackBufferIndex[i] != 0) {
-			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBufferIndex[i]));
-			m_glPixelPackBufferIndex[i] = 0;
-		}
-	}
+Error:
+	return;
 }
 
 RESULT OGLTexture::Bind() {
@@ -519,6 +515,18 @@ RESULT OGLTexture::UpdateDimensions(int pxWidth, int pxHeight) {
 	// TODO: Pull deeper settings from texture object
 	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
 
+	// Handle the pack PBO resizing
+	if (IsOGLPBOPackEnabled()) {
+		CR(DeallocateOGLPBOPack());
+		CR(EnableOGLPBOPack());
+	}
+
+	// Handle the unpack PBO resizing
+	if (IsOGLPBOUnpackEnabled()) {
+		CR(DeallocateOGLPBOUnpack());
+		CR(EnableOGLPBOUnpack());
+	}
+
 Error:
 	return r;
 }
@@ -527,6 +535,8 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
 	PIXEL_FORMAT pixelFormat = m_pixelFormat;
+
+	m_pParentImp->MakeCurrentContext();
 
 	if (IsOGLPBOPackEnabled()) {
 		//// Set the target framebuffer to read
@@ -676,6 +686,28 @@ RESULT OGLTexture::EnableOGLPBOPack() {
 Error:
 	return r;
 }
+
+RESULT OGLTexture::DeallocateOGLPBOPack() {
+	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
+		if (m_glPixelPackBuferIndex[i] != 0) {
+			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBuferIndex[i]));
+			m_glPixelPackBuferIndex[i] = 0;
+		}
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLTexture::DeallocateOGLPBOUnpack() {
+	if (m_glPixelUnpackBuferIndex != 0) {
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBuferIndex);
+		m_glPixelUnpackBuferIndex = 0;
+	}
+
+	return R_PASS;
+}
+
+
 
 bool OGLTexture::IsOGLPBOUnpackEnabled() {
 	return (m_glPixelUnpackBuferIndex != 0);

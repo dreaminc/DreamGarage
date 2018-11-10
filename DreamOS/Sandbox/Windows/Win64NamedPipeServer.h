@@ -12,7 +12,7 @@
 
 #include <windows.h> 
 
-#define DEFAULT_NAMED_PIPE_SERVER_BUFFER_SIZE 512
+#define DEFAULT_NAMED_PIPE_SERVER_BUFFER_SIZE 1280 * 720 * 4
 #define DEFAULT_NAMED_PIPE_TIMEOUT 0
 
 class Win64NamedPipeServer;
