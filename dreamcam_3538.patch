@@ -75,10 +75,10 @@ index 9e4bcfc..caccca3 100644
            command_line->GetSwitchValueASCII(
 diff --git a/media/capture/video/dream_video_capture_device.cc b/media/capture/video/dream_video_capture_device.cc
 new file mode 100644
-index 0000000..5e35ddd
+index 0000000..271c3ae
 --- /dev/null
 +++ b/media/capture/video/dream_video_capture_device.cc
-@@ -0,0 +1,1073 @@
+@@ -0,0 +1,1087 @@
 +// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -389,8 +389,8 @@ index 0000000..5e35ddd
 +  if (m_pDreamNamedPipeClient != nullptr) {
 +    m_pDreamNamedPipeClient->StopNamedPipeProcess();
 +
-+	delete m_pDreamNamedPipeClient;
-+	m_pDreamNamedPipeClient = nullptr;
++    delete m_pDreamNamedPipeClient;
++    m_pDreamNamedPipeClient = nullptr;
 +  }
 +}
 +
@@ -472,18 +472,44 @@ index 0000000..5e35ddd
 +  return;
 +}
 +
-+DreamNamedPipeClient::DreamNamedPipeClient(DreamFramePainter* pParent) 
-+	//: m_pParent(pParent)
++DreamNamedPipeClient::DreamNamedPipeClient(DreamFramePainter* pParent)
++//: m_pParent(pParent)
 +{
-+	// empty
++  // empty
++}
++
++int DreamNamedPipeClient::GetSafeBuffer(uint8_t* target_buffer,
++                                        int width,
++                                        int height,
++                                        int byteSizeOfElement) {
++  int r = 0;
++
++  int safeBuffer_i = m_pBuffer_i - 1;
++  if (safeBuffer_i < 0)
++    safeBuffer_i = (NUM_PIPE_BUFFERS - 1);
++
++  // lock?
++
++  int sizeToCopy = byteSizeOfElement * width * height;
++  if (sizeToCopy > m_pipeBufferSize) {
++    sizeToCopy = m_pipeBufferSize;
++  }
++
++  if (m_pBuffer[m_pBuffer_i] != nullptr) {
++    memcpy(target_buffer, m_pBuffer[m_pBuffer_i], sizeToCopy);
++  }
++
++  return r;
 +}
 +
 +int DreamNamedPipeClient::NamedPipeClientProcess() {
 +  int r = 0;
 +
-+  unsigned char* pBuffer = nullptr;
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++)
++    m_pBuffer[i] = nullptr;
++
 +  // int lastBufferSize = m_pipeBufferSize;
-+  size_t pBuffer_n = (size_t)m_pipeBufferSize;
++  m_pBuffer_n = (size_t)m_pipeBufferSize;
 +  DWORD cbBytesRead = 0;
 +
 +  bool fSuccess = false;
@@ -492,33 +518,20 @@ index 0000000..5e35ddd
 +
 +  DLOG(INFO) << "DVCD: Pipe client process started";
 +
-+  pBuffer = new unsigned char[pBuffer_n];
-+  DCHECK((pBuffer != nullptr));  // "Failed to allocate pipe buffer");
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++) {
++    m_pBuffer[i] = new unsigned char[m_pBuffer_n];
++    DCHECK((m_pBuffer[i] != nullptr));  // "Failed to allocate pipe buffer");
++  }
 +
 +  // Loop until done
 +  // while (m_fNamedPipeRunning) {
 +  while (m_fNamedPipeRunning) {
-+    /*
-+    // Update the buffer to write into
-+if (m_pipeBufferSize != lastBufferSize) {
-+  lastBufferSize = m_pipeBufferSize;
-+  pBuffer_n = (size_t)(lastBufferSize);
-+
-+  if (pBuffer != nullptr) {
-+    delete[] pBuffer;
-+    pBuffer = nullptr;
-+  }
-+
-+  pBuffer = new unsigned char[pBuffer_n];
-+  DCHECK((pBuffer != nullptr));  // "Failed to allocate pipe buffer");
-+}
-+    */
-+
-+    fSuccess = ReadFile(m_handleNamedPipe,  // handle to pipe
-+                        (void*)pBuffer,     // buffer to receive data
-+                        (DWORD)pBuffer_n,   // size of buffer
-+                        &cbBytesRead,       // number of bytes read
-+                        nullptr);           // not overlapped I/O
++    fSuccess =
++        ReadFile(m_handleNamedPipe,              // handle to pipe
++                 (void*)m_pBuffer[m_pBuffer_i],  // buffer to receive data
++                 (DWORD)m_pBuffer_n,             // size of buffer
++                 &cbBytesRead,                   // number of bytes read
++                 nullptr);                       // not overlapped I/O
 +
 +    // TODO: Handle this better
 +    if (GetLastError() == ERROR_BROKEN_PIPE) {
@@ -527,19 +540,11 @@ index 0000000..5e35ddd
 +    }
 +
 +    if (fSuccess && cbBytesRead != 0) {
-+      // TODO: Handle it
++      // DLOG(INFO) << "DVCD: Got frame of byte size " << cbBytesRead;
 +
-+      //DLOG(INFO) << "DVCD: Got message of size " << cbBytesRead;
-+
-+	  char* pszMessage = (char*)(pBuffer);
-+      DLOG(INFO) << "HandleServerPipeMessage: " << pszMessage;
++      m_pBuffer_i += 1;
++      m_pBuffer_i = m_pBuffer_i % NUM_PIPE_BUFFERS;
 +    }
-+
-+    // Process the incoming message.
-+    // if (m_fnPipeMessageHandler != nullptr) {
-+    //  CRM(m_fnPipeMessageHandler(pBuffer, (size_t)cbBytesRead),
-+    //      "Server pipe message handler failed");
-+    //}
 +  };
 +
 +  DLOG(INFO) << "DVCD: Pipe client process ended";
@@ -555,9 +560,11 @@ index 0000000..5e35ddd
 +    m_handleNamedPipe = INVALID_HANDLE_VALUE;
 +  }
 +
-+  if (pBuffer != nullptr) {
-+    delete[] pBuffer;
-+    pBuffer = nullptr;
++  for (int i = 0; i < NUM_PIPE_BUFFERS; i++) {
++    if (m_pBuffer[i] != nullptr) {
++      delete[] m_pBuffer[i];
++      m_pBuffer[i] = nullptr;
++    }
 +  }
 +
 +  m_fNamedPipeRunning = false;
@@ -590,7 +597,7 @@ index 0000000..5e35ddd
 +
 +  DLOG(INFO) << "StopNamedPipeProcess+";
 +
-+  //DCHECK(CancelSynchronousIo(m_namedPipeClientProcess.native_handle()));
++  // DCHECK(CancelSynchronousIo(m_namedPipeClientProcess.native_handle()));
 +  DCHECK(TerminateThread(m_namedPipeClientProcess.native_handle(), 0));
 +
 +  if (m_handleNamedPipe != INVALID_HANDLE_VALUE) {
@@ -638,9 +645,16 @@ index 0000000..5e35ddd
 +      break;
 +  }
 +
++  // TODO: Sizes should be more programmatic
++
 +  // Update the buffer size
 +  memset(target_buffer, 0, byteSizeOfElement * width * height);
 +
++  if (m_pDreamNamedPipeClient != nullptr) {
++    m_pDreamNamedPipeClient->GetSafeBuffer(target_buffer, width, height, byteSizeOfElement);
++  }
++
++  /*
 +  for (int i = 0; i < width * height; i++) {
 +    if (i % 60 < 20) {
 +      target_buffer[i * byteSizeOfElement + 2] = 0xFF;  // red
@@ -1154,10 +1168,10 @@ index 0000000..5e35ddd
 +}  // namespace media
 diff --git a/media/capture/video/dream_video_capture_device.h b/media/capture/video/dream_video_capture_device.h
 new file mode 100644
-index 0000000..6921365
+index 0000000..8089c53
 --- /dev/null
 +++ b/media/capture/video/dream_video_capture_device.h
-@@ -0,0 +1,195 @@
+@@ -0,0 +1,205 @@
 +// Copyright (c) 2012 The Chromium Authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -1184,7 +1198,8 @@ index 0000000..6921365
 +class DreamFramePainter;
 +
 +// Assume 1080p BGRA
-+#define DEFAULT_NAMED_PIPE_CLIENT_BUFFER_SIZE 1920 * 1080 * 4
++#define DEFAULT_NAMED_PIPE_CLIENT_BUFFER_SIZE 1280 * 720 * 4
++#define NUM_PIPE_BUFFERS 2
 +
 +class DreamNamedPipeClient {
 + public:
@@ -1196,8 +1211,17 @@ index 0000000..6921365
 +  int StartNamedPipeProcess();
 +  int StopNamedPipeProcess();
 +
++  // A safe buffer to read from 
++  int GetSafeBuffer(uint8_t* target_buffer,
++                    int width,
++                    int height,
++                    int byteSizeOfElement);
++
 + private:
-+  //DreamFramePainter *m_pParent = nullptr;
++  // DreamFramePainter *m_pParent = nullptr;
++  unsigned char* m_pBuffer[NUM_PIPE_BUFFERS] = {nullptr};
++  int m_pBuffer_i = 0;
++  size_t m_pBuffer_n = 0;
 +
 +  bool m_fNamedPipeRunning = false;
 +  bool m_fNamedPipeConnected = false;
@@ -1354,7 +1378,7 @@ index 0000000..6921365
 +
 +#endif  // MEDIA_CAPTURE_VIDEO_DREAM_VIDEO_CAPTURE_DEVICE_H_
 diff --git a/media/capture/video/win/video_capture_device_factory_win.cc b/media/capture/video/win/video_capture_device_factory_win.cc
-index 38d6190..b8f091b 100644
+index 38d6190..7494427 100644
 --- a/media/capture/video/win/video_capture_device_factory_win.cc
 +++ b/media/capture/video/win/video_capture_device_factory_win.cc
 @@ -31,13 +31,15 @@
@@ -1395,7 +1419,7 @@ index 38d6190..b8f091b 100644
  };
  
  const std::pair<VideoCaptureApi, std::vector<std::pair<GUID, GUID>>>
-@@ -379,39 +384,129 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
+@@ -379,39 +384,133 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
    }
  }
  
@@ -1403,9 +1427,13 @@ index 38d6190..b8f091b 100644
 +static const media::FakeVideoCaptureDevice::DeliveryMode kDefaultDreamDeliveryMode =
 +    media::FakeVideoCaptureDevice::DeliveryMode::USE_DEVICE_INTERNAL_BUFFERS;
 +
-+static constexpr std::array<gfx::Size, 5> kDefaultDreamResolutions{
-+    {gfx::Size(96, 96), gfx::Size(320, 240), gfx::Size(640, 480),
-+     gfx::Size(1280, 720), gfx::Size(1920, 1080)}};
++//static constexpr std::array<gfx::Size, 5> kDefaultDreamResolutions{
++//    {gfx::Size(96, 96), gfx::Size(320, 240), gfx::Size(640, 480),
++//     gfx::Size(1280, 720), gfx::Size(1920, 1080)}};
++
++static constexpr std::array<gfx::Size, 5> kDefaultDreamResolutions{{
++		gfx::Size(1280, 720)
++	}};
 +
 +static constexpr std::array<float, 1> kDefaultDreamFrameRates{{30.0f}};
 +
@@ -1551,7 +1579,7 @@ index 38d6190..b8f091b 100644
    return nullptr;
  }
  
-@@ -419,11 +514,22 @@ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
+@@ -419,11 +518,22 @@ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
      VideoCaptureDeviceDescriptors* device_descriptors) {
    DCHECK(thread_checker_.CalledOnValidThread());
  
@@ -1578,7 +1606,7 @@ index 38d6190..b8f091b 100644
    }
  }
  
-@@ -463,18 +569,17 @@ void VideoCaptureDeviceFactoryWin::EnumerateDevicesUWP(
+@@ -463,18 +573,17 @@ void VideoCaptureDeviceFactoryWin::EnumerateDevicesUWP(
        &VideoCaptureDeviceFactoryWin::FoundAllDevicesUWP,
        base::Unretained(factory), base::Passed(&device_descriptors),
        base::Passed(&result_callback));
@@ -1608,7 +1636,7 @@ index 38d6190..b8f091b 100644
  
    ComPtr<ABI::Windows::Devices::Enumeration::IDeviceInformationStatics>
        dev_info_statics;
-@@ -699,6 +804,32 @@ bool VideoCaptureDeviceFactoryWin::EnumerateVideoDevicesMediaFoundation(
+@@ -699,6 +808,32 @@ bool VideoCaptureDeviceFactoryWin::EnumerateVideoDevicesMediaFoundation(
        mf_enum_device_sources_func_(attributes.Get(), devices, count));
  }
  
