@@ -75,7 +75,8 @@ RESULT DreamVCam::Update(void *pContext) {
 
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1000) {
+		// Approximately 30 FPS
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 30) {
 			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
@@ -160,9 +161,9 @@ RESULT DreamVCam::SetSourceTexture(texture *pTexture) {
 	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pSourceTexture);
 	CNM(pOGLTexture, "Source texture not compatible OpenGL Texture");
 
-	if (pOGLTexture->IsOGLPBOPackEnabled() == false) {
-		CRM(pOGLTexture->EnableOGLPBOPack(), "Failed to enable pack PBO on source texture");
-	}
+	//if (pOGLTexture->IsOGLPBOPackEnabled() == false) {
+	//	CRM(pOGLTexture->EnableOGLPBOPack(), "Failed to enable pack PBO on source texture");
+	//}
 
 Error:
 	return r;

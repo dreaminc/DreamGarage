@@ -1149,7 +1149,7 @@ Error:
 RESULT DreamOSTestSuite::AddTestDreamVCam() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 59000.0f;
+	double sTestTime = 500000.0f;
 	int nRepeats = 1;
 	//const int numTests = 5;
 
@@ -1208,62 +1208,31 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-		pUIProgramNode = pHAL->MakeProgramNode("uistage");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		//TODO: Matrix node
-		//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
-
-		// Connect output as pass-thru to internal blend program
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
-		m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-
 		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		// Aux
-
+		
 		CameraNode* pAuxCamera;
 		pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
 		CN(pAuxCamera);
 		CB(pAuxCamera->incRefCount());
 
-		// Skybox
-
-		pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 
 		// Reference Geometry Shader Program
-		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");		CN(pReferenceGeometryProgram);		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-		pUIProgramNode = pHAL->MakeProgramNode("uistage");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
-		
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");		CN(pSkyboxProgram);		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//*/
 
 		// Don't actually need to hook up the AUX node 
 		//// Connect to aux (we will likely need to reproduce the pipeline)
@@ -1272,6 +1241,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		//	CR(pAuxSinkNode->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 		//}
 
+		//CR(pDestSinkNode->ConnectToAllInputs(pSkyboxProgram->Output("output_framebuffer")));
 
 		// Hook up a texture
 		{
@@ -1279,7 +1249,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			CN(pTestContext);
 
 			pTestContext->pRenderNode = pRenderProgramNode;
-			pTestContext->pEndAuxNode = pUIProgramNode;
+			pTestContext->pEndAuxNode = pSkyboxProgram;
 
 			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 			CN(pLight);
@@ -1294,9 +1264,9 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
 			CN(pTestContext->pTexture);
 
-			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTestContext->pTexture);
-			CN(pOGLTexture);
-			CR(pOGLTexture->EnableOGLPBOPack());
+			//OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTestContext->pTexture);
+			//CN(pOGLTexture);
+			//CR(pOGLTexture->EnableOGLPBOPack());
 
 			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
 
@@ -1306,6 +1276,9 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			
 			CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
 				"Failed to set source texture for Dream VCam");
+
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
 		}
 		
 
@@ -1328,23 +1301,36 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		CN(pTestContext);
 
 		{
-			// Only the render node actually has a frame buffer
-			OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pTestContext->pRenderNode);
-			CN(pOGLProgram);
+			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
-			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pOGLProgram->GetOGLFramebufferColorTexture());
-			CN(pOGLTexture);
+			if (pTestContext->pDreamVCam != nullptr && pTestContext->pRenderNode != nullptr) {
 
-			if (pOGLTexture->IsOGLPBOPackEnabled()) {
-				CR(pOGLTexture->EnableOGLPBOPack());
+				std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+				// Approximately 30 FPS - 30 ms per frame is a bit faster
+				if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 30) {
+
+					// Only the render node actually has a frame buffer
+					OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pTestContext->pRenderNode);
+					CN(pOGLProgram);
+
+					OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pOGLProgram->GetOGLFramebufferColorTexture());
+					CN(pOGLTexture);
+
+					if (pOGLTexture->IsOGLPBOPackEnabled()) {
+						CR(pOGLTexture->EnableOGLPBOPack());
+					}
+
+					pTestContext->pDreamVCam->UnsetSourceTexture();
+					CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLTexture),
+						"Failed to set source texture for Dream VCam");
+
+
+					CR(pTestContext->pEndAuxNode->RenderNode(count++));
+
+					lastUpdateTime = timeNow;
+				}
 			}
-
-			pTestContext->pDreamVCam->UnsetSourceTexture();
-			CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLTexture),
-				"Failed to set source texture for Dream VCam");
-
-
-			CR(pTestContext->pEndAuxNode->RenderNode(count++));
 
 		}
 
