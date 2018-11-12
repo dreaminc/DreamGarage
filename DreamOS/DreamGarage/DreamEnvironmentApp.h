@@ -59,6 +59,7 @@ public:
 	RESULT FadeIn();
 	RESULT FadeOut(std::function<RESULT(void*)> fnFadeOutCallback = nullptr);
 
+	RESULT SendOnFadeInMessage(void *pContext);
 
 	RESULT SwitchToEnvironment(environment::type type);
 	RESULT GetSharedScreenPosition(point& ptPosition, quaternion& qOrientation, float& scale);
@@ -115,6 +116,8 @@ private:
 	float m_backAngle = 90.0f * (float)M_PI / 180.0f;
 
 	int m_maxSeatingIndex = 6;
+
+	std::string m_strOnFadeInString = "DreamEnvironmentApp.OnFadeIn";
 
 private:
 	ObjectStoreNode *m_pSceneGraph = nullptr;

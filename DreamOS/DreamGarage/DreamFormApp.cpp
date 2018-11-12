@@ -86,6 +86,8 @@ RESULT DreamFormApp::Update(void *pContext) {
 		CR(m_pDreamBrowserForm->InitializeWithBrowserManager(GetDOS()->GetUserApp()->GetBrowserManager(), m_strURL));
 
 		DOSLOG(INFO, "Created browser app for form: %s", m_strURL);
+
+		//Show();
 	}
 	if (m_fUpdateFormURL) {
 		m_fUpdateFormURL = false;
@@ -152,6 +154,12 @@ std::string DreamFormApp::StringFromType(FormType type) {
 	else if (type == FormType::SIGN_UP) {
 		strType = "FormKey.UsersSignUp";
 	}
+	else if (type == FormType::SIGN_UP_WELCOME) {
+		strType = "FormKey.UsersSignUpWelcome";
+	}
+	else if (type == FormType::ENVIRONMENTS_WELCOME) {
+		strType = "FormKey.EnvironmentsWelcome";
+	}
 	else if (type == FormType::SETTINGS) {
 		strType = "FormKey.UsersSettings";
 	}
@@ -171,6 +179,12 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	}
 	else if (strType == "FormKey.UsersSignUp") {
 		type = FormType::SIGN_UP;
+	}
+	else if (strType == "FormKey.UsersSignUpWelcome") {
+		type = FormType::SIGN_UP_WELCOME;
+	}
+	else if (strType == "FormKey.EnvironmentsWelcome") {
+		type = FormType::ENVIRONMENTS_WELCOME;
 	}
 	else if (strType == "FormKey.UsersSettings") {
 		type = FormType::SETTINGS;
@@ -330,6 +344,11 @@ RESULT DreamFormApp::SetAsActive() {
 	return R_PASS;
 }
 
+RESULT DreamFormApp::SetFormType(FormType type) {
+	m_formType = type;
+	return R_PASS;
+}
+
 RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
@@ -347,7 +366,8 @@ RESULT DreamFormApp::Notify(InteractionObjectEvent *pEvent) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr && 
 			pCloudController->IsUserLoggedIn() && 
-			pCloudController->IsEnvironmentConnected()) {
+			pCloudController->IsEnvironmentConnected() &&
+			m_formType != FormType::ENVIRONMENTS_WELCOME) {
 
 			if (GetDOS()->GetKeyboardApp()->IsVisible()) {
 				CR(m_pDreamBrowserForm->HandleUnfocusEvent());

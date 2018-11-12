@@ -193,6 +193,14 @@ Error:
 RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 	RESULT r = R_PASS;
 
+	auto fnOnFadeIn = [&](void *pContext) {
+
+		GetDOS()->SendDOSMessage(m_strOnFadeInString);
+
+		return R_PASS;
+	};
+	
+
 	auto fnOnFadeOut = [&](void *pContext) {
 		if (m_pCurrentEnvironmentModel != nullptr) {
 			m_pCurrentEnvironmentModel->SetVisible(true);
@@ -200,10 +208,19 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 			GetDOS()->GetUserApp()->HideMessageQuad();
 		}
 
-		m_pFadeProgram->FadeIn();
+		auto fnOnFadeIn2 = [&](void *pContext) {
+
+			GetDOS()->SendDOSMessage(m_strOnFadeInString);
+
+			return R_PASS;
+		};
+
+		m_pFadeProgram->FadeIn(std::bind(&DreamEnvironmentApp::SendOnFadeInMessage, this, std::placeholders::_1));
 
 		return R_PASS;
 	};
+
+
 
 	float fadeProgress = 0.0f;
 	CNR(m_pFadeProgram, R_SKIPPED);
@@ -218,7 +235,7 @@ RESULT DreamEnvironmentApp::ShowEnvironment(void *pContext) {
 			m_pCurrentEnvironmentModel->SetVisible(true);
 		}
 
-		m_pFadeProgram->FadeIn();
+		m_pFadeProgram->FadeIn(std::bind(&DreamEnvironmentApp::SendOnFadeInMessage, this, std::placeholders::_1));
 	}
 
 Error:
@@ -240,6 +257,15 @@ RESULT DreamEnvironmentApp::FadeOut(std::function<RESULT(void*)> fnFadeOutCallba
 
 	CNR(m_pFadeProgram, R_SKIPPED);
 	m_pFadeProgram->FadeOut(fnFadeOutCallback);
+
+Error:
+	return r;
+}
+
+RESULT DreamEnvironmentApp::SendOnFadeInMessage(void *pContext) {
+	RESULT r = R_PASS;
+
+	CR(GetDOS()->SendDOSMessage(m_strOnFadeInString));
 
 Error:
 	return r;

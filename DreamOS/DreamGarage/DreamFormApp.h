@@ -12,6 +12,8 @@ struct UIEvent;
 enum class FormType {
 	SIGN_IN,
 	SIGN_UP,
+	SIGN_UP_WELCOME,
+	ENVIRONMENTS_WELCOME,
 	SETTINGS,
 	TEAMS_MISSING,
 	DEFAULT,
@@ -70,6 +72,8 @@ public:
 
 	RESULT SetAsActive();
 
+	RESULT SetFormType(FormType type);
+
 private:
 	WebBrowserPoint GetRelativePointofContact(point ptContact);
 
@@ -98,6 +102,7 @@ protected:
 	bool m_fPendShowFormView = false;
 	bool m_fSetAsActive = false;
 
+	FormType m_formType;
 };
 
 #endif // ! DREAM_FORM_APP_H_
