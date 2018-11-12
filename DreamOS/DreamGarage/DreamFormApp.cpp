@@ -155,7 +155,7 @@ std::string DreamFormApp::StringFromType(FormType type) {
 		strType = "FormKey.UsersSignUp";
 	}
 	else if (type == FormType::SIGN_UP_WELCOME) {
-		strType = "FormKey.UsersSignUpWelcome";
+		strType = "FormKey.UsersWelcome";
 	}
 	else if (type == FormType::ENVIRONMENTS_WELCOME) {
 		strType = "FormKey.EnvironmentsWelcome";
@@ -180,7 +180,7 @@ FormType DreamFormApp::TypeFromString(std::string& strType) {
 	else if (strType == "FormKey.UsersSignUp") {
 		type = FormType::SIGN_UP;
 	}
-	else if (strType == "FormKey.UsersSignUpWelcome") {
+	else if (strType == "FormKey.UsersWelcome") {
 		type = FormType::SIGN_UP_WELCOME;
 	}
 	else if (strType == "FormKey.EnvironmentsWelcome") {
