@@ -1806,7 +1806,13 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 	}
 	else {
 		CR(m_pDreamGeneralForm->UpdateWithNewForm(strURL));
-		//CR(m_pDreamGeneralForm->Show());
+
+		// forms that show at the beginning of being in the environment wait until 
+		// the environment is faded in to show
+		if (strKey != DreamFormApp::StringFromType(FormType::ENVIRONMENTS_WELCOME)) {
+			CR(m_pDreamGeneralForm->Show());
+		}
+
 		CR(GetUserApp()->ResetAppComposite());
 
 		// Used for special case with disabling button presses on welcome form
