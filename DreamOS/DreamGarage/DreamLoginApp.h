@@ -47,7 +47,7 @@ public:
 	RESULT SaveTokens();
 	RESULT ClearTokens();
 
-	std::string GetSuccessString();
+	virtual std::string GetSuccessString() override;
 
 public:
 	std::string m_strSuccess = "DreamLoginApp.OnSuccess";

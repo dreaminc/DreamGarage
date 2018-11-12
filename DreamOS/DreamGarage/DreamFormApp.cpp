@@ -524,3 +524,7 @@ RESULT DreamFormApp::Hide() {
 Error:
 	return r;
 }
+
+std::string DreamFormApp::GetSuccessString() {
+	return m_strSuccess;
+}
