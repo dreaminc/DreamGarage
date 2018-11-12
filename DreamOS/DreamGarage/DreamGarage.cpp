@@ -1522,14 +1522,12 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 	auto pCloudController = GetCloudController();
 	if (pCloudController != nullptr && pCloudController->IsUserLoggedIn() && pCloudController->IsEnvironmentConnected()) {
 		// Resuming Dream functions if form was accessed out of Menu
-		if (strMessage == m_pDreamLoginApp->GetSuccessString()) {
-			m_pDreamUserControlArea->OnDreamFormSuccess();
+		if (strMessage == "DreamEnvironmentApp.OnFadeIn") {
+			m_pDreamUserApp->ResetAppComposite();
 		}
-		else if (strMessage == "DreamEnvironmentApp.OnFadeIn") {
-			if (m_fFirstLogin) {
-				m_pDreamGeneralForm->Show();
-				m_pDreamUserApp->ResetAppComposite();
-			}
+		// DreamFormApp success or DreamLoginApp success
+		else {
+			m_pDreamUserControlArea->OnDreamFormSuccess();
 		}
 	}
 	else {
@@ -1809,9 +1807,10 @@ RESULT DreamGarage::OnGetForm(std::string& strKey, std::string& strTitle, std::s
 
 		// forms that show at the beginning of being in the environment wait until 
 		// the environment is faded in to show
-		if (strKey != DreamFormApp::StringFromType(FormType::ENVIRONMENTS_WELCOME)) {
+		//if (strKey != DreamFormApp::StringFromType(FormType::ENVIRONMENTS_WELCOME) ||
+		//	(GetCloudController() != nullptr && !GetCloudController()->IsUserLoggedIn())) {
 			CR(m_pDreamGeneralForm->Show());
-		}
+		//}
 
 		CR(GetUserApp()->ResetAppComposite());
 
