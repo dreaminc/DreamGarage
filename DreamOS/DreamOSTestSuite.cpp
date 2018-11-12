@@ -1308,7 +1308,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 				std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 				// Approximately 30 FPS - 30 ms per frame is a bit faster
-				if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 30) {
+				if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 
 					// Only the render node actually has a frame buffer
 					OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pTestContext->pRenderNode);

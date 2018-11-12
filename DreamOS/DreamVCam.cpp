@@ -76,7 +76,7 @@ RESULT DreamVCam::Update(void *pContext) {
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 		// Approximately 30 FPS
-		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 30) {
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
