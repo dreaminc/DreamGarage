@@ -687,7 +687,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pLeftController->SetOrientation(qOrientation);
 
 						if (m_deviceType == HMDDeviceType::OCULUS) {
-							m_pLeftHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pLeftHand->SetPosition(ptControllerPosition); // - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pLeftHand->SetHandModelPosition(point(0.0f, -0.05f, 0.10f));
 							m_pLeftHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 						}
 						else {
@@ -706,7 +707,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pRightController->SetOrientation(qOrientation);
 
 						if (m_deviceType == HMDDeviceType::OCULUS) {
-							m_pRightHand->SetPosition(ptControllerPosition - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pRightHand->SetPosition(ptControllerPosition); // - (point(0.00629f, 0.02522f, -0.03469f) + ptOffset));
+							m_pRightHand->SetHandModelPosition(point(0.0f, -0.05f, 0.10f));
 							m_pRightHand->SetOrientation(qOrientation * quaternion::MakeQuaternionWithEuler(-39.4f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 						}
 						else {

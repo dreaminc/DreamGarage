@@ -393,6 +393,16 @@ Error:
 	return r;
 }
 
+RESULT hand::SetHandModelPosition(point ptOffset) {
+	RESULT r = R_PASS;
+
+	CNR(m_pModel, R_SKIPPED);
+	m_pModel->SetPosition(ptOffset);
+	
+Error:
+	return r;
+}
+
 RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
 	m_pModel->SetOrientation(qOrientation);
 	return R_PASS;

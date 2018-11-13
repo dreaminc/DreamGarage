@@ -84,6 +84,7 @@ public:
 	static hand::HandState GetDebugHandState(HAND_TYPE handType);
 	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
 	virtual RESULT SetHandModel(HAND_TYPE type);
+	RESULT SetHandModelPosition(point ptOffset);
 	RESULT SetHandModelOrientation(quaternion qOrientation);
 
 	std::shared_ptr<composite> GetModel(HAND_TYPE handType);
