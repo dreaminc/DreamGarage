@@ -87,27 +87,33 @@ protected:
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent);
 
+	hand *GetHand(HAND_TYPE type);
 	RESULT SetHand(hand* pHand);
 	RESULT ClearHands();
 
-	hand *GetHand(HAND_TYPE type);
 	RESULT CreateHapticImpulse(VirtualObj *pEventObj);
 
+	RESULT HandleUserObserverEvent(UserObserverEventType type);
+	
+public:
+	// used to set seating position created in DreamGarage and DreamEnvironmentApp
 	RESULT GetAppBasisPosition(point& ptOrigin);
 	RESULT GetAppBasisOrientation(quaternion& qOrigin) ;
 
-	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
-
-	RESULT HandleUserObserverEvent(UserObserverEventType type);
-
-	RESULT ResetAppComposite();
-	
-	// used to set seating position created in DreamGarage and DreamEnvironmentApp
 	RESULT SetAppCompositeOrientation(quaternion qOrientation);
 	RESULT SetAppCompositePosition(point ptPosition);
 
+	// used for app transitioning logic, helps with what happens when menu is pressed or 
+	// DreamFormSuccess is fired
 	RESULT SetHasOpenApp(bool fHasOpenApp);
 	RESULT SetEventApp(DreamUserObserver *pEventApp);
+	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
+
+	// Other apps 
+	RESULT ResetAppComposite();
+
+private:
+	RESULT UpdateCompositeWithHands(float yPos);
 
 //protected:
 public:
@@ -117,8 +123,6 @@ public:
 	RESULT UpdateOverlayTexture(HAND_TYPE type);
 	RESULT UpdateOverlayTextures();
 
-	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
-	RESULT UpdateCompositeWithHands(float yPos);
 
 // user settings
 public:
@@ -132,6 +136,7 @@ public:
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
+// Startup Message Quad
 public:
 	enum class StartupMessage {
 		WELCOME,

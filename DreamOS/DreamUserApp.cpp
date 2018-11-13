@@ -593,19 +593,6 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	return R_PASS;
 }
 
-RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
-
-	composite *pComposite = GetComposite();
-	auto pCamera = pComposite->GetCamera();
-	vector vLookXZ = pCamera->GetLookVectorXZ();
-	point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
-
-	m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-	m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-
-	return R_PASS;
-}
-
 RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	RESULT r = R_PASS;
 
