@@ -229,12 +229,12 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	m_pHead->SetVisible(false);
 	m_pHead->SetPosition(m_headOffset);
 
-//	float testZ = m_handType == HAND_TYPE::HAND_LEFT ? (float)M_PI_2 : -1.0f * (float)M_PI_2;
-	//m_pHead->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI, testZ));
-	//m_pHead->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI_2, 0.0f));
-	//m_pHead->SetVisible(false);
 
+	// the mallet head is used for the collision interactions with buttons
 	pDreamOS->AddInteractionObject(m_pHead.get());
+
+	// the hand is used to the intersection interactions like pointing
+	pDreamOS->AddInteractionObject(this);
 
 
 Error:

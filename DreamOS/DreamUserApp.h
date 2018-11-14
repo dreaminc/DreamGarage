@@ -20,9 +20,12 @@
 #include <stack>
 
 struct InteractionObjectEvent;
+struct HysteresisEvent;
 
+class HysteresisObject;
 class volume;
 class quad; 
+class sphere;
 class texture;
 class hand;
 class DimRay;
@@ -65,7 +68,9 @@ public:
 	virtual texture* GetOverlayTexture(HAND_TYPE type);
 };
 
-class DreamUserApp : public DreamApp<DreamUserApp>, public Subscriber<InteractionObjectEvent> {
+class DreamUserApp : public DreamApp<DreamUserApp>, 
+					public Subscriber<InteractionObjectEvent>,
+					public Subscriber<HysteresisEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
@@ -109,8 +114,24 @@ public:
 	RESULT SetEventApp(DreamUserObserver *pEventApp);
 	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
 
-	// Other apps 
 	RESULT ResetAppComposite();
+
+	// Pointing
+public:
+	virtual RESULT Notify(HysteresisEvent *mEvent);
+
+private:
+	sphere *m_pPointSphereLeft = nullptr;
+	sphere *m_pPointSphereRight = nullptr;
+
+	// Current Hysteresis Event (ON/OFF)
+	bool m_fLeftSphereOn = false;
+	bool m_fRightSphereOn = false;
+
+	bool m_fLeftSphereInteracting = false;
+	bool m_fRightSphereInteracting = false;
+
+	HysteresisObject *m_pPointingArea = nullptr;
 
 private:
 	RESULT UpdateCompositeWithHands(float yPos);
@@ -123,6 +144,7 @@ public:
 	RESULT UpdateOverlayTexture(HAND_TYPE type);
 	RESULT UpdateOverlayTextures();
 
+	RESULT UpdateHysteresisObject();
 
 // user settings
 public:
