@@ -87,6 +87,18 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->SetVisible(true);
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
+	m_pPointSphereLeft = pDreamOS->AddSphere(0.025f);
+	m_pPointSphereLeft->SetMaterialDiffuseColor(COLOR_RED);
+	m_pPointSphereLeft->SetVisible(false);
+
+	m_pPointSphereRight = pDreamOS->AddSphere(0.025f);
+	m_pPointSphereRight->SetMaterialDiffuseColor(COLOR_BLUE);
+	m_pPointSphereRight->SetVisible(false);
+
+	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.45f, 0.3f, CYLINDER);
+
+	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
+	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::OFF, this));
 
 	// user settings
 	m_userSettings = new UserSettings();
@@ -269,6 +281,23 @@ RESULT DreamUserApp::Update(void *pContext) {
 		}
 	}
 
+	CR(UpdateHysteresisObject());
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::UpdateHysteresisObject() {
+	RESULT r = R_PASS;
+
+	m_pPointingArea->SetPosition(GetDOS()->GetCamera()->GetPosition(true));
+	CR(m_pPointingArea->Update());
+
+	if (GetDOS()->IsSharing()) {
+		m_pPointSphereLeft->SetVisible(m_fLeftSphereOn && m_fLeftSphereInteracting);
+		m_pPointSphereRight->SetVisible(m_fRightSphereOn && m_fRightSphereInteracting);
+	}
+
 Error:
 	return r;
 }
@@ -389,6 +418,19 @@ Error:
 RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 	RESULT r = R_PASS;
 
+	auto pDreamOS = GetDOS();
+	auto pUserApp = pDreamOS->GetUserApp();
+	auto pLeftHand = pUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+	auto pRightHand = pUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+	auto handType = HAND_TYPE::HAND_INVALID;
+
+	if (mEvent->m_pInteractionObject == pLeftHand) {
+		handType = HAND_TYPE::HAND_LEFT;
+	}
+	else if (mEvent->m_pInteractionObject == pRightHand) {
+		handType = HAND_TYPE::HAND_RIGHT;
+	}
+
 	switch (mEvent->m_eventType) {
 
 	case (ELEMENT_INTERSECT_BEGAN): {
@@ -416,8 +458,36 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			}
 		}
 
+		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+			m_fLeftSphereInteracting = true;
+		}
+		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+			m_fRightSphereInteracting = true;
+		}
+
 	} break;
+
+	case ELEMENT_INTERSECT_MOVED: {
+
+		//*
+		if (handType == HAND_TYPE::HAND_LEFT) {
+			m_pPointSphereLeft->SetPosition(mEvent->m_ptContact[0]);
+		}
+		else if (handType == HAND_TYPE::HAND_RIGHT) {
+			m_pPointSphereRight->SetPosition(mEvent->m_ptContact[0]);
+		}
+		//*/
+
+	} break;
+
 	case (ELEMENT_INTERSECT_ENDED): {
+
+		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+			m_fLeftSphereInteracting = false;
+		}
+		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+			m_fRightSphereInteracting = false;
+		}
 
 		auto pEventObj = mEvent->m_pEventObject;
 		volume* pLeftVolume = nullptr;
@@ -456,11 +526,47 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 
 	} break;
+
 	case INTERACTION_EVENT_MENU: {
 		HideMessageQuad();
+	} break;
+
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	switch (mEvent->m_eventType) {
+
+	case HysteresisEventType::ON: {
+
+		if (m_pLeftHand == mEvent->m_pEventObject) {
+			m_fLeftSphereOn = true;
+		}
+		else if (m_pRightHand == mEvent->m_pEventObject) {
+			m_fRightSphereOn = true;
+		}
+
+	} break;
+
+	case HysteresisEventType::OFF: {
+
+		if (m_pLeftHand == mEvent->m_pEventObject) {
+			m_fLeftSphereOn = false;
+		}
+		else if (m_pRightHand == mEvent->m_pEventObject) {
+			m_fRightSphereOn = false;
+		}
+
+	} break;
+
 	}
-//Error:
+
+Error:
 	return r;
 }
 
@@ -495,6 +601,8 @@ RESULT DreamUserApp::SetHand(hand *pHand) {
 
 	pDreamOS->AddObject(pHand);
 	CR(pHand->InitializeWithContext(pDreamOS));
+
+	CR(m_pPointingArea->RegisterObject(pHand));
 
 	if (type == HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
@@ -593,19 +701,6 @@ RESULT DreamUserApp::SetAppCompositePosition(point ptPosition) {
 	return R_PASS;
 }
 
-RESULT DreamUserApp::UpdateCompositeWithCameraLook(float depth, float yPos) {
-
-	composite *pComposite = GetComposite();
-	auto pCamera = pComposite->GetCamera();
-	vector vLookXZ = pCamera->GetLookVectorXZ();
-	point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
-
-	m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
-	m_pAppBasis->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
-
-	return R_PASS;
-}
-
 RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 	RESULT r = R_PASS;
 
@@ -682,35 +777,12 @@ Error:
 
 }
 
-RESULT DreamUserApp::HandleKBEnterEvent() {
-	RESULT r = R_PASS;
-	CNR(m_pEventApp, R_SKIPPED);
-	m_pEventApp->HandleEvent(UserObserverEventType::KB_ENTER);
-Error:
-	return r;
-}
-
 RESULT DreamUserApp::HandleUserObserverEvent(UserObserverEventType type) {
 	RESULT r = R_PASS;
 	CNR(m_pEventApp, R_SKIPPED);
 	m_pEventApp->HandleEvent(type);
 Error:
 	return r;
-}
-
-RESULT DreamUserApp::GetStreamingState(bool& fStreaming) {
-	fStreaming = m_fStreaming;
-	return R_PASS;
-}
-
-RESULT DreamUserApp::SetStreamingState(bool fStreaming) {
-	m_fStreaming = fStreaming;
-	return R_PASS;
-}
-
-RESULT DreamUserApp::PreserveSharingState(bool fIsSharing) {
-	m_fIsSharing = fIsSharing;
-	return R_PASS;
 }
 
 RESULT DreamUserApp::ResetAppComposite() {

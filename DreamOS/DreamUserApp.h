@@ -20,9 +20,12 @@
 #include <stack>
 
 struct InteractionObjectEvent;
+struct HysteresisEvent;
 
+class HysteresisObject;
 class volume;
 class quad; 
+class sphere;
 class texture;
 class hand;
 class DimRay;
@@ -65,7 +68,9 @@ public:
 	virtual texture* GetOverlayTexture(HAND_TYPE type);
 };
 
-class DreamUserApp : public DreamApp<DreamUserApp>, public Subscriber<InteractionObjectEvent> {
+class DreamUserApp : public DreamApp<DreamUserApp>, 
+					public Subscriber<InteractionObjectEvent>,
+					public Subscriber<HysteresisEvent> {
 	friend class DreamAppManager;
 	friend class MultiContentTestSuite;
 	friend class DreamUserControlArea;
@@ -87,30 +92,49 @@ protected:
 public:
 	virtual RESULT Notify(InteractionObjectEvent *mEvent);
 
+	hand *GetHand(HAND_TYPE type);
 	RESULT SetHand(hand* pHand);
 	RESULT ClearHands();
 
-	hand *GetHand(HAND_TYPE type);
 	RESULT CreateHapticImpulse(VirtualObj *pEventObj);
 
+	RESULT HandleUserObserverEvent(UserObserverEventType type);
+	
+public:
+	// used to set seating position created in DreamGarage and DreamEnvironmentApp
 	RESULT GetAppBasisPosition(point& ptOrigin);
 	RESULT GetAppBasisOrientation(quaternion& qOrigin) ;
 
-	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
-
-	RESULT HandleKBEnterEvent();
-	RESULT HandleUserObserverEvent(UserObserverEventType type);
-
-	RESULT GetStreamingState(bool& fStreaming);
-	RESULT SetStreamingState(bool fStreaming);
-	RESULT PreserveSharingState(bool fIsSharing);
-
-	RESULT ResetAppComposite();
 	RESULT SetAppCompositeOrientation(quaternion qOrientation);
 	RESULT SetAppCompositePosition(point ptPosition);
 
+	// used for app transitioning logic, helps with what happens when menu is pressed or 
+	// DreamFormSuccess is fired
 	RESULT SetHasOpenApp(bool fHasOpenApp);
 	RESULT SetEventApp(DreamUserObserver *pEventApp);
+	RESULT SetPreviousApp(DreamUserObserver* pObserver) ;
+
+	RESULT ResetAppComposite();
+
+	// Pointing
+public:
+	virtual RESULT Notify(HysteresisEvent *mEvent);
+
+private:
+	sphere *m_pPointSphereLeft = nullptr;
+	sphere *m_pPointSphereRight = nullptr;
+
+	// Current Hysteresis Event (ON/OFF)
+	bool m_fLeftSphereOn = false;
+	bool m_fRightSphereOn = false;
+
+	bool m_fLeftSphereInteracting = false;
+	bool m_fRightSphereInteracting = false;
+
+	HysteresisObject *m_pPointingArea = nullptr;
+
+private:
+	RESULT UpdateCompositeWithHands(float yPos);
 
 //protected:
 public:
@@ -120,8 +144,7 @@ public:
 	RESULT UpdateOverlayTexture(HAND_TYPE type);
 	RESULT UpdateOverlayTextures();
 
-	RESULT UpdateCompositeWithCameraLook(float depth, float yPos);
-	RESULT UpdateCompositeWithHands(float yPos);
+	RESULT UpdateHysteresisObject();
 
 // user settings
 public:
@@ -135,6 +158,7 @@ public:
 
 	std::shared_ptr<CEFBrowserManager> GetBrowserManager();
 
+// Startup Message Quad
 public:
 	enum class StartupMessage {
 		WELCOME,
@@ -150,8 +174,6 @@ public:
 
 	RESULT ShowMessageQuad();
 	RESULT HideMessageQuad();
-
-	RESULT FadeInWithMessageQuad(StartupMessage startupMessage);
 
 private:
 	std::wstring k_wstrUpdateRequired = L"LaunchQuad/launch-update-required.png"; 

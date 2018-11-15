@@ -5,6 +5,7 @@
 #include "Primitives/texture.h"
 #include "DreamShareViewMessage.h"
 #include "DreamControlView/UIControlView.h"
+#include "DreamUserApp.h"
 
 #include "Sound/AudioPacket.h"
 #include "DreamGarage/AudioDataMessage.h"
@@ -29,6 +30,9 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	SetAppName("DreamShareView");
+
+	DreamOS *pDreamOS = GetDOS();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 
@@ -56,6 +60,10 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pCastBackgroundQuad->SetDiffuseTexture(GetDOS()->MakeTexture(texture::type::TEXTURE_2D, L"control-view-main-background.png"));
 	m_pCastBackgroundQuad->SetPosition(ptPosition + point(0.0f, 0.0f, -0.001f));
 	m_pCastBackgroundQuad->SetVisible(false);
+
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_BEGAN, pDreamUserApp.get()));
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_MOVED, pDreamUserApp.get()));
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_ENDED, pDreamUserApp.get()));
 
 	m_pVideoCastTexture = GetComposite()->MakeTexture(
 		texture::type::TEXTURE_2D,
@@ -330,10 +338,6 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 	RESULT r = R_PASS;
 
 	m_fStreaming = fStreaming;
-
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-	pDreamUserApp->SetStreamingState(fStreaming);
 
 Error:
 	return r;

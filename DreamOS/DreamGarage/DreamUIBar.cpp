@@ -332,8 +332,6 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				pKeyboardApp = nullptr;
 			} 
 
-			pDreamUserApp->PreserveSharingState(true);
-			
 			if (m_pParentApp != nullptr) {
 				CR(m_pParentApp->CreateBrowserSource(m_pMenuNode->GetScope()));
 			}

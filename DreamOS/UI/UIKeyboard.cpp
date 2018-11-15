@@ -363,7 +363,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	VirtualObj *pObj = nullptr;
 
 	InteractionEngineProxy *pProxy = nullptr;
-	DreamOS *pDOS = GetDOS();
+	DreamOS *pDreamOS = GetDOS();
 
 	UIKey *keyCollisions[2];
 	keyCollisions[0] = nullptr;
@@ -373,28 +373,23 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	std::vector<UIKey*> activeKeysToRemove;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = pDOS->GetUserApp();
-	CN(pDreamUserApp);
-
 	// skip keyboard interaction if not visible
 	//CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
 	CBR(GetComposite()->IsVisible(), R_SKIPPED);
 
-
-	CN(pDOS);
-	pProxy = pDOS->GetInteractionEngineProxy();
+	CN(pDreamOS);
+	pProxy = pDreamOS->GetInteractionEngineProxy();
 	CN(pProxy);
 
-	// Update Keys if the app is active
-	int i = 0;
-
-
-	hand* pLHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+	hand* pLHand = GetDOS()->GetHand(HAND_TYPE::HAND_LEFT);
 	CNR(pLHand, R_SKIPPED);
-	hand* pRHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+	hand* pRHand = GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT);
 	CNR(pRHand, R_SKIPPED);
 
 	CBR(m_pSurface, R_SKIPPED);
+
+	// Update Keys if the app is active
+	int i = 0;
 
 	//  Note: this predictive collision functionality is duplicated in control view
 	for (auto &hand : { pLHand, pRHand })
