@@ -540,19 +540,9 @@ Error:
 RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = nullptr;
-	if (m_pLeftHand == mEvent->m_pEventObject) {
-		pSphere = m_pPointSphereLeft;
-	}
-	else if (m_pRightHand == mEvent->m_pEventObject) {
-		pSphere = m_pPointSphereRight;
-	}
-
-	CNR(pSphere, R_SKIPPED);
 	switch (mEvent->m_eventType) {
-	case ON: {
-		//pMallet->Show();
-		//pSphere->SetVisible(true);
+
+	case HysteresisEventType::ON: {
 
 		if (m_pLeftHand == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = true;
@@ -563,9 +553,7 @@ RESULT DreamUserApp::Notify(HysteresisEvent *mEvent) {
 
 	} break;
 
-	case OFF: {
-		//pMallet->Hide();
-		//pSphere->SetVisible(false);
+	case HysteresisEventType::OFF: {
 
 		if (m_pLeftHand == mEvent->m_pEventObject) {
 			m_fLeftSphereOn = false;
