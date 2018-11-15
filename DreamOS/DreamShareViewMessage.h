@@ -11,7 +11,7 @@
 #include "DreamAppMessage.h"
 #include "Primitives/Types/UID.h"
 
-#define DREAM_BROWSER_APP_NAME "DreamShareView"
+#define DREAM_SHARE_VIEW_APP_NAME "DreamShareView.Share"
 
 class DreamShareViewMessage : public DreamAppMessage {
 

@@ -74,6 +74,10 @@ public:
 	// Environment
 	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
 
+	// Pointing
+	//RESULT UpdateSphere
+	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
+
 	struct PendingFrame {
 		bool fPending = false;
 		int pxWidth = 0;
@@ -120,6 +124,9 @@ private:
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
+
+	// Pointing members
+	std::map<long, std::vector<sphere*>> m_pointingObjects; // user id to left/right sphere
 
 private:
 //	std::shared_ptr<UIView> 

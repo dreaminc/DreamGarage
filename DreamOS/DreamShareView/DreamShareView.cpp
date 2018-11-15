@@ -113,22 +113,23 @@ RESULT DreamShareView::Shutdown(void *pContext) {
 RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
-	CN(pDreamShareViewMessage);
+	if (pDreamAppMessage->GetDreamAppName() == "DreamShareView.Share") {
+		DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
+		CN(pDreamShareViewMessage);
 
-	//currently, only store the most recent message received
-	m_currentMessageType = pDreamShareViewMessage->GetMessageType();
-	m_currentAckType = pDreamShareViewMessage->GetAckType();
+		//currently, only store the most recent message received
+		m_currentMessageType = pDreamShareViewMessage->GetMessageType();
+		m_currentAckType = pDreamShareViewMessage->GetAckType();
 
-	switch (pDreamShareViewMessage->GetMessageType()) {
-		case DreamShareViewMessage::type::PING: {
-			CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::PING));
-		} break;
+		switch (pDreamShareViewMessage->GetMessageType()) {
+			case DreamShareViewMessage::type::PING: {
+				CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::PING));
+			} break;
 
-		case DreamShareViewMessage::type::ACK: {
-			switch (pDreamShareViewMessage->GetAckType()) {
-				// We get a request streaming start ACK when we requested to start streaming
-				// This will begin broadcasting
+			case DreamShareViewMessage::type::ACK: {
+				switch (pDreamShareViewMessage->GetAckType()) {
+					// We get a request streaming start ACK when we requested to start streaming
+					// This will begin broadcasting
 				case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
 					if (IsStreaming()) {
 						// For non-changing stuff we need to send the current frame
@@ -136,12 +137,16 @@ RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, Dr
 					}
 
 				} break;
-			}
-		} break;
+				}
+			} break;
 
-		case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
-			CR(StartReceiving(pPeerConnection));
-		} break;
+			case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
+				CR(StartReceiving(pPeerConnection));
+			} break;
+		}
+	}
+	else if (pDreamAppMessage->GetDreamAppName() == "DreamShareView.Pointer") {
+
 	}
 
 Error:
@@ -550,6 +555,18 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	if (m_pSpatialBrowserObject != nullptr) {
 		m_pSpatialBrowserObject->SetPosition(ptPosition);
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand) {
+	RESULT r = R_PASS;
+
+	DreamUpdatePointerMessage *pDreamPointerMessage = new DreamUpdatePointerMessage(0, 0, GetAppUID(), ptPointer, cColor, fVisible, fLeftHand);
+	CN(pDreamPointerMessage);
+
+	CR(BroadcastDreamAppMessage(pDreamPointerMessage));
 
 Error:
 	return r;
