@@ -308,6 +308,7 @@ Global
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|ARM64.ActiveCfg = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|ARM64.Build.0 = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|x64.ActiveCfg = Production|x64
+		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|x64.Build.0 = Production|x64
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|x86.ActiveCfg = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusDevelopment|x86.Build.0 = Release|Win32
 		{05050918-71E9-AF87-0B3C-6F34D471A55A}.OculusProduction|Any CPU.ActiveCfg = Production|x64
