@@ -310,6 +310,7 @@
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
+    <ClCompile Include="..\..\..\DreamUpdatePointerMessage.cpp" />
     <ClCompile Include="..\..\..\DreamUserApp.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\OVRPlatformSDK_v1.24.0\Windows\OVR_PlatformLoader.cpp" />
@@ -605,6 +606,7 @@
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamPeerApp.h" />
+    <ClInclude Include="..\..\..\DreamUpdatePointerMessage.h" />
     <ClInclude Include="..\..\..\DreamUserApp.h" />
     <ClInclude Include="..\..\..\DreamVideoStreamSubscriber.h" />
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />

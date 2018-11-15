@@ -1009,6 +1009,9 @@
     <ClCompile Include="..\..\..\Primitives\HysteresisObject.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamUpdatePointerMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2196,6 +2199,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\HysteresisObject.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamUpdatePointerMessage.h">
+      <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

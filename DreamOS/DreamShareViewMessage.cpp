@@ -1,7 +1,7 @@
 #include "DreamShareViewMessage.h"
 
 DreamShareViewMessage::DreamShareViewMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, DreamShareViewMessage::type dreamBrowserMessageType, DreamShareViewMessage::type dreamBrowserAckType) :
-	DreamAppMessage(senderUserID, receiverUserID, DREAM_BROWSER_APP_NAME, uidSenderDreamApp, sizeof(DreamShareViewMessage))
+	DreamAppMessage(senderUserID, receiverUserID, DREAM_SHARE_VIEW_APP_NAME, uidSenderDreamApp, sizeof(DreamShareViewMessage))
 {
 	m_body.m_msgType = dreamBrowserMessageType;
 	m_body.m_ackMsgType = dreamBrowserAckType;
