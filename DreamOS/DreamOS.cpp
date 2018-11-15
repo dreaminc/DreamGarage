@@ -795,9 +795,8 @@ RESULT DreamOS::InitializeDreamUserApp() {
 	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CNM(m_pDreamUserApp, "Failed to launch dream user app");
 
-	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
-
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
 Error:
 	return r;

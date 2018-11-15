@@ -51,9 +51,18 @@ Error:
 RESULT UIButton::RegisterToInteractionEngine(DreamOS *pDreamOS) {
 	RESULT r = R_PASS;
 	
+	// could move back to something like this, if the button truly should be registered for everything
+	/*
 	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 		CR(pDreamOS->AddAndRegisterInteractionObject(this, (InteractionEventType)(i), this));
 	}
+	//*/
+
+	CR(pDreamOS->AddAndRegisterInteractionObject(this, ELEMENT_COLLIDE_BEGAN, this));
+	CR(pDreamOS->AddAndRegisterInteractionObject(this, ELEMENT_COLLIDE_MOVED, this));
+	CR(pDreamOS->AddAndRegisterInteractionObject(this, ELEMENT_COLLIDE_TRIGGER, this));
+	CR(pDreamOS->AddAndRegisterInteractionObject(this, ELEMENT_COLLIDE_ENDED, this));
+
 
 Error:
 	return r;

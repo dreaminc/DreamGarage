@@ -741,6 +741,7 @@ RESULT InteractionEngine::RemoveActiveObjects(std::map<VirtualObj*, std::vector<
 		if (activeObjectQueuePair.first == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_eventType = InteractionEventType::ELEMENT_INTERSECT_ENDED;
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay();
+			interactionEvent.m_pInteractionObject = pInteractionObject;
 		}
 		else if (activeObjectQueuePair.first == ActiveObject::type::COLLIDE) {
 			interactionEvent.m_eventType = InteractionEventType::ELEMENT_COLLIDE_ENDED;
