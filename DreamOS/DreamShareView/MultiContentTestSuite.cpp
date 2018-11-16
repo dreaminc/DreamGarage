@@ -1742,7 +1742,7 @@ RESULT MultiContentTestSuite::AddTestActiveSource() {
 						pTestContext->pUserControlArea->m_pDreamTabView->m_fForceContentFocus = true;
 						pTestContext->pUserControlArea->m_pDreamTabView->SelectTab(pButton.get(), nullptr);
 					}
-					*/
+					
 
 				}
 				else if (randAction == 9) {

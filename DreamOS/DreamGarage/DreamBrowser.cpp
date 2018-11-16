@@ -22,6 +22,7 @@
 #include "Core/Utilities.h"
 
 #include "Sound/SoundBuffer.h"
+#include "HAL\opengl\OGLTexture.h"	// necessary for the dynamic cast to enable PBO
 
 #include <thread>
 
@@ -565,7 +566,10 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
+	
+	CR(dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->EnableOGLPBOUnpack());
+
 	m_pLoadingScreenTexture = GetComposite()->MakeTexture(texture::type::TEXTURE_2D, (wchar_t*)(L"client-loading-1366-768.png"));
 	CN(m_pLoadingScreenTexture);
 	//m_pBrowserTexture = m_pLoadingScreenTexture;
@@ -748,7 +752,7 @@ Error:
 
 // TODO: Only update the rect
 // TODO: Turn off CEF when we're not using it
-RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
+RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
 	m_fFirstFrameIsReady = true;
@@ -759,14 +763,21 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 
 	CNR(m_pBrowserTexture, R_SKIPPED);
 
-	// Update texture dimensions if needed
-	CR(m_pBrowserTexture->UpdateDimensions(width, height));
-	if (r != R_NOT_HANDLED) {
-		DEBUG_LINEOUT("Changed chrome texture dimensions");
+	if (m_browserHeight != height || m_browserWidth != width) {
+		// Update texture dimensions if needed
+		CR(m_pBrowserTexture->UpdateDimensions(width, height));
+		if (r != R_NOT_HANDLED) {
+			DEBUG_LINEOUT("Changed chrome texture dimensions");
+		}
 	}
 
-	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-	
+	if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->IsOGLPBOUnpackEnabled()) {
+		m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
+	}
+	else {
+		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+	}
+
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);

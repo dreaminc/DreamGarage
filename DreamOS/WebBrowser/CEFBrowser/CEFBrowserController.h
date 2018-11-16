@@ -94,7 +94,7 @@ public:
 
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseDown, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
-	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;
+	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;	
 	virtual RESULT CloseBrowser() override;
 
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) override;
@@ -135,6 +135,8 @@ private:
 	// browser physical size (buffer size)
 	int m_bufferWidth = 0;
 	int m_bufferHeight = 0;
+
+	bool m_fUseOGLPBO = false;
 
 	// reference to the browser object
 	CefRefPtr<CefBrowser> m_pCEFBrowser;

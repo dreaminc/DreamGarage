@@ -53,6 +53,10 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestDreamBrowser());
+
+	CR(AddTestDreamDesktop());
+
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
@@ -60,8 +64,6 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestEnvironmentSeating());
 
 	CR(AddTestModuleManager());
-
-	CR(AddTestDreamBrowser());
 
 	CR(AddTestCredentialStorage());
 
@@ -73,11 +75,7 @@ RESULT DreamOSTestSuite::AddTests() {
 
 	CR(AddTestCredentialStorage());
 
-	CR(AddTestMeta());
-	
-	CR(AddTestDreamDesktop());
-
-	CR(AddTestDreamBrowser());		
+	CR(AddTestMeta());	
 
 	CR(AddTestDreamOS());
 
@@ -659,8 +657,9 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
 		//std::string strURL = "https://twitch.tv";
-		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
-		
+		//std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		std::string strURL = "https://www.youtube.com/watch?v=B9mEIZ3qMTw";
+
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
@@ -683,7 +682,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		CR(pTestContext->m_pWebBrowserManager->Initialize());
 			
 		// This presents a timing issue if it works 
-		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(3.0f, 3.0f);
+		pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
 		CN(pTestContext->m_pBrowserQuad);
 		pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
 		pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);

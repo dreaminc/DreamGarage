@@ -67,7 +67,7 @@ RESULT CEFBrowserController::PollFrame() {
 	
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
-		CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+		CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
 	}
 
 Error:
@@ -83,9 +83,9 @@ RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 
 	if (m_pWebBrowserControllerObserver != nullptr) {
 		for (auto& dirtyFrame : m_NewDirtyFrames) {
-			WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
+			//WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
 			
-			CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+			CR(m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
 		
 			rNumFramesProcessed++;
 		}
@@ -439,7 +439,6 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
-
 	size_t pBuffer_n = width * height * 4;
 
 	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
