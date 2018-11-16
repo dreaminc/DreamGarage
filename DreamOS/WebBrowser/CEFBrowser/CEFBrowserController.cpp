@@ -343,11 +343,6 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::UseOGLPBOUnpack() {
-	m_fUseOGLPBO = true;
-	return R_PASS;
-}
-
 RESULT CEFBrowserController::CloseBrowser() {
 	RESULT r = R_PASS;
 
@@ -443,39 +438,20 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	RESULT r = R_PASS;
 	//DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
-	if (m_fUseOGLPBO) {
-		bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
+	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
+	size_t pBuffer_n = width * height * 4;
 
-		if (fSizeChanged) {
-			m_bufferWidth = width;
-			m_bufferHeight = height;
-			DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
-		}
+	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
 
-		size_t pBuffer_n = width * height * 4;
-		m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
-		if (m_pWebBrowserControllerObserver != nullptr) {
-			m_pWebBrowserControllerObserver->OnPaint(&m_vectorBuffer[0], width, height);
-		}
-		m_vectorBuffer.clear();
+	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
+
+	if (fSizeChanged) {
+		m_bufferWidth = width;
+		m_bufferHeight = height;
+		DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
 	}
-	else {
-		std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
-		size_t pBuffer_n = width * height * 4;
-
-		m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
-
-		bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
-
-		if (fSizeChanged) {
-			m_bufferWidth = width;
-			m_bufferHeight = height;
-			DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
-		}
-
-		m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
-	}
+	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
 
 //Error:
 	return r;

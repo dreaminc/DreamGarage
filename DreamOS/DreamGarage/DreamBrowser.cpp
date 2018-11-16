@@ -645,10 +645,6 @@ RESULT DreamBrowser::InitializeWithBrowserManager(std::shared_ptr<WebBrowserMana
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->RegisterWebBrowserControllerObserver(this));
 
-	//if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->GetOGLTexturePixelUnpackBufferIndex() != 0) {
-		//m_pWebBrowserController->UseOGLPBOUnpack();
-	//}
-	m_browserRenderProcessingThread = std::thread(&DreamBrowser::RenderProcess, this);
 	// Set up the audio system (captures audio from browser, pushes it into a buffer)
 	CRM(InitializeDreamBrowserSoundSystem(), "Failed to initialize sound system for browser");
 
@@ -775,12 +771,12 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 		}
 	}
 
-	//if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->GetOGLTexturePixelUnpackBufferIndex() != 0) {
+	if (dynamic_cast<OGLTexture*>(m_pBrowserTexture.get())->IsOGLPBOUnpackEnabled()) {
 		m_pBrowserTexture->UpdateTextureFromBuffer((unsigned char*)pBuffer, width * height * 4);
-	//}
-	//else {
-	//	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
-	//}
+	}
+	else {
+		CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, PIXEL_FORMAT::BGRA));
+	}
 
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
@@ -792,21 +788,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 Error:
 	return r;
 }
-/*
-RESULT DreamBrowser::RenderProcess() {
-	RESULT r = R_PASS;
 
-	int numFramesProcessed = 0;
-	CN(m_pWebBrowserController);
-	while (true) {
-		m_pWebBrowserController->PollNewDirtyFrames(numFramesProcessed);
-		Sleep(1000);
-	}
-	
-Error:
-	return r;
-}
-*/
 RESULT DreamBrowser::InitializeDreamBrowserSoundSystem() {
 	RESULT r = R_PASS;
 

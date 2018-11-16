@@ -94,12 +94,15 @@ public:
 	RESULT EnableOGLPBOUnpack();
 	RESULT EnableOGLPBOPack();
 
+	bool IsOGLPBOUnpackEnabled();
+	bool IsOGLPBOPackEnabled();
+
 private:
 	// TODO: More?
-	GLuint m_glPixelUnpackBuferIndex = 0;
+	GLuint m_glPixelUnpackBufferIndex = 0;
 
 	int m_packBufferIndex = 0;
-	GLuint m_glPixelPackBuferIndex[NUM_PACK_BUFFERS] = { 0 };
+	GLuint m_glPixelPackBufferIndex[NUM_PACK_BUFFERS] = { 0 };
 };
 
 #endif // !OGL_TEXTURE_H_

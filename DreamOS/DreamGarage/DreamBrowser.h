@@ -281,10 +281,6 @@ private:
 	sound::state m_soundState = sound::state::UNINITIALIZED;
 	SoundBuffer *m_pRenderSoundBuffer = nullptr;
 	std::thread	m_browserAudioProcessingThread;
-
-	RESULT RenderProcess();
-
-	std::thread m_browserRenderProcessingThread;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

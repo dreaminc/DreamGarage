@@ -60,7 +60,7 @@ RESULT CEFBrowserManager::Update() {
 		// TODO: optimize with actual dirty rects copy
 		
 		int numFramesProcessed = 0;
-		//CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
+		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
 
 		CR(pWebBrowserController->PollPendingAudioPackets(numFramesProcessed));
 	}

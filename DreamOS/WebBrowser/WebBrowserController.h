@@ -90,7 +90,6 @@ public:
 	// This function can be called by any thread.
 	virtual RESULT PollFrame() = 0;
 
-	virtual RESULT UseOGLPBOUnpack() = 0;
 	virtual RESULT CloseBrowser() = 0;
 
 	// Mouse

@@ -35,15 +35,15 @@ OGLTexture::~OGLTexture() {
 		m_glTextureIndex = 0;
 	}
 
-	if (m_glPixelUnpackBuferIndex != 0) {
-		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBuferIndex);
-		m_glPixelUnpackBuferIndex = 0;
+	if (m_glPixelUnpackBufferIndex != 0) {
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBufferIndex);
+		m_glPixelUnpackBufferIndex = 0;
 	}
 
 	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
-		if (m_glPixelPackBuferIndex[i] != 0) {
-			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBuferIndex[i]));
-			m_glPixelPackBuferIndex[i] = 0;
+		if (m_glPixelPackBufferIndex[i] != 0) {
+			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBufferIndex[i]));
+			m_glPixelPackBufferIndex[i] = 0;
 		}
 	}
 }
@@ -53,11 +53,11 @@ RESULT OGLTexture::Bind() {
 }
 
 RESULT OGLTexture::BindPixelUnpackBuffer(int index) {
-	return m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBuferIndex);
+	return m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex);
 }
 
 RESULT OGLTexture::BindPixelPackBuffer(int index) {
-	return m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBuferIndex[index]);
+	return m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBufferIndex[index]);
 }
 
 RESULT OGLTexture::SetTextureParameter(GLenum paramName, GLint paramVal) {
@@ -528,7 +528,7 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 
 	PIXEL_FORMAT pixelFormat = m_pixelFormat;
 
-	if (m_glPixelPackBuferIndex[0] != 0) {
+	if (m_glPixelPackBufferIndex[0] != 0) {
 		//// Set the target framebuffer to read
 		// glReadBuffer(GL_FRONT);
 
@@ -577,7 +577,7 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 	CR(Bind());
 
-	if (m_glPixelUnpackBuferIndex != 0) {
+	if (m_glPixelUnpackBufferIndex != 0) {
 		CR(BindPixelUnpackBuffer());
 
 		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
@@ -647,9 +647,9 @@ RESULT OGLTexture::EnableOGLPBOUnpack() {
 	// Create pixel unpack buffer objects
 	// glBufferData() with NULL pointer reserves only memory space
 
-	CR(m_pParentImp->glGenBuffers(1, &m_glPixelUnpackBuferIndex));
+	CR(m_pParentImp->glGenBuffers(1, &m_glPixelUnpackBufferIndex));
 
-	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBuferIndex));
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex));
 	CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, GetTextureSize(), 0, GL_STREAM_DRAW));
 
 	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
@@ -664,10 +664,10 @@ RESULT OGLTexture::EnableOGLPBOPack() {
 	// Create pixel unpack buffer objects
 	// glBufferData() with NULL pointer reserves only memory space
 
-	CR(m_pParentImp->glGenBuffers(NUM_PACK_BUFFERS, m_glPixelPackBuferIndex));
+	CR(m_pParentImp->glGenBuffers(NUM_PACK_BUFFERS, m_glPixelPackBufferIndex));
 
 	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
-		CR(m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBuferIndex[i]));
+		CR(m_pParentImp->glBindBuffer(GL_PIXEL_PACK_BUFFER, m_glPixelPackBufferIndex[i]));
 		CR(m_pParentImp->glBufferData(GL_PIXEL_PACK_BUFFER, GetTextureSize(), 0, GL_STREAM_READ));
 	}
 
@@ -675,4 +675,19 @@ RESULT OGLTexture::EnableOGLPBOPack() {
 
 Error:
 	return r;
+}
+
+bool OGLTexture::IsOGLPBOPackEnabled() {
+	bool fEnabled = false;
+	if (m_glPixelPackBufferIndex[0] != 0) {
+		fEnabled = true;
+	}
+	return fEnabled;
+}
+bool OGLTexture::IsOGLPBOUnpackEnabled() {
+	bool fEnabled = false;
+	if (m_glPixelUnpackBufferIndex != 0) {
+		fEnabled = true;
+	}
+	return fEnabled;
 }
