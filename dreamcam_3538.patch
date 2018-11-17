@@ -1378,7 +1378,7 @@ index 0000000..8089c53
 +
 +#endif  // MEDIA_CAPTURE_VIDEO_DREAM_VIDEO_CAPTURE_DEVICE_H_
 diff --git a/media/capture/video/win/video_capture_device_factory_win.cc b/media/capture/video/win/video_capture_device_factory_win.cc
-index 38d6190..7494427 100644
+index 38d6190..1ba2ec2 100644
 --- a/media/capture/video/win/video_capture_device_factory_win.cc
 +++ b/media/capture/video/win/video_capture_device_factory_win.cc
 @@ -31,13 +31,15 @@
@@ -1419,7 +1419,7 @@ index 38d6190..7494427 100644
  };
  
  const std::pair<VideoCaptureApi, std::vector<std::pair<GUID, GUID>>>
-@@ -379,39 +384,133 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
+@@ -379,39 +384,134 @@ VideoCaptureDeviceFactoryWin::~VideoCaptureDeviceFactoryWin() {
    }
  }
  
@@ -1435,7 +1435,8 @@ index 38d6190..7494427 100644
 +		gfx::Size(1280, 720)
 +	}};
 +
-+static constexpr std::array<float, 1> kDefaultDreamFrameRates{{30.0f}};
++//static constexpr std::array<float, 1> kDefaultDreamFrameRates{{30.0f}};
++static constexpr std::array<float, 1> kDefaultDreamFrameRates{{24.0f}};
 +
 +static const double kInitialZoom = 100.0;
 +
@@ -1579,7 +1580,7 @@ index 38d6190..7494427 100644
    return nullptr;
  }
  
-@@ -419,11 +518,22 @@ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
+@@ -419,11 +519,22 @@ void VideoCaptureDeviceFactoryWin::GetDeviceDescriptors(
      VideoCaptureDeviceDescriptors* device_descriptors) {
    DCHECK(thread_checker_.CalledOnValidThread());
  
@@ -1606,7 +1607,7 @@ index 38d6190..7494427 100644
    }
  }
  
-@@ -463,18 +573,17 @@ void VideoCaptureDeviceFactoryWin::EnumerateDevicesUWP(
+@@ -463,18 +574,17 @@ void VideoCaptureDeviceFactoryWin::EnumerateDevicesUWP(
        &VideoCaptureDeviceFactoryWin::FoundAllDevicesUWP,
        base::Unretained(factory), base::Passed(&device_descriptors),
        base::Passed(&result_callback));
@@ -1636,7 +1637,7 @@ index 38d6190..7494427 100644
  
    ComPtr<ABI::Windows::Devices::Enumeration::IDeviceInformationStatics>
        dev_info_statics;
-@@ -699,6 +808,32 @@ bool VideoCaptureDeviceFactoryWin::EnumerateVideoDevicesMediaFoundation(
+@@ -699,6 +809,32 @@ bool VideoCaptureDeviceFactoryWin::EnumerateVideoDevicesMediaFoundation(
        mf_enum_device_sources_func_(attributes.Get(), devices, count));
  }
  
