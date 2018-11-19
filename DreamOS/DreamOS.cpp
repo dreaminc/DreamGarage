@@ -21,6 +21,8 @@
 #include "PeerAckMessage.h"
 #include "PeerStayAliveMessage.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -616,6 +618,25 @@ point DreamOS::GetCameraPosition() {
 
 hand *DreamOS::GetHand(HAND_TYPE handType) {
 	return m_pSandbox->GetHand(handType);
+}
+
+ProgramNode* DreamOS::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+	RESULT r = R_PASS;
+
+	ProgramNode *pProgramNode = nullptr;
+
+	pProgramNode = m_pSandbox->MakeProgramNode(strNodeName, optFlags);
+	CN(pProgramNode);
+
+	return pProgramNode;
+
+Error:
+	if (pProgramNode != nullptr) {
+		delete pProgramNode;
+		pProgramNode = nullptr;
+	}
+
+	return nullptr;
 }
 
 quaternion DreamOS::GetCameraOrientation() {

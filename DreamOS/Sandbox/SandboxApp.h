@@ -378,6 +378,8 @@ public:
 	user *AddUser();
 	user *MakeUser();
 
+	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+
 	// Cloud Controller 
 public:
 	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);

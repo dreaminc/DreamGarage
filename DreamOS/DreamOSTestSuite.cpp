@@ -1214,6 +1214,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
+		/*
 		// Aux
 		
 		CameraNode* pAuxCamera;
@@ -1274,11 +1275,12 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pRenderProgramNode);
 			CN(pOGLProgram);
 			
-			CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
-				"Failed to set source texture for Dream VCam");
+			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
+			//	"Failed to set source texture for Dream VCam");
 
 			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+			//CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+			CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
 		}
 		
 
@@ -1300,6 +1302,8 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
+		/* 
+		// Now done in the module
 		{
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 
@@ -1331,8 +1335,8 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 					lastUpdateTime = timeNow;
 				}
 			}
-
 		}
+		*/
 
 	Error:
 		return r;

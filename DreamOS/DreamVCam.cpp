@@ -10,6 +10,9 @@
 
 #include "Sandbox/NamedPipeServer.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/opengl/OGLProgram.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {
@@ -47,8 +50,40 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pLoadBuffer = (unsigned char*) malloc(m_pLoadBuffer_n);
 	CNM(m_pLoadBuffer, "Failed to allocate DreamCam buffer");
 
+	// Set up the aux camera and local pipeline
+
+	// TODO: 
+
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+	CN(m_pCamera);
+	CB(m_pCamera->incRefCount());
+
+	ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode *pReferenceGeometryProgram = GetDOS()->MakeProgramNode("reference");	CN(pReferenceGeometryProgram);	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode *pSkyboxProgram = GetDOS()->MakeProgramNode("skybox_scatter");	CN(pSkyboxProgram);	CR(pSkyboxProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));	CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	m_pOGLRenderNode = dynamic_cast<OGLProgram*>(pRenderProgramNode);
+	CN(m_pOGLRenderNode);
+	
+	m_pOGLEndNode = dynamic_cast<OGLProgram*>(pSkyboxProgram);
+	CN(m_pOGLEndNode);
+
+	CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
+
 Error:
 	return r;
+}
+
+CameraNode *DreamVCam::GetCameraNode() {
+	return m_pCamera;
 }
 
 RESULT DreamVCam::HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
@@ -77,6 +112,20 @@ RESULT DreamVCam::Update(void *pContext) {
 
 		// Approximately 30 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
+			
+			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pOGLRenderNode->GetOGLFramebufferColorTexture());
+			CN(pOGLTexture);
+
+			if (pOGLTexture->IsOGLPBOPackEnabled()) {
+				CR(pOGLTexture->EnableOGLPBOPack());
+			}
+
+			UnsetSourceTexture();
+			CRM(SetSourceTexture(pOGLTexture), "Failed to set source texture for Dream VCam");
+
+			// Update the local render
+			CR(m_pOGLEndNode->RenderNode(count++));
+			
 			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {

@@ -1627,6 +1627,27 @@ Error:
 	return nullptr;
 }
 
+ProgramNode* SandboxApp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+	RESULT r = R_PASS;
+
+	ProgramNode *pProgramNode = nullptr;
+
+	CN(m_pHALImp);
+
+	pProgramNode = m_pHALImp->MakeProgramNode(strNodeName, optFlags);
+	CN(pProgramNode);
+
+	return pProgramNode;
+
+Error:
+	if (pProgramNode != nullptr) {
+		delete pProgramNode;
+		pProgramNode = nullptr;
+	}
+
+	return nullptr;
+}
+
 model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 

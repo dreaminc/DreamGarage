@@ -455,6 +455,9 @@ public:
 	// Hands
 	hand *GetHand(HAND_TYPE handType);
 
+	// Shaders / Programs
+	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
+
 protected:
 	long GetTickCount();
 

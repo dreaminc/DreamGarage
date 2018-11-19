@@ -87,6 +87,7 @@ public:
 						 rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory,
 						 WebRTCConductor *pParentWebRTCConductor
 						 );
+
 	~WebRTCPeerConnection();
 
 	// TODO: Generalize this when we add renegotiation 

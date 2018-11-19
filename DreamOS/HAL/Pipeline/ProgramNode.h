@@ -14,7 +14,7 @@
 class ProgramNode : public DNode {
 public:
 	ProgramNode(std::string strName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
-	~ProgramNode();
+	virtual ~ProgramNode();
 
 	virtual RESULT SetupConnections() = 0;
 	virtual RESULT ProcessNode(long frameID = 0) = 0;
