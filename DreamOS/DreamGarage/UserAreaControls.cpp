@@ -41,12 +41,12 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 
 	float backOffset = start + buttonWidth / 2.0f;
 	float forwardOffset = backOffset + spacingSize + buttonWidth;
-	float closeOffset = forwardOffset + spacingSize + buttonWidth;
+	float shareOffset = forwardOffset + spacingSize + buttonWidth;
 
 	float urlOffset = 0.0f;
-	float shareOffset = urlOffset + (m_urlWidth * width / 2.0f) + buttonWidth / 2.0f + spacingSize;
-	float openOffset = shareOffset + spacingSize + buttonWidth;
+	float openOffset = urlOffset + (m_urlWidth * width / 2.0f) + buttonWidth / 2.0f + spacingSize;
 	float hideOffset = openOffset + spacingSize + buttonWidth;
+	float closeOffset = hideOffset + spacingSize + buttonWidth;
 
 	//GetDOS()->AddObjectToUIGraph(GetComposite());
 
@@ -86,9 +86,9 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UserAreaControls::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[2], controlTextures[3]);
 
-	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
-		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[4]);
+	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[7], controlTextures[8]);
 
 // Re-enable for selectability of the URL button
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
@@ -100,13 +100,13 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UserAreaControls::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[6]);
 
-	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
-		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[7], controlTextures[8]);
-
 	m_pMinimizeButton = AddButton(hideOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[9], controlTextures[10]);
+
+	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[4]);
 
 	CN(m_pBackButton);
 	CN(m_pForwardButton);
