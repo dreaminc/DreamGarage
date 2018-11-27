@@ -1,7 +1,7 @@
 #include "DreamUpdatePointerMessage.h"
 
 DreamUpdatePointerMessage::DreamUpdatePointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, color cColor, bool fVisible, bool fLeftHand) :
-	DreamAppMessage(senderUserID, receiverUserID, DREAM_SHARE_VIEW_APP_NAME, uidSenderDreamApp, sizeof(DreamUpdatePointerMessage))
+	DreamAppMessage(senderUserID, receiverUserID, DREAM_SHARE_POINTER_APP_NAME, uidSenderDreamApp, sizeof(DreamUpdatePointerMessage))
 {
 	m_body.ptPointer = ptPointer;
 	m_body.cColor = cColor;

@@ -10,7 +10,7 @@
 #include "Primitives/point.h"
 #include "Primitives/color.h"
 
-#define DREAM_SHARE_VIEW_APP_NAME "DreamShareView.Pointer"
+#define DREAM_SHARE_POINTER_APP_NAME "DreamShareView"
 
 class DreamUpdatePointerMessage : public DreamAppMessage {
 

@@ -7,12 +7,15 @@
 #include "DreamAppHandle.h"
 #include "DreamVideoStreamSubscriber.h"
 #include "DreamShareViewMessage.h"
+#include "DreamUpdatePointerMessage.h"
 #include "DreamUserApp.h"
 
 #include "DreamGarage/UICommon.h"
 
 class quad;
 class texture;
+class color;
+
 class AudioPacket;
 class SpatialSoundObject;
 class AudioDataMessage;
@@ -54,6 +57,7 @@ public:
 	// App Messaging
 	RESULT BeginStream();
 	RESULT BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
+	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
@@ -75,8 +79,9 @@ public:
 	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
 
 	// Pointing
-	//RESULT UpdateSphere
-	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
+	RESULT BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand);
+	RESULT UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand);
+	RESULT AllocateSpheres(long userID);
 
 	struct PendingFrame {
 		bool fPending = false;
@@ -127,6 +132,8 @@ private:
 
 	// Pointing members
 	std::map<long, std::vector<sphere*>> m_pointingObjects; // user id to left/right sphere
+
+	std::queue<sphere*> m_pointerSpherePool;
 
 private:
 //	std::shared_ptr<UIView> 

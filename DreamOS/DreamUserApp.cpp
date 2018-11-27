@@ -293,10 +293,15 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	m_pPointingArea->SetPosition(GetDOS()->GetCamera()->GetPosition(true));
 	CR(m_pPointingArea->Update());
 
+	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fLeftSphereOn && m_fLeftSphereInteracting, true));
+	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fRightSphereOn && m_fRightSphereInteracting, false));
+
+	/*
 	if (GetDOS()->IsSharing()) {
 		m_pPointSphereLeft->SetVisible(m_fLeftSphereOn && m_fLeftSphereInteracting);
 		m_pPointSphereRight->SetVisible(m_fRightSphereOn && m_fRightSphereInteracting);
 	}
+	//*/
 
 Error:
 	return r;
@@ -469,12 +474,23 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	case ELEMENT_INTERSECT_MOVED: {
 
+		auto pCloudController = GetDOS()->GetCloudController();
+		CBR(pCloudController, R_SKIPPED);
+
+		long userID;
+		userID = pCloudController->GetUserID();
+
+		CBR(userID != -1, R_SKIPPED);
 		//*
 		if (handType == HAND_TYPE::HAND_LEFT) {
 			m_pPointSphereLeft->SetPosition(mEvent->m_ptContact[0]);
+
+			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], true));
 		}
 		else if (handType == HAND_TYPE::HAND_RIGHT) {
 			m_pPointSphereRight->SetPosition(mEvent->m_ptContact[0]);
+
+			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], false));
 		}
 		//*/
 
