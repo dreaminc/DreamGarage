@@ -1418,6 +1418,26 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand) {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamShareView);
+	CR(m_pDreamShareView->BroadcastUpdatePointerMessage(fVisible, fLeftHand));
+
+Error:
+	return R_PASS;
+}
+
+RESULT DreamOS::UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand) {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamShareView);
+	CR(m_pDreamShareView->UpdatePointerPosition(userID, ptPosition, fLeftHand));
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket) {
 	RESULT r = R_PASS;
 

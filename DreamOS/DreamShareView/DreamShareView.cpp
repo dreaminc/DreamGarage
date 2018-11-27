@@ -3,6 +3,8 @@
 
 #include "Primitives/quad.h"
 #include "Primitives/texture.h"
+#include "Primitives/color.h"
+
 #include "DreamShareViewMessage.h"
 #include "DreamControlView/UIControlView.h"
 #include "DreamUserApp.h"
@@ -87,6 +89,20 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pSpatialBrowserObject = GetDOS()->AddSpatialSoundObject(point(0.0f, 0.0f, 0.0f), vector(), vector());
 	CN(m_pSpatialBrowserObject);
 
+	for (int i = 0; i < 12; i++) {
+
+		auto pSphere = GetDOS()->AddSphere(0.025f);
+		pSphere->SetVisible(false);
+		if (i % 2 == 0) {
+			pSphere->SetMaterialDiffuseColor(COLOR_RED);
+		}
+		else {
+			pSphere->SetMaterialDiffuseColor(COLOR_BLUE);
+		}
+
+		m_pointerSpherePool.push(pSphere);
+	}
+
 Error:
 	return r;
 }
@@ -146,7 +162,29 @@ RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, Dr
 		}
 	}
 	else if (pDreamAppMessage->GetDreamAppName() == "DreamShareView.Pointer") {
+		DreamUpdatePointerMessage *pUpdatePointerMessage = (DreamUpdatePointerMessage*)(pDreamAppMessage);
+		CN(pUpdatePointerMessage);
 
+		if (m_fReceivingStream || IsStreaming()) {
+			sphere *pPointer;
+			long userID = pUpdatePointerMessage->GetSenderUserID();
+
+			CR(UpdatePointerPosition(pUpdatePointerMessage->GetSenderUserID(),
+				pUpdatePointerMessage->m_body.ptPointer,
+				pUpdatePointerMessage->m_body.fLeftHand));
+
+			if (pUpdatePointerMessage->m_body.fLeftHand) {
+				pPointer = m_pointingObjects[userID][0];
+				pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+				pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+			}
+			else {
+				pPointer = m_pointingObjects[userID][1];
+				pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+				pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+			}
+
+		}
 	}
 
 Error:
@@ -365,6 +403,18 @@ Error:
 	return r;
 }
 
+RESULT DreamShareView::BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand) {
+	RESULT r = R_PASS;
+
+	DreamUpdatePointerMessage *pUpdatePointerMessage = new DreamUpdatePointerMessage(0, 0, GetAppUID(), ptPointer, cColor, fVisible, fLeftHand);
+	CN(pUpdatePointerMessage);
+
+	CR(BroadcastDreamAppMessage(pUpdatePointerMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
@@ -560,13 +610,72 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand) {
+RESULT DreamShareView::BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand) {
 	RESULT r = R_PASS;
 
-	DreamUpdatePointerMessage *pDreamPointerMessage = new DreamUpdatePointerMessage(0, 0, GetAppUID(), ptPointer, cColor, fVisible, fLeftHand);
+	DreamUpdatePointerMessage *pDreamPointerMessage = nullptr;
+	color cColor;
+	sphere *pPointer;
+
+	auto pCloudController = GetDOS()->GetCloudController();
+	CBR(pCloudController, R_SKIPPED);
+
+	long userID;
+	userID = pCloudController->GetUserID();
+
+	CBR(userID != -1, R_SKIPPED);
+	CR(AllocateSpheres(userID));
+	
+	if (fLeftHand) {
+		pPointer = m_pointingObjects[userID][0];
+	}
+	else {
+		pPointer = m_pointingObjects[userID][1];
+	}
+
+	pPointer->SetVisible(fVisible);
+	cColor = pPointer->GetDiffuseColor();
+
+	pDreamPointerMessage = new DreamUpdatePointerMessage(userID, 0, GetAppUID(), pPointer->GetPosition(), cColor, fVisible, fLeftHand);
 	CN(pDreamPointerMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamPointerMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand) {
+	RESULT r = R_PASS;
+
+	CR(AllocateSpheres(userID));
+
+	if (fLeftHand) {
+		m_pointingObjects[userID][0]->SetPosition(ptPosition);
+	}
+	else {
+		m_pointingObjects[userID][1]->SetPosition(ptPosition);
+	}
+
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::AllocateSpheres(long userID) {
+	RESULT r = R_PASS;
+
+	std::vector<sphere*> userPointers;
+
+	CBR(userID != -1, R_SKIPPED);
+	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
+
+	userPointers.emplace_back(m_pointerSpherePool.front());
+	m_pointerSpherePool.pop();
+	userPointers.emplace_back(m_pointerSpherePool.front());
+	m_pointerSpherePool.pop();
+
+	m_pointingObjects[userID] = userPointers;
 
 Error:
 	return r;

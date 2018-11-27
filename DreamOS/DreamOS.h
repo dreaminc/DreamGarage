@@ -533,6 +533,9 @@ public:
 	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 	virtual RESULT BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket);
 
+	RESULT BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand);
+	RESULT UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand);
+
 	// TODO: This is temporary code for the mirror stage - 
 	// in future should replace this with real functionality (that's generalized) 
 	// or remove it entirely 
