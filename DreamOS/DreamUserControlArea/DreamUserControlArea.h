@@ -86,6 +86,8 @@ public:
 	RESULT Show();
 	RESULT Hide();
 
+	RESULT ShowDesktopKeyboard();
+
 // DreamControlView
 public:
 	int GetWidth();

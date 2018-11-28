@@ -41,12 +41,12 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 
 	float backOffset = start + buttonWidth / 2.0f;
 	float forwardOffset = backOffset + spacingSize + buttonWidth;
-	float closeOffset = forwardOffset + spacingSize + buttonWidth;
+	float shareOffset = forwardOffset + spacingSize + buttonWidth;
 
 	float urlOffset = 0.0f;
-	float shareOffset = urlOffset + (m_urlWidth * width / 2.0f) + buttonWidth / 2.0f + spacingSize;
-	float openOffset = shareOffset + spacingSize + buttonWidth;
+	float openOffset = urlOffset + (m_urlWidth * width / 2.0f) + buttonWidth / 2.0f + spacingSize;
 	float hideOffset = openOffset + spacingSize + buttonWidth;
+	float closeOffset = hideOffset + spacingSize + buttonWidth;
 
 	//GetDOS()->AddObjectToUIGraph(GetComposite());
 
@@ -71,13 +71,19 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszHide));
 	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszShow));
 
-	// TODO: desktop logic
 	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszKeyboard));
+
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceCamera));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceShare));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSourceNoShare));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszSend));
+	controlTextures.emplace_back(m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, k_wszStopSending));
 
 	for (auto pTexture : controlTextures) {
 		CN(pTexture);
 	}
 
+	// browser
 	m_pBackButton = AddButton(backOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleBackPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[0], controlTextures[1]);
@@ -86,9 +92,28 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UserAreaControls::HandleForwardPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[2], controlTextures[3]);
 
-	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
-		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[4]);
+	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[7], controlTextures[8]);
+
+	// desktop
+	m_pKeyboardButton = AddButton(backOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
+		std::bind(&UserAreaControls::HandleKeyboardPressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[11]);
+
+	m_pKeyboardButton->SetVisible(false);
+
+	// camera
+	m_pCameraSourceButton = AddButton(backOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
+		std::bind(&UserAreaControls::HandleSourceTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[14], controlTextures[13]);
+
+	m_pSendButton = AddButton(shareOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleSendTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[16], controlTextures[15]);
+
+	m_pCameraSourceButton->SetVisible(false);
+	m_pSendButton->SetVisible(false);
 
 // Re-enable for selectability of the URL button
 //	CR(AddButton(ControlBarButtonType::URL, urlOffset, m_urlWidth * width, 
@@ -100,13 +125,13 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		std::bind(&UserAreaControls::HandleOpenPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[6]);
 
-	m_pShareButton = AddButton(shareOffset, buttonWidth, buttonHeight,
-		std::bind(&UserAreaControls::HandleShareTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
-		controlTextures[7], controlTextures[8]);
-
 	m_pMinimizeButton = AddButton(hideOffset, buttonWidth, buttonHeight,
 		std::bind(&UserAreaControls::HandleShowTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[9], controlTextures[10]);
+
+	m_pCloseButton = AddButton(closeOffset, buttonWidth, buttonHeight,
+		std::bind(&UserAreaControls::HandleClosePressed, this, std::placeholders::_1, std::placeholders::_2),
+		controlTextures[4]);
 
 	CN(m_pBackButton);
 	CN(m_pForwardButton);
@@ -115,6 +140,9 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	CN(m_pOpenButton);
 	CN(m_pShareButton);
 	CN(m_pMinimizeButton);
+	CN(m_pKeyboardButton);
+	CN(m_pCameraSourceButton);
+	CN(m_pSendButton);
 
 	// create text for title
 	CR(InitializeText());
@@ -178,7 +206,6 @@ RESULT UserAreaControls::SetTitleText(const std::string& strTitle) {
 // ControlBarObserver
 RESULT UserAreaControls::HandleBackPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::BACK));
 	auto pBrowser = std::dynamic_pointer_cast<DreamBrowser>(m_pParentApp->GetActiveSource());
 	CNR(pBrowser, R_SKIPPED);
 
@@ -196,7 +223,6 @@ RESULT UserAreaControls::HandleForwardPressed(UIButton* pButtonContext, void* pC
 	CNR(pBrowser, R_SKIPPED);
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::FORWARD));
 	CR(pBrowser->HandleForwardEvent());
 
 Error:
@@ -208,11 +234,9 @@ RESULT UserAreaControls::HandleShowTogglePressed(UIButton* pButtonContext, void*
 
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
 	if (!pButtonContext->IsToggled()) {
-	//	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MAXIMIZE));
 		m_pParentApp->Maximize();
 	}
 	else {
-		//CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::MINIMIZE));
 		m_pParentApp->Minimize();
 	}
 
@@ -281,29 +305,52 @@ Error:
 
 RESULT UserAreaControls::HandleURLPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
+
 	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+
 Error:
 	return R_PASS;
 }
 
 RESULT UserAreaControls::HandleKeyboardPressed(UIButton* pButtonContext, void* pContext) {
 	RESULT r = R_PASS;
-	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
-	// TODO: this button is currently unused
-	/*
-	CR(m_pParentApp->HandleControlBarEvent(ControlBarButtonType::KEYBOARD));
 
-		m_pDreamUserApp->SetEventApp(m_pControlView.get());
-	//*/
+	CBR(m_pParentApp->CanPressButton(pButtonContext), R_SKIPPED);
+	CR(m_pParentApp->ShowDesktopKeyboard());
+
 Error:
 	return R_PASS;
+}
+
+RESULT UserAreaControls::HandleSourceTogglePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	// TODO: vcam release integration
+
+Error:
+	return r;
+}
+
+RESULT UserAreaControls::HandleSendTogglePressed(UIButton* pButtonContext, void* pContext) {
+	RESULT r = R_PASS;
+
+	// TODO: vcam release integration
+
+Error:
+	return r;
 }
 
 RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentType) {
 	RESULT r = R_PASS;
 
-	// TODO: if source is desktop, switch around buttons
-	// doing things like settings visibility was removed from this function in UIControlBar
+	if (m_strCurrentContentType != strContentType) {
+
+		// hide buttons for previous layout, then show buttons for new layout
+		CR(UpdateButtonVisibility(m_strCurrentContentType, false));
+
+		m_strCurrentContentType = strContentType;
+		CR(UpdateButtonVisibility(m_strCurrentContentType, true));
+	}
 
 	if (m_pParentApp != nullptr) {
 		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pDreamOS->GetSharedContentTexture());
@@ -315,9 +362,34 @@ RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentT
 		if (pBrowser != nullptr) {
 			CR(pBrowser->UpdateNavigationFlags());
 		}
+
+		// TODO: logic for 
 	}
 
 Error:
+	return r;
+}
+
+RESULT UserAreaControls::UpdateButtonVisibility(std::string strContentType, bool fVisible) {
+	RESULT r = R_PASS;
+
+	if (strContentType == CONTENT_TYPE_BROWSER) {
+		m_pBackButton->SetVisible(fVisible);
+		m_pForwardButton->SetVisible(fVisible);
+		m_pShareButton->SetVisible(fVisible);
+	}
+
+	else if (strContentType == CONTENT_TYPE_CAMERA) {
+		m_pCameraSourceButton->SetVisible(fVisible);
+		m_pSendButton->SetVisible(fVisible);
+	}
+
+	else if (strContentType == CONTENT_TYPE_DESKTOP) {
+		m_pShareButton->SetVisible(fVisible);
+		m_pKeyboardButton->SetVisible(fVisible);
+	}
+
+	
 	return r;
 }
 

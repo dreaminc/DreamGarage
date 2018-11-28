@@ -6,6 +6,7 @@
 #include <memory>
 
 #define CONTENT_TYPE_BROWSER "ContentControlType.Website"
+#define CONTENT_TYPE_CAMERA "ContentControlType.Camera"
 #define CONTENT_TYPE_DESKTOP "ContentControlType.Desktop"
 #define CONTENT_TYPE_DEFAULT ""	// conforms with the string UIControlBar is expecting
 

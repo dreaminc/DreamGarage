@@ -274,6 +274,17 @@ RESULT DreamUserControlArea::Hide() {
 	return r;
 }
 
+RESULT DreamUserControlArea::ShowDesktopKeyboard() {
+	RESULT r = R_PASS;
+
+	CN(m_pControlView);
+	CR(GetDOS()->GetUserApp()->SetEventApp(m_pControlView.get()));
+	CR(m_pControlView->HandleKeyboardUp());
+
+Error:
+	return r;
+}
+
 RESULT DreamUserControlArea::Open() {
 	RESULT r = R_PASS;
 

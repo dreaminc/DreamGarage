@@ -7,6 +7,8 @@
 
 #include "DreamGarage/UICommon.h"
 
+#include "DreamUserControlArea/DreamContentSource.h"
+
 //#include "DreamUserControlArea/DreamUserControlArea.h"
 class DreamUserControlArea;
 class text;
@@ -35,12 +37,17 @@ public:
 	RESULT HandleClosePressed(UIButton* pButtonContext, void* pContext);
 	RESULT HandleShareTogglePressed(UIButton *pButtonContext, void *pContext);
 	RESULT HandleURLPressed(UIButton* pButtonContext, void* pContext);
+
 	RESULT HandleKeyboardPressed(UIButton* pButtonContext, void* pContext);
+
+	RESULT HandleSourceTogglePressed(UIButton* pButtonContext, void* pContext);
+	RESULT HandleSendTogglePressed(UIButton* pButtonContext, void* pContext);
 
 	// Update functions specific to this type of control bar
 	RESULT SetSharingFlag(bool fIsSharing);
 	RESULT SetTitleText(const std::string& strTitle);
 	RESULT UpdateControlBarButtonsWithType(std::string strContentType);
+	RESULT UpdateButtonVisibility(std::string strContentType, bool fVisible);
 	RESULT UpdateNavigationButtons(bool fCanGoBack, bool fCanGoForward);
 
 	std::shared_ptr<text> GetURLText();
@@ -62,7 +69,16 @@ private:
 	const wchar_t *k_wszHide = L"control-view-minimize.png";
 	const wchar_t *k_wszShow = L"control-view-maximize.png";
 	const wchar_t *k_wszURL = L"control-view-url.png";
+
+	// keyboard
 	const wchar_t *k_wszKeyboard = L"control-view-keyboard.png";
+
+	// camera
+	const wchar_t *k_wszSourceCamera = L"control-view-source-camera.png";
+	const wchar_t *k_wszSourceShare = L"control-view-source-share.png";
+	const wchar_t *k_wszSourceNoShare = L"control-view-source-camera-no-share.png";
+	const wchar_t *k_wszSend = L"control-view-send.png";
+	const wchar_t *k_wszStopSending = L"control-view-stop-sending.png";
 
 private:
 
@@ -78,13 +94,25 @@ private:
 	double m_urlWidth = URL_WIDTH;
 	double m_urlHeight = ITEM_SIZE;
 
+	// browser
 	std::shared_ptr<UIButton> m_pBackButton = nullptr;
 	std::shared_ptr<UIButton> m_pForwardButton = nullptr;
-	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+	std::shared_ptr<UIButton> m_pShareButton = nullptr;
+
+	// desktop
+	std::shared_ptr<UIButton> m_pKeyboardButton = nullptr;
+
+	// camera
+	std::shared_ptr<UIButton> m_pCameraSourceButton = nullptr;
+	std::shared_ptr<UIButton> m_pSendButton = nullptr;
+
+	// general
 	std::shared_ptr<UIButton> m_pURLButton = nullptr;
 	std::shared_ptr<UIButton> m_pOpenButton = nullptr;
-	std::shared_ptr<UIButton> m_pShareButton = nullptr;
 	std::shared_ptr<UIButton> m_pMinimizeButton = nullptr;
+	std::shared_ptr<UIButton> m_pCloseButton = nullptr;
+
+	std::string m_strCurrentContentType = CONTENT_TYPE_BROWSER;
 };
 
 #endif // ! DREAM_CONTROL_BAR_H_
