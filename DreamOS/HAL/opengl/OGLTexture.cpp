@@ -692,9 +692,9 @@ Error:
 
 RESULT OGLTexture::DeallocateOGLPBOPack() {
 	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
-		if (m_glPixelPackBuferIndex[i] != 0) {
-			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBuferIndex[i]));
-			m_glPixelPackBuferIndex[i] = 0;
+		if (m_glPixelPackBufferIndex[i] != 0) {
+			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBufferIndex[i]));
+			m_glPixelPackBufferIndex[i] = 0;
 		}
 	}
 
@@ -702,9 +702,9 @@ RESULT OGLTexture::DeallocateOGLPBOPack() {
 }
 
 RESULT OGLTexture::DeallocateOGLPBOUnpack() {
-	if (m_glPixelUnpackBuferIndex != 0) {
-		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBuferIndex);
-		m_glPixelUnpackBuferIndex = 0;
+	if (m_glPixelUnpackBufferIndex != 0) {
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBufferIndex);
+		m_glPixelUnpackBufferIndex = 0;
 	}
 
 	return R_PASS;
@@ -713,9 +713,9 @@ RESULT OGLTexture::DeallocateOGLPBOUnpack() {
 
 
 bool OGLTexture::IsOGLPBOUnpackEnabled() {
-	return (m_glPixelUnpackBuferIndex != 0);
+	return (m_glPixelUnpackBufferIndex != 0);
 }
 
 bool OGLTexture::IsOGLPBOPackEnabled() {
-	return (m_glPixelPackBuferIndex[0] != 0);
+	return (m_glPixelPackBufferIndex[0] != 0);
 }
