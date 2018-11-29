@@ -17,6 +17,9 @@
 #include "Win64GamepadController.h"
 #include "Win64CredentialManager.h"
 
+#include "Win64NamedPipeClient.h"
+#include "Win64NamedPipeServer.h"
+
 #include <string>
 #include <netlistmgr.h>
 
@@ -228,6 +231,47 @@ bool Windows64App::IsSandboxInternetConnectionValid() {
 	// (This should be called on application shutdown.)	
 	CoUninitialize();
 	return false;
+}
+
+// Sandbox Objects
+std::shared_ptr<NamedPipeClient> Windows64App::MakeNamedPipeClient(std::wstring strPipename) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<NamedPipeClient> pRetPipeClient = nullptr;
+
+	pRetPipeClient = std::make_shared<Win64NamedPipeClient>(strPipename);
+	CN(pRetPipeClient);
+
+	CR(pRetPipeClient->Initialize());
+
+	return pRetPipeClient;
+
+Error:
+	if (pRetPipeClient != nullptr) {
+		pRetPipeClient = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<NamedPipeServer> Windows64App::MakeNamedPipeServer(std::wstring strPipename) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<NamedPipeServer> pRetPipeServer = nullptr;
+
+	pRetPipeServer = std::make_shared<Win64NamedPipeServer>(strPipename);
+	CN(pRetPipeServer);
+
+	CR(pRetPipeServer->Initialize());
+
+	return pRetPipeServer;
+
+Error:
+	if (pRetPipeServer != nullptr) {
+		pRetPipeServer = nullptr;
+	}
+
+	return nullptr;
 }
 
 /*

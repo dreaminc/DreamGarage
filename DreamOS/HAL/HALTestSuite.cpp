@@ -5206,7 +5206,8 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 			pTestContext->pQuad = m_pDreamOS->AddQuad(3.0f, 3.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f));
 			CN(pTestContext->pQuad);
 
-			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			//pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
 			CN(pTestContext->pTexture);
 
 			size_t bufferSize = pTestContext->pTexture->GetTextureSize();
@@ -5215,7 +5216,7 @@ RESULT HALTestSuite::AddTestPBOTextureReadback() {
 
 			//CR(pTestContext->pTexture->LoadBufferFromTexture(pTestContext->pLoadBuffer, bufferSize));
 
-			// Enable PBO unpack
+			// Enable PBO pack
 			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOPack());
 
 			CR(pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture));

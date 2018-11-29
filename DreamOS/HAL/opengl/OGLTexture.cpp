@@ -28,6 +28,8 @@ OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
 }
 
 OGLTexture::~OGLTexture() {
+	RESULT r = R_PASS;
+
 	texture::~texture();
 
 	if (m_glTextureIndex != 0) {
@@ -35,17 +37,11 @@ OGLTexture::~OGLTexture() {
 		m_glTextureIndex = 0;
 	}
 
-	if (m_glPixelUnpackBufferIndex != 0) {
-		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBufferIndex);
-		m_glPixelUnpackBufferIndex = 0;
-	}
+	CR(DeallocateOGLPBOPack());
+	CR(DeallocateOGLPBOUnpack());
 
-	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
-		if (m_glPixelPackBufferIndex[i] != 0) {
-			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBufferIndex[i]));
-			m_glPixelPackBufferIndex[i] = 0;
-		}
-	}
+Error:
+	return;
 }
 
 RESULT OGLTexture::Bind() {
@@ -519,6 +515,18 @@ RESULT OGLTexture::UpdateDimensions(int pxWidth, int pxHeight) {
 	// TODO: Pull deeper settings from texture object
 	CR(m_pParentImp->TexImage2D(m_glTextureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, nullptr));			 
 
+	// Handle the pack PBO resizing
+	if (IsOGLPBOPackEnabled()) {
+		CR(DeallocateOGLPBOPack());
+		CR(EnableOGLPBOPack());
+	}
+
+	// Handle the unpack PBO resizing
+	if (IsOGLPBOUnpackEnabled()) {
+		CR(DeallocateOGLPBOUnpack());
+		CR(EnableOGLPBOUnpack());
+	}
+
 Error:
 	return r;
 }
@@ -528,7 +536,9 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 
 	PIXEL_FORMAT pixelFormat = m_pixelFormat;
 
-	if (m_glPixelPackBufferIndex[0] != 0) {
+	m_pParentImp->MakeCurrentContext();
+
+	if (IsOGLPBOPackEnabled()) {
 		//// Set the target framebuffer to read
 		// glReadBuffer(GL_FRONT);
 
@@ -561,7 +571,10 @@ RESULT OGLTexture::LoadBufferFromTexture(void *pBuffer, size_t pBuffer_n) {
 		
 	}
 	else {
-		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+		//CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GetOpenGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+
+		CR(m_pParentImp->GetTextureImage(m_glTextureIndex, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLsizei)(pBuffer_n), (GLvoid*)(pBuffer)));
+		
 	}
 
 	CN(pBuffer);
@@ -577,7 +590,7 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 	CR(Bind());
 
-	if (m_glPixelUnpackBufferIndex != 0) {
+	if (IsOGLPBOUnpackEnabled()) {
 		CR(BindPixelUnpackBuffer());
 
 		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
@@ -677,17 +690,32 @@ Error:
 	return r;
 }
 
-bool OGLTexture::IsOGLPBOPackEnabled() {
-	bool fEnabled = false;
-	if (m_glPixelPackBufferIndex[0] != 0) {
-		fEnabled = true;
+RESULT OGLTexture::DeallocateOGLPBOPack() {
+	for (int i = 0; i < NUM_PACK_BUFFERS; i++) {
+		if (m_glPixelPackBufferIndex[i] != 0) {
+			m_pParentImp->glDeleteBuffers(1, &(m_glPixelPackBufferIndex[i]));
+			m_glPixelPackBufferIndex[i] = 0;
+		}
 	}
-	return fEnabled;
+
+	return R_PASS;
 }
-bool OGLTexture::IsOGLPBOUnpackEnabled() {
-	bool fEnabled = false;
+
+RESULT OGLTexture::DeallocateOGLPBOUnpack() {
 	if (m_glPixelUnpackBufferIndex != 0) {
-		fEnabled = true;
+		m_pParentImp->glDeleteBuffers(1, &m_glPixelUnpackBufferIndex);
+		m_glPixelUnpackBufferIndex = 0;
 	}
-	return fEnabled;
+
+	return R_PASS;
+}
+
+
+
+bool OGLTexture::IsOGLPBOUnpackEnabled() {
+	return (m_glPixelUnpackBufferIndex != 0);
+}
+
+bool OGLTexture::IsOGLPBOPackEnabled() {
+	return (m_glPixelPackBufferIndex[0] != 0);
 }

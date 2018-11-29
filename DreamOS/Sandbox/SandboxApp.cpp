@@ -877,7 +877,19 @@ const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
 	return m_pHALImp->GetHALConfiguration();
 }
 
+
+
 // Sandbox Factory Methods
+
+// Sandbox Objects
+std::shared_ptr<NamedPipeClient> SandboxApp::MakeNamedPipeClient(std::wstring strPipename) {
+	return nullptr;
+}
+
+std::shared_ptr<NamedPipeServer> SandboxApp::MakeNamedPipeServer(std::wstring strPipename) {
+	return nullptr;
+}
+
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
@@ -1612,6 +1624,27 @@ Error:
 		delete pUser;
 		pUser = nullptr;
 	}
+	return nullptr;
+}
+
+ProgramNode* SandboxApp::MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags) {
+	RESULT r = R_PASS;
+
+	ProgramNode *pProgramNode = nullptr;
+
+	CN(m_pHALImp);
+
+	pProgramNode = m_pHALImp->MakeProgramNode(strNodeName, optFlags);
+	CN(pProgramNode);
+
+	return pProgramNode;
+
+Error:
+	if (pProgramNode != nullptr) {
+		delete pProgramNode;
+		pProgramNode = nullptr;
+	}
+
 	return nullptr;
 }
 

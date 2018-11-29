@@ -28,10 +28,15 @@
 #include "DreamGarage\DreamGamepadCameraApp.h"
 #include "DreamGarage\DreamEnvironmentApp.h"
 
+#include "DreamVCam.h"
+
 #include "DreamGarage\DreamBrowser.h"
 #include "DreamGarage\Dream2DMouseApp.h"
 #include "WebBrowser\WebBrowserController.h"
 #include "WebBrowser\CEFBrowser/CEFBrowserManager.h"
+
+#include "Sandbox/NamedPipeClient.h"
+#include "Sandbox/NamedPipeServer.h"
 
 #include <chrono>
 
@@ -56,14 +61,18 @@ RESULT DreamOSTestSuite::AddTests() {
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamDesktop());
+	
+	CR(AddTestDreamVCam());
 
+	CR(AddTestNamedPipes());
+
+	CR(AddTestModuleManager());
+	
 	CR(AddTestGamepadCamera());
 
 	CR(AddTestDreamLogger());
 
 	CR(AddTestEnvironmentSeating());
-
-	CR(AddTestModuleManager());
 
 	CR(AddTestCredentialStorage());
 
@@ -971,6 +980,407 @@ Error:
 	return r;
 }
 
+RESULT DreamOSTestSuite::AddTestNamedPipes() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 5000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	struct TestContext {
+		texture *pTexture = nullptr;
+		unsigned char *pBuffer = nullptr;
+
+		std::shared_ptr<NamedPipeServer> pNamedPipeServer = nullptr;
+		std::shared_ptr<NamedPipeClient> pNamedPipeClient1 = nullptr;
+		std::shared_ptr<NamedPipeClient> pNamedPipeClient2 = nullptr;
+
+		RESULT HandleClientPipeMessage(void *pBuffer, size_t pBuffer_n) {
+			RESULT r = R_PASS;
+
+			char *pszMessage = (char *)(pBuffer);
+			CN(pszMessage);
+
+			DEBUG_LINEOUT("HandleClientPipeMessage: %s", pszMessage);
+
+		Error:
+			return r;
+		}
+
+		RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n) {
+			RESULT r = R_PASS;
+
+			char *pszMessage = (char *)(pBuffer);
+			CN(pszMessage);
+
+			DEBUG_LINEOUT("HandleServerPipeMessage: %s", pszMessage);
+
+		Error:
+			return r;
+		}
+
+	} *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		int msBuffer = 50;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		{
+			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+			CN(pLight);
+
+			sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pSphere);
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"brickwall_color.jpg");
+			CN(pTestContext->pTexture);
+
+			// Set up named pipe server
+			pTestContext->pNamedPipeServer = m_pDreamOS->MakeNamedPipeServer(L"dreamvcampipe");
+			CN(pTestContext->pNamedPipeServer);
+			CR(pTestContext->pNamedPipeServer->RegisterMessageHandler(std::bind(&TestContext::HandleServerPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeServer->Start());
+
+			///*
+			// This form of IPC isn't designed to be same process
+			// so we add a bit of delay to accommodate for problematic event handling / timing errors
+			// that would normally be fixed with a mutex for cross-thread sync
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
+
+			// Set up named pipe clients
+			/*
+			pTestContext->pNamedPipeClient1 = m_pDreamOS->MakeNamedPipeClient(L"dreamvcampipe");
+			CN(pTestContext->pNamedPipeClient1);
+			CR(pTestContext->pNamedPipeClient1->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeClient1->Start());
+			
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
+
+			pTestContext->pNamedPipeClient2 = m_pDreamOS->MakeNamedPipeClient(L"dreamvcampipe");
+			CN(pTestContext->pNamedPipeClient2);
+			CR(pTestContext->pNamedPipeClient2->RegisterMessageHandler(std::bind(&TestContext::HandleClientPipeMessage, pTestContext, std::placeholders::_1, std::placeholders::_2)));
+			CR(pTestContext->pNamedPipeClient2->Start());
+
+			// just to be careful
+			std::this_thread::sleep_for(std::chrono::milliseconds(msBuffer));
+			//*/
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		static int count = 0;
+
+		static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+		static std::chrono::system_clock::time_point lastUpdateTimeResetClient = std::chrono::system_clock::now();
+
+		{
+			std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+			// This sort of emulates 24 FPS or so
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 1000) {
+				std::string strTestMessage = "testing: " + std::to_string(count++);
+				pTestContext->pNamedPipeServer->SendMessage((void*)(strTestMessage.c_str()), sizeof(char) * strTestMessage.size());
+				lastUpdateTime = timeNow;
+			}
+
+			// Will disconnect client 2 after 5 seconds
+			if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - lastUpdateTimeResetClient).count() > 5) {
+				if (pTestContext->pNamedPipeClient2 != nullptr) {
+					pTestContext->pNamedPipeClient2 = nullptr;
+				}
+				lastUpdateTimeResetClient = timeNow;
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Dream VCam Test");
+	pUITest->SetTestDescription("Testing the dream virtual camera module");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT DreamOSTestSuite::AddTestDreamVCam() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 500000.0f;
+	int nRepeats = 1;
+	//const int numTests = 5;
+
+	struct TestContext {
+		texture *pTexture = nullptr;
+		unsigned char *pBuffer = nullptr;
+		std::shared_ptr<DreamVCam> pDreamVCam = nullptr;
+		ProgramNode* pRenderNode = nullptr;
+		ProgramNode* pEndAuxNode = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Set up the pipeline
+
+		ProgramNode* pRenderProgramNode = nullptr;
+		ProgramNode* pReferenceGeometryProgram = nullptr;
+		ProgramNode* pSkyboxProgram = nullptr;
+		ProgramNode* pUIProgramNode = nullptr;
+		ProgramNode *pRenderScreenQuad = nullptr;
+
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		// TODO: This test doesn't actually need an aux node 
+		// webcam won't be mirrored to window after all
+		//SinkNode *pAuxSinkNode;
+		//pAuxSinkNode = pPipeline->GetAuxiliarySinkNode();
+		//CNM(pAuxSinkNode, "Aux sink node isn't set");
+
+		CN(m_pDreamOS);
+
+		CR(pHAL->MakeCurrentContext());
+
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		/*
+		// Aux
+		
+		CameraNode* pAuxCamera;
+		pAuxCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
+		CN(pAuxCamera);
+		CB(pAuxCamera->incRefCount());
+
+		pRenderProgramNode = pHAL->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");		CN(pReferenceGeometryProgram);		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pReferenceGeometryProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");		CN(pSkyboxProgram);		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));		CR(pSkyboxProgram->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//*/
+
+		// Don't actually need to hook up the AUX node 
+		//// Connect to aux (we will likely need to reproduce the pipeline)
+		//if (pAuxSinkNode != nullptr) {
+		//	CR(pAuxSinkNode->ConnectToInput("camera", pAuxCamera->Output("stereocamera")));
+		//	CR(pAuxSinkNode->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+		//}
+
+		//CR(pDestSinkNode->ConnectToAllInputs(pSkyboxProgram->Output("output_framebuffer")));
+
+		// Hook up a texture
+		{
+			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+			CN(pTestContext);
+
+			pTestContext->pRenderNode = pRenderProgramNode;
+			pTestContext->pEndAuxNode = pSkyboxProgram;
+
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+			CN(pLight);
+
+			sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 20, 20);
+			CN(pSphere);
+
+			// Create the VCam		
+			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCam>(this);
+			CNM(pTestContext->pDreamVCam, "Failed to create dream virtual camera");
+
+			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
+			CN(pTestContext->pTexture);
+
+			//OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTestContext->pTexture);
+			//CN(pOGLTexture);
+			//CR(pOGLTexture->EnableOGLPBOPack());
+
+			CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
+
+			// Only the render node actually has a frame buffer
+			OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pRenderProgramNode);
+			CN(pOGLProgram);
+			
+			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
+				//"Failed to set source texture for Dream VCam");
+
+			{
+				auto pComposite = m_pDreamOS->AddComposite();
+				pComposite->InitializeOBB();
+
+				auto pView = pComposite->AddUIView(m_pDreamOS);
+				pView->InitializeOBB();
+
+				auto pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+				pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+				pQuad->FlipUVVertical();
+				pQuad->SetDiffuseTexture(pTestContext->pDreamVCam->GetSourceTexture().get());
+			}
+
+			//auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			//CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
+			//CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
+		}
+		
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		int count = 0;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		//* 
+		// Now done in the module
+		{
+			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
+
+			if (pTestContext->pDreamVCam != nullptr && pTestContext->pRenderNode != nullptr) {
+
+				std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+
+				// Approximately 30 FPS - 30 ms per frame is a bit faster
+				if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
+
+					// Only the render node actually has a frame buffer
+					OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pTestContext->pRenderNode);
+					CN(pOGLProgram);
+
+					OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pOGLProgram->GetOGLFramebufferColorTexture());
+					CN(pOGLTexture);
+					/*
+					if (pOGLTexture->IsOGLPBOPackEnabled()) {
+						CR(pOGLTexture->EnableOGLPBOPack());
+					}
+					*/
+					pTestContext->pDreamVCam->UnsetSourceTexture();
+					CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLTexture),
+						"Failed to set source texture for Dream VCam");
+
+
+					CR(pTestContext->pEndAuxNode->RenderNode(count++));
+
+					lastUpdateTime = timeNow;
+				}
+			}
+		}
+		//*/
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+		// TODO: Kill apps
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Dream VCam Test");
+	pUITest->SetTestDescription("Testing the dream virtual camera module");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT DreamOSTestSuite::AddTestModuleManager() {
 	RESULT r = R_PASS;
 
@@ -996,9 +1406,10 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 			RESULT r = R_PASS;
 
 			SetName("DreamSoundSystem");
-			SetModuleDescription("The Dream Sound System Module");
+			SetModuleDescription("The Dream System Module");
 
-			CR(r);
+			// nullptr is optional, but added to the test for completeness
+			CR(StartModuleProcess(nullptr));	
 
 		Error:
 			return r;
@@ -1010,7 +1421,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 		virtual RESULT Update(void *pContext = nullptr) override {
 			RESULT r = R_PASS;
 
-			CR(Print(std::to_string(m_testingValue)));
+			//CR(Print(std::to_string(m_testingValue)));
 
 		Error:
 			return r;
@@ -1025,6 +1436,19 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 			return R_PASS;
 		}
 
+		virtual RESULT ModuleProcess(void *pContext) override { 
+			RESULT r = R_PASS;
+
+			while (true) {
+				DEBUG_LINEOUT("module %d: count %d", m_testingValue, m_count++);
+
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+
+		Error:
+			return r;
+		}
+
 	protected:
 		static DreamTestingModule* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 			DreamTestingModule *pDreamModule = new DreamTestingModule(pDreamOS, pContext);
@@ -1033,6 +1457,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 
 	private:
 		int m_testingValue = -1;
+		int m_count = 0;
 	};
 
 	// Initialize Code
@@ -1053,7 +1478,7 @@ RESULT DreamOSTestSuite::AddTestModuleManager() {
 		// Create the testing modules
 		for (int i = 0; i < 5; i++) {
 			pDreamTestModules[i] = m_pDreamOS->LaunchDreamModule<DreamTestingModule>(this);
-			CNM(pDreamTestModules[i], "Failed to create dream test app");
+			CNM(pDreamTestModules[i], "Failed to create dream test module");
 			pDreamTestModules[i]->SetTestingValue(i);
 		}
 

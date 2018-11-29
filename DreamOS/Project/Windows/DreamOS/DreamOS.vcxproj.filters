@@ -1000,6 +1000,21 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLSphere.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamVCam.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64NamedPipeServer.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64NamedPipeCient.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\NamedPipeServer.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\NamedPipeClient.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2178,6 +2193,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironment.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamVCam.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64NamedPipeServer.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64NamedPipeClient.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\NamedPipeServer.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\NamedPipeClient.h">
+      <Filter>Sandbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

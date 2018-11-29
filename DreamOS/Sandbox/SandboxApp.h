@@ -61,6 +61,9 @@ class UIKeyboardLayout;
 class DreamAppManager;
 class DreamModuleManager;
 
+class NamedPipeClient;
+class NamedPipeServer;
+
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
@@ -189,6 +192,11 @@ protected:
 
 public:
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
+
+	// Sandbox level objects
+public:
+	virtual std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
+	virtual std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
 
 public:
 	// Physics
@@ -369,6 +377,8 @@ public:
 
 	user *AddUser();
 	user *MakeUser();
+
+	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
 	// Cloud Controller 
 public:
