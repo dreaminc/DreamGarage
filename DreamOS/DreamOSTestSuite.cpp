@@ -1269,18 +1269,31 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			//CN(pOGLTexture);
 			//CR(pOGLTexture->EnableOGLPBOPack());
 
-			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
+			CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
 
 			// Only the render node actually has a frame buffer
 			OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pRenderProgramNode);
 			CN(pOGLProgram);
 			
 			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
-			//	"Failed to set source texture for Dream VCam");
+				//"Failed to set source texture for Dream VCam");
 
-			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			{
+				auto pComposite = m_pDreamOS->AddComposite();
+				pComposite->InitializeOBB();
+
+				auto pView = pComposite->AddUIView(m_pDreamOS);
+				pView->InitializeOBB();
+
+				auto pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+				pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+				pQuad->FlipUVVertical();
+				pQuad->SetDiffuseTexture(pTestContext->pDreamVCam->GetSourceTexture().get());
+			}
+
+			//auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			//CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
-			CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
+			//CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
 		}
 		
 
@@ -1302,7 +1315,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		/* 
+		//* 
 		// Now done in the module
 		{
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
@@ -1320,11 +1333,11 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 
 					OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pOGLProgram->GetOGLFramebufferColorTexture());
 					CN(pOGLTexture);
-
+					/*
 					if (pOGLTexture->IsOGLPBOPackEnabled()) {
 						CR(pOGLTexture->EnableOGLPBOPack());
 					}
-
+					*/
 					pTestContext->pDreamVCam->UnsetSourceTexture();
 					CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLTexture),
 						"Failed to set source texture for Dream VCam");
@@ -1336,7 +1349,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 				}
 			}
 		}
-		*/
+		//*/
 
 	Error:
 		return r;

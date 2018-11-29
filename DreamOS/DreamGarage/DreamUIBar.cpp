@@ -466,6 +466,12 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					CR(pKeyboardApp->ShowTitleView());
 				}
 
+				else if (strScope == "MenuProviderScope.VirtualCameraMenuProvider") {
+					if (m_pParentApp != nullptr) {
+						CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
+					}
+				}
+
 				else if (strScope == "TeamScope.Switch") {
 					auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 

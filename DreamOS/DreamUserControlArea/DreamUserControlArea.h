@@ -17,6 +17,7 @@ class DreamUIBar;
 class UITabView;
 class DreamContentSource;
 class DreamDesktopApp;
+class DreamVCam;
 
 class CEFBrowserManager;
 struct WebBrowserPoint;
@@ -220,6 +221,7 @@ private:
 	float m_centerOffset;
 
 	std::shared_ptr<DreamDesktopApp> m_pDreamDesktop = nullptr;
+	std::shared_ptr<DreamVCam> m_pDreamVCam = nullptr;
 
 	float m_animationScale = ANIMATION_SCALE;
 

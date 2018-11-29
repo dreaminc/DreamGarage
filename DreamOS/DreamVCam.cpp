@@ -53,7 +53,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	// Set up the aux camera and local pipeline
 
 	// TODO: 
-
+	/*
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
@@ -77,6 +77,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pOGLEndNode);
 
 	CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
+	*/	
 
 Error:
 	return r;
@@ -104,16 +105,16 @@ RESULT DreamVCam::Update(void *pContext) {
 	static int count = 0;
 
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-
+	/*
 	// TODO: Some more logic around texture / buffer sizes etc 
 	if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
-
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 		// Approximately 30 FPS
 		if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - lastUpdateTime).count() > 41) {
 			
-			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pOGLRenderNode->GetOGLFramebufferColorTexture());
+			texture *pTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
+			OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTexture);
 			CN(pOGLTexture);
 
 			if (pOGLTexture->IsOGLPBOPackEnabled()) {
@@ -142,8 +143,9 @@ RESULT DreamVCam::Update(void *pContext) {
 			}
 		}
 	}
+	*/
 
-Error:
+//Error:
 	return r;
 }
 
@@ -206,6 +208,12 @@ RESULT DreamVCam::SetSourceTexture(texture *pTexture) {
 
 	m_pSourceTexture = pTexture;
 
+	/*
+	if (m_pParentApp != nullptr) {
+		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, this);
+	}
+	*/
+
 	// Enable PBO packing (DMA memory mapping) 
 	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pSourceTexture);
 	CNM(pOGLTexture, "Source texture not compatible OpenGL Texture");
@@ -221,4 +229,75 @@ Error:
 RESULT DreamVCam::UnsetSourceTexture() {
 	m_pSourceTexture = nullptr;
 	return R_PASS;
+}
+
+RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
+	m_pParentApp = pParentApp;
+	m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
+	return R_PASS;
+}
+
+RESULT DreamVCam::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	m_assetID = pEnvironmentAsset->GetAssetID();
+	m_strContentType = pEnvironmentAsset->GetContentType();
+	return R_PASS;
+}
+
+RESULT DreamVCam::OnClick(point ptDiff, bool fMouseDown) { 
+	return R_NOT_IMPLEMENTED; 
+}
+
+RESULT DreamVCam::OnMouseMove(point mousePoint) { 
+	return R_NOT_IMPLEMENTED; 
+}
+
+RESULT DreamVCam::OnScroll(float pxXDiff, float pxYDiff, point scrollPoint) { 
+	return R_NOT_IMPLEMENTED; 
+}
+
+RESULT DreamVCam::OnKeyPress(char chkey, bool fkeyDown) { 
+	return R_NOT_IMPLEMENTED; 
+}
+
+std::shared_ptr<texture> DreamVCam::GetSourceTexture() {
+	return std::shared_ptr<texture>(m_pSourceTexture);
+}
+
+RESULT DreamVCam::SetScope(std::string strScope) {
+	m_strScope = strScope;
+	return R_PASS;
+}
+
+RESULT DreamVCam::SetPath(std::string strPath) {
+	m_strPath = strPath;
+	return R_PASS;
+}
+
+long DreamVCam::GetCurrentAssetID() {
+	return m_assetID;
+}
+
+RESULT DreamVCam::SendFirstFrame() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamVCam::CloseSource() {
+	Shutdown();
+	return R_PASS;
+}
+
+int DreamVCam::GetWidth() {
+	return 0;
+}
+
+int DreamVCam::GetHeight() {
+	return 0;
+}
+
+std::string DreamVCam::GetTitle() {
+	return m_strTitle;
+}
+
+std::string DreamVCam::GetContentType() {
+	return m_strContentType;
 }

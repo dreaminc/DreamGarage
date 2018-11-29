@@ -8,6 +8,8 @@
 #include "DreamGarage/UITabView.h"
 #include "DreamControlView/UIControlView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
+#include "DreamGarage/DreamGamepadCameraApp.h"
+#include "DreamVCam.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
 #include "WebBrowser/DOMNode.h"
@@ -659,22 +661,23 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 	if (m_pActiveSource != nullptr) {													// If content is already open
-		if (strTitle == m_strDesktopTitle && m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
+		if (strTitle == m_strDesktopTitle) { //&& m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
+			/*
 			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
 				SetIsAnimating(false);
 				m_fFromMenu = true;
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
 			}
-			else {
-				Show();
-			}
+			*/
+			Show();
+			
 		}
 		else {
 			m_pDreamTabView->AddContent(m_pActiveSource);
 		}
 		
 	}
-
+	/*
 	if (strTitle == m_strDesktopTitle) {
 		if (m_pDreamDesktop == nullptr) {
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
@@ -683,6 +686,33 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pActiveSource = m_pDreamDesktop;
 			m_pDreamDesktop->InitializeWithParent(this);
 			m_pUserControls->SetTitleText(m_pDreamDesktop->GetTitle());
+			// new desktop can't be the current content
+			m_pUserControls->SetSharingFlag(false);
+		}
+	}
+	*/
+	else if (strTitle == m_strDesktopTitle) {
+		if (m_pDreamDesktop == nullptr) {
+			//CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
+			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
+			m_pActiveSource = m_pDreamVCam;
+			m_pDreamVCam->InitializeWithParent(this);
+			auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamVCam->GetCameraNode()));
+			// new desktop can't be the current content
+			m_pUserControls->SetSharingFlag(false);
+		}
+	}
+	else if (strScope == "MenuProviderScope.VirtualCameraMenuProvider") {
+		if (m_pDreamVCam == nullptr) {
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
+			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
+			m_pActiveSource = m_pDreamVCam;
+			m_pDreamVCam->InitializeWithParent(this);
+			auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			CR(pDreamGamepadCamera->SetCamera(m_pDreamVCam->GetCameraNode()));
 			// new desktop can't be the current content
 			m_pUserControls->SetSharingFlag(false);
 		}
@@ -789,9 +819,14 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	else {
+		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
+	}
+	/*
+	else {
 		// TODO: desktop setup
 		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
 	}
+	*/
 
 	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	//m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
@@ -799,7 +834,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 	CR(Show());
 
-	m_pUserControls->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
+	//m_pUserControls->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
 
 Error:
 	return r;
