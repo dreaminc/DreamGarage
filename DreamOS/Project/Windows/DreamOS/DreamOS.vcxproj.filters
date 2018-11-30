@@ -853,9 +853,6 @@
     <ClCompile Include="..\..\..\PhysicsEngine\Simplex.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UI\UISpatialScrollView.cpp">
       <Filter>UI</Filter>
     </ClCompile>
@@ -1027,6 +1024,10 @@
     <ClCompile Include="..\..\..\DreamUpdatePointerMessage.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ShareMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2062,9 +2063,6 @@
     <ClInclude Include="..\..\..\PhysicsEngine\Simplex.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamShareViewMessage.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UI\UISpatialScrollView.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -2233,6 +2231,10 @@
     <ClInclude Include="..\..\..\DreamUpdatePointerMessage.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\ShareMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
