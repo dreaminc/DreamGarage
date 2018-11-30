@@ -748,39 +748,39 @@ RESULT DreamUserApp::UpdateCompositeWithHands(float yPos) {
 		point ptCamera = pCamera->GetPosition();
 
 		//*
-		sphere *pLeftMallet = m_pLeftHand->GetMalletHead();
-		sphere *pRightMallet = m_pRightHand->GetMalletHead();
+		if (m_pLeftHand != nullptr && m_pRightHand != nullptr) {
+			sphere *pLeftMallet = m_pLeftHand->GetMalletHead();
+			sphere *pRightMallet = m_pRightHand->GetMalletHead();
 
-		if (pLeftMallet != nullptr && pRightMallet != nullptr &&
-			m_pLeftHand != nullptr && m_pRightHand != nullptr) {
+			if (pLeftMallet != nullptr && pRightMallet != nullptr) {
 
-			vector vPos;
+				vector vPos;
 
-			for (auto& mallet : { pLeftMallet, pRightMallet }) {	// which hand is closer
+				for (auto& mallet : { pLeftMallet, pRightMallet }) {	// which hand is closer
 
-				RotationMatrix qOffset;
-				auto pHand = mallet == pLeftMallet ? m_pLeftHand : m_pRightHand;
+					RotationMatrix qOffset;
+					auto pHand = mallet == pLeftMallet ? m_pLeftHand : m_pRightHand;
 
-				// at least one of two hands should be tracked, since this is 
-				// called as a result of menu press
-				if (pHand->IsTracked()) {
-					qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+					// at least one of two hands should be tracked, since this is 
+					// called as a result of menu press
+					if (pHand->IsTracked()) {
+						qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
-					//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
+						//point ptHand = pHand->GetPosition(true) + point(qOffset * mallet->GetHeadOffset());
 
-					point ptHand = mallet->GetPosition(true);
-					vector vHand = ptHand - pCamera->GetOrigin(true);
-					vHand = vector(vHand.x(), 0.0f, vHand.z());
-					//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
-					vector vTempPos = vAppLookXZ * vHand.magnitude();
-					if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
-						vPos = vTempPos;
+						point ptHand = mallet->GetPosition(true);
+						vector vHand = ptHand - pCamera->GetOrigin(true);
+						vHand = vector(vHand.x(), 0.0f, vHand.z());
+						//vector vTempPos = vAppLookXZ * (vHand.dot(vAppLookXZ));
+						vector vTempPos = vAppLookXZ * vHand.magnitude();
+						if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
+							vPos = vTempPos;
+					}
 				}
+				point lookOffset = vPos + point(0.0f, yPos, 0.0f);
+				m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
 			}
-			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
-			m_pAppBasis->SetPosition(pCamera->GetPosition() + lookOffset);
 		}
-		
 		//*/
 		
 		//m_pAppBasis->SetPosition(ptCameraOrigin + ptMenuPosition + point(0.0f, yPos, 0.0f));
