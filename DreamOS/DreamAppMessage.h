@@ -21,7 +21,6 @@ private:
 
 public:
 	DreamAppMessage(long senderUserID, long receiverUserID, std::string strSenderDreamAppName, UID uidSenderDreamApp, long messageSize);
-
 	~DreamAppMessage();
 
 	virtual RESULT PrintMessage() override;

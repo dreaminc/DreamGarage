@@ -5,7 +5,7 @@
 #include "Primitives/texture.h"
 #include "Primitives/color.h"
 
-#include "DreamShareViewMessage.h"
+#include "ShareMessage.h"
 #include "DreamControlView/UIControlView.h"
 #include "DreamUserApp.h"
 
@@ -129,62 +129,90 @@ RESULT DreamShareView::Shutdown(void *pContext) {
 RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
 	RESULT r = R_PASS;
 
-	if (pDreamAppMessage->GetDreamAppName() == "DreamShareView.Share") {
-		DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
-		CN(pDreamShareViewMessage);
+	DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
+	CNR(pDreamShareViewMessage, R_SKIPPED);
 
-		//currently, only store the most recent message received
-		m_currentMessageType = pDreamShareViewMessage->GetMessageType();
-		m_currentAckType = pDreamShareViewMessage->GetAckType();
+	CBR(pDreamAppMessage->GetDreamAppName() == GetAppName(), R_SKIPPED);
 
-		switch (pDreamShareViewMessage->GetMessageType()) {
-			case DreamShareViewMessage::type::PING: {
-				CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::PING));
-			} break;
+	CB(pDreamShareViewMessage->GetMessageType() != DreamShareViewMessage::type::INVALID);
 
-			case DreamShareViewMessage::type::ACK: {
-				switch (pDreamShareViewMessage->GetAckType()) {
-					// We get a request streaming start ACK when we requested to start streaming
-					// This will begin broadcasting
-				case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
-					if (IsStreaming()) {
-						// For non-changing stuff we need to send the current frame
-						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
-					}
+	switch (pDreamShareViewMessage->GetMessageType()) {
 
-				} break;
-				}
-			} break;
+	case (DreamShareViewMessage::type::SHARE): {
+		CR(HandleShareMessage(pPeerConnection, (ShareMessage*)(pDreamAppMessage)));
+	} break;
 
-			case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
-				CR(StartReceiving(pPeerConnection));
-			} break;
-		}
+	case (DreamShareViewMessage::type::POINTER): {
+		CR(HandlePointerMessage(pPeerConnection, (DreamUpdatePointerMessage*)(pDreamAppMessage)));
+	} break;
+
 	}
-	else if (pDreamAppMessage->GetDreamAppName() == "DreamShareView.Pointer") {
-		DreamUpdatePointerMessage *pUpdatePointerMessage = (DreamUpdatePointerMessage*)(pDreamAppMessage);
-		CN(pUpdatePointerMessage);
 
-		if (m_fReceivingStream || IsStreaming()) {
-			sphere *pPointer;
-			long userID = pUpdatePointerMessage->GetSenderUserID();
+Error:
+	return r;
+}
 
-			CR(UpdatePointerPosition(pUpdatePointerMessage->GetSenderUserID(),
-				pUpdatePointerMessage->m_body.ptPointer,
-				pUpdatePointerMessage->m_body.fLeftHand));
+RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, ShareMessage *pShareMessage) {
+	RESULT r = R_PASS;
 
-			if (pUpdatePointerMessage->m_body.fLeftHand) {
-				pPointer = m_pointingObjects[userID][0];
-				pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-				pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+	CN(pShareMessage);
+
+	//currently, only store the most recent message received
+	m_currentMessageType = pShareMessage->GetShareMessageType();
+	m_currentAckType = pShareMessage->GetAckType();
+
+	switch (pShareMessage->GetShareMessageType()) {
+		case ShareMessage::type::PING: {
+			CR(BroadcastDreamShareViewMessage(ShareMessage::type::ACK, ShareMessage::type::PING));
+		} break;
+
+		case ShareMessage::type::ACK: {
+			switch (pShareMessage->GetAckType()) {
+				// We get a request streaming start ACK when we requested to start streaming
+				// This will begin broadcasting
+			case ShareMessage::type::REQUEST_STREAMING_START: {
+				if (IsStreaming()) {
+					// For non-changing stuff we need to send the current frame
+					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+				}
+
+			} break;
 			}
-			else {
-				pPointer = m_pointingObjects[userID][1];
-				pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-				pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
-			}
+		} break;
 
+		case ShareMessage::type::REQUEST_STREAMING_START: {
+			CR(StartReceiving(pPeerConnection));
+		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, DreamUpdatePointerMessage *pUpdatePointerMessage) {
+	RESULT r = R_PASS;
+
+	CN(pUpdatePointerMessage);
+
+	if (m_fReceivingStream || IsStreaming()) {
+		sphere *pPointer;
+		long userID = pUpdatePointerMessage->GetSenderUserID();
+
+		CR(UpdatePointerPosition(pUpdatePointerMessage->GetSenderUserID(),
+			pUpdatePointerMessage->m_body.ptPointer,
+			pUpdatePointerMessage->m_body.fLeftHand));
+
+		if (pUpdatePointerMessage->m_body.fLeftHand) {
+			pPointer = m_pointingObjects[userID][0];
+			pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+			pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 		}
+		else {
+			pPointer = m_pointingObjects[userID][1];
+			pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+			pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
+		}
+
 	}
 
 Error:
@@ -273,7 +301,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 	m_fReceivingStream = true;
 
-	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::REQUEST_STREAMING_START));
+	CR(BroadcastDreamShareViewMessage(ShareMessage::type::ACK, ShareMessage::type::REQUEST_STREAMING_START));
 
 Error:
 	return r;
@@ -370,7 +398,7 @@ RESULT DreamShareView::BeginStream() {
 	//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
 	//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
-	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+	CR(BroadcastDreamShareViewMessage(ShareMessage::type::REQUEST_STREAMING_START));
 	SetStreamingState(true);
 
 Error:
@@ -391,10 +419,10 @@ bool DreamShareView::IsStreaming() {
 }
 
 
-RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType) {
+RESULT DreamShareView::BroadcastDreamShareViewMessage(ShareMessage::type msgType, ShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	DreamShareViewMessage *pDreamBrowserMessage = new DreamShareViewMessage(0, 0, GetAppUID(), msgType, ackType);
+	ShareMessage *pDreamBrowserMessage = new ShareMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));

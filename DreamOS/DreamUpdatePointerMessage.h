@@ -4,15 +4,13 @@
 #include "RESULT/EHM.h"
 
 #include <string>
-#include "DreamAppMessage.h"
+#include "DreamShareViewMessage.h"
 #include "Primitives/Types/UID.h"
 
 #include "Primitives/point.h"
 #include "Primitives/color.h"
 
-#define DREAM_SHARE_POINTER_APP_NAME "DreamShareView"
-
-class DreamUpdatePointerMessage : public DreamAppMessage {
+class DreamUpdatePointerMessage : public DreamShareViewMessage {
 
 public:
 	__declspec(align(8)) struct MessageBody {

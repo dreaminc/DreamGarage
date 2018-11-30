@@ -307,6 +307,7 @@
     <ClCompile Include="..\..\..\DreamModule.cpp" />
     <ClCompile Include="..\..\..\DreamModuleManager.cpp" />
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
+    <ClCompile Include="..\..\..\ShareMessage.cpp" />
     <ClCompile Include="..\..\..\DreamLogger\DreamLogger.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamPeerApp.cpp" />
@@ -602,6 +603,7 @@
     <ClInclude Include="..\..\..\DreamModule.h" />
     <ClInclude Include="..\..\..\DreamModuleManager.h" />
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
+    <ClInclude Include="..\..\..\ShareMessage.h" />
     <ClInclude Include="..\..\..\DreamLogger\DreamLogger.h" />
     <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />

@@ -6,7 +6,7 @@
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
 #include "DreamVideoStreamSubscriber.h"
-#include "DreamShareViewMessage.h"
+#include "ShareMessage.h"
 #include "DreamUpdatePointerMessage.h"
 #include "DreamUserApp.h"
 
@@ -38,6 +38,11 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
+private:
+	RESULT HandleShareMessage(PeerConnection* pPeerConnection, ShareMessage *pShareMessage);
+	RESULT HandlePointerMessage(PeerConnection* pPeerConnection, DreamUpdatePointerMessage *pUpdatePointerMessage);
+
+public:
 	// Handle Interface
 	RESULT ShowLoadingTexture();
 	RESULT ShowCastingTexture();
@@ -56,7 +61,7 @@ public:
 
 	// App Messaging
 	RESULT BeginStream();
-	RESULT BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
+	RESULT BroadcastDreamShareViewMessage(ShareMessage::type msgType, ShareMessage::type ackType = ShareMessage::type::INVALID);
 	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
 
 	bool IsStreaming();
@@ -124,8 +129,8 @@ private:
 	bool m_fReadyForFrame = false;
 
 	// Dream app message members
-	DreamShareViewMessage::type m_currentMessageType;
-	DreamShareViewMessage::type m_currentAckType;
+	ShareMessage::type m_currentMessageType;
+	ShareMessage::type m_currentAckType;
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
