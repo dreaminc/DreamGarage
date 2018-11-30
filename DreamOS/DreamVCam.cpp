@@ -77,8 +77,25 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pOGLEndNode);
 
 	CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
-	*/	
+	/*/	
+	/*
+	{
+		sphere *pSphere = GetDOS()->AddSphere(0.25f, 20, 20);
+		CN(pSphere);
+		pSphere->SetPosition(0.0f, 0.0f, 2.0f);
 
+		auto pComposite = GetDOS()->AddComposite();
+		pComposite->InitializeOBB();
+
+		auto pView = pComposite->AddUIView(GetDOS());
+		pView->InitializeOBB();
+
+		auto pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+		pQuad->SetPosition(0.0f, 0.0f, 2.0f);
+		pQuad->FlipUVVertical();
+		pQuad->SetDiffuseTexture(m_pSourceTexture);
+	}
+	//*/
 Error:
 	return r;
 }
@@ -107,7 +124,8 @@ RESULT DreamVCam::Update(void *pContext) {
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
 	/*
 	// TODO: Some more logic around texture / buffer sizes etc 
-	if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+	{
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 		// Approximately 30 FPS
@@ -143,9 +161,9 @@ RESULT DreamVCam::Update(void *pContext) {
 			}
 		}
 	}
-	*/
+	//*/
 
-//Error:
+Error:
 	return r;
 }
 
@@ -208,11 +226,9 @@ RESULT DreamVCam::SetSourceTexture(texture *pTexture) {
 
 	m_pSourceTexture = pTexture;
 
-	/*
 	if (m_pParentApp != nullptr) {
-		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, this);
+		m_pParentApp->UpdateContentSourceTexture(GetSourceTexture(), this);
 	}
-	*/
 
 	// Enable PBO packing (DMA memory mapping) 
 	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pSourceTexture);
@@ -233,7 +249,7 @@ RESULT DreamVCam::UnsetSourceTexture() {
 
 RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
-	m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
+	//m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
 	return R_PASS;
 }
 
