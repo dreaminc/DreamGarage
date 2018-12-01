@@ -139,7 +139,7 @@ std::shared_ptr<UIButton> UITabView::CreateTab(std::shared_ptr<DreamContentSourc
 
 	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
 
-	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
+	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture());
 	pNewTabButton->GetSurface()->FlipUVVertical();
 
 	pNewTabButton->SetPosition(m_ptMostRecent);
@@ -221,7 +221,7 @@ RESULT UITabView::SelectTab(UIButton *pButtonContext, void *pContext) {
 
 	std::shared_ptr<UIButton> pNewTabButton = nullptr;
 	auto pContent = m_pParentApp->GetActiveSource();
-	auto tabTexture = pContent->GetSourceTexture().get();
+	auto tabTexture = pContent->GetSourceTexture();
 	auto pDreamOS = m_pDreamOS;
 
 	pNewTabButton = CreateTab(pContent);
@@ -268,7 +268,7 @@ RESULT UITabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent) 
 RESULT UITabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent) {
 
 	if (m_appToTabMap.count(pContent) > 0) {
-		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture().get());
+		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture());
 	}
 
 	return R_PASS;

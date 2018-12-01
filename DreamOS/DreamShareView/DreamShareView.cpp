@@ -173,9 +173,8 @@ RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, Dream
 			case DreamShareViewShareMessage::type::REQUEST_STREAMING_START: {
 				if (IsStreaming()) {
 					// For non-changing stuff we need to send the current frame
-					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture, 0, PIXEL_FORMAT::BGRA));
 				}
-
 			} break;
 			}
 		} break;
@@ -228,11 +227,11 @@ RESULT DreamShareView::ShowLoadingTexture() {
 }
 
 RESULT DreamShareView::ShowCastingTexture() {
-	m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
+	m_pCastQuad->SetDiffuseTexture(m_pCastTexture);
 	return R_PASS;
 }
 
-RESULT DreamShareView::SetCastingTexture(std::shared_ptr<texture> pNewCastTexture) {
+RESULT DreamShareView::SetCastingTexture(texture* pNewCastTexture) {
 	RESULT r = R_PASS;
 
 	m_pCastTexture = pNewCastTexture;
@@ -381,7 +380,7 @@ RESULT DreamShareView::BeginStream() {
 	RESULT r = R_PASS;
 
 	m_pCastQuad->SetVisible(true);
-	m_pCastQuad->SetDiffuseTexture(m_pCastTexture.get());
+	m_pCastQuad->SetDiffuseTexture(m_pCastTexture);
 	m_pCastBackgroundQuad->SetVisible(true);
 
 	if (m_fReceivingStream) {

@@ -55,7 +55,7 @@ public:
 	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
 
-	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) = 0;
+	virtual RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) = 0;
 
 	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
 	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;
@@ -182,7 +182,7 @@ public:
 
 	RESULT InitializeWithBrowserManager(std::shared_ptr<WebBrowserManager> pWebBrowserManager, std::string strURL);
 
-	virtual std::shared_ptr<texture> GetSourceTexture() override;
+	virtual texture* GetSourceTexture() override;
 	virtual long GetCurrentAssetID() override;
 	RESULT SetCurrentAssetID(long assetID);
 

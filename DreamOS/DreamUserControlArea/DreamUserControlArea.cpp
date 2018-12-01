@@ -440,7 +440,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) {
 	if (pContext == m_pActiveSource.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
@@ -480,7 +480,7 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 	CNR(pDreamOS, R_SKIPPED);
 	CNR(pDreamOS->GetSharedContentTexture(), R_SKIPPED);
 
-	if (pContext->GetSourceTexture().get() == pDreamOS->GetSharedContentTexture()) {
+	if (pContext->GetSourceTexture() == pDreamOS->GetSharedContentTexture()) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr) {
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
@@ -865,13 +865,13 @@ RESULT DreamUserControlArea::ForceStopSharing() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	//*
 	CNR(m_pActiveSource, R_SKIPPED);
-	if (m_pActiveSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
-			if (pSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
 				GetDOS()->OnStopSending();
 			}
@@ -911,13 +911,13 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	//*
 	CNR(m_pActiveSource, R_SKIPPED);
-	if (m_pActiveSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
-			if (pSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
 				GetDOS()->OnStopSending();
 			}

@@ -22,7 +22,7 @@ public:
 
 	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) = 0;
 
-	virtual std::shared_ptr<texture> GetSourceTexture() = 0;
+	virtual texture* GetSourceTexture() = 0;
 
 	virtual RESULT SetScope(std::string strScope) = 0;
 	virtual RESULT SetPath(std::string strPath) = 0;

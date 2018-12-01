@@ -16,6 +16,7 @@ class SpatialSoundObject;
 class SoundFile;
 class HMD;
 class texture;
+
 class NamedPipeServer;
 class ProgramNode;
 class OGLProgram;
@@ -42,7 +43,7 @@ public:
 
 	RESULT ModuleProcess(void *pContext) override;
 
-	RESULT SetSourceTexture(texture *pTexture);
+	RESULT SetSourceTexture(texture* pTexture);
 	RESULT UnsetSourceTexture();
 
 	RESULT HandleServerPipeMessage(void *pBuffer, size_t pBuffer_n);
@@ -60,7 +61,7 @@ public:
 
 	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
 
-	virtual std::shared_ptr<texture> GetSourceTexture() override;
+	virtual texture* GetSourceTexture() override;
 
 	virtual RESULT SetScope(std::string strScope) override;
 	virtual RESULT SetPath(std::string strPath) override;

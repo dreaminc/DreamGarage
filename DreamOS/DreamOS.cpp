@@ -1430,7 +1430,7 @@ texture* DreamOS::GetSharedContentTexture() {
 	return nullptr;
 }
 
-RESULT DreamOS::SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture) {
+RESULT DreamOS::SetSharedContentTexture(texture* pSharedTexture) {
 	if (m_pDreamShareView != nullptr) {
 		m_pDreamShareView->SetCastingTexture(pSharedTexture);
 	}

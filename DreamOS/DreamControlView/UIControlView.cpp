@@ -181,8 +181,8 @@ texture *UIControlView::GetOverlayTexture(HAND_TYPE type) {
 	return pTexture;
 }
 
-RESULT UIControlView::SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture) {
-	m_pViewQuad->SetDiffuseTexture(pBrowserTexture.get());	//Control view texture to be set by Browser
+RESULT UIControlView::SetViewQuadTexture(texture* pBrowserTexture) {
+	m_pViewQuad->SetDiffuseTexture(pBrowserTexture);	//Control view texture to be set by Browser
 	return R_PASS;
 }
 

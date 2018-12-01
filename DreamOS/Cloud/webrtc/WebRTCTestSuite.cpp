@@ -504,7 +504,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 
 		virtual RESULT UpdateControlBarText(std::string& strTitle) override { return R_NOT_HANDLED; }
 		virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override { return R_NOT_HANDLED; }
-		virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
+		virtual RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) override { return R_NOT_HANDLED; }
 		virtual RESULT HandleDreamFormSuccess() override { return R_NOT_HANDLED; }
@@ -874,7 +874,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		if (pTestContext->m_pBrowserQuad != nullptr) {
 
 			if (pTestContext->m_pDreamBrowser != nullptr) {
-				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture().get();
+				auto pSourceTexture = pTestContext->m_pDreamBrowser->GetSourceTexture();
 
 				pTestContext->m_pBrowserQuad->SetDiffuseTexture(pSourceTexture);
 

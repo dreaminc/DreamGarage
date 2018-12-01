@@ -121,7 +121,7 @@ public:
 // DreamBrowser
 public:
 
-	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) override;
+	virtual RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) override;
 	virtual RESULT UpdateControlBarText(std::string& strTitle) override;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;

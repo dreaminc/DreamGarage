@@ -74,7 +74,7 @@ private:
 public:
 	float GetBackgroundWidth();
 	RESULT SetKeyboardAnimationDuration(float animationDuration);
-	RESULT SetViewQuadTexture(std::shared_ptr<texture> pBrowserTexture);
+	RESULT SetViewQuadTexture(texture* pBrowserTexture);
 
 public:
 	const wchar_t *k_wszLoadingScreen = L"client-loading-1366-768.png";
