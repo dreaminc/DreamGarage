@@ -130,7 +130,7 @@ RESULT DreamVCam::Update(void *pContext) {
 
 			// Update the local render
 			CR(m_pOGLEndNode->RenderNode(count++));
-			/*
+			//*
 			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
