@@ -314,9 +314,6 @@ RESULT DreamUserApp::UpdateHysteresisObject() {
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
 	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
 
-//	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fLeftSphereOn && m_fLeftSphereInteracting, true));
-//	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fRightSphereOn && m_fRightSphereInteracting, false));
-
 Error:
 	return r;
 }
@@ -477,10 +474,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			}
 		}
 
-		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = true;
 		}
-		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = true;
 		}
 
@@ -495,25 +492,21 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		userID = pCloudController->GetUserID();
 
 		CBR(userID != -1, R_SKIPPED);
-		//*
 		if (handType == HAND_TYPE::HAND_LEFT) {
 			m_ptLeftPointer = mEvent->m_ptContact[0];
-//			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], true));
 		}
 		else if (handType == HAND_TYPE::HAND_RIGHT) {
 			m_ptRightPointer = mEvent->m_ptContact[0];
-//			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], false));
 		}
-		//*/
 
 	} break;
 
 	case (ELEMENT_INTERSECT_ENDED): {
 
-		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = false;
 		}
-		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = false;
 		}
 
