@@ -17,7 +17,6 @@ RESULT DreamShareViewPointerMessage::PrintMessage() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("UpdatePointerMessage:");
-	Message::PrintMessage();
 
 	m_body.ptPointer.Print("position");
 
