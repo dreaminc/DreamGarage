@@ -14,6 +14,11 @@
 #include "HAL/opengl/OGLProgram.h"
 #include "DreamGarage/DreamGamepadCameraApp.h"
 
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramWater.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
+
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
 {
@@ -54,11 +59,15 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	// Set up the aux camera and local pipeline
 
 	// TODO: 
-	//*
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
 
+	CR(GetDOS()->MakeMirrorPipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode));
+	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
+	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
+
+	/*
 	ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));
@@ -81,6 +90,12 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	//CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
 	//*/	
+
+	{
+		auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+		CN(pDreamGamepadCamera);
+		CR(pDreamGamepadCamera->SetCamera(m_pCamera));
+	}
 
 Error:
 	return r;

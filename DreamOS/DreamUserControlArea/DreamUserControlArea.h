@@ -36,8 +36,9 @@ class quad;
 
 #define ANIMATION_SCALE 0.1f
 
-#define TITLE_DESKTOP "Desktop"
-#define TITLE_WEBSITE "website"
+#define SCOPE_DESKTOP "MenuProviderScope.DesktopMenuProvider"
+#define SCOPE_WEBSITE "MenuProviderScope.WebsiteMenuProvider"
+#define SCOPE_CAMERA "MenuProviderScope.CameraMenuProvider"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,
@@ -230,8 +231,9 @@ private:
 	// certainly temporary
 	bool m_fIsAnimating = false;
 
-	std::string m_strDesktopTitle = TITLE_DESKTOP;
-	std::string m_strWebsiteTitle = TITLE_WEBSITE;
+	std::string m_strDesktopScope = SCOPE_DESKTOP;
+	std::string m_strWebsiteScope = SCOPE_WEBSITE;
+	std::string m_strCameraScope = SCOPE_CAMERA;
 
 	bool m_fUpdateDreamUIBar = false;
 };

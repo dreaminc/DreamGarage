@@ -329,6 +329,141 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::MakeMirrorPipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) {
+	RESULT r = R_PASS;
+
+	{
+		ProgramNode* pScatteringSkyboxProgram;
+		pScatteringSkyboxProgram = MakeProgramNode("skybox_scatter_cube");
+		CN(pScatteringSkyboxProgram);
+		CR(pScatteringSkyboxProgram->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		ProgramNode* pSkyboxConvolutionProgramNode;
+		pSkyboxConvolutionProgramNode = MakeProgramNode("cubemap_convolution");
+		CN(pSkyboxConvolutionProgramNode);
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
+		CR(pSkyboxConvolutionProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		// Reflection
+
+		auto pReflectionProgramNodeMirror = MakeProgramNode("reflection");
+		CN(pReflectionProgramNodeMirror);
+		CR(pReflectionProgramNodeMirror->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		ProgramNode* pReflectionSkyboxProgram;
+		pReflectionSkyboxProgram = MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
+		CN(pReflectionSkyboxProgram);
+		CR(pReflectionSkyboxProgram->ConnectToInput("camera", pCamera->Output("stereocamera")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pReflectionSkyboxProgram->ConnectToInput("input_framebuffer", pReflectionProgramNodeMirror->Output("output_framebuffer")));
+
+		// Refraction
+
+		auto pRefractionProgramNodeMirror = MakeProgramNode("refraction");
+		CN(pRefractionProgramNodeMirror);
+		CR(pRefractionProgramNodeMirror->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		// "Water"
+
+		ProgramNode* pWaterProgramNode = MakeProgramNode("water");
+		CN(pWaterProgramNode);
+		// Still need scene graph for lights
+		// TODO: make lights a different node
+		CR(pWaterProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		// TODO: This is not particularly general yet
+		// Uncomment below to turn on water effects
+		CR(pWaterProgramNode->ConnectToInput("input_refraction_map", pRefractionProgramNodeMirror->Output("output_framebuffer")));
+		CR(pWaterProgramNode->ConnectToInput("input_reflection_map", pReflectionSkyboxProgram->Output("output_framebuffer")));
+
+		// Environment shader
+
+		auto pRenderEnvironmentProgramNodeMirror = MakeProgramNode("environment", PIPELINE_FLAGS::PASSTHRU);
+		CN(pRenderEnvironmentProgramNodeMirror);
+		CR(pRenderEnvironmentProgramNodeMirror->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		CR(pRenderEnvironmentProgramNodeMirror->ConnectToInput("input_framebuffer", pWaterProgramNode->Output("output_framebuffer")));
+
+		// Everything else
+		ProgramNode* pRenderProgramNode = MakeProgramNode("standard", PIPELINE_FLAGS::PASSTHRU);
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_irradiance_cubemap", pSkyboxConvolutionProgramNode->Output("output_framebuffer_cube")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer_environment_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		// NOTE: Add this in if you want to have reflective objects
+		//CR(pRenderProgramNode->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+
+		CR(pRenderProgramNode->ConnectToInput("input_framebuffer", pRenderEnvironmentProgramNodeMirror->Output("output_framebuffer")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = MakeProgramNode("reference", PIPELINE_FLAGS::PASSTHRU);
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram;
+		pSkyboxProgram = MakeProgramNode("skybox", PIPELINE_FLAGS::PASSTHRU);
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("camera", pCamera->Output("stereocamera")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer_cubemap", pScatteringSkyboxProgram->Output("output_framebuffer_cube")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		ProgramNode* pUIProgramNode = MakeProgramNode("uistage", PIPELINE_FLAGS::PASSTHRU);
+		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+		CR(pUIProgramNode->ConnectToInput("camera", pCamera->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		pRenderNode = dynamic_cast<OGLProgram*>(pRenderProgramNode);
+		CN(pRenderNode);
+
+		pEndNode = dynamic_cast<OGLProgram*>(pSkyboxProgram);
+		CN(pEndNode);
+
+		quad *pWaterQuad = MakeQuad(1000.0f, 1000.0f);
+		point ptQuadOffset = point(90.0f, -1.3f, -25.0f);
+		pWaterQuad->SetPosition(ptQuadOffset);
+		pWaterQuad->SetMaterialColors(color(57.0f / 255.0f, 112.0f / 255.0f, 151.0f / 255.0f, 1.0f));
+		CN(pWaterQuad);
+
+		if (pWaterProgramNode != nullptr) {
+			CR(dynamic_cast<OGLProgramWater*>(pWaterProgramNode)->SetPlaneObject(pWaterQuad));
+		}
+
+		if (pReflectionProgramNodeMirror != nullptr) {
+			CR(dynamic_cast<OGLProgramReflection*>(pReflectionProgramNodeMirror)->SetReflectionObject(pWaterQuad));
+		}
+
+		if (pRefractionProgramNodeMirror != nullptr) {
+			CR(dynamic_cast<OGLProgramRefraction*>(pRefractionProgramNodeMirror)->SetRefractionObject(pWaterQuad));
+		}
+
+		if (pReflectionSkyboxProgram != nullptr) {
+			CR(dynamic_cast<OGLProgramSkybox*>(pReflectionSkyboxProgram)->SetReflectionObject(pWaterQuad));
+		}
+
+		CN(pRenderEnvironmentProgramNodeMirror);
+		CR(pRenderEnvironmentProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+		CN(pReflectionProgramNodeMirror);
+		CR(pReflectionProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+
+		CN(pRefractionProgramNodeMirror);
+		CR(pRefractionProgramNodeMirror->ConnectToInput("scenegraph", m_pDreamEnvironmentApp->GetSceneGraphNode()->Output("objectstore")));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 

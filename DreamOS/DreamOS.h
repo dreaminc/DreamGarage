@@ -60,6 +60,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+class OGLProgram;
 
 class NamedPipeClient;
 class NamedPipeServer;
@@ -293,7 +294,6 @@ protected:
 	// related functionality
 	HALImp* GetHALImp();
 
-
 	// Dream Apps
 public:
 	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
@@ -312,6 +312,8 @@ public:
 
 	std::vector<UID> GetAppUID(std::string strAppName);
 	UID GetUniqueAppUID(std::string strAppName);
+
+	virtual RESULT MakeMirrorPipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -344,7 +346,7 @@ public:
 	// Sandbox level objects
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
-
+	
 	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
