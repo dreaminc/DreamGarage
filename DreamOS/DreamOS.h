@@ -479,9 +479,11 @@ protected:
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
+public:
 	// Dream App Messaging
-	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
+protected:
 	// Sound 
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);

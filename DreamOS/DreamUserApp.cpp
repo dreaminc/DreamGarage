@@ -87,14 +87,6 @@ RESULT DreamUserApp::InitializeApp(void *pContext) {
 	m_pMessageQuadBackground->SetVisible(true);
 	m_pMessageQuadBackground->RotateXByDeg(90);
 
-	m_pPointSphereLeft = pDreamOS->AddSphere(0.025f);
-	m_pPointSphereLeft->SetMaterialDiffuseColor(COLOR_RED);
-	m_pPointSphereLeft->SetVisible(false);
-
-	m_pPointSphereRight = pDreamOS->AddSphere(0.025f);
-	m_pPointSphereRight->SetMaterialDiffuseColor(COLOR_BLUE);
-	m_pPointSphereRight->SetVisible(false);
-
 	m_pPointingArea = pDreamOS->MakeHysteresisObject(0.45f, 0.3f, CYLINDER);
 
 	CR(m_pPointingArea->RegisterSubscriber(HysteresisEventType::ON, this));
@@ -290,18 +282,40 @@ Error:
 RESULT DreamUserApp::UpdateHysteresisObject() {
 	RESULT r = R_PASS;
 
+	auto pCloudController = GetDOS()->GetCloudController();
+	long userID;
+	CN(pCloudController);
+
+	userID = pCloudController->GetUserID();
+
+	DreamShareViewPointerMessage *pPointerMessageLeft = new DreamShareViewPointerMessage(
+		userID,
+		0,
+		GetAppUID(),
+		m_ptLeftPointer,
+		COLOR_RED,
+		m_fLeftSphereOn && m_fLeftSphereInteracting,
+		true);
+
+	DreamShareViewPointerMessage *pPointerMessageRight = new DreamShareViewPointerMessage(
+		userID,
+		0,
+		GetAppUID(),
+		m_ptRightPointer,
+		COLOR_BLUE,
+		m_fRightSphereOn && m_fRightSphereInteracting,
+		false);
+
+	DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK | DreamAppMessage::flags::SHARE_LOCAL;
+
 	m_pPointingArea->SetPosition(GetDOS()->GetCamera()->GetPosition(true));
 	CR(m_pPointingArea->Update());
 
-	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fLeftSphereOn && m_fLeftSphereInteracting, true));
-	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fRightSphereOn && m_fRightSphereInteracting, false));
+	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageLeft, messageFlags));
+	CR(GetDOS()->BroadcastDreamAppMessage(pPointerMessageRight, messageFlags));
 
-	/*
-	if (GetDOS()->IsSharing()) {
-		m_pPointSphereLeft->SetVisible(m_fLeftSphereOn && m_fLeftSphereInteracting);
-		m_pPointSphereRight->SetVisible(m_fRightSphereOn && m_fRightSphereInteracting);
-	}
-	//*/
+//	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fLeftSphereOn && m_fLeftSphereInteracting, true));
+//	CR(GetDOS()->BroadcastUpdatePointerMessage(m_fRightSphereOn && m_fRightSphereInteracting, false));
 
 Error:
 	return r;
@@ -463,10 +477,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 			}
 		}
 
-		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = true;
 		}
-		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = true;
 		}
 
@@ -483,14 +497,12 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 		CBR(userID != -1, R_SKIPPED);
 		//*
 		if (handType == HAND_TYPE::HAND_LEFT) {
-			m_pPointSphereLeft->SetPosition(mEvent->m_ptContact[0]);
-
-			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], true));
+			m_ptLeftPointer = mEvent->m_ptContact[0];
+//			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], true));
 		}
 		else if (handType == HAND_TYPE::HAND_RIGHT) {
-			m_pPointSphereRight->SetPosition(mEvent->m_ptContact[0]);
-
-			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], false));
+			m_ptRightPointer = mEvent->m_ptContact[0];
+//			CR(GetDOS()->UpdatePointerPosition(userID, mEvent->m_ptContact[0], false));
 		}
 		//*/
 
@@ -498,10 +510,10 @@ RESULT DreamUserApp::Notify(InteractionObjectEvent *mEvent) {
 
 	case (ELEMENT_INTERSECT_ENDED): {
 
-		if (m_pLeftHand == mEvent->m_pInteractionObject) {
+		if (m_pLeftHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fLeftSphereInteracting = false;
 		}
-		else if (m_pRightHand == mEvent->m_pInteractionObject) {
+		else if (m_pRightHand->GetMalletHead() == mEvent->m_pInteractionObject) {
 			m_fRightSphereInteracting = false;
 		}
 

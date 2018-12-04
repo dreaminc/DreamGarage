@@ -121,8 +121,6 @@ public:
 	virtual RESULT Notify(HysteresisEvent *mEvent);
 
 private:
-	sphere *m_pPointSphereLeft = nullptr;
-	sphere *m_pPointSphereRight = nullptr;
 
 	// Current Hysteresis Event (ON/OFF)
 	bool m_fLeftSphereOn = false;
@@ -130,6 +128,9 @@ private:
 
 	bool m_fLeftSphereInteracting = false;
 	bool m_fRightSphereInteracting = false;
+
+	point m_ptLeftPointer;
+	point m_ptRightPointer;
 
 	HysteresisObject *m_pPointingArea = nullptr;
 
