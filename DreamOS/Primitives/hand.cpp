@@ -459,9 +459,9 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 
 hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
-		m_handType,
 		GetPosition(true),
 		GetOrientation(true),
+		m_handType,
 		m_fTracked
 	};
 

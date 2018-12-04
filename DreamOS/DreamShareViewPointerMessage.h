@@ -10,19 +10,23 @@
 #include "Primitives/point.h"
 #include "Primitives/color.h"
 
-class DreamUpdatePointerMessage : public DreamShareViewMessage {
+class DreamShareViewPointerMessage : public DreamShareViewMessage {
 
 public:
-	__declspec(align(8)) struct MessageBody {
+	__declspec(align(4)) struct MessageBody {
 		point ptPointer;
 		color cColor;
+
 		bool fVisible;
 		bool fLeftHand;
+		unsigned int reserved0;
+		unsigned int reserved1;
+
 	} m_body;
 
 public:
-	DreamUpdatePointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, color cColor, bool fVisible, bool fLeftHand);
-	~DreamUpdatePointerMessage();
+	DreamShareViewPointerMessage(long senderUserID, long receiverUserID, UID uidSenderDreamApp, point ptPointer, color cColor, bool fVisible, bool fLeftHand);
+	~DreamShareViewPointerMessage();
 
 	RESULT PrintMessage() override;
 

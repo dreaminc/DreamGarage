@@ -13,3 +13,12 @@ DreamShareViewMessage::~DreamShareViewMessage() {
 DreamShareViewMessage::type DreamShareViewMessage::GetMessageType() {
 	return m_body.m_msgType;
 }
+
+RESULT DreamShareViewMessage::PrintMessage() {
+	RESULT r = R_PASS;
+
+	CR(DreamAppMessage::PrintMessage());
+
+Error:
+	return r;
+}
