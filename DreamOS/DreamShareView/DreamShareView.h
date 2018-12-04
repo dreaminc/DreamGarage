@@ -62,7 +62,6 @@ public:
 	// App Messaging
 	RESULT BeginStream();
 	RESULT BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);
-	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
@@ -84,8 +83,6 @@ public:
 	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
 
 	// Pointing
-	RESULT BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand);
-	RESULT UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand);
 	RESULT AllocateSpheres(long userID);
 	RESULT DeallocateSpheres(long userID);
 

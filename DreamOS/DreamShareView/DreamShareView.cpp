@@ -195,26 +195,22 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 	CN(pUpdatePointerMessage);
 
 	if (m_fReceivingStream || IsStreaming()) {
+
 		sphere *pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
 		CR(AllocateSpheres(userID));
 
-		CR(UpdatePointerPosition(pUpdatePointerMessage->GetSenderUserID(),
-			pUpdatePointerMessage->m_body.ptPointer,
-			pUpdatePointerMessage->m_body.fLeftHand));
-
 		if (pUpdatePointerMessage->m_body.fLeftHand) {
 			pPointer = m_pointingObjects[userID][0];
-			pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-			pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 		}
 		else {
 			pPointer = m_pointingObjects[userID][1];
-			pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
-			pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 		}
 
+		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+		pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
 Error:
@@ -433,18 +429,6 @@ Error:
 	return r;
 }
 
-RESULT DreamShareView::BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand) {
-	RESULT r = R_PASS;
-
-	DreamShareViewPointerMessage *pUpdatePointerMessage = new DreamShareViewPointerMessage(0, 0, GetAppUID(), ptPointer, cColor, fVisible, fLeftHand);
-	CN(pUpdatePointerMessage);
-
-	CR(BroadcastDreamAppMessage(pUpdatePointerMessage));
-
-Error:
-	return r;
-}
-
 RESULT DreamShareView::BroadcastVideoFrame(const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
@@ -635,58 +619,6 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	if (m_pSpatialBrowserObject != nullptr) {
 		m_pSpatialBrowserObject->SetPosition(ptPosition);
 	}
-
-Error:
-	return r;
-}
-
-RESULT DreamShareView::BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand) {
-	RESULT r = R_PASS;
-
-	DreamShareViewPointerMessage *pDreamPointerMessage = nullptr;
-	color cColor;
-	sphere *pPointer;
-
-	auto pCloudController = GetDOS()->GetCloudController();
-	CBR(pCloudController, R_SKIPPED);
-
-	long userID;
-	userID = pCloudController->GetUserID();
-
-	CBR(userID != -1, R_SKIPPED);
-	CR(AllocateSpheres(userID));
-	
-	if (fLeftHand) {
-		pPointer = m_pointingObjects[userID][0];
-	}
-	else {
-		pPointer = m_pointingObjects[userID][1];
-	}
-
-	pPointer->SetVisible(fVisible);
-	cColor = pPointer->GetDiffuseColor();
-
-	pDreamPointerMessage = new DreamShareViewPointerMessage(userID, 0, GetAppUID(), pPointer->GetPosition(), cColor, fVisible, fLeftHand);
-	CN(pDreamPointerMessage);
-
-	CR(BroadcastDreamAppMessage(pDreamPointerMessage));
-
-Error:
-	return r;
-}
-
-RESULT DreamShareView::UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand) {
-	RESULT r = R_PASS;
-
-	CR(AllocateSpheres(userID));
-
-	if (fLeftHand) {
-		m_pointingObjects[userID][0]->SetPosition(ptPosition);
-	}
-	else {
-		m_pointingObjects[userID][1]->SetPosition(ptPosition);
-	}
-
 
 Error:
 	return r;
