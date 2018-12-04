@@ -198,6 +198,8 @@ RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, Dre
 		sphere *pPointer;
 		long userID = pUpdatePointerMessage->GetSenderUserID();
 
+		CR(AllocateSpheres(userID));
+
 		CR(UpdatePointerPosition(pUpdatePointerMessage->GetSenderUserID(),
 			pUpdatePointerMessage->m_body.ptPointer,
 			pUpdatePointerMessage->m_body.fLeftHand));

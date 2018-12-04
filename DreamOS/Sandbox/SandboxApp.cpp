@@ -1835,10 +1835,13 @@ RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
-	CN(pPeerConnection);
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CN(pPeerConnection);
+	}
+
 	CN(pDreamAppMessage);
 
 	CR(m_pDreamAppManager->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
@@ -1847,12 +1850,18 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
 	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
 
-	CR(BroadcastDataMessage(pDreamAppMessage));
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CR(BroadcastDataMessage(pDreamAppMessage));
+	}
+
+	if ((messageFlags & DreamAppMessage::flags::SHARE_LOCAL) != DreamAppMessage::flags::NONE) {
+		CR(HandleDreamAppMessage(nullptr, pDreamAppMessage, DreamAppMessage::flags::SHARE_LOCAL));
+	}
 
 Error:
 	return r;
