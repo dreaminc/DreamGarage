@@ -1006,13 +1006,13 @@
     <ClCompile Include="..\..\..\Primitives\HysteresisObject.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\DreamUpdatePointerMessage.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\ShareMessage.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\DreamShareViewMessage.cpp" />
+    <ClCompile Include="..\..\..\DreamShareViewShareMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamShareViewPointerMessage.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\RESULT\EHM.h">
@@ -2198,13 +2198,13 @@
     <ClInclude Include="..\..\..\Primitives\HysteresisObject.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\DreamUpdatePointerMessage.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\ShareMessage.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamShareViewMessage.h" />
+    <ClInclude Include="..\..\..\DreamShareViewShareMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamShareViewPointerMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

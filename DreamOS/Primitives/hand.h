@@ -44,11 +44,14 @@ class hand : public composite {
 
 public:
 	struct HandState {
-		HAND_TYPE handType;
+
 		point ptPalm;
 		quaternion qOrientation;
 
+		HAND_TYPE handType;
 		bool fTracked;
+		unsigned int reserved0;
+		unsigned int reserved1;
 
 		RESULT PrintState() {
 			ptPalm.Print();

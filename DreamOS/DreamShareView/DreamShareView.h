@@ -6,8 +6,8 @@
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
 #include "DreamVideoStreamSubscriber.h"
-#include "ShareMessage.h"
-#include "DreamUpdatePointerMessage.h"
+#include "DreamShareViewShareMessage.h"
+#include "DreamShareViewPointerMessage.h"
 #include "DreamUserApp.h"
 
 #include "DreamGarage/UICommon.h"
@@ -39,8 +39,8 @@ public:
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
 private:
-	RESULT HandleShareMessage(PeerConnection* pPeerConnection, ShareMessage *pShareMessage);
-	RESULT HandlePointerMessage(PeerConnection* pPeerConnection, DreamUpdatePointerMessage *pUpdatePointerMessage);
+	RESULT HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage);
+	RESULT HandlePointerMessage(PeerConnection* pPeerConnection, DreamShareViewPointerMessage *pUpdatePointerMessage);
 
 public:
 	// Handle Interface
@@ -61,7 +61,7 @@ public:
 
 	// App Messaging
 	RESULT BeginStream();
-	RESULT BroadcastDreamShareViewMessage(ShareMessage::type msgType, ShareMessage::type ackType = ShareMessage::type::INVALID);
+	RESULT BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);
 	RESULT BroadcastUpdatePointerMessage(point ptPointer, color cColor, bool fVisible, bool fLeftHand);
 
 	bool IsStreaming();
@@ -87,6 +87,7 @@ public:
 	RESULT BroadcastUpdatePointerMessage(bool fVisible, bool fLeftHand);
 	RESULT UpdatePointerPosition(long userID, point ptPosition, bool fLeftHand);
 	RESULT AllocateSpheres(long userID);
+	RESULT DeallocateSpheres(long userID);
 
 	struct PendingFrame {
 		bool fPending = false;
@@ -129,8 +130,8 @@ private:
 	bool m_fReadyForFrame = false;
 
 	// Dream app message members
-	ShareMessage::type m_currentMessageType;
-	ShareMessage::type m_currentAckType;
+	DreamShareViewShareMessage::type m_currentMessageType;
+	DreamShareViewShareMessage::type m_currentAckType;
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 	PeerConnection *m_pStreamerPeerConnection = nullptr;

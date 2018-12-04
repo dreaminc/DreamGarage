@@ -24,6 +24,8 @@ public:
 	~DreamShareViewMessage();
 
 	DreamShareViewMessage::type GetMessageType();
+
+	virtual RESULT PrintMessage() override;
 };
 
 #endif DREAM_SHARE_VIEW_MESSAGE_H_

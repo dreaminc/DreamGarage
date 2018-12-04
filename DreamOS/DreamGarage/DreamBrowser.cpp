@@ -913,10 +913,10 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::BroadcastDreamBrowserMessage(ShareMessage::type msgType, ShareMessage::type ackType) {
+RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	ShareMessage *pDreamBrowserMessage = new ShareMessage(0, 0, GetAppUID(), msgType, ackType);
+	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
