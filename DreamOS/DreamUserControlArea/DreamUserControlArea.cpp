@@ -697,7 +697,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			// new desktop can't be the current content
 			m_pUserControls->SetSharingFlag(false);;
 			
-			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, "a", strTitle), "Failed to share environment asset");
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, "", strTitle), "Failed to share environment asset");
 		}
 	}
 

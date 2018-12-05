@@ -63,7 +63,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
 
-	CR(GetDOS()->MakeMirrorPipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode));
+	CR(GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode));
 	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
 	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
 
@@ -92,9 +92,9 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	//*/	
 
 	{
-		auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
-		CN(pDreamGamepadCamera);
-		CR(pDreamGamepadCamera->SetCamera(m_pCamera));
+		//auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+		//CN(pDreamGamepadCamera);
+		//CR(pDreamGamepadCamera->SetCamera(m_pCamera));
 	}
 
 Error:

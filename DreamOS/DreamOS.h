@@ -313,7 +313,7 @@ public:
 	std::vector<UID> GetAppUID(std::string strAppName);
 	UID GetUniqueAppUID(std::string strAppName);
 
-	virtual RESULT MakeMirrorPipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
