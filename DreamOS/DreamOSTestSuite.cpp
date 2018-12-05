@@ -58,11 +58,11 @@ RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
 	CR(AddTestDreamVCam());
-
+	
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamDesktop());
-	
+
 	CR(AddTestNamedPipes());
 
 	CR(AddTestModuleManager());
