@@ -1159,6 +1159,8 @@ Error:
 RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeerApp> pDreamPeer) {
 	RESULT r = R_PASS;
 
+	CR(m_pDreamShareView->DeallocateSpheres(pDreamPeer->GetPeerUserID()));
+
 	CR(UnallocateUserModelFromPool(pDreamPeer));
 
 Error:
@@ -1336,7 +1338,6 @@ user* DreamGarage::ActivateUser(long userId) {
 		if (m_peerUsers[userId] != nullptr) {
 			user *u = m_peerUsers[userId];
 			m_peerUsers[userId]->SetVisible();
-			m_peerUsers[userId]->Activate();
 		}
 	}
 

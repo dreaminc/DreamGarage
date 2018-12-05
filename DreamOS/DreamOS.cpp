@@ -816,9 +816,8 @@ RESULT DreamOS::InitializeDreamUserApp() {
 	m_pDreamUserApp = LaunchDreamApp<DreamUserApp>(this, false);
 	CNM(m_pDreamUserApp, "Failed to launch dream user app");
 
-	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
-	//	WCRM(m_pDreamUser->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
-
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_LEFT)), "Warning: Failed to set left hand");
+	//WCRM(m_pDreamUserApp->SetHand(GetHand(HAND_TYPE::HAND_RIGHT)), "Warning: Failed to set right hand");
 
 Error:
 	return r;
@@ -1036,6 +1035,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 
 quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+HysteresisObject *DreamOS::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	return m_pSandbox->MakeHysteresisObject(onThreshold, offThreshold, objectType);
 }
 
 std::shared_ptr<UIKeyboard> DreamOS::GetKeyboardApp() {
@@ -1330,8 +1333,8 @@ RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
-	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage);
+RESULT DreamOS::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
+	return m_pSandbox->BroadcastDreamAppMessage(pDreamAppMessage, messageFlags);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {

@@ -35,6 +35,8 @@
 #include "Primitives/skybox.h"
 #include "Primitives/user.h"
 
+#include "Primitives/HysteresisObject.h"
+
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
@@ -368,6 +370,8 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
+	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
+
 	template<typename objType, typename... Targs>
 	objType *Add(Targs... Fargs) {
 		return m_pSandbox->TAddObject<objType>(Fargs...);
@@ -484,9 +488,11 @@ protected:
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 	RESULT BroadcastVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight, int channels);
 
+public:
 	// Dream App Messaging
-	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
+protected:
 	// Sound 
 	RESULT InitializeDreamSoundSystem();
 	RESULT RegisterSoundSystemObserver(DreamSoundSystem::observer *pObserver);

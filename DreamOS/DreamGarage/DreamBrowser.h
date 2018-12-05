@@ -46,7 +46,7 @@ class DreamUserControlArea;
 class AudioPacket;
 class SoundBuffer;
 
-#include "DreamShareViewMessage.h"
+#include "DreamShareViewShareMessage.h"
 
 class DreamBrowserObserver {
 public:
@@ -114,7 +114,7 @@ public:
 	virtual RESULT OnMouseMove(point mousePoint) override;
 	virtual RESULT OnClick(point ptDiff, bool fMouseDown) override;
 
-	RESULT BroadcastDreamBrowserMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
+	RESULT BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);
 
 	// InteractionObjectEvent
 	RESULT HandleTestQuadInteractionEvents(InteractionObjectEvent *pEvent);

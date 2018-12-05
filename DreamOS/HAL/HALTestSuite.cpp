@@ -9,6 +9,8 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "Primitives/HysteresisCylinder.h"
+
 #include "PhysicsEngine/CollisionManifold.h"
 
 #include "HAL/opengl/OGLProgramReflection.h"

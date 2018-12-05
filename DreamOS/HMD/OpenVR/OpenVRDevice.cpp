@@ -694,7 +694,6 @@ RESULT OpenVRDevice::UpdateHMD() {
 							m_pLeftHand->SetPosition(ptControllerPosition);
 							m_pLeftHand->SetOrientation(qOrientation);
 						}
-						m_pLeftHand->SetLocalOrientation(qOrientation);
 
 						fLeftHandTracked = true;
 						m_pLeftHand->SetTracked(true);
@@ -713,7 +712,6 @@ RESULT OpenVRDevice::UpdateHMD() {
 							m_pRightHand->SetPosition(ptControllerPosition);
 							m_pRightHand->SetOrientation(qOrientation);
 						}
-						m_pRightHand->SetLocalOrientation(qOrientation);
 
 						fRightHandTracked = true;
 						m_pRightHand->SetTracked(true);

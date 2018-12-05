@@ -11,9 +11,8 @@
 #include "UI/UIButton.h"
 #include "UI/UIMenuItem.h"
 #include "UI/UISpatialScrollView.h"
-#include "UI/UIMallet.h"
 
-#include "DreamControlView/UIControlView.h"
+//#include "DreamControlView/UIControlView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamBrowser.h"
 
@@ -333,8 +332,6 @@ RESULT DreamUIBar::HandleEvent(UserObserverEventType type) {
 				pKeyboardApp = nullptr;
 			} 
 
-			pDreamUserApp->PreserveSharingState(true);
-			
 			if (m_pParentApp != nullptr) {
 				CR(m_pParentApp->CreateBrowserSource(m_pMenuNode->GetScope()));
 			}
@@ -410,15 +407,15 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 	pDreamUserApp = GetDOS()->GetUserApp();
 	CNR(pDreamUserApp, R_SKIPPED);
 	
-	UIMallet* pLeftMallet;
-	pLeftMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-	CN(pLeftMallet);
+	hand* pLeftHand;
+	pLeftHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+	CN(pLeftHand);
 
-	UIMallet* pRightMallet;
-	pRightMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
+	hand* pRightMallet;
+	pRightMallet = pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
 	CN(pRightMallet);
 
-	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftMallet->GetMalletHead());
+	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pLeftHand->GetMalletHead());
 	GetDOS()->GetInteractionEngineProxy()->ReleaseObjects(pRightMallet->GetMalletHead());
 
 	pDreamUserApp->CreateHapticImpulse(pSelected->GetInteractionObject());

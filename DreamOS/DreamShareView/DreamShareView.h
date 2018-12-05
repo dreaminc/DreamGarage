@@ -6,13 +6,16 @@
 #include "DreamApp.h"
 #include "DreamAppHandle.h"
 #include "DreamVideoStreamSubscriber.h"
-#include "DreamShareViewMessage.h"
+#include "DreamShareViewShareMessage.h"
+#include "DreamShareViewPointerMessage.h"
 #include "DreamUserApp.h"
 
 #include "DreamGarage/UICommon.h"
 
 class quad;
 class texture;
+class color;
+
 class AudioPacket;
 class SpatialSoundObject;
 class AudioDataMessage;
@@ -35,6 +38,11 @@ public:
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 	virtual RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) override;
 
+private:
+	RESULT HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage);
+	RESULT HandlePointerMessage(PeerConnection* pPeerConnection, DreamShareViewPointerMessage *pUpdatePointerMessage);
+
+public:
 	// Handle Interface
 	RESULT ShowLoadingTexture();
 	RESULT ShowCastingTexture();
@@ -53,7 +61,7 @@ public:
 
 	// App Messaging
 	RESULT BeginStream();
-	RESULT BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType = DreamShareViewMessage::type::INVALID);
+	RESULT BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType = DreamShareViewShareMessage::type::INVALID);
 
 	bool IsStreaming();
 	RESULT SetStreamingState(bool fStreaming);
@@ -73,6 +81,10 @@ public:
 
 	// Environment
 	RESULT UpdateScreenPosition(point ptPosition, quaternion qOrientation, float scale);
+
+	// Pointing
+	RESULT AllocateSpheres(long userID);
+	RESULT DeallocateSpheres(long userID);
 
 	struct PendingFrame {
 		bool fPending = false;
@@ -115,11 +127,16 @@ private:
 	bool m_fReadyForFrame = false;
 
 	// Dream app message members
-	DreamShareViewMessage::type m_currentMessageType;
-	DreamShareViewMessage::type m_currentAckType;
+	DreamShareViewShareMessage::type m_currentMessageType;
+	DreamShareViewShareMessage::type m_currentAckType;
 
 	std::shared_ptr<SpatialSoundObject> m_pSpatialBrowserObject = nullptr;
 	PeerConnection *m_pStreamerPeerConnection = nullptr;
+
+	// Pointing members
+	std::map<long, std::vector<sphere*>> m_pointingObjects; // user id to left/right sphere
+
+	std::queue<sphere*> m_pointerSpherePool;
 
 private:
 //	std::shared_ptr<UIView> 

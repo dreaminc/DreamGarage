@@ -26,6 +26,10 @@
 
 #include "Primitives/model/ModelFactory.h"
 
+#include "Primitives/HysteresisCylinder.h"
+#include "Primitives/HysteresisPlane.h"
+#include "Primitives/HysteresisSphere.h"
+
 #include <HMD/HMDFactory.h>
 
 SandboxApp::SandboxApp() :
@@ -274,9 +278,6 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
-	pLeftHand->SetOriented(true);
-	pRightHand->SetOriented(true);
-
 	// TODO: broken for now
 //	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 //	CR(m_pSenseLeapMotion->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
@@ -291,9 +292,6 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 	if (m_pHMD != nullptr) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_LEFT);
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp), HAND_TYPE::HAND_RIGHT);
-
-		pLeftHand->SetOriented(false);
-		pRightHand->SetOriented(false);
 
 		CR(m_pHMD->AttachHand(pLeftHand, HAND_TYPE::HAND_LEFT));
 		CR(m_pHMD->AttachHand(pRightHand, HAND_TYPE::HAND_RIGHT));
@@ -1648,6 +1646,35 @@ Error:
 	return nullptr;
 }
 
+HysteresisObject *SandboxApp::MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType) {
+	RESULT r = R_PASS;
+
+	HysteresisObject *pObject = nullptr;
+
+	switch (objectType) {
+		case (SPHERE): {
+			pObject = new HysteresisSphere(onThreshold, offThreshold);
+		} break;
+		case (CYLINDER): {
+			pObject = new HysteresisCylinder(onThreshold, offThreshold);
+		} break;
+		case (PLANE): {
+			pObject = new HysteresisPlane(onThreshold, offThreshold);
+		} break;
+	}
+
+	CN(pObject);
+
+	return pObject;
+
+Error:
+	if (pObject != nullptr) {
+		delete pObject;
+		pObject = nullptr;
+	}
+	return nullptr;
+}
+
 model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
@@ -1808,10 +1835,13 @@ RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
 
-RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
-	CN(pPeerConnection);
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CN(pPeerConnection);
+	}
+
 	CN(pDreamAppMessage);
 
 	CR(m_pDreamAppManager->HandleDreamAppMessage(pPeerConnection, pDreamAppMessage));
@@ -1820,12 +1850,18 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage) {
+RESULT SandboxApp::BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags) {
 	RESULT r = R_PASS;
 
 	CBM((m_pDreamAppManager->FindDreamAppWithName(pDreamAppMessage->GetDreamAppName())), "Cannot find dream app name %s", pDreamAppMessage->GetDreamAppName().c_str());
 
-	CR(BroadcastDataMessage(pDreamAppMessage));
+	if ((messageFlags & DreamAppMessage::flags::SHARE_NETWORK) != DreamAppMessage::flags::NONE) {
+		CR(BroadcastDataMessage(pDreamAppMessage));
+	}
+
+	if ((messageFlags & DreamAppMessage::flags::SHARE_LOCAL) != DreamAppMessage::flags::NONE) {
+		CR(HandleDreamAppMessage(nullptr, pDreamAppMessage, DreamAppMessage::flags::SHARE_LOCAL));
+	}
 
 Error:
 	return r;

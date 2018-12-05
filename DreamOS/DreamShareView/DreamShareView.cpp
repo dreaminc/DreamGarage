@@ -3,8 +3,11 @@
 
 #include "Primitives/quad.h"
 #include "Primitives/texture.h"
-#include "DreamShareViewMessage.h"
+#include "Primitives/color.h"
+
+#include "DreamShareViewShareMessage.h"
 #include "DreamControlView/UIControlView.h"
+#include "DreamUserApp.h"
 
 #include "Sound/AudioPacket.h"
 #include "DreamGarage/AudioDataMessage.h"
@@ -29,6 +32,9 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	SetAppName("DreamShareView");
+
+	DreamOS *pDreamOS = GetDOS();
+	std::shared_ptr<DreamUserApp> pDreamUserApp = pDreamOS->GetUserApp();
 
 	GetDOS()->AddObjectToUIGraph(GetComposite());
 
@@ -57,6 +63,10 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	m_pCastBackgroundQuad->SetPosition(ptPosition + point(0.0f, 0.0f, -0.001f));
 	m_pCastBackgroundQuad->SetVisible(false);
 
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_BEGAN, pDreamUserApp.get()));
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_MOVED, pDreamUserApp.get()));
+	CR(GetDOS()->AddAndRegisterInteractionObject(m_pCastBackgroundQuad.get(), ELEMENT_INTERSECT_ENDED, pDreamUserApp.get()));
+
 	m_pVideoCastTexture = GetComposite()->MakeTexture(
 		texture::type::TEXTURE_2D,
 		m_castpxWidth, 
@@ -78,6 +88,20 @@ RESULT DreamShareView::InitializeApp(void *pContext) {
 	// Spatial Audio Object
 	m_pSpatialBrowserObject = GetDOS()->AddSpatialSoundObject(point(0.0f, 0.0f, 0.0f), vector(), vector());
 	CN(m_pSpatialBrowserObject);
+
+	for (int i = 0; i < 12; i++) {
+
+		auto pSphere = GetDOS()->AddSphere(0.025f);
+		pSphere->SetVisible(false);
+		if (i % 2 == 0) {
+			pSphere->SetMaterialDiffuseColor(COLOR_RED);
+		}
+		else {
+			pSphere->SetMaterialDiffuseColor(COLOR_BLUE);
+		}
+
+		m_pointerSpherePool.push(pSphere);
+	}
 
 Error:
 	return r;
@@ -106,34 +130,87 @@ RESULT DreamShareView::HandleDreamAppMessage(PeerConnection* pPeerConnection, Dr
 	RESULT r = R_PASS;
 
 	DreamShareViewMessage *pDreamShareViewMessage = (DreamShareViewMessage*)(pDreamAppMessage);
-	CN(pDreamShareViewMessage);
+	CNR(pDreamShareViewMessage, R_SKIPPED);
 
-	//currently, only store the most recent message received
-	m_currentMessageType = pDreamShareViewMessage->GetMessageType();
-	m_currentAckType = pDreamShareViewMessage->GetAckType();
+	CBR(pDreamAppMessage->GetDreamAppName() == GetAppName(), R_SKIPPED);
+
+	CB(pDreamShareViewMessage->GetMessageType() != DreamShareViewMessage::type::INVALID);
 
 	switch (pDreamShareViewMessage->GetMessageType()) {
-		case DreamShareViewMessage::type::PING: {
-			CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::PING));
+
+	case (DreamShareViewMessage::type::SHARE): {
+		CR(HandleShareMessage(pPeerConnection, (DreamShareViewShareMessage*)(pDreamAppMessage)));
+	} break;
+
+	case (DreamShareViewMessage::type::POINTER): {
+		CR(HandlePointerMessage(pPeerConnection, (DreamShareViewPointerMessage*)(pDreamAppMessage)));
+	} break;
+
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::HandleShareMessage(PeerConnection* pPeerConnection, DreamShareViewShareMessage *pShareMessage) {
+	RESULT r = R_PASS;
+
+	CN(pShareMessage);
+
+	//currently, only store the most recent message received
+	m_currentMessageType = pShareMessage->GetShareMessageType();
+	m_currentAckType = pShareMessage->GetAckType();
+
+	switch (pShareMessage->GetShareMessageType()) {
+		case DreamShareViewShareMessage::type::PING: {
+			CR(BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::ACK, DreamShareViewShareMessage::type::PING));
 		} break;
 
-		case DreamShareViewMessage::type::ACK: {
-			switch (pDreamShareViewMessage->GetAckType()) {
+		case DreamShareViewShareMessage::type::ACK: {
+			switch (pShareMessage->GetAckType()) {
 				// We get a request streaming start ACK when we requested to start streaming
 				// This will begin broadcasting
-				case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
-					if (IsStreaming()) {
-						// For non-changing stuff we need to send the current frame
-						CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
-					}
+			case DreamShareViewShareMessage::type::REQUEST_STREAMING_START: {
+				if (IsStreaming()) {
+					// For non-changing stuff we need to send the current frame
+					CR(GetDOS()->GetCloudController()->BroadcastTextureFrame(m_pCastTexture.get(), 0, PIXEL_FORMAT::BGRA));
+				}
 
-				} break;
+			} break;
 			}
 		} break;
 
-		case DreamShareViewMessage::type::REQUEST_STREAMING_START: {
+		case DreamShareViewShareMessage::type::REQUEST_STREAMING_START: {
 			CR(StartReceiving(pPeerConnection));
 		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::HandlePointerMessage(PeerConnection* pPeerConnection, DreamShareViewPointerMessage *pUpdatePointerMessage) {
+	RESULT r = R_PASS;
+
+	CN(pUpdatePointerMessage);
+
+	if (m_fReceivingStream || IsStreaming()) {
+
+		sphere *pPointer;
+		long userID = pUpdatePointerMessage->GetSenderUserID();
+
+		CR(AllocateSpheres(userID));
+
+		if (pUpdatePointerMessage->m_body.fLeftHand) {
+			pPointer = m_pointingObjects[userID][0];
+		}
+		else {
+			pPointer = m_pointingObjects[userID][1];
+		}
+
+		pPointer->SetPosition(pUpdatePointerMessage->m_body.ptPointer);
+		pPointer->SetVisible(pUpdatePointerMessage->m_body.fVisible);
+		pPointer->SetMaterialDiffuseColor(pUpdatePointerMessage->m_body.cColor);
 	}
 
 Error:
@@ -222,7 +299,7 @@ RESULT DreamShareView::StartReceiving(PeerConnection *pPeerConnection) {
 	CR(GetDOS()->RegisterVideoStreamSubscriber(pPeerConnection, this));
 	m_fReceivingStream = true;
 
-	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::ACK, DreamShareViewMessage::type::REQUEST_STREAMING_START));
+	CR(BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::ACK, DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
 
 Error:
 	return r;
@@ -319,7 +396,7 @@ RESULT DreamShareView::BeginStream() {
 	//CR(GetDOS()->GetCloudController()->StartVideoStreaming(m_browserWidth, m_browserHeight, 30, PIXEL_FORMAT::BGRA));
 
 	//CR(BroadcastDreamBrowserMessage(DreamShareViewMessage::type::PING));
-	CR(BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+	CR(BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
 	SetStreamingState(true);
 
 Error:
@@ -331,10 +408,6 @@ RESULT DreamShareView::SetStreamingState(bool fStreaming) {
 
 	m_fStreaming = fStreaming;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = GetDOS()->GetUserApp();
-	CNR(pDreamUserApp, R_SKIPPED);
-	pDreamUserApp->SetStreamingState(fStreaming);
-
 Error:
 	return r;
 }
@@ -344,10 +417,10 @@ bool DreamShareView::IsStreaming() {
 }
 
 
-RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType) {
+RESULT DreamShareView::BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	DreamShareViewMessage *pDreamBrowserMessage = new DreamShareViewMessage(0, 0, GetAppUID(), msgType, ackType);
+	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));
@@ -546,6 +619,44 @@ RESULT DreamShareView::UpdateScreenPosition(point ptPosition, quaternion qOrient
 	if (m_pSpatialBrowserObject != nullptr) {
 		m_pSpatialBrowserObject->SetPosition(ptPosition);
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::AllocateSpheres(long userID) {
+	RESULT r = R_PASS;
+
+	std::vector<sphere*> userPointers;
+
+	CBR(userID != -1, R_SKIPPED);
+	CBR(m_pointingObjects.count(userID) == 0, R_SKIPPED);
+
+	userPointers.emplace_back(m_pointerSpherePool.front());
+	m_pointerSpherePool.pop();
+	userPointers.emplace_back(m_pointerSpherePool.front());
+	m_pointerSpherePool.pop();
+
+	m_pointingObjects[userID] = userPointers;
+
+Error:
+	return r;
+}
+
+RESULT DreamShareView::DeallocateSpheres(long userID) {
+	RESULT r = R_PASS;
+
+	std::vector<sphere*> userPointers;
+
+	CBR(userID != -1, R_SKIPPED);
+	CBR(m_pointingObjects.count(userID) != 0, R_SKIPPED);
+
+	userPointers = m_pointingObjects[userID];
+
+	m_pointerSpherePool.push(userPointers[0]);
+	m_pointerSpherePool.push(userPointers[1]);
+
+	m_pointingObjects.erase(userID);
 
 Error:
 	return r;

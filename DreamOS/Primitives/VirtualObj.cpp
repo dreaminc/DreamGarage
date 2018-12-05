@@ -203,7 +203,13 @@ VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_
 }
 
 ray VirtualObj::GetRay(bool fAbsolute) {
-	vector vDirection = vector::jVector(1.0f).RotateByQuaternion(GetOrientation(fAbsolute));
+	// TODO: this method returns the undesired result
+	//vector vDirection = vector::jVector(1.0f).RotateByQuaternion(GetOrientation(fAbsolute));
+	//return ray(GetOrigin(fAbsolute), vDirection);
+
+	RotationMatrix matLook = RotationMatrix(GetOrientation(fAbsolute));
+	vector vDirection = matLook * vector::kVector(-1.0f);
+	vDirection.Normalize();
 	return ray(GetOrigin(fAbsolute), vDirection);
 }
 

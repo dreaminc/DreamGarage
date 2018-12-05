@@ -1,5 +1,5 @@
 #include "DreamBrowser.h"
-#include "DreamControlView/UIControlView.h"
+//#include "DreamControlView/UIControlView.h"
 #include "DreamShareView/DreamShareView.h"
 #include "DreamUserControlArea/DreamUserControlArea.h"
 #include "DreamOS.h"
@@ -925,10 +925,10 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamShareViewMessage::type msgType, DreamShareViewMessage::type ackType) {
+RESULT DreamBrowser::BroadcastDreamBrowserMessage(DreamShareViewShareMessage::type msgType, DreamShareViewShareMessage::type ackType) {
 	RESULT r = R_PASS;
 
-	DreamShareViewMessage *pDreamBrowserMessage = new DreamShareViewMessage(0, 0, GetAppUID(), msgType, ackType);
+	DreamShareViewShareMessage *pDreamBrowserMessage = new DreamShareViewShareMessage(0, 0, GetAppUID(), msgType, ackType);
 	CN(pDreamBrowserMessage);
 
 	CR(BroadcastDreamAppMessage(pDreamBrowserMessage));

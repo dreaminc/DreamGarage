@@ -363,7 +363,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	VirtualObj *pObj = nullptr;
 
 	InteractionEngineProxy *pProxy = nullptr;
-	DreamOS *pDOS = GetDOS();
+	DreamOS *pDreamOS = GetDOS();
 
 	UIKey *keyCollisions[2];
 	keyCollisions[0] = nullptr;
@@ -373,48 +373,43 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	std::vector<UIKey*> activeKeysToRemove;
 
-	std::shared_ptr<DreamUserApp> pDreamUserApp = pDOS->GetUserApp();
-	CN(pDreamUserApp);
-
 	// skip keyboard interaction if not visible
 	//CBR(m_keyboardState == UIKeyboard::state::VISIBLE, R_SKIPPED);
 	CBR(GetComposite()->IsVisible(), R_SKIPPED);
 
-
-	CN(pDOS);
-	pProxy = pDOS->GetInteractionEngineProxy();
+	CN(pDreamOS);
+	pProxy = pDreamOS->GetInteractionEngineProxy();
 	CN(pProxy);
+
+	hand* pLHand = GetDOS()->GetHand(HAND_TYPE::HAND_LEFT);
+	CNR(pLHand, R_SKIPPED);
+	hand* pRHand = GetDOS()->GetHand(HAND_TYPE::HAND_RIGHT);
+	CNR(pRHand, R_SKIPPED);
+
+	CBR(m_pSurface, R_SKIPPED);
 
 	// Update Keys if the app is active
 	int i = 0;
 
-
-	UIMallet* pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-	CNR(pLMallet, R_SKIPPED);
-	UIMallet* pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
-	CNR(pRMallet, R_SKIPPED);
-
-	CBR(m_pSurface, R_SKIPPED);
-
 	//  Note: this predictive collision functionality is duplicated in control view
-	for (auto &mallet : { pLMallet, pRMallet })
+	for (auto &hand : { pLHand, pRHand })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
-		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
+		point ptSphereOrigin = hand->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pSurface->GetOrientation(true))) * (ptSphereOrigin - m_pSurface->GetOrigin(true)));
 		ptCollisions[i] = ptSphereOrigin;
 
-		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
+		if (ptSphereOrigin.y() >= hand->GetMalletRadius()) hand->CheckAndCleanDirty();
 		//else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
 		
 		// if the sphere is lower than its own radius, there must be an interaction
-		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
+		if (ptSphereOrigin.y() < hand->GetMalletRadius() && !hand->IsDirty()) {
 
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
 			// if it accounted for the radius, it would be able to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
 			if (!key) {
-				CR(mallet->SetDirty());
+				CR(hand->SetDirty());
 				continue;
 			}
 			CR(AddActiveKey(key));
@@ -423,7 +418,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 			point ptPosition = key->m_pQuad->GetPosition();
 
 			// TODO: edge case where there is a new interaction during the key release animation
-			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetRadius(), ptPosition.z()));
+			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - hand->GetMalletRadius(), ptPosition.z()));
 		}
 
 		i++;
@@ -435,7 +430,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		auto key = keyCollisions[0];
 		point ptPosition = key->m_pQuad->GetPosition();
 		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
-		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLMallet->GetRadius(), ptPosition.z()));
+		key->m_pQuad->SetPosition(point(ptPosition.x(), y - pLHand->GetMalletRadius(), ptPosition.z()));
 	}
 
 
@@ -444,14 +439,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 		// get collision point and check that key is active
 		bool fActive = false;
 		ControllerType controllerType;
-		UIMallet *pMallet = nullptr;
+		hand *pHand = nullptr;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
 			if (key == k) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
 				controllerType = (ControllerType)(j);
-				pMallet = (j == 0) ? pLMallet : pRMallet;
+				pHand = (j == 0) ? pLHand : pRHand;
 			}
 		}
 
@@ -467,8 +462,8 @@ RESULT UIKeyboard::Update(void *pContext) {
 			if (ptCollision.y() > m_keyTypeThreshold) key->m_state = KeyState::KEY_MAYBE_UP;
 			else if (ptCollision.y() < m_keyReleaseThreshold) {
 				ReleaseKey(key);
-				if (pMallet != nullptr)
-					pMallet->SetDirty();
+				if (pHand != nullptr)
+					pHand->SetDirty();
 			}
 			//else key->m_state = KeyState::KEY_DOWN;
 		} break;
@@ -554,13 +549,13 @@ RESULT UIKeyboard::Show() {
 		pDreamUserApp = GetDOS()->GetUserApp();
 		CNR(pDreamUserApp, R_SKIPPED);
 
-		UIMallet* pLMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_LEFT);
-		CNR(pLMallet, R_SKIPPED);
-		UIMallet* pRMallet = pDreamUserApp->GetMallet(HAND_TYPE::HAND_RIGHT);
-		CNR(pRMallet, R_SKIPPED);
+		hand* pLHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_LEFT);
+		CNR(pLHand, R_SKIPPED);
+		hand* pRHand = pDreamUserApp->GetHand(HAND_TYPE::HAND_RIGHT);
+		CNR(pRHand, R_SKIPPED);
 
-		pLMallet->SetDirty();
-		pRMallet->SetDirty();
+		pLHand->SetDirty();
+		pRHand->SetDirty();
 
 	Error:
 		return r;

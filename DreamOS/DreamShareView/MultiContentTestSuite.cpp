@@ -2572,7 +2572,7 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 					m_pDreamShareView->ShowCastingTexture();
 
 					m_pDreamShareView->SetStreamingState(false);
-					CR(m_pDreamShareView->BroadcastDreamShareViewMessage(DreamShareViewMessage::type::REQUEST_STREAMING_START));
+					CR(m_pDreamShareView->BroadcastDreamShareViewMessage(DreamShareViewShareMessage::type::REQUEST_STREAMING_START));
 					m_pDreamShareView->SetStreamingState(true);
 				}
 

@@ -36,31 +36,11 @@ Error:
 	return;
 }
 
-RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
-
-	if (!CompareParent(pParent.get()) && pHandState.fOriented)
-		pParent->AddChild(std::shared_ptr<DimObj>(this));
-
-	return R_PASS;
-}
-
-std::shared_ptr<composite> hand::GetModel(HAND_TYPE handType) {
-	return m_pModel;
-}
-
 RESULT hand::Initialize(HAND_TYPE type, long avatarModelID) {
 	RESULT r = R_PASS;
 
-
-	// why
-	SetPosition(point(0.0f, 0.0f, -1.0f));
-
 	m_handType = type;
 	
-	m_fOriented = false;
-
-	m_qRotation = GetOrientation();
-
 	m_fTracked = false;
 	//Start all visibility at false
 	CR(OnLostTrack());	//CR here because the only other C is inside of the #ifndef
@@ -145,12 +125,27 @@ RESULT hand::LoadHandModel() {
 	//m_pModel->AddVolume(0.02f);
 	m_pModel = AddModel(L"cube.obj");
 	m_pModel->SetScale(0.02f);
+
+	if (m_handType == HAND_TYPE::HAND_LEFT) {
+		vector vLeftHandOffset = vector(0.0f, (float)(M_PI), (float)(M_PI_2));
+		m_pModel->SetOrientationOffset(vLeftHandOffset);
+	}
+	
+	if (m_handType == HAND_TYPE::HAND_RIGHT) {
+		vector vRightHandOffset = vector(0.0f, (float)(M_PI), (float)(-M_PI_2));
+		m_pModel->SetOrientationOffset(vRightHandOffset);
+	}
+
 #endif
 
 	m_fLoadHandModel = false;
 
 Error:
 	return r;
+}
+
+std::shared_ptr<composite> hand::GetModel() {
+	return m_pModel;
 }
 
 RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
@@ -165,6 +160,8 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 	m_pController = pHMD->GetSenseControllerObject((ControllerType)(m_handType));
 	CN(m_pController);
 	m_pController->SetVisible(false);
+
+	m_radius = 0.015f;
 
 	//TODO: several unique positioning variables per device here that aren't used anywhere else
 	switch (pHMD->GetDeviceType()) {
@@ -183,6 +180,9 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		m_pOverlayQuad->SetVisible(false);
 		//*/
 
+		m_distance = 0.2f;
+		m_angle = -23.0f * (float)(M_PI) / 180.0f;
+
 	} break;
 	case (HMDDeviceType::VIVE): {
 
@@ -200,6 +200,9 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 		m_pOverlayQuad->SetVisible(false);
 		//*/
 
+		m_distance = 0.2f;
+		m_angle = -60.0f * (float)(M_PI) / 180.0f;
+
 	} break;
 	case (HMDDeviceType::META): {
 		float scale = VIVE_OVERLAY_SCALE;
@@ -213,12 +216,72 @@ RESULT hand::InitializeWithContext(DreamOS *pDreamOS) {
 			scale * VIVE_OVERLAY_POSITION_Z));
 		m_pOverlayQuad->SetVisible(false);
 		//*/
+
+		m_distance = 0.0f;
+		m_angle = 0.0f;
+
 	} break;
 	}
+
+	m_headOffset = point(0.0f, m_distance * sin(m_angle), -m_distance * cos(m_angle));
+
+	m_pHead = AddSphere(m_radius, 20.0f, 20.0f);
+	m_pHead->SetVisible(false);
+	m_pHead->SetPosition(m_headOffset);
+
+
+	// the mallet head is used for the collision interactions with buttons
+	pDreamOS->AddInteractionObject(m_pHead.get());
+
+	// the hand is used to the intersection interactions like pointing
+	pDreamOS->AddInteractionObject(this);
 
 
 Error:
 	return r;
+}
+
+RESULT hand::ShowMallet() {
+	RESULT r = R_PASS;
+	//TODO: Mallet animation
+	m_pHead->SetVisible(true);
+	
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pHead.get(), 
+		color(1.0f, 1.0f, 1.0f, 1.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags()));
+
+Error:
+	return r;
+}
+
+RESULT hand::HideMallet() {
+	RESULT r = R_PASS;
+	m_pHead->SetVisible(false);
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pHead.get(), 
+		color(1.0f, 1.0f, 1.0f, 0.0f), 
+		0.1, 
+		AnimationCurveType::LINEAR, 
+		AnimationFlags()));
+
+Error:
+	return r;
+}
+
+float hand::GetMalletRadius() {
+	return m_radius;
+}
+
+sphere* hand::GetMalletHead() {
+	return m_pHead.get();
+}
+
+point hand::GetMalletOffset() {
+	return m_headOffset;
 }
 
 hand::ModelState hand::GetModelState() {
@@ -285,21 +348,8 @@ RESULT hand::Update() {
 	} break;
 	case ModelState::CONTROLLER: {
 		m_pController->SetVisible(m_fTracked);
+		m_pHead->SetVisible(m_fTracked);
 	} break;
-	}
-
-Error:
-	return r;
-}
-
-RESULT hand::SetVisible(bool fVisible, bool fSetChildren /* = true */) {
-	RESULT r = R_PASS;
-
-	//Ensure hand is not set to visible while not tracked
-	CR(DimObj::SetVisible(fVisible && m_fTracked, fSetChildren));
-	//Ensure phantom volume is not set to visible
-	if (m_pPhantomVolume != nullptr) {
-		m_pPhantomVolume->SetVisible(false);
 	}
 
 Error:
@@ -345,17 +395,13 @@ std::shared_ptr<volume> hand::GetPhantomVolume() {
 	return m_pPhantomVolume;
 }
 
-RESULT hand::SetOriented(bool fOriented) {
-	m_fOriented = fOriented;
-	return R_PASS;
-}
-
-bool hand::IsOriented() {
-	return m_fOriented;
-}
-
 RESULT hand::SetTracked(bool fTracked) {
 	m_fTracked = fTracked;
+
+	if (!m_fTracked) {
+		OnLostTrack();
+	}
+
 	return R_PASS;
 }
 
@@ -369,47 +415,39 @@ RESULT hand::OnLostTrack() {
 	if (m_pModel != nullptr) {
 		m_pModel->SetVisible(m_fTracked);
 	}
+	if (m_pHead != nullptr) {
+		m_pHead->SetVisible(m_fTracked);
+	}
 
 	//m_pPalm->SetVisible(m_fTracked);
 
 	return R_PASS;
 }
 
-RESULT hand::SetLocalOrientation(quaternion qRotation) {
-	m_qRotation = qRotation;
-	return R_PASS;
-}
-
-
 RESULT hand::SetHandModel(HAND_TYPE type) {
 	RESULT r = R_PASS;
 
 	CBR(type == HAND_TYPE::HAND_SKELETON, R_SKIPPED) 
 
-	SetVisible();
+	SetVisible(true, false);
 	m_pModel->SetVisible(true);
 
 Error:
 	return r;
 }
 
-RESULT hand::SetHandModelOrientation(quaternion qOrientation) {
-	m_pModel->SetOrientation(qOrientation);
-	return R_PASS;
-}
-
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	point pt = pHandState.ptPalm;
-	SetPosition(pt);
+	SetPosition(pHandState.ptPalm);
 
 	m_handType = pHandState.handType;
 	SetHandModel(pHandState.handType);
 
 	m_fTracked = pHandState.fTracked;
-	if (!m_fTracked)
+	if (!m_fTracked) {
 		OnLostTrack();
+	}
 
 	if (m_pModel != nullptr) {
 		m_pModel->SetOrientation(pHandState.qOrientation);
@@ -421,23 +459,10 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 
 hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
-		m_handType,
 		GetPosition(true),
-		m_qRotation,
-		m_fOriented,
+		GetOrientation(true),
+		m_handType,
 		m_fTracked
-	};
-
-	return handState;
-}
-
-hand::HandState hand::GetDebugHandState(HAND_TYPE handType) {
-	hand::HandState handState = {
-		handType,
-		point(1,2,3),
-		quaternion(),
-		false,
-		false
 	};
 
 	return handState;
@@ -529,6 +554,7 @@ RESULT hand::HideController() {
 
 	m_pController->SetVisible(false);
 
+	CR(HideMallet());
 	/*
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 //		m_pController, 
@@ -559,8 +585,6 @@ RESULT hand::ShowController() {
 
 	m_pController->SetVisible(m_fTracked);
 
-	auto pMesh = m_pController->GetFirstChild<mesh>().get();
-	CNR(pMesh, R_SKIPPED);
 
 
 	// TODO: re-enable if overlays come back
@@ -568,7 +592,13 @@ RESULT hand::ShowController() {
 		m_pOverlayQuad->SetVisible(false);
 	}
 
+	if (m_fTracked) {
+		CR(ShowMallet());
+	}
+
 	/*
+	auto pMesh = m_pController->GetFirstChild<mesh>().get();
+	CNR(pMesh, R_SKIPPED);
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pMesh,
 		color(1.0f, 1.0f, 1.0f, 0.0f), 

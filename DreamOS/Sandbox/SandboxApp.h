@@ -27,10 +27,13 @@
 //class CloudController;
 #include "Cloud/CloudController.h"
 
+#include "DreamAppMessage.h"
+
 #include "PhysicsEngine/PhysicsEngine.h"
 #include "InteractionEngine/InteractionEngine.h"
 
 #include "Primitives/viewport.h"
+#include "Primitives/HysteresisObject.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -54,7 +57,6 @@ class skybox;
 class model;
 class user;
 class Message;
-class DreamAppMessage;
 
 class UIKeyboardLayout;
 
@@ -380,6 +382,8 @@ public:
 
 	ProgramNode* MakeProgramNode(std::string strNodeName, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE);
 
+	HysteresisObject *MakeHysteresisObject(float onThreshold, float offThreshold, HysteresisObjectType objectType);
+
 	// Cloud Controller 
 public:
 	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
@@ -390,9 +394,9 @@ public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT BroadcastDataMessage(Message *pDataMessage);
 
-	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage);
+	RESULT BroadcastDreamAppMessage(DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
-	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
+	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage, DreamAppMessage::flags messageFlags = DreamAppMessage::flags::SHARE_NETWORK);
 
 	// IO
 public:
