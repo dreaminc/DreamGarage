@@ -368,13 +368,13 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
 		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
-		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture, this);
+		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture.get(), this);
 		m_fDesktopDuplicationIsRunning = true;
 	}
 
 	m_pDesktopTexture->Update((unsigned char*)pMessageData, pxWidth, pxHeight, PIXEL_FORMAT::BGRA);
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+	CBR(GetSourceTexture() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pMessageData), pxWidth, pxHeight);
 
 Error:
@@ -392,7 +392,7 @@ RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 	
 	m_pParentApp = pParentApp;
-	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture, this);
+	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture.get(), this);
 	//CRM(StartDuplicationProcess(), "Error starting duplication process");
 	
 Error:
@@ -472,8 +472,8 @@ Error:
 	return r;
 }
 
-std::shared_ptr<texture> DreamDesktopApp::GetSourceTexture() {
-	return m_pDesktopTexture;
+texture* DreamDesktopApp::GetSourceTexture() {
+	return m_pDesktopTexture.get();
 }
 
 RESULT DreamDesktopApp::SetScope(std::string strScope) {

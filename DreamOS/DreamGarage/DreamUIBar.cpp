@@ -451,22 +451,16 @@ RESULT DreamUIBar::HandleSelect(UIButton* pButtonContext, void* pContext) {
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 
-				if (strTitle == "Desktop") {
+				if (strScope == SCOPE_DESKTOP || strScope == SCOPE_CAMERA) {
 					if (m_pParentApp != nullptr) {
 						CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
 					}
 				}
-				else if (strTitle == "Website") {
+				else if (strScope == SCOPE_WEBSITE) {
 					std::shared_ptr<UIKeyboard> pKeyboardApp = GetDOS()->GetKeyboardApp();
 					CN(pKeyboardApp);
 					CR(pKeyboardApp->Show());
 					CR(pKeyboardApp->ShowTitleView());
-				}
-
-				else if (strScope == "MenuProviderScope.VirtualCameraMenuProvider") {
-					if (m_pParentApp != nullptr) {
-						CR(m_pParentApp->RequestOpenAsset(strScope, strPath, strTitle));
-					}
 				}
 
 				else if (strScope == "TeamScope.Switch") {

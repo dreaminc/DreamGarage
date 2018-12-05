@@ -225,11 +225,11 @@ RESULT DreamFormApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForw
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamFormApp::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource *pContext) {
+RESULT DreamFormApp::UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);
-	CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(pTexture.get()));
+	CR(m_pFormView->GetViewQuad()->SetDiffuseTexture(pTexture));
 
 Error:
 	return r;

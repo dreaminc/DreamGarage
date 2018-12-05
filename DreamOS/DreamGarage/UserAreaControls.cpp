@@ -353,7 +353,7 @@ RESULT UserAreaControls::UpdateControlBarButtonsWithType(std::string strContentT
 	}
 
 	if (m_pParentApp != nullptr) {
-		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture().get() == m_pDreamOS->GetSharedContentTexture());
+		bool fIsSharing = (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pDreamOS->GetSharedContentTexture());
 		fIsSharing = (fIsSharing && m_pDreamOS->IsSharing());
 
 		CR(SetSharingFlag(fIsSharing));

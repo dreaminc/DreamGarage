@@ -652,8 +652,8 @@ Error:
 	return r;
 }
 
-std::shared_ptr<texture> DreamBrowser::GetSourceTexture() {
-	return m_pBrowserTexture;
+texture* DreamBrowser::GetSourceTexture() {
+	return m_pBrowserTexture.get();
 }
 
 long DreamBrowser::GetCurrentAssetID() {
@@ -700,7 +700,7 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pObserver != nullptr) {
-		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture, this));
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), this));
 	}
 
 	m_fUpdateObjectTextures = false;
@@ -781,7 +781,7 @@ RESULT DreamBrowser::OnPaint(const void *pBuffer, int width, int height) {
 	// When the browser gets a paint event, it checks if its texture is currently shared
 	// if so, it tells the shared view to broadcast a frame
 	CNR(GetDOS()->GetSharedContentTexture(), R_SKIPPED);
-	CBR(GetSourceTexture().get() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
+	CBR(GetSourceTexture() == GetDOS()->GetSharedContentTexture(), R_SKIPPED);
 
 	GetDOS()->BroadcastSharedVideoFrame((unsigned char*)(pBuffer), width, height);
 

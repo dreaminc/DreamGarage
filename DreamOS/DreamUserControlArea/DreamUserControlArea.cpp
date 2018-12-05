@@ -8,7 +8,6 @@
 #include "DreamGarage/UITabView.h"
 #include "DreamControlView/UIControlView.h"
 #include "DreamGarage/DreamDesktopDupplicationApp/DreamDesktopApp.h"
-#include "DreamGarage/DreamGamepadCameraApp.h"
 #include "DreamVCam.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"	
@@ -440,7 +439,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) {
 	if (pContext == m_pActiveSource.get()) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
@@ -480,7 +479,7 @@ RESULT DreamUserControlArea::HandleAudioPacket(const AudioPacket &pendingAudioPa
 	CNR(pDreamOS, R_SKIPPED);
 	CNR(pDreamOS->GetSharedContentTexture(), R_SKIPPED);
 
-	if (pContext->GetSourceTexture().get() == pDreamOS->GetSharedContentTexture()) {
+	if (pContext->GetSourceTexture() == pDreamOS->GetSharedContentTexture()) {
 		auto pCloudController = GetDOS()->GetCloudController();
 		if (pCloudController != nullptr) {
 			CR(GetDOS()->BroadcastSharedAudioPacket(pendingAudioPacket));
@@ -661,24 +660,22 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 	CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 	if (m_pActiveSource != nullptr) {													// If content is already open
-		if (strTitle == m_strDesktopTitle) { //&& m_pDreamDesktop != nullptr) {						// and we're trying to share the desktop for not the first time
-			/*
+		if (strScope == m_strDesktopScope && m_pDreamDesktop != nullptr) {				// and we're trying to share the desktop for not the first time
 			if (m_pDreamDesktop != m_pActiveSource) {									// and desktop is in the tabview	
 				SetIsAnimating(false);
 				m_fFromMenu = true;
 				m_pDreamTabView->SelectByContent(m_pDreamDesktop);						// pull desktop out of tabview
 			}
-			*/
-			Show();
-			
+			else {
+				Show();
+			}
 		}
 		else {
 			m_pDreamTabView->AddContent(m_pActiveSource);
 		}
-		
 	}
-	/*
-	if (strTitle == m_strDesktopTitle) {
+	
+	if (strScope == m_strDesktopScope) {
 		if (m_pDreamDesktop == nullptr) {
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
@@ -690,31 +687,17 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pUserControls->SetSharingFlag(false);
 		}
 	}
-	*/
-	else if (strTitle == m_strDesktopTitle) {
-		if (m_pDreamDesktop == nullptr) {
-			//CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 
-			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
-			m_pActiveSource = m_pDreamVCam;
-			m_pDreamVCam->InitializeWithParent(this);
-			auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CR(pDreamGamepadCamera->SetCamera(m_pDreamVCam->GetCameraNode()));
-			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);
-		}
-	}
-	else if (strScope == "MenuProviderScope.VirtualCameraMenuProvider") {
+	else if (strScope == m_strCameraScope) {
 		if (m_pDreamVCam == nullptr) {
-			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
 			m_pDreamVCam = GetDOS()->LaunchDreamModule<DreamVCam>(this);
 			m_pActiveSource = m_pDreamVCam;
 			m_pDreamVCam->InitializeWithParent(this);
-			auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this);
-			CR(pDreamGamepadCamera->SetCamera(m_pDreamVCam->GetCameraNode()));
+			m_pUserControls->SetTitleText(m_pDreamVCam->GetTitle());
 			// new desktop can't be the current content
-			m_pUserControls->SetSharingFlag(false);
+			m_pUserControls->SetSharingFlag(false);;
+			
+			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, "", strTitle), "Failed to share environment asset");
 		}
 	}
 
@@ -741,7 +724,7 @@ Error:
 RESULT DreamUserControlArea::CreateBrowserSource(std::string strScope) {
 	RESULT r = R_PASS;
 
-	std::string strTitle = m_strWebsiteTitle;
+	std::string strTitle = "Website";
 	std::string strURL = GetDOS()->GetKeyboardApp()->GetText();
 
 	if (strURL == "") {
@@ -818,15 +801,13 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 		//pBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
-	else {
+	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strCameraScope) {
 		m_pDreamVCam->SetEnvironmentAsset(pEnvironmentAsset);
 	}
-	/*
-	else {
+	else if(pEnvironmentAsset->GetStorageProviderScope() == m_strDesktopScope) {
 		// TODO: desktop setup
 		m_pDreamDesktop->SetEnvironmentAsset(pEnvironmentAsset);
 	}
-	*/
 
 	//m_pActiveBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	//m_pActiveBrowser->SetURI(pEnvironmentAsset->GetURL());
@@ -834,7 +815,7 @@ RESULT DreamUserControlArea::AddEnvironmentAsset(std::shared_ptr<EnvironmentAsse
 
 	CR(Show());
 
-	//m_pUserControls->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
+	m_pUserControls->UpdateControlBarButtonsWithType(pEnvironmentAsset->GetContentType());
 
 Error:
 	return r;
@@ -865,13 +846,13 @@ RESULT DreamUserControlArea::ForceStopSharing() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	//*
 	CNR(m_pActiveSource, R_SKIPPED);
-	if (m_pActiveSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
-			if (pSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
 				GetDOS()->OnStopSending();
 			}
@@ -911,13 +892,13 @@ RESULT DreamUserControlArea::ShutdownAllSources() {
 	CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 	//*
 	CNR(m_pActiveSource, R_SKIPPED);
-	if (m_pActiveSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+	if (m_pActiveSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 	//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(m_pActiveSource->GetCurrentAssetID()), "Failed to share environment asset");
 		GetDOS()->OnStopSending();
 	}
 	else {
 		for (auto pSource : m_pDreamTabView->GetAllSources()) {
-			if (pSource->GetSourceTexture().get() == GetDOS()->GetSharedContentTexture()) {
+			if (pSource->GetSourceTexture() == GetDOS()->GetSharedContentTexture()) {
 			//	CRM(m_pEnvironmentControllerProxy->RequestStopSharing(pSource->GetCurrentAssetID()), "Failed to share environment asset");
 				GetDOS()->OnStopSending();
 			}

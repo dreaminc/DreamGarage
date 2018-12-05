@@ -12,6 +12,12 @@
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/opengl/OGLProgram.h"
+#include "DreamGarage/DreamGamepadCameraApp.h"
+
+#include "HAL/opengl/OGLProgramReflection.h"
+#include "HAL/opengl/OGLProgramRefraction.h"
+#include "HAL/opengl/OGLProgramWater.h"
+#include "HAL/opengl/OGLProgramSkybox.h"
 
 DreamVCam::DreamVCam(DreamOS *pDreamOS, void *pContext) :
 	DreamModule<DreamVCam>(pDreamOS, pContext)
@@ -53,11 +59,15 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	// Set up the aux camera and local pipeline
 
 	// TODO: 
-	/*
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), viewport(1280, 720, 60));
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
 
+	CR(GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode));
+	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
+	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
+
+	/*
 	ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));
@@ -76,8 +86,16 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	m_pOGLEndNode = dynamic_cast<OGLProgram*>(pSkyboxProgram);
 	CN(m_pOGLEndNode);
 
-	CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
-	*/	
+	//CRM(SetSourceTexture(std::shared_ptr<texture>(m_pOGLRenderNode->GetOGLFramebufferColorTexture())), "Failed to set source texture");
+
+	//CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
+	//*/	
+
+	{
+		//auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+		//CN(pDreamGamepadCamera);
+		//CR(pDreamGamepadCamera->SetCamera(m_pCamera));
+	}
 
 Error:
 	return r;
@@ -105,9 +123,10 @@ RESULT DreamVCam::Update(void *pContext) {
 	static int count = 0;
 
 	static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
-	/*
+	//*
 	// TODO: Some more logic around texture / buffer sizes etc 
-	if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+	//if (m_pNamedPipeServer != nullptr && m_pSourceTexture != nullptr) {
+	{
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 		// Approximately 30 FPS
@@ -120,13 +139,13 @@ RESULT DreamVCam::Update(void *pContext) {
 			if (pOGLTexture->IsOGLPBOPackEnabled()) {
 				CR(pOGLTexture->EnableOGLPBOPack());
 			}
-
+			
 			UnsetSourceTexture();
-			CRM(SetSourceTexture(pOGLTexture), "Failed to set source texture for Dream VCam");
+			CRM(SetSourceTexture(pTexture), "Failed to set source texture for Dream VCam");
 
 			// Update the local render
 			CR(m_pOGLEndNode->RenderNode(count++));
-			
+			//*
 			size_t bufferSize = m_pSourceTexture->GetTextureSize();
 
 			if (bufferSize == m_pLoadBuffer_n) {
@@ -141,11 +160,12 @@ RESULT DreamVCam::Update(void *pContext) {
 			else {
 				DEBUG_LINEOUT("Mismatch in buffer size for source texture and virtual camera");
 			}
+			//*/
 		}
 	}
-	*/
+	//*/
 
-//Error:
+Error:
 	return r;
 }
 
@@ -201,22 +221,20 @@ Error:
 	return r;
 }
 
-RESULT DreamVCam::SetSourceTexture(texture *pTexture) {
+RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	RESULT r = R_PASS;
 
 	CBM((m_pSourceTexture == nullptr), "Source texture already set");
 
 	m_pSourceTexture = pTexture;
 
-	/*
 	if (m_pParentApp != nullptr) {
 		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, this);
 	}
-	*/
 
 	// Enable PBO packing (DMA memory mapping) 
-	OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pSourceTexture);
-	CNM(pOGLTexture, "Source texture not compatible OpenGL Texture");
+	//OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(m_pSourceTexture.get());
+	//CNM(pOGLTexture, "Source texture not compatible OpenGL Texture");
 
 	//if (pOGLTexture->IsOGLPBOPackEnabled() == false) {
 	//	CRM(pOGLTexture->EnableOGLPBOPack(), "Failed to enable pack PBO on source texture");
@@ -233,7 +251,7 @@ RESULT DreamVCam::UnsetSourceTexture() {
 
 RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	m_pParentApp = pParentApp;
-	m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
+	//m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
 	return R_PASS;
 }
 
@@ -259,8 +277,8 @@ RESULT DreamVCam::OnKeyPress(char chkey, bool fkeyDown) {
 	return R_NOT_IMPLEMENTED; 
 }
 
-std::shared_ptr<texture> DreamVCam::GetSourceTexture() {
-	return std::shared_ptr<texture>(m_pSourceTexture);
+texture* DreamVCam::GetSourceTexture() {
+	return m_pSourceTexture;
 }
 
 RESULT DreamVCam::SetScope(std::string strScope) {

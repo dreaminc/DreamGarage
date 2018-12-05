@@ -36,8 +36,9 @@ class quad;
 
 #define ANIMATION_SCALE 0.1f
 
-#define TITLE_DESKTOP "Desktop"
-#define TITLE_WEBSITE "website"
+#define SCOPE_DESKTOP "MenuProviderScope.DesktopMenuProvider"
+#define SCOPE_WEBSITE "MenuProviderScope.WebsiteMenuProvider"
+#define SCOPE_CAMERA "MenuProviderScope.CameraMenuProvider"
  
 class DreamUserControlArea : public DreamApp<DreamUserControlArea>, 
 	public Subscriber<InteractionObjectEvent>,
@@ -121,7 +122,7 @@ public:
 // DreamBrowser
 public:
 
-	virtual RESULT UpdateContentSourceTexture(std::shared_ptr<texture> pTexture, DreamContentSource* pContext) override;
+	virtual RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) override;
 	virtual RESULT UpdateControlBarText(std::string& strTitle) override;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
 	virtual RESULT HandleAudioPacket(const AudioPacket &pendingAudioPacket, DreamContentSource *pContext) override;
@@ -230,8 +231,9 @@ private:
 	// certainly temporary
 	bool m_fIsAnimating = false;
 
-	std::string m_strDesktopTitle = TITLE_DESKTOP;
-	std::string m_strWebsiteTitle = TITLE_WEBSITE;
+	std::string m_strDesktopScope = SCOPE_DESKTOP;
+	std::string m_strWebsiteScope = SCOPE_WEBSITE;
+	std::string m_strCameraScope = SCOPE_CAMERA;
 
 	bool m_fUpdateDreamUIBar = false;
 };

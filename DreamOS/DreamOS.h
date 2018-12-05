@@ -60,6 +60,7 @@ class DreamMessage;
 class DreamAppMessage;
 class DreamSettingsApp;
 class DreamLoginApp;
+class OGLProgram;
 
 class NamedPipeClient;
 class NamedPipeServer;
@@ -293,7 +294,6 @@ protected:
 	// related functionality
 	HALImp* GetHALImp();
 
-
 	// Dream Apps
 public:
 	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
@@ -312,6 +312,8 @@ public:
 
 	std::vector<UID> GetAppUID(std::string strAppName);
 	UID GetUniqueAppUID(std::string strAppName);
+
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
 
 	//template<class derivedAppType>
 	//RESULT ReleaseApp(DreamAppHandleBase* pAppHandle, DreamAppBase* pHoldingApp);
@@ -344,7 +346,7 @@ public:
 	// Sandbox level objects
 	std::shared_ptr<NamedPipeClient> MakeNamedPipeClient(std::wstring strPipename);
 	std::shared_ptr<NamedPipeServer> MakeNamedPipeServer(std::wstring strPipename);
-
+	
 	RESULT AddObject(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
@@ -540,7 +542,7 @@ public:
 
 	virtual bool IsSharing();
 	virtual texture* GetSharedContentTexture();
-	virtual RESULT SetSharedContentTexture(std::shared_ptr<texture> pSharedTexture);
+	virtual RESULT SetSharedContentTexture(texture* pSharedTexture);
 	virtual RESULT BroadcastSharedVideoFrame(uint8_t *pVideoFrameBuffer, int pxWidth, int pxHeight);
 	virtual RESULT BroadcastSharedAudioPacket(const AudioPacket &pendingAudioPacket);
 

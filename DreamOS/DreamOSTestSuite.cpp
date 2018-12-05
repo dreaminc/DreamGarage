@@ -56,13 +56,13 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
+	
+	CR(AddTestDreamVCam());
 
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamDesktop());
 	
-	CR(AddTestDreamVCam());
-
 	CR(AddTestNamedPipes());
 
 	CR(AddTestModuleManager());
@@ -1147,6 +1147,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		std::shared_ptr<DreamVCam> pDreamVCam = nullptr;
 		ProgramNode* pRenderNode = nullptr;
 		ProgramNode* pEndAuxNode = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
 	} *pTestContext = new TestContext();
 
 	// Initialize Code
@@ -1250,14 +1251,14 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			pTestContext->pDreamVCam = m_pDreamOS->LaunchDreamModule<DreamVCam>(this);
 			CNM(pTestContext->pDreamVCam, "Failed to create dream virtual camera");
 
-			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
-			CN(pTestContext->pTexture);
+			//pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"Brick_1280x720.jpg");
+			//CN(pTestContext->pTexture);
 
 			//OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pTestContext->pTexture);
 			//CN(pOGLTexture);
 			//CR(pOGLTexture->EnableOGLPBOPack());
 
-			CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
+			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pTestContext->pTexture), "Failed to set source texture for Dream VCam");
 
 			// Only the render node actually has a frame buffer
 			OGLProgram *pOGLProgram = dynamic_cast<OGLProgram*>(pRenderProgramNode);
@@ -1265,7 +1266,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			
 			//CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLProgram->GetOGLFramebufferColorTexture()), 
 				//"Failed to set source texture for Dream VCam");
-
+			/*
 			{
 				auto pComposite = m_pDreamOS->AddComposite();
 				pComposite->InitializeOBB();
@@ -1273,15 +1274,15 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 				auto pView = pComposite->AddUIView(m_pDreamOS);
 				pView->InitializeOBB();
 
-				auto pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
-				pQuad->SetPosition(0.0f, 0.0f, 0.0f);
-				pQuad->FlipUVVertical();
-				pQuad->SetDiffuseTexture(pTestContext->pDreamVCam->GetSourceTexture().get());
+				pTestContext->pQuad = pView->AddQuad(.938f * 4.0, .484f * 4.0, 1, 1, nullptr, vector::kVector());
+				pTestContext->pQuad->SetPosition(0.0f, 0.0f, 0.0f);
+				pTestContext->pQuad->FlipUVVertical();
+				pTestContext->pQuad->SetDiffuseTexture(pOGLProgram->GetOGLFramebufferColorTexture());
 			}
-
-			//auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
+			//*/
+			auto pDreamGamepadCamera = m_pDreamOS->LaunchDreamApp<DreamGamepadCameraApp>(this);
 			//CR(pDreamGamepadCamera->SetCamera(pAuxCamera));
-			//CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
+			CR(pDreamGamepadCamera->SetCamera(pTestContext->pDreamVCam->GetCameraNode()));
 		}
 		
 
@@ -1303,7 +1304,7 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		//* 
+		/* 
 		// Now done in the module
 		{
 			static std::chrono::system_clock::time_point lastUpdateTime = std::chrono::system_clock::now();
@@ -1321,11 +1322,12 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 
 					OGLTexture *pOGLTexture = dynamic_cast<OGLTexture*>(pOGLProgram->GetOGLFramebufferColorTexture());
 					CN(pOGLTexture);
-					/*
+					
 					if (pOGLTexture->IsOGLPBOPackEnabled()) {
 						CR(pOGLTexture->EnableOGLPBOPack());
 					}
-					*/
+					pTestContext->pQuad->SetDiffuseTexture(pOGLTexture);
+
 					pTestContext->pDreamVCam->UnsetSourceTexture();
 					CRM(pTestContext->pDreamVCam->SetSourceTexture(pOGLTexture),
 						"Failed to set source texture for Dream VCam");

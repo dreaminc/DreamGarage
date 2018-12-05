@@ -54,7 +54,7 @@ public:
 
 	virtual RESULT OnKeyPress(char chkey, bool fkeyDown) override;
 
-	virtual std::shared_ptr<texture> GetSourceTexture() override;
+	virtual texture* GetSourceTexture() override;
 
 	virtual RESULT SetScope(std::string strScope) override;
 	virtual RESULT SetPath(std::string strPath) override;

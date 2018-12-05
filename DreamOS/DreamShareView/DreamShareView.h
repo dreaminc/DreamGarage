@@ -46,7 +46,7 @@ public:
 	// Handle Interface
 	RESULT ShowLoadingTexture();
 	RESULT ShowCastingTexture();
-	RESULT SetCastingTexture(std::shared_ptr<texture> pNewCastTexture);
+	RESULT SetCastingTexture(texture* pNewCastTexture);
 	texture* GetCastingTexture();
 	RESULT Show();
 	RESULT Hide();
@@ -105,7 +105,7 @@ private:
 	std::shared_ptr<quad> m_pCastQuad = nullptr;
 	std::shared_ptr<quad> m_pCastBackgroundQuad = nullptr;
 
-	std::shared_ptr<texture> m_pCastTexture = nullptr;
+	texture* m_pCastTexture = nullptr;
 	std::shared_ptr<texture> m_pCastBackgroundTexture = nullptr;
 	std::shared_ptr<texture> m_pVideoCastTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingTexture = nullptr;
