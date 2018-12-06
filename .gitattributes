@@ -1,5 +1,6 @@
-DreamOS/External/CEF/CEF_BINARY_3.2924.1570/Debug/* filter=lfs diff=lfs merge=lfs -text
-DreamOS/External/CEF/CEF_BINARY_3.2924.1570/Release/* filter=lfs diff=lfs merge=lfs -text
+DreamOS/External/CEF/CEF_BINARY_3538/Debug/* filter=lfs diff=lfs merge=lfs -text
+DreamOS/External/CEF/CEF_BINARY_3538/Release/* filter=lfs diff=lfs merge=lfs -text
+DreamOS/External/CEF/CEF_BINARY_3538/OfficialBuild/* filter=lfs diff=lfs merge=lfs -text
 DreamOS/External/assimp/3.3.1/bin/Debug/*.pdb filter=lfs diff=lfs merge=lfs -text
 DreamOS/External/assimp/3.3.1/bin/Debug/*.ilk filter=lfs diff=lfs merge=lfs -text
 webrtc.lib filter=lfs diff=lfs merge=lfs -text
