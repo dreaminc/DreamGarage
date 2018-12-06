@@ -700,7 +700,9 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pObserver != nullptr) {
-		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), this));
+		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamAppFromUID(GetAppUID()));
+		CNM(pContentSource, "Failed getting Browser as a content source");
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), pContentSource));
 	}
 
 	m_fUpdateObjectTextures = false;

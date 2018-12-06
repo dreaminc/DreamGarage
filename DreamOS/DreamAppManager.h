@@ -113,6 +113,7 @@ public:
 //private:
 public:
 	std::vector<DreamAppBase*> GetDreamApp(std::string strDreamAppName);
+	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
 
 protected:
 	RESULT HandleDreamAppMessage(PeerConnection* pPeerConnection, DreamAppMessage *pDreamAppMessage);
@@ -126,7 +127,7 @@ private:
 	std::queue<std::shared_ptr<DreamAppBase>> m_pendingAppQueue;
 
 	std::map<UID, std::vector<std::pair<DreamAppHandle*, DreamAppBase*>>> m_appHandleRegistry;
-	std::map<UID, DreamAppBase*> m_appRegistry;
+	std::map<UID, std::shared_ptr<DreamAppBase>> m_appRegistry;
 	DreamOS *m_pDreamOS;
 
 	double m_minFrameRate = 90.0f;

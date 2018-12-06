@@ -781,6 +781,10 @@ UID DreamOS::GetUniqueAppUID(std::string strAppName) {
 	}
 }
 
+std::shared_ptr<DreamAppBase> DreamOS::GetDreamAppFromUID(UID appUID) {
+	return m_pSandbox->m_pDreamAppManager->GetDreamAppFromUID(appUID);
+}
+
 std::vector<UID> DreamOS::GetModuleUID(std::string strName) {
 	return m_pSandbox->m_pDreamModuleManager->GetModuleUID(strName);
 }
@@ -794,6 +798,10 @@ UID DreamOS::GetUniqueModuleUID(std::string strName) {
 	else {
 		return UID::MakeInvalidUID();
 	}
+}
+
+std::shared_ptr<DreamModuleBase> DreamOS::GetDreamModuleFromUID(UID moduleUID) {
+	return m_pSandbox->m_pDreamModuleManager->GetDreamModuleFromUID(moduleUID);
 }
 
 HALImp* DreamOS::GetHALImp() {

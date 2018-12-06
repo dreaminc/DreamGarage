@@ -439,12 +439,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) {
-	if (pContext == m_pActiveSource.get()) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
+	if (pContext == m_pActiveSource) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
+		m_pDreamTabView->UpdateContentTexture(pContext);
 	}
 	return R_PASS;
 }

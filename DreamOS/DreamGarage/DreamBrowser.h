@@ -55,7 +55,7 @@ public:
 	virtual RESULT UpdateControlBarText(std::string& strTitle) = 0;
 	virtual RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) = 0;
 
-	virtual RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) = 0;
+	virtual RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) = 0;
 
 	virtual RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) = 0;
 	virtual RESULT HandleIsInputFocused(bool fIsInputFocused, DreamContentSource *pContext) = 0;

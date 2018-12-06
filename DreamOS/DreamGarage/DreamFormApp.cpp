@@ -225,7 +225,7 @@ RESULT DreamFormApp::UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForw
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamFormApp::UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) {
+RESULT DreamFormApp::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
 	RESULT r = R_PASS;
 
 	CNR(m_pFormView, R_SKIPPED);

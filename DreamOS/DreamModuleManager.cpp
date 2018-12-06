@@ -57,11 +57,22 @@ std::vector<DreamModuleBase*> DreamModuleManager::GetDreamModule(std::string str
 		auto &pDreamModule = dreamModuleEntry.second;
 
 		if (pDreamModule->GetName() == strDreamModuleName) {
-			returnModuleVector.push_back(pDreamModule);
+			returnModuleVector.push_back(pDreamModule.get());
 		}
 	}
 
 	return returnModuleVector;
+}
+
+std::shared_ptr<DreamModuleBase> DreamModuleManager::GetDreamModuleFromUID(UID moduleUID) {
+	for (auto dreamModuleEntry : m_moduleRegistry) {
+		auto &pDreamModule = dreamModuleEntry.second;
+
+		if (pDreamModule->GetUID() == moduleUID) {
+			return pDreamModule;
+		}
+	}
+	return nullptr;
 }
 
 // TODO: Move to manager class
@@ -92,7 +103,7 @@ RESULT DreamModuleManager::Update() {
 			m_pendingModuleQueue.pop();
 			m_modulePriorityQueue.push(pPendingModule);
 
-			m_moduleRegistry[pPendingModule->GetUID()] = pPendingModule.get();
+			m_moduleRegistry[pPendingModule->GetUID()] = pPendingModule;
 		}
 	}
 

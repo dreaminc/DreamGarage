@@ -229,7 +229,9 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	m_pSourceTexture = pTexture;
 
 	if (m_pParentApp != nullptr) {
-		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, this);
+		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamModuleFromUID(GetUID()));
+		CNM(pContentSource, "Failed getting VirtualCamera as a content source");
+		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, pContentSource);
 	}
 
 	// Enable PBO packing (DMA memory mapping) 
