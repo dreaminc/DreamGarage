@@ -577,8 +577,6 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	// Set up mouse / hand cursor model
 	///*
 	GetComposite()->InitializeOBB();
-
-	m_pThisContentSource = std::shared_ptr<DreamContentSource>(this);
 	
 Error:
 	return r;
@@ -702,7 +700,9 @@ RESULT DreamBrowser::UpdateObjectTextures() {
 	RESULT r = R_PASS;
 
 	if (m_pObserver != nullptr) {
-		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), m_pThisContentSource));
+		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamAppFromUID(GetAppUID()));
+		CNM(pContentSource, "Failed getting Browser as a content source");
+		CR(m_pObserver->UpdateContentSourceTexture(m_pBrowserTexture.get(), pContentSource));
 	}
 
 	m_fUpdateObjectTextures = false;

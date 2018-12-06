@@ -313,6 +313,8 @@ public:
 	std::vector<UID> GetAppUID(std::string strAppName);
 	UID GetUniqueAppUID(std::string strAppName);
 
+	std::shared_ptr<DreamAppBase> GetDreamAppFromUID(UID appUID);
+
 	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) = 0;
 
 	//template<class derivedAppType>
@@ -330,6 +332,8 @@ public:
 
 	std::vector<UID> GetModuleUID(std::string strName);
 	UID GetUniqueModuleUID(std::string strName);
+
+	std::shared_ptr<DreamModuleBase> GetDreamModuleFromUID(UID moduleUID);
 
 //protected:
 public:

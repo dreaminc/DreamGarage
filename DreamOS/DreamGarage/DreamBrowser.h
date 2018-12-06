@@ -205,7 +205,6 @@ protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<DreamContentSource> m_pThisContentSource = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;

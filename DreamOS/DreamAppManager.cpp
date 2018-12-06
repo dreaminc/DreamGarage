@@ -73,11 +73,22 @@ std::vector<DreamAppBase*> DreamAppManager::GetDreamApp(std::string strDreamAppN
 		auto &pDreamApp = dreamAppEntry.second;
 
 		if (pDreamApp->GetAppName() == strDreamAppName) {
-			returnAppVector.push_back(pDreamApp);
+			returnAppVector.push_back(pDreamApp.get());
 		}
 	}
 
 	return returnAppVector;
+}
+
+std::shared_ptr<DreamAppBase> DreamAppManager::GetDreamAppFromUID(UID appUID) {		// return nullptr if no app found, app may be in pending queue though
+	for (auto dreamAppEntry : m_appRegistry) {
+		auto &pDreamApp = dreamAppEntry.second;
+
+		if (pDreamApp->GetAppUID() == appUID) {
+			return pDreamApp;
+		}
+	}
+	return nullptr;
 }
 
 bool DreamAppManager::FindDreamAppWithName(std::string strDreamAppName) {
@@ -105,7 +116,7 @@ RESULT DreamAppManager::Update() {
 			m_pendingAppQueue.pop();
 			m_appPriorityQueue.push(pPendingApp);
 
-			m_appRegistry[pPendingApp->GetAppUID()] = pPendingApp.get();
+			m_appRegistry[pPendingApp->GetAppUID()] = pPendingApp;
 		}
 	}
 
@@ -227,10 +238,12 @@ DreamAppHandle* DreamAppManager::CaptureApp(UID uid, DreamAppBase* pRequestingAp
 	DreamAppHandle* pAppHandle = nullptr;
 	RESULT r = R_PASS;
 
+	std::shared_ptr<DreamAppBase> pApp = nullptr;
+
 	CN(pRequestingApp);
 //	CBM(m_appRegistry.count(pRequestingApp->GetAppUID()) > 0,"requesting app not in DreamAppManager");
 	CB(m_appRegistry.count(uid) > 0);
-	auto pApp = m_appRegistry[uid];
+	pApp = m_appRegistry[uid];
 	CN(pApp);
 	CB(pApp->GetAppUID() == uid);
 

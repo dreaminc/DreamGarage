@@ -86,6 +86,9 @@ public:
 	RESULT SetMinFrameRate(double minFrameRate);
 	bool FindDreamModuleWithName(std::string strDreamModuleName);
 
+public:
+	std::shared_ptr<DreamModuleBase> GetDreamModuleFromUID(UID moduleUID);
+
 private:
 	std::vector<DreamModuleBase*> GetDreamModule(std::string strDreamModuleName);
 
@@ -97,7 +100,7 @@ private:
 	std::priority_queue<std::shared_ptr<DreamModuleBase>, std::vector<std::shared_ptr<DreamModuleBase>>, DreamModuleBaseCompare> m_modulePriorityQueue;
 	std::queue<std::shared_ptr<DreamModuleBase>> m_pendingModuleQueue;
 
-	std::map<UID, DreamModuleBase*> m_moduleRegistry;
+	std::map<UID, std::shared_ptr<DreamModuleBase>> m_moduleRegistry;
 	
 	DreamOS *m_pDreamOS = nullptr;
 

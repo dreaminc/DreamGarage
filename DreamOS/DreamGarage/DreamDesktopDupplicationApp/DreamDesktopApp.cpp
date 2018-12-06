@@ -154,8 +154,6 @@ RESULT DreamDesktopApp::InitializeApp(void *pContext) {
 
 	CR(GetComposite()->SetVisible(true));
 
-	m_pThisContentSource = std::shared_ptr<DreamContentSource>(this);
-
 Error:
 	return r;
 }
@@ -370,7 +368,9 @@ RESULT DreamDesktopApp::OnDesktopFrame(unsigned long messageSize, void* pMessage
 		m_pxDesktopWidth = pxWidth;
 		m_pxDesktopHeight = pxHeight;
 		CRM(m_pDesktopTexture->UpdateDimensions(pxWidth, pxHeight), "Failed updating desktop texture dimensions");
-		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture.get(), m_pThisContentSource);
+		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamAppFromUID(GetAppUID()));
+		CNM(pContentSource, "Failed getting Desktop as a content source");
+		m_pParentApp->UpdateContentSourceTexture(m_pDesktopTexture.get(), pContentSource);
 		m_fDesktopDuplicationIsRunning = true;
 	}
 
@@ -394,7 +394,9 @@ RESULT DreamDesktopApp::InitializeWithParent(DreamUserControlArea *pParentApp) {
 	RESULT r = R_PASS;
 	
 	m_pParentApp = pParentApp;
-	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture.get(), m_pThisContentSource);
+	std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamAppFromUID(GetAppUID()));
+	CNM(pContentSource, "Failed getting Desktop as a content source");
+	m_pParentApp->UpdateContentSourceTexture(m_pLoadingScreenTexture.get(), pContentSource);
 	//CRM(StartDuplicationProcess(), "Error starting duplication process");
 	
 Error:

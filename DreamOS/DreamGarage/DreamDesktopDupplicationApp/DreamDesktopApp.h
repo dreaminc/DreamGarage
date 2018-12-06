@@ -105,7 +105,6 @@ protected:
 	static DreamDesktopApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	std::shared_ptr<DreamContentSource> m_pThisContentSource = nullptr;
 	std::shared_ptr<quad> m_pDesktopQuad = nullptr;
 	std::shared_ptr<texture> m_pDesktopTexture = nullptr;
 	std::shared_ptr<texture> m_pLoadingScreenTexture = nullptr;
