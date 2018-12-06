@@ -444,7 +444,7 @@ RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, std::
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		m_pDreamTabView->UpdateContentTexture(pContext, pTexture);
+		m_pDreamTabView->UpdateContentTexture(pContext);
 	}
 	return R_PASS;
 }

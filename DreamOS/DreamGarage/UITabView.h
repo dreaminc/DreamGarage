@@ -50,7 +50,7 @@ public:
 	RESULT SelectTab(UIButton *pButtonContext, void *pContext);
 	RESULT SelectByContent(std::shared_ptr<DreamContentSource> pContent);
 
-	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent, texture* pTexture);
+	RESULT UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent);
 
 	std::vector<std::shared_ptr<DreamContentSource>> GetAllSources();
 	// Called on logout, closes all tabs
