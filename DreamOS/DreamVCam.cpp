@@ -67,6 +67,8 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
 	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
 
+	m_pThisContentSource = std::shared_ptr<DreamContentSource>(this);
+
 	/*
 	ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
 	CN(pRenderProgramNode);
@@ -229,7 +231,7 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	m_pSourceTexture = pTexture;
 
 	if (m_pParentApp != nullptr) {
-		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, this);
+		m_pParentApp->UpdateContentSourceTexture(m_pSourceTexture, m_pThisContentSource);
 	}
 
 	// Enable PBO packing (DMA memory mapping) 

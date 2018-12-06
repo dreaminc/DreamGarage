@@ -83,6 +83,8 @@ private:
 	std::shared_ptr<NamedPipeServer> m_pNamedPipeServer = nullptr;
 	texture* m_pSourceTexture = nullptr;
 
+	std::shared_ptr<DreamContentSource> m_pThisContentSource = nullptr;
+
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;
 

@@ -439,17 +439,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, DreamContentSource* pContext) {
-	if (pContext == m_pActiveSource.get()) {
+RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) {
+	if (pContext == m_pActiveSource) {
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		if (pContext->GetContentType() == "ContentControlType.Camera") {
-			m_pDreamTabView->UpdateContentTexture(m_pDreamVCam, pTexture);
-		}
-		else {
-			m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext), pTexture);
-		}
+		m_pDreamTabView->UpdateContentTexture(pContext, pTexture);
 	}
 	return R_PASS;
 }

@@ -58,7 +58,7 @@ public:
 	RESULT UpdateControlBarText(std::string& strTitle) override;
 	RESULT UpdateControlBarNavigation(bool fCanGoBack, bool fCanGoForward) override;
 
-	RESULT UpdateContentSourceTexture(texture* pTexture, DreamContentSource *pContext) override;
+	RESULT UpdateContentSourceTexture(texture* pTexture, std::shared_ptr<DreamContentSource> pContext) override;
 
 	RESULT HandleNodeFocusChanged(DOMNode *pDOMNode, DreamContentSource *pContext) override;
 	RESULT HandleIsInputFocused(bool fIsFocused, DreamContentSource *pContext) override;
