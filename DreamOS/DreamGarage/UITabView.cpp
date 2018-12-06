@@ -265,10 +265,10 @@ RESULT UITabView::SelectByContent(std::shared_ptr<DreamContentSource> pContent) 
 	return R_PASS;
 }
 
-RESULT UITabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent) {
+RESULT UITabView::UpdateContentTexture(std::shared_ptr<DreamContentSource> pContent, texture* pTexture) {
 
 	if (m_appToTabMap.count(pContent) > 0) {
-		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture());
+		m_appToTabMap[pContent]->GetSurface()->SetDiffuseTexture(pTexture);
 	}
 
 	return R_PASS;

@@ -444,7 +444,12 @@ RESULT DreamUserControlArea::UpdateContentSourceTexture(texture* pTexture, Dream
 		m_pControlView->SetViewQuadTexture(pTexture);
 	}
 	else {
-		m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext));
+		if (pContext->GetContentType() == "ContentControlType.Camera") {
+			m_pDreamTabView->UpdateContentTexture(m_pDreamVCam, pTexture);
+		}
+		else {
+			m_pDreamTabView->UpdateContentTexture(std::shared_ptr<DreamContentSource>(pContext), pTexture);
+		}
 	}
 	return R_PASS;
 }
