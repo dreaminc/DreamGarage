@@ -167,7 +167,7 @@ index 0cbb947..1ae3238 100644
  
  		packet->set_data_size(packet_size);
 diff --git a/libcef/browser/audio_push_sink.cc b/libcef/browser/audio_push_sink.cc
-index 60836ad..6af30cb 100644
+index 60836ad..ca0a233 100644
 --- a/libcef/browser/audio_push_sink.cc
 +++ b/libcef/browser/audio_push_sink.cc
 @@ -28,10 +28,11 @@ CefAudioPushSink::CefAudioPushSink(const media::AudioParameters& params,
@@ -202,7 +202,7 @@ index 60836ad..6af30cb 100644
  	//int packet_size = frames * params_.GetBytesPerFrame();
  	int channels = params_.channels();
 -	int bits_per_sample = params_.bits_per_sample();
-+    int bits_per_sample = params_.GetBytesPerFrame(sampleFormat) * 8;
++    int bits_per_sample = (params_.GetBytesPerFrame(sampleFormat) * 8) / channels;
  
  	//LOG(INFO) << "CefAudioPushSink::OnData " << frames << " frames " << packet_size << " packet size "  << buffer_size << " buffersize";
  

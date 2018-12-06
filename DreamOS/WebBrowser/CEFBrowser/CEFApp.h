@@ -79,13 +79,14 @@ public:
 		command_line->AppendSwitchWithValue(L"disable-features", L"AsyncWheelEvents");
 		command_line->AppendSwitchWithValue(L"disable-features", L"TouchpadAndWheelScrollLatching");
 
-		
-
 		//command_line->AppendSwitch(L"mute-audio");
 		//command_line->AppendSwitch(L"enable-exclusive-audio");
 		command_line->AppendSwitch(L"enable-widevine-cdm");
 
 		command_line->AppendSwitchWithValue(L"--audio-buffer-size", L"480");
+
+		command_line->AppendSwitch(L"enable-media-stream");
+		command_line->AppendSwitch(L"use-dream-device-for-media-stream");
 
 		return;
 	}
