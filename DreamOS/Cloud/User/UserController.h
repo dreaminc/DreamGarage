@@ -140,7 +140,7 @@ public:
 	RESULT GetSettings(std::string& strAccessToken);
 	RESULT OnGetApiSettings(std::string&& strResponse);
 
-	RESULT SetSettings(std::string& strAccessToken, float height, float depth, float scale);
+	RESULT SetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation);
 	RESULT OnSetApiSettings(std::string&& strResponse);
 
 	RESULT GetTeam(std::string& strAccessToken, std::string strTeamID = "");

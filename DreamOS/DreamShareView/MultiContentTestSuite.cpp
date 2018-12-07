@@ -707,18 +707,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			RESULT r = R_PASS;
 
 			if (strMessage == "DreamLoginApp.OnSuccess") {
-				// TODO:
 				CR(pLoginApp->SetLaunchDate());
-				//CR(pUserController->SetSettings(strAccessToken, pUserApp->GetHeight(), pUserApp->GetDepth(), pUserApp->GetScale()));
-
-				/*
-				CR(pUserController->RequestSetSettings(wstrHardwareId,
-					strHMDType,
-					pUserApp->GetHeight(),
-					pUserApp->GetDepth(),
-					pUserApp->GetScale()));
-					//*/
-//				CR(pLoginApp->SaveTokens());
 			}
 
 		Error:
@@ -1255,7 +1244,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			RESULT r = R_PASS;
 
 			if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-				pUserControllerProxy->RequestSetSettings(wstrHardwareID,"HMDType.OculusRift", m_height, m_depth, m_scale);
+			//	pUserControllerProxy->RequestSetSettings(wstrHardwareID,"HMDType.OculusRift", m_height, m_depth, m_scale);
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 				float diff = pEvent->state.ptTouchpad.y() * 0.015f;

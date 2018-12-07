@@ -731,7 +731,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::SetSettings(std::string& strAccessToken, float height, float depth, float scale) {
+RESULT UserController::SetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -744,9 +744,15 @@ RESULT UserController::SetSettings(std::string& strAccessToken, float height, fl
 
 	nlohmann::json jsonSettings = nlohmann::json::object();
 	jsonSettings["user_settings"] = nlohmann::json::object();
-	jsonSettings["user_settings"]["ui_offset_y"] = height;
-	jsonSettings["user_settings"]["ui_offset_z"] = depth;
-	jsonSettings["user_settings"]["ui_scale"] = scale;
+
+	jsonSettings["camera_position_x"_json_pointer] = ptPosition.x();
+	jsonSettings["camera_position_y"_json_pointer] = ptPosition.y();
+	jsonSettings["camera_position_z"_json_pointer] = ptPosition.z();
+
+	jsonSettings["camera_orientation_w"_json_pointer] = qOrientation.w();
+	jsonSettings["camera_orientation_x"_json_pointer] = qOrientation.x();
+	jsonSettings["camera_orientation_y"_json_pointer] = qOrientation.y();
+	jsonSettings["camera_orientation_z"_json_pointer] = qOrientation.z();
 
 	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
 
@@ -806,7 +812,7 @@ RESULT UserController::OnGetTeam(std::string&& strResponse) {
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 		// Allow force of environment ID in DEBUG
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
@@ -815,7 +821,7 @@ RESULT UserController::OnGetTeam(std::string&& strResponse) {
 		if ((strEnvironmentID.compare("default") == 0) == false) {
 			environmentId = stoi(strEnvironmentID);
 		}
-//#endif
+#endif
 
 		SetUserDefaultEnvironmentID(environmentId);
 
@@ -1214,11 +1220,6 @@ RESULT UserController::RequestSetSettings(std::wstring wstrHardwareID, std::stri
 
 	jsonPayload["user_settings"] = nlohmann::json::object();
 	jsonPayload["user_settings"]["user"] = (int)(m_user.GetUserID());
-//	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
-//	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
-	jsonPayload["user_settings"]["ui_offset_y"] = yOffset;
-	jsonPayload["user_settings"]["ui_offset_z"] = zOffset;
-	jsonPayload["user_settings"]["ui_scale"] = scale;
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);
