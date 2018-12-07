@@ -480,11 +480,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnGetSettings(float height, float depth, float scale) {
+RESULT CloudController::OnGetSettings(point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	if (m_pUserObserver != nullptr) {
-		CR(m_pUserObserver->OnGetSettings(height, depth, scale));
+		CR(m_pUserObserver->OnGetSettings(ptPosition, qOrientation));
 	}
 
 Error:

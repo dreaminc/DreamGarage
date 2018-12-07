@@ -81,6 +81,8 @@ RESULT MultiContentTestSuite::AddTests() {
 	//CR(AddTestRemoveObjects2());
 	//CR(AddTestRemoveObjects());
 
+	CR(AddTestCameraSettings());
+
 	CR(AddTestLoginForms());
 
 	CR(AddTestDreamSettingsApp());
@@ -723,7 +725,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			return r;
 		}
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 			RESULT r = R_PASS;
 
 			//CR(pUserApp->UpdateHeight(height));
@@ -1125,6 +1127,105 @@ Error:
 	return r;
 }
 
+RESULT MultiContentTestSuite::AddTestCameraSettings() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 2000.0f;
+	int nRepeats = 1;
+
+	struct TestContext : public CloudController::UserObserver
+	{
+		UserController* pUserControllerProxy = nullptr;
+		CloudController *pCloudController = nullptr;
+
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
+			return R_PASS;
+		}
+		virtual RESULT OnSetSettings() override {
+			return R_PASS;
+		}
+
+		virtual RESULT OnLogin() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnLogout() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnPendLogout() override {
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnSwitchTeams() override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnFormURL(std::string& strKey, std::string& strTitle, std::string& strURL) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
+			return R_NOT_IMPLEMENTED;
+		}
+
+		virtual RESULT OnDreamVersion(version dreamVersion) override {
+			DEBUG_LINEOUT("OnDreamVersion");
+
+			return R_NOT_HANDLED;
+		}
+
+		virtual RESULT OnAPIConnectionCheck(bool fIsConnected) override {
+			DEBUG_LINEOUT("OnAPIConnectionCheck");
+
+			return R_NOT_HANDLED;
+		}
+
+	} *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		SetupPipeline();
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		m_pDreamOS->InitializeCloudController();
+		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
+		pTestContext->pCloudController->Start("jason_test1@dreamos.com", "nightmare", 168);
+		pTestContext->pCloudController->RegisterUserObserver(pTestContext);
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Content Active Source");
+	pNewTest->SetTestDescription("Multi Content, swapping active source");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 	RESULT r = R_PASS;
 	double sTestTime = 2000.0f;
@@ -1198,13 +1299,15 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			return r;
 		};
 
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 			RESULT r = R_PASS;
 
 			pUserControlArea->GetDOS()->GetKeyboardApp()->Show();
+			/*
 			m_height = height;
 			m_depth = depth;
 			m_scale = scale;
+			//*/
 
 			float currentHeight = pUserControlArea->m_pDreamUserApp->m_pAppBasis->GetPosition().y();
 			pUserControlArea->SetViewHeight(currentHeight + m_height);

@@ -184,7 +184,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 		}
 
 		// CloudController::UserObserver
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 			DEBUG_LINEOUT("OnGetSettings");
 
 			return R_NOT_HANDLED;
@@ -608,7 +608,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 		}
 
 		// CloudController::UserObserver
-		virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 			DEBUG_LINEOUT("OnGetSettings");
 
 			return R_NOT_HANDLED;

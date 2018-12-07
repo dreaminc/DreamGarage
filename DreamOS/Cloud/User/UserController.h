@@ -19,6 +19,8 @@
 #include "json.hpp"
 
 class UserControllerObserver;
+class point;
+class quaternion;
 
 struct LoginState {
 	unsigned fFirstLaunch : 1;
@@ -173,7 +175,7 @@ public:
 	class UserControllerObserver {
 	public:
 		// socket methods
-		virtual RESULT OnGetSettings(float height, float depth, float scale) = 0;
+		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) = 0;
 		virtual RESULT OnSetSettings() = 0;
 		virtual RESULT OnLogin() = 0;
 		virtual RESULT OnLogout() = 0;

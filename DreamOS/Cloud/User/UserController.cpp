@@ -690,26 +690,42 @@ RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
 	nlohmann::json jsonData;
 	int statusCode;
 
-	float height;
-	float depth;
-	float scale;
+	point ptCamera;
+	quaternion qCamera;
+
+	int cameraID;
+	int userID;
+	float ptX, ptY, ptZ;
+	float qW, qX, qY, qZ;
 
 	CR(GetResponseData(jsonData, jsonResponse, statusCode));
 
 	if (statusCode == 404) {
-		//TODO: it isn't right to have this code here
-		std::string strSettingsFormKey = "FormKey.UsersSettings";
-		GetFormURL(strSettingsFormKey);
+		// user does not have camera settings
+		// TODO: may want a default camera location from elsewhere
+		CR(m_pUserControllerObserver->OnGetSettings(point(0.0f, 0.0f, 0.0f), quaternion()));
 	}
 	//TODO: combine with the json rpc response
 	else if (statusCode == 200) {
 		nlohmann::json jsonSettings = jsonData["/user_settings"_json_pointer];
-		height = jsonSettings["ui_offset_y"].get<float>();
-		depth = jsonSettings["ui_offset_z"].get<float>();
-		scale = jsonSettings["ui_scale"].get<float>();
+
+		cameraID = jsonSettings["id"_json_pointer].get<int>();
+		userID = jsonSettings["user"_json_pointer].get<int>();
+
+		ptX = jsonSettings["camera_position_x"_json_pointer].get<float>();
+		ptY = jsonSettings["camera_position_y"_json_pointer].get<float>();
+		ptZ = jsonSettings["camera_position_z"_json_pointer].get<float>();
+
+		qW = jsonSettings["camera_orientation_w"_json_pointer].get<float>();
+		qX = jsonSettings["camera_orientation_x"_json_pointer].get<float>();
+		qY = jsonSettings["camera_orientation_y"_json_pointer].get<float>();
+		qZ = jsonSettings["camera_orientation_z"_json_pointer].get<float>();
+
+		ptCamera = point(ptX, ptY, ptZ);
+		qCamera = quaternion(qW, qX, qY, qZ);
 	}
 
-	CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
+	CR(m_pUserControllerObserver->OnGetSettings(ptCamera, qCamera));
 
 Error:
 	return r;
@@ -790,7 +806,7 @@ RESULT UserController::OnGetTeam(std::string&& strResponse) {
 		int environmentId = jsonTeam["/default_environment/id"_json_pointer].get<int>();
 		int environmentModelId = jsonTeam["/default_environment/model_id"_json_pointer].get<int>();
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 		// Allow force of environment ID in DEBUG
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCommandLineManager);
@@ -799,7 +815,7 @@ RESULT UserController::OnGetTeam(std::string&& strResponse) {
 		if ((strEnvironmentID.compare("default") == 0) == false) {
 			environmentId = stoi(strEnvironmentID);
 		}
-#endif
+//#endif
 
 		SetUserDefaultEnvironmentID(environmentId);
 
@@ -1113,6 +1129,8 @@ RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonUserSettings = jsonPayload["/user_settings"_json_pointer];
 
+	// deprecated
+	/*
 	if (!jsonUserSettings.is_null()) {
 		if (m_pUserControllerObserver != nullptr) {
 			// Moving to Send/Receive paradigm
@@ -1141,6 +1159,7 @@ RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage
 		CN(pEnvironmentControllerProxy);
 		pEnvironmentControllerProxy->RequestForm("FormKey.UsersSettings");
 	}
+	//*/
 
 Error:
 	return r;

@@ -202,7 +202,7 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT OnGetSettings(float height, float depth, float scale) override {
+	virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
 		return R_NOT_IMPLEMENTED;
 	}
 
