@@ -474,6 +474,32 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RequestOpenCamera() {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_asset"] = nlohmann::json::object();
+	//jsonPayload["environment_asset"]["path"] = strPath;
+
+	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	//jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
+
+	//jsonPayload["environment_asset"]["title"] = strTitle;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_asset.camera"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_OPEN_CAMERA));
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::RequestCloseAsset(long assetID) {
 	RESULT r = R_PASS;
 
