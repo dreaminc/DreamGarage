@@ -112,6 +112,10 @@ version DreamTestApp::GetDreamVersion() {
 	return version("0.0.0");		// This is... a placeholder?
 }
 
+RESULT DreamTestApp::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) {
+	return R_NOT_IMPLEMENTED;
+}
+
 // Cloud
 RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	return R_NOT_IMPLEMENTED;

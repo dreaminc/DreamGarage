@@ -34,6 +34,8 @@ public:
 	virtual RESULT Update(void) override;
 	virtual version GetDreamVersion() override;
 
+	virtual RESULT MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) override;
+
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
 	virtual RESULT OnNewDreamPeer(DreamPeerApp *pDreamPeer) override;
