@@ -63,39 +63,44 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	CN(m_pCamera);
 	CB(m_pCamera->incRefCount());
 
-	CR(GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode));
-	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
-	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
+	r = GetDOS()->MakePipeline(m_pCamera, m_pOGLRenderNode, m_pOGLEndNode);
+	if (r != R_NOT_IMPLEMENTED) {
+		CR(r);
+	}
+	else {
+		///*
+		ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
 
-	/*
-	ProgramNode *pRenderProgramNode = GetDOS()->MakeProgramNode("standard");
-	CN(pRenderProgramNode);
-	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));
-	CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		// Reference Geometry Shader Program
+		ProgramNode *pReferenceGeometryProgram = GetDOS()->MakeProgramNode("reference");		CN(pReferenceGeometryProgram);		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Reference Geometry Shader Program
-	ProgramNode *pReferenceGeometryProgram = GetDOS()->MakeProgramNode("reference");	CN(pReferenceGeometryProgram);	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		// Skybox
+		ProgramNode *pSkyboxProgram = GetDOS()->MakeProgramNode("skybox_scatter");		CN(pSkyboxProgram);		CR(pSkyboxProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));		CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
-	// Skybox
-	ProgramNode *pSkyboxProgram = GetDOS()->MakeProgramNode("skybox_scatter");	CN(pSkyboxProgram);	CR(pSkyboxProgram->ConnectToInput("scenegraph", GetDOS()->GetSceneGraphNode()->Output("objectstore")));	CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		m_pOGLRenderNode = dynamic_cast<OGLProgram*>(pRenderProgramNode);
+		CN(m_pOGLRenderNode);
 
-	m_pOGLRenderNode = dynamic_cast<OGLProgram*>(pRenderProgramNode);
-	CN(m_pOGLRenderNode);
-	
-	m_pOGLEndNode = dynamic_cast<OGLProgram*>(pSkyboxProgram);
-	CN(m_pOGLEndNode);
+		m_pOGLEndNode = dynamic_cast<OGLProgram*>(pSkyboxProgram);
+		CN(m_pOGLEndNode);
 
-	//CRM(SetSourceTexture(std::shared_ptr<texture>(m_pOGLRenderNode->GetOGLFramebufferColorTexture())), "Failed to set source texture");
+		//CRM(SetSourceTexture(std::shared_ptr<texture>(m_pOGLRenderNode->GetOGLFramebufferColorTexture())), "Failed to set source texture");
 
-	//CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
-	//*/	
+		//CRM(SetSourceTexture(m_pOGLRenderNode->GetOGLFramebufferColorTexture()), "Failed to set source texture");
+		//*/
+	}
 
 	{
 		//auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
 		//CN(pDreamGamepadCamera);
 		//CR(pDreamGamepadCamera->SetCamera(m_pCamera));
 	}
+
+	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
+	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
 
 Error:
 	return r;
@@ -193,6 +198,7 @@ DreamVCam* DreamVCam::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	return pDreamModule;
 }
 
+// NOTE: This is not currently used, update is used to render VCam pipeline
 RESULT DreamVCam::ModuleProcess(void *pContext) {
 	RESULT r = R_PASS;
 

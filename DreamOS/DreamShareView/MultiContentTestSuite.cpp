@@ -1101,7 +1101,7 @@ RESULT MultiContentTestSuite::AddTestDreamSettingsApp() {
 		//pFormView->SetViewQuadTexture(pTestContext->pTestTexture);
 		//pTestContext->pSettingsApp->InitializeSettingsForm("https://twitch.tv");
 
-		pTestContext->pBrowserQuad->SetDiffuseTexture(pTexture.get());
+		pTestContext->pBrowserQuad->SetDiffuseTexture(pTexture);
 
 	//Error:
 		return r;
@@ -2026,7 +2026,7 @@ RESULT MultiContentTestSuite::AddTestUserControlAreaLayout() {
 		//pTestContext->pUserControlArea->Update();
 
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture().get());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture());
 		}
 		return R_PASS;
 	};
@@ -2139,7 +2139,7 @@ RESULT MultiContentTestSuite::AddTestManyBrowsers() {
 
 		//pTestContext->pWebBrowserManager->Update();
 		for (int i = 0; i < pTestContext->strURIs.size(); i++) {
-			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture().get());
+			pTestContext->pBrowserQuads[i]->SetDiffuseTexture(pTestContext->pDreamBrowsers[i]->GetSourceTexture());
 		}
 		return R_PASS;
 	};
@@ -2296,7 +2296,8 @@ RESULT MultiContentTestSuite::AddTestMultiPeerBasic() {
 				m_pTestTexture = m_pTestTextureUser2;
 			}
 
-			m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+			//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+			m_pDreamShareView->SetCastingTexture(m_pTestTexture.get());
 			m_pDreamShareView->ShowCastingTexture();
 		}
 
@@ -2568,7 +2569,8 @@ RESULT MultiContentTestSuite::Notify(InteractionObjectEvent *pEvent) {
 					}
 					//*/
 					m_pDreamBrowser->SetURI(m_strURL);
-					m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+					//m_pDreamShareView->SetCastingTexture(m_pTestTexture);
+					m_pDreamShareView->SetCastingTexture(m_pTestTexture.get());
 					m_pDreamShareView->ShowCastingTexture();
 
 					m_pDreamShareView->SetStreamingState(false);

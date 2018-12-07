@@ -56,13 +56,13 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	
-	CR(AddTestDreamVCam());
 
+	CR(AddTestDreamVCam());
+	
 	CR(AddTestDreamBrowser());
 
 	CR(AddTestDreamDesktop());
-	
+
 	CR(AddTestNamedPipes());
 
 	CR(AddTestModuleManager());
@@ -712,7 +712,7 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+		pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
 
 	Error:
 		return r;
@@ -1142,12 +1142,18 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 	//const int numTests = 5;
 
 	struct TestContext {
+		// VCam
 		texture *pTexture = nullptr;
 		unsigned char *pBuffer = nullptr;
 		std::shared_ptr<DreamVCam> pDreamVCam = nullptr;
 		ProgramNode* pRenderNode = nullptr;
 		ProgramNode* pEndAuxNode = nullptr;
 		std::shared_ptr<quad> pQuad = nullptr;
+
+		// Browser
+		std::shared_ptr<CEFBrowserManager> m_pWebBrowserManager;
+		std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+		quad *m_pBrowserQuad = nullptr;
 	} *pTestContext = new TestContext();
 
 	// Initialize Code
@@ -1155,6 +1161,8 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 		RESULT r = R_PASS;
 
 		// Set up the pipeline
+
+		std::string strURL = "https://www.webcamtests.com";
 
 		ProgramNode* pRenderProgramNode = nullptr;
 		ProgramNode* pReferenceGeometryProgram = nullptr;
@@ -1238,6 +1246,27 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 			auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 			CN(pTestContext);
 
+			///*
+			// Set up Browser to test
+			pTestContext->m_pWebBrowserManager = std::make_shared<CEFBrowserManager>();
+			CN(pTestContext->m_pWebBrowserManager);
+			CR(pTestContext->m_pWebBrowserManager->Initialize());
+
+			// This presents a timing issue if it works 
+			pTestContext->m_pBrowserQuad = m_pDreamOS->AddQuad(4.8f, 2.7f);
+			CN(pTestContext->m_pBrowserQuad);
+			pTestContext->m_pBrowserQuad->RotateXByDeg(90.0f);
+			pTestContext->m_pBrowserQuad->RotateZByDeg(180.0f);
+			pTestContext->m_pBrowserQuad->SetMaterialAmbient(1.0f);
+
+			// Create the Shared View App
+			pTestContext->m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+			pTestContext->m_pDreamBrowser->InitializeWithBrowserManager(pTestContext->m_pWebBrowserManager, strURL);
+			CNM(pTestContext->m_pDreamBrowser, "Failed to create dream browser");
+
+			pTestContext->m_pDreamBrowser->SetURI(strURL);
+			//*/
+
 			pTestContext->pRenderNode = pRenderProgramNode;
 			pTestContext->pEndAuxNode = pSkyboxProgram;
 
@@ -1303,6 +1332,10 @@ RESULT DreamOSTestSuite::AddTestDreamVCam() {
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
+
+		if (pTestContext->m_pBrowserQuad != nullptr) {
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
+		}
 
 		/* 
 		// Now done in the module
@@ -1869,7 +1902,8 @@ RESULT DreamOSTestSuite::AddTestDreamShareView() {
 			pDreamShareView->Show();
 
 			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
-			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
+			//pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
+			pDreamShareView->SetCastingTexture(pCastTexture);
 
 			pTestContext->pDreamShareView = pDreamShareView;
 		}
@@ -1964,7 +1998,8 @@ RESULT DreamOSTestSuite::AddTestBasicBrowserCast() {
 			pDreamShareView->Show();
 
 			auto pCastTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, L"website.png");
-			pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
+			//pDreamShareView->SetCastingTexture(std::shared_ptr<texture>(pCastTexture));
+			pDreamShareView->SetCastingTexture(pCastTexture);
 
 			pTestContext->pDreamShareView = pDreamShareView;
 

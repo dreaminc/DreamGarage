@@ -17,12 +17,13 @@ RESULT DreamTestApp::ConfigureSandbox() {
 
 	SandboxApp::configuration sandboxconfig;
 	
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 	sandboxconfig.fUseGamepad = true;
 	sandboxconfig.fInitCloud = false;		// TODO: This is currently breaking stuff
 	sandboxconfig.fInitSound = false;
+	sandboxconfig.fInitUserApp = false;		// Turn on for testing User app related functionality 
 	
 	sandboxconfig.fHMDMirror = true;
 	sandboxconfig.fHideWindow = false;
@@ -54,7 +55,7 @@ RESULT DreamTestApp::LoadScene() {
 	// Push to a test suite factory in testing
 
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::COLLISION, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::SOUND, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::WEBRTC, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::MULTICONTENT, this);
@@ -110,6 +111,10 @@ Error:
 
 version DreamTestApp::GetDreamVersion() {
 	return version("0.0.0");		// This is... a placeholder?
+}
+
+RESULT DreamTestApp::MakePipeline(CameraNode* pCamera, OGLProgram* &pRenderNode, OGLProgram* &pEndNode) {
+	return R_NOT_IMPLEMENTED;
 }
 
 // Cloud

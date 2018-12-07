@@ -520,7 +520,7 @@ RESULT SoundTestSuite::AddTestBrowserSoundRouting() {
 		CN(pTestContext);
 
 		if (pTestContext->m_pBrowserQuad != nullptr && pTestContext->m_pDreamBrowser != nullptr) {
-			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture().get());
+			pTestContext->m_pBrowserQuad->SetDiffuseTexture(pTestContext->m_pDreamBrowser->GetSourceTexture());
 		}
 
 		{
