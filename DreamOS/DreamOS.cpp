@@ -151,7 +151,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(RegisterSoundSystemObserver(this), "Failed to register this as sound system observer");
 	}
 
-	//CR(InitializeDreamUserApp());
+	if (m_pSandbox->m_SandboxConfiguration.fInitUserApp) {
+		CRM(InitializeDreamUserApp(), "Failed to initalize user app");
+	}
 
 	CR(InitializeKeyboard());
 
