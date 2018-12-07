@@ -182,7 +182,23 @@ texture *UIControlView::GetOverlayTexture(HAND_TYPE type) {
 }
 
 RESULT UIControlView::SetViewQuadTexture(texture* pBrowserTexture) {
+	bool fIsQuadUVFlipped = false;
+	
+	if (m_pViewQuad->GetTextureDiffuse() != nullptr) {
+		if (m_pViewQuad->GetTextureDiffuse()->IsUVVerticalFlipped()) {
+			fIsQuadUVFlipped = true;
+		}
+	}
+	
+	if (pBrowserTexture->IsUVVerticalFlipped() && !fIsQuadUVFlipped) {
+		m_pViewQuad->FlipUVVertical();
+	}
+	else if (!pBrowserTexture->IsUVVerticalFlipped() && fIsQuadUVFlipped) {
+		m_pViewQuad->FlipUVVertical();
+	}
+	
 	m_pViewQuad->SetDiffuseTexture(pBrowserTexture);	//Control view texture to be set by Browser
+
 	return R_PASS;
 }
 

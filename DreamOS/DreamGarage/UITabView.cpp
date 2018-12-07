@@ -140,7 +140,10 @@ std::shared_ptr<UIButton> UITabView::CreateTab(std::shared_ptr<DreamContentSourc
 	pNewTabButton = m_pScrollView->AddUIButton(m_tabWidth, m_tabHeight);
 
 	pNewTabButton->GetSurface()->SetDiffuseTexture(pContent->GetSourceTexture());
-	pNewTabButton->GetSurface()->FlipUVVertical();
+	
+	if (!pContent->GetSourceTexture()->IsUVVerticalFlipped()) {
+		pNewTabButton->GetSurface()->FlipUVVertical();
+	}
 
 	pNewTabButton->SetPosition(m_ptMostRecent);
 	pNewTabButton->GetSurface()->RotateXByDeg(-90.0f);

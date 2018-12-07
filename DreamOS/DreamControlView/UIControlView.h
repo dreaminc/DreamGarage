@@ -86,7 +86,6 @@ public:
 	const wchar_t *k_wszViveOverlayRight = L"vive-controller-overlay-right-active.png";
 
 private:
-	
 	std::shared_ptr<texture> m_pViewTexture = nullptr;
 
 	std::shared_ptr<quad> m_pViewBackground = nullptr;

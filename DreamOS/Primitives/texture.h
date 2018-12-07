@@ -18,8 +18,9 @@ class image;
 class texture : public valid {
 public:
 	enum class flags : uint16_t {
-		NONE			= 0,
-		DISTANCE_MAP	= 1 << 0,
+		NONE = 0,
+		DISTANCE_MAP = 1 << 0,
+		UV_VERTICAL_FLIPPED = 1 << 1,
 		INVALID			= 0xFFFF
 	};
 	
@@ -145,6 +146,9 @@ public:
 
 	bool IsDistanceMapped();
 	RESULT SetDistanceMapped();
+
+	bool IsUVVerticalFlipped();
+	RESULT SetUVVerticalFlipped();
 
 	uint8_t *GetImageBuffer();
 
