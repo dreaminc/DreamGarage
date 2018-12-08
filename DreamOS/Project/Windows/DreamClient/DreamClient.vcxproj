@@ -302,9 +302,9 @@
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\Resources\*" "$(TargetDir)"
  /D
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\OfficialBuild\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3538\OfficialBuild\*" "$(TargetDir)"
  /D
 
 xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
