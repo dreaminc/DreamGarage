@@ -1095,20 +1095,9 @@ RESULT DreamGarage::OnNewSocketConnection(int seatPosition) {
 
 		long avatarID;
 
-		auto fnOnFadeInCallback = [&](void *pContext) {
-			
-			if (m_fFirstLogin) {
-				m_pDreamGeneralForm->Show();
-				m_pDreamUserApp->ResetAppComposite();
-			}
-			
-			return R_PASS;
-		};
-
 		CR(m_pDreamEnvironmentApp->GetSharedScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 		CR(m_pDreamShareView->UpdateScreenPosition(ptScreenPosition, qScreenRotation, screenScale));
 
-		//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr, fnOnFadeInCallback));
 		CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 		//*/
 
