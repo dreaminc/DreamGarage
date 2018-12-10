@@ -303,6 +303,15 @@ RESULT texture::SetDistanceMapped() {
 	return R_PASS;
 }
 
+bool texture::IsUVVerticalFlipped() {
+	return ((m_flags & texture::flags::UV_VERTICAL_FLIPPED) != texture::flags::NONE);
+}
+
+RESULT texture::SetUVVerticalFlipped() {
+	m_flags = m_flags | texture::flags::UV_VERTICAL_FLIPPED;
+	return R_PASS;
+}
+
 uint8_t *texture::GetImageBuffer() {
 	if (m_pImage != nullptr)
 		return m_pImage->GetImageBuffer();

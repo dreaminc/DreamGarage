@@ -101,6 +101,9 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 
 	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
 	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
+	
+	m_pSourceTexture = m_pOGLRenderNode->GetOGLFramebufferColorTexture();
+	m_pSourceTexture->SetUVVerticalFlipped();
 
 Error:
 	return r;
@@ -233,6 +236,10 @@ RESULT DreamVCam::SetSourceTexture(texture* pTexture) {
 	CBM((m_pSourceTexture == nullptr), "Source texture already set");
 
 	m_pSourceTexture = pTexture;
+	
+	if (!m_pSourceTexture->IsUVVerticalFlipped()) {
+		m_pSourceTexture->SetUVVerticalFlipped();
+	}	
 
 	if (m_pParentApp != nullptr) {
 		std::shared_ptr<DreamContentSource> pContentSource = std::dynamic_pointer_cast<DreamContentSource>(GetDOS()->GetDreamModuleFromUID(GetUID()));
@@ -258,9 +265,12 @@ RESULT DreamVCam::UnsetSourceTexture() {
 }
 
 RESULT DreamVCam::InitializeWithParent(DreamUserControlArea *pParentApp) {
-	m_pParentApp = pParentApp;
-	//m_pParentApp->UpdateContentSourceTexture(std::shared_ptr<texture>(m_pSourceTexture), this);
-	return R_PASS;
+	RESULT r = R_PASS;
+
+	m_pParentApp = pParentApp;	
+
+Error:
+	return r;
 }
 
 RESULT DreamVCam::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {

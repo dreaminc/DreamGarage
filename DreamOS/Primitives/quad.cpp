@@ -327,6 +327,31 @@ Error:
 	return r;
 }
 
+RESULT quad::SetDiffuseTexture(texture* pTexture) {
+	RESULT r = R_PASS;
+
+	bool fIsQuadUVFlipped = false;
+	CN(pTexture);
+	
+	if (m_pTextureDiffuse != nullptr) {
+		if (m_pTextureDiffuse->IsUVVerticalFlipped()) {
+			fIsQuadUVFlipped = true;
+		}
+	}
+
+	if (pTexture->IsUVVerticalFlipped() && !fIsQuadUVFlipped) {
+		FlipUVVertical();
+	}
+	else if (!pTexture->IsUVVerticalFlipped() && fIsQuadUVFlipped) {
+		FlipUVVertical();
+	}
+
+	m_pTextureDiffuse = pTexture;
+
+Error:
+	return r;
+}
+
 vector quad::GetNormal(bool fAbsolute) {
 	vector vNormal = m_vNormal;
 
