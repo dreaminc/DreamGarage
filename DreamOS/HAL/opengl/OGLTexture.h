@@ -103,8 +103,7 @@ public:
 
 private:
 	// TODO: More?
-	int m_unpackBufferIndex = 0;
-	GLuint m_glPixelUnpackBufferIndex[NUM_UNPACK_BUFFERS] = { 0 };
+	GLuint m_glPixelUnpackBufferIndex = 0;
 
 	int m_packBufferIndex = 0;
 	GLuint m_glPixelPackBufferIndex[NUM_PACK_BUFFERS] = { 0 };

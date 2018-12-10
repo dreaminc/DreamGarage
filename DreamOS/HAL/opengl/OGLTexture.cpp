@@ -48,7 +48,7 @@ RESULT OGLTexture::Bind() {
 }
 
 RESULT OGLTexture::BindPixelUnpackBuffer(int index) {
-	return m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex[index]);
+	return m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex);
 }
 
 RESULT OGLTexture::BindPixelPackBuffer(int index) {
@@ -594,17 +594,14 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GetOpenGLPixelFormat(m_pixelFormat), GL_UNSIGNED_BYTE, NULL));
 
-		// increment index
-		m_unpackBufferIndex = (m_unpackBufferIndex + 1) % NUM_PACK_BUFFERS;
-
 		// Needed?  Only if we want to do two PBOs for unpack?
-		CR(BindPixelUnpackBuffer(m_unpackBufferIndex));
+		CR(BindPixelUnpackBuffer());
 
 		CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, pBuffer_n, 0, GL_STREAM_DRAW));
 
 		void* pUnpackPBO = m_pParentImp->glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 		CN(pUnpackPBO);
-		
+
 		// update the data here
 		//updatePixels(ptr, DATA_SIZE);
 
@@ -612,8 +609,9 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 		memcpy((void*)pUnpackPBO, (void*)pBuffer, pBuffer_n);
 
 		// release pointer to mapping buffer
-		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);  
-		
+		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+
+
 		// It is good idea to release PBOs with ID 0 after use.
 		// Once bound with 0, all pixel operations behave normal ways.
 		(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
@@ -661,12 +659,10 @@ RESULT OGLTexture::EnableOGLPBOUnpack() {
 	// Create pixel unpack buffer objects
 	// glBufferData() with NULL pointer reserves only memory space
 
-	CR(m_pParentImp->glGenBuffers(NUM_UNPACK_BUFFERS, m_glPixelUnpackBufferIndex));
+	CR(m_pParentImp->glGenBuffers(1, &m_glPixelUnpackBufferIndex));
 
-	for (int i = 0; i < NUM_UNPACK_BUFFERS; i++) {
-		CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex[i]));
-		CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, GetTextureSize(), 0, GL_STREAM_DRAW));
-	}
+	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, m_glPixelUnpackBufferIndex));
+	CR(m_pParentImp->glBufferData(GL_PIXEL_UNPACK_BUFFER, GetTextureSize(), 0, GL_STREAM_DRAW));
 
 	CR(m_pParentImp->glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0));
 

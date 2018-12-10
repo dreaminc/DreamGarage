@@ -57,10 +57,10 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamVCam());
-	
 	CR(AddTestDreamBrowser());
 
+	CR(AddTestDreamVCam());
+	
 	CR(AddTestDreamDesktop());
 
 	CR(AddTestNamedPipes());
@@ -654,8 +654,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
 		//std::string strURL = "https://twitch.tv";
-		//std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
-		std::string strURL = "https://www.youtube.com/watch?v=B9mEIZ3qMTw";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		//std::string strURL = "https://www.youtube.com/watch?v=B9mEIZ3qMTw";
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
