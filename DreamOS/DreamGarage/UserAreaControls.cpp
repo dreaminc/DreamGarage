@@ -31,15 +31,17 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 	float buttonWidth = m_buttonWidth * width;
 	float buttonHeight = buttonWidth;
 	float spacingSize = m_pParentApp->GetSpacingSize() * width;
+	float doubleButtonWidth = buttonWidth * 2 + spacingSize;
 
 	m_buttonWidth = buttonWidth;
 	m_buttonHeight = buttonHeight;
 	m_spacingSize = spacingSize;
 
 	// button positioning
-	float start = -width / 2.0f - spacingSize/2.0f;
+	float start = -width / 2.0f - spacingSize;
 
 	float backOffset = start + buttonWidth / 2.0f;
+	float backSourceOffset = start + doubleButtonWidth / 2.0f;
 	float forwardOffset = backOffset + spacingSize + buttonWidth;
 	float shareOffset = forwardOffset + spacingSize + buttonWidth;
 
@@ -97,14 +99,14 @@ RESULT UserAreaControls::Initialize(DreamUserControlArea *pParent) {
 		controlTextures[7], controlTextures[8]);
 
 	// desktop
-	m_pKeyboardButton = AddButton(backOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
+	m_pKeyboardButton = AddButton(backSourceOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
 		std::bind(&UserAreaControls::HandleKeyboardPressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[11]);
 
 	m_pKeyboardButton->SetVisible(false);
 
 	// camera
-	m_pCameraSourceButton = AddButton(backOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
+	m_pCameraSourceButton = AddButton(backSourceOffset, buttonWidth*2.0f + spacingSize, buttonHeight,
 		std::bind(&UserAreaControls::HandleSourceTogglePressed, this, std::placeholders::_1, std::placeholders::_2),
 		controlTextures[14], controlTextures[13]);
 
