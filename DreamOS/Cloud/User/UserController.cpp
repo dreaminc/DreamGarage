@@ -35,11 +35,6 @@ UserController::~UserController() {
 RESULT UserController::Initialize() {
 	RESULT r = R_PASS;
 
-	// Register Methods
-	//user
-	CR(RegisterMethod("get_settings", std::bind(&UserController::OnGetSettings, this, std::placeholders::_1)));
-	CR(RegisterMethod("set_settings", std::bind(&UserController::OnSetSettings, this, std::placeholders::_1)));
-
 Error:
 	return r;
 }
@@ -215,7 +210,7 @@ RESULT UserController::SwitchTeam() {
 	m_fSwitchingTeams = true;
 
 	// get new environmentID
-	CRM(GetTeam(m_strAccessToken, m_strPendingTeamID), "Failed to switch to new team");
+	CRM(RequestTeam(m_strAccessToken, m_strPendingTeamID), "Failed to switch to new team");
 
 	m_strPendingTeamID = "";
 
@@ -555,7 +550,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::GetFormURL(std::string& strFormKey) {
+RESULT UserController::RequestFormURL(std::string& strFormKey) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -612,7 +607,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::GetAccessToken(std::string& strRefreshToken) {
+RESULT UserController::RequestAccessToken(std::string& strRefreshToken) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -666,7 +661,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::GetSettings(std::string& strAccessToken) {
+RESULT UserController::RequestGetSettings(std::string& strAccessToken) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -709,17 +704,17 @@ RESULT UserController::OnGetApiSettings(std::string&& strResponse) {
 	else if (statusCode == 200) {
 		nlohmann::json jsonSettings = jsonData["/user_settings"_json_pointer];
 
-		cameraID = jsonSettings["id"_json_pointer].get<int>();
-		userID = jsonSettings["user"_json_pointer].get<int>();
+		cameraID = jsonSettings["id"].get<int>();
+		userID = jsonSettings["user"].get<int>();
 
-		ptX = jsonSettings["camera_position_x"_json_pointer].get<float>();
-		ptY = jsonSettings["camera_position_y"_json_pointer].get<float>();
-		ptZ = jsonSettings["camera_position_z"_json_pointer].get<float>();
+		ptX = jsonSettings["camera_position_x"].get<float>();
+		ptY = jsonSettings["camera_position_y"].get<float>();
+		ptZ = jsonSettings["camera_position_z"].get<float>();
 
-		qW = jsonSettings["camera_orientation_w"_json_pointer].get<float>();
-		qX = jsonSettings["camera_orientation_x"_json_pointer].get<float>();
-		qY = jsonSettings["camera_orientation_y"_json_pointer].get<float>();
-		qZ = jsonSettings["camera_orientation_z"_json_pointer].get<float>();
+		qW = jsonSettings["camera_orientation_w"].get<float>();
+		qX = jsonSettings["camera_orientation_x"].get<float>();
+		qY = jsonSettings["camera_orientation_y"].get<float>();
+		qZ = jsonSettings["camera_orientation_z"].get<float>();
 
 		ptCamera = point(ptX, ptY, ptZ);
 		qCamera = quaternion(qW, qX, qY, qZ);
@@ -731,7 +726,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::SetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) {
+RESULT UserController::RequestSetSettings(std::string& strAccessToken, point ptPosition, quaternion qOrientation) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -745,16 +740,17 @@ RESULT UserController::SetSettings(std::string& strAccessToken, point ptPosition
 	nlohmann::json jsonSettings = nlohmann::json::object();
 	jsonSettings["user_settings"] = nlohmann::json::object();
 
-	jsonSettings["camera_position_x"_json_pointer] = ptPosition.x();
-	jsonSettings["camera_position_y"_json_pointer] = ptPosition.y();
-	jsonSettings["camera_position_z"_json_pointer] = ptPosition.z();
+	jsonSettings["user_settings"]["camera_position_x"] = ptPosition.x();
+	jsonSettings["user_settings"]["camera_position_y"] = ptPosition.y();
+	jsonSettings["user_settings"]["camera_position_z"] = ptPosition.z();
 
-	jsonSettings["camera_orientation_w"_json_pointer] = qOrientation.w();
-	jsonSettings["camera_orientation_x"_json_pointer] = qOrientation.x();
-	jsonSettings["camera_orientation_y"_json_pointer] = qOrientation.y();
-	jsonSettings["camera_orientation_z"_json_pointer] = qOrientation.z();
+	jsonSettings["user_settings"]["camera_orientation_w"] = qOrientation.w();
+	jsonSettings["user_settings"]["camera_orientation_x"] = qOrientation.x();
+	jsonSettings["user_settings"]["camera_orientation_y"] = qOrientation.y();
+	jsonSettings["user_settings"]["camera_orientation_z"] = qOrientation.z();
 
-	CB(pHTTPController->APOST(strURI, headers, jsonSettings.dump(-1), std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
+	std::string strMessage = jsonSettings.dump(-1);
+	CB(pHTTPController->APOST(strURI, headers, strMessage, std::bind(&UserController::OnSetApiSettings, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -776,7 +772,7 @@ Error:
 	return r;
 }
 
-RESULT UserController::GetTeam(std::string& strAccessToken, std::string strTeamID) {
+RESULT UserController::RequestTeam(std::string& strAccessToken, std::string strTeamID) {
 	RESULT r = R_PASS;
 
 	HTTPResponse httpResponse;
@@ -1125,110 +1121,6 @@ RESULT UserController::HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessa
 	RESULT r = R_PASS;
 
 	CR(HandleOnMethodCallback(pCloudMessage));
-Error:
-	return r;
-}
-
-RESULT UserController::OnGetSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-	nlohmann::json jsonUserSettings = jsonPayload["/user_settings"_json_pointer];
-
-	// deprecated
-	/*
-	if (!jsonUserSettings.is_null()) {
-		if (m_pUserControllerObserver != nullptr) {
-			// Moving to Send/Receive paradigm
-			float height = 0.0f;
-			float depth = 0.0f;
-			float scale = 1.0f;
-
-			if (jsonUserSettings["/ui_offset_y"_json_pointer].is_number_float()) {
-				height = jsonUserSettings["/ui_offset_y"_json_pointer].get<float>();
-			}
-			if (jsonUserSettings["/ui_offset_z"_json_pointer].is_number_float()) {
-				depth = jsonUserSettings["/ui_offset_z"_json_pointer].get<float>();
-			}
-			if (jsonUserSettings["/ui_scale"_json_pointer].is_number_float()) {
-				scale = jsonUserSettings["/ui_scale"_json_pointer].get<float>();
-			}
-
-			CR(m_pUserControllerObserver->OnGetSettings(height, depth, scale));
-		}
-	}
-	else {
-		//TODO: is this the right place to request the settings form?
-		auto pCloudController = GetCloudController();
-		CN(pCloudController);
-		auto pEnvironmentControllerProxy = dynamic_cast<EnvironmentControllerProxy*>(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-		CN(pEnvironmentControllerProxy);
-		pEnvironmentControllerProxy->RequestForm("FormKey.UsersSettings");
-	}
-	//*/
-
-Error:
-	return r;
-}
-
-RESULT UserController::OnSetSettings(std::shared_ptr<CloudMessage> pCloudMessage) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
-
-	if (jsonPayload.size() != 0) {
-		if (m_pUserControllerObserver != nullptr) {
-			// Moving to Send/Receive paradigm
-			CR(m_pUserControllerObserver->OnSetSettings());
-		}
-	}
-
-Error:
-	return r;
-}
-
-RESULT UserController::RequestGetSettings(std::wstring wstrHardwareID, std::string strHMDType) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload;
-	CloudController *pParentCloudController = GetCloudController();
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
-
-	jsonPayload["user_settings"] = nlohmann::json::object();
-	jsonPayload["user_settings"]["user"] = (int)(m_user.GetUserID());
-//	jsonPayload["user_settings"]["instance_id"] = util::WideStringToString(wstrHardwareID);
-//	jsonPayload["user_settings"]["hmd_type"] = strHMDType;
-
-	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
-	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("user.get_settings"));
-
-	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CN(pEnvironmentController);
-	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::USER_GET_SETTINGS));
-
-Error:
-	return r;
-}
-
-RESULT UserController::RequestSetSettings(std::wstring wstrHardwareID, std::string strHMDType, float yOffset, float zOffset, float scale) {
-	RESULT r = R_PASS;
-
-	nlohmann::json jsonPayload;
-	CloudController *pParentCloudController = GetCloudController();
-	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
-
-	jsonPayload["user_settings"] = nlohmann::json::object();
-	jsonPayload["user_settings"]["user"] = (int)(m_user.GetUserID());
-
-	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
-	CN(pCloudRequest);
-	CR(pCloudRequest->SetControllerMethod("user.set_settings"));
-
-	auto pEnvironmentController = dynamic_cast<EnvironmentController*>(pParentCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
-	CN(pEnvironmentController);
-	CR(pEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::USER_SET_SETTINGS));
-
 Error:
 	return r;
 }

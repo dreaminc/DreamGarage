@@ -722,7 +722,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			//CR(pUserApp->UpdateScale(scale));
 
 			// get team 
-			pUserController->GetTeam(pLoginApp->GetAccessToken());
+			pUserController->RequestTeam(pLoginApp->GetAccessToken());
 			
 		Error:
 			return r;
@@ -789,10 +789,8 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				pLoginApp->ClearTokens();
 			}
 			else {
-			//	pLoginApp->Set
-			//	pUserController->RequestGetSettings(wstrHardwareId,strHMDType);
+				pUserController->RequestGetSettings(strAccessToken);
 				CR(pLoginApp->SetAccessToken(strAccessToken));
-				CR(pUserController->GetSettings(strAccessToken));
 			}
 
 		Error:
@@ -805,7 +803,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 			if (!fSuccess) {
 				// need to create a team, since the user has no teams
 				std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-				CR(pUserController->GetFormURL(strFormType));
+				CR(pUserController->RequestFormURL(strFormType));
 			}
 			else {
 				CR(pLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
@@ -865,7 +863,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 
 			pTestContext->pUserController = dynamic_cast<UserController*>(m_pDreamOS->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 			std::string strKey = DreamFormApp::StringFromType(FormType::SETTINGS);
-			pTestContext->pUserController->GetFormURL(strKey);
+			pTestContext->pUserController->RequestFormURL(strKey);
 			//pUserController->GetUser();
 			//pTestContext->pSettingsApp->UpdateWithNewForm("https://www.develop.dreamos.com/forms/users/settings");
 			//pTestContext->pSettingsApp->UpdateWithNewForm("https://twitch.tv");
@@ -878,7 +876,7 @@ RESULT MultiContentTestSuite::AddTestLoginForms() {
 				if (pTestContext->fHasCreds) {
 					//TODO: remove when encoding bug is fixed
 					pTestContext->strRefreshToken.pop_back();
-					pTestContext->pUserController->GetAccessToken(pTestContext->strRefreshToken);
+					pTestContext->pUserController->RequestAccessToken(pTestContext->strRefreshToken);
 				}
 			}
 
@@ -1124,14 +1122,33 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 
 	struct TestContext : public CloudController::UserObserver
 	{
-		UserController* pUserControllerProxy = nullptr;
+		UserControllerProxy* pUserControllerProxy = nullptr;
 		CloudController *pCloudController = nullptr;
 
+		std::string m_strRefreshToken;
+		std::string m_strAccessToken;
+
+		point ptTest = point(3.0f, 3.0f, 3.0f);
+		quaternion qTest = quaternion();
+
 		virtual RESULT OnGetSettings(point ptPosition, quaternion qOrientation) override {
-			return R_PASS;
+			RESULT r = R_PASS;
+
+			CBM(ptPosition == ptTest, "User settings are different than test set settings");
+			CBM(qOrientation == qTest, "User settings are different than test set settings");
+
+		Error:
+			return r;
 		}
 		virtual RESULT OnSetSettings() override {
-			return R_PASS;
+			RESULT r = R_PASS;
+
+			// Set settings to test settings, then get settings
+			CN(pUserControllerProxy);
+			CR(pUserControllerProxy->RequestGetSettings(m_strAccessToken))
+
+		Error:
+			return r;
 		}
 
 		virtual RESULT OnLogin() override {
@@ -1155,7 +1172,18 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		}
 
 		virtual RESULT OnAccessToken(bool fSuccess, std::string& strAccessToken) override {
-			return R_NOT_IMPLEMENTED;
+			RESULT r = R_PASS;
+
+			CB(fSuccess);
+
+			m_strAccessToken = strAccessToken;
+
+			// test setting the camera values
+			CN(pUserControllerProxy);
+			pUserControllerProxy->RequestSetSettings(m_strAccessToken, ptTest, qTest);
+
+		Error:
+			return r;
 		}
 
 		virtual RESULT OnGetTeam(bool fSuccess, int environmentId, int environmentModelId) override {
@@ -1184,9 +1212,26 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 
 		m_pDreamOS->InitializeCloudController();
+
 		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
-		pTestContext->pCloudController->Start("jason_test1@dreamos.com", "nightmare", 168);
 		pTestContext->pCloudController->RegisterUserObserver(pTestContext);
+
+		auto pLoginApp = m_pDreamOS->LaunchDreamApp<DreamLoginApp>(this, false);
+
+		pTestContext->pUserControllerProxy = (UserControllerProxy*)(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+
+		auto pCommandLineManager = CommandLineManager::instance();
+		CN(pCommandLineManager);
+
+		CR(pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
+		CR(pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
+
+		CN(pTestContext->pUserControllerProxy);
+
+		pLoginApp->HasStoredCredentials(pTestContext->m_strRefreshToken, pTestContext->m_strAccessToken);
+		pTestContext->pUserControllerProxy->RequestAccessToken(pTestContext->m_strRefreshToken);
+
+		m_pDreamOS->AddSphere();
 
 	Error:
 		return r;
@@ -1195,7 +1240,6 @@ RESULT MultiContentTestSuite::AddTestCameraSettings() {
 	auto fnUpdate = [&](void *pContext) {
 		return R_PASS;
 	};
-
 	auto fnTest = [&](void *pContext) {
 		return R_PASS;
 	};
@@ -1244,7 +1288,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 			RESULT r = R_PASS;
 
 			if (pEvent->type == SENSE_CONTROLLER_MENU_UP && pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
-			//	pUserControllerProxy->RequestSetSettings(wstrHardwareID,"HMDType.OculusRift", m_height, m_depth, m_scale);
+			//	pUserControllerProxy->RequestSetSettings(point(0.0f, 0.0f, 0.0f), quaternion());
 			}
 			else if (pEvent->type == SENSE_CONTROLLER_PAD_MOVE) {
 				float diff = pEvent->state.ptTouchpad.y() * 0.015f;
@@ -1309,8 +1353,11 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		//Error:
 			return r;
 		}
+
 		virtual RESULT OnSetSettings() override {
-			return R_PASS;
+			RESULT r = R_PASS;
+		Error:
+			return r;
 		}
 
 		//TODO: to update this, extend environment controller observer
@@ -1390,7 +1437,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 		
 		m_pDreamOS->InitializeCloudController();
 		pTestContext->pCloudController = m_pDreamOS->GetCloudController();
-		pTestContext->pCloudController->Start("jason_test1@dreamos.com", "nightmare", 168);
+//		pTestContext->pCloudController->Start("jason_test1@dreamos.com", "nightmare", 168);
 		pTestContext->pCloudController->RegisterUserObserver(pTestContext);
 		pTestContext->pUserControllerProxy = dynamic_cast<UserController*>(pTestContext->pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
 
@@ -1409,7 +1456,7 @@ RESULT MultiContentTestSuite::AddTestChangeUIWidth() {
 
 		if (pTestContext->fFirst) {
 
-			CR(pTestContext->pUserControllerProxy->RequestGetSettings(m_pDreamOS->GetHardwareID(),"HMDType.OculusRift"));
+			//CR(pTestContext->pUserControllerProxy->RequestGetSettings());
 //			CR(pTestContext->pUserControlArea->m_pDreamUserApp->GetKeyboard()->Show());		
 
 			pTestContext->fFirst = false;

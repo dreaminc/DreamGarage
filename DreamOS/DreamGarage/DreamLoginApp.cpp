@@ -55,15 +55,6 @@ RESULT DreamLoginApp::HandleDreamFormSetEnvironmentId(int environmentId) {
 
 	m_strLastEnvironmentId = std::to_string(environmentId);
 
-	// deprecated
-	/*
-	auto pUserController = dynamic_cast<UserController*>(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
-	CN(pUserController);
-	pUserController->SetUserDefaultEnvironmentID(environmentId);
-	pUserController->UpdateLoginState();
-
-Error:
-	//*/
 	return r;
 }
 

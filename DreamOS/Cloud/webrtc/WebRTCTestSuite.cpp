@@ -251,7 +251,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 
 			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
 
-			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			CRM(pUserController->RequestTeam(strAccessToken), "Failed to request team");
 
 		Error:
 			return r;
@@ -323,7 +323,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCMultiPeer() {
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			CRM(pTestContext->pUserController->RequestAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 	Error:
@@ -673,7 +673,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			
 			CRM(pUserController->RequestTwilioNTSInformation(strAccessToken), "Failed to request twilio info");
 
-			CRM(pUserController->GetTeam(strAccessToken), "Failed to request team");
+			CRM(pUserController->RequestTeam(strAccessToken), "Failed to request team");
 
 		Error:
 			return r;
@@ -824,7 +824,7 @@ RESULT WebRTCTestSuite::AddTestWebRTCAudio() {
 			// m_tokens stores the refresh token of users test0-9,
 			// so use -t 0 to login as test0@dreamos.com
 			std::string strTestUserRefreshToken = CloudTestSuite::GetTestUserRefreshToken(testUserNumber);
-			CRM(pTestContext->pUserController->GetAccessToken(strTestUserRefreshToken), "Failed to request access token");
+			CRM(pTestContext->pUserController->RequestAccessToken(strTestUserRefreshToken), "Failed to request access token");
 		}
 
 		/*

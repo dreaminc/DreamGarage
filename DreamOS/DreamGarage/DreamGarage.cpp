@@ -647,7 +647,7 @@ RESULT DreamGarage::DidFinishLoading() {
 			int testUserNumber = stoi(strTestUserNumber);
 
 			std::string strDebugRefreshToken = testRefreshTokens[testUserNumber];
-			return m_pUserController->GetAccessToken(strDebugRefreshToken);
+			return m_pUserController->RequestAccessToken(strDebugRefreshToken);
 		}
 	}
 #endif
@@ -717,7 +717,7 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 	// if there has already been a successful login, try to authenticate
 	if (!m_fFirstLogin && m_fHasCredentials) {
 		DOSLOG(INFO, "Not first login and has creds");
-		m_pUserController->GetAccessToken(m_strRefreshToken);
+		m_pUserController->RequestAccessToken(m_strRefreshToken);
 	}
 	else {
 		// Otherwise, start by showing the login form
@@ -736,7 +736,7 @@ RESULT DreamGarage::AuthenticateFromStoredCredentials() {
 
 		CR(m_pDreamUserApp->ShowMessageQuad());
 
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 
 		if (m_pDreamEnvironmentApp != nullptr) {
 			// fade into lobby (with no environment showing)
@@ -1460,7 +1460,7 @@ RESULT DreamGarage::HandleDOSMessage(std::string& strMessage) {
 			// could also be once the environment id is set
 
 			// TODO: populate user
-			CR(m_pUserController->GetTeam(m_strAccessToken));
+			CR(m_pUserController->RequestTeam(m_strAccessToken));
 			CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 			CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
 		}
@@ -1484,9 +1484,6 @@ RESULT DreamGarage::OnLogin() {
 	//CR(m_pDreamEnvironmentApp->SetCurrentEnvironment(ISLAND));
 	//CR(m_pDreamEnvironmentApp->ShowEnvironment(nullptr));
 
-	// TODO: uncomment when everything else works
-	//CR(pUserController->RequestGetSettings(GetHardwareID(), GetHMDTypeString()));
-
 //Error:
 	return r;
 }
@@ -1503,7 +1500,7 @@ RESULT DreamGarage::OnLogout() {
 
 	m_pDreamLoginApp->ClearCredential(CREDENTIAL_REFRESH_TOKEN);
 
-	CR(pUserController->GetFormURL(strFormType));
+	CR(pUserController->RequestFormURL(strFormType));
 
 	CR(m_pDreamShareView->Hide());
 	CR(m_pDreamEnvironmentApp->HideEnvironment(nullptr));
@@ -1618,7 +1615,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		CR(m_pDreamUserApp->SetStartupMessageType(DreamUserApp::StartupMessage::INVALID_REFRESH_TOKEN));
 		CR(m_pDreamUserApp->ShowMessageQuad());
 
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 
 		if (m_pDreamEnvironmentApp != nullptr) {
 			CR(m_pDreamEnvironmentApp->FadeIn());
@@ -1632,7 +1629,7 @@ RESULT DreamGarage::OnAccessToken(bool fSuccess, std::string& strAccessToken) {
 		//CR(m_pUserController->GetSettings(m_strAccessToken));
 		CR(m_pUserController->RequestUserProfile(m_strAccessToken));
 		CR(m_pUserController->RequestTwilioNTSInformation(m_strAccessToken));
-		CR(m_pUserController->GetTeam(m_strAccessToken));
+		CR(m_pUserController->RequestTeam(m_strAccessToken));
 	}
 
 Error:
@@ -1661,7 +1658,7 @@ RESULT DreamGarage::OnGetTeam(bool fSuccess, int environmentId, int environmentM
 	if (!fSuccess) {
 		// need to create a team, since the user has no teams
 		std::string strFormType = DreamFormApp::StringFromType(FormType::TEAMS_MISSING);
-		CR(m_pUserController->GetFormURL(strFormType));
+		CR(m_pUserController->RequestFormURL(strFormType));
 	}
 	else {
 		CR(m_pDreamLoginApp->HandleDreamFormSetEnvironmentId(environmentId));
