@@ -12,6 +12,7 @@
 #include "OpenGLCommon.h"
 
 #define NUM_PACK_BUFFERS 2
+#define NUM_UNPACK_BUFFERS 2
 
 class OpenGLImp;
 

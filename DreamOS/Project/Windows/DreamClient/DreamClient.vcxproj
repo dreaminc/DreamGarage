@@ -481,6 +481,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Release\assi
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\release\FreeImage.dll" "$(TargetDir)"
 
 xcopy /y /s /e /d "$(ProjectDir)..\DreamOS\x64\Production\DreamCef.exe" "$(TargetDir)"
+xcopy /y /s /e /d "$(ProjectDir)..\DreamOS\x64\Production\DreamDesktopCapture.exe" "$(TargetDir)"
 
 $(SolutionDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(SolutionDir)DreamClient.oculusdevelopment.nuspec" -properties version=$(DREAMVERSION)
 
@@ -848,13 +849,17 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\Freeimage\bin\x64\debug\FreeI
     <None Include="..\DreamOS\DreamClient.development.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="..\DreamOS\DreamClient.oculusdevelopment.nuspec" />
+    <None Include="..\DreamOS\DreamClient.oculusdevelopment.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="..\DreamOS\DreamClient.oculusproduction.nuspec">
       <SubType>Designer</SubType>
     </None>
     <None Include="..\DreamOS\DreamClient.production.nuspec" />
     <None Include="..\DreamOS\packages.config" />
-    <None Include="PropertySheet.props" />
+    <None Include="PropertySheet.props">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

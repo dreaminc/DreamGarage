@@ -39,7 +39,6 @@ OGLTexture::~OGLTexture() {
 
 	CR(DeallocateOGLPBOPack());
 	CR(DeallocateOGLPBOUnpack());
-
 Error:
 	return;
 }
@@ -602,7 +601,7 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 
 		void* pUnpackPBO = m_pParentImp->glMapBuffer(GL_PIXEL_UNPACK_BUFFER, GL_WRITE_ONLY);
 		CN(pUnpackPBO);
-		
+
 		// update the data here
 		//updatePixels(ptr, DATA_SIZE);
 
@@ -610,8 +609,8 @@ RESULT OGLTexture::UpdateTextureFromBuffer(void *pBuffer, size_t pBuffer_n) {
 		memcpy((void*)pUnpackPBO, (void*)pBuffer, pBuffer_n);
 
 		// release pointer to mapping buffer
-		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);  
-		
+		m_pParentImp->glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
+
 
 		// It is good idea to release PBOs with ID 0 after use.
 		// Once bound with 0, all pixel operations behave normal ways.
@@ -709,8 +708,6 @@ RESULT OGLTexture::DeallocateOGLPBOUnpack() {
 
 	return R_PASS;
 }
-
-
 
 bool OGLTexture::IsOGLPBOUnpackEnabled() {
 	return (m_glPixelUnpackBufferIndex != 0);

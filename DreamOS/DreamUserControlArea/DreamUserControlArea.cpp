@@ -575,16 +575,6 @@ Error:
 	return r;
 }
 
-RESULT DreamUserControlArea::OnDesktopFrame(unsigned long messageSize, void* pMessageData, int pxHeight, int pxWidth) {
-	RESULT r = R_PASS;
-
-	CNR(m_pDreamDesktop, R_SKIPPED);
-	m_pDreamDesktop->OnDesktopFrame(messageSize, pMessageData, pxHeight, pxWidth);
-
-Error:
-	return r;
-}
-
 int DreamUserControlArea::GetWidth() {
 	return m_pActiveSource->GetWidth();
 }
@@ -674,7 +664,7 @@ RESULT DreamUserControlArea::RequestOpenAsset(std::string strScope, std::string 
 			m_pDreamTabView->AddContent(m_pActiveSource);
 		}
 	}
-	
+
 	if (strScope == m_strDesktopScope) {
 		if (m_pDreamDesktop == nullptr) {
 			CRM(pEnvironmentControllerProxy->RequestOpenAsset(strScope, strPath, strTitle), "Failed to share environment asset");

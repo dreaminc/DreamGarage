@@ -994,12 +994,13 @@ DUPL_RETURN D3D11DesktopDuplicationOutputManager::ResizeSwapChain() {
 	m_pSharedSurf->GetDesc(&shardSurfDesc);
 	UINT Width = shardSurfDesc.Width;
 	UINT Height = shardSurfDesc.Height;
-	if (Width > 1920) {	// if we're larger than 1920 then we're gonna down sample
+	
+	if (Width > 3000) {	// if we're larger than 1920 then we're gonna down sample
 		GetClientRect(m_pWindowHandle, &WindowRect);
 		Width = WindowRect.right - WindowRect.left;
 		Height = WindowRect.bottom - WindowRect.top;
 	}
-
+	
 	// Resize swapchain
 	DXGI_SWAP_CHAIN_DESC SwapChainDesc;
 	m_pSwapChain->GetDesc(&SwapChainDesc);

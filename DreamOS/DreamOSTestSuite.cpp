@@ -57,10 +57,10 @@ DreamOSTestSuite::~DreamOSTestSuite() {
 RESULT DreamOSTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestDreamVCam());
-	
 	CR(AddTestDreamBrowser());
 
+	CR(AddTestDreamVCam());
+	
 	CR(AddTestDreamDesktop());
 
 	CR(AddTestNamedPipes());
@@ -654,8 +654,8 @@ RESULT DreamOSTestSuite::AddTestDreamBrowser() {
 		
 		//std::string strURL = "https://www.youtube.com/watch?v=YqzHvcwJmQY?autoplay=1";
 		//std::string strURL = "https://twitch.tv";
-		//std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
-		std::string strURL = "https://www.youtube.com/watch?v=B9mEIZ3qMTw";
+		std::string strURL = "https://www.youtube.com/watch?v=JzqumbhfxRo&t=27s";
+		//std::string strURL = "https://www.youtube.com/watch?v=B9mEIZ3qMTw";
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
@@ -2097,19 +2097,21 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		SetupDreamAppPipeline();
 
 		light *pLight;
-		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
-
+		pLight = m_pDreamOS->AddLight(LIGHT_DIRECTIONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+		
 		{
 			//std::shared_ptr<EnvironmentAsset> pEnvAsset = nullptr;
 			pTestContext->pDreamDesktop = m_pDreamOS->LaunchDreamApp<DreamDesktopApp>(this);
 			CNM(pTestContext->pDreamDesktop, "Failed to create dream desktop");
-
+			pTestContext->pDreamDesktop->StartDuplicationProcess();
 			//pTestContext->pDreamUserControlArea = m_pDreamOS->LaunchDreamApp<DreamUserControlArea>(this);
+			//pTestContext->pDreamUserControlArea->Show();
 			//pTestContext->pDreamUserControlArea->AddEnvironmentAsset(pEnvAsset);
 			//pTestContext->pDreamUserControlArea->SetActiveSource(pTestContext->pDreamDesktop);	
 			//pTestContext->pDreamUserControlArea->GetComposite()->SetPosition(m_pDreamOS->GetCameraPosition() + point(0.0f, 1.5f, -.3f));
+			//pTestContext->pDreamDesktop->InitializeWithParent(pTestContext->pDreamUserControlArea.get());
 			
-			
+			/*
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
@@ -2127,86 +2129,12 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 			m_pDataBuffer = (unsigned char*)malloc(m_pDataBuffer_n);
 
 			pTestContext->pTexture = m_pDreamOS->MakeTexture(texture::type::TEXTURE_2D, pxWidth, pxHeight, PIXEL_FORMAT::BGRA, 4, m_pDataBuffer, (int)m_pDataBuffer_n);
+			CR(dynamic_cast<OGLTexture*>(pTestContext->pTexture)->EnableOGLPBOUnpack());
 
 			m_pDataBuffer_n = 0;
+			
 			pTestContext->pQuad->SetDiffuseTexture(pTestContext->pTexture);
-
-			/*
-			STARTUPINFO si;
-			PROCESS_INFORMATION pi;
-
-			HWND desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-			if (desktopHWND == NULL) {
-				ZeroMemory(&si, sizeof(si));
-				si.cb = sizeof(si);
-				ZeroMemory(&pi, sizeof(pi));
-
-				PathManager* pPathManager = PathManager::instance();
-				std::wstring wstrDreamPath;
-				pPathManager->GetDreamPath(wstrDreamPath);
-
-				std::wstring wstrPathfromDreamPath = L"\\Project\\Windows\\DreamOS\\x64\\Testing\\DreamDesktopCapture.exe";
-				std::wstring wstrFullpath = wstrDreamPath + wstrPathfromDreamPath;
-				const wchar_t *wPath = wstrFullpath.c_str();
-				std::vector<wchar_t> vwszLocation(wstrFullpath.begin(), wstrFullpath.end());
-				vwszLocation.push_back(0);
-				LPWSTR strLPWlocation = vwszLocation.data();
-
-				if (!CreateProcess(strLPWlocation,
-					L" /output 1",	// Command line
-					nullptr,           // Process handle not inheritable
-					nullptr,           // Thread handle not inheritable
-					false,          // Set handle inheritance to FALSE
-					0,              // No creation flags
-					nullptr,           // Use parent's environment block
-					nullptr,           // Use parent's starting directory
-					&si,            // Pointer to STARTUPINFO structure
-					&pi)            // Pointer to PROCESS_INFORMATION structure
-					)
-				{
-					DEBUG_LINEOUT("CreateProcess failed (%d). \n", GetLastError());
-					r = R_FAIL;
-				}
-
-				while (desktopHWND == NULL) {
-					desktopHWND = FindWindow(NULL, L"DreamDesktopDuplication");
-				}
-			}
-
-			DWORD desktopPID;
-			GetWindowThreadProcessId(desktopHWND, &desktopPID);
-
-			HWND dreamHWND = FindWindow(NULL, L"Dream Testing");
-			if (dreamHWND == NULL) {
-				MessageBox(dreamHWND, L"Unable to find the Dream window",
-					L"Error", MB_ICONERROR);
-				return r;
-			}
-
-			DDCIPCMessage ddcMessage;
-			ddcMessage.m_msgType = DDCIPCMessage::type::START;
-			COPYDATASTRUCT desktopCDS;
-
-			desktopCDS.dwData = (unsigned long)ddcMessage.m_msgType;
-			desktopCDS.cbData = sizeof(ddcMessage);
-			desktopCDS.lpData = &ddcMessage;
-
-			SendMessage(desktopHWND, WM_COPYDATA, (WPARAM)(HWND)dreamHWND, (LPARAM)(LPVOID)&desktopCDS);
-			DWORD dwError = GetLastError();
-			if (dwError != NO_ERROR) {
-				MessageBox(dreamHWND, L"error sending message", L"error", MB_ICONERROR);
-			}
-			else {
-				DEBUG_LINEOUT("Message sent");
-			}
-			//*/
-
-			// Wait until child process exits.
-			//WaitForSingleObject(pi.hProcess, INFINITE);
-
-			// Close process and thread handles.
-			//CloseHandle(pi.hProcess);
-			//CloseHandle(pi.hThread);
+			*/
 		}
 
 	Error:
@@ -2220,18 +2148,7 @@ RESULT DreamOSTestSuite::AddTestDreamDesktop() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 		
-		CBR(m_pDataBuffer_n != 0, R_SKIPPED);
-		
 		if (!pTestContext->once) {
-			//CR(pTestContext->pDreamDesktop->OnDesktopFrame((int)m_pDataBuffer_n, m_pDataBuffer, m_pxHeight, m_pxWidth));
-			pTestContext->pTexture->Update(m_pDataBuffer, m_pxWidth, m_pxHeight, PIXEL_FORMAT::BGRA);
-			// pTestContext->once = true;
-			if (m_pDataBuffer) {
-				free(m_pDataBuffer);
-				m_pDataBuffer = nullptr;
-				m_pDataBuffer_n = 0;
-			}
-
 			//pTestContext->once = true;
 		}
 
