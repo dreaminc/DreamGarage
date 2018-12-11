@@ -599,12 +599,10 @@ RESULT DreamGarage::DidFinishLoading() {
 		CN(m_pDreamGamepadCameraApp);
 
 		if (m_pAuxCamera != nullptr) {
-			CR(m_pDreamGamepadCameraApp->SetCamera(m_pAuxCamera));
-			CR(m_pDreamGamepadCameraApp->SetControlType(DreamGamepadCameraApp::CameraControlType::GAMEPAD));
+			CR(m_pDreamGamepadCameraApp->SetCamera(m_pAuxCamera, DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 		else {
-			CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera()));
-			CR(m_pDreamGamepadCameraApp->SetControlType(DreamGamepadCameraApp::CameraControlType::GAMEPAD));
+			CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera(), DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 	}
 

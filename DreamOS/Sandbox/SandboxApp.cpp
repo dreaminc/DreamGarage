@@ -1929,6 +1929,29 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	RESULT r = R_PASS;
+	if (m_pHMD != nullptr) {
+		SenseController *pSenseController = m_pHMD->GetSenseController();
+		if (pSenseController != nullptr) {
+			CR(pSenseController->UnregisterSubscriber(controllerEvent, pControllerSubscriber));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber) {
+	RESULT r = R_PASS;
+
+	CNM(m_pSenseGamepad, "Gamepad not initialized");
+	CR(m_pSenseGamepad->UnregisterSubscriber(gamePadEvent, pGamepadSubscriber));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
 	RESULT r = R_PASS;
 

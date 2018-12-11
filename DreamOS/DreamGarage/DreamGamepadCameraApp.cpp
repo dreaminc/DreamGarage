@@ -52,29 +52,46 @@ Error:
 	return r;
 }
 
-RESULT DreamGamepadCameraApp::SetCamera(camera *pCamera) {
+RESULT DreamGamepadCameraApp::SetCamera(camera *pCamera, CameraControlType controlType) {
 	RESULT r = R_PASS;
 
 	CN(pCamera);
 	m_pCamera = pCamera;
-
-Error:
-	return r;
-}
-
-RESULT DreamGamepadCameraApp::SetControlType(CameraControlType controlType) {
-	RESULT r = R_PASS;
-
+	
 	if (controlType == CameraControlType::GAMEPAD) {
+		if (m_controlType == CameraControlType::SENSECONTROLLER) {
+			for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
+				CR(GetDOS()->UnregisterSubscriber((SenseControllerEventType)(i), this));
+			}
+		}
 		for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
-			GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this);
+			CR(GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this));
 		}
 	}
 	else if (controlType == CameraControlType::SENSECONTROLLER) {
+		if (m_controlType == CameraControlType::GAMEPAD) {
+			for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
+				CR(GetDOS()->UnregisterSubscriber((SenseGamepadEventType)(i), this));
+			}
+		}
 		for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
-			GetDOS()->RegisterSubscriber((SenseControllerEventType)(i), this);
+			CR(GetDOS()->RegisterSubscriber((SenseControllerEventType)(i), this));
 		}
 	}
+	else if (controlType == CameraControlType::INVALID) {
+		if (m_controlType == CameraControlType::GAMEPAD) {
+			for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
+				CR(GetDOS()->UnregisterSubscriber((SenseGamepadEventType)(i), this));
+			}
+		}
+		if (m_controlType == CameraControlType::SENSECONTROLLER) {
+			for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
+				CR(GetDOS()->UnregisterSubscriber((SenseControllerEventType)(i), this));
+			}
+		}
+	}
+
+	m_controlType = controlType;
 
 Error:
 	return r;

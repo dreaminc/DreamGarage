@@ -96,8 +96,7 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 	{
 		auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
 		CN(pDreamGamepadCamera);
-		CR(pDreamGamepadCamera->SetCamera(m_pCamera));
-		CR(pDreamGamepadCamera->SetControlType(DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+		CR(pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 	}
 
 	{

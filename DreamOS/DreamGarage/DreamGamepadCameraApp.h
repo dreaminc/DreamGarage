@@ -27,7 +27,8 @@ class DreamGamepadCameraApp : public DreamApp<DreamGamepadCameraApp>,
 public:
 	enum class CameraControlType {
 		GAMEPAD,
-		SENSECONTROLLER
+		SENSECONTROLLER,
+		INVALID
 	};
 
 	DreamGamepadCameraApp(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -38,8 +39,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	RESULT SetCamera(camera *pCamera);
-	RESULT SetControlType(CameraControlType controlType);
+	RESULT SetCamera(camera *pCamera, CameraControlType controlType);
 
 protected:
 	static DreamGamepadCameraApp* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -79,7 +79,8 @@ private:
 	bool m_fUpdateRightTrigger = false;
 	
 	bool m_fLockY = false;
-
+	
+	CameraControlType m_controlType = CameraControlType::INVALID;
 	std::list<ForceGenerator*> m_pForceGenerators;
 };
 

@@ -520,6 +520,9 @@ public:
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 	RESULT RegisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
+	
+	RESULT UnregisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
+	RESULT UnregisterSubscriber(SenseGamepadEventType gamePadEvent, Subscriber<SenseGamepadEvent>* pGamepadSubscriber);
 
 	RESULT SaveCredential(std::wstring wstrKey, std::string strValue, CredentialManager::type credType, bool fOverwrite);
 	RESULT GetCredential(std::wstring wstrKey, std::string &strOut, CredentialManager::type credType);
