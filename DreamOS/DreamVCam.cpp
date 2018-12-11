@@ -93,18 +93,14 @@ RESULT DreamVCam::InitializeModule(void *pContext) {
 		//*/
 	}
 
-	{
-		auto pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
-		CN(pDreamGamepadCamera);
-		CR(pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
-	}
+	m_pDreamGamepadCamera = GetDOS()->LaunchDreamApp<DreamGamepadCameraApp>(this, false);
+	CN(m_pDreamGamepadCamera);
+	CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
 
-	{
-		m_pCameraModel = GetDOS()->AddModel(L"\\Bear\\bear-obj.obj");
-		CN(m_pCameraModel);
-		m_pCameraModel->SetScale(0.01f);
-	}
-
+	m_pCameraModel = GetDOS()->AddModel(L"\\Bear\\bear-obj.obj");
+	CN(m_pCameraModel);
+	m_pCameraModel->SetScale(0.01f);
+	
 	CNM(m_pOGLRenderNode, "Failed to create mirror pipeline for virtual camera");
 	CNM(m_pOGLEndNode, "Failed to create mirror pipeline for virtual camera");
 	
@@ -179,7 +175,16 @@ RESULT DreamVCam::Update(void *pContext) {
 	}
 	//*/
 
-	if (m_pCameraModel != nullptr && m_pCamera != nullptr) {
+	if (m_pCameraModel != nullptr && m_pCamera != nullptr && m_pParentApp != nullptr) {
+		
+		// Check if Active Source
+		if (m_pParentApp->GetActiveSource()->GetSourceTexture() == m_pSourceTexture) {
+			CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::SENSECONTROLLER));
+		}
+		else {
+			CR(m_pDreamGamepadCamera->SetCamera(m_pCamera, DreamGamepadCameraApp::CameraControlType::INVALID));
+		}
+		
 		m_pCameraModel->SetPosition(m_pCamera->GetPosition(true));
 		m_pCameraModel->SetOrientation(quaternion(vector::kVector(-1.0f), m_pCamera->GetLookVector()));
 	}

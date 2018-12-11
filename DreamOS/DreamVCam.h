@@ -22,6 +22,7 @@ class ProgramNode;
 class OGLProgram;
 class CameraNode;
 class model;
+class DreamGamepadCameraApp;
 //class SoundBuffer;
 
 class DreamUserControlArea;
@@ -87,6 +88,7 @@ private:
 	unsigned char *m_pLoadBuffer = nullptr;
 	size_t m_pLoadBuffer_n = 0;
 
+	std::shared_ptr<DreamGamepadCameraApp> m_pDreamGamepadCamera = nullptr;
 	CameraNode* m_pCamera = nullptr;
 	model* m_pCameraModel = nullptr;
 
