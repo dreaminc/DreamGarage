@@ -58,6 +58,8 @@ RESULT DreamGamepadCameraApp::SetCamera(camera *pCamera, CameraControlType contr
 	CN(pCamera);
 	m_pCamera = pCamera;
 	
+	CBR(m_controlType != controlType, R_SKIPPED);	// if already that control type then skip
+
 	if (controlType == CameraControlType::GAMEPAD) {
 		if (m_controlType == CameraControlType::SENSECONTROLLER) {
 			for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
