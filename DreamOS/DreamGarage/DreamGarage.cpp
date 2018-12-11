@@ -600,9 +600,11 @@ RESULT DreamGarage::DidFinishLoading() {
 
 		if (m_pAuxCamera != nullptr) {
 			CR(m_pDreamGamepadCameraApp->SetCamera(m_pAuxCamera));
+			CR(m_pDreamGamepadCameraApp->SetControlType(DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 		else {
 			CR(m_pDreamGamepadCameraApp->SetCamera(GetCamera()));
+			CR(m_pDreamGamepadCameraApp->SetControlType(DreamGamepadCameraApp::CameraControlType::GAMEPAD));
 		}
 	}
 

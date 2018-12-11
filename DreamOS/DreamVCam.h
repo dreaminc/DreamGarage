@@ -21,6 +21,7 @@ class NamedPipeServer;
 class ProgramNode;
 class OGLProgram;
 class CameraNode;
+class model;
 //class SoundBuffer;
 
 class DreamUserControlArea;
@@ -87,6 +88,7 @@ private:
 	size_t m_pLoadBuffer_n = 0;
 
 	CameraNode* m_pCamera = nullptr;
+	model* m_pCameraModel = nullptr;
 
 	// This node is used for the render texture
 	OGLProgram *m_pOGLRenderNode = nullptr;

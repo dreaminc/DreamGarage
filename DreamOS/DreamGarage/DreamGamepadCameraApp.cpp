@@ -35,10 +35,6 @@ RESULT DreamGamepadCameraApp::InitializeApp(void *pContext) {
 	SetAppName("DreamGamepadCameraApp");
 	SetAppDescription("A Dream App for using game pad to control the camera");
 
-	for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
-		GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this);
-	}
-	
 	AirResistanceGenerator* pAirResistanceForceGenerator = dynamic_cast<AirResistanceGenerator*>(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_AIR_RESISTANCE));
 	CN(pAirResistanceForceGenerator);
 	m_pForceGenerators.emplace_back(pAirResistanceForceGenerator);
@@ -61,6 +57,24 @@ RESULT DreamGamepadCameraApp::SetCamera(camera *pCamera) {
 
 	CN(pCamera);
 	m_pCamera = pCamera;
+
+Error:
+	return r;
+}
+
+RESULT DreamGamepadCameraApp::SetControlType(CameraControlType controlType) {
+	RESULT r = R_PASS;
+
+	if (controlType == CameraControlType::GAMEPAD) {
+		for (int i = 0; i < SENSE_GAMEPAD_INVALID; i++) {
+			GetDOS()->RegisterSubscriber((SenseGamepadEventType)(i), this);
+		}
+	}
+	else if (controlType == CameraControlType::SENSECONTROLLER) {
+		for (int i = 0; i < SENSE_CONTROLLER_INVALID; i++) {
+			GetDOS()->RegisterSubscriber((SenseControllerEventType)(i), this);
+		}
+	}
 
 Error:
 	return r;
@@ -172,7 +186,7 @@ RESULT DreamGamepadCameraApp::Update(void *pContext) {
 		m_pCamera->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_pForceGenerators);
 	}
 
-	//DEBUG_LINEOUT_RETURN("vel magn: %0.8f", m_pCamera->GetVelocity().magnitude());
+	//DEBUG_LINEOUT_RETURN("vel mag: %0.8f", m_pCamera->GetVelocity().magnitude());
 	//DEBUG_LINEOUT_RETURN("Velocity: x: %0.8f y: %0.8f z: %0.8f", m_pCamera->GetVelocity().x(), m_pCamera->GetVelocity().y(), m_pCamera->GetVelocity().z());
 
 
@@ -244,6 +258,39 @@ RESULT DreamGamepadCameraApp::Notify(SenseGamepadEvent *pEvent) {
 				DEBUG_LINEOUT("DPAD DOWN");
 			}
 		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGamepadCameraApp::Notify(SenseControllerEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	switch (pEvent->type) {
+	case SENSE_CONTROLLER_TRIGGER_MOVE: {
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+			m_fUpdateLeftTrigger = true;
+			m_pendLeftTriggerValue = -(pEvent->state.triggerRange) * 255;
+		}
+		else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+			m_fUpdateRightTrigger = true;
+			m_pendRightTriggerValue = pEvent->state.triggerRange * 255;
+			//DEBUG_LINEOUT("pending x: %0.8f", (double)m_pendRightTriggerValue);
+		}
+	} break;
+	
+	case SENSE_CONTROLLER_PAD_MOVE: {
+		if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_LEFT) {
+			m_fUpdateLeftStick = true;
+			m_ptPendLeftStick = point2D(pEvent->state.ptTouchpad.x(), pEvent->state.ptTouchpad.y());
+			//DEBUG_LINEOUT("pending x: %0.8f y: %0.8f", m_ptPendLeftStick.x(), m_ptPendLeftStick.y());
+		}
+		else if (pEvent->state.type == CONTROLLER_TYPE::CONTROLLER_RIGHT) {
+			m_fUpdateRightStick = true;
+			m_ptPendRightStick = point2D(pEvent->state.ptTouchpad.x(), pEvent->state.ptTouchpad.y());
+		}
+	} break;
 	}
 
 Error:
